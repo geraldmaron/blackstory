@@ -6,6 +6,8 @@
  * fields styled in `reading-room.css` (`ds-law-idx`), with subgrid alignment like `/books`.
  */
 import React from 'react';
+import { Pagination } from '@repo/ui';
+import { isLawStatus, legalStatusDisplay } from '../../components/legal/format';
 import Link from 'next/link';
 import { US_STATES } from '@repo/domain';
 import {
@@ -24,7 +26,7 @@ import {
 import { LegalDisclaimer, humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
 import type { LegalSnapshotDocument } from '../../lib/legal/public-source';
 import { formatResultSummary } from '../../lib/discovery/result-summary';
-import type { LawBrowseViewModel } from './law-view-model';
+import { lawBrowseHref, type RawLawBrowseParams, type LawBrowseViewModel } from './law-view-model';
 
 export type LawBrowseSectionsProps = {
   readonly view: LawBrowseViewModel;
@@ -49,21 +51,6 @@ export function statePostalForJurisdiction(jurisdictionId: string): string | und
   const match = /^us-(\d{1,2})$/.exec(jurisdictionId);
   const fips = match?.[1]?.padStart(2, '0');
   return fips ? US_STATES.find((entry) => entry.fips === fips)?.postalCode : undefined;
-}
-
-function buildLawHref(params: {
-  readonly q: string;
-  readonly kind: string;
-  readonly topic: string;
-  readonly sort: string;
-}): string {
-  const search = new URLSearchParams();
-  if (params.q) search.set('q', params.q);
-  if (params.kind !== 'all') search.set('kind', params.kind);
-  if (params.topic !== 'all') search.set('topic', params.topic);
-  if (params.sort !== 'chronological') search.set('sort', params.sort);
-  const query = search.toString();
-  return query.length > 0 ? `/law?${query}#browse` : '/law#browse';
 }
 
 function countBy(values: readonly string[]): Map<string, number> {
@@ -97,6 +84,9 @@ const LAW_READ_FACTS: readonly RoomFact[] = [
 ];
 
 export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
+  const buildLawHref = (params: RawLawBrowseParams) =>
+    `${lawBrowseHref({ status: view.status, ...params })}#browse`;
+
   const countLabel = formatResultSummary({
     matched: view.totalMatched,
     total: view.isFiltered ? view.totalAvailable : view.totalMatched,
@@ -131,6 +121,20 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
       key: 'topic',
       label: humanizeLegalTopic(view.topic),
       href: buildLawHref({ q: view.q, kind: view.kind, topic: 'all', sort: view.sort }),
+    });
+  }
+
+  if (view.status !== 'all') {
+    activeChips.push({
+      key: 'status',
+      label: isLawStatus(view.status) ? legalStatusDisplay(view.status) : 'Unknown status filter',
+      href: buildLawHref({
+        q: view.q,
+        kind: view.kind,
+        topic: view.topic,
+        sort: view.sort,
+        status: 'all',
+      }),
     });
   }
 
@@ -176,6 +180,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
               kind: view.kind !== 'all' ? view.kind : undefined,
               topic: view.topic !== 'all' ? view.topic : undefined,
               sort: view.sort !== 'chronological' ? view.sort : undefined,
+              status: view.status !== 'all' ? view.status : undefined,
             }}
             active={activeChips}
             clearHref="/law"
@@ -269,31 +274,53 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
               )}
             </EmptyList>
           ) : (
-            <div className="ds-law-idx ds-room-idx__list" aria-labelledby="law-results-heading">
+            <ul className="ds-law-idx ds-room-idx__list" aria-label="Law entries">
               {view.items.map((item) => {
                 const jurisdiction = jurisdictionById.get(item.id) ?? 'Unknown jurisdiction';
                 const year = item.effectiveYear ? String(item.effectiveYear) : 'Year unknown';
                 const gloss = item.summary ?? 'No plain-language summary yet.';
                 return (
-                  <Link className="ds-room-idx__row" href={`/law/${item.slug}`} key={item.id}>
-                    <span className="ds-room-idx__glyph" aria-hidden="true">
-                      §
-                    </span>
-                    <span className="ds-room-idx__name">{item.title}</span>
-                    <span className="ds-law-idx__kind">{humanizeLegalKind(item.kind)}</span>
-                    <span className="ds-room-idx__place" title={jurisdiction}>
-                      {jurisdiction}
-                    </span>
-                    <span className="ds-room-idx__era">{year}</span>
-                    <span className="ds-law-idx__citation" title={item.citation}>
-                      {item.citation}
-                    </span>
-                    <span className="ds-law-idx__gloss">{gloss}</span>
-                  </Link>
+                  <li key={item.id}>
+                    <Link className="ds-room-idx__row" href={`/law/${item.slug}`}>
+                      <span className="ds-room-idx__glyph" aria-hidden="true">
+                        §
+                      </span>
+                      <span className="ds-room-idx__name" title={item.title}>
+                        {item.title}
+                      </span>
+                      <span className="ds-law-idx__kind">{humanizeLegalKind(item.kind)}</span>
+                      <span className="ds-room-idx__place" title={jurisdiction}>
+                        {jurisdiction}
+                      </span>
+                      <span className="ds-room-idx__era">{year}</span>
+                      <span className="ds-law-idx__citation" title={item.citation}>
+                        {item.citation}
+                      </span>
+                      <span className="ds-law-idx__gloss">{gloss}</span>
+                    </Link>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           )}
+          {view.totalMatched > 0 ? (
+            <Pagination
+              page={view.page}
+              pageCount={view.pageCount}
+              pageSize={view.pageSize}
+              total={view.totalMatched}
+              itemLabel="law entries"
+              hrefForPage={(page) =>
+                buildLawHref({
+                  q: view.q,
+                  kind: view.kind,
+                  topic: view.topic,
+                  sort: view.sort,
+                  page: String(page),
+                })
+              }
+            />
+          ) : null}
         </div>
       </RoomSection>
 

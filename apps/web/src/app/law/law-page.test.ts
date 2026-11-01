@@ -39,7 +39,7 @@ test('law browse preserves GET URL contract at /law', () => {
   assert.match(browseSectionsSource, /<FindBar/);
   assert.match(browseSectionsSource, /action="\/law#browse"/);
   assert.match(browseSectionsSource, /id="browse"/);
-  assert.deepEqual(lawSubmittedParams(), ['q', 'kind', 'topic', 'sort']);
+  assert.deepEqual(lawSubmittedParams(), ['q', 'kind', 'topic', 'sort', 'status']);
   assert.match(browseSectionsSource, /sortOptions\.map/);
   assert.match(browseSectionsSource, /clearHref="\/law"/);
 });

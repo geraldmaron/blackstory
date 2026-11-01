@@ -15,6 +15,10 @@
 import React from 'react';
 import Link from 'next/link';
 import type { CitesRelation } from '../../lib/release/build-cites-edge';
+import { recordsHref } from '../../lib/records/records-query';
+import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
+import { buildExploreHref, defaultExploreOverlayState } from '../../lib/map-experience/url-state';
+import { storyCollectionToken } from '../../lib/discovery/story-collection';
 
 void React;
 
@@ -22,6 +26,8 @@ export type StoryRecordsState = 'empty' | 'complete' | 'partial' | 'unavailable'
 
 export type StoryRecordsProps = {
   readonly noun: string;
+  /** Published slug. Enables the Records / Map / Chronology handoff for exactly the linked set. */
+  readonly slug?: string;
   /** Output of `storyCitedEntities(doc)`: entity id to its strongest relation. */
   readonly linked: ReadonlyMap<string, CitesRelation>;
   /** Resolved public records for (a subset of) the linked ids. */
@@ -40,7 +46,14 @@ export function storyRecordsState(
   return resolvedCount < linkedCount ? 'partial' : 'complete';
 }
 
-export function StoryRecords({ noun, linked, records, source }: StoryRecordsProps) {
+export function StoryRecords({ noun, slug, linked, records, source }: StoryRecordsProps) {
+  // Hrefs go through the shared codecs, never string concatenation.
+  const token = slug === undefined ? '' : storyCollectionToken(slug);
+  const exploreHref = buildExploreHref({
+    filters: DEFAULT_EXPLORE_FILTERS,
+    ...defaultExploreOverlayState(),
+    ...(token === '' ? {} : { collection: token }),
+  });
   const byId = new Map(records.map((record) => [record.id, record] as const));
   // Linked order and relation come from the derivation; only the display name comes from the read.
   const resolved = [...linked].flatMap(([id, relation]) => {
@@ -96,6 +109,27 @@ export function StoryRecords({ noun, linked, records, source }: StoryRecordsProp
           {missing} more linked {missing === 1 ? 'record' : 'records'} could not be loaded right in
           this public release. Their availability could not be confirmed.
         </p>
+      ) : null}
+      {slug !== undefined && resolved.length > 0 ? (
+        <nav className="ds-reading-appx__records-explore" aria-label={`Explore the linked records`}>
+          <p className="ds-reading-appx__records-note">
+            Explore exactly the records this {noun} links to. This is not every source the {noun}{' '}
+            drew on.
+          </p>
+          <ul className="ds-reading-appx__record-list">
+            <li>
+              <Link href={recordsHref({ collection: token })}>Records</Link>
+            </li>
+            <li>
+              <Link href={exploreHref}>Map</Link>
+            </li>
+            <li>
+              <Link href={recordsHref({ collection: token, layout: 'chronology' })}>
+                Chronology
+              </Link>
+            </li>
+          </ul>
+        </nav>
       ) : null}
     </section>
   );

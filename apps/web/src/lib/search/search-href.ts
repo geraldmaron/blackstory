@@ -46,6 +46,11 @@ export function mapSearchQueryToRecordsHref(raw: RawSearchParams): string {
   if (collection.state) params.set('state', collection.state);
   if (collection.evidence) params.set('evidence', collection.evidence);
   if (collection.sort !== 'discovery') params.set('sort', collection.sort);
+  if (collection.collection) params.set('collection', collection.collection);
+  if (collection.periodStart) params.set('periodStart', collection.periodStart);
+  if (collection.periodEnd) params.set('periodEnd', collection.periodEnd);
+  if (collection.includeUndated) params.set('includeUndated', '1');
+  if (collection.layout === 'chronology') params.set('layout', 'chronology');
 
   const qs = params.toString();
   return qs ? `/records?${qs}` : '/records';

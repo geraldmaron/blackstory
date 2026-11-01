@@ -21,11 +21,24 @@ import { recordsHref } from '../../lib/records/records-query';
 import {
   drawableCollection,
   matchExploreCollection,
+  periodDecadesFor,
   recordsQueryFromExplore,
 } from '../../lib/discovery/explore-collection';
 import { mapListContinuityLabel } from '../../lib/discovery/continuity-label';
-import { buildExploreHref } from '../../lib/map-experience/url-state';
+import { buildExploreHref, buildExploreSearchParams } from '../../lib/map-experience/url-state';
 import { CollectionContext } from '../../components/discovery/collection-context';
+import { CollectionPeriodControls } from '../../components/discovery/collection-period-controls';
+import {
+  normalizePeriod,
+  periodIsActive,
+  periodIsInvalid,
+  periodLabel,
+} from '../../lib/discovery/collection-period';
+import {
+  collectionIsUnresolved,
+  collectionMemberIds,
+  collectionStateMessage,
+} from '../../lib/discovery/story-collection';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Notice } from '@repo/ui';
@@ -331,6 +344,13 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         ...(evidenceFloor === 'A' || evidenceFloor === 'B' || evidenceFloor === 'C'
           ? { evidence: evidenceFloor }
           : {}),
+        // The named collection, range and Records layout ride into the record so Return and
+        // previous/next restore exactly what the reader left.
+        ...(collectionState.collection ? { collection: collectionState.collection } : {}),
+        ...(collectionState.periodStart ? { periodStart: collectionState.periodStart } : {}),
+        ...(collectionState.periodEnd ? { periodEnd: collectionState.periodEnd } : {}),
+        ...(collectionState.includeUndated ? { includeUndated: true } : {}),
+        ...(collectionState.layout ? { layout: collectionState.layout } : {}),
       },
       'map',
     );
@@ -338,6 +358,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     query,
     era,
     exactKind,
+    collectionState.collection,
+    collectionState.periodStart,
+    collectionState.periodEnd,
+    collectionState.includeUndated,
+    collectionState.layout,
     collectionState.sort,
     evidenceFloor,
     kindFamily,
@@ -718,22 +743,75 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
    * is not visible the rail keeps its own "Open record list" return link, so the list is never
    * unreachable.
    */
+  const namedCollection = collectionState.collection ?? '';
+  /**
+   * A named collection that cannot be shown (unknown story, unreadable address, failed story
+   * read) is stated, not counted. It is never "Counting", never zero matches and never the whole
+   * archive. This holds before the catalog arrives, so the strip does not wait for the facts.
+   */
+  const unresolvedCollection =
+    namedCollection !== '' && (!view.collection || collectionIsUnresolved(view.collection))
+      ? (collectionStateMessage(view.collection ?? { state: 'unavailable', slug: '' }) ??
+        'Membership for this collection is unavailable.')
+      : undefined;
+  const unresolvedRange = periodIsInvalid(
+    normalizePeriod({
+      start: collectionState.periodStart,
+      end: collectionState.periodEnd,
+      includeUndated: collectionState.includeUndated,
+    }),
+  )
+    ? 'This documented-decade range is not readable. Fix or clear it before counting records.'
+    : undefined;
+  const unresolvedScope = unresolvedCollection ?? unresolvedRange;
   const showCollection =
-    mode === 'atlas' && !chromeHidden && !sheetOpen && Boolean(view.collectionFacts);
+    mode === 'atlas' &&
+    !chromeHidden &&
+    !sheetOpen &&
+    (Boolean(view.collectionFacts) || unresolvedCollection !== undefined);
+  const exploreQuery = recordsQueryFromExplore(collectionState);
   const collectionHrefs = {
     map: buildExploreHref(collectionState),
-    records: recordsHref(recordsQueryFromExplore(collectionState)),
+    // Both Records representations carry the same collection and every narrowing.
+    records: recordsHref({ ...exploreQuery, layout: 'index' }),
+    chronology: recordsHref({ ...exploreQuery, layout: 'chronology' }),
   };
+  const collectionMembers = useMemo(
+    () => (view.collection ? collectionMemberIds(view.collection) : undefined),
+    [view.collection],
+  );
   /** Collection members with a public map anchor, before any temporary map constraint. */
   const collectionDrawable = useMemo(
     () =>
       view.collectionFacts
         ? drawableCollection(
             view.allFeatures,
-            matchExploreCollection(view.collectionFacts, collectionState),
+            matchExploreCollection(view.collectionFacts, collectionState, collectionMembers),
           ).length
         : null,
-    [view.collectionFacts, view.allFeatures, collectionState],
+    [view.collectionFacts, view.allFeatures, collectionState, collectionMembers],
+  );
+  /** Decade-range controls: native GET to `/explore`, every other param carried as hidden fields. */
+  const period = normalizePeriod({
+    start: collectionState.periodStart,
+    end: collectionState.periodEnd,
+    includeUndated: collectionState.includeUndated,
+  });
+  const periodDecades = useMemo(
+    () =>
+      view.collectionFacts
+        ? periodDecadesFor(view.collectionFacts, collectionState, collectionMembers)
+        : [],
+    [view.collectionFacts, collectionState, collectionMembers],
+  );
+  const {
+    periodStart: _periodStart,
+    periodEnd: _periodEnd,
+    includeUndated: _includeUndated,
+    ...periodBase
+  } = collectionState;
+  const periodPreserved = Object.fromEntries(
+    new URLSearchParams(buildExploreSearchParams(periodBase)).entries(),
   );
   /** Temporary map constraints. They limit what is drawn, never what is in the collection. */
   const mapLimits = [
@@ -863,6 +941,35 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           activeView="map"
           mapHref={collectionHrefs.map}
           recordsHref={collectionHrefs.records}
+          chronologyHref={collectionHrefs.chronology}
+          {...(view.collection?.state === 'live'
+            ? {
+                source: {
+                  label: view.collection.title,
+                  href: view.collection.href,
+                  unresolvedCount: view.collection.unresolvedCount,
+                },
+              }
+            : {})}
+          {...(unresolvedScope !== undefined ? { unresolved: unresolvedScope } : {})}
+          {...(view.collectionFacts && unresolvedCollection === undefined
+            ? {
+                period: (
+                  <CollectionPeriodControls
+                    action="/explore"
+                    preserved={periodPreserved}
+                    decades={periodDecades}
+                    start={period.start}
+                    end={period.end}
+                    includeUndated={period.includeUndated}
+                    clearHref={buildExploreHref(periodBase)}
+                  />
+                ),
+                periodSummary: periodIsActive(period)
+                  ? periodLabel(period)
+                  : 'Documented decade range',
+              }
+            : {})}
           ready={Boolean(view.collectionFacts)}
           matched={view.collectionFacts ? collectionMatched : null}
           drawable={collectionDrawable}

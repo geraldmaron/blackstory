@@ -21,6 +21,14 @@ export type PlaceArrivalFields = {
   readonly evidence?: string;
   readonly status?: string;
   readonly selected?: string;
+  /** Already-normalized `story:<slug>` or sentinel (see `story-collection.ts`). */
+  readonly collection?: string;
+  /** Already-normalized inclusive decade-start bounds (see `collection-period.ts`). */
+  readonly periodStart?: string;
+  readonly periodEnd?: string;
+  readonly includeUndated?: boolean;
+  /** Return context only: the Records representation the reader left. */
+  readonly layout?: 'chronology';
 };
 
 /**
@@ -39,5 +47,12 @@ export function placeArrivalQuery(fields: PlaceArrivalFields, from: 'map' | 'lis
   if (fields.evidence) params.set('evidence', fields.evidence);
   if (fields.status) params.set('status', fields.status);
   if (fields.selected) params.set('selected', fields.selected);
+  if (fields.collection) params.set('collection', fields.collection);
+  if (fields.periodStart) params.set('periodStart', fields.periodStart);
+  if (fields.periodEnd) params.set('periodEnd', fields.periodEnd);
+  if (fields.includeUndated && (fields.periodStart || fields.periodEnd)) {
+    params.set('includeUndated', '1');
+  }
+  if (fields.layout === 'chronology') params.set('layout', 'chronology');
   return params.toString();
 }

@@ -240,6 +240,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const recordsBehind = (
     <StoryRecords
       noun={noun}
+      slug={doc.slug}
       linked={linkedRecords}
       records={citedRead.data}
       source={citedRead.source}

@@ -334,3 +334,28 @@ test('legacy search and history retain supported collection narrowing and biblio
     '/records',
   );
 });
+
+test('legacy collection handoffs retain chronology and invalid range sentinels without widening', () => {
+  const raw = {
+    collection: 'story:the-count',
+    periodStart: '1920',
+    periodEnd: '1880',
+    includeUndated: '1',
+    layout: 'chronology',
+    sort: 'name',
+  };
+  for (const href of [mapSearchQueryToRecordsHref(raw), mapHistoryQueryToRecordsHref(raw)]) {
+    const params = new URL(href, 'https://example.test').searchParams;
+    assert.equal(params.get('collection'), 'story:the-count');
+    assert.equal(params.get('periodStart'), '1880');
+    assert.equal(params.get('periodEnd'), '1920');
+    assert.equal(params.get('includeUndated'), '1');
+    assert.equal(params.get('layout'), 'chronology');
+    assert.equal(params.get('sort'), 'name');
+  }
+  assert.match(
+    mapSearchQueryToRecordsHref({ collection: 'bogus', periodStart: '1885' }),
+    /collection=invalid/,
+  );
+  assert.match(mapHistoryQueryToRecordsHref({ periodStart: '1885' }), /periodStart=invalid/);
+});

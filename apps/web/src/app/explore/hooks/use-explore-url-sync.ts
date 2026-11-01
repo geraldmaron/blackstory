@@ -71,6 +71,13 @@ export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSync
     ...(base.edge ? { edge: base.edge } : {}),
     ...(base.radius ? { radius: base.radius } : {}),
     ...(base.near ? { near: base.near } : {}),
+    // Lens edits never own these: dropping them would silently widen a named collection or
+    // range to the whole archive in the address bar, and lose the Records layout to return to.
+    ...(base.collection ? { collection: base.collection } : {}),
+    ...(base.periodStart ? { periodStart: base.periodStart } : {}),
+    ...(base.periodEnd ? { periodEnd: base.periodEnd } : {}),
+    ...(base.includeUndated ? { includeUndated: true } : {}),
+    ...(base.layout ? { layout: base.layout } : {}),
   };
   return buildExploreHref(next);
 }

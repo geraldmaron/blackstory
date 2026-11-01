@@ -1,5 +1,6 @@
 import type { CollectionFacts } from '../../lib/records/records-matching';
 import { matchExploreCollection, drawableCollection } from '../../lib/discovery/explore-collection';
+import { collectionMemberIds } from '../../lib/discovery/story-collection';
 /**
  * Wire shapes for the Explore server -> client hand-off. Lives apart from `explore-view-model.ts`
  * because that module (via the history graph seed) reaches server-only imports (`node:crypto`);
@@ -182,7 +183,13 @@ export function hydrateExploreViewModel(
     filteredFeatures: serialized.collectionFacts
       ? drawableCollection(
           allFeatures,
-          matchExploreCollection(serialized.collectionFacts, serialized.viewState),
+          matchExploreCollection(
+            serialized.collectionFacts,
+            serialized.viewState,
+            // An absent or unresolved collection yields no members, so a named collection that
+            // could not be read matches nothing here instead of widening to every record.
+            serialized.collection ? collectionMemberIds(serialized.collection) : undefined,
+          ),
         )
       : serialized.initialMatchIndexes
         ? serialized.initialMatchIndexes.flatMap((index) => {

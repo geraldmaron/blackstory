@@ -962,6 +962,18 @@ a.ds-errata__row-id {
   column-gap: var(--ds-space-3);
 }
 
+ul.ds-law-idx {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-law-idx > li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
 .ds-law-idx .ds-room-idx__row {
   grid-column: 1 / -1;
   grid-template-columns: subgrid;

@@ -1,0 +1,121 @@
+/*
+ * Collection period controls. A flat matte form under the collection strip: kit tokens only, one
+ * hairline, no shadow. Every control is a 44px target; copper is not used here (the active range
+ * is named by the constraint chip and the collection strip, not by decoration).
+ */
+.ds-period {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  padding: var(--ds-space-3) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-period__title {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-period__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ds-space-3) var(--ds-space-4);
+  min-width: 0;
+}
+
+.ds-period__field {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-period__label {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-period__select {
+  min-height: 44px;
+  min-width: 9rem;
+  max-width: 100%;
+  padding: 0 var(--ds-space-3);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-period__check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 44px;
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+}
+
+.ds-period__check input {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.ds-period__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+}
+
+.ds-period__apply,
+.ds-period__clear {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.ds-period__clear {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--ds-space-2);
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ds-period__select:focus-visible,
+.ds-period__check input:focus-visible,
+.ds-period__clear:focus-visible,
+.ds-period__apply:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.ds-period__note {
+  margin: 0;
+  font-size: var(--ds-text-caption);
+  line-height: 1.35;
+  color: var(--ds-ink-muted);
+}
+
+/* An unreadable range is stated in words and a rule, not by hue alone. */
+.ds-period__note--error {
+  padding-left: var(--ds-space-2);
+  border-left: 3px solid var(--ds-ink);
+  color: var(--ds-ink);
+}
+
+@media (max-width: 40rem) {
+  .ds-period__select {
+    width: 100%;
+  }
+
+  .ds-period__field {
+    flex: 1 1 8rem;
+  }
+}

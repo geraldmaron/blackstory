@@ -291,3 +291,17 @@ test('a protected or undrawable record returns to the collection without a pin o
   assert.equal(params.get('sort'), 'name');
   for (const key of ['selected', 'lat', 'lng', 'zoom']) assert.equal(params.has(key), false);
 });
+
+test('record return restores the displayed chronology page and its prior index order', () => {
+  const result = placeDiscoveryReturn(
+    'record-125',
+    { layout: 'chronology', sort: 'name', view: 'list' },
+    undefined,
+    { index: 124, total: 300 },
+  );
+  const params = new URL(result.listHref, 'https://example.test').searchParams;
+  assert.equal(params.get('page'), '2');
+  assert.equal(params.get('layout'), 'chronology');
+  assert.equal(params.get('sort'), 'name');
+  assert.match(result.positionLabel ?? '', /125 of 300 in this chronology/);
+});

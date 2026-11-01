@@ -65,6 +65,9 @@ const view: LawBrowseViewModel = {
   topic: 'all',
   status: 'all',
   sort: 'chronological',
+  page: 1,
+  pageCount: 1,
+  pageSize: 24,
   items: [
     {
       id: 'full',

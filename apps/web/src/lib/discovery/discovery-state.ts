@@ -15,11 +15,17 @@ import { DEFAULT_EXPLORE_FILTERS } from '../map-experience/filters';
 import type { EvidenceGrade } from '../map-experience/evidence-grade';
 import {
   EMPTY_RECORDS_QUERY,
+  RECORDS_PAGE_SIZE,
   recordsHref,
   type RecordsQuery,
 } from '../records/build-records-index';
 import { parseRecordsQuery } from '../records/records-query';
-import { placeArrivalQuery as placeArrivalQueryFields } from './discovery-arrival';
+import {
+  placeArrivalQuery as placeArrivalQueryFields,
+  type PlaceArrivalFields,
+} from './discovery-arrival';
+import { normalizePeriod } from './collection-period';
+import { parseCollectionToken } from './story-collection';
 
 export { mapListContinuityLabel } from './continuity-label';
 export { withQuery } from './discovery-arrival';
@@ -42,11 +48,53 @@ export type DiscoveryState = {
   /** Evidence floor letter (`A` | `B` | `C`), not an exact confidence tier. */
   readonly evidence?: EvidenceGrade;
   readonly status?: readonly string[];
+  /** Named collection token(s); today only the first is read (`story:<slug>` or a sentinel). */
   readonly collection?: readonly string[];
+  /** Inclusive stored decade-start bounds (`collection-period.ts`); not event dates, not `from`. */
+  readonly periodStart?: string;
+  readonly periodEnd?: string;
+  readonly includeUndated?: boolean;
+  /** Records representation to restore on return. `index` has no spelling. */
+  readonly layout?: 'chronology';
   readonly sort?: string;
   readonly selected?: string;
   readonly view?: DiscoveryView;
 };
+
+/** Collection, range and layout fields shared by every adapter below. */
+function scopeFromQuery(query: {
+  readonly collection: string;
+  readonly periodStart: string;
+  readonly periodEnd: string;
+  readonly includeUndated: boolean;
+  readonly layout: 'index' | 'chronology';
+}): Pick<DiscoveryState, 'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'> {
+  return {
+    ...(query.collection ? { collection: [query.collection] } : {}),
+    ...(query.periodStart ? { periodStart: query.periodStart } : {}),
+    ...(query.periodEnd ? { periodEnd: query.periodEnd } : {}),
+    ...(query.includeUndated ? { includeUndated: true } : {}),
+    ...(query.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
+  };
+}
+
+/** The same fields, normalized through the shared codecs, ready for a `RecordsQuery`. */
+function scopeToRecordsQuery(
+  state: DiscoveryState,
+): Pick<RecordsQuery, 'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'> {
+  const period = normalizePeriod({
+    start: state.periodStart,
+    end: state.periodEnd,
+    includeUndated: state.includeUndated,
+  });
+  return {
+    collection: parseCollectionToken(firstOf(state.collection)),
+    periodStart: period.start,
+    periodEnd: period.end,
+    includeUndated: period.includeUndated,
+    layout: state.layout === 'chronology' ? 'chronology' : 'index',
+  };
+}
 
 export const EMPTY_DISCOVERY_STATE: DiscoveryState = Object.freeze({});
 
@@ -76,6 +124,11 @@ export function discoveryFromExplore(state: ExploreViewState): DiscoveryState {
     ...(state.floor ? { evidence: state.floor } : {}),
     ...(status ? { status } : {}),
     ...(state.selected ? { selected: state.selected } : {}),
+    ...(state.collection ? { collection: [state.collection] } : {}),
+    ...(state.periodStart ? { periodStart: state.periodStart } : {}),
+    ...(state.periodEnd ? { periodEnd: state.periodEnd } : {}),
+    ...(state.includeUndated ? { includeUndated: true } : {}),
+    ...(state.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
     view: 'map',
   };
 }
@@ -97,6 +150,7 @@ export function discoveryFromRecords(query: RecordsQuery): DiscoveryState {
       ? { evidence: query.evidence }
       : {}),
     ...(status ? { status } : {}),
+    ...scopeFromQuery(query),
     view: 'list',
   };
 }
@@ -113,6 +167,7 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
     topic: (firstOf(state.topic) ?? '').toLowerCase(),
     status: (firstOf(state.status) ?? '').toLowerCase(),
     evidence: evidence ?? '',
+    ...scopeToRecordsQuery(state),
     page: 1,
   };
 }
@@ -141,6 +196,23 @@ export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewStat
     ...(postal ? { state: postal } : {}),
     ...(state.evidence ? { floor: state.evidence } : {}),
     ...(state.selected ? { selected: state.selected } : {}),
+    ...exploreScope(state),
+  };
+}
+
+function exploreScope(
+  state: DiscoveryState,
+): Pick<
+  ExploreViewState,
+  'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'
+> {
+  const scope = scopeToRecordsQuery(state);
+  return {
+    ...(scope.collection ? { collection: scope.collection } : {}),
+    ...(scope.periodStart ? { periodStart: scope.periodStart } : {}),
+    ...(scope.periodEnd ? { periodEnd: scope.periodEnd } : {}),
+    ...(scope.includeUndated ? { includeUndated: true } : {}),
+    ...(scope.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
   };
 }
 
@@ -181,7 +253,15 @@ export function discoveryFromSearchParams(
   const evidenceRaw = paramOne(params.evidence) ?? paramOne(params.floor);
   const evidence =
     evidenceRaw === 'A' || evidenceRaw === 'B' || evidenceRaw === 'C' ? evidenceRaw : undefined;
-  const normalized = parseRecordsQuery({ q: params.q, sort: params.sort });
+  const normalized = parseRecordsQuery({
+    q: params.q,
+    sort: params.sort,
+    collection: params.collection,
+    periodStart: params.periodStart,
+    periodEnd: params.periodEnd,
+    includeUndated: params.includeUndated,
+    layout: params.layout,
+  });
   const query = normalized.q;
   const selected = paramOne(params.selected);
   const from = paramOne(params.from);
@@ -202,6 +282,7 @@ export function discoveryFromSearchParams(
     ...(evidence ? { evidence } : {}),
     ...(status ? { status } : {}),
     ...(selected ? { selected } : {}),
+    ...scopeFromQuery(normalized),
     ...(view ? { view } : {}),
   };
 }
@@ -220,6 +301,10 @@ export function discoveryHasNarrowing(state: DiscoveryState): boolean {
     Boolean(state.topic) ||
     Boolean(state.evidence) ||
     Boolean(state.status) ||
+    Boolean(state.collection) ||
+    Boolean(state.periodStart) ||
+    Boolean(state.periodEnd) ||
+    state.layout === 'chronology' ||
     (state.sort !== undefined && state.sort !== 'discovery')
   );
 }
@@ -270,9 +355,27 @@ export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): 
       ...(state.evidence ? { evidence: state.evidence } : {}),
       ...(status !== undefined ? { status } : {}),
       ...(state.selected ? { selected: state.selected } : {}),
+      ...placeScopeFields(state),
     },
     from,
   );
+}
+
+/** Normalized through the shared codecs, never copied from the raw request. */
+function placeScopeFields(
+  state: DiscoveryState,
+): Pick<
+  PlaceArrivalFields,
+  'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'
+> {
+  const scope = scopeToRecordsQuery(state);
+  return {
+    ...(scope.collection ? { collection: scope.collection } : {}),
+    ...(scope.periodStart ? { periodStart: scope.periodStart } : {}),
+    ...(scope.periodEnd ? { periodEnd: scope.periodEnd } : {}),
+    ...(scope.includeUndated ? { includeUndated: true } : {}),
+    ...(scope.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
+  };
 }
 
 /**
@@ -310,19 +413,32 @@ export function placeDiscoveryReturn(
     Boolean(arrival.state) ||
     Boolean(arrival.topic) ||
     Boolean(arrival.evidence) ||
-    Boolean(arrival.status);
+    Boolean(arrival.status) ||
+    Boolean(arrival.collection) ||
+    Boolean(arrival.periodStart) ||
+    Boolean(arrival.periodEnd);
 
   return {
     mapHref,
-    listHref: listHrefFromDiscovery(arrival),
+    listHref: neighbors
+      ? recordsHref({
+          ...recordsQueryFromDiscovery(arrival),
+          page: Math.floor(neighbors.index / RECORDS_PAGE_SIZE) + 1,
+        })
+      : listHrefFromDiscovery(arrival),
     mapLabel: hasListNarrowing
       ? 'Return to the map with this narrowing'
       : mapped
         ? 'See this place on the map'
         : 'Browse the map',
-    listLabel: hasListNarrowing
-      ? 'Return to the record list with this narrowing'
-      : 'Browse the record list',
+    listLabel:
+      arrival.layout === 'chronology'
+        ? hasListNarrowing
+          ? 'Return to chronology with this narrowing'
+          : 'Return to chronology'
+        : hasListNarrowing
+          ? 'Return to the record list with this narrowing'
+          : 'Browse the record list',
     ...(neighbors?.previous
       ? {
           previousHref: neighbors.previous.href,
@@ -337,7 +453,7 @@ export function placeDiscoveryReturn(
       : {}),
     ...(neighbors && neighbors.total > 0
       ? {
-          positionLabel: `${(neighbors.index + 1).toLocaleString('en-US')} of ${neighbors.total.toLocaleString('en-US')} in this list`,
+          positionLabel: `${(neighbors.index + 1).toLocaleString('en-US')} of ${neighbors.total.toLocaleString('en-US')} in this ${arrival.layout === 'chronology' ? 'chronology' : 'list'}`,
         }
       : {}),
   };

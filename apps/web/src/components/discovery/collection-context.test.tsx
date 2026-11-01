@@ -146,6 +146,12 @@ describe('CollectionContext integrations', () => {
       clearAllHref: '/records',
       atlasHref: '/explore?q=school&sort=era',
       atlasReason: '30 records match. 25 appear on the map.',
+      collection: { state: 'none' },
+      indexHref: '/records?q=school&sort=era&page=2',
+      chronologyHref: '/records?q=school&sort=era&layout=chronology',
+      periodClearHref: '/records?q=school&sort=era',
+      periodDecades: [],
+      undatedExcluded: 0,
     } as unknown as RecordsIndexModel;
     const markup = renderToStaticMarkup(
       <RecordsIndexRoom model={model} releaseLabel="Active release" />,

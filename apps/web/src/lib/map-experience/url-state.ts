@@ -37,6 +37,8 @@ import {
 } from './explore-population';
 import { EXPLORE_RADIUS_PRESETS, type ExploreRadiusPresetId } from './explore-place-radius';
 import type { EvidenceGrade } from './evidence-grade';
+import { normalizePeriod, type PeriodBound } from '../discovery/collection-period';
+import { parseCollectionToken, type CollectionToken } from '../discovery/story-collection';
 
 export type ExploreViewport = {
   readonly lat: number;
@@ -119,6 +121,20 @@ export type ExploreViewState = {
    * as the edge stripping an unrecognized query key.
    */
   readonly find?: string;
+  /**
+   * Named collection (`story:<slug>`, or the finite `missing` / `invalid` sentinels). Narrows the
+   * same way it does on `/records`: an unresolved one matches nothing, never the whole archive.
+   */
+  readonly collection?: CollectionToken;
+  /** Inclusive stored decade-start bounds; distinct from `decade` (relationship slice) and `pop*`. */
+  readonly periodStart?: PeriodBound;
+  readonly periodEnd?: PeriodBound;
+  readonly includeUndated?: boolean;
+  /**
+   * Return context, not a filter: the Records representation the reader came from, so that
+   * leaving the map for Records restores the chronology they left. Never narrows anything.
+   */
+  readonly layout?: 'chronology';
 };
 
 export type RawExploreSearchParams = Readonly<
@@ -166,6 +182,11 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'hidePanels',
   'panels',
   'find',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
 ] as const;
 
 export type ExploreUrlParamKey = (typeof EXPLORE_URL_PARAM_KEYS)[number];
@@ -366,6 +387,13 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const radiusRaw = firstValue(raw.radius)?.trim();
   const nearRaw = firstValue(raw.near)?.trim();
   const findRaw = cleanLabelParam(firstValue(raw.find), 120);
+  const collectionToken = parseCollectionToken(raw.collection);
+  const period = normalizePeriod({
+    start: raw.periodStart,
+    end: raw.periodEnd,
+    includeUndated: raw.includeUndated,
+  });
+  const chronologyLayout = firstValue(raw.layout)?.trim().toLowerCase() === 'chronology';
 
   const groupOn =
     groupRaw === '0' || groupRaw === 'false'
@@ -435,6 +463,11 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(near ? { near } : {}),
     ...(floor ? { floor } : {}),
     ...(findRaw ? { find: findRaw } : {}),
+    ...(collectionToken !== '' ? { collection: collectionToken } : {}),
+    ...(period.start !== '' ? { periodStart: period.start } : {}),
+    ...(period.end !== '' ? { periodEnd: period.end } : {}),
+    ...(period.includeUndated ? { includeUndated: true } : {}),
+    ...(chronologyLayout ? { layout: 'chronology' as const } : {}),
   };
 }
 
@@ -500,6 +533,17 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.near) params.set('near', state.near);
   if (state.floor) params.set('floor', state.floor);
   if (state.find) params.set('find', state.find);
+  if (state.collection) params.set('collection', state.collection);
+  // Re-normalized so reversed bounds and a redundant `includeUndated` have one spelling.
+  const period = normalizePeriod({
+    start: state.periodStart,
+    end: state.periodEnd,
+    includeUndated: state.includeUndated,
+  });
+  if (period.start !== '') params.set('periodStart', period.start);
+  if (period.end !== '') params.set('periodEnd', period.end);
+  if (period.includeUndated) params.set('includeUndated', '1');
+  if (state.layout === 'chronology') params.set('layout', 'chronology');
   return params.toString();
 }
 

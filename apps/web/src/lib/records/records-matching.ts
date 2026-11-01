@@ -5,6 +5,8 @@ import type { ConfidenceTier } from '../map-experience/build-explore-map-source'
 import { kindMatchesPublicFilter } from '../map-experience/filters';
 import { meetsEvidenceFloor, type EvidenceFloor } from '../map-experience/evidence-grade';
 import { isInternalRecordLabel } from '../place/public-place-path';
+import { matchesPeriod } from '../discovery/collection-period';
+import { COLLECTION_INVALID, COLLECTION_MISSING } from '../discovery/story-collection';
 
 export type RecordFacts = {
   readonly row: RecordsRow;
@@ -23,11 +25,35 @@ export type CollectionFacts = Omit<RecordFacts, 'row' | 'stateName'> & {
   readonly row: Pick<RecordsRow, 'id' | 'name' | 'kind' | 'mapTone'>;
 };
 
+/**
+ * `members` is the resolved id set of a named collection (`query.collection`). A named collection
+ * with no resolved set (`undefined`: unknown story, failed read, malformed token) matches nothing.
+ * It must never fall through to the whole archive, nor read as a story with zero members.
+ */
 export function matchesExcept(
   facts: CollectionFacts,
   query: RecordsQuery,
-  skip: RecordsFilterKey | 'none',
+  skip: RecordsFilterKey | 'period' | 'none',
+  members?: ReadonlySet<string>,
 ): boolean {
+  if (query.collection.length > 0) {
+    // The finite sentinels are errors, not sets: they match nothing even if a caller hands over
+    // members.
+    if (query.collection === COLLECTION_INVALID || query.collection === COLLECTION_MISSING) {
+      return false;
+    }
+    if (members === undefined || !members.has(facts.row.id)) return false;
+  }
+  if (
+    skip !== 'period' &&
+    !matchesPeriod(facts.eraBuckets, {
+      start: query.periodStart,
+      end: query.periodEnd,
+      includeUndated: query.includeUndated,
+    })
+  ) {
+    return false;
+  }
   if (query.q.length > 0 && !facts.haystack.includes(query.q.toLowerCase())) return false;
   if (
     skip !== 'kind' &&

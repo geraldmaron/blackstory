@@ -63,6 +63,7 @@ function normalizePathname(pathname: string): string {
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
   const path = normalizePathname(pathname);
   if (path === '/atlas/catalog') return ['v'];
+  if (path === '/stories/mosaic-credits') return ['page'];
   if (path === '/search') {
     return SEARCH_PAGE_PARAM_ALLOWLIST;
   }
@@ -145,6 +146,11 @@ export function normalizeQueryString(
   for (const key of Object.keys(bag).sort()) {
     const value = firstString(bag[key]);
     if (value === undefined) continue;
+    if ((path === '/law' || path === '/stories/mosaic-credits') && key === 'page') {
+      const page = Number(value);
+      if (Number.isSafeInteger(page) && page > 1) normalized.set(key, String(Math.min(page, 1000)));
+      continue;
+    }
     normalized.set(key, value);
   }
   return normalized.toString();

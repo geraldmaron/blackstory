@@ -19,6 +19,11 @@ import {
  */
 export const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'q',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
   'kind',
   'state',
   'evidence',
@@ -73,7 +78,7 @@ export type ExplorePageParam = Exclude<ExploreUrlParamKey, ExploreViewportPolicy
  * `sort` joined the contract with the catalog card redesign — it backs the Sort select, and
  * omitting it here silently dropped the reader's ordering at the edge.
  */
-export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'sort'] as const;
+export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'status', 'sort', 'page'] as const;
 
 export type LawPageParam = (typeof LAW_PAGE_PARAM_ALLOWLIST)[number];
 
@@ -133,6 +138,11 @@ export const PLACE_PAGE_PARAM_ALLOWLIST = [
   'evidence',
   'floor',
   'selected',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
 ] as const;
 
 export type PlacePageParam = (typeof PLACE_PAGE_PARAM_ALLOWLIST)[number];

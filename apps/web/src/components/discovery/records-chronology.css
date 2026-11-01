@@ -1,0 +1,49 @@
+/*
+ * Chronology layout. Section headings over the shared hairline rows: flat, matte, kit tokens
+ * only. The undated section is set off with a rule and plain words, not a different hue.
+ */
+.ds-chronology {
+  display: grid;
+  gap: var(--ds-space-5);
+  min-width: 0;
+  margin-block: var(--ds-space-4);
+}
+
+.ds-chronology__coverage {
+  margin: 0;
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+.ds-chronology__section {
+  min-width: 0;
+}
+
+.ds-chronology__heading {
+  margin: 0 0 var(--ds-space-2);
+  padding-bottom: var(--ds-space-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ds-ink);
+}
+
+.ds-chronology__section[data-undated='true'] {
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-chronology__section[data-undated='true'] .ds-chronology__heading {
+  font-family: var(--ds-font-sans);
+  font-weight: 550;
+  color: var(--ds-ink-muted);
+}
+
+/* Coverage is real bucket metadata; keep the sparse values readable on touch screens. */
+.ds-chronology .ds-room-idx__note {
+  white-space: normal;
+  line-height: 1.45;
+}

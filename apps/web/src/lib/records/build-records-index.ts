@@ -60,6 +60,24 @@ import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experi
 import { kindFilterLabel } from '../map-experience/filters';
 import { formatResultSummary } from '../discovery/result-summary';
 import {
+  buildChronologyPage,
+  chronologyOrder,
+  type ChronologyPage,
+} from '../discovery/collection-chronology';
+import {
+  documentedDecades,
+  periodIsActive,
+  periodIsInvalid,
+  periodLabel,
+} from '../discovery/collection-period';
+import {
+  NO_COLLECTION,
+  collectionIsUnresolved,
+  collectionMemberIds,
+  collectionStateMessage,
+  type CollectionDescriptor,
+} from '../discovery/story-collection';
+import {
   EMPTY_RECORDS_QUERY,
   RECORDS_FILTER_KEYS,
   isRecordsCombinationQuery,
@@ -80,6 +98,12 @@ function recordsArrivalQuery(query: RecordsQuery): string {
   if (query.topic.length > 0) params.set('topic', query.topic);
   if (query.status.length > 0) params.set('status', query.status);
   if (query.evidence.length > 0) params.set('evidence', query.evidence);
+  if (query.collection.length > 0) params.set('collection', query.collection);
+  if (query.periodStart.length > 0) params.set('periodStart', query.periodStart);
+  if (query.periodEnd.length > 0) params.set('periodEnd', query.periodEnd);
+  if (query.includeUndated) params.set('includeUndated', '1');
+  // The layout rides along so Return restores the chronology a reader left, not the index.
+  if (query.layout === 'chronology') params.set('layout', 'chronology');
   // Bare from=list is enough to mark the handoff; keep it even when unnarrowed.
   return params.toString();
 }
@@ -125,6 +149,7 @@ export type RecordsRow = {
   readonly confidenceTier: ConfidenceTier;
   /** Known map availability for this released plate; omitted by legacy callers. */
   readonly mappable?: boolean;
+  readonly documentedDecades?: readonly string[];
 };
 
 export type RecordsFacet = {
@@ -144,10 +169,20 @@ export type RecordsGroup = {
 
 /** One active constraint, with the words that say why the set is narrowed. */
 export type RecordsConstraint = {
-  readonly key: RecordsFilterKey | 'q';
+  readonly key: RecordsFilterKey | 'q' | 'collection' | 'period';
   readonly label: string;
   readonly clearHref: string;
 };
+
+/** An explicit absence or error the page renders instead of a result list. */
+export type RecordsNotice = {
+  readonly kind: 'collection' | 'period';
+  readonly state: 'unknown' | 'unavailable' | 'missing' | 'invalid';
+  readonly message: string;
+};
+
+/** A decade a period select can offer: only decades the collection actually documents. */
+export type RecordsPeriodDecade = { readonly decade: number; readonly count: number };
 
 export type RecordsIndex = {
   readonly query: RecordsQuery;
@@ -172,6 +207,21 @@ export type RecordsIndex = {
   readonly atlasReason: string;
   /** Matched records that carry a public map anchor (honest Explore continuity). */
   readonly mappableMatched: number;
+  /** The resolved named collection (`none` when the whole archive is the collection). */
+  readonly collection: CollectionDescriptor;
+  /** Set when the collection or period cannot be shown; never a silently widened list. */
+  readonly notice: RecordsNotice | undefined;
+  /** Same collection, other representation: native links that keep every other narrowing. */
+  readonly indexHref: string;
+  readonly chronologyHref: string;
+  /** Lifts the period only (bounds and includeUndated), keeping q, facets, sort and layout. */
+  readonly periodClearHref: string;
+  /** Known decades in the collection with the period lifted, ascending. Sparse stays sparse. */
+  readonly periodDecades: readonly RecordsPeriodDecade[];
+  /** Records without a documented decade that the active period leaves out. */
+  readonly undatedExcluded: number;
+  /** Present for `layout=chronology`: the page's rows grouped by documented decade. */
+  readonly chronology: ChronologyPage<RecordsRow> | undefined;
 };
 
 function humanize(value: string): string {
@@ -464,6 +514,11 @@ export function buildRecordsIndex(
     readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
   query: RecordsQuery,
   drawableIds?: ReadonlySet<string>,
+  /**
+   * The resolved named collection for `query.collection`. Omitted for the whole archive. A named
+   * query with a missing or unresolved descriptor matches nothing, never everything.
+   */
+  collection: CollectionDescriptor = NO_COLLECTION,
 ): RecordsIndex {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
@@ -474,10 +529,37 @@ export function buildRecordsIndex(
       stateNames.set(record.statePostal, record.stateName);
     }
   }
+  const members = collectionMemberIds(collection);
+  const period = {
+    start: query.periodStart,
+    end: query.periodEnd,
+    includeUndated: query.includeUndated,
+  };
 
   const matched = facts
-    .filter((record) => matchesExcept(record, query, 'none'))
+    .filter((record) => matchesExcept(record, query, 'none', members))
     .sort(comparatorFor(query.sort));
+  const periodDecades = [
+    ...facts
+      .filter((record) => !query.collection || members?.has(record.row.id) === true)
+      .reduce((counts, record) => {
+        for (const decade of documentedDecades(record.eraBuckets)) {
+          counts.set(decade, (counts.get(decade) ?? 0) + 1);
+        }
+        return counts;
+      }, new Map<number, number>())
+      .entries(),
+  ]
+    .map(([decade, count]) => ({ decade, count }))
+    .sort((a, b) => a.decade - b.decade);
+  const undatedExcluded =
+    periodIsActive(period) && !periodIsInvalid(period) && !query.includeUndated
+      ? facts.filter(
+          (record) =>
+            documentedDecades(record.eraBuckets).length === 0 &&
+            matchesExcept(record, { ...query, includeUndated: true }, 'none', members),
+        ).length
+      : 0;
   const mappableMatched = matched.filter((record) =>
     drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
   ).length;
@@ -486,7 +568,7 @@ export function buildRecordsIndex(
     RECORDS_FILTER_KEYS.map((key) => {
       const counts = new Map<string, number>();
       for (const record of facts) {
-        if (!matchesExcept(record, query, key)) continue;
+        if (!matchesExcept(record, query, key, members)) continue;
         for (const value of valuesFor(record, key)) {
           counts.set(value, (counts.get(value) ?? 0) + 1);
         }
@@ -529,13 +611,80 @@ export function buildRecordsIndex(
   const page = Math.min(query.page, pageCount);
   const start = (page - 1) * RECORDS_PAGE_SIZE;
   const discoveryQuery = recordsArrivalQuery(query);
-  const rows = matched.slice(start, start + RECORDS_PAGE_SIZE).map((record) => ({
+  const toRow = (record: RecordFacts): RecordsRow => ({
     ...record.row,
     href: withArrivalQuery(record.row.href, discoveryQuery),
     mappable: drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
-  }));
+    documentedDecades: record.eraBuckets,
+  });
+  // Chronology pages the same bounded rows the index does, in displayed chronology order, so a
+  // record's previous/next and the page boundaries both follow what the reader sees.
+  const ordered = query.layout === 'chronology' ? chronologyOrder(matched, query) : undefined;
+  const chronology = ordered
+    ? buildChronologyPage(ordered, start, start + RECORDS_PAGE_SIZE, toRow)
+    : undefined;
+  const rows = ordered
+    ? ordered.slice(start, start + RECORDS_PAGE_SIZE).map((entry) => toRow(entry.facts))
+    : matched.slice(start, start + RECORDS_PAGE_SIZE).map(toRow);
+
+  const noticeState =
+    collection.state === 'unknown' ||
+    collection.state === 'unavailable' ||
+    collection.state === 'missing' ||
+    collection.state === 'invalid'
+      ? collection.state
+      : undefined;
+  const notice: RecordsNotice | undefined =
+    noticeState !== undefined && collectionIsUnresolved(collection)
+      ? {
+          kind: 'collection',
+          state: noticeState,
+          message: collectionStateMessage(collection) ?? '',
+        }
+      : query.collection.length > 0 && collection.state === 'none'
+        ? {
+            kind: 'collection',
+            state: 'unavailable',
+            message:
+              collectionStateMessage({ state: 'unavailable', slug: '' }) ??
+              'This collection could not be read.',
+          }
+        : periodIsInvalid(period)
+          ? {
+              kind: 'period',
+              state: 'invalid',
+              message:
+                'The decade range in this address is not readable. Decades are four-digit multiples of ten such as 1880. No records are shown until it is fixed or cleared.',
+            }
+          : undefined;
 
   const constraints: RecordsConstraint[] = [];
+  if (collection.state === 'live') {
+    constraints.push({
+      key: 'collection',
+      label: `Linked from “${collection.title}”`,
+      clearHref: recordsHref({ ...query, collection: '', page: 1 }),
+    });
+  } else if (query.collection.length > 0) {
+    constraints.push({
+      key: 'collection',
+      label: 'Story collection unavailable',
+      clearHref: recordsHref({ ...query, collection: '', page: 1 }),
+    });
+  }
+  if (periodIsActive(period)) {
+    constraints.push({
+      key: 'period',
+      label: periodLabel(period),
+      clearHref: recordsHref({
+        ...query,
+        periodStart: '',
+        periodEnd: '',
+        includeUndated: false,
+        page: 1,
+      }),
+    });
+  }
   if (query.q.length > 0) {
     constraints.push({
       key: 'q',
@@ -596,6 +745,28 @@ export function buildRecordsIndex(
     atlasHref: buildAtlasHref(query),
     atlasReason: mapListContinuityLabel(matched.length, mappableMatched),
     mappableMatched,
+    collection,
+    notice,
+    indexHref: recordsHref({
+      ...query,
+      layout: 'index',
+      page: query.layout === 'index' ? page : 1,
+    }),
+    chronologyHref: recordsHref({
+      ...query,
+      layout: 'chronology',
+      page: query.layout === 'chronology' ? page : 1,
+    }),
+    periodClearHref: recordsHref({
+      ...query,
+      periodStart: '',
+      periodEnd: '',
+      includeUndated: false,
+      page: 1,
+    }),
+    periodDecades,
+    undatedExcluded,
+    chronology,
   };
 }
 
@@ -622,13 +793,20 @@ export function findRecordsNeighbors(
   query: RecordsQuery,
   entityId: string,
   arrivalQuery = '',
+  /** Resolved member ids of `query.collection`; without them a named collection has no records. */
+  members?: ReadonlySet<string>,
 ): RecordsNeighbors | undefined {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
-  const matched = entries
+  const inCollection = entries
     .map((entry) => toFacts(entry, collisions))
-    .filter((record) => matchesExcept(record, query, 'none'))
+    .filter((record) => matchesExcept(record, query, 'none', members))
     .sort(comparatorFor(query.sort));
+  // Stepping follows the displayed order: decade groups for chronology, the sort otherwise.
+  const matched =
+    query.layout === 'chronology'
+      ? chronologyOrder(inCollection, query).map((entry) => entry.facts)
+      : inCollection;
   const index = matched.findIndex((record) => record.row.id === entityId);
   if (index < 0 || matched.length === 0) return undefined;
 
@@ -671,6 +849,12 @@ export function buildAtlasHref(query: RecordsQuery): string {
   if (query.topic.length > 0) params.set('theme', query.topic);
   if (query.status.length > 0) params.set('status', query.status);
   if (query.evidence.length > 0) params.set('floor', query.evidence);
+  if (query.collection.length > 0) params.set('collection', query.collection);
+  if (query.periodStart.length > 0) params.set('periodStart', query.periodStart);
+  if (query.periodEnd.length > 0) params.set('periodEnd', query.periodEnd);
+  if (query.includeUndated) params.set('includeUndated', '1');
+  // Return context only: Explore ignores it for matching and hands it back with the reader.
+  if (query.layout === 'chronology') params.set('layout', 'chronology');
   const search = params.toString();
   return search.length > 0 ? `/explore?${search}` : '/explore';
 }

@@ -121,6 +121,40 @@ a.ds-collection__view:focus-visible {
   letter-spacing: 0.01em;
 }
 
+/* The named story behind a story collection: a caption link back to the source, not a control. */
+.ds-collection__source a {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ds-collection__source a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Decade-range controls folded under the strip. Third row, full width, order after the views. */
+.ds-collection__period {
+  flex: 1 1 100%;
+  order: 3;
+  min-width: 0;
+}
+
+.ds-collection__period-summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: var(--ds-text-caption);
+  font-weight: 550;
+  color: var(--ds-ink);
+}
+
+.ds-collection__period-summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
 /* Inside the Records workbench: no box of its own, a rule under it instead. */
 .ds-collection--flat {
   margin: 0;

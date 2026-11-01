@@ -25,7 +25,15 @@ import './collection-context.css';
 
 void React;
 
-export type CollectionView = 'map' | 'records';
+export type CollectionView = 'map' | 'records' | 'chronology';
+
+/** The named story a collection is built from. Absent for an unnamed query. */
+export type CollectionSource = {
+  readonly label: string;
+  readonly href: string;
+  /** Linked records that are not in this public release: a count, never names. */
+  readonly unresolvedCount?: number;
+};
 
 export type CollectionContextProps = {
   /** Which view is on screen. Its link stays a real anchor, marked `aria-current="page"`. */
@@ -33,6 +41,23 @@ export type CollectionContextProps = {
   /** Supplied by the caller (`atlasHref` / `recordsHref(...)`); never rebuilt here. */
   readonly mapHref: string;
   readonly recordsHref: string;
+  /** Third view, same collection regrouped by documented decade. Omitted when not offered. */
+  readonly chronologyHref?: string;
+  /** Names the story behind a story collection, linking back to it. */
+  readonly source?: CollectionSource;
+  /**
+   * Set when the named collection cannot be shown (unknown story, unreadable address, failed
+   * read). It replaces the count: an unresolved collection is neither "Counting" nor zero.
+   */
+  readonly unresolved?: string;
+  /**
+   * Optional decade-range controls, folded behind a native disclosure so the strip stays compact
+   * over the map. The caller supplies the form (`CollectionPeriodControls`); it is never nested
+   * inside another form here.
+   */
+  readonly period?: React.ReactNode;
+  /** Summary text for the disclosure, e.g. the active range. */
+  readonly periodSummary?: string;
   /** Records in the collection, located or not. `null` while the catalog facts are unavailable. */
   readonly matched: number | null;
   /** Collection members that can be drawn on the map. `null` when unknown. */
@@ -102,6 +127,11 @@ export function CollectionContext({
   activeView,
   mapHref,
   recordsHref,
+  chronologyHref,
+  source,
+  unresolved,
+  period,
+  periodSummary,
   matched,
   drawable,
   onMap,
@@ -110,10 +140,15 @@ export function CollectionContext({
   announce = false,
   className,
 }: CollectionContextProps) {
-  const counted = ready && matched !== null;
+  // An unresolved named collection is explained, not counted; its views stay reachable because
+  // each one carries the same collection and says the same thing.
+  const counted = unresolved === undefined && ready && matched !== null;
   const views = [
     { id: 'map' as const, label: 'Map', href: mapHref },
     { id: 'records' as const, label: 'Records', href: recordsHref },
+    ...(chronologyHref !== undefined
+      ? [{ id: 'chronology' as const, label: 'Chronology', href: chronologyHref }]
+      : []),
   ];
   const mapText = counted ? collectionMapText(matched, drawable) : null;
   const limitText = counted ? collectionLimitText(onMap, mapLimits) : null;
@@ -129,7 +164,7 @@ export function CollectionContext({
           const active = view.id === activeView;
           // While facts are unavailable the other view would open a collection nobody has
           // counted; show it as plain text rather than a live link.
-          if (!active && !counted) {
+          if (!active && !counted && unresolved === undefined) {
             return (
               <span key={view.id} className="ds-collection__view" aria-disabled="true">
                 {view.label}
@@ -152,12 +187,39 @@ export function CollectionContext({
         className="ds-collection__facts"
         {...(announce ? { 'aria-live': 'polite' as const, 'aria-atomic': true } : {})}
       >
-        <p className="ds-collection__count">{collectionCountText(counted ? matched : null)}</p>
+        <p className="ds-collection__count">
+          {unresolved !== undefined
+            ? 'This collection cannot be shown'
+            : collectionCountText(counted ? matched : null)}
+        </p>
+        {unresolved !== undefined ? (
+          <p className="ds-collection__note" role="status">
+            {unresolved}
+          </p>
+        ) : null}
+        {source ? (
+          <p className="ds-collection__note ds-collection__source">
+            Records this story links to directly: <a href={source.href}>{source.label}</a>
+            {source.unresolvedCount
+              ? `. ${n(source.unresolvedCount)} linked ${
+                  source.unresolvedCount === 1 ? 'record is' : 'records are'
+                } not in this public release.`
+              : '.'}
+          </p>
+        ) : null}
         {mapText ? <p className="ds-collection__note">{mapText}</p> : null}
         {limitText ? (
           <p className="ds-collection__note ds-collection__note--limit">{limitText}</p>
         ) : null}
       </div>
+      {period ? (
+        <details className="ds-collection__period">
+          <summary className="ds-collection__period-summary">
+            {periodSummary ?? 'Documented decade range'}
+          </summary>
+          {period}
+        </details>
+      ) : null}
     </section>
   );
 }

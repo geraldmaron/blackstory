@@ -3,7 +3,12 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildLawBrowseViewModel, buildLawDetailViewModel } from './law-view-model';
+import {
+  buildLawBrowseViewModel,
+  buildLawDetailViewModel,
+  LAW_PAGE_SIZE,
+  lawBrowseHref,
+} from './law-view-model';
 import { seedLegalCatalog } from '../../lib/legal/public-source';
 
 // Seed-backed source keeps these deterministic and off postgres; the Supabase path
@@ -89,4 +94,40 @@ test('buildLawDetailViewModel resolves explainer for CRA 1964', () => {
 test('buildLawDetailViewModel returns not_found for unknown slug', () => {
   const view = buildLawDetailViewModel('does-not-exist', source);
   assert.equal(view.kind, 'not_found');
+});
+
+test('law paging preserves ordering, clamps stale pages and keeps detail neighbors across page boundaries', () => {
+  const snapshots = Array.from({ length: LAW_PAGE_SIZE + 3 }, (_, i) => ({
+    ...source.snapshots[0]!,
+    id: `fixture-${i}`,
+    slug: `fixture-${i}`,
+    title: `Fixture ${String(i).padStart(3, '0')}`,
+    effectiveYear: 1800 + i,
+  }));
+  const catalog = { snapshots, explainerFor: () => undefined };
+  const first = buildLawBrowseViewModel({}, catalog);
+  const second = buildLawBrowseViewModel({ page: '2' }, catalog);
+  assert.equal(first.items.length, LAW_PAGE_SIZE);
+  assert.equal(second.items.length, 3);
+  assert.equal(second.items[0]?.id, `fixture-${LAW_PAGE_SIZE}`);
+  assert.equal(second.totalMatched, LAW_PAGE_SIZE + 3);
+  assert.equal(buildLawBrowseViewModel({ page: '99999' }, catalog).page, 2);
+  assert.equal(buildLawBrowseViewModel({ page: 'bad' }, catalog).page, 1);
+  const detail = buildLawDetailViewModel(`fixture-${LAW_PAGE_SIZE}`, catalog);
+  assert.equal(detail.kind, 'ok');
+  if (detail.kind === 'ok') {
+    assert.equal(detail.previous?.slug, `fixture-${LAW_PAGE_SIZE - 1}`);
+    assert.equal(detail.next?.slug, `fixture-${LAW_PAGE_SIZE + 1}`);
+  }
+  assert.equal(
+    lawBrowseHref({
+      q: 'voting',
+      kind: 'statute',
+      topic: 'voting',
+      status: 'in_force',
+      sort: 'recent',
+      page: '2',
+    }),
+    '/law?q=voting&kind=statute&topic=voting&status=in_force&sort=recent&page=2',
+  );
 });

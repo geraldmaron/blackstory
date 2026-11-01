@@ -27,6 +27,12 @@ import {
 import { isResolvablePlaceSlug } from '../lib/place/place-slug';
 import { buildExploreMapSource } from '../lib/map-experience/build-explore-map-source';
 import { findRecordsNeighbors } from '../lib/records/build-records-index';
+import { resolveStoryCollectionSource } from '../lib/stories/source';
+import {
+  collectionMemberIds,
+  resolveStoryCollection,
+  storyCollectionSlug,
+} from '../lib/discovery/story-collection';
 import { loadRecordsCatalog } from '../lib/records/records-catalog';
 
 /** The public families a released record can address. */
@@ -78,11 +84,28 @@ export async function loadRecordListNeighbors(
 ): Promise<ListNeighbors> {
   if (arrival.view !== 'list') return undefined;
   const { data: catalog } = await loadRecordsCatalog();
+  const query = recordsQueryFromDiscovery(arrival);
+  // A named collection steps through its own released members. When it cannot be resolved
+  // (unknown story, failed read, malformed token) there is no list to step through; the arrival
+  // never falls back to stepping through the whole archive.
+  let members: ReadonlySet<string> | undefined;
+  if (query.collection !== '') {
+    const slug = storyCollectionSlug(query.collection);
+    if (slug === undefined) return undefined;
+    members = collectionMemberIds(
+      resolveStoryCollection(
+        await resolveStoryCollectionSource(slug),
+        new Set((catalog as readonly { readonly id: string }[]).map((entry) => entry.id)),
+      ),
+    );
+    if (members === undefined) return undefined;
+  }
   const found = findRecordsNeighbors(
     catalog,
-    recordsQueryFromDiscovery(arrival),
+    query,
     entityId,
     placeArrivalQuery(arrival, 'list'),
+    members,
   );
   if (!found) return undefined;
   return {

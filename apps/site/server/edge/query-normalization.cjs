@@ -18,6 +18,11 @@ const {
 
 const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'q',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
   'kind',
   'state',
   'evidence',
@@ -33,7 +38,7 @@ const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'topic',
   'offset',
 ];
-const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'sort'];
+const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'status', 'sort', 'page'];
 const STORIES_PAGE_PARAM_ALLOWLIST = [
   'q',
   'format',
@@ -58,6 +63,11 @@ const PLACE_PAGE_PARAM_ALLOWLIST = [
   'evidence',
   'floor',
   'selected',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
 ];
 
 const TRACKING_QUERY_PREFIXES = ['utm_', 'mc_', 'pk_', 'vero_'];
@@ -99,6 +109,7 @@ function normalizePathname(pathname) {
 function getAllowedQueryParamsForPath(pathname) {
   const path = normalizePathname(pathname);
   if (path === '/atlas/catalog') return ['v'];
+  if (path === '/stories/mosaic-credits') return ['page'];
   if (path === '/search') return SEARCH_PAGE_PARAM_ALLOWLIST;
   if (path === RECORDS_PATH) return RECORDS_PAGE_PARAM_ALLOWLIST;
   if (path === '/law') return LAW_PAGE_PARAM_ALLOWLIST;
@@ -148,6 +159,11 @@ function normalizeQueryString(pathname, input) {
   for (const key of Object.keys(bag).sort()) {
     const value = firstString(bag[key]);
     if (value === undefined) continue;
+    if ((path === '/law' || path === '/stories/mosaic-credits') && key === 'page') {
+      const page = Number(value);
+      if (Number.isSafeInteger(page) && page > 1) normalized.set(key, String(Math.min(page, 1000)));
+      continue;
+    }
     normalized.set(key, value);
   }
   return normalized.toString();

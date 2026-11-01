@@ -2,6 +2,7 @@ import {
   matchExploreCollection,
   drawableCollection,
 } from '../../../lib/discovery/explore-collection';
+import { collectionMemberIds } from '../../../lib/discovery/story-collection';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { UseToasts } from '../../../components/patterns/Toast';
@@ -155,12 +156,18 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     topicId,
     status,
   ]);
+  /** Released members of the named collection. Absent when the collection is unresolved, which
+   *  makes a named collection match nothing rather than the whole archive. */
+  const collectionMembers = useMemo(
+    () => (view.collection ? collectionMemberIds(view.collection) : undefined),
+    [view.collection],
+  );
   const collectionMatches = useMemo(
     () =>
       view.collectionFacts
-        ? matchExploreCollection(view.collectionFacts, collectionState)
+        ? matchExploreCollection(view.collectionFacts, collectionState, collectionMembers)
         : undefined,
-    [view.collectionFacts, collectionState],
+    [view.collectionFacts, collectionState, collectionMembers],
   );
   /** Unlocated matches remain in collectionMatches; only drawable records enter the plate. */
   const lensFiltered = useMemo(() => {

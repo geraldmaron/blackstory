@@ -4,6 +4,11 @@ import {
 } from '../../lib/records/build-records-index';
 import type { CollectionFacts } from '../../lib/records/records-matching';
 import { matchExploreCollection, drawableCollection } from '../../lib/discovery/explore-collection';
+import {
+  NO_COLLECTION,
+  collectionMemberIds,
+  type CollectionDescriptor,
+} from '../../lib/discovery/story-collection';
 /**
  * Pure server-side view-model builder for the `/explore` page. Parses URL search params,
  * builds the explore map source from the active release snapshot, applies filters, and shapes
@@ -59,6 +64,13 @@ export type ExploreViewModel = {
   readonly viewState: ExploreViewState;
   readonly collectionFacts?: readonly CollectionFacts[];
   readonly initialMatchIndexes?: readonly number[];
+  /**
+   * The resolved named collection behind `viewState.collection`, with released member ids when
+   * live. Request-scoped, so it rides the shell, not the release-wide catalog. Absent means the
+   * whole archive. An unresolved descriptor matches nothing and the UI says membership is
+   * unavailable; it never widens to the archive or reads as zero.
+   */
+  readonly collection?: CollectionDescriptor;
   readonly source: ExploreMapSource;
   readonly allFeatures: readonly ExploreMapFeature[];
   readonly filteredFeatures: readonly ExploreMapFeature[];
@@ -177,6 +189,7 @@ export function buildExploreViewModel(
   dataSource: PublicReadSource = 'none',
   graphArtifact?: ReturnType<typeof getHistoryGraphReleaseArtifact>,
   citesEdge: CitesEdgeIndex = {},
+  collection: CollectionDescriptor = NO_COLLECTION,
 ): ExploreViewModel {
   const viewState = parseExploreSearchParams(raw);
   const source = exploreMapSourceFor(entities);
@@ -185,7 +198,11 @@ export function buildExploreViewModel(
     entities,
     new Set(allFeatures.map((feature) => feature.properties.entityId)),
   );
-  const matches = matchExploreCollection(collectionFacts, viewState);
+  const matches = matchExploreCollection(
+    collectionFacts,
+    viewState,
+    collectionMemberIds(collection),
+  );
   const filteredFeatures = drawableCollection(allFeatures, matches);
   const densityLevels = buildStateDensityLevels(source.stateAggregates);
 
@@ -202,6 +219,7 @@ export function buildExploreViewModel(
   return {
     viewState,
     collectionFacts,
+    ...(collection.state !== 'none' ? { collection } : {}),
     initialMatchIndexes: drawableMatchIndexes(matches, allFeatures),
     source,
     allFeatures,
@@ -235,6 +253,7 @@ export function buildAtlasShell(
   dataSource: PublicReadSource = 'none',
   firstPaintFeatures?: readonly ExploreMapFeature[],
   collectionCatalog: RecordsCatalogInput = entities,
+  collection: CollectionDescriptor = NO_COLLECTION,
 ): {
   readonly shell: AtlasShellModel;
   readonly noscriptFeatures: readonly ExploreMapFeature[];
@@ -246,11 +265,16 @@ export function buildAtlasShell(
     collectionCatalog,
     new Set((firstPaintFeatures ?? allFeatures).map((feature) => feature.properties.entityId)),
   );
-  const matches = matchExploreCollection(collectionFacts, viewState);
+  const matches = matchExploreCollection(
+    collectionFacts,
+    viewState,
+    collectionMemberIds(collection),
+  );
   const filteredFeatures = drawableCollection(allFeatures, matches);
   return {
     shell: {
       viewState,
+      ...(collection.state !== 'none' ? { collection } : {}),
       initialMatchIndexes: drawableMatchIndexes(matches, firstPaintFeatures ?? allFeatures),
       densityLevels: buildStateDensityLevels(source.stateAggregates),
       facetOptions: buildExploreFacetOptions(allFeatures),

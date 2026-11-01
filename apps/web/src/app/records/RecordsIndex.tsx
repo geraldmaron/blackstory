@@ -25,8 +25,62 @@ import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { RecordsIndex as RecordsIndexModel } from '../../lib/records/build-records-index';
 import { RECORDS_FILTER_KEYS, recordsHref } from '../../lib/records/build-records-index';
 import { CollectionContext } from '../../components/discovery/collection-context';
+import { CollectionPeriodControls } from '../../components/discovery/collection-period-controls';
+import { RecordsChronology } from '../../components/discovery/records-chronology';
+import { documentedCoverageLabel } from '../../lib/discovery/collection-period';
+import type { RecordsRow } from '../../lib/records/build-records-index';
+import type { RecordsQuery } from '../../lib/records/records-query';
 
 void React;
+
+/** The scope params a text search, facet form or sort link must carry so none is overwritten. */
+function scopeParams(query: RecordsQuery): Record<string, string> {
+  return {
+    ...(query.collection.length > 0 ? { collection: query.collection } : {}),
+    ...(query.periodStart.length > 0 ? { periodStart: query.periodStart } : {}),
+    ...(query.periodEnd.length > 0 ? { periodEnd: query.periodEnd } : {}),
+    ...(query.includeUndated ? { includeUndated: '1' } : {}),
+    ...(query.layout === 'chronology' ? { layout: 'chronology' } : {}),
+  };
+}
+
+function toIndexRows(rows: readonly RecordsRow[], showCoverage = false) {
+  return rows.map((row) => ({
+    href: row.href,
+    name: row.name,
+    note: [
+      row.mappable === false ? 'Not on the map' : '',
+      showCoverage ? documentedCoverageLabel(row.documentedDecades ?? []) : '',
+    ]
+      .filter(Boolean)
+      .join(' · '),
+    place: row.place,
+    era: row.era,
+    glyph: (
+      <KindGlyph kind={row.kind} {...(row.mapTone ? { mapTone: row.mapTone } : {})} size={13} />
+    ),
+    /*
+     * The same evidence meter the Explore rail, the record sheet and the record page draw.
+     */
+    grade: (
+      <span className="ds-records-grade" title={row.gradeDescription}>
+        <RecordMeter
+          className="ds-records-grade__meter"
+          level={meterLevelForTier(row.confidenceTier)}
+          tone={row.confidenceTier}
+          label={row.gradeDescription}
+        />
+        <span
+          className="ds-records-grade__letter"
+          data-grade={row.confidenceTier}
+          aria-hidden="true"
+        >
+          {row.grade ?? '·'}
+        </span>
+      </span>
+    ),
+  }));
+}
 
 type FilterKey = (typeof RECORDS_FILTER_KEYS)[number];
 
@@ -88,7 +142,27 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
     clearAllHref,
     atlasHref,
     atlasReason,
+    collection,
+    notice,
+    indexHref,
+    chronologyHref,
+    periodClearHref,
+    periodDecades,
+    undatedExcluded,
+    chronology,
   } = model;
+  const scope = scopeParams(query);
+  const periodPreserved = Object.fromEntries(
+    Object.entries({
+      ...(query.q.length > 0 ? { q: query.q } : {}),
+      ...Object.fromEntries(
+        RECORDS_FILTER_KEYS.filter((key) => query[key].length > 0).map((key) => [key, query[key]]),
+      ),
+      ...(query.sort !== 'discovery' ? { sort: query.sort } : {}),
+      ...(query.collection.length > 0 ? { collection: query.collection } : {}),
+      ...(query.layout === 'chronology' ? { layout: 'chronology' } : {}),
+    }),
+  ) as Record<string, string>;
 
   const rail = (
     <OrientationInstrument
@@ -148,9 +222,20 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           already the list, so Records is the current view and Map carries the same narrowing. */}
         <CollectionContext
           className="ds-collection--flat"
-          activeView="records"
+          activeView={query.layout === 'chronology' ? 'chronology' : 'records'}
           mapHref={atlasHref}
-          recordsHref={recordsHref(query)}
+          recordsHref={indexHref}
+          chronologyHref={chronologyHref}
+          {...(collection.state === 'live'
+            ? {
+                source: {
+                  label: collection.title,
+                  href: collection.href,
+                  unresolvedCount: collection.unresolvedCount,
+                },
+              }
+            : {})}
+          {...(notice !== undefined ? { unresolved: notice.message } : {})}
           matched={typeof totalMatched === 'number' ? totalMatched : null}
           drawable={typeof mappableMatched === 'number' ? mappableMatched : null}
         />
@@ -175,6 +260,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           preserved={{
             ...Object.fromEntries(RECORDS_FILTER_KEYS.map((key) => [key, query[key]])),
             ...(query.sort !== 'discovery' ? { sort: query.sort } : {}),
+            ...scope,
           }}
           /*
            * The index had no sort at all: 4,210 records could only be read best-evidence-first,
@@ -183,11 +269,9 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
            */
           sort={SORTS.map((option) => ({
             label: option.label,
-            href: recordsHref({
-              ...Object.fromEntries(RECORDS_FILTER_KEYS.map((key) => [key, query[key]])),
-              q: query.q,
-              sort: option.id,
-            }),
+            // The whole query rides along, so re-ordering never drops the collection, range or
+            // layout. A new order starts at page one.
+            href: recordsHref({ ...query, sort: option.id, page: 1 }),
             active: query.sort === option.id,
           }))}
           active={constraints.map((constraint) => ({
@@ -229,6 +313,12 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
                       <form className="ds-records-facet__form" action="/records" method="get">
                         {query.q.length > 0 ? (
                           <input type="hidden" name="q" value={query.q} />
+                        ) : null}
+                        {Object.entries(scope).map(([name, value]) => (
+                          <input key={name} type="hidden" name={name} value={value} />
+                        ))}
+                        {query.sort !== 'discovery' ? (
+                          <input type="hidden" name="sort" value={query.sort} />
                         ) : null}
                         {RECORDS_FILTER_KEYS.filter(
                           (other) => other !== key && query[other].length > 0,
@@ -273,58 +363,88 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
             })}
           </div>
         </FindBar>
+
+        {/* A sibling of the find form, never nested in it. Hidden fields keep every other param. */}
+        <CollectionPeriodControls
+          action="/records"
+          preserved={periodPreserved}
+          decades={periodDecades}
+          start={query.periodStart}
+          end={query.periodEnd}
+          includeUndated={query.includeUndated}
+          clearHref={periodClearHref}
+          undatedExcluded={undatedExcluded}
+        />
       </div>
 
-      <HairlineIndex
-        countLabel={pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel}
-        rows={rows.map((row) => ({
-          href: row.href,
-          name: row.name,
-          ...(row.mappable === false ? { note: 'Not on the map' } : {}),
-          place: row.place,
-          era: row.era,
-          glyph: (
-            <KindGlyph
-              kind={row.kind}
-              {...(row.mapTone ? { mapTone: row.mapTone } : {})}
-              size={13}
+      {notice !== undefined ? (
+        /* An unresolved collection or unreadable range is stated, never shown as an empty or
+           whole archive. The collection strip above carries the same message for a collection. */
+        <EmptyList
+          title={
+            notice.kind === 'collection'
+              ? 'This collection cannot be shown'
+              : 'This decade range cannot be read'
+          }
+        >
+          {notice.message}{' '}
+          <a href={notice.kind === 'collection' ? clearAllHref : periodClearHref}>
+            {notice.kind === 'collection' ? 'Browse every record' : 'Clear the range'}
+          </a>
+          .
+        </EmptyList>
+      ) : (
+        (() => {
+          const empty = (
+            <EmptyList title="No record matches this narrowing">
+              {collection.state === 'live' && collection.memberIds.length === 0 ? (
+                <>
+                  This story links to no records in this public release. That says nothing about the
+                  sources it was written from, which are listed on the story.{' '}
+                  <a href={collection.href}>Read the story</a> or{' '}
+                  <a href={clearAllHref}>browse every record</a>.
+                </>
+              ) : constraints.length > 0 ? (
+                <>
+                  Nothing in the release matches {constraints.map((c) => c.label).join(', ')}.{' '}
+                  <a href={clearAllHref}>Clear every constraint</a> to see all{' '}
+                  {totalAll.toLocaleString('en-US')} records.
+                </>
+              ) : (
+                <>The release is empty. This is a fault on our side, not an absence of history.</>
+              )}
+            </EmptyList>
+          );
+          return chronology !== undefined ? (
+            <RecordsChronology
+              sections={chronology.sections.map((section) => ({
+                key: section.decade === null ? 'undated' : String(section.decade),
+                label: section.label,
+                total: section.total,
+                shown: section.shown,
+                continued: section.continued,
+                undated: section.decade === null,
+                rows: toIndexRows(section.rows, true),
+              }))}
+              coverageLabel={
+                pageCount > 1
+                  ? `${chronology.coverageLabel} Page ${page} of ${pageCount}.`
+                  : chronology.coverageLabel
+              }
+              undatedCount={chronology.undatedCount}
+              empty={empty}
             />
-          ),
-          /*
-           * The same evidence meter the Explore rail, the record sheet and the record page draw.
-           */
-          grade: (
-            <span className="ds-records-grade" title={row.gradeDescription}>
-              <RecordMeter
-                className="ds-records-grade__meter"
-                level={meterLevelForTier(row.confidenceTier)}
-                tone={row.confidenceTier}
-                label={row.gradeDescription}
-              />
-              <span
-                className="ds-records-grade__letter"
-                data-grade={row.confidenceTier}
-                aria-hidden="true"
-              >
-                {row.grade ?? '·'}
-              </span>
-            </span>
-          ),
-        }))}
-        empty={
-          <EmptyList title="No record matches this narrowing">
-            {constraints.length > 0 ? (
-              <>
-                Nothing in the release matches {constraints.map((c) => c.label).join(', ')}.{' '}
-                <a href={clearAllHref}>Clear every constraint</a> to see all{' '}
-                {totalAll.toLocaleString('en-US')} records.
-              </>
-            ) : (
-              <>The release is empty. This is a fault on our side, not an absence of history.</>
-            )}
-          </EmptyList>
-        }
-      />
+          ) : (
+            <HairlineIndex
+              countLabel={
+                pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel
+              }
+              rows={toIndexRows(rows)}
+              empty={empty}
+            />
+          );
+        })()
+      )}
 
       {pageCount > 1 ? (
         <nav className="ds-records-pager" aria-label="Records pages">

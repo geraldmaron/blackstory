@@ -14,6 +14,17 @@ import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
 import { loadRecordsCatalog } from '../lib/records/records-catalog';
 import { pickStoryChapters } from '../lib/story/pick-story-chapters';
 import { pickStoryRecord } from '../lib/story/pick-story-record';
+import { redirect } from 'next/navigation';
+import { buildExploreHref, parseExploreSearchParams } from '../lib/map-experience/url-state';
+import { resolveStoryCollectionSource } from '../lib/stories/source';
+import {
+  NO_COLLECTION,
+  collectionDescriptorWithoutRead,
+  parseCollectionToken,
+  resolveStoryCollection,
+  storyCollectionSlug,
+  type CollectionDescriptor,
+} from '../lib/discovery/story-collection';
 import { buildAtlasShell } from './explore/explore-view-model';
 import { DoorImmersive, type DoorOpenLedgerRow } from './door-immersive';
 import { DoorNoscript } from './door-noscript';
@@ -58,12 +69,36 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
     { data: entities, source: dataSource },
     { data: collectionCatalog },
   ] = await Promise.all([loadDoorPinPlate(), getSharedPublicEntities(), loadRecordsCatalog()]);
+
+  // A named story collection reads the story cache; the unfiltered map never does, so an
+  // unavailable story source cannot take the plain map down. Sentinels need no read.
+  const viewState = parseExploreSearchParams(params);
+  const token = parseCollectionToken(viewState.collection);
+  const storySlug = storyCollectionSlug(token);
+  const storySource =
+    storySlug === undefined ? undefined : await resolveStoryCollectionSource(storySlug);
+  const collection: CollectionDescriptor =
+    storySource !== undefined
+      ? resolveStoryCollection(
+          storySource,
+          new Set(
+            (collectionCatalog as readonly { readonly id: string }[]).map((entry) => entry.id),
+          ),
+        )
+      : (collectionDescriptorWithoutRead(token) ?? NO_COLLECTION);
+  // A well-formed story the release does not have redirects TEMPORARILY (307) to the finite
+  // `missing` sentinel, keeping every other narrowing. It never falls through to the bare map.
+  if (collection.state === 'unknown') {
+    redirect(buildExploreHref({ ...viewState, collection: 'missing' }));
+  }
+
   const { shell, noscriptFeatures } = buildAtlasShell(
     params,
     entities,
     dataSource,
     features,
     collectionCatalog,
+    collection,
   );
   const placeCount = pins.features.length.toLocaleString('en-US');
   const openLedger = buildOpenLedger(features);
