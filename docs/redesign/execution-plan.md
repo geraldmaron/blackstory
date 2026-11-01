@@ -86,14 +86,15 @@ of repeatedly reviewing the whole plan. No Astra/Fable or paid API fallback.
 Initial implementation leases are Codex Luna for the route/state manifest and guard, and
 Codex Sol for query/sort continuity through existing Records, Explore and record adapters.
 Each has its own local clone. The coordinator alone integrates and commits; workers do not
-commit, push, publish, prune branches or launch other agents. Editorial layout and rendered
-acceptance lanes await Claude authentication and a current-owner handshake rather than
-starting competing writers in the live checkout.
+commit, push, publish, prune branches or launch other agents. A subsequent restricted Claude
+Sonnet 5.5 lane completed the shared collection-navigation UI in its own clone; Codex reviewed
+and validated that delta. See `local-handoff.md` for its receipt and evidence.
 
 At this baseline, `claude agents --json --cwd <repo>` returned no discoverable sessions,
 although process working directories show existing Claude processes. That does not identify
-an owner or establish inactivity. A new read-only Sonnet lane exited with `Not logged in ·
-Please run /login`; no Claude review ran. Do not resume or take over those processes. Until
+an owner or establish inactivity. The initial read-only Sonnet attempt failed before execution;
+later authentication was verified through the existing Max subscription outside the sandbox.
+Do not resume or take over the original processes. Until
 ownership is resolved, independent work stays in isolated local clones and does not modify
 the active checkout or its running preview. Existing preview: http://localhost:3048/.
 
@@ -108,7 +109,9 @@ the active checkout or its running preview. Existing preview: http://localhost:3
 
 ## Current blockers
 
-- Claude subscription login is unavailable in this shell. Do not configure billing or tokens.
+- Full candidate live-data preview awaits explicit approval to reuse the original environment
+  and Postgres connection. Automatic approval review denied that action; static component
+  fixtures are available without credentials. Do not configure billing or tokens.
 - Existing Claude ownership cannot be identified or messaged through the available native
   discovery interface; shared-checkout integration and branch pruning wait for ownership.
 - A legal-dataset migration needs separate operator authorization; preserve statute URLs.

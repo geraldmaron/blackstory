@@ -5,7 +5,9 @@ as a **Map** or as **Records**. Records and the embedded Explore browse surface 
 component, so the choice reads the same in both places.
 
 Module: `apps/web/src/components/discovery/collection-context.tsx` and `collection-context.css`.
-Status: implemented; rendered, mobile and theme acceptance are not yet recorded.
+Status: implemented. Actual component fixtures were inspected at 375px and 1280px across
+light/dark themes, including keyboard focus. Full app, panel-overlap and live-data acceptance
+remain pending; fixture inspection is not that sign-off.
 
 ## What it shows
 
