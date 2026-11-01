@@ -121,6 +121,17 @@ export function PopulationByDecadeChart({
         role="img"
         aria-hidden="true"
       >
+        <defs>
+          <pattern
+            id="ds-viz-hatch"
+            width="6"
+            height="6"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <line x1="0" y1="0" x2="0" y2="6" stroke="var(--ds-canvas)" strokeWidth="2.2" />
+          </pattern>
+        </defs>
         {yTicks.map((tick) => {
           const y = yScale(tick);
           return (
@@ -177,7 +188,14 @@ export function PopulationByDecadeChart({
           const showLabel = index % 2 === 0 || index === rows.length - 1;
 
           // Split decades: enslaved base + free on top; else a single ink Black-total bar.
-          const segments =
+          const segments:
+            readonly {
+              key: string;
+              from: number;
+              to: number;
+              fill: string;
+              hatched?: boolean;
+            }[] =
             row.enslavedBlackPopulation !== null && row.freeBlackPopulation !== null
               ? [
                   {
@@ -191,6 +209,7 @@ export function PopulationByDecadeChart({
                     from: row.enslavedBlackPopulation,
                     to: row.blackPopulation,
                     fill: FILL_FREE,
+                    hatched: true,
                   },
                 ]
               : [
@@ -208,17 +227,34 @@ export function PopulationByDecadeChart({
                 const top = yScale(segment.to);
                 const bottom = yScale(segment.from);
                 return (
-                  <rect
-                    key={segment.key}
-                    className="ds-data-chart__mark"
-                    x={barX}
-                    y={top}
-                    width={barWidth}
-                    height={Math.max(0, bottom - top)}
-                    fill={segment.fill}
-                  >
-                    <title>{`${row.decade} · ${segment.key === 'enslaved' ? 'Enslaved' : segment.key === 'free' ? 'Free' : 'Black population'}: ${formatChartCount(segment.to - segment.from)}`}</title>
-                  </rect>
+                  <g key={segment.key}>
+                    <rect
+                      className="ds-data-chart__mark"
+                      x={barX}
+                      y={top}
+                      width={barWidth}
+                      height={Math.max(0, bottom - top)}
+                      fill={segment.fill}
+                    >
+                      <title>{`${row.decade} · ${segment.key === 'enslaved' ? 'Enslaved' : segment.key === 'free' ? 'Free' : 'Black population'}: ${formatChartCount(segment.to - segment.from)}`}</title>
+                    </rect>
+                    {/*
+                     * brand.md: colour is never the only signal. The free series carries
+                     * --ds-viz-4, which is 2.06:1 on the light canvas and so below the 3:1
+                     * minimum for a meaningful graphic. The hatch tells the two series apart
+                     * without touching a shared brand token.
+                     */}
+                    {segment.hatched ? (
+                      <rect
+                        x={barX}
+                        y={top}
+                        width={barWidth}
+                        height={Math.max(0, bottom - top)}
+                        fill="url(#ds-viz-hatch)"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                  </g>
                 );
               })}
               {showLabel ? (
@@ -262,7 +298,11 @@ export function PopulationByDecadeChart({
           Enslaved (1790 to 1860)
         </li>
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: FILL_FREE }} />
+          {/* The swatch carries the same hatch as the bar, so the legend matches what is drawn. */}
+          <span
+            className="ds-data-chart__legend-swatch ds-data-chart__legend-swatch--hatched"
+            style={{ background: FILL_FREE }}
+          />
           Free (1790 to 1860)
         </li>
         <li className="ds-data-chart__legend-item">
