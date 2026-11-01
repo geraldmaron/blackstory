@@ -11,9 +11,9 @@ This table supersedes the initial phase-one suggestions below. It records intent
 | Memorial, Errata, Sources and Rooms | Intentional distinct publication layouts retained | Names/order and Memorial protection preserved; source lineage readable; no route retirement or forced merge. |
 | Static information, Submit and Corrections | Existing publication/intake UI retained; receipt wait added | Labels and existing validation remain; lookup failure differs from not-found. No submission or stored-record write was performed. |
 | Legacy redirects and internal design-system route | Retained compatible routing and existing access posture | Historical URLs keep supported context; no fixture or staff data was exposed through an application route. |
-| Staff/auth entry | Protected desk layouts retained; shared recovery, sign-in status/touch states and representative case selection/empty states migrated | Auth logic unchanged; sign-in targets measured44px; synthetic state fixtures and SSR checks pass. Populated staff workflows and real dialog keyboard interaction require an existing staff session; fixtures do not prove them. |
+| Staff/auth entry | Protected desk layouts retained; shared recovery, sign-in status/touch states and representative case selection/empty states migrated | Auth logic unchanged; sign-in targets measured44px; synthetic state fixtures and SSR checks pass. Representative populated Inbox/Queue and real dialog keyboard checks now pass using the existing Admin session; no mutation-path or all-role acceptance is claimed. |
 
-There are no requested schema or stored-record changes needed for these UI slices. Canonical integration/pruning awaits owner release; exact copied-tile credit data remains unavailable. Retiring Rooms or merging Sources is optional, not a blocker.
+There are no requested schema or stored-record changes needed for these UI slices. Canonical integration and recoverable cleanup are complete after owner release; exact copied-tile credit data remains unavailable. Retiring Rooms or merging Sources is optional, not a blocker.
 
 ---
 

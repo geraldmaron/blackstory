@@ -1,3 +1,15 @@
+# Current handoff — owner release and staff acceptance resolved
+
+Canonical redesign/ux-audit-2026-10 has been fast-forwarded to the tested candidate. The integration branch is synced with this documentation-only acceptance receipt. Follow the actual app on http://127.0.0.1:3103 .
+
+Real signed-in, read-only Work/Inbox/Queue checks passed, including populated keyboard detail, modal inertness/containment/return, filtered-empty recovery and mobile sizing. No record mutation was submitted. See staff-acceptance-and-reconciliation.md for precise scope.
+
+Cleanup:two worktrees removed with source/index snapshots; eight archived intact with ignored local configuration. Former heads, patches and recovery refs are preserved. The old root HANDOFF.md is archived intact. No owner or login blocker remains. Current code evidence is7fb7f62a (2,945 pass,eight skipped,zero failures); executable sources are unchanged by this receipt.
+
+Only copied-tile metadata and the separately preserved release-graph guard need owner/data review before their respective repair/apply work. Any schema/record mutation still needs final user sign-off. No push/deploy occurred.
+
+---
+
 # Local redesign handoff
 
 2026-11-01. This is an isolated integration candidate, not a released or visually accepted

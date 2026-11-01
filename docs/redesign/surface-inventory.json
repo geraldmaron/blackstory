@@ -129,12 +129,13 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "status": "partial",
+          "reason": "Actual existing Admin session rendered the Work dashboard read-only; current protected navigation remains. No mutation or other-role acceptance is claimed.",
           "evidence": [
             "apps/web/src/app/admin/page.tsx",
             "apps/web/src/app/admin/error.tsx",
-            "apps/web/src/app/admin/error.test.tsx"
+            "apps/web/src/app/admin/error.test.tsx",
+            "docs/redesign/staff-acceptance-and-reconciliation.md"
           ]
         },
         "loading": {
@@ -891,12 +892,13 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "status": "partial",
+          "reason": "Actual populated Inbox rendered50 paginated rows at desktop and375px mobile without document overflow. Read-only acceptance is recorded; mutation paths were not exercised.",
           "evidence": [
             "apps/web/src/app/admin/inbox/page.tsx",
             "apps/web/src/app/admin/error.tsx",
-            "apps/web/src/app/admin/error.test.tsx"
+            "apps/web/src/app/admin/error.test.tsx",
+            "docs/redesign/staff-acceptance-and-reconciliation.md"
           ]
         },
         "loading": {
@@ -916,16 +918,20 @@
         },
         "empty": {
           "status": "partial",
-          "reason": "The inbox renders the shared case list, which separates a filtered zero (Clear filters link) from an empty inbox. SSR component test only; no authenticated session or populated data.",
+          "reason": "Actual GET no-match filter rendered zero rows and a native Clear filters link; clearing restored50 rows. The truly empty-desk variant remains synthetic component evidence.",
           "evidence": [
             "apps/web/src/admin/cases/case-queue-empty.tsx",
-            "apps/web/src/admin/cases/case-queue-empty.test.tsx"
+            "apps/web/src/admin/cases/case-queue-empty.test.tsx",
+            "docs/redesign/staff-acceptance-and-reconciliation.md"
           ]
         },
         "selected": {
           "status": "partial",
-          "reason": "Shares the case list: native row button opens the detail sheet and focus returns on close. Populated acceptance needs a real staff session.",
-          "evidence": ["apps/web/src/admin/cases/CaseQueue.tsx"]
+          "reason": "Actual Enter opened a populated case modal, focused Close, contained Shift+Tab and inerted the background. Escape restored row focus and removed inertness. Mobile dialog width matched375px.",
+          "evidence": [
+            "apps/web/src/admin/cases/CaseQueue.tsx",
+            "docs/redesign/staff-acceptance-and-reconciliation.md"
+          ]
         },
         "auth": {
           "status": "baseline",
@@ -996,14 +1002,15 @@
           "evidence": ["apps/web/src/app/admin/login/page.tsx"]
         },
         "auth": {
-          "status": "baseline",
-          "reason": "The sign-in route is the existing unauthenticated entry to staff access.",
+          "status": "partial",
+          "reason": "User performed sign-in; the existing Admin session then accessed real protected Work/Inbox/Queue. Agent did not handle credentials or extract tokens. Input/status fixtures and44px unauthenticated rendering remain supporting evidence.",
           "evidence": [
             "apps/web/src/proxy.ts",
             "apps/web/src/proxy.test.ts",
             "apps/web/src/admin/auth/protected-paths.test.ts",
             "apps/web/src/app/admin/login/page.tsx",
-            "apps/web/src/app/admin/login/safe-admin-next-path.test.ts"
+            "apps/web/src/app/admin/login/safe-admin-next-path.test.ts",
+            "docs/redesign/staff-acceptance-and-reconciliation.md"
           ]
         }
       },
@@ -1026,12 +1033,13 @@
       "status": "partial",
       "states": {
         "default": {
-          "status": "baseline",
-          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "status": "partial",
+          "reason": "Actual populated Queue rendered50 rows at restored desktop viewport, without alerts or document overflow. No write action or all-role matrix was exercised.",
           "evidence": [
             "apps/web/src/app/admin/queue/page.tsx",
             "apps/web/src/app/admin/error.tsx",
-            "apps/web/src/app/admin/error.test.tsx"
+            "apps/web/src/app/admin/error.test.tsx",
+            "docs/redesign/staff-acceptance-and-reconciliation.md"
           ]
         },
         "loading": {

@@ -164,13 +164,16 @@ edits and local fixtures remain separate from stored data.
 - A legal-dataset migration needs separate operator authorization; preserve statute URLs.
 - No permission is implied to amend protected experiences or change production access.
 
-## Remaining release and acceptance gates
+## Current release and acceptance state
 
-Independent source work is complete to the current migrated/retained classification. Future authorized work must start with a coherent visible/interactive slice on the live candidate, publish its verified preview URL early, and label any synthetic fixture separately. Browser evidence is a milestone criterion, not a last-step decoration. Reuse unchanged checks, then freeze the aggregate once the candidate is stable.
+Future authorized milestones remain visual-first: serve a coherent visible/interactive slice early on the verified candidate, provide its URL, and clearly label fixtures. Reuse unchanged checks and freeze aggregates only after meaningful source integration.
 
-1. **Original-owner release, pending and not attempted:** the owner of the original `redesign/ux-audit-2026-10` session must confirm it has stopped writing and released that branch for reconciliation. This is the minimal next step. Then the integrator can recheck both heads, reconcile and prune only integrated/recoverable/unowned branches. No takeover, canonical merge or pruning occurred.
-2. **Protected populated acceptance, pending access:** use an existing authorized staff session to check real list/detail/dialog keyboard behavior and populated views. The synthetic captures do not substitute for that check. No role changes, credential creation or mutation-path validation is authorized by this UI pass.
-3. **Copied-tile credits, pending data-owner decision:** retain the honest missing-credit notice or supply the captured author/licence/source metadata for a separately reviewed repair. No metadata was invented and no historical content was deleted.
-4. **Conditional data/signoff gate:** any proposed schema or stored-record remedy requires an exact scoped diff, adversarial review, isolated validation, impact/rollback plan and final user sign-off before application. No such mutation was needed or performed here.
+Owner release and representative populated staff acceptance are resolved. The original redesign branch is reconciled by fast-forward; obsolete UI worker branches/worktrees are removed or archived with complete recovery records. See staff-acceptance-and-reconciliation.md for the exact read-only browser checks and Git results. Neither is an outstanding permission blocker.
 
-Push/deploy remain unrequested and unattempted. Optional Rooms retirement, Sources merge or pagination unification do not block the current candidate.
+Remaining decisions and conditional safeguards:
+
+1. Copied-tile credits: retain the honest missing-credit notice or supply captured author/licence/source metadata for a separately reviewed repair. Nothing was invented or deleted.
+2. Release-graph safety: the separate graph-guard worktree is preserved. Review its empty-graph protection against the schema and validate it before any future graph-apply operation. No graph apply is needed for these UI changes or was run.
+3. Any future schema or stored-record remedy still requires an exact scoped diff, adversarial review, isolated validation, impact/rollback and final user sign-off before application. No such mutation is part of this candidate.
+
+Push/deploy remain unrequested and unattempted. Optional Rooms retirement, Sources merge and pagination unification are not blockers.

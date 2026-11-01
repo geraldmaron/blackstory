@@ -154,3 +154,8 @@ Claude execution:1473cad3 (loading/auth/staff recovery),901f964e (public states 
 Final frozen aggregate after cleanup:2,953 tests,2,945 pass,eight skipped,zero failures (/tmp/blackstory-final-stable-web.log). TypeScript passes on the same TypeScript sources; scoped changed-file ESLint, inventory guard and66-route/six-shared-surface manifest checks pass. Existing unrelated token-ratchet debt remains outside this slice; no global-clean claim.
 
 Durable visual evidence and the two labelled standalone HTML captures are in /Users/geralddagher/Documents/Codex/2026-10-31/task-4/artifacts/blackstory-redesign-20261101 . The actual app remains http://127.0.0.1:3103 . The separate synthetic capture is http://127.0.0.1:3102/state-fixtures-light.html .
+
+
+## Real staff acceptance after owner release
+
+The former protected-session gate is resolved. Real read-only Work/Inbox/Queue and desktop/mobile case-dialog checks passed on code7fb7f62a in the user's existing Chrome session; see staff-acceptance-and-reconciliation.md. No protected record text, identifiers, credentials or tokens are included in this report. Synthetic fixtures remain distinct. No record decision or mutation was submitted.
