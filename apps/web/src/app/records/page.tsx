@@ -12,6 +12,8 @@
  * Plate posture: Parked. This room never shows the map; the off-ramp hands the narrowing to it.
  */
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { recordsHref } from '../../lib/records/build-records-index';
 import { RecordsIndexRoom } from './RecordsIndex';
 import { loadRecordsIndex, recordsQueryCacheKey } from './load-records-index';
 import '../reading-room.css';
@@ -32,6 +34,14 @@ export async function generateMetadata({ searchParams }: RecordsPageProps): Prom
   const key = recordsQueryCacheKey(await searchParams);
   const { model } = await loadRecordsIndex(key);
   const absolute = (path: string): string => new URL(path, SITE_URL).toString();
+  // An unresolved collection or unreadable range is an explicit error state, never indexable.
+  if (model.notice !== undefined) {
+    return {
+      title: 'Records',
+      robots: { index: false, follow: false },
+      alternates: { canonical: absolute(model.canonicalPath) },
+    };
+  }
 
   const title =
     model.constraints.length > 0
@@ -54,7 +64,14 @@ export async function generateMetadata({ searchParams }: RecordsPageProps): Prom
 
 export default async function RecordsPage({ searchParams }: RecordsPageProps) {
   const key = recordsQueryCacheKey(await searchParams);
-  const { model } = await loadRecordsIndex(key);
+  const { model, query, collection } = await loadRecordsIndex(key);
+
+  // A well-formed reference to a story the release does not have redirects TEMPORARILY (307)
+  // to the finite `missing` sentinel: the story may publish later, so this is not a permanent
+  // move, and every other narrowing rides along. It never drops into the bare archive.
+  if (collection.state === 'unknown') {
+    redirect(recordsHref({ ...query, collection: 'missing', page: 1 }));
+  }
 
   return (
     <>

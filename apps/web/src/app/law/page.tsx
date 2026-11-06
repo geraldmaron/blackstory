@@ -6,7 +6,7 @@ import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
-import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
+import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from './law-view-model';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { LawBrowseSections } from './LawBrowseSections';
 import { humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
@@ -21,16 +21,24 @@ import '../reading-room.css';
 
 void React;
 
-export const metadata: Metadata = buildStaticPageMetadata({
-  path: '/law',
-  title: 'Law',
-  description:
-    'Plain-language statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for.',
-});
-
 type LawPageProps = {
   readonly searchParams: Promise<RawLawBrowseParams>;
 };
+
+export async function generateMetadata({ searchParams }: LawPageProps): Promise<Metadata> {
+  const view = buildLawBrowseViewModel(await searchParams, await loadLegalCatalog());
+  return {
+    ...buildStaticPageMetadata({
+      path: lawBrowseHref({ ...view, page: String(view.page) }),
+      title: 'Law',
+      description:
+        'Plain-language statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for.',
+    }),
+    ...(view.q.trim() || view.sort !== 'chronological'
+      ? { robots: { index: false, follow: true } }
+      : {}),
+  };
+}
 
 export default async function LawPage({ searchParams }: LawPageProps) {
   const params = await searchParams;

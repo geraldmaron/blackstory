@@ -882,7 +882,7 @@
   font-size: var(--ds-text-caption);
   line-height: 1.45;
   color: var(--ds-ink-muted);
-  border-left: 3px solid var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-rule);
   background: var(--room-sunk);
 }
 
@@ -899,7 +899,7 @@
   font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink);
-  border-left: 3px solid var(--ds-accent-graphic);
+  border: var(--ds-border-width) solid var(--ds-rule);
   background: var(--room-sunk);
 }
 
@@ -1136,7 +1136,6 @@
   color: var(--ds-ink);
   background: var(--ds-surface);
   border-color: var(--ds-accent-graphic);
-  border-left-width: 3px;
 }
 
 .lives-milestone__choices a:focus-visible,
@@ -1329,11 +1328,24 @@
     var(--ds-viz-grid);
 }
 
+/*
+ * No estimate: an empty track, not a short bar. The 2px minimum fill above exists so a tiny
+ * real percentage stays visible, which is exactly why it must never be applied to a value
+ * that does not exist — "Withheld" and "Not published" were rendering as near-zero
+ * measurements. The reason itself is already stated in words next to this track.
+ */
+.lives-era__bar--absent {
+  background: none;
+  border-top: 1px dashed var(--ds-viz-grid);
+  height: 0;
+  align-self: center;
+}
+
 .lives-era__evidence,
 .lives-era__rules {
   padding: var(--ds-space-4);
   background: var(--ds-surface-sunken);
-  border-left: 3px solid var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .lives-era__source-label {
@@ -1472,7 +1484,7 @@
 .lives-archive__account blockquote {
   margin: var(--ds-space-5) 0;
   padding-left: var(--ds-space-4);
-  border-left: 3px solid var(--ds-accent-graphic);
+  border-left: 2px solid var(--ds-accent-graphic);
   font-size: var(--ds-text-editorial-lede);
 }
 .lives-archive__account-scope {
@@ -1508,7 +1520,7 @@
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   line-height: 1.55;
-  border-left: 2px solid var(--ds-rule);
+  border-left: var(--ds-border-width) solid var(--ds-rule);
   padding-left: var(--ds-space-3);
 }
 .lives-archive__citation {
@@ -1572,6 +1584,23 @@
   font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   color: var(--ds-ink-muted);
+}
+
+.lives-source-notice {
+  margin: var(--ds-space-6) 0;
+}
+
+.lives-source-notice__retry {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
+}
+
+.lives-source-notice__retry:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 3px;
 }
 
 @media (min-width: 40rem) {

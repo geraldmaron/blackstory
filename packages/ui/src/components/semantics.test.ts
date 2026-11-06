@@ -15,9 +15,9 @@ import { Notice } from '../components/Notice.tsx';
 import { ResultList } from '../components/ResultList.tsx';
 import { Timeline } from '../components/Timeline.tsx';
 
-test('Confidence exposes role=status and non-color mark', () => {
+test('Confidence is a static label with a non-color mark, not a live region', () => {
   const html = renderToStaticMarkup(createElement(Confidence, { level: 'high' }));
-  assert.match(html, /role="status"/);
+  assert.doesNotMatch(html, /role="status"/);
   assert.match(html, /High confidence/);
   assert.match(html, /aria-hidden="true"/);
 });

@@ -43,6 +43,16 @@ export function withoutSummaryEchoClaims(
   return claims.filter((claim) => normalizeForEcho(claim.object) !== normalizedSummary);
 }
 
+/**
+ * Matches text the page already prints as an accepted claim. The "Inclusion evidence" list under
+ * "Can I trust this" quotes the same claims a second time, with the same source link; with this it
+ * can point back to them instead. Same normalization as the summary-echo check above.
+ */
+export function claimTextMatcher(claims: readonly PublicClaimView[]): (text: string) => boolean {
+  const printed = new Set(claims.map((claim) => normalizeForEcho(claim.object)));
+  return (text) => printed.has(normalizeForEcho(text));
+}
+
 /** Maps seed `PublicClaimView` rows into `EvidenceClaimInput` (citation field rename + dispute).  */
 export function toEvidenceClaimInputs(
   claims: readonly PublicClaimView[],

@@ -9,6 +9,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import {
   EMPTY_RECORDS_QUERY,
+  buildRecordsIndex,
   type RecordsFacet,
   type RecordsIndex as RecordsIndexModel,
 } from '../../lib/records/build-records-index';
@@ -30,6 +31,7 @@ const STATES = ['DC', 'VA', 'NC', 'SC', 'GA', 'AL', 'MS', 'LA', 'TX', 'FL', 'TN'
 
 function render(): string {
   const model = {
+    ...buildRecordsIndex([], EMPTY_RECORDS_QUERY),
     query: EMPTY_RECORDS_QUERY,
     rows: [],
     totalAll: 1200,

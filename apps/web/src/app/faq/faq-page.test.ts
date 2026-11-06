@@ -68,7 +68,8 @@ test('the AI question is answered, and the answer is no', () => {
   const all = FAQ_ENTRIES.flatMap((entry) => entry.answer).join(' ');
   assert.match(all, /from fetched sources/, 'the answer says where facts do come from');
   assert.match(all, /never supplies a fact/, 'and what a model is never allowed to do');
-  assert.match(all, /neo-voice\.md/, 'the voice standard is named, so the claim is checkable');
+  assert.match(all, /written voice standard/, 'the writing standard is mentioned');
+  assert.doesNotMatch(all, /\.md\b|docs\//, 'no internal file path reaches a reader');
   assert.match(all, /scan of a drawing/, 'the covers are drawn, and the page says so');
 });
 

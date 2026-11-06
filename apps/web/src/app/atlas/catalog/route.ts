@@ -9,13 +9,19 @@
  * `explore/atlas-catalog.ts` for the cost history.
  */
 import { getSharedPublicEntities } from '../../../lib/map-experience/shared-map-data';
+import { loadRecordsCatalog } from '../../../lib/records/records-catalog';
 import { ATLAS_CATALOG_CACHE_CONTROL, buildAtlasCatalogJson } from '../../explore/atlas-catalog';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(): Promise<Response> {
-  const { data: entities, source } = await getSharedPublicEntities();
-  const body = await buildAtlasCatalogJson(entities, source);
+export async function GET(request: Request): Promise<Response> {
+  const [{ data: entities, source }, { data: collectionCatalog }] = await Promise.all([
+    getSharedPublicEntities(),
+    loadRecordsCatalog(),
+  ]);
+  // Legacy URLs retain ordinary string haystacks. Only the new loader opts into references.
+  const transport = new URL(request.url).searchParams.get('v') === '4' ? 'story-references' : 'raw';
+  const body = await buildAtlasCatalogJson(entities, source, collectionCatalog, transport);
   return new Response(body, {
     status: 200,
     headers: {

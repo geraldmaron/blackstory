@@ -48,10 +48,14 @@ describe('surface class is the only shell switch', () => {
     assert.doesNotMatch(shellCss, /data-surface='map'/);
   });
 
-  it('never strips the desktop nav, mobile menu, or CTA on a document surface', () => {
-    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-nav--desktop/);
-    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-menu\b/);
-    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-header__cta/);
+  it('never strips the command bar or its wordmark on a document surface', () => {
+    // SiteShellHeader mounts CommandBar on every reading surface; a surface-keyed rule in any
+    // stylesheet that styles the bar could still hide it, which no render-gate test would see.
+    const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
+    for (const css of [shellCss, commandBarCss, uiShellHeaderCss]) {
+      assert.doesNotMatch(css, /\[data-surface='reading'\][^{]*\.ds-bar\b/);
+      assert.doesNotMatch(css, /\[data-surface='reading'\][^{]*\.ds-shell-wordmark\b/);
+    }
   });
 
   it('scopes shell-level surface rules from .ds-shell so the sibling header can match', () => {
@@ -102,17 +106,8 @@ describe('instrument shell layout', () => {
   });
 });
 
-describe('shell header theme tokens', () => {
-  it('uses a flush opaque bar with theme surface/ink (no floating top gap)', () => {
-    assert.match(uiShellHeaderCss, /\.ds-shell-header\s*\{[^}]*top:\s*0/s);
-    assert.match(uiShellHeaderCss, /\.ds-shell-header\s*\{[^}]*background:\s*var\(--ds-surface\)/s);
-    assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*background:\s*transparent/s);
-    assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    // Regression: no surface class may freeze the navbar on charcoal / dark-kit artwork.
-    assert.doesNotMatch(
-      uiShellHeaderCss,
-      /\[data-surface='[a-z]+'\]\)?\s+\.ds-shell-header__inner\s*\{[^}]*--ds-fixed-charcoal/s,
-    );
+describe('shell wordmark theme swap', () => {
+  it('never freezes the wordmark on dark-kit artwork for a surface class', () => {
     assert.doesNotMatch(
       uiShellHeaderCss,
       /\[data-surface='[a-z]+'\]\)?[\s\S]*ds-shell-wordmark__img--theme-dark\s*\{[^}]*display:\s*block/s,

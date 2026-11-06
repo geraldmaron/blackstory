@@ -31,17 +31,8 @@ export type KnownFinding = {
   readonly recorded: string;
 };
 
-export const KNOWN_COMPONENT_FINDINGS: readonly KnownFinding[] = Object.freeze([
-  {
-    subjects: ['FacetRail', 'records index'],
-    ruleId: 'aria-allowed-attr',
-    problem:
-      'packages/ui/src/components/FacetRail.tsx renders each facet option as <a href> carrying aria-pressed. The link role does not support aria-pressed, so a screen reader announces no on/off state at all — the active facet is conveyed by class name and color only.',
-    remedy:
-      'Either swap aria-pressed for aria-current="true" on the active option (it is a navigation link, and aria-current is what links use), or make the option a real toggle button inside a form. aria-current is the smaller change and matches SynchronizedResultList, which already uses it.',
-    recorded: '2026-09-13',
-  },
-]);
+// Empty: the FacetRail aria-pressed finding (2026-09-13) was fixed with aria-current.
+export const KNOWN_COMPONENT_FINDINGS: readonly KnownFinding[] = Object.freeze([]);
 
 export type PartitionedViolations = {
   /** Violations with no entry in the register. These fail the lane. */

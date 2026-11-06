@@ -114,6 +114,7 @@
 }
 
 .ds-receipt__value {
+  display: block;
   margin-top: var(--ds-space-2);
   font-family: var(--ds-font-mono);
   font-size: 30px;
@@ -123,7 +124,7 @@
 }
 
 .ds-receipt__keep {
-  margin-top: 10px;
+  margin: 10px 0 0;
   font-size: 13px;
   line-height: 1.55;
   color: var(--ds-ink-muted);

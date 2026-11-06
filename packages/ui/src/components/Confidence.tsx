@@ -32,11 +32,7 @@ const DEFAULT_LABELS: Record<ConfidenceLevel, string> = {
 export function Confidence({ level, label, className }: ConfidenceProps) {
   const text = label ?? DEFAULT_LABELS[level];
   return (
-    <span
-      className={cx('ds-confidence', `ds-confidence--${level}`, className)}
-      data-tier={level}
-      role="status"
-    >
+    <span className={cx('ds-confidence', `ds-confidence--${level}`, className)} data-tier={level}>
       <span className="ds-confidence__mark" aria-hidden="true">
         {MARKS[level]}
       </span>

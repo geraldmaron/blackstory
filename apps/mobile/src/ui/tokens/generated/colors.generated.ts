@@ -109,21 +109,21 @@ export const statusColors = {
 export const confidenceColors = {
   "light": {
     "high": {
-      "fg": "#215A34",
+      "fg": "#2F6B3C",
       "bg": "#DCEBDD",
       "border": "#3E8B54",
       "cue": "High confidence"
     },
     "medium": {
-      "fg": "#6B4A17",
-      "bg": "#F3E4C6",
-      "border": "#B87A2A",
+      "fg": "#6B6A17",
+      "bg": "#EBEBC6",
+      "border": "#8B8A2E",
       "cue": "Medium confidence"
     },
     "low": {
-      "fg": "#4A453D",
-      "bg": "#E7E1D3",
-      "border": "#7A7364",
+      "fg": "#8E4F2A",
+      "bg": "#F3E4C6",
+      "border": "#B86B2A",
       "cue": "Low confidence"
     }
   },
@@ -135,15 +135,15 @@ export const confidenceColors = {
       "cue": "High confidence"
     },
     "medium": {
-      "fg": "#F0CE8E",
-      "bg": "#3A2A0E",
-      "border": "#D6A354",
+      "fg": "#D4D48E",
+      "bg": "#2A2A0E",
+      "border": "#C4C04A",
       "cue": "Medium confidence"
     },
     "low": {
-      "fg": "#D4CDBE",
-      "bg": "#2B2822",
-      "border": "#8F8672",
+      "fg": "#D98540",
+      "bg": "#3A2A0E",
+      "border": "#B86B2A",
       "cue": "Low confidence"
     }
   }

@@ -49,14 +49,23 @@ import {
   type RecordGapKind,
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
+import {
+  EVIDENCE_DIMENSION_COPY,
+  confidenceTierPhrase,
+  recordMaturityLabel,
+} from '../../../lib/evidence/confidence-language';
 import { confidenceIconFor } from '../../../lib/map-experience/confidence-icons';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
+import { buildExploreMapSource } from '../../../lib/map-experience/build-explore-map-source';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
 import { shouldShowVisitBlock } from '../../../lib/geography/visit-handoff';
 import {
-  buildExploreHref,
-  defaultExploreOverlayState,
-} from '../../../lib/map-experience/url-state';
+  discoveryHasNarrowing,
+  EMPTY_DISCOVERY_STATE,
+  type DiscoveryState,
+} from '../../../lib/discovery/discovery-state';
+import { RecordInvestigationReturn } from '../../../components/discovery/record-investigation-return';
+import { recordDiscoveryReturn } from '../../record-first-paint';
 import {
   displayEncodingFor,
   kindFamilyEncodingForKind,
@@ -73,6 +82,7 @@ import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-pro
 import { WhyThisAppears } from '../../../components/why-appears';
 import {
   buildWhyThisAppearsForEntity,
+  claimTextMatcher,
   toEvidenceClaimInputs,
   whyAppearsEvidenceById,
   withoutSummaryEchoClaims,
@@ -203,7 +213,14 @@ function plural(count: number, noun: string): string {
   return `${count.toLocaleString('en-US')} ${noun}${count === 1 ? '' : 's'}`;
 }
 
-export async function EntityRecordRoom({ entity }: { readonly entity: PublicEntityView }) {
+export async function EntityRecordRoom({
+  entity,
+  arrival = EMPTY_DISCOVERY_STATE,
+}: {
+  readonly entity: PublicEntityView;
+  /** Normalized investigation context from the arrival URL; empty for a direct entry. */
+  readonly arrival?: DiscoveryState;
+}) {
   const standingLabel = deriveRecordStanding(entity);
   const jurisdictionLabel = isDisplayableJurisdictionLabel(entity.jurisdictionLabel)
     ? entity.jurisdictionLabel.trim()
@@ -227,19 +244,21 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
     ...(geoAnchor ? { lat: geoAnchor.lat, lng: geoAnchor.lng } : {}),
   };
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
-  const exploreHref = buildExploreHref({
-    filters: {
-      era: 'all',
-      kind: 'all',
-      tone: 'all',
-      theme: 'all',
-      status: 'all',
-      confidence: 'all',
-    },
-    ...defaultExploreOverlayState(),
-    selected: entity.id,
-    ...(geoAnchor ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } } : {}),
-  });
+  const publicMapFeature = buildExploreMapSource([entity]).featureCollection.features[0];
+  const publicMapGeo = publicMapFeature
+    ? {
+        lng: publicMapFeature.geometry.coordinates[0],
+        lat: publicMapFeature.geometry.coordinates[1],
+      }
+    : undefined;
+  /* Map, list and list position from the arrival, through the same builder Place uses. The pin
+     viewport is only added when a stored anchor exists, so an unmapped record promises no pin. */
+  const returns = await recordDiscoveryReturn(
+    entity.id,
+    arrival,
+    publicMapGeo,
+    publicMapFeature !== undefined,
+  );
   const { data: searchIndex } = await getPublicSearchIndex();
   const orderedIds = searchIndex.map((doc) => doc.id);
   const crossReferences = await resolveEntityCrossReferences(entity.id);
@@ -317,24 +336,35 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
         <RecordSmallTitle id="record-file-heading" icon="provenance">
           Record file
         </RecordSmallTitle>
+        {/*
+         * Same facts, reader wording. This block printed the pipeline's own tokens —
+         * "Maturity: Partial Enrichment" — to people who have never seen the pipeline. Nothing
+         * is removed: the release id is what a correction or an errata entry is traced
+         * through, so it stays, with a line saying what it is rather than leaving a bare
+         * identifier on a public page.
+         */}
         <dl className="ds-rec-file__rows">
           <div className="ds-rec-file__row">
-            <dt>Maturity</dt>
-            <dd>{humanizeToken(entity.recordMaturity)}</dd>
+            <dt>How far researched</dt>
+            <dd>{recordMaturityLabel(entity.recordMaturity)}</dd>
           </div>
           <div className="ds-rec-file__row">
-            <dt>Coverage</dt>
+            <dt>{EVIDENCE_DIMENSION_COPY.researchCoverage.label}</dt>
             <dd>{humanizeToken(entity.researchCoverage)}</dd>
           </div>
           <div className="ds-rec-file__row">
-            <dt>Updated</dt>
+            <dt>Last updated</dt>
             <dd className="ds-mono">{formatRecordDate(entity.revision.recordUpdatedAt)}</dd>
           </div>
           <div className="ds-rec-file__row">
-            <dt>Release</dt>
+            <dt>Published in</dt>
             <dd className="ds-mono ds-rec-file__release">{entity.revision.releaseId}</dd>
           </div>
         </dl>
+        <p className="ds-rec-file__note">
+          The release is the batch this version of the record was published in. Quote it in a
+          correction and the exact text you read can be traced.
+        </p>
         <Link className="ds-rec-file__correct" href={correctionsHref} prefetch={false}>
           <FontAwesomeIcon icon={faPenToSquare} className="ds-rec-inline-icon" aria-hidden="true" />
           Submit a correction
@@ -389,7 +419,11 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
             Why this is here
           </RecordSmallTitle>
           {whyThisAppears !== undefined ? (
-            <WhyThisAppears result={whyThisAppears} evidenceById={whyAppearsEvidenceById(entity)} />
+            <WhyThisAppears
+              result={whyThisAppears}
+              evidenceById={whyAppearsEvidenceById(entity)}
+              isPrintedClaim={claimTextMatcher(displayClaims)}
+            />
           ) : (
             <p>An inclusion explanation with linked evidence has not been recorded.</p>
           )}
@@ -457,6 +491,12 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
       foot={apparatus}
       masthead={
         <>
+          <RecordInvestigationReturn
+            returns={returns}
+            family="record"
+            narrowed={discoveryHasNarrowing(arrival)}
+            pinned={publicMapFeature !== undefined}
+          />
           {/*
            * The masthead. The record's own photograph, at the width of the page, with the record
            * written over it, rather than a text header followed by a picture of the thing the
@@ -499,8 +539,9 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
                 >
                   {anatomyInputs.eraLabel}
                 </RecordPill>
+                {/* Plain words here too, so the two record templates say one thing. */}
                 <RecordGradePill tier={anatomyInputs.evidenceTier} href={evidenceHref}>
-                  {gradeWord}
+                  {confidenceTierPhrase(anatomyInputs.evidenceTier)}
                 </RecordGradePill>
               </div>
               <h1 className="ds-record-mast__title">{entity.displayName}</h1>
@@ -582,10 +623,10 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
               <RecordFactTile
                 className={`ds-rec-tile--evidence ds-rec-tile--evidence-${anatomyInputs.evidenceTier}`}
                 icon={confidenceIconFor(anatomyInputs.evidenceTier)}
-                label="Evidence"
+                label="Confidence"
                 value={
                   <Link href={evidenceHref} prefetch={false}>
-                    {gradeWord}
+                    {confidenceTierPhrase(anatomyInputs.evidenceTier)}
                   </Link>
                 }
                 meter={{
@@ -612,13 +653,13 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
               />
             </dl>
             <div className="ds-rec-facts__actions">
-              <Link className="ds-cta ds-cta--copper" href={exploreHref} scroll={false}>
+              <Link className="ds-cta ds-cta--copper" href={returns.mapHref} scroll={false}>
                 <FontAwesomeIcon
                   icon={faMapLocationDot}
                   className="ds-rec-inline-icon"
                   aria-hidden="true"
                 />
-                See it on the map
+                {publicMapFeature ? 'See it on the map' : 'Browse the map'}
               </Link>
               {whereMapsHref ? (
                 <MapsExternalLink

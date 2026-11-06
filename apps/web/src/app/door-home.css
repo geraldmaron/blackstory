@@ -74,7 +74,7 @@
     padding: var(--ds-space-1) var(--ds-space-3);
     transform: translateX(-50%);
     white-space: nowrap;
-    font-family: var(--ds-font-ui);
+    font-family: var(--ds-font-sans);
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--ds-ink);
@@ -137,7 +137,7 @@
   border-radius: var(--ds-radius-full);
   background: var(--ds-surface);
   color: var(--ds-ink);
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -263,12 +263,11 @@
   border-radius: var(--ds-radius-full);
   background: var(--ds-surface-raised);
   color: var(--ds-ink);
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.01em;
   cursor: pointer;
-  box-shadow: var(--ds-contact-hairline);
 }
 
 .ds-door__browse-exit-btn:hover {
@@ -382,7 +381,7 @@ html[data-door-browse='1'] .ds-door {
 }
 
 .ds-door__walk-rail a {
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
   line-height: 1.3;
   color: var(--ds-accent-text);
@@ -449,7 +448,12 @@ html:has(.ds-door) {
 
 .ds-door-open {
   box-sizing: border-box;
-  width: min(54rem, 90vw);
+  display: grid;
+  /* Action column beside an orientation column: shorter than the old single stack, so the
+     country stays visible above and to the right of the sheet. */
+  grid-template-columns: minmax(0, 1.35fr) minmax(13rem, 0.65fr);
+  column-gap: var(--ds-space-6);
+  width: min(62rem, 92vw);
   max-width: 100%;
   min-width: 0;
   padding: var(--ds-space-5) var(--ds-space-6) var(--ds-space-5) var(--ds-space-6);
@@ -478,7 +482,7 @@ html:has(.ds-door) {
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(2.5rem, 7.4vw, 5.5rem);
+  font-size: clamp(2.25rem, 5.2vw, 4.25rem);
   letter-spacing: -0.055em;
   line-height: 0.84;
   color: var(--ds-ink);
@@ -508,13 +512,73 @@ html:has(.ds-door) {
 .ds-door-open__invite {
   max-width: 38rem;
   margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-ui);
-  font-size: 0.9375rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.45;
   color: var(--ds-ink-muted);
   text-wrap: pretty;
+}
+
+/* The two columns of the opening: what to do, and what is here. */
+.ds-door-open__primary,
+.ds-door-open__orient {
+  min-width: 0;
+}
+
+.ds-door-open__orient {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+  padding-left: var(--ds-space-5);
+  border-left: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-door-open__eyebrow {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/* A real GET search into /records: one field, one button, the same `q` the index reads. */
+.ds-door-open__search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-4) 0 0;
+}
+
+.ds-door-open__search-input {
+  flex: 1 1 14rem;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-door-open__search-input::placeholder {
+  color: var(--ds-ink-muted);
+}
+
+.ds-door-open__search-input:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-door-open__search-go {
+  flex: 0 0 auto;
+  min-height: 44px;
 }
 
 /*
@@ -526,9 +590,7 @@ html:has(.ds-door) {
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-4) 0 0;
-  padding-top: var(--ds-space-3);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
@@ -557,9 +619,10 @@ html:has(.ds-door) {
 }
 
 .ds-door-open__place {
-  font-family: var(--ds-font-ui);
-  font-size: 0.9375rem;
-  font-weight: 550;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  line-height: 1.15;
   letter-spacing: 0;
   color: var(--ds-ink);
   text-decoration: none;
@@ -590,7 +653,7 @@ a.ds-door-open__place:focus-visible {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
   gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-4) 0 0;
+  margin: var(--ds-space-2) 0 0;
   padding: var(--ds-space-3) 0;
   border-top: var(--ds-border-width) solid var(--ds-rule);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
@@ -606,7 +669,7 @@ a.ds-door-open__place:focus-visible {
 
 .ds-door-open__ledger-label {
   margin: 0;
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -626,7 +689,7 @@ a.ds-door-open__place:focus-visible {
 }
 
 .ds-door-open__count {
-  margin: var(--ds-space-3) 0 0;
+  margin: 0;
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
@@ -655,15 +718,11 @@ a.ds-door-open__place:focus-visible {
   color: var(--ds-ink);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
-  border-left: 4px solid var(--ds-accent-graphic);
-  box-shadow: var(--ds-contact-hairline);
   pointer-events: auto;
 }
 
 .ds-door-journey__chapter--center .ds-door-journey__card {
   width: min(32rem, 100%);
-  border-left-width: var(--ds-border-width);
-  border-left-color: var(--ds-rule);
 }
 
 /* Cold-open subject morph — History → His Story → … → Black Story.
@@ -896,7 +955,7 @@ a.ds-door-open__place:focus-visible {
 .ds-door-journey__cite {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.02em;
   line-height: 1.5;
   color: var(--ds-ink-muted);
@@ -904,8 +963,8 @@ a.ds-door-open__place:focus-visible {
 
 .ds-door-journey__record {
   margin: var(--ds-space-3) 0 0;
-  font-family: var(--ds-font-ui);
-  font-size: 0.9375rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-door-journey__record a {
@@ -997,7 +1056,7 @@ body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--ds-ink);
@@ -1018,7 +1077,6 @@ body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-contact-overlap);
 }
 
 .ds-door__field-fallback-kicker {
@@ -1053,8 +1111,8 @@ body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
 
 .ds-door__field-fallback-actions a,
 .ds-door__field-fallback-actions button {
-  font-family: var(--ds-font-ui);
-  font-size: 0.9375rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
   font-weight: 600;
   color: var(--ds-accent-text);
   background: none;
@@ -1200,10 +1258,20 @@ body:has(.ds-door) .ds-door-journey {
   }
 
   .ds-door-open {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--ds-space-4);
     width: 100%;
     padding-inline: var(--ds-gutter);
     border-right: 0;
     border-radius: 0;
+  }
+
+  /* Stacked: orientation follows the actions, set off by a rule instead of a column edge. */
+  .ds-door-open__orient {
+    padding-left: 0;
+    padding-top: var(--ds-space-4);
+    border-left: 0;
+    border-top: var(--ds-border-width) solid var(--ds-rule);
   }
 
   .ds-door-open__headline {
@@ -1226,7 +1294,7 @@ body:has(.ds-door) .ds-door-journey {
   }
 
   .ds-door-open__actions > * {
-    flex: 1 1 0;
+    flex: 1 1 7rem;
   }
 
   .ds-door-journey__chapter--center {

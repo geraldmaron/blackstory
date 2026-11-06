@@ -164,6 +164,7 @@
 
   .ds-tabbar-sheet__title {
     margin: 0;
+    font-weight: bold; /* was an h2's UA weight */
     font-size: 1.125rem;
   }
 

@@ -48,7 +48,14 @@ export function BlackPopulationShareChart({
   const plotW = CHART_WIDTH - CHART_MARGIN.left - CHART_MARGIN.right;
   const plotH = CHART_HEIGHT - CHART_MARGIN.top - CHART_MARGIN.bottom;
   const shares = rows.map(shareValue);
-  const domainMin = Math.max(0, Math.floor(Math.min(...shares) - 1));
+  /*
+   * Zero-based. This is a share chart, and a truncated baseline made the decline from the
+   * 1790 peak and the recovery after 1930 read as far steeper than they are. The previous
+   * `floor(min - 1)` put the axis at about 8%, and the caption disclosed only the 2000
+   * definition break, so the truncation was never stated anywhere. A reader should not have
+   * to check the numbers table to find out the axis does not start at zero.
+   */
+  const domainMin = 0;
   const domainMax = Math.ceil(Math.max(...shares) + 1);
   const xScale = scaleLinear(0, rows.length - 1, CHART_MARGIN.left, CHART_MARGIN.left + plotW);
   const yScale = scaleLinear(domainMin, domainMax, CHART_MARGIN.top + plotH, CHART_MARGIN.top);

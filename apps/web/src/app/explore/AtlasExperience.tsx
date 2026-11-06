@@ -17,6 +17,29 @@
  */
 'use client';
 
+import { recordsHref } from '../../lib/records/records-query';
+import {
+  drawableCollection,
+  matchExploreCollection,
+  periodDecadesFor,
+  recordsQueryFromExplore,
+} from '../../lib/discovery/explore-collection';
+import { mapListContinuityLabel } from '../../lib/discovery/continuity-label';
+import { buildExploreHref, buildExploreSearchParams } from '../../lib/map-experience/url-state';
+import { CollectionContext } from '../../components/discovery/collection-context';
+import { CollectionPeriodControls } from '../../components/discovery/collection-period-controls';
+import {
+  normalizePeriod,
+  periodIsActive,
+  periodIsInvalid,
+  periodLabel,
+} from '../../lib/discovery/collection-period';
+import {
+  collectionIsUnresolved,
+  collectionMemberIds,
+  collectionStateMessage,
+} from '../../lib/discovery/story-collection';
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { focusLandmark } from '../../lib/keyboard/use-focus-trap';
@@ -63,6 +86,10 @@ import { useMapSync } from './hooks/use-map-sync';
 import { usePopulationChoropleth } from './hooks/use-population-choropleth';
 import { useAtlasCamera } from './hooks/use-atlas-camera';
 import { useRecordSelection } from './hooks/use-record-selection';
+import {
+  emitExplorePinSelect,
+  resolveExplorePinEntityId,
+} from '../../lib/map-experience/explore-pin-select';
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useLocateMe } from './hooks/use-locate-me';
@@ -238,6 +265,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
   const {
+    query,
+    era,
+    exactKind,
+    collectionState,
+    collectionMatched,
     stateCode,
     setStateCode,
     kindFamily,
@@ -306,20 +338,45 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const holdingPlaceArrival = useMemo(() => {
     return placeArrivalQuery(
       {
-        ...(kindFamily ? { kind: kindFamily } : {}),
-        ...(decade !== null ? { era: eraBucketFor(decade) } : {}),
+        ...(query ? { query } : {}),
+        sort: collectionState.sort,
+        ...((exactKind ?? kindFamily) ? { kind: exactKind ?? kindFamily! } : {}),
+        ...(era !== 'all' ? { era } : {}),
         ...(stateCode ? { state: stateCode } : {}),
         ...(topicId ? { topic: topicId } : {}),
         ...(status ? { status } : {}),
         ...(evidenceFloor === 'A' || evidenceFloor === 'B' || evidenceFloor === 'C'
           ? { evidence: evidenceFloor }
           : {}),
+        // The named collection, range and Records layout ride into the record so Return and
+        // previous/next restore exactly what the reader left.
+        ...(collectionState.collection ? { collection: collectionState.collection } : {}),
+        ...(collectionState.periodStart ? { periodStart: collectionState.periodStart } : {}),
+        ...(collectionState.periodEnd ? { periodEnd: collectionState.periodEnd } : {}),
+        ...(collectionState.includeUndated ? { includeUndated: true } : {}),
+        ...(collectionState.layout ? { layout: collectionState.layout } : {}),
       },
       'map',
     );
-  }, [decade, evidenceFloor, kindFamily, stateCode, status, topicId]);
+  }, [
+    query,
+    era,
+    exactKind,
+    collectionState.collection,
+    collectionState.periodStart,
+    collectionState.periodEnd,
+    collectionState.includeUndated,
+    collectionState.layout,
+    collectionState.sort,
+    evidenceFloor,
+    kindFamily,
+    stateCode,
+    status,
+    topicId,
+  ]);
 
   useExploreUrlSync(view.viewState, {
+    collectionState,
     stateCode,
     kindFamily,
     evidenceFloor,
@@ -472,9 +529,14 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     const saved = readPinContinuity();
     if (!saved) return;
     continuityRestoredRef.current = true;
-    const byId = view.allFeatures.find((feature) => feature.properties.entityId === saved.entityId);
-    if (byId) {
-      selectById(saved.entityId);
+    /*
+     * The Door's pins carry first-paint `pin-N` ids. Selecting one by id alone opened the sheet and
+     * then dropped it a second later, when the catalog replaced those ids. Going through the pin
+     * select path remembers the pin's coordinates, so the selection re-resolves to the real entity.
+     */
+    const pin = { pinId: saved.entityId, lng: saved.lng, lat: saved.lat };
+    if (resolveExplorePinEntityId(pin, view.allFeatures)) {
+      emitExplorePinSelect(pin);
     } else {
       camera.flyToRecord({
         center: [saved.lng, saved.lat],
@@ -482,7 +544,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       });
     }
     clearPinContinuity();
-  }, [camera, initial.viewState.selected, selectById, view.allFeatures]);
+  }, [camera, initial.viewState.selected, view.allFeatures]);
   const { copy, citationFor } = useReaderActions(toasts);
   /**
    * The radius chip the reader last picked, kept even before anything is located: pick "5 mi",
@@ -684,6 +746,105 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     mode === 'atlas' &&
     (bothColumns || selectedId === undefined);
 
+  /**
+   * The collection strip rides with the instruments: gone when chrome is hidden, and gone while a
+   * record sheet is open (the sheet takes the column the strip's right edge would cross). While it
+   * is not visible the rail keeps its own "Open record list" return link, so the list is never
+   * unreachable.
+   */
+  const namedCollection = collectionState.collection ?? '';
+  /**
+   * A named collection that cannot be shown (unknown story, unreadable address, failed story
+   * read) is stated, not counted. It is never "Counting", never zero matches and never the whole
+   * archive. This holds before the catalog arrives, so the strip does not wait for the facts.
+   */
+  const unresolvedCollection =
+    namedCollection !== '' && (!view.collection || collectionIsUnresolved(view.collection))
+      ? (collectionStateMessage(view.collection ?? { state: 'unavailable', slug: '' }) ??
+        'Membership for this collection is unavailable.')
+      : undefined;
+  const unresolvedRange = periodIsInvalid(
+    normalizePeriod({
+      start: collectionState.periodStart,
+      end: collectionState.periodEnd,
+      includeUndated: collectionState.includeUndated,
+    }),
+  )
+    ? 'This documented-decade range is not readable. Fix or clear it before counting records.'
+    : undefined;
+  const unresolvedScope = unresolvedCollection ?? unresolvedRange;
+  const showCollection =
+    mode === 'atlas' &&
+    !chromeHidden &&
+    !sheetOpen &&
+    (Boolean(view.collectionFacts) || unresolvedCollection !== undefined);
+  const exploreQuery = recordsQueryFromExplore(collectionState);
+  const collectionHrefs = {
+    map: buildExploreHref(collectionState),
+    // Both Records representations carry the same collection and every narrowing.
+    records: recordsHref({ ...exploreQuery, layout: 'index' }),
+    chronology: recordsHref({ ...exploreQuery, layout: 'chronology' }),
+  };
+  const collectionMembers = useMemo(
+    () => (view.collection ? collectionMemberIds(view.collection) : undefined),
+    [view.collection],
+  );
+  /** Collection members with a public map anchor, before any temporary map constraint. */
+  const collectionDrawable = useMemo(
+    () =>
+      view.collectionFacts
+        ? drawableCollection(
+            view.allFeatures,
+            matchExploreCollection(view.collectionFacts, collectionState, collectionMembers),
+          ).length
+        : null,
+    [view.collectionFacts, view.allFeatures, collectionState, collectionMembers],
+  );
+  /** Decade-range controls: native GET to `/explore`, every other param carried as hidden fields. */
+  const period = normalizePeriod({
+    start: collectionState.periodStart,
+    end: collectionState.periodEnd,
+    includeUndated: collectionState.includeUndated,
+  });
+  const periodDecades = useMemo(
+    () =>
+      view.collectionFacts
+        ? periodDecadesFor(view.collectionFacts, collectionState, collectionMembers)
+        : [],
+    [view.collectionFacts, collectionState, collectionMembers],
+  );
+  const {
+    periodStart: _periodStart,
+    periodEnd: _periodEnd,
+    includeUndated: _includeUndated,
+    ...periodBase
+  } = collectionState;
+  const periodPreserved = Object.fromEntries(
+    new URLSearchParams(buildExploreSearchParams(periodBase)).entries(),
+  );
+  /**
+   * Current collection and documented-range status for the instruments that otherwise speak for
+   * the whole archive (the time slider, the Filters chip). Undefined when nothing is narrowed or
+   * the scope cannot be counted, so the archive-wide wording stays true.
+   */
+  const scopeStatus =
+    view.collectionFacts &&
+    unresolvedScope === undefined &&
+    (namedCollection !== '' || periodIsActive(period))
+      ? [
+          namedCollection !== ''
+            ? `Collection narrowed: ${collectionMatched.toLocaleString('en-US')} ${collectionMatched === 1 ? 'record' : 'records'}`
+            : `Documented range: ${collectionMatched.toLocaleString('en-US')} ${collectionMatched === 1 ? 'record' : 'records'}`,
+          ...(periodIsActive(period) ? [periodLabel(period)] : []),
+        ].join(', ')
+      : undefined;
+  /** Temporary map constraints. They limit what is drawn, never what is in the collection. */
+  const mapLimits = [
+    ...(nearby ? ['nearby'] : []),
+    ...(sweepDecade !== null ? ['the time sweep'] : []),
+    ...(overlapIds ? ['overlapping pins'] : []),
+  ];
+
   /** Compact: is any sheet up? The on-map controls ride above it (map-controls.css). */
   const compactSheetOpen =
     narrow &&
@@ -701,11 +862,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     if (showResults) return edge + 344 + gap;
     return edge;
   })();
-  const zoomBy = (delta: number) => {
-    const map = stage.getMap();
-    if (!map) return;
-    map.easeTo({ zoom: map.getZoom() + delta, duration: 260 } as never);
-  };
 
   return (
     /* `data-key-scope` is what makes the bare camera, time and record keys legal here and nowhere
@@ -713,12 +869,15 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
        marking its own root is the entire scope contract — no route check, no second list. */
     <div
       ref={atlasRootRef}
+      inert={!view.collectionFacts}
+      aria-busy={!view.collectionFacts}
       className={embedded ? 'ds-atlas ds-atlas--embedded' : 'ds-atlas'}
       data-key-scope="instrument"
       data-chrome={chromeHidden ? 'hidden' : 'shown'}
       data-mode={mode}
       data-embedded={embedded ? 'true' : undefined}
       data-sheet-open={compactSheetOpen ? 'true' : undefined}
+      data-collection={showCollection ? 'shown' : undefined}
     >
       {embedded ? null : (
         <CommandBar
@@ -801,12 +960,67 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         />
       </SheetPresence>
 
+      {showCollection ? (
+        <CollectionContext
+          className="ds-collection--atlas"
+          activeView="map"
+          mapHref={collectionHrefs.map}
+          recordsHref={collectionHrefs.records}
+          chronologyHref={collectionHrefs.chronology}
+          {...(view.collection?.state === 'live'
+            ? {
+                source: {
+                  label: view.collection.title,
+                  href: view.collection.href,
+                  unresolvedCount: view.collection.unresolvedCount,
+                },
+              }
+            : {})}
+          {...(unresolvedScope !== undefined ? { unresolved: unresolvedScope } : {})}
+          {...(view.collectionFacts && unresolvedCollection === undefined
+            ? {
+                period: (
+                  <CollectionPeriodControls
+                    action="/explore"
+                    preserved={periodPreserved}
+                    decades={periodDecades}
+                    start={period.start}
+                    end={period.end}
+                    includeUndated={period.includeUndated}
+                    clearHref={buildExploreHref(periodBase)}
+                  />
+                ),
+                periodSummary: periodIsActive(period)
+                  ? periodLabel(period)
+                  : 'Documented decade range',
+              }
+            : {})}
+          ready={Boolean(view.collectionFacts)}
+          matched={view.collectionFacts ? collectionMatched : null}
+          drawable={collectionDrawable}
+          onMap={overlapFeatures?.length ?? filtered.length}
+          mapLimits={mapLimits}
+          announce
+        />
+      ) : null}
+
       <SheetPresence show={showResults}>
         <ResultsRail
           photos={sheetPhotos}
           onIntent={() => setRailTouched(true)}
           features={overlapFeatures ?? sorted}
           total={view.allFeatures.length}
+          /* The strip above owns the collection count and the list link while it is visible; the
+             rail keeps both only as the return path when the strip is hidden. */
+          {...(showCollection
+            ? {}
+            : {
+                collectionLabel:
+                  nearby || sweepDecade !== null
+                    ? `${collectionMatched.toLocaleString('en-US')} records in collection. ${filtered.length.toLocaleString('en-US')} shown with map constraints.`
+                    : mapListContinuityLabel(collectionMatched, filtered.length),
+                collectionHref: collectionHrefs.records,
+              })}
           selectedId={selectedId}
           onSelect={select}
           sort={sort}
@@ -851,6 +1065,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           decade={decade}
           onDecadeChange={setDecade}
           totalRecords={view.allFeatures.length}
+          scope={scopeStatus}
         />
       </SheetPresence>
       <SheetPresence show={mode === 'atlas' && !chromeHidden && panels.camera}>
@@ -894,7 +1109,9 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             const detail =
               key === 'lens'
                 ? constraints.length === 0
-                  ? 'no filters'
+                  ? scopeStatus !== undefined
+                    ? 'no map filters'
+                    : 'no filters'
                   : `${constraints.length} filter${constraints.length === 1 ? '' : 's'}`
                 : key === 'results'
                   ? `${sorted.length} of ${view.allFeatures.length}`
@@ -925,8 +1142,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           onLocate={nearMe}
           locating={locateStatus === 'locating'}
           located={nearby?.source === 'device'}
-          onZoomIn={() => zoomBy(1)}
-          onZoomOut={() => zoomBy(-1)}
           bearing={bearing}
           onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
           {...(controlsRight !== null

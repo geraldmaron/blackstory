@@ -58,7 +58,10 @@ export type DataTableProps<Row> = {
    * never virtualize (printing, tests, a page that must be Ctrl-F-able end to end).
    */
   readonly virtualizeAbove?: number;
-  /** Height of the scroll viewport once virtualized. */
+  /**
+   * Height of the table's own scroll viewport. Every table scrolls in one, windowed or not, so
+   * the header row can stay pinned while the body scrolls under it.
+   */
   readonly viewportHeight?: string;
   readonly className?: string;
 };
@@ -285,7 +288,7 @@ export function DataTable<Row>({
         virtualized && 'ds-datatable--virtual',
         className,
       )}
-      style={virtualized ? { maxHeight: viewportHeight } : undefined}
+      style={{ maxHeight: viewportHeight }}
       onScroll={
         virtualized
           ? (event) => setScrollTop((event.target as HTMLDivElement).scrollTop)

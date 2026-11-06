@@ -10,6 +10,7 @@ import React, { type ComponentType, type ReactNode } from 'react';
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
 import { cx } from '../utils/cx.js';
+import { headingTag, type HeadingLevel } from '../utils/heading.js';
 
 export type ResultItem = {
   readonly id: string;
@@ -31,6 +32,8 @@ export type ResultListProps = {
   readonly labelledBy?: string;
   /** Soft-nav link primitive; defaults to a native anchor. */
   readonly LinkComponent?: ComponentType<ResultListLinkProps>;
+  /** Renders each item title as a heading at this level. Defaults to h3. */
+  readonly headingLevel?: HeadingLevel;
 };
 
 function DefaultResultLink({ href, className, children }: ResultListLinkProps) {
@@ -46,14 +49,16 @@ export function ResultList({
   className,
   labelledBy,
   LinkComponent = DefaultResultLink,
+  headingLevel = 3,
 }: ResultListProps) {
   const Link = LinkComponent;
+  const Heading = headingTag(headingLevel);
   return (
     <ul className={cx('ds-result-list', className)} aria-labelledby={labelledBy}>
       {items.map((item) => (
         <li key={item.id} className="ds-result-list__item">
           <Link className="ds-result-list__link" href={item.href}>
-            <h3 className="ds-result-list__title">{item.title}</h3>
+            <Heading className="ds-result-list__title">{item.title}</Heading>
             <p className="ds-result-list__summary">{item.summary}</p>
             {item.meta ? <div className="ds-result-list__meta">{item.meta}</div> : null}
           </Link>

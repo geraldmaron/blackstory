@@ -241,8 +241,12 @@
   margin-top: var(--ds-space-4);
 }
 
+/* One step down from the "Why this is here" small title that heads this block, never above it. */
 .ds-why-appears__block .ds-subheading {
   margin: 0 0 var(--ds-space-3);
+  font-size: var(--rec-h3, 0.9375rem);
+  font-weight: 600;
+  color: var(--ds-ink-muted);
 }
 
 /* Compact inclusion basis: criterion once, prose notes, deduped sources — not the heavy editorial qualify-list. */
@@ -359,6 +363,7 @@
 }
 
 .ds-evidence-legend__summary {
+  min-height: 24px;
   cursor: pointer;
   font-family: var(--ds-font-sans);
   font-size: 0.9375rem;
@@ -433,48 +438,21 @@
 /* —— Accepted claims ————————————————————————————————————————————————————————————
    A claim is a row, not a card: `.ds-card` is the shared bordered-panel primitive, right for a
    standalone surface and wrong for a stack of them. Each claim after the first gets a hairline
-   top, matching `.ds-record-beat + .ds-record-beat`. A tone bar down the left edge carries the
-   confidence tier (paired with the confidence pill, so color is never the only signal). Sizes
-   are the record scale (`--rec-*`, record-room.css). */
+   top, matching `.ds-record-beat + .ds-record-beat`. The confidence tier is carried by the
+   claim's own pill (color, glyph and words together), so the row needs no tone bar of its own:
+   a colored stripe down the edge said the same thing a second time, in color alone. Sizes are
+   the record scale (`--rec-*`, record-room.css). */
 .ds-entity-evidence .ds-card {
-  position: relative;
   background: none;
   border: 0;
   border-radius: 0;
-  padding: 0 0 0 var(--ds-space-4);
-}
-
-.ds-entity-evidence .ds-card::before {
-  content: '';
-  position: absolute;
-  top: 0.35rem;
-  bottom: 0.35rem;
-  left: 0;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--room-rule-2, var(--ds-rule));
-}
-
-.ds-entity-evidence .ds-evidence-claim--high::before {
-  background: var(--ds-confidence-high-border);
-}
-
-.ds-entity-evidence .ds-evidence-claim--medium::before {
-  background: var(--ds-confidence-medium-border);
-}
-
-.ds-entity-evidence .ds-evidence-claim--low::before {
-  background: var(--ds-confidence-low-border);
+  padding: 0;
 }
 
 .ds-entity-evidence .ds-stack > .ds-card + .ds-card {
   margin-top: var(--ds-space-5);
   padding-top: var(--ds-space-5);
   border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
-}
-
-.ds-entity-evidence .ds-stack > .ds-card + .ds-card::before {
-  top: calc(var(--ds-space-5) + 0.35rem);
 }
 
 /* The predicate is a quiet label above the claim, not a card title. */

@@ -270,7 +270,8 @@ export function buildBrandTokens(): BrandTokens {
   };
 
   // Status/confidence hues verbatim from packages/ui/src/tokens/colors.ts
-  // (see docblock above for why these are not brand-swatch-derived).
+  // (see docblock above for why these are not brand-swatch-derived). Confidence runs
+  // green -> olive -> orange, as on web since 6fbfcaf2 reconciled colors.ts with tokens.css.
   const status = {
     light: {
       warning: { fg: '#6B4A17', bg: '#F3E4C6', border: '#B87A2A', cue: 'Warning' },
@@ -285,14 +286,14 @@ export function buildBrandTokens(): BrandTokens {
   };
   const confidence = {
     light: {
-      high: { fg: '#215A34', bg: '#DCEBDD', border: '#3E8B54', cue: 'High confidence' },
-      medium: { fg: '#6B4A17', bg: '#F3E4C6', border: '#B87A2A', cue: 'Medium confidence' },
-      low: { fg: '#4A453D', bg: '#E7E1D3', border: '#7A7364', cue: 'Low confidence' },
+      high: { fg: '#2F6B3C', bg: '#DCEBDD', border: '#3E8B54', cue: 'High confidence' },
+      medium: { fg: '#6B6A17', bg: '#EBEBC6', border: '#8B8A2E', cue: 'Medium confidence' },
+      low: { fg: '#8E4F2A', bg: '#F3E4C6', border: '#B86B2A', cue: 'Low confidence' },
     },
     dark: {
       high: { fg: '#A9D9B4', bg: '#12301C', border: '#5CAD73', cue: 'High confidence' },
-      medium: { fg: '#F0CE8E', bg: '#3A2A0E', border: '#D6A354', cue: 'Medium confidence' },
-      low: { fg: '#D4CDBE', bg: '#2B2822', border: '#8F8672', cue: 'Low confidence' },
+      medium: { fg: '#D4D48E', bg: '#2A2A0E', border: '#C4C04A', cue: 'Medium confidence' },
+      low: { fg: '#D98540', bg: '#3A2A0E', border: '#B86B2A', cue: 'Low confidence' },
     },
   };
 

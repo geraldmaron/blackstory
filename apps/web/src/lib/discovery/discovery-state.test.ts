@@ -2,17 +2,20 @@
  * DiscoveryState adapters and map/list continuity — v10.
  */
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, it, test } from 'node:test';
 import { normalizeQueryString } from '../runtime-hardening/query-normalization';
 import { parseExploreSearchParams } from '../map-experience/url-state';
 import {
   discoveryFromExplore,
   discoveryFromRecords,
   discoveryFromSearchParams,
+  discoveryHasNarrowing,
   listHrefFromDiscovery,
   mapHrefFromDiscovery,
   placeArrivalQuery,
   placeDiscoveryReturn,
+  recordArrivalQuery,
+  withQuery,
 } from './discovery-state';
 import { EMPTY_RECORDS_QUERY, buildAtlasHref } from '../records/build-records-index';
 
@@ -82,10 +85,10 @@ describe('DiscoveryState map/list continuity', () => {
     assert.equal(href.includes('group='), false);
   });
 
-  it('does not claim text query crosses to the map', () => {
+  it('preserves text query crossing to the map', () => {
     const discovery = discoveryFromRecords({ ...EMPTY_RECORDS_QUERY, q: 'greenwood', state: 'OK' });
     const mapHref = mapHrefFromDiscovery(discovery);
-    assert.equal(mapHref.includes('q='), false);
+    assert.equal(mapHref.includes('q=greenwood'), true);
     assert.equal(mapHref.includes('state=OK'), true);
     const listHref = listHrefFromDiscovery(discovery);
     assert.equal(listHref.includes('q=greenwood'), true);
@@ -167,4 +170,138 @@ describe('DiscoveryState map/list continuity', () => {
     assert.equal(ret.nextHref?.includes('gamma'), true);
     assert.equal(ret.positionLabel, '2 of 3 in this list');
   });
+});
+
+describe('record arrival carried through redirects', () => {
+  it('is empty for a bare direct URL so canonical addresses gain no from=', () => {
+    assert.equal(recordArrivalQuery({}), '');
+    assert.equal(recordArrivalQuery({ selected: 'ent_a' }), '');
+    assert.equal(recordArrivalQuery({ sort: 'discovery' }), '');
+  });
+
+  it('canonicalizes legacy origins and carries every supported narrowing', () => {
+    const params = new URLSearchParams(
+      recordArrivalQuery({
+        from: 'records',
+        q: 'school',
+        sort: 'name',
+        kind: 'place',
+        era: '1920s',
+        state: 'ok',
+        theme: 'abolition',
+        status: 'historic',
+        floor: 'B',
+      }),
+    );
+    assert.equal(params.get('from'), 'list');
+    assert.equal(params.get('q'), 'school');
+    assert.equal(params.get('sort'), 'name');
+    assert.equal(params.get('kind'), 'place');
+    assert.equal(params.get('era'), '1920s');
+    assert.equal(params.get('state'), 'OK');
+    assert.equal(params.get('topic'), 'abolition');
+    assert.equal(params.get('status'), 'historic');
+    assert.equal(params.get('evidence'), 'B');
+    assert.equal(params.has('theme'), false);
+    assert.equal(params.has('floor'), false);
+  });
+
+  it('keeps q-only and sort-only arrivals as narrowing', () => {
+    assert.equal(new URLSearchParams(recordArrivalQuery({ q: 'dunbar' })).get('q'), 'dunbar');
+    assert.equal(new URLSearchParams(recordArrivalQuery({ sort: 'name' })).get('sort'), 'name');
+  });
+
+  it('drops unknown, auth, token, returnTo, external and selected params', () => {
+    const qs = recordArrivalQuery({
+      from: 'map',
+      kind: 'person',
+      token: 'secret',
+      access_token: 'secret',
+      returnTo: 'https://evil.example/',
+      next: '//evil.example',
+      redirect: 'https://evil.example/',
+      utm_source: 'x',
+      selected: 'ent_other',
+    });
+    assert.deepEqual(Object.fromEntries(new URLSearchParams(qs)), {
+      from: 'map',
+      kind: 'person',
+    });
+  });
+
+  it('encodes values through URLSearchParams instead of concatenating raw input', () => {
+    const qs = recordArrivalQuery({ from: 'list', q: 'a&returnTo=https://evil.example/#x' });
+    const parsed = new URLSearchParams(qs);
+    assert.equal(parsed.has('returnTo'), false);
+    assert.equal(parsed.has('from'), true);
+    assert.equal(qs.includes('#'), false);
+  });
+
+  it('survives the place/invention edge allowlist unchanged', () => {
+    const qs = recordArrivalQuery({ from: 'list', q: 'school', kind: 'invention', state: 'DC' });
+    const normalized = normalizeQueryString(
+      '/invention/example',
+      Object.fromEntries(new URLSearchParams(qs)),
+    );
+    assert.deepEqual(
+      Object.fromEntries(new URLSearchParams(normalized)),
+      Object.fromEntries(new URLSearchParams(qs)),
+    );
+  });
+
+  it('preserves only the public discovery vocabulary on entity redirect ingress', () => {
+    const normalized = normalizeQueryString('/entity/public-record', {
+      from: 'list',
+      q: 'school',
+      sort: 'name',
+      kind: 'person',
+      token: 'not-forwarded',
+      returnTo: 'https://invalid.example/',
+    });
+    assert.deepEqual(Object.fromEntries(new URLSearchParams(normalized)), {
+      from: 'list',
+      sort: 'name',
+      q: 'school',
+      kind: 'person',
+    });
+  });
+
+  it('withQuery appends to a canonical address and is a no-op for an empty query', () => {
+    assert.equal(withQuery('/place/dunbar--ent_a', ''), '/place/dunbar--ent_a');
+    assert.equal(withQuery('/invention/lamp', 'from=map'), '/invention/lamp?from=map');
+  });
+
+  it('discoveryHasNarrowing ignores selection and the default order', () => {
+    assert.equal(discoveryHasNarrowing({ selected: 'ent_a', sort: 'discovery' }), false);
+    assert.equal(discoveryHasNarrowing({ query: 'x' }), true);
+    assert.equal(discoveryHasNarrowing({ sort: 'name' }), true);
+  });
+});
+
+test('a protected or undrawable record returns to the collection without a pin or viewport', () => {
+  const result = placeDiscoveryReturn(
+    'protected-record',
+    { query: 'school', sort: 'name', selected: 'other' },
+    { lat: 1, lng: 2 },
+    undefined,
+    false,
+  );
+  const params = new URL(result.mapHref, 'https://example.test').searchParams;
+  assert.equal(params.get('q'), 'school');
+  assert.equal(params.get('sort'), 'name');
+  for (const key of ['selected', 'lat', 'lng', 'zoom']) assert.equal(params.has(key), false);
+});
+
+test('record return restores the displayed chronology page and its prior index order', () => {
+  const result = placeDiscoveryReturn(
+    'record-125',
+    { layout: 'chronology', sort: 'name', view: 'list' },
+    undefined,
+    { index: 124, total: 300 },
+  );
+  const params = new URL(result.listHref, 'https://example.test').searchParams;
+  assert.equal(params.get('page'), '2');
+  assert.equal(params.get('layout'), 'chronology');
+  assert.equal(params.get('sort'), 'name');
+  assert.match(result.positionLabel ?? '', /125 of 300 in this chronology/);
 });

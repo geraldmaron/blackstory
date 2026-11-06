@@ -24,6 +24,12 @@
  * `kindFamilyEncodingFor`, `resolveEntityEraBuckets`, `recordConfidenceTier`, `getTopicLabel` — never
  * by a local copy of the list. `build-records-index.test.ts` asserts that on drift.
  */
+import {
+  matchesExcept,
+  comparatorFor,
+  type RecordFacts,
+  type CollectionFacts,
+} from './records-matching';
 import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
 import {
   findUsStateByPostalCode,
@@ -39,7 +45,7 @@ import {
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
 import { geoAnchorFor } from '../map-experience/entity-geo';
 import { mapListContinuityLabel } from '../discovery/continuity-label';
-import { canStandHere, staysOffPublicMap, isInternalRecordLabel } from '../place/public-place-path';
+import { canStandHere, staysOffPublicMap } from '../place/public-place-path';
 import { publicRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 import {
   EVIDENCE_FLOORS,
@@ -51,8 +57,26 @@ import {
   type EvidenceGrade,
 } from '../map-experience/evidence-grade';
 import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experience/kind-encoding';
-import { kindFilterLabel, kindMatchesPublicFilter } from '../map-experience/filters';
+import { kindFilterLabel } from '../map-experience/filters';
 import { formatResultSummary } from '../discovery/result-summary';
+import {
+  buildChronologyPage,
+  chronologyOrder,
+  type ChronologyPage,
+} from '../discovery/collection-chronology';
+import {
+  documentedDecades,
+  periodIsActive,
+  periodIsInvalid,
+  periodLabel,
+} from '../discovery/collection-period';
+import {
+  NO_COLLECTION,
+  collectionIsUnresolved,
+  collectionMemberIds,
+  collectionStateMessage,
+  type CollectionDescriptor,
+} from '../discovery/story-collection';
 import {
   EMPTY_RECORDS_QUERY,
   RECORDS_FILTER_KEYS,
@@ -67,12 +91,19 @@ function recordsArrivalQuery(query: RecordsQuery): string {
   const params = new URLSearchParams();
   params.set('from', 'list');
   if (query.q.length > 0) params.set('q', query.q);
+  if (query.sort !== 'discovery') params.set('sort', query.sort);
   if (query.kind.length > 0) params.set('kind', query.kind);
   if (query.era.length > 0) params.set('era', query.era);
   if (query.state.length > 0) params.set('state', query.state);
   if (query.topic.length > 0) params.set('topic', query.topic);
   if (query.status.length > 0) params.set('status', query.status);
   if (query.evidence.length > 0) params.set('evidence', query.evidence);
+  if (query.collection.length > 0) params.set('collection', query.collection);
+  if (query.periodStart.length > 0) params.set('periodStart', query.periodStart);
+  if (query.periodEnd.length > 0) params.set('periodEnd', query.periodEnd);
+  if (query.includeUndated) params.set('includeUndated', '1');
+  // The layout rides along so Return restores the chronology a reader left, not the index.
+  if (query.layout === 'chronology') params.set('layout', 'chronology');
   // Bare from=list is enough to mark the handoff; keep it even when unnarrowed.
   return params.toString();
 }
@@ -96,6 +127,7 @@ export {
   recordsHref,
   type RecordsFilterKey,
   type RecordsQuery,
+  type RecordsSort,
 } from './records-query';
 
 export type RecordsRow = {
@@ -115,6 +147,9 @@ export type RecordsRow = {
   /** The stored tier behind the letter, so the row can draw the same evidence meter the Explore
    *  results rail, the record sheet and the record page draw. */
   readonly confidenceTier: ConfidenceTier;
+  /** Known map availability for this released plate; omitted by legacy callers. */
+  readonly mappable?: boolean;
+  readonly documentedDecades?: readonly string[];
 };
 
 export type RecordsFacet = {
@@ -134,10 +169,20 @@ export type RecordsGroup = {
 
 /** One active constraint, with the words that say why the set is narrowed. */
 export type RecordsConstraint = {
-  readonly key: RecordsFilterKey | 'q';
+  readonly key: RecordsFilterKey | 'q' | 'collection' | 'period';
   readonly label: string;
   readonly clearHref: string;
 };
+
+/** An explicit absence or error the page renders instead of a result list. */
+export type RecordsNotice = {
+  readonly kind: 'collection' | 'period';
+  readonly state: 'unknown' | 'unavailable' | 'missing' | 'invalid';
+  readonly message: string;
+};
+
+/** A decade a period select can offer: only decades the collection actually documents. */
+export type RecordsPeriodDecade = { readonly decade: number; readonly count: number };
 
 export type RecordsIndex = {
   readonly query: RecordsQuery;
@@ -162,6 +207,21 @@ export type RecordsIndex = {
   readonly atlasReason: string;
   /** Matched records that carry a public map anchor (honest Explore continuity). */
   readonly mappableMatched: number;
+  /** The resolved named collection (`none` when the whole archive is the collection). */
+  readonly collection: CollectionDescriptor;
+  /** Set when the collection or period cannot be shown; never a silently widened list. */
+  readonly notice: RecordsNotice | undefined;
+  /** Same collection, other representation: native links that keep every other narrowing. */
+  readonly indexHref: string;
+  readonly chronologyHref: string;
+  /** Lifts the period only (bounds and includeUndated), keeping q, facets, sort and layout. */
+  readonly periodClearHref: string;
+  /** Known decades in the collection with the period lifted, ascending. Sparse stays sparse. */
+  readonly periodDecades: readonly RecordsPeriodDecade[];
+  /** Records without a documented decade that the active period leaves out. */
+  readonly undatedExcluded: number;
+  /** Present for `layout=chronology`: the page's rows grouped by documented decade. */
+  readonly chronology: ChronologyPage<RecordsRow> | undefined;
 };
 
 function humanize(value: string): string {
@@ -183,18 +243,6 @@ function humanize(value: string): string {
 export function recordsQueryIndexable(query: Partial<RecordsQuery>): boolean {
   return !isRecordsCombinationQuery({ ...EMPTY_RECORDS_QUERY, ...query });
 }
-
-type RecordFacts = {
-  readonly row: RecordsRow;
-  readonly eraBuckets: readonly string[];
-  readonly topicIds: readonly string[];
-  readonly confidenceTier: ConfidenceTier;
-  readonly statePostal: string | undefined;
-  readonly stateName: string | undefined;
-  readonly status: string;
-  readonly haystack: string;
-  readonly mappable: boolean;
-};
 
 /**
  * Minimal catalog row for Records. Full entities and search_index docs both adapt into this.
@@ -370,10 +418,10 @@ function isSearchIndexDoc(value: unknown): value is PublicSearchIndexDoc {
   );
 }
 
-function toRecordsCatalog(
-  catalog:
-    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
-): readonly RecordsCatalogEntry[] {
+export type RecordsCatalogInput =
+  readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[];
+
+function toRecordsCatalog(catalog: RecordsCatalogInput): readonly RecordsCatalogEntry[] {
   if (catalog.length === 0) return [];
   const first = catalog[0];
   if (isRecordsCatalogEntry(first)) {
@@ -383,34 +431,6 @@ function toRecordsCatalog(
     return (catalog as readonly PublicSearchIndexDoc[]).map(recordsCatalogFromSearchDoc);
   }
   return (catalog as readonly PublicEntityView[]).map(recordsCatalogFromEntity);
-}
-
-function matchesExcept(
-  facts: RecordFacts,
-  query: RecordsQuery,
-  skip: RecordsFilterKey | 'none',
-): boolean {
-  if (query.q.length > 0 && !facts.haystack.includes(query.q.toLowerCase())) return false;
-  if (
-    skip !== 'kind' &&
-    query.kind.length > 0 &&
-    !kindMatchesPublicFilter(facts.row.kind, query.kind)
-  )
-    return false;
-  if (skip !== 'era' && query.era.length > 0 && !facts.eraBuckets.includes(query.era)) return false;
-  if (skip !== 'state' && query.state.length > 0 && facts.statePostal !== query.state) return false;
-  if (skip !== 'topic' && query.topic.length > 0 && !facts.topicIds.includes(query.topic))
-    return false;
-  if (skip !== 'status' && query.status.length > 0 && facts.status !== query.status) return false;
-  // A floor, not an equality match. Routing "B and up" through an exact match would drop every
-  // grade A record — the opposite of what the reader asked for (see `applyEvidenceFloor`).
-  if (
-    skip !== 'evidence' &&
-    query.evidence.length > 0 &&
-    !meetsEvidenceFloor(facts.confidenceTier, query.evidence as EvidenceFloor)
-  )
-    return false;
-  return true;
 }
 
 /** Values a facet key takes on one record, so counting is one shared loop. */
@@ -456,36 +476,6 @@ function compareGroups(a: RecordsGroup, b: RecordsGroup): number {
   return b.count - a.count || a.label.localeCompare(b.label);
 }
 
-/** Sequenced discovery: authored, graded, dated records before opaque site codes and undated rows. */
-const TIER_RANK: Readonly<Record<string, number>> = {
-  high: 0,
-  medium: 1,
-  low: 2,
-  unrated: 3,
-};
-
-function earliestEraYear(facts: RecordFacts): number {
-  let earliest = Number.POSITIVE_INFINITY;
-  for (const bucket of facts.eraBuckets) {
-    const year = Number.parseInt(bucket, 10);
-    if (Number.isFinite(year) && year < earliest) earliest = year;
-  }
-  return earliest;
-}
-
-function compareDiscoveryOrder(a: RecordFacts, b: RecordFacts): number {
-  const internalA = isInternalRecordLabel(a.row.name) ? 1 : 0;
-  const internalB = isInternalRecordLabel(b.row.name) ? 1 : 0;
-  if (internalA !== internalB) return internalA - internalB;
-  const tierA = TIER_RANK[a.confidenceTier] ?? 3;
-  const tierB = TIER_RANK[b.confidenceTier] ?? 3;
-  if (tierA !== tierB) return tierA - tierB;
-  const eraA = earliestEraYear(a);
-  const eraB = earliestEraYear(b);
-  if (eraA !== eraB) return eraA - eraB;
-  return a.row.name.localeCompare(b.row.name);
-}
-
 /**
  * Builds everything `/records` renders for one request.
  *
@@ -495,10 +485,40 @@ function compareDiscoveryOrder(a: RecordFacts, b: RecordFacts): number {
  *
  * Accepts either full entities (tests + pre-backfill fallback) or slim search_index docs.
  */
+export function buildRecordFacts(catalog: RecordsCatalogInput): readonly RecordFacts[] {
+  const entries = toRecordsCatalog(catalog);
+  const collisions = placeSlugCollisionCounts(entries);
+  return entries.map((entry) => toFacts(entry, collisions));
+}
+
+export function buildCollectionFacts(
+  catalog: RecordsCatalogInput,
+  drawableIds?: ReadonlySet<string>,
+): readonly CollectionFacts[] {
+  return buildRecordFacts(catalog).map(
+    ({ row, eraBuckets, topicIds, confidenceTier, statePostal, status, haystack, mappable }) => ({
+      row: { id: row.id, name: row.name, kind: row.kind, mapTone: row.mapTone },
+      eraBuckets,
+      topicIds,
+      confidenceTier,
+      statePostal,
+      status,
+      haystack,
+      mappable: drawableIds === undefined ? mappable : drawableIds.has(row.id),
+    }),
+  );
+}
+
 export function buildRecordsIndex(
   catalog:
     readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
   query: RecordsQuery,
+  drawableIds?: ReadonlySet<string>,
+  /**
+   * The resolved named collection for `query.collection`. Omitted for the whole archive. A named
+   * query with a missing or unresolved descriptor matches nothing, never everything.
+   */
+  collection: CollectionDescriptor = NO_COLLECTION,
 ): RecordsIndex {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
@@ -509,17 +529,46 @@ export function buildRecordsIndex(
       stateNames.set(record.statePostal, record.stateName);
     }
   }
+  const members = collectionMemberIds(collection);
+  const period = {
+    start: query.periodStart,
+    end: query.periodEnd,
+    includeUndated: query.includeUndated,
+  };
 
   const matched = facts
-    .filter((record) => matchesExcept(record, query, 'none'))
-    .sort(compareDiscoveryOrder);
-  const mappableMatched = matched.filter((record) => record.mappable).length;
+    .filter((record) => matchesExcept(record, query, 'none', members))
+    .sort(comparatorFor(query.sort));
+  const periodDecades = [
+    ...facts
+      .filter((record) => !query.collection || members?.has(record.row.id) === true)
+      .reduce((counts, record) => {
+        for (const decade of documentedDecades(record.eraBuckets)) {
+          counts.set(decade, (counts.get(decade) ?? 0) + 1);
+        }
+        return counts;
+      }, new Map<number, number>())
+      .entries(),
+  ]
+    .map(([decade, count]) => ({ decade, count }))
+    .sort((a, b) => a.decade - b.decade);
+  const undatedExcluded =
+    periodIsActive(period) && !periodIsInvalid(period) && !query.includeUndated
+      ? facts.filter(
+          (record) =>
+            documentedDecades(record.eraBuckets).length === 0 &&
+            matchesExcept(record, { ...query, includeUndated: true }, 'none', members),
+        ).length
+      : 0;
+  const mappableMatched = matched.filter((record) =>
+    drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
+  ).length;
 
   const facets = Object.fromEntries(
     RECORDS_FILTER_KEYS.map((key) => {
       const counts = new Map<string, number>();
       for (const record of facts) {
-        if (!matchesExcept(record, query, key)) continue;
+        if (!matchesExcept(record, query, key, members)) continue;
         for (const value of valuesFor(record, key)) {
           counts.set(value, (counts.get(value) ?? 0) + 1);
         }
@@ -562,12 +611,80 @@ export function buildRecordsIndex(
   const page = Math.min(query.page, pageCount);
   const start = (page - 1) * RECORDS_PAGE_SIZE;
   const discoveryQuery = recordsArrivalQuery(query);
-  const rows = matched.slice(start, start + RECORDS_PAGE_SIZE).map((record) => ({
+  const toRow = (record: RecordFacts): RecordsRow => ({
     ...record.row,
     href: withArrivalQuery(record.row.href, discoveryQuery),
-  }));
+    mappable: drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
+    documentedDecades: record.eraBuckets,
+  });
+  // Chronology pages the same bounded rows the index does, in displayed chronology order, so a
+  // record's previous/next and the page boundaries both follow what the reader sees.
+  const ordered = query.layout === 'chronology' ? chronologyOrder(matched, query) : undefined;
+  const chronology = ordered
+    ? buildChronologyPage(ordered, start, start + RECORDS_PAGE_SIZE, toRow)
+    : undefined;
+  const rows = ordered
+    ? ordered.slice(start, start + RECORDS_PAGE_SIZE).map((entry) => toRow(entry.facts))
+    : matched.slice(start, start + RECORDS_PAGE_SIZE).map(toRow);
+
+  const noticeState =
+    collection.state === 'unknown' ||
+    collection.state === 'unavailable' ||
+    collection.state === 'missing' ||
+    collection.state === 'invalid'
+      ? collection.state
+      : undefined;
+  const notice: RecordsNotice | undefined =
+    noticeState !== undefined && collectionIsUnresolved(collection)
+      ? {
+          kind: 'collection',
+          state: noticeState,
+          message: collectionStateMessage(collection) ?? '',
+        }
+      : query.collection.length > 0 && collection.state === 'none'
+        ? {
+            kind: 'collection',
+            state: 'unavailable',
+            message:
+              collectionStateMessage({ state: 'unavailable', slug: '' }) ??
+              'This collection could not be read.',
+          }
+        : periodIsInvalid(period)
+          ? {
+              kind: 'period',
+              state: 'invalid',
+              message:
+                'The decade range in this address is not readable. Decades are four-digit multiples of ten such as 1880. No records are shown until it is fixed or cleared.',
+            }
+          : undefined;
 
   const constraints: RecordsConstraint[] = [];
+  if (collection.state === 'live') {
+    constraints.push({
+      key: 'collection',
+      label: `Linked from “${collection.title}”`,
+      clearHref: recordsHref({ ...query, collection: '', page: 1 }),
+    });
+  } else if (query.collection.length > 0) {
+    constraints.push({
+      key: 'collection',
+      label: 'Story collection unavailable',
+      clearHref: recordsHref({ ...query, collection: '', page: 1 }),
+    });
+  }
+  if (periodIsActive(period)) {
+    constraints.push({
+      key: 'period',
+      label: periodLabel(period),
+      clearHref: recordsHref({
+        ...query,
+        periodStart: '',
+        periodEnd: '',
+        includeUndated: false,
+        page: 1,
+      }),
+    });
+  }
   if (query.q.length > 0) {
     constraints.push({
       key: 'q',
@@ -628,6 +745,28 @@ export function buildRecordsIndex(
     atlasHref: buildAtlasHref(query),
     atlasReason: mapListContinuityLabel(matched.length, mappableMatched),
     mappableMatched,
+    collection,
+    notice,
+    indexHref: recordsHref({
+      ...query,
+      layout: 'index',
+      page: query.layout === 'index' ? page : 1,
+    }),
+    chronologyHref: recordsHref({
+      ...query,
+      layout: 'chronology',
+      page: query.layout === 'chronology' ? page : 1,
+    }),
+    periodClearHref: recordsHref({
+      ...query,
+      periodStart: '',
+      periodEnd: '',
+      includeUndated: false,
+      page: 1,
+    }),
+    periodDecades,
+    undatedExcluded,
+    chronology,
   };
 }
 
@@ -654,12 +793,20 @@ export function findRecordsNeighbors(
   query: RecordsQuery,
   entityId: string,
   arrivalQuery = '',
+  /** Resolved member ids of `query.collection`; without them a named collection has no records. */
+  members?: ReadonlySet<string>,
 ): RecordsNeighbors | undefined {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
-  const matched = entries
+  const inCollection = entries
     .map((entry) => toFacts(entry, collisions))
-    .filter((record) => matchesExcept(record, query, 'none'));
+    .filter((record) => matchesExcept(record, query, 'none', members))
+    .sort(comparatorFor(query.sort));
+  // Stepping follows the displayed order: decade groups for chronology, the sort otherwise.
+  const matched =
+    query.layout === 'chronology'
+      ? chronologyOrder(inCollection, query).map((entry) => entry.facts)
+      : inCollection;
   const index = matched.findIndex((record) => record.row.id === entityId);
   if (index < 0 || matched.length === 0) return undefined;
 
@@ -689,20 +836,25 @@ export function findRecordsNeighbors(
  * `EXPLORE_URL_PARAM_KEYS` / the edge allowlist — a param this function invents is stripped by
  * middleware before Explore ever sees it, silently widening the set.
  *
- * One constraint does NOT cross, and the off-ramp copy says so rather than pretending: `q`,
- * because Explore has no text pin filter.
- *
  * `topic` becomes `theme` (Lens name for the same controlled topic id).
  * `evidence` becomes `floor` (and-up grade predicate; not exact-match `confidence`).
  */
 export function buildAtlasHref(query: RecordsQuery): string {
   const params = new URLSearchParams();
+  if (query.q) params.set('q', query.q);
+  if (query.sort !== 'discovery') params.set('sort', query.sort);
   if (query.kind.length > 0) params.set('kind', query.kind);
   if (query.era.length > 0) params.set('era', query.era);
   if (query.state.length > 0) params.set('state', query.state);
   if (query.topic.length > 0) params.set('theme', query.topic);
   if (query.status.length > 0) params.set('status', query.status);
   if (query.evidence.length > 0) params.set('floor', query.evidence);
+  if (query.collection.length > 0) params.set('collection', query.collection);
+  if (query.periodStart.length > 0) params.set('periodStart', query.periodStart);
+  if (query.periodEnd.length > 0) params.set('periodEnd', query.periodEnd);
+  if (query.includeUndated) params.set('includeUndated', '1');
+  // Return context only: Explore ignores it for matching and hands it back with the reader.
+  if (query.layout === 'chronology') params.set('layout', 'chronology');
   const search = params.toString();
   return search.length > 0 ? `/explore?${search}` : '/explore';
 }

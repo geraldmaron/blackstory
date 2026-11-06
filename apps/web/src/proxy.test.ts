@@ -143,3 +143,13 @@ test('component fixtures require staff authentication and never receive public C
     assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), null);
   }
 });
+
+test('named collection documents never create shared negative cache entries', async () => {
+  for (const path of ['/records?collection=story%3Athe-count', '/explore?collection=missing']) {
+    const request = requestFor(path);
+    assert.equal(isPublicDocumentCacheable(request), false);
+    const response = await proxy(request);
+    assert.equal(response.headers.get('Cache-Control'), 'no-store');
+    assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), 'no-store');
+  }
+});

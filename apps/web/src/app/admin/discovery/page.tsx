@@ -7,6 +7,7 @@
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { DeskTitleBar } from '../../../admin/design-system/ui';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
 import { listDiscoveryCampaignRuns } from '../../../admin/ops/discovery-ops-store';
 import { formatSurvivorCount, shouldShowSurvivorsColumn } from './discovery-runs-view';
@@ -30,12 +31,11 @@ export default async function DiscoveryRunsPage() {
 
   return (
     <main className="ds-container ds-page" id="main">
-      <p className="ds-page__eyebrow">Discovery</p>
-      <h1 className="ds-page__title">Campaign runs</h1>
-      <p className="ds-page__lede">
-        Private discovery campaign run history and survivor counts for operator review. Survivors
-        feed Inbox triage — this desk does not publish or edit canonical entities.
-      </p>
+      <DeskTitleBar
+        eyebrow="Discovery"
+        title="Campaign runs"
+        description="Private discovery campaign run history and survivor counts for operator review. Survivors feed Inbox triage — this desk does not publish or edit canonical entities."
+      />
       <p className="story-review__notice">
         Next: <Link href="/admin/inbox">Open inbox</Link>
         {' · '}

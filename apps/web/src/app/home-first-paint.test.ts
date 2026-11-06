@@ -252,12 +252,13 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, /href="\/place\/vernon-ame-church"/);
   assert.match(html, /Tulsa, Oklahoma/);
   assert.match(html, />Places</);
-  assert.match(html, /href="\/data"/);
-  assert.match(html, /href="\/law"/);
-  assert.match(html, /href="\/memorial"/);
-  assert.match(html, /href="\/methodology"/);
-  assert.match(html, /href="\/errata"/);
-  assert.match(html, />BlackStory</);
+  // The footer lists the national rooms; a place does not repeat them as a pill row.
+  assert.doesNotMatch(html, /href="\/data"/);
+  assert.doesNotMatch(html, /href="\/law"/);
+  assert.doesNotMatch(html, /href="\/memorial"/);
+  assert.doesNotMatch(html, /href="\/errata"/);
+  assert.match(html, /href="\/methodology[^"]*"/);
+  assert.match(html, /Back to BlackStory/);
   assert.match(html, /href="\/"/);
   assert.doesNotMatch(html, /id="stories"/);
   assert.doesNotMatch(html, /href="#stories"/);
@@ -268,11 +269,21 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /place-connected archive of Black history/);
   assert.match(html, /ds-record-evidence-strip/);
   assert.match(html, /ds-rec-facts__tiles--glance/);
-  assert.match(html, /See it on the map/);
+  // One map link, in the investigation bar; the strip does not repeat it.
+  assert.match(html, /See this place on the map/);
+  assert.doesNotMatch(html, /See it on the map/);
   assert.match(html, />Confidence</);
   assert.match(html, />Precision</);
   assert.match(html, />Sources</);
-  assert.match(html, /Grade A|Grade B|Grade C|Unrated/);
+  /*
+   * First paint states confidence in plain words, not a bare letter. The letter is not gone:
+   * it is what the fixed citation string carries and what the native app shares through
+   * public-contracts. It simply is not the first thing a reader meets, and it no longer sits
+   * next to a second vocabulary saying the same thing differently.
+   */
+  assert.match(html, /Well evidenced|Partly evidenced|Thinly evidenced|Not graded/);
+  assert.match(html, /Evidence grade [ABC]/, 'the grade is still stated, as support text');
+  assert.doesNotMatch(html, />Grade [ABC]</, 'no bare letter as the headline value');
   assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
   assert.doesNotMatch(html, /radius affordance|Shown at locality/i);
   assert.doesNotMatch(html, /Journey|42Cb1758|4,101|Orbit|Tilt|Trace/);
@@ -332,11 +343,7 @@ test('seed Dunbar place record shows sourced claims without catalog chrome', () 
   assert.match(html, /Browse the record list/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dunbar-alumni-federation"/);
-  assert.match(html, /href="\/data"/);
-  assert.match(html, /href="\/law"/);
-  assert.match(html, /href="\/memorial"/);
-  assert.match(html, /href="\/methodology"/);
-  assert.match(html, /href="\/errata"/);
+  assert.doesNotMatch(html, /href="\/memorial"/);
   assert.doesNotMatch(html, /href="#stories"/);
   assert.doesNotMatch(html, /href="\/books"/);
   assert.doesNotMatch(html, /Records this one touches|this one/);
@@ -477,7 +484,7 @@ test('a place with no place neighbors walks on to another published stand', () =
     }),
   );
   assert.match(html, /African American Research Library and Cultural Center/);
-  assert.match(html, />BlackStory</);
+  assert.match(html, /Back to BlackStory/);
   assert.match(html, /href="\/"/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dillard-high-school-old"/);

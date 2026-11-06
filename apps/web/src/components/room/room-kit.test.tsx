@@ -23,12 +23,13 @@ import { resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
 import { RoomSection, RoomHandoff } from './RoomSection';
 import { RoomJump } from './RoomJump';
+import { ChoiceField, Field, fieldControlProps } from './Utility';
 import { FindBar, FindBarFilters } from './FindBar';
 import { Prose, RecordRef } from './Prose';
 import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
 import { DataTable } from './DataTable';
-import { Disclosure, Field, UtilityCard, UtilityStep } from './Utility';
+import { Disclosure, UtilityCard, UtilityStep } from './Utility';
 import { EmptyList, OffRamp, RecordNav } from './RoomFoot';
 import {
   MapMoment,
@@ -1204,5 +1205,50 @@ describe('room kit · FindBarFilters', () => {
     const html = render(2);
     assert.match(html, /<details class="ds-find__more" open="">/);
     assert.match(html, /<span class="ds-room-num">2<\/span>/);
+  });
+});
+
+/**
+ * Field errors. Field used to document that "the caller renders itself", and every caller then
+ * wired a different subset: some linked `aria-describedby`, none set `aria-invalid`, and
+ * ChoiceField had no error slot at all, so the corrections form passed its category error in as
+ * a `hint` and it rendered as ordinary help text that was never announced.
+ */
+describe('field error contract', () => {
+  it('Field links and announces its error, and marks the control invalid', () => {
+    const html = renderToStaticMarkup(
+      <Field label="Which record is wrong?" htmlFor="rec" hint="A hint" error="An error">
+        <input {...fieldControlProps({ htmlFor: 'rec', hint: true, error: 'An error' })} />
+      </Field>,
+    );
+    assert.match(html, /role="alert"/, 'the error must be announced');
+    assert.match(html, /id="rec-error"/);
+    assert.match(html, /aria-invalid="true"/, 'the control must be marked invalid');
+    assert.match(html, /aria-describedby="rec-hint rec-error"/, 'hint then error, in order');
+    assert.match(html, /class="ds-room-field__error"/, 'an error is not styled as a hint');
+  });
+
+  it('ChoiceField can render an error, not only a hint', () => {
+    const html = renderToStaticMarkup(
+      <ChoiceField
+        legend="What is wrong with it?"
+        name="category"
+        choices={[
+          { value: 'a', label: 'A' },
+          { value: 'b', label: 'B' },
+        ]}
+        error="Choose a correction category."
+      />,
+    );
+    assert.match(html, /role="alert"/);
+    assert.match(html, /id="category-error"/);
+    assert.match(html, /aria-describedby="category-error"/);
+    // exactly one radio carries the invalid state, so it announces once not once per choice
+    assert.equal((html.match(/aria-invalid="true"/g) ?? []).length, 1);
+  });
+
+  it('fieldControlProps stays quiet when there is nothing to describe', () => {
+    const props = fieldControlProps({ htmlFor: 'x' });
+    assert.deepEqual(props, { id: 'x' });
   });
 });

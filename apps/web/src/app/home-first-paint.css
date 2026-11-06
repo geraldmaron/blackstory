@@ -16,6 +16,18 @@
   --record-shell-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
 }
 
+/* The record's own place strings, set under the name as the first fact about it. */
+.ds-record-mast__where {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 54ch;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
 .ds-home-first-paint .ds-record-mast {
   /* Width counts as well as height: on a wide, short window `42vh` alone made a 4:1 strip. */
   min-height: clamp(18rem, max(42vh, 30vw), 32rem);
@@ -41,11 +53,11 @@
  */
 .ds-home-first-paint .ds-record-mast[data-media='map'] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 42%);
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 34%);
+  align-items: start;
   column-gap: var(--ds-space-8);
   min-height: 0;
-  padding: var(--ds-space-10) var(--record-shell-pad) var(--ds-space-8);
+  padding: var(--ds-space-8) var(--record-shell-pad) var(--ds-space-8);
   background: none;
 }
 
@@ -66,12 +78,36 @@
   margin: 0;
 }
 
+/* The frame states its precision in words under the map, so a coarse pin is never read as exact. */
+.ds-record-mast__map-note {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  background: var(--ds-surface);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.03em;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+/* The evidence band reads as the second beat of the mast: values at name-adjacent weight. */
+.ds-home-first-paint .ds-record-evidence-strip {
+  border-top: 2px solid var(--ds-ink);
+}
+
+.ds-home-first-paint .ds-record-evidence-strip .ds-rec-tile__value {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  letter-spacing: -0.02em;
+}
+
 .ds-home-first-paint .ds-record-mast__map .ds-embed-map,
 .ds-home-first-paint .ds-record-mast__map .ds-locator:not(.ds-embed-map__standin) {
   position: relative;
   width: 100%;
   height: auto;
-  aspect-ratio: 960 / 500;
+  aspect-ratio: 1;
   margin: 0;
   border: 0;
   border-radius: 0;
@@ -85,6 +121,11 @@
 }
 
 @media (max-width: 47.9375rem), (max-height: 34.9375rem) {
+  .ds-home-first-paint .ds-record-mast__map .ds-embed-map,
+  .ds-home-first-paint .ds-record-mast__map .ds-locator:not(.ds-embed-map__standin) {
+    aspect-ratio: 960 / 500;
+  }
+
   .ds-home-first-paint .ds-record-mast[data-media='map'] {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--ds-space-6);
@@ -136,7 +177,6 @@
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   text-decoration: none;
-  box-shadow: var(--ds-contact-hairline);
 }
 
 .ds-relation-chip:hover,

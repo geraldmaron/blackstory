@@ -1,3 +1,6 @@
+import type { CollectionFacts } from '../../lib/records/records-matching';
+import { matchExploreCollection, drawableCollection } from '../../lib/discovery/explore-collection';
+import { collectionMemberIds } from '../../lib/discovery/story-collection';
 /**
  * Wire shapes for the Explore server -> client hand-off. Lives apart from `explore-view-model.ts`
  * because that module (via the history graph seed) reaches server-only imports (`node:crypto`);
@@ -33,7 +36,7 @@ import type { ExploreViewModel } from './explore-view-model';
 import type { PaletteRecord } from '../../components/patterns/command-palette/CommandPalette';
 
 /** Where the client fetches the catalog from. One path, one cache key. */
-export const ATLAS_CATALOG_PATH = '/atlas/catalog';
+export const ATLAS_CATALOG_PATH = '/atlas/catalog?v=4';
 
 const EMPTY_EDGE_CATALOG: ExploreEdgeLineCatalog = {
   allTime: { edges: [], lineCollection: { type: 'FeatureCollection', features: [] } },
@@ -89,6 +92,7 @@ export type SerializableExploreViewModel = Omit<
 
 /** The release-wide half. Same bytes for every reader until the release changes. */
 export type AtlasCatalogPayload = {
+  readonly collectionFacts?: readonly CollectionFacts[];
   readonly schemaVersion: 1;
   readonly releaseId: string;
   readonly generatedAt: string;
@@ -105,6 +109,7 @@ export type AtlasCatalogPayload = {
 /** The per-request half: everything in the view model the catalog does not carry. */
 export type AtlasShellModel = Omit<
   SerializableExploreViewModel,
+  | 'collectionFacts'
   | 'source'
   | 'edgeLineCatalog'
   | 'availableDecades'
@@ -127,6 +132,7 @@ export function toAtlasShellModel(view: ExploreViewModel): AtlasShellModel {
   const {
     allFeatures: _allFeatures,
     filteredFeatures: _filteredFeatures,
+    collectionFacts: _collectionFacts,
     source: _source,
     edgeLineCatalog: _edgeLineCatalog,
     availableDecades: _availableDecades,
@@ -157,6 +163,7 @@ export function assembleExploreViewModel(
     source: catalog.source,
     edgeLineCatalog: catalog.edgeLineCatalog,
     availableDecades: catalog.availableDecades,
+    ...(catalog.collectionFacts ? { collectionFacts: catalog.collectionFacts } : {}),
     citesEdge: catalog.citesEdge,
     unmappedPaletteRecords: catalog.unmappedPaletteRecords,
     historyEdges: active.edges,
@@ -173,10 +180,26 @@ export function hydrateExploreViewModel(
   return {
     ...serialized,
     allFeatures,
-    filteredFeatures: applyExploreFilters(
-      allFeatures,
-      serialized.viewState.filters,
-      serialized.viewState.state,
-    ),
+    filteredFeatures: serialized.collectionFacts
+      ? drawableCollection(
+          allFeatures,
+          matchExploreCollection(
+            serialized.collectionFacts,
+            serialized.viewState,
+            // An absent or unresolved collection yields no members, so a named collection that
+            // could not be read matches nothing here instead of widening to every record.
+            serialized.collection ? collectionMemberIds(serialized.collection) : undefined,
+          ),
+        )
+      : serialized.initialMatchIndexes
+        ? serialized.initialMatchIndexes.flatMap((index) => {
+            const feature = allFeatures[index];
+            return feature ? [feature] : [];
+          })
+        : applyExploreFilters(
+            allFeatures,
+            serialized.viewState.filters,
+            serialized.viewState.state,
+          ),
   };
 }

@@ -114,6 +114,16 @@
     /* A bottom sheet is open: ride above it rather than under it. */
     --ds-map-controls-lift: calc(var(--ds-atlas-sheet-peek) + var(--ds-space-2));
   }
+
+  /*
+   * Compact, collection strip up, sheet open: the lift would carry the group onto the strip's
+   * caption, so the group steps aside until the sheet closes. Hidden (not just faded) so it also
+   * leaves the tab order; the map itself stays keyboard and touch operable.
+   */
+  .ds-atlas[data-sheet-open='true'][data-collection='shown'] .ds-map-controls {
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
 
 /* Landscape phone: the open instrument docks to the left edge, so the controls stay low-right. */
@@ -125,6 +135,12 @@
     align-items: flex-end;
     /* The sheet is a left column here, so nothing to ride above. */
     --ds-map-controls-lift: 0px;
+  }
+
+  /* No lift here, so no collision with the collection strip: keep the group. */
+  .ds-atlas[data-sheet-open='true'][data-collection='shown'] .ds-map-controls {
+    visibility: visible;
+    pointer-events: auto;
   }
 }
 

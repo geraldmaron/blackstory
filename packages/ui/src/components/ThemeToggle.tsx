@@ -51,32 +51,42 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       type="button"
       className={cx('ds-theme-toggle', className)}
       onClick={toggle}
-      aria-pressed={theme === 'dark'}
       aria-label={`Switch to ${next} theme`}
       title={`Switch to ${next} theme`}
     >
-      {theme === 'light' ? (
-        /* Moon — the action: switch to dark. */
-        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
-          <path
-            d="M16.5 12.2A7 7 0 0 1 7.8 3.5a7 7 0 1 0 8.7 8.7Z"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ) : (
-        /* Sun — the action: switch to light. */
-        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
-          <circle cx="10" cy="10" r="3.5" stroke="currentColor" strokeWidth="1.5" />
-          <path
-            d="M10 1.5v2.2M10 16.3v2.2M18.5 10h-2.2M3.7 10H1.5M16 4l-1.6 1.6M5.6 14.4 4 16M16 16l-1.6-1.6M5.6 5.6 4 4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      )}
+      {/* Both icons render; CSS shows the one for the theme on <html>, so the first paint matches
+          the head bootstrap instead of waiting for the effect to read it. */}
+      {/* Moon — the action: switch to dark. */}
+      <svg
+        className="ds-theme-toggle__icon ds-theme-toggle__icon--to-dark"
+        viewBox="0 0 20 20"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M16.5 12.2A7 7 0 0 1 7.8 3.5a7 7 0 1 0 8.7 8.7Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      </svg>
+      {/* Sun — the action: switch to light. */}
+      <svg
+        className="ds-theme-toggle__icon ds-theme-toggle__icon--to-light"
+        viewBox="0 0 20 20"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="10" cy="10" r="3.5" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="M10 1.5v2.2M10 16.3v2.2M18.5 10h-2.2M3.7 10H1.5M16 4l-1.6 1.6M5.6 14.4 4 16M16 16l-1.6-1.6M5.6 5.6 4 4"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
     </button>
   );
 }

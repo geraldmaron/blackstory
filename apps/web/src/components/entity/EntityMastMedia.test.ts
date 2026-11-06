@@ -33,7 +33,9 @@ test('EntityMastMedia renders a pinned image with credit and a source link', () 
   );
   assert.match(html, /<img[^>]*src="https:\/\/commons\.wikimedia\.org\/wiki\/Special:FilePath/);
   assert.match(html, /Wikimedia Commons/);
-  assert.match(html, /Source: Wikimedia Commons · CC-BY-SA-4\.0/);
+  // The credit already names Wikimedia Commons and the license, so the link just says what it is.
+  assert.match(html, /Source page/);
+  assert.doesNotMatch(html, /Source: Wikimedia Commons/);
   assert.match(
     html,
     /<a[^>]*href="https:\/\/commons\.wikimedia\.org\/wiki\/File:Rosa_Parks\.jpg"[^>]*>/,
@@ -129,7 +131,9 @@ test('RecordPhotoCredit keeps the rights line in flow', () => {
   );
   assert.match(html, /ds-record-mast__credit/);
   assert.match(html, /Wikimedia Commons/);
-  assert.match(html, /Source: Wikimedia Commons · CC-BY-SA-4\.0/);
+  // The credit already names Wikimedia Commons and the license, so the link just says what it is.
+  assert.match(html, /Source page/);
+  assert.doesNotMatch(html, /Source: Wikimedia Commons/);
   assert.doesNotMatch(html, /<figcaption/);
 });
 

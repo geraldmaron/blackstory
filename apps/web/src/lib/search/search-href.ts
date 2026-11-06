@@ -12,6 +12,7 @@
  * onto a page boundary without silently moving the reader.
  */
 import { historyKindToRecordsKind } from '../history/filters';
+import { parseRecordsQuery } from '../records/records-query';
 
 /** The filter keys `/search` and `/records` both understand, in canonical URL order. */
 export const SEARCH_TO_RECORDS_PARAM_KEYS = ['kind', 'status', 'era', 'topic'] as const;
@@ -39,6 +40,17 @@ export function mapSearchQueryToRecordsHref(raw: RawSearchParams): string {
     }
     params.set(key, value);
   }
+
+  // Preserve supported collection constraints and bibliography order across old addresses.
+  const collection = parseRecordsQuery(raw);
+  if (collection.state) params.set('state', collection.state);
+  if (collection.evidence) params.set('evidence', collection.evidence);
+  if (collection.sort !== 'discovery') params.set('sort', collection.sort);
+  if (collection.collection) params.set('collection', collection.collection);
+  if (collection.periodStart) params.set('periodStart', collection.periodStart);
+  if (collection.periodEnd) params.set('periodEnd', collection.periodEnd);
+  if (collection.includeUndated) params.set('includeUndated', '1');
+  if (collection.layout === 'chronology') params.set('layout', 'chronology');
 
   const qs = params.toString();
   return qs ? `/records?${qs}` : '/records';

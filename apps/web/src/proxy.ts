@@ -57,16 +57,36 @@ export const PUBLIC_DOCUMENT_CDN_CACHE_CONTROL =
  */
 export function isPublicDocumentCacheable(request: NextRequest): boolean {
   if (request.method !== 'GET' && request.method !== 'HEAD') return false;
+  if (isCollectionScopedDocument(request)) return false;
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith('/corrections/status')) return false;
   if (pathname === '/design-system' || pathname.startsWith('/design-system/')) return false;
   return surfaceClassFor(pathname) !== null;
 }
 
+/**
+ * Named-collection HTML (`/records` or `/explore` with `collection`) is never kept by a shared
+ * cache. A reader or crawler can mint any `collection=story:<slug>` value, and each unknown slug
+ * would otherwise become its own negative cache entry. The underlying released reads stay
+ * cached; only the rendered document is no-store.
+ */
+function isCollectionScopedDocument(request: NextRequest): boolean {
+  const { pathname, searchParams } = request.nextUrl;
+  return (
+    (pathname === '/records' || pathname === '/explore') &&
+    (searchParams.get('collection') ?? '').trim().length > 0
+  );
+}
+
 function applyPublicDocumentCdnCache(request: NextRequest, response: NextResponse): NextResponse {
   // A maintenance 503 or a crawler 403 decided here is not a document. Vercel would not keep
   // either status anyway; this just keeps the header off responses that were never candidates.
   if (response.status >= 400) return response;
+  if (isCollectionScopedDocument(request)) {
+    response.headers.set('Cache-Control', 'no-store');
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
+    return response;
+  }
   if (!isPublicDocumentCacheable(request)) return response;
   response.headers.set('Vercel-CDN-Cache-Control', PUBLIC_DOCUMENT_CDN_CACHE_CONTROL);
   return response;
@@ -167,8 +187,9 @@ async function resolveProxyResponse(request: NextRequest): Promise<NextResponse>
  * `/records` was unmatched until 2026-09-29, so any query rendered afresh at the origin; crawlers
  * made it the largest source of Cloudflare misses. It now canonicalizes through records-query.ts.
  * `/` is the Door and has an empty allowlist, so leftover Explore params 308 away instead of
- * fragmenting the Cloudflare HTML cache. `/atlas/catalog` and `/sitemap.xml` take no query:
- * cache-busting `?x=` 308s to the bare path. Search/refine/geocode APIs stay out so their
+ * fragmenting the Cloudflare HTML cache. `/atlas/catalog` accepts only the finite `v=3`/`v=4`
+ * cache version; `/sitemap.xml` takes no query. Cache-busting `?x=` drops on both.
+ * Search/refine/geocode APIs stay out so their
  * contracts are not stripped.
  */
 const SECURITY_NORMALIZED_EXACT = new Set([

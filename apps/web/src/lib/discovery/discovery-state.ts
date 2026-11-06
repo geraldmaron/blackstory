@@ -15,10 +15,17 @@ import { DEFAULT_EXPLORE_FILTERS } from '../map-experience/filters';
 import type { EvidenceGrade } from '../map-experience/evidence-grade';
 import {
   EMPTY_RECORDS_QUERY,
+  RECORDS_PAGE_SIZE,
   recordsHref,
   type RecordsQuery,
 } from '../records/build-records-index';
-import { placeArrivalQuery as placeArrivalQueryFields } from './discovery-arrival';
+import { parseRecordsQuery } from '../records/records-query';
+import {
+  placeArrivalQuery as placeArrivalQueryFields,
+  type PlaceArrivalFields,
+} from './discovery-arrival';
+import { normalizePeriod } from './collection-period';
+import { parseCollectionToken } from './story-collection';
 
 export { mapListContinuityLabel } from './continuity-label';
 export { withQuery } from './discovery-arrival';
@@ -41,11 +48,53 @@ export type DiscoveryState = {
   /** Evidence floor letter (`A` | `B` | `C`), not an exact confidence tier. */
   readonly evidence?: EvidenceGrade;
   readonly status?: readonly string[];
+  /** Named collection token(s); today only the first is read (`story:<slug>` or a sentinel). */
   readonly collection?: readonly string[];
+  /** Inclusive stored decade-start bounds (`collection-period.ts`); not event dates, not `from`. */
+  readonly periodStart?: string;
+  readonly periodEnd?: string;
+  readonly includeUndated?: boolean;
+  /** Records representation to restore on return. `index` has no spelling. */
+  readonly layout?: 'chronology';
   readonly sort?: string;
   readonly selected?: string;
   readonly view?: DiscoveryView;
 };
+
+/** Collection, range and layout fields shared by every adapter below. */
+function scopeFromQuery(query: {
+  readonly collection: string;
+  readonly periodStart: string;
+  readonly periodEnd: string;
+  readonly includeUndated: boolean;
+  readonly layout: 'index' | 'chronology';
+}): Pick<DiscoveryState, 'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'> {
+  return {
+    ...(query.collection ? { collection: [query.collection] } : {}),
+    ...(query.periodStart ? { periodStart: query.periodStart } : {}),
+    ...(query.periodEnd ? { periodEnd: query.periodEnd } : {}),
+    ...(query.includeUndated ? { includeUndated: true } : {}),
+    ...(query.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
+  };
+}
+
+/** The same fields, normalized through the shared codecs, ready for a `RecordsQuery`. */
+function scopeToRecordsQuery(
+  state: DiscoveryState,
+): Pick<RecordsQuery, 'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'> {
+  const period = normalizePeriod({
+    start: state.periodStart,
+    end: state.periodEnd,
+    includeUndated: state.includeUndated,
+  });
+  return {
+    collection: parseCollectionToken(firstOf(state.collection)),
+    periodStart: period.start,
+    periodEnd: period.end,
+    includeUndated: period.includeUndated,
+    layout: state.layout === 'chronology' ? 'chronology' : 'index',
+  };
+}
 
 export const EMPTY_DISCOVERY_STATE: DiscoveryState = Object.freeze({});
 
@@ -66,6 +115,8 @@ export function discoveryFromExplore(state: ExploreViewState): DiscoveryState {
   const topic = asSingleton(state.filters.theme);
   const status = asSingleton(state.filters.status);
   return {
+    ...(state.query ? { query: state.query } : {}),
+    ...(state.sort ? { sort: state.sort } : {}),
     ...(kind ? { kind } : {}),
     ...(era ? { era } : {}),
     ...(state.state ? { state: [state.state] } : {}),
@@ -73,6 +124,11 @@ export function discoveryFromExplore(state: ExploreViewState): DiscoveryState {
     ...(state.floor ? { evidence: state.floor } : {}),
     ...(status ? { status } : {}),
     ...(state.selected ? { selected: state.selected } : {}),
+    ...(state.collection ? { collection: [state.collection] } : {}),
+    ...(state.periodStart ? { periodStart: state.periodStart } : {}),
+    ...(state.periodEnd ? { periodEnd: state.periodEnd } : {}),
+    ...(state.includeUndated ? { includeUndated: true } : {}),
+    ...(state.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
     view: 'map',
   };
 }
@@ -85,6 +141,7 @@ export function discoveryFromRecords(query: RecordsQuery): DiscoveryState {
   const status = asSingleton(query.status);
   return {
     ...(query.q.length > 0 ? { query: query.q } : {}),
+    sort: query.sort,
     ...(kind ? { kind } : {}),
     ...(era ? { era } : {}),
     ...(postal ? { state: postal } : {}),
@@ -93,6 +150,7 @@ export function discoveryFromRecords(query: RecordsQuery): DiscoveryState {
       ? { evidence: query.evidence }
       : {}),
     ...(status ? { status } : {}),
+    ...scopeFromQuery(query),
     view: 'list',
   };
 }
@@ -101,20 +159,21 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
   const evidence = state.evidence;
   return {
     ...EMPTY_RECORDS_QUERY,
-    q: state.query?.trim() ?? '',
+    q: parseRecordsQuery({ q: state.query }).q,
+    sort: parseRecordsQuery({ sort: state.sort }).sort,
     kind: (firstOf(state.kind) ?? '').toLowerCase(),
     era: (firstOf(state.era) ?? '').toLowerCase(),
     state: (firstOf(state.state) ?? '').toUpperCase(),
     topic: (firstOf(state.topic) ?? '').toLowerCase(),
     status: (firstOf(state.status) ?? '').toLowerCase(),
     evidence: evidence ?? '',
+    ...scopeToRecordsQuery(state),
     page: 1,
   };
 }
 
 /**
- * Builds an Explore view state for handoff. Text search (`query`) does not cross: Explore has
- * no text pin filter. Callers must disclose that in off-ramp copy (Records already does).
+ * Builds an Explore view state carrying the same collection narrowing and bibliography order.
  */
 export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewState {
   const kind = firstOf(state.kind) ?? DEFAULT_EXPLORE_FILTERS.kind;
@@ -124,6 +183,8 @@ export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewStat
   const postal = firstOf(state.state)?.toUpperCase();
 
   return {
+    ...(state.query ? { query: parseRecordsQuery({ q: state.query }).q } : {}),
+    sort: parseRecordsQuery({ sort: state.sort }).sort,
     filters: {
       ...DEFAULT_EXPLORE_FILTERS,
       kind,
@@ -135,6 +196,23 @@ export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewStat
     ...(postal ? { state: postal } : {}),
     ...(state.evidence ? { floor: state.evidence } : {}),
     ...(state.selected ? { selected: state.selected } : {}),
+    ...exploreScope(state),
+  };
+}
+
+function exploreScope(
+  state: DiscoveryState,
+): Pick<
+  ExploreViewState,
+  'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'
+> {
+  const scope = scopeToRecordsQuery(state);
+  return {
+    ...(scope.collection ? { collection: scope.collection } : {}),
+    ...(scope.periodStart ? { periodStart: scope.periodStart } : {}),
+    ...(scope.periodEnd ? { periodEnd: scope.periodEnd } : {}),
+    ...(scope.includeUndated ? { includeUndated: true } : {}),
+    ...(scope.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
   };
 }
 
@@ -175,7 +253,16 @@ export function discoveryFromSearchParams(
   const evidenceRaw = paramOne(params.evidence) ?? paramOne(params.floor);
   const evidence =
     evidenceRaw === 'A' || evidenceRaw === 'B' || evidenceRaw === 'C' ? evidenceRaw : undefined;
-  const query = paramOne(params.q);
+  const normalized = parseRecordsQuery({
+    q: params.q,
+    sort: params.sort,
+    collection: params.collection,
+    periodStart: params.periodStart,
+    periodEnd: params.periodEnd,
+    includeUndated: params.includeUndated,
+    layout: params.layout,
+  });
+  const query = normalized.q;
   const selected = paramOne(params.selected);
   const from = paramOne(params.from);
   const view: DiscoveryView | undefined =
@@ -187,6 +274,7 @@ export function discoveryFromSearchParams(
 
   return {
     ...(query ? { query } : {}),
+    sort: normalized.sort,
     ...(kind ? { kind } : {}),
     ...(era ? { era } : {}),
     ...(state ? { state } : {}),
@@ -194,8 +282,47 @@ export function discoveryFromSearchParams(
     ...(evidence ? { evidence } : {}),
     ...(status ? { status } : {}),
     ...(selected ? { selected } : {}),
+    ...scopeFromQuery(normalized),
     ...(view ? { view } : {}),
   };
+}
+
+/**
+ * True when the state carries an origin or a narrowing a reader would want back: a map/list
+ * origin, a search, a facet, an evidence floor, or a non-default bibliography order.
+ * `selected` alone is not narrowing.
+ */
+export function discoveryHasNarrowing(state: DiscoveryState): boolean {
+  return (
+    Boolean(state.query) ||
+    Boolean(state.kind) ||
+    Boolean(state.era) ||
+    Boolean(state.state) ||
+    Boolean(state.topic) ||
+    Boolean(state.evidence) ||
+    Boolean(state.status) ||
+    Boolean(state.collection) ||
+    Boolean(state.periodStart) ||
+    Boolean(state.periodEnd) ||
+    state.layout === 'chronology' ||
+    (state.sort !== undefined && state.sort !== 'discovery')
+  );
+}
+
+/**
+ * Query string (no leading `?`) that carries a record arrival through a redirect.
+ * Re-serialized from DiscoveryState, never concatenated from the raw request, so unknown,
+ * auth, token, `returnTo` and external params cannot ride along. Empty for a bare direct URL
+ * (no origin, no narrowing) so canonical addresses do not acquire a gratuitous `from=`.
+ * Legacy origin spellings (`explore`, `records`) canonicalize to `map` / `list`.
+ */
+export function recordArrivalQuery(
+  params: Readonly<Record<string, string | readonly string[] | undefined>>,
+): string {
+  const { selected, ...carried } = discoveryFromSearchParams(params);
+  void selected;
+  if (carried.view === undefined && !discoveryHasNarrowing(carried)) return '';
+  return placeArrivalQuery(carried, carried.view ?? 'map');
 }
 
 export type PlaceDiscoveryReturn = {
@@ -220,6 +347,7 @@ export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): 
   return placeArrivalQueryFields(
     {
       ...(state.query ? { query: state.query } : {}),
+      ...(state.sort ? { sort: state.sort } : {}),
       ...(kind !== undefined ? { kind } : {}),
       ...(era !== undefined ? { era } : {}),
       ...(stateCode !== undefined ? { state: stateCode } : {}),
@@ -227,9 +355,27 @@ export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): 
       ...(state.evidence ? { evidence: state.evidence } : {}),
       ...(status !== undefined ? { status } : {}),
       ...(state.selected ? { selected: state.selected } : {}),
+      ...placeScopeFields(state),
     },
     from,
   );
+}
+
+/** Normalized through the shared codecs, never copied from the raw request. */
+function placeScopeFields(
+  state: DiscoveryState,
+): Pick<
+  PlaceArrivalFields,
+  'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'
+> {
+  const scope = scopeToRecordsQuery(state);
+  return {
+    ...(scope.collection ? { collection: scope.collection } : {}),
+    ...(scope.periodStart ? { periodStart: scope.periodStart } : {}),
+    ...(scope.periodEnd ? { periodEnd: scope.periodEnd } : {}),
+    ...(scope.includeUndated ? { includeUndated: true } : {}),
+    ...(scope.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
+  };
 }
 
 /**
@@ -246,17 +392,19 @@ export function placeDiscoveryReturn(
     readonly index: number;
     readonly total: number;
   },
+  mapped = true,
 ): PlaceDiscoveryReturn {
+  const { selected: _arrivalSelection, ...withoutSelection } = arrival;
   const withSelection: DiscoveryState = {
-    ...arrival,
-    selected: entityId,
+    ...withoutSelection,
+    ...(mapped ? { selected: entityId } : {}),
     view: arrival.view ?? 'map',
   };
   const exploreBase = exploreViewFromDiscovery(withSelection);
   const mapHref = buildExploreHref({
     ...exploreBase,
-    selected: entityId,
-    ...(geo ? { viewport: { lat: geo.lat, lng: geo.lng, zoom: 11 } } : {}),
+    ...(mapped ? { selected: entityId } : {}),
+    ...(geo && mapped ? { viewport: { lat: geo.lat, lng: geo.lng, zoom: 11 } } : {}),
   });
   const hasListNarrowing =
     Boolean(arrival.query) ||
@@ -265,17 +413,32 @@ export function placeDiscoveryReturn(
     Boolean(arrival.state) ||
     Boolean(arrival.topic) ||
     Boolean(arrival.evidence) ||
-    Boolean(arrival.status);
+    Boolean(arrival.status) ||
+    Boolean(arrival.collection) ||
+    Boolean(arrival.periodStart) ||
+    Boolean(arrival.periodEnd);
 
   return {
     mapHref,
-    listHref: listHrefFromDiscovery(arrival),
+    listHref: neighbors
+      ? recordsHref({
+          ...recordsQueryFromDiscovery(arrival),
+          page: Math.floor(neighbors.index / RECORDS_PAGE_SIZE) + 1,
+        })
+      : listHrefFromDiscovery(arrival),
     mapLabel: hasListNarrowing
       ? 'Return to the map with this narrowing'
-      : 'See this place on the map',
-    listLabel: hasListNarrowing
-      ? 'Return to the record list with this narrowing'
-      : 'Browse the record list',
+      : mapped
+        ? 'See this place on the map'
+        : 'Browse the map',
+    listLabel:
+      arrival.layout === 'chronology'
+        ? hasListNarrowing
+          ? 'Return to chronology with this narrowing'
+          : 'Return to chronology'
+        : hasListNarrowing
+          ? 'Return to the record list with this narrowing'
+          : 'Browse the record list',
     ...(neighbors?.previous
       ? {
           previousHref: neighbors.previous.href,
@@ -290,7 +453,7 @@ export function placeDiscoveryReturn(
       : {}),
     ...(neighbors && neighbors.total > 0
       ? {
-          positionLabel: `${(neighbors.index + 1).toLocaleString('en-US')} of ${neighbors.total.toLocaleString('en-US')} in this list`,
+          positionLabel: `${(neighbors.index + 1).toLocaleString('en-US')} of ${neighbors.total.toLocaleString('en-US')} in this ${arrival.layout === 'chronology' ? 'chronology' : 'list'}`,
         }
       : {}),
   };

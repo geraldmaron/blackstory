@@ -1,29 +1,42 @@
-/**
- * Archive mosaic credits: lists the rights-cleared collage tiles used as
- * decorative atmosphere on story pages and the about-page living mosaic.
- */
+/** Decorative mosaic sources: source-backed names, honest current-image credits and native paging. */
 import type { Metadata } from 'next';
-import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
+import { Notice, Pagination } from '@repo/ui';
+import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { ATMOSPHERE_TILE_CREDITS } from '../../../components/atmosphere';
+import { getPublicSearchIndex } from '../../../lib/public-data/source';
+import { OffRamp, Prose, Room, ReadingEntry } from '../../../components/room';
 import {
-  DataTable,
-  GroupHeading,
-  OffRamp,
-  Prose,
-  Room,
-  ReadingEntry,
-} from '../../../components/room';
+  MOSAIC_CREDITS_PAGE_SIZE,
+  mosaicCreditsPage,
+  mosaicCreditsHref,
+  mosaicCreditRow,
+} from './credit-model';
 import '../../utility.css';
+import './mosaic-credits.css';
 
-export const metadata: Metadata = buildStaticPageMetadata({
-  path: '/stories/mosaic-credits',
-  title: 'Archive mosaic credits',
-  description:
-    'Source credits for the rights-cleared archive mosaic tiles used as symbolic atmosphere on BlackStory story and about pages.',
-});
+type Props = { readonly searchParams?: Promise<Record<string, string | string[] | undefined>> };
 
-export default function MosaicCreditsPage() {
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { page } = mosaicCreditsPage((await searchParams)?.page, ATMOSPHERE_TILE_CREDITS.length);
+  return buildStaticPageMetadata({
+    path: mosaicCreditsHref(page),
+    title: 'Archive mosaic credits',
+    description:
+      'The decorative archive images, their associated records and current source information.',
+  });
+}
+
+export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
+  const { page, pageCount, start } = mosaicCreditsPage(
+    (await searchParams)?.page,
+    ATMOSPHERE_TILE_CREDITS.length,
+  );
+  const tiles = ATMOSPHERE_TILE_CREDITS.slice(start, start + MOSAIC_CREDITS_PAGE_SIZE);
+  // Credit labels need names, not hundreds of hydrated claim/relationship projections.
+  const read = await getPublicSearchIndex().catch(() => ({ data: [], source: 'failed' as const }));
+  const records = new Map(read.data.map((record) => [record.id, record]));
+
   return (
     <Room>
       <ReadingEntry
@@ -33,30 +46,68 @@ export default function MosaicCreditsPage() {
             Archive mosaic <em>credits</em>
           </>
         }
-        lede="Story pages may show a soft black-and-white mosaic in the page gutters. Those tiles are rights-cleared archive images, served from this site (never hotlinked from Wikimedia at request time). The mosaic is symbolic atmosphere, not a photograph of a page subject."
+        lede="These decorative archive images provide atmosphere. They do not depict the subject of every chapter. Each tile below links to the record associated with it."
       />
-
-      <GroupHeading>{ATMOSPHERE_TILE_CREDITS.length} curated tiles</GroupHeading>
       <Prose>
         <p>
-          Each tile maps to a published entity primary image (GCS public-media). Rebuild the local
-          pool with the collage tile script when the Commons promote set changes.
+          This list records an image address and an associated record for each tile. Open the record
+          to read its current image credit. Separate credits for the copied tiles are not recorded
+          in this list.
         </p>
       </Prose>
-      <DataTable
-        caption="Archive mosaic tile pool: index, source entity and stored path"
-        columns={[
-          { key: 'index', label: 'Tile', numeric: true },
-          { key: 'entity', label: 'Entity' },
-          { key: 'path', label: 'Path' },
-        ]}
-        rows={ATMOSPHERE_TILE_CREDITS.map((tile) => ({
-          index: tile.index,
-          entity: <Link href={`/entity/${tile.entityId}`}>{tile.entityId}</Link>,
-          path: <span className="ds-mono">{tile.path}</span>,
-        }))}
+      {read.source !== 'live' ? (
+        <Notice tone="warning" title="Record information could not be loaded">
+          The tiles and their recorded image links are available below. Reload to try the record
+          information again.
+        </Notice>
+      ) : null}
+      <div className="ds-mosaic-credits">
+        {tiles.map((tile) => {
+          const row = mosaicCreditRow(tile, records.get(tile.entityId));
+          return (
+            <article
+              className="ds-mosaic-credit"
+              key={tile.index}
+              aria-labelledby={`mosaic-credit-${tile.index}`}
+            >
+              {/* Local derivatives are the actual decorative assets, not the current record image. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={row.tilePath} width={96} height={96} loading="lazy" alt="" />
+              <div>
+                <p className="ds-mosaic-credit__index">Tile {row.index}</p>
+                <h2 id={`mosaic-credit-${tile.index}`}>
+                  {row.recordHref ? (
+                    <Link href={row.recordHref}>{row.name}</Link>
+                  ) : (
+                    'Associated record unavailable'
+                  )}
+                </h2>
+                <p className="ds-mosaic-credit__note">
+                  Separate copied-tile credit not recorded here.
+                </p>
+                {row.recordedImageHref ? (
+                  <a
+                    className="ds-mosaic-credit__source"
+                    href={row.recordedImageHref}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                  >
+                    Recorded image
+                  </a>
+                ) : null}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <Pagination
+        page={page}
+        pageCount={pageCount}
+        pageSize={MOSAIC_CREDITS_PAGE_SIZE}
+        total={ATMOSPHERE_TILE_CREDITS.length}
+        itemLabel="tiles"
+        hrefForPage={mosaicCreditsHref}
       />
-
       <OffRamp
         title="Keep reading"
         actions={[
@@ -64,7 +115,7 @@ export default function MosaicCreditsPage() {
           { href: '/about', label: 'About the archive' },
         ]}
       >
-        These tiles are atmosphere. The chapters they sit behind are the account.
+        The mosaic is atmosphere. The chapters carry the account.
       </OffRamp>
     </Room>
   );

@@ -15,11 +15,14 @@
  */
 'use client';
 
+import { decodeCollectionCatalog } from '../../lib/discovery/collection-catalog-wire';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { hasMaintenanceBypassHint } from '../../lib/maintenance/maintenance-bypass-hint';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import { AtlasExperience } from './AtlasExperience';
+import { recordsHref } from '../../lib/records/records-query';
+import { recordsQueryFromExplore } from '../../lib/discovery/explore-collection';
 import {
   ATLAS_CATALOG_PATH,
   assembleExploreViewModel,
@@ -43,10 +46,7 @@ async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<Atla
   if (!response.ok) {
     throw new Error(`atlas catalog ${response.status}`);
   }
-  const payload = (await response.json()) as AtlasCatalogPayload;
-  if (payload.schemaVersion !== 1 || !payload.source?.featureCollection) {
-    throw new Error('atlas catalog: unexpected shape');
-  }
+  const payload = decodeCollectionCatalog(await response.json());
   lastCatalog = { url, payload };
   return payload;
 }
@@ -107,9 +107,9 @@ export function AtlasLoader({
   }, [catalogUrl, attempt]);
 
   const active = catalog ?? firstPaint;
-  const hasPins = pins.features.length > 0 || catalog !== undefined;
+  const matchingRecordsHref = recordsHref(recordsQueryFromExplore(shell.viewState));
 
-  if (error && !hasPins) {
+  if (error && !catalog?.collectionFacts) {
     return (
       <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
         <Notice
@@ -125,12 +125,28 @@ export function AtlasLoader({
               onClick={() => setAttempt((n) => n + 1)}
             >
               Try again
-            </button>
+            </button>{' '}
+            <a href={matchingRecordsHref}>Open matching records</a>
           </p>
         </Notice>
       </div>
     );
   }
 
-  return <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />;
+  return (
+    <>
+      {!catalog?.collectionFacts ? (
+        <div role="status" className="ds-atlas__notice ds-collection">
+          <span>Loading map records.</span>
+          <a
+            className="ds-button ds-button--secondary ds-button--compact"
+            href={matchingRecordsHref}
+          >
+            Open matching records
+          </a>
+        </div>
+      ) : null}
+      <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />
+    </>
+  );
 }

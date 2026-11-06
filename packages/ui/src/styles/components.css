@@ -423,8 +423,10 @@
 
 /* Action vocabulary (design-direction-v5 §5): `.ds-button` (form buttons)
    and shell.css's `.ds-cta` (links) share ONE recipe — sans 13px, no caps,
-   PILL radius, 40px target. Weights: --primary = copper (THE orientation
-   action, max one per view), --secondary = quiet hairline.
+   PILL radius. Weights: --primary = copper (THE orientation action, max one
+   per view), --secondary = quiet hairline. Height is the one exception:
+   `.ds-button` is 44px, the WCAG 2.5.5 target size, while apps/web's
+   `.ds-cta` still holds the comps' 40px.
 
    Both comments here and in shell.css have claimed "ONE recipe" for several
    cycles while the two rules actually diverged: `.ds-cta` dropped the caps
@@ -437,7 +439,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--ds-space-2);
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0 var(--ds-space-5);
   border: var(--ds-border-width) solid transparent;
   border-radius: var(--ds-radius-full);
@@ -579,6 +581,14 @@
   border-color: var(--ds-error-border);
 }
 
+/* Success reuses the confidence-high family: the palette already carries a settled green in
+   both themes, so a confirmation does not need a new colour pair invented for it. */
+.ds-notice--success {
+  color: var(--ds-confidence-high-fg);
+  background: var(--ds-confidence-high-bg);
+  border-color: var(--ds-confidence-high-border);
+}
+
 .ds-notice__cue {
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
@@ -683,6 +693,16 @@
 .ds-theme-toggle svg {
   width: var(--ds-icon-md);
   height: var(--ds-icon-md);
+}
+
+/* Dark is the default theme, so the moon only shows once <html> says light. */
+.ds-theme-toggle__icon--to-dark,
+[data-theme='light'] .ds-theme-toggle__icon--to-light {
+  display: none;
+}
+
+[data-theme='light'] .ds-theme-toggle__icon--to-dark {
+  display: block;
 }
 
 .ds-gallery-section {

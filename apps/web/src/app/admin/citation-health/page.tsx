@@ -7,6 +7,7 @@
 import Link from 'next/link';
 import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@repo/domain';
 import { Citation } from '@repo/ui';
+import { DeskTitleBar } from '../../../admin/design-system/ui';
 import { CITATION_HEALTH_FIXTURES } from './fixtures';
 import './citation-health.css';
 
@@ -28,13 +29,11 @@ export default function CitationHealthPage() {
 
   return (
     <main className="ds-container ds-prose ds-page citation-health-page" id="main">
-      <p className="ds-page__eyebrow">Evidence quality</p>
-      <h1 className="ds-page__title">Citation health</h1>
-      <p className="ds-page__lede">
-        Rot rate by source class from the scheduled citation link-health sweep, plus a preview of
-        the reader-facing degraded-citation treatment. This desk reads fixture telemetry only — it
-        does not repair links, mutate citations, or publish catalog changes.
-      </p>
+      <DeskTitleBar
+        eyebrow="Evidence quality"
+        title="Citation health"
+        description="Rot rate by source class from the scheduled citation link-health sweep, plus a preview of the reader-facing degraded-citation treatment. This desk reads fixture telemetry only — it does not repair links, mutate citations, or publish catalog changes."
+      />
 
       <section aria-labelledby="rot-rate-heading">
         <div className="citation-health-section-heading">

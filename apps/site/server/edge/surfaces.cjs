@@ -100,7 +100,14 @@ const PUBLIC_DOCUMENT_CDN_CACHE_CONTROL = 'public, s-maxage=300, stale-while-rev
  * A response the CDN may keep: a GET or HEAD for a rendered public surface, never a correction
  * receipt (its URL is its only protection) and never the design system.
  */
-function isPublicDocumentCacheable({ method, pathname }) {
+function isCollectionScopedDocument({ pathname, searchParams }) {
+  return (pathname === '/records' || pathname === '/explore') &&
+    typeof searchParams?.get === 'function' && (searchParams.get('collection') ?? '').trim().length > 0;
+}
+
+function isPublicDocumentCacheable(facts) {
+  const { method, pathname } = facts;
+  if (isCollectionScopedDocument(facts)) return false;
   if (method !== 'GET' && method !== 'HEAD') return false;
   if (pathname.startsWith('/corrections/status')) return false;
   if (pathname === '/design-system' || pathname.startsWith('/design-system/')) return false;
@@ -110,6 +117,7 @@ function isPublicDocumentCacheable({ method, pathname }) {
 module.exports = {
   surfaceClassFor,
   isPublicDocumentCacheable,
+  isCollectionScopedDocument,
   PUBLIC_DOCUMENT_CDN_CACHE_CONTROL,
   ENDPOINT_ROUTES,
 };

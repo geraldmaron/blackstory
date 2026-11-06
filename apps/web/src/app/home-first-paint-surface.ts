@@ -41,18 +41,11 @@ export type DoorRoom = {
   readonly href: string;
 };
 
-/**
- * Archive chrome on every place. Law, Data, and Memorial are national rooms,
- * not this record's rooms. `/books` is not a walk room. `/banned-books` is
- * not a room.
+/*
+ * Law, Data, Memorial, Methodology and Errata are national rooms, not this record's rooms, and the
+ * site footer already lists every one of them, so a place no longer repeats them as a pill row.
+ * The only door a place opens of its own is Stories, and only when a chapter cites it.
  */
-export const ARCHIVE_DOOR_ROOMS: readonly DoorRoom[] = [
-  { id: 'law', label: 'Law', href: '/law' },
-  { id: 'data', label: 'Data', href: '/data' },
-  { id: 'memorial', label: 'Memorial', href: '/memorial' },
-  { id: 'methodology', label: 'Methodology', href: '/methodology' },
-  { id: 'errata', label: 'Errata', href: '/errata' },
-];
 
 /*
  * The id vocabulary and the strip both live in `@repo/public-contracts/narrative-text` now: the
@@ -298,7 +291,6 @@ export function selectDoorRooms(
   if (storiesRoomMaterial(citing)) {
     rooms.push({ id: 'stories', label: 'Stories', href: '#stories' });
   }
-  rooms.push(...ARCHIVE_DOOR_ROOMS);
   return rooms;
 }
 

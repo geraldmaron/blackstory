@@ -14,6 +14,7 @@
  * and LIVING_STATUSES below for what the old readers silently dropped.
  */
 import { queryPostgres } from './canonical-postgres-client.js';
+import { entityIdsForStateFilter, readPublishedJurisdictions } from './published-jurisdictions.js';
 
 /**
  * Living status lives in the vocabulary module so client components can read it without pulling
@@ -68,6 +69,11 @@ export type EntityQuery = {
   readonly sensitivityClasses?: readonly string[];
   readonly mergeState?: MergeStateFilter;
   readonly withoutClaims?: boolean;
+  /**
+   * A postal code, or `unassigned`: published records the Footprint view counts toward that state.
+   * Records outside the active release have no state and never match.
+   */
+  readonly state?: string | undefined;
   readonly sort?: EntitySortKey;
   readonly direction?: 'asc' | 'desc';
   readonly page?: number;
@@ -115,7 +121,20 @@ type WhereClause = {
   readonly params: readonly unknown[];
 };
 
-function buildWhere(query: EntityQuery, omit?: keyof EntityQuery): WhereClause {
+/**
+ * A query whose state filter has been turned into the entity ids it selects. The ids come from
+ * footprint-attribution.ts, the same function the Footprint view counts with, rather than a SQL
+ * restatement of it, so a Footprint cell and the catalog it links to always agree.
+ */
+type ResolvedEntityQuery = EntityQuery & { readonly stateEntityIds?: readonly string[] };
+
+async function resolveQuery(query: EntityQuery): Promise<ResolvedEntityQuery> {
+  if (!query.state) return query;
+  const { rows } = await readPublishedJurisdictions();
+  return { ...query, stateEntityIds: entityIdsForStateFilter(rows, query.state) };
+}
+
+function buildWhere(query: ResolvedEntityQuery, omit?: keyof EntityQuery): WhereClause {
   const conditions: string[] = [];
   const params: unknown[] = [];
   const bind = (value: unknown): string => {
@@ -167,6 +186,10 @@ function buildWhere(query: EntityQuery, omit?: keyof EntityQuery): WhereClause {
 
   if (query.withoutClaims && omit !== 'withoutClaims') {
     conditions.push(`NOT EXISTS (SELECT 1 FROM canonical.claims c WHERE c.entity_id = e.id)`);
+  }
+
+  if (query.stateEntityIds && omit !== 'state') {
+    conditions.push(`e.id = ANY(${bind(query.stateEntityIds)}::text[])`);
   }
 
   return {
@@ -274,7 +297,8 @@ export function normalizePageSize(value: number | undefined): number {
 }
 
 /** One page of entities under the query's filters and sort, plus the unpaginated total. */
-export async function queryEntityPage(query: EntityQuery): Promise<EntityPage> {
+export async function queryEntityPage(input: EntityQuery): Promise<EntityPage> {
+  const query = await resolveQuery(input);
   const pageSize = normalizePageSize(query.pageSize);
   const where = buildWhere(query);
   const sortKey = query.sort ?? 'updated';
@@ -319,7 +343,7 @@ export async function queryEntityPage(query: EntityQuery): Promise<EntityPage> {
 }
 
 async function facetCounts(
-  query: EntityQuery,
+  query: ResolvedEntityQuery,
   omit: keyof EntityQuery,
   expression: string,
 ): Promise<readonly FacetBucket[]> {
@@ -344,7 +368,8 @@ async function facetCounts(
  * applied but not its own, so selecting "person" still shows how many places you'd get by
  * switching — the behavior operators expect from a faceted browser.
  */
-export async function queryEntityFacets(query: EntityQuery): Promise<EntityFacets> {
+export async function queryEntityFacets(input: EntityQuery): Promise<EntityFacets> {
+  const query = await resolveQuery(input);
   const [kind, entityClass, livingStatus, sensitivityClass] = await Promise.all([
     facetCounts(query, 'kinds', 'e.kind'),
     facetCounts(query, 'entityClasses', 'e.entity_class'),
@@ -363,10 +388,10 @@ export async function queryEntityFacets(query: EntityQuery): Promise<EntityFacet
  * action can address a whole filtered set instead of only the rendered page.
  */
 export async function queryMatchingEntityIds(
-  query: EntityQuery,
+  input: EntityQuery,
   cap = 10_000,
 ): Promise<readonly string[]> {
-  const where = buildWhere(query);
+  const where = buildWhere(await resolveQuery(input));
   const rows = await queryPostgres<{ readonly id: string }>(
     `SELECT e.id FROM canonical.entities e ${where.sql} ORDER BY e.id ASC LIMIT $${
       where.params.length + 1

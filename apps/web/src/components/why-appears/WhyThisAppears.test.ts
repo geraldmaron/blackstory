@@ -224,3 +224,27 @@ test('shows honest gap copy when evidenceIds are present but citations are unres
   assert.match(html, /No linked source citations for this inclusion reason yet/);
   assert.doesNotMatch(html, /\d+ documented sources/);
 });
+
+test('a basis note the page already prints as a claim is pointed back to, not repeated', () => {
+  const result = buildPublicWhyThisAppears({
+    explanation: 'Included because archival records document this campus.',
+    evidence: ACCEPTED_EVIDENCE,
+    notabilityBasis: [
+      { criterion: 'documented_site', note: 'Founded year 1870.', evidenceIds: ['ev-1'] },
+    ],
+    storyTexts: ['The community founded the school.'],
+  });
+  const html = renderToStaticMarkup(
+    createElement(WhyThisAppears, {
+      result,
+      evidenceById: {
+        'ev-1': { id: 'ev-1', source: 'HMdb.org', label: 'Marker', href: 'https://x.test/' },
+      },
+      isPrintedClaim: (note: string) => note === 'Founded year 1870.',
+    }),
+  );
+  assert.match(html, /Documented site/);
+  assert.doesNotMatch(html, /Founded year 1870/);
+  assert.doesNotMatch(html, /https:\/\/x\.test/);
+  assert.match(html, /rests on a claim above/);
+});

@@ -22,8 +22,6 @@ export type MapControlsProps = {
   readonly locating: boolean;
   /** True while the reader's own position is the active "near" constraint. */
   readonly located: boolean;
-  readonly onZoomIn: () => void;
-  readonly onZoomOut: () => void;
   readonly bearing: number;
   readonly onResetBearing: () => void;
   readonly className?: string;
@@ -39,8 +37,6 @@ export function MapControls({
   onLocate,
   locating,
   located,
-  onZoomIn,
-  onZoomOut,
   bearing,
   onResetBearing,
   className,
@@ -88,36 +84,12 @@ export function MapControls({
         </svg>
       </button>
 
-      <div className="ds-map-controls__stack">
-        <button
-          type="button"
-          className="ds-map-controls__btn"
-          onClick={onZoomIn}
-          aria-label="Zoom in"
-          title="Zoom in"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path
-              d="M8 3v10M3 8h10"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-        <button
-          type="button"
-          className="ds-map-controls__btn"
-          onClick={onZoomOut}
-          aria-label="Zoom out"
-          title="Zoom out"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M3 8h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-        </button>
-      </div>
-
+      {/*
+       * No zoom here. CameraConsole owns zoom — "zoom lives in the console, so the map keeps
+       * one control vocabulary" (CameraConsole.test.ts). Both components mount in the same
+       * AtlasExperience render, so this stack put a second identical "Zoom in" and "Zoom out"
+       * on screen and a screen reader read each twice.
+       */}
       {rotated ? (
         <button
           type="button"

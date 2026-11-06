@@ -35,7 +35,7 @@ export const REM_TO_DP = 16;
 export const RADIUS_PX = {
   none: 0,
   sm: 8,
-  md: 16,
+  md: 14,
   lg: 28,
   full: 999,
 } as const;

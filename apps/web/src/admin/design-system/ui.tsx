@@ -7,7 +7,9 @@
  * `management.css` under the `admin-base-*` names the shell already uses.
  */
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
+
+void React;
 
 export function DeskTitleBar({
   eyebrow,

@@ -80,7 +80,11 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
             key={group.letter}
             aria-labelledby={`${groupId(group.letter)}-heading`}
           >
-            <h2 className="ds-memorial__group-letter" id={`${groupId(group.letter)}-heading`}>
+            <h2
+              className="ds-memorial__group-letter"
+              id={`${groupId(group.letter)}-heading`}
+              aria-label={`${group.letter}: ${group.names.length} ${group.names.length === 1 ? 'name' : 'names'}`}
+            >
               <span id={groupId(group.letter)} className="ds-memorial__group-anchor" />
               {group.letter}
               <span className="ds-memorial__group-count">{group.names.length}</span>

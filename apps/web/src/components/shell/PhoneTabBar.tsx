@@ -284,7 +284,7 @@ export function PhoneTabBar({ pathname, browsing }: PhoneTabBarProps) {
           onPointerCancel={onHeadPointerEnd}
         >
           <span className="ds-tabbar-sheet__grab" aria-hidden="true" />
-          <h2 className="ds-tabbar-sheet__title">Rooms</h2>
+          <p className="ds-tabbar-sheet__title">Rooms</p>
           <button
             type="button"
             className="ds-tabbar-sheet__close"

@@ -14,6 +14,7 @@ import { readMergeCandidates } from '../../../../admin/lib/entity-merge';
 import { MAX_ABSORBED_PER_MERGE } from '../../../../admin/lib/entity-merge-plan';
 import { readPostgresOrDegrade } from '../../../../admin/lib/canonical-postgres-client';
 import { MergeForm } from './MergeForm';
+import { DeskTitleBar } from '../../../../admin/design-system/ui';
 
 function parseIds(raw: string | string[] | undefined): readonly string[] {
   const values = Array.isArray(raw) ? raw : raw ? [raw] : [];
@@ -87,21 +88,18 @@ export default async function MergePage({
 
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">Canonical catalog</p>
-          <h1 className="ds-page__title">Merge {candidates.length} records</h1>
-          <p className="ds-page__lede">
-            The survivor keeps its own name, kind, and sensitivity. Everything the absorbed records
-            own — claims, relationships, event participation, identifiers, locations, aliases —
-            moves to it. Nothing is deleted: the absorbed records stay in the archive, marked
-            absorbed, and the merge can be reversed from the survivor&rsquo;s page.
-          </p>
-          <p className="story-review__notice">
-            <Link href="/admin/catalog">← Back to catalog</Link>
-          </p>
-        </div>
-      </header>
+      <DeskTitleBar
+        eyebrow="Canonical catalog"
+        title={`Merge ${candidates.length} records`}
+        description="The survivor keeps its own name, kind, and sensitivity. Everything the absorbed records own — claims, relationships, event participation, identifiers, locations, aliases — moves to it."
+      />
+      <p>
+        Nothing is deleted: the absorbed records stay in the archive, marked absorbed, and the merge
+        can be reversed from the survivor&rsquo;s page.
+      </p>
+      <p className="story-review__notice">
+        <Link href="/admin/catalog">← Back to catalog</Link>
+      </p>
 
       {missing.length > 0 ? (
         <p className="story-review__alert" role="alert">

@@ -127,7 +127,8 @@ test('the page discloses how the long-form writing is made, including the AI use
   assert.match(sectionsSource, /ABOUT_NEO/);
   const neo = [...ABOUT_NEO.rules, ...ABOUT_NEO.human, ABOUT_NEO.hand].join(' ');
   assert.match(neo, /\bAI\b/, 'the section says plainly that AI is used');
-  assert.match(neo, /neo-voice\.md/, 'the voice document is named, so the claim is checkable');
+  assert.match(neo, /written standard/, 'the writing standard is mentioned');
+  assert.doesNotMatch(neo, /\.md\b|docs\//, 'no internal file path reaches a reader');
   assert.match(neo, /evidence gate/, 'the section states the bar the voice cannot move');
   assert.match(neo, /not a generated image/, 'the hand-drawn cover commitment is stated');
   // Measured in the rendered body, not in the file. The import block is alphabetised, so

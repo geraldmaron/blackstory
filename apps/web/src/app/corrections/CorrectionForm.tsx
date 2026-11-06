@@ -5,9 +5,9 @@
  * public. Supports entity/claim/source/location targets, structured categories, source URL,
  * privacy consent, and returns a receipt code on success.
  */
-import React, { useId, useState, type FormEvent } from 'react';
+import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Button, Notice } from '@repo/ui';
-import { ChoiceField, Field } from '../../components/room';
+import { ChoiceField, Field, fieldControlProps, fieldErrorId } from '../../components/room';
 import { ReceiptBlock } from './ReceiptBlock';
 import {
   CORRECTION_CATEGORIES,
@@ -117,9 +117,40 @@ export function CorrectionForm({
       ? state.fieldIssues?.find((issue) => issue.field === field)
       : undefined;
 
+  const receiptRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (state.status === 'success') receiptRef.current?.focus();
+  }, [state.status]);
+
+  /*
+   * Submit-wide error handling belongs to the form, not to a field: only the form knows which
+   * of its fields failed and which one is first in reading order. Without this, a rejected
+   * submission announced the summary and then left the caret on a submit button, so a keyboard
+   * user had to tab back through the whole form to find what was wrong.
+   */
+  const formRef = useRef<HTMLFormElement | null>(null);
+  useEffect(() => {
+    if (state.status !== 'error') return;
+    const firstInvalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    if (firstInvalid) firstInvalid.focus();
+    else formRef.current?.querySelector<HTMLElement>('[role="alert"]')?.focus();
+  }, [state]);
+
   if (state.status === 'success') {
     return (
-      <div className="ds-corrections__received">
+      <div
+        className="ds-corrections__received"
+        /*
+         * The receipt code is the only credential for looking up what happened to a report,
+         * and this panel replaces the whole form. Without moving focus here, a screen-reader
+         * user was left on a submit button that no longer exists and never heard the code.
+         * Focus lands on the panel, which carries the heading and the receipt; that is the
+         * confirmation-panel pattern, and it avoids the double announcement a live region
+         * would cause on a node that has just been inserted.
+         */
+        ref={receiptRef}
+        tabIndex={-1}
+      >
         <h2>It arrived. Here is your receipt.</h2>
         <ReceiptBlock receiptCode={state.receiptCode} />
         <p className="ds-room-field__hint">
@@ -135,7 +166,7 @@ export function CorrectionForm({
   }
 
   return (
-    <form className="ds-stack" onSubmit={handleSubmit} noValidate>
+    <form className="ds-stack" onSubmit={handleSubmit} ref={formRef} noValidate>
       {state.status === 'error' && !state.fieldIssues ? (
         <Notice tone="error" title="Submission failed">
           {state.message}
@@ -172,22 +203,21 @@ export function CorrectionForm({
         label="Which record is wrong?"
         htmlFor={targetRecordId}
         hint="Name the place or paste its page address. You do not need an internal id."
+        {...(fieldIssue('targetRecordId') ? { error: fieldIssue('targetRecordId')!.message } : {})}
       >
         <input
-          id={targetRecordId}
+          {...fieldControlProps({
+            htmlFor: targetRecordId,
+            hint: true,
+            error: fieldIssue('targetRecordId'),
+          })}
           name="targetRecordId"
           type="text"
           defaultValue={initialTarget}
           maxLength={128}
           required
           placeholder="Fifteenth Street Presbyterian Church"
-          aria-describedby={fieldIssue('targetRecordId') ? `${targetRecordId}-issue` : undefined}
         />
-        {fieldIssue('targetRecordId') ? (
-          <p id={`${targetRecordId}-issue`} className="ds-room-field__hint" role="alert">
-            {fieldIssue('targetRecordId')!.message}
-          </p>
-        ) : null}
       </Field>
 
       {/* Four pills rather than a select: the set is small enough to read faster than it opens,
@@ -200,28 +230,27 @@ export function CorrectionForm({
           value: category,
           label: CORRECTION_CATEGORY_LABELS[category],
         }))}
-        {...(fieldIssue('category') ? { hint: fieldIssue('category')!.message } : {})}
+        {...(fieldIssue('category') ? { error: fieldIssue('category')!.message } : {})}
       />
 
       <Field
         label="What should it say instead?"
         htmlFor={statementId}
         hint="Plain language is fine. You do not need to write like a citation."
+        {...(fieldIssue('statement') ? { error: fieldIssue('statement')!.message } : {})}
       >
         <textarea
-          id={statementId}
+          {...fieldControlProps({
+            htmlFor: statementId,
+            hint: true,
+            error: fieldIssue('statement'),
+          })}
           name="statement"
           rows={5}
           required
           minLength={20}
           placeholder="The 1891 building was purpose-built, not converted."
-          aria-describedby={fieldIssue('statement') ? `${statementId}-issue` : undefined}
         />
-        {fieldIssue('statement') ? (
-          <p id={`${statementId}-issue`} className="ds-room-field__hint" role="alert">
-            {fieldIssue('statement')!.message}
-          </p>
-        ) : null}
       </Field>
 
       {/*
@@ -237,20 +266,15 @@ export function CorrectionForm({
           </>
         }
         htmlFor={sourceUrlId}
+        {...(fieldIssue('sourceUrl') ? { error: fieldIssue('sourceUrl')!.message } : {})}
       >
         <input
-          id={sourceUrlId}
+          {...fieldControlProps({ htmlFor: sourceUrlId, error: fieldIssue('sourceUrl') })}
           name="sourceUrl"
           type="url"
           required
           placeholder="https://"
-          aria-describedby={fieldIssue('sourceUrl') ? `${sourceUrlId}-issue` : undefined}
         />
-        {fieldIssue('sourceUrl') ? (
-          <p id={`${sourceUrlId}-issue`} className="ds-room-field__hint" role="alert">
-            {fieldIssue('sourceUrl')!.message}
-          </p>
-        ) : null}
       </Field>
 
       <Field
@@ -261,7 +285,9 @@ export function CorrectionForm({
         }
         htmlFor={contactId}
       >
-        <input id={contactId} name="contact" type="text" placeholder="you@example.org" />
+        {/* type="email": the label says Email, so the control should bring the email
+            keyboard on a phone and get the browser's own format check. */}
+        <input id={contactId} name="contact" type="email" placeholder="you@example.org" />
       </Field>
 
       <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
@@ -270,11 +296,10 @@ export function CorrectionForm({
 
       <div className="ds-row" style={{ alignItems: 'flex-start' }}>
         <input
-          id={privacyId}
+          {...fieldControlProps({ htmlFor: privacyId, error: fieldIssue('privacyConsent') })}
           name="privacyConsent"
           type="checkbox"
           required
-          aria-describedby={fieldIssue('privacyConsent') ? `${privacyId}-issue` : undefined}
         />
         <label htmlFor={privacyId} className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)' }}>
           I have read the privacy notice and understand this submission enters a restricted review
@@ -283,7 +308,7 @@ export function CorrectionForm({
         </label>
       </div>
       {fieldIssue('privacyConsent') ? (
-        <p id={`${privacyId}-issue`} className="ds-sans" role="alert">
+        <p id={fieldErrorId(privacyId)} className="ds-sans ds-room-field__error" role="alert">
           {fieldIssue('privacyConsent')!.message}
         </p>
       ) : null}

@@ -102,3 +102,16 @@ test('hasActiveFilters ignores defaults but sees every real narrowing', () => {
   assert.equal(hasActiveFilters(parseEntityQuery({ merge: 'absorbed' })), true);
   assert.equal(hasActiveFilters(parseEntityQuery({ noclaims: '1' })), true);
 });
+
+test('state filter round-trips, normalizes case, rejects unknown codes, and counts as active', () => {
+  const query = parseEntityQuery({ state: 'al' });
+  assert.equal(query.state, 'AL');
+  assert.equal(serializeEntityQuery(query), 'state=AL');
+  assert.equal(parseEntityQuery({ state: 'unassigned' }).state, 'unassigned');
+  assert.equal(parseEntityQuery({ state: 'ZZ' }).state, undefined);
+  assert.equal(hasActiveFilters(query), true);
+  assert.equal(
+    entityQueryHref('/admin/catalog', { ...query, page: 3 }, { state: undefined }),
+    '/admin/catalog',
+  );
+});

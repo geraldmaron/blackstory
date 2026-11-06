@@ -31,6 +31,7 @@ import {
   type FacetBucket,
 } from '../../../admin/lib/entity-query';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { stateFilterLabel } from '../../../admin/lib/footprint-attribution';
 import { readVerifiedAdminIdentity } from '../../../admin/auth/supabase-server';
 import { staffRoleHasPermission } from '../../../admin/auth/staff-permissions';
 import { EntityWorkbenchTable } from './EntityWorkbenchTable';
@@ -169,6 +170,14 @@ export default async function CatalogPage({
     ...(query.sensitivityClasses ?? []).map((v) =>
       facetValue('sensitivityClasses', v, `Sensitivity: ${titleCase(v)}`),
     ),
+    ...(query.state
+      ? [
+          {
+            label: `State: ${stateFilterLabel(query.state)}`,
+            removeHref: entityQueryHref(BASE_PATH, query, { state: undefined }),
+          },
+        ]
+      : []),
     ...(query.withoutClaims
       ? [
           {

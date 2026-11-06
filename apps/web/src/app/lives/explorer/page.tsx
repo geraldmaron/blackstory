@@ -5,8 +5,9 @@ import { LIVES_NATIONAL, livesAreaBySlug } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { DocumentColophon, ReadingEntry, Room } from '../../../components/room';
 import { WalkOffRamp } from '../../walk-off-ramp';
-import { emptyLivesAreaBundle, loadLivesAreaBundle } from '../../../lib/lives/lives-source';
+import { emptyLivesAreaBundle, loadLivesAreaView } from '../../../lib/lives/lives-source';
 import { parseLivesAreaSlug, type RawLivesSearchParams } from '../../../lib/lives/lives-url-state';
+import { LivesSourceNotice } from '../../../components/lives/LivesSourceNotice';
 import { LivesTimeline } from '../../../components/lives/LivesTimeline';
 import { LivesTimelineStatic } from '../../../components/lives/LivesTimelineStatic';
 import '../../reading-room.css';
@@ -31,8 +32,8 @@ export default async function LivesExplorerPage({
   const raw = await searchParams;
   const areaSlug = parseLivesAreaSlug(raw);
   const area = livesAreaBySlug(areaSlug) ?? LIVES_NATIONAL;
-  const loaded = await loadLivesAreaBundle(area.slug);
-  const bundle = loaded ?? emptyLivesAreaBundle(area);
+  const loaded = await loadLivesAreaView(area.slug);
+  const bundle = loaded?.bundle ?? emptyLivesAreaBundle(area);
 
   return (
     <Room>
@@ -47,6 +48,12 @@ export default async function LivesExplorerPage({
       <p className="lives-explorer__return">
         This is the research view. For the guided experience, <a href="/lives">return to Lives</a>.
       </p>
+
+      <LivesSourceNotice
+        source={loaded?.source ?? 'unreadable'}
+        areaName={bundle.areaName}
+        retryHref={`/lives/explorer?area=${encodeURIComponent(area.slug)}`}
+      />
 
       <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={area.slug} />}>
         <LivesTimeline bundle={bundle} areaSlug={area.slug} />

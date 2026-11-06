@@ -18,8 +18,14 @@ const {
 
 const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'q',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
   'kind',
   'state',
+  'evidence',
   'precision',
   'releaseId',
   'status',
@@ -32,7 +38,7 @@ const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'topic',
   'offset',
 ];
-const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'sort'];
+const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'status', 'sort', 'page'];
 const STORIES_PAGE_PARAM_ALLOWLIST = [
   'q',
   'format',
@@ -46,6 +52,7 @@ const STORIES_PAGE_PARAM_ALLOWLIST = [
 const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'];
 const PLACE_PAGE_PARAM_ALLOWLIST = [
   'from',
+  'sort',
   'q',
   'kind',
   'era',
@@ -56,6 +63,11 @@ const PLACE_PAGE_PARAM_ALLOWLIST = [
   'evidence',
   'floor',
   'selected',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
 ];
 
 const TRACKING_QUERY_PREFIXES = ['utm_', 'mc_', 'pk_', 'vero_'];
@@ -96,12 +108,14 @@ function normalizePathname(pathname) {
 /** The allowlist for a path. Empty for pages that take no query, which is most of them. */
 function getAllowedQueryParamsForPath(pathname) {
   const path = normalizePathname(pathname);
+  if (path === '/atlas/catalog') return ['v'];
+  if (path === '/stories/mosaic-credits') return ['page'];
   if (path === '/search') return SEARCH_PAGE_PARAM_ALLOWLIST;
   if (path === RECORDS_PATH) return RECORDS_PAGE_PARAM_ALLOWLIST;
   if (path === '/law') return LAW_PAGE_PARAM_ALLOWLIST;
   if (path === '/stories') return STORIES_PAGE_PARAM_ALLOWLIST;
   if (path === '/corrections') return CORRECTIONS_PAGE_PARAM_ALLOWLIST;
-  if (path.startsWith('/place/') || path.startsWith('/invention/'))
+  if (path.startsWith('/place/') || path.startsWith('/invention/') || path.startsWith('/entity/'))
     return PLACE_PAGE_PARAM_ALLOWLIST;
   return [];
 }
@@ -136,11 +150,20 @@ function normalizeQueryString(pathname, input) {
   if (path === EXPLORE_PATH)
     throw new Error('/explore query normalization is not ported (repo-5tjl0)');
   const bag = allowlistedBag(path, readParamBag(input));
+  if (path === '/atlas/catalog') {
+    const version = firstString(bag.v);
+    return version === '3' || version === '4' ? `v=${version}` : '';
+  }
   if (path === RECORDS_PATH) return recordsQueryString(parseRecordsQuery(bag));
   const normalized = new URLSearchParams();
   for (const key of Object.keys(bag).sort()) {
     const value = firstString(bag[key]);
     if (value === undefined) continue;
+    if ((path === '/law' || path === '/stories/mosaic-credits') && key === 'page') {
+      const page = Number(value);
+      if (Number.isSafeInteger(page) && page > 1) normalized.set(key, String(Math.min(page, 1000)));
+      continue;
+    }
     normalized.set(key, value);
   }
   return normalized.toString();

@@ -44,7 +44,7 @@ body {
 .admin-home__eyebrow {
   margin: 0 0 0.5rem;
   font-family: var(--ds-font-mono), ui-monospace, monospace;
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ds-ink-subtle, #6d675f);
@@ -104,6 +104,42 @@ body {
   font-size: 0.8125rem;
   letter-spacing: normal;
   text-transform: none;
+  color: var(--ds-ink-subtle, #6d675f);
+}
+
+/* Sign-in is where a phone arrives, and a narrow desktop window reports a fine pointer, so the
+   dense 32px desk rule must not decide here: fields, the show-password toggle and the submit
+   button keep 44px targets whatever the pointer type. */
+.admin-base-shell .admin-login {
+  --adm-h: 44px;
+}
+
+.admin-base-shell .admin-login [data-baseweb='input'],
+.admin-base-shell .admin-login [data-baseweb='button'] {
+  min-height: 44px;
+}
+
+/* The wrapper alone is not the target: BaseUI sizes the native input to its own padding and line
+   height (40px), and only the password field grows past that because of its toggle button. The
+   native email input, which is what a finger lands on, takes the 44px floor itself. */
+.admin-base-shell .admin-login [data-baseweb='base-input'],
+.admin-base-shell .admin-login [data-baseweb='input'] input {
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.admin-base-shell .admin-login [data-baseweb='input'] button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Reserves one line so the live status appearing never shifts the button. */
+.admin-login__status {
+  margin: 0;
+  min-height: 1.5em;
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
   color: var(--ds-ink-subtle, #6d675f);
 }
 
@@ -257,6 +293,23 @@ body {
   border: 1px solid var(--ds-rule, #d7d0c4);
   border-radius: var(--ds-radius-md, 16px);
   background: var(--ds-surface, #fbf8f2);
+}
+
+/* Catalog entity table: the card scrolls sideways on its own, so a wide table is reached by
+   scrolling inside it rather than by the page growing or the last column being cut off. */
+.catalog-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.catalog-table .ds-datatable__table {
+  min-width: 46rem;
+}
+
+/* The Entity column wraps long names and ids instead of stretching the table. */
+.catalog-table__entity {
+  max-width: 26rem;
+  overflow-wrap: anywhere;
 }
 
 .story-review__table {
@@ -600,7 +653,7 @@ body {
   font-size: 0.8125rem;
   letter-spacing: normal;
   text-transform: none;
-  color: var(--ds-ink-subtle, #6d675f);
+  color: var(--ds-ink-subtle);
 }
 
 .entity-edit__check {
@@ -667,8 +720,8 @@ body {
 }
 
 .entity-merge__record {
-  border-left: 3px solid var(--ds-color-border, #d8d2c8);
-  padding-left: var(--ds-space-4, 1rem);
+  border: 1px solid var(--ds-color-border, #d8d2c8);
+  padding: var(--ds-space-3, 0.75rem) var(--ds-space-4, 1rem);
   margin-block: var(--ds-space-4, 1rem);
 }
 

@@ -8,7 +8,8 @@ import { useAdminAuth } from './AdminAuthProvider';
 import type { AdminPermission } from './server-authorization';
 import { permissionsForStaffRole } from './staff-permissions';
 
-export type AdminUiRole = 'admin' | 'research' | 'publication' | 'security' | 'operator';
+export type AdminUiRole =
+  'admin' | 'research' | 'publication' | 'security' | 'observer' | 'operator';
 
 /**
  * Derived from the server's table so hidden affordances and enforced permissions cannot drift.
@@ -20,6 +21,7 @@ const PERMISSION_BY_ROLE: Readonly<Record<AdminUiRole, ReadonlySet<AdminPermissi
   research: new Set(permissionsForStaffRole('research')),
   publication: new Set(permissionsForStaffRole('publication')),
   security: new Set(permissionsForStaffRole('security')),
+  observer: new Set(permissionsForStaffRole('observer')),
   operator: new Set(['research:write']),
 };
 

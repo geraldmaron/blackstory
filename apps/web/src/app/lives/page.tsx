@@ -5,13 +5,14 @@ import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
-import { emptyLivesAreaBundle, loadLivesAreaBundle } from '../../lib/lives/lives-source';
+import { emptyLivesAreaBundle, loadLivesAreaView } from '../../lib/lives/lives-source';
 import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
 import {
   buildLivesMilestonePanels,
   livesMilestoneSpanLabel,
   parseLivesMilestone,
 } from '../../lib/lives/lives-milestones';
+import { LivesSourceNotice } from '../../components/lives/LivesSourceNotice';
 import { LivesMilestoneExperience } from '../../components/lives/LivesMilestoneExperience';
 import { resolveStoryCollection } from '../../lib/stories/source';
 import {
@@ -41,8 +42,8 @@ export default async function LivesIndexPage({
 }) {
   const raw = await searchParams;
   const milestone = parseLivesMilestone(raw.milestone);
-  const loaded = await loadLivesAreaBundle(LIVES_NATIONAL.slug);
-  const bundle = loaded ?? emptyLivesAreaBundle(LIVES_NATIONAL);
+  const loaded = await loadLivesAreaView(LIVES_NATIONAL.slug);
+  const bundle = loaded?.bundle ?? emptyLivesAreaBundle(LIVES_NATIONAL);
   const mapping = mapLivesNarrativesToEras(
     await resolveStoryCollection(livesNarrativeSeriesId(milestone.key)),
   );
@@ -66,6 +67,11 @@ export default async function LivesIndexPage({
         ]}
       />
 
+      <LivesSourceNotice
+        source={loaded?.source ?? 'unreadable'}
+        areaName={bundle.areaName}
+        retryHref="/lives"
+      />
       <LivesMilestoneExperience bundle={bundle} milestone={milestone} narratives={narratives} />
 
       <WalkOffRamp>

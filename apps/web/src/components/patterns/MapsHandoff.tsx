@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Maps handoff: the archive's exits into a reader's own maps app.
  *
@@ -21,11 +23,12 @@
  * provider's name in text (WCAG 1.4.1, and the house rule that an icon is never the only signal).
  * They identify the destination service; they are not a claim of endorsement by either company.
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faDiamondTurnRight } from '@fortawesome/free-solid-svg-icons';
+import { prefersAppleMaps } from '../../lib/geography/external-maps-url';
 import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
 import './maps-handoff.css';
@@ -86,7 +89,7 @@ function ProviderControl({
           className="ds-cta ds-cta--quiet ds-cta--sm ds-maps-handoff__seg ds-maps-handoff__seg--place"
           href={provider.placeHref}
           placeLabel={placeLabel}
-          ariaLabel={`Open ${placeLabel} in ${name}`}
+          ariaLabel={`Open ${placeLabel} in ${name} (opens in a new tab)`}
           title={`Open ${placeLabel} in ${name}.`}
         >
           <FontAwesomeIcon
@@ -103,7 +106,7 @@ function ProviderControl({
           className="ds-cta ds-cta--quiet ds-cta--sm ds-maps-handoff__seg ds-maps-handoff__seg--directions"
           href={provider.directionsHref}
           placeLabel={placeLabel}
-          ariaLabel={`Get directions to ${placeLabel} in ${name}`}
+          ariaLabel={`Get directions to ${placeLabel} in ${name} (opens in a new tab)`}
           title={`Directions to ${placeLabel} in ${name}.`}
         >
           <FontAwesomeIcon
@@ -119,10 +122,20 @@ function ProviderControl({
 }
 
 export function MapsHandoff({ placeLabel, providers, className }: MapsHandoffProps) {
+  // Server and first client paint agree on Google (as `MapsExternalLink` does); an Apple device
+  // swaps to Apple after mount.
+  const [native, setNative] = useState<MapsProviderKey>('google');
+  useEffect(() => {
+    if (prefersAppleMaps(navigator.userAgent, navigator.platform)) setNative('apple');
+  }, []);
+
   const drawable = providers.filter(hasAnyExit);
   if (drawable.length === 0) {
     return null;
   }
+  // Every provider is drawn the same way, so neither reads as the afterthought. The reader's own
+  // maps app comes first; the order is the only difference.
+  const ordered = [...drawable].sort((a, b) => Number(b.key === native) - Number(a.key === native));
 
   const rootClass = ['ds-maps-handoff', className ?? '']
     .filter((part) => part.length > 0)
@@ -130,7 +143,7 @@ export function MapsHandoff({ placeLabel, providers, className }: MapsHandoffPro
 
   return (
     <div className={rootClass} role="group" aria-label="Open this place in a maps app">
-      {drawable.map((provider) => (
+      {ordered.map((provider) => (
         <ProviderControl key={provider.key} provider={provider} placeLabel={placeLabel} />
       ))}
     </div>

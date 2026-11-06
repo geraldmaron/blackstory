@@ -26,7 +26,12 @@ import { hasPostgresConnection } from '../public-data/live-policy';
 import { createReleaseScopedCache } from '../public-data/release-scoped-cache';
 import { getPublicActiveReleaseMeta, listPublicEntityViewsByIds } from '../public-data/source';
 import { listThemeImpactPacketsByIds } from '../theme-impact/source';
-import { buildCitesEdge, type CitesEdgeIndex } from '../release/build-cites-edge';
+import {
+  buildCitesEdge,
+  storyCitedEntities,
+  type CitesEdgeIndex,
+} from '../release/build-cites-edge';
+import type { StoryCollectionSource } from '../discovery/story-collection';
 import { fetchReleaseStory, listReleaseStories } from './postgres-readers';
 import { storyMapEntityIds, storyPacketIds, hydrateStory, type HydratedStory } from './hydrate';
 
@@ -171,6 +176,37 @@ export const resolveCitesEdgeIndex = cache(async (): Promise<CitesEdgeIndex> => 
     return {};
   }
 });
+
+/**
+ * The explicit record links of one published story, for `collection=story:<slug>`.
+ *
+ * Reads the unhydrated docs from the same release-scoped list the readers above share, and takes
+ * membership from `storyCitedEntities` alone (related entity ids plus map inset ids). It does not
+ * use `resolveCitesEdgeIndex`, which turns a failed read into `{}` and would make an unreachable
+ * story look like one with no records. The three outcomes stay distinct:
+ *  - `live`: the story is published; `linkedIds` may be empty (a story with no links);
+ *  - `unknown`: neither the cached release list nor its existing point-read fallback has the slug;
+ *    a freshly published story can be used before the list cache refreshes;
+ *  - `unavailable`: the read could not run or failed. Never zero members, never the archive.
+ */
+export const resolveStoryCollectionSource = cache(
+  async (slug: string): Promise<StoryCollectionSource> => {
+    if (!shouldAttemptLiveReads()) return { state: 'unavailable', slug };
+    try {
+      const doc = await readStoryBySlug(slug);
+      if (!doc) return { state: 'unknown', slug };
+      return {
+        state: 'live',
+        slug,
+        title: doc.title,
+        linkedIds: [...storyCitedEntities(doc).keys()],
+      };
+    } catch (error) {
+      logReadFailure(`resolveStoryCollectionSource(${slug})`, error);
+      return { state: 'unavailable', slug };
+    }
+  },
+);
 
 /** Slugs of every published story, for `generateStaticParams`. */
 export async function listPublishedStorySlugs(): Promise<readonly string[]> {

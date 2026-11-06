@@ -48,6 +48,9 @@ export const AI_TRAINING_USER_AGENTS: readonly string[] = [
   'DuckAssistBot',
   'MistralAI-User',
   'Meta-ExternalFetcher',
+  // Meta AI search indexer ("improve Meta AI search result quality", per Meta's crawler docs).
+  // Missing from this list, it made ~20k uncached renders in three hours on 2026-10-26.
+  'meta-webindexer',
   // Training crawlers added 2026-09-30.
   'Kangaroo Bot',
   'img2dataset',
@@ -73,6 +76,8 @@ export const SEO_TOOL_USER_AGENTS: readonly string[] = [
   'serpstatbot',
   'Barkrowler',
   'MegaIndex',
+  // ~1k uncached renders between 2026-10-21 and 2026-10-23.
+  'SERankingBacklinksBot',
 ];
 
 /** Conventional search and social preview crawlers that we allow to index. */

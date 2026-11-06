@@ -1,6 +1,12 @@
 /** Shared permission table for server authorization and client control visibility. */
 import type { AdminPermission } from './server-authorization';
-export type StaffRole = 'admin' | 'research' | 'publication' | 'security';
+/**
+ * `observer` reads the console and holds nothing else. It exists for development agents driving
+ * the admin against the live database: see `scripts/admin-dev-session.mts`. Beyond its empty
+ * permission set, `isReadOnlyStaffRole` fences it off every non-GET at the edge gate and the
+ * route authorizer, so a handler that forgets its own check still cannot write for it.
+ */
+export type StaffRole = 'admin' | 'research' | 'publication' | 'security' | 'observer';
 
 /**
  * Canonical writes are separated from `research:write` on purpose. Research writes propose;
@@ -23,6 +29,7 @@ const PERMISSIONS_BY_STAFF_ROLE: Readonly<Record<StaffRole, readonly AdminPermis
   research: ['research:write', 'canonical:write'],
   publication: ['publication:publish', 'publication:retract'],
   security: ['rights:change', 'export:privileged'],
+  observer: [],
 };
 
 const PERMISSION_SETS: Readonly<Record<StaffRole, ReadonlySet<AdminPermission>>> = {
@@ -30,7 +37,18 @@ const PERMISSION_SETS: Readonly<Record<StaffRole, ReadonlySet<AdminPermission>>>
   research: new Set(PERMISSIONS_BY_STAFF_ROLE.research),
   publication: new Set(PERMISSIONS_BY_STAFF_ROLE.publication),
   security: new Set(PERMISSIONS_BY_STAFF_ROLE.security),
+  observer: new Set(PERMISSIONS_BY_STAFF_ROLE.observer),
 };
+
+/** A role that may never send a mutating request, whatever a route's own rule says. */
+export function isReadOnlyStaffRole(role: StaffRole): boolean {
+  return role === 'observer';
+}
+
+/** GET and HEAD read; every other method can change something. */
+export function isReadMethod(method: string): boolean {
+  return method === 'GET' || method === 'HEAD';
+}
 
 export function permissionsForStaffRole(role: StaffRole): readonly AdminPermission[] {
   return PERMISSIONS_BY_STAFF_ROLE[role] ?? [];

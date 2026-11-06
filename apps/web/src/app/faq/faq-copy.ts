@@ -124,7 +124,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
       {
         question: 'So where is AI actually used?',
         answer: [
-          'In two places. In the research work, to search, read and pull source material that a person then checks against the original. And in drafting the long-form writing, the chapters and articles, under a written voice standard kept in the project as docs/content/neo-voice.md.',
+          'In two places. In the research work, to search, read and pull source material that a person then checks against the original. And in drafting the long-form writing, the chapters and articles, under a written voice standard.',
           'What it does not decide: whether a record is true, which sources a claim rests on, what confidence grade it carries, or whether any of it goes live.',
         ],
       },

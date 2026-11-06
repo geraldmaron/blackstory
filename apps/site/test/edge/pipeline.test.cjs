@@ -189,3 +189,12 @@ test('eligibility follows the path as sent: /place/ redirects away, /placement d
   });
   assert.equal(bigSlash.response.status, 413, 'the size limit covers the same set');
 });
+
+
+test('named collection documents keep no-store on the site edge too', () => {
+  for (const pathname of ['/records', '/explore']) {
+    assert.deepEqual(decorate(facts({ pathname, searchParams: new URLSearchParams('collection=story%3Athe-count') }), 200), {
+      'Cache-Control': 'no-store', 'Vercel-CDN-Cache-Control': 'no-store',
+    });
+  }
+});

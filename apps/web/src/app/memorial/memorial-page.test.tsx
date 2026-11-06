@@ -149,3 +149,9 @@ test('no plate posture other than Parked is reachable on /memorial', () => {
   assert.equal(defaultPostureFor('reading'), 'parked');
   assert.equal(defaultPostureFor(surfaceClassFor('/memorial')), 'parked');
 });
+
+test('letter headings announce a letter and a name count as words without changing the wall', () => {
+  const html = renderToStaticMarkup(<MemorialSections />);
+  assert.match(html, /aria-label="A: \d+ names"/);
+  assert.ok(html.includes('ds-memorial__group-count'));
+});

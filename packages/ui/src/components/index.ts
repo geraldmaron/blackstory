@@ -50,14 +50,5 @@ export {
 export { SelectionBar, type SelectionBarProps } from './SelectionBar.js';
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle.js';
 export { Toolbar, ToolbarField, type ToolbarProps, type ToolbarFieldProps } from './Toolbar.js';
-export {
-  ShellHeader,
-  isShellNavActive,
-  syncShellHeaderHeight,
-  type ShellBrandAssets,
-  type ShellHeaderLinkProps,
-  type ShellHeaderProps,
-  type ShellNavItem,
-} from './ShellHeader.js';
-export { ShellWordmark, type ShellWordmarkProps } from './ShellWordmark.js';
+export { ShellWordmark, type ShellBrandAssets, type ShellWordmarkProps } from './ShellWordmark.js';
 export { Timeline, type TimelineItem, type TimelineProps } from './Timeline.js';

@@ -27,7 +27,7 @@ const mediaSource = readFileSync(
 test('standable records 308 to /place; non-standable records still render here', () => {
   // The address itself is computed by `publicAddressOf`, shared with the merge-redirect path.
   assert.match(pageSource, /return publicRecordHref\(entity, collisions\)/);
-  assert.match(pageSource, /permanentRedirect\(address\)/);
+  assert.match(pageSource, /permanentRedirect\(withQuery\(address, arrivalQuery\)\)/);
   assert.match(pageSource, /canStandHere/);
   assert.match(roomSource, /<Room/);
   assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);
@@ -113,9 +113,9 @@ test('the record room is shared with the invention family, not copied', () => {
   // An invention needs a room that carries an inventor, a patent receipt and an impact beat.
   // Rendering a thinner page there would trade one misrepresentation for another.
   assert.match(roomSource, /export async function EntityRecordRoom/);
-  assert.match(pageSource, /EntityRecordRoom\(\{ entity \}\)/);
+  assert.match(pageSource, /EntityRecordRoom\(\{ entity, arrival:/);
   const inventionSource = readFileSync(join(here, '../../invention/[slug]/page.tsx'), 'utf8');
-  assert.match(inventionSource, /EntityRecordRoom\(\{ entity \}\)/);
+  assert.match(inventionSource, /EntityRecordRoom\(\{ entity, arrival:/);
   assert.match(inventionSource, /familyForKind/);
 });
 

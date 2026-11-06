@@ -14,6 +14,7 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useAdminAuth } from '../../../../admin/auth/AdminAuthProvider';
 import { actionLabel, formatWhen } from '../../../../admin/cases/case-queue';
+import { assignCaseToMe, assigneeLabel } from '../../../../admin/cases/case-assign-client';
 import type { ResearchCaseReasonCode } from '@repo/domain';
 import {
   CASE_TRIAGE_STEPS,
@@ -118,6 +119,26 @@ export default function CaseDetailPage() {
     }
   }
 
+  async function assignToMe() {
+    if (!caseId) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const token = await getIdToken(true);
+      if (!token) {
+        setError('Sign in required');
+        return;
+      }
+      await assignCaseToMe(token, caseId, reason);
+      setStatus('Assigned to you');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <main className="ds-container ds-page acq" id="main">
       <p className="acq__eyebrow">
@@ -159,6 +180,10 @@ export default function CaseDetailPage() {
             <div>
               <dt>Candidate</dt>
               <dd className="acq__mono">{detail.candidateId}</dd>
+            </div>
+            <div>
+              <dt>Assignee</dt>
+              <dd>{assigneeLabel(detail.assignment)}</dd>
             </div>
             <div>
               <dt>Updated</dt>
@@ -275,6 +300,15 @@ export default function CaseDetailPage() {
                   {actionLabel(action)}
                 </FormButton>
               ))}
+              <FormButton
+                type="button"
+                className="acq__button acq__button--ghost"
+                title="Assign this case to yourself. Needs the research:write permission; the server refuses otherwise."
+                disabled={busy}
+                onClick={() => void assignToMe()}
+              >
+                Assign to me
+              </FormButton>
             </div>
           </section>
         </>

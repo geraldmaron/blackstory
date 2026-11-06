@@ -22,7 +22,7 @@ export const borders = {
   widthStrong: '2px',
   radiusNone: '0',
   radiusSm: '8px',
-  radiusMd: '16px',
+  radiusMd: '14px',
   radiusLg: '28px',
 } as const;
 

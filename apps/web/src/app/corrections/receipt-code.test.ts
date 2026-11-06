@@ -26,3 +26,25 @@ test('compares receipt codes in constant time', () => {
   assert.equal(receiptCodesMatch(code, code), true);
   assert.equal(receiptCodesMatch(code, `${code.slice(0, -1)}0`), false);
 });
+
+/**
+ * The code and the sentence after it are separate elements. As two adjacent spans they ran
+ * together in the flat text — "BB-COR-…Keep this." — so anything reading the page as text,
+ * including some assistive-tech reading modes, got the next word stuck to the one thing a
+ * person has to keep.
+ */
+test('the receipt code is its own element, not a span glued to the next sentence', async () => {
+  const { renderToStaticMarkup } = await import('react-dom/server');
+  const React = (await import('react')).default;
+  const { ReceiptBlock } = await import('./ReceiptBlock');
+  const html = renderToStaticMarkup(
+    React.createElement(ReceiptBlock, { receiptCode: 'BB-COR-TESTTESTTESTTEST' }),
+  );
+  assert.match(html, /<code class="ds-receipt__value">BB-COR-TESTTESTTESTTEST<\/code>/);
+  assert.match(html, /<p class="ds-receipt__keep">/);
+  assert.doesNotMatch(
+    html,
+    /BB-COR-TESTTESTTESTTEST<\/span><span/,
+    'the code must not be a span immediately followed by another span',
+  );
+});

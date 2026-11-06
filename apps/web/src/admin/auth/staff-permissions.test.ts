@@ -6,6 +6,8 @@ import { test } from 'node:test';
 import {
   StaffPermissionDeniedError,
   assertStaffPermission,
+  isReadMethod,
+  isReadOnlyStaffRole,
   permissionsForStaffRole,
   staffRoleHasPermission,
 } from './staff-permissions';
@@ -46,4 +48,15 @@ test('every role resolves to a concrete permission list', () => {
   for (const role of ['admin', 'research', 'publication', 'security'] as const) {
     assert.ok(permissionsForStaffRole(role).length > 0, `${role} should have permissions`);
   }
+});
+
+test('observer holds no permission and is the only read-only role', () => {
+  assert.deepEqual(permissionsForStaffRole('observer'), []);
+  assert.equal(isReadOnlyStaffRole('observer'), true);
+  for (const role of ['admin', 'research', 'publication', 'security'] as const) {
+    assert.equal(isReadOnlyStaffRole(role), false);
+  }
+  assert.equal(isReadMethod('GET'), true);
+  assert.equal(isReadMethod('HEAD'), true);
+  assert.equal(isReadMethod('POST'), false);
 });

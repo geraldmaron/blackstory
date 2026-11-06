@@ -22,4 +22,6 @@ export const WHY_THIS_APPEARS_COPY = {
   missingPerspectiveClose:
     'This reflects the current state of research, not an absence of history.',
   citationsHeading: 'Sources',
+  /** Shown once when a basis note is a claim the page already prints, with its source. */
+  statedAbove: 'Each reason rests on a claim above, with its source.',
 } as const;

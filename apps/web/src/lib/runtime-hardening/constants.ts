@@ -19,8 +19,14 @@ import {
  */
 export const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'q',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
   'kind',
   'state',
+  'evidence',
   'precision',
   'releaseId',
   'status',
@@ -72,7 +78,7 @@ export type ExplorePageParam = Exclude<ExploreUrlParamKey, ExploreViewportPolicy
  * `sort` joined the contract with the catalog card redesign — it backs the Sort select, and
  * omitting it here silently dropped the reader's ordering at the edge.
  */
-export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'sort'] as const;
+export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'status', 'sort', 'page'] as const;
 
 export type LawPageParam = (typeof LAW_PAGE_PARAM_ALLOWLIST)[number];
 
@@ -111,7 +117,7 @@ export const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'] as cons
 export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[number];
 
 /**
- * Allowed arrival keys on `/place/{slug}`.
+ * Allowed arrival keys on public place, invention and entity record URLs.
  *
  * Place is a reading room that must preserve DiscoveryState when the reader arrives from
  * Records (`from=list`) or Explore (`from=map`). Matched with an empty allowlist, the edge
@@ -121,6 +127,7 @@ export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[num
  */
 export const PLACE_PAGE_PARAM_ALLOWLIST = [
   'from',
+  'sort',
   'q',
   'kind',
   'era',
@@ -131,6 +138,11 @@ export const PLACE_PAGE_PARAM_ALLOWLIST = [
   'evidence',
   'floor',
   'selected',
+  'collection',
+  'periodStart',
+  'periodEnd',
+  'includeUndated',
+  'layout',
 ] as const;
 
 export type PlacePageParam = (typeof PLACE_PAGE_PARAM_ALLOWLIST)[number];

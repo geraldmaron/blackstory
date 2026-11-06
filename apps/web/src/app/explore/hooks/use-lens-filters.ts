@@ -1,20 +1,17 @@
+import {
+  matchExploreCollection,
+  drawableCollection,
+} from '../../../lib/discovery/explore-collection';
+import { collectionMemberIds } from '../../../lib/discovery/story-collection';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { UseToasts } from '../../../components/patterns/Toast';
 import type { LensLayers } from '../../../components/map-experience/LensPanel';
 import type { ResultsSort } from '../../../components/map-experience/ResultsRail';
-import {
-  applyEvidenceFloor,
-  floorLabel,
-  type EvidenceFloor,
-} from '../../../lib/map-experience/evidence-grade';
+import { floorLabel, type EvidenceFloor } from '../../../lib/map-experience/evidence-grade';
 import { decadeDensityBars } from '../../../lib/map-experience/decade-density';
 import { earliestDecadeFor } from '../../../lib/map-experience/decade-transition';
-import {
-  buildTopicCounts,
-  effectiveTopicIds,
-  type TopicCount,
-} from '../../../lib/map-experience/filters';
+import { buildTopicCounts, type TopicCount } from '../../../lib/map-experience/filters';
 import { lensPermitsAreaFill } from '../../../lib/map-experience/lens-composition';
 import {
   isKnownMapKind,
@@ -43,7 +40,7 @@ const PRESENCE_ROWS = 10;
  * (docs/ui/patterns-lens-handoff.md §3). `selected`, `collection` and `find` are named
  * exclusions there — they address rather than narrow — and none of them is built here. */
 export type LensConstraint = {
-  readonly key: 'near' | 'state' | 'kind' | 'topic' | 'status' | 'evidenceFloor' | 'decade';
+  readonly key: 'q' | 'near' | 'state' | 'kind' | 'topic' | 'status' | 'evidenceFloor' | 'decade';
   readonly label: string;
   readonly onClear: () => void;
 };
@@ -55,14 +52,27 @@ export type LensConstraint = {
  */
 export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   const [stateCode, setStateCode] = useState(view.viewState.state ?? '');
-  const [kindFamily, setKindFamily] = useState<MapKindFamily | null>(() => {
+  const [query, setQuery] = useState(view.viewState.query ?? '');
+  const [era, setEra] = useState(view.viewState.filters.era);
+  const [exactKind, setExactKind] = useState<string | null>(
+    isKnownMapKind(view.viewState.filters.kind) ? view.viewState.filters.kind : null,
+  );
+  const [kindFamily, setKindFamilyState] = useState<MapKindFamily | null>(() => {
     const kind = view.viewState.filters.kind;
     if (isKnownMapKindFamily(kind)) return kind;
     if (isKnownMapKind(kind)) return kindFamilyFor(kind);
     return null;
   });
+  const setKindFamily = useCallback((next: MapKindFamily | null) => {
+    setExactKind(null);
+    setKindFamilyState(next);
+  }, []);
   const [evidenceFloor, setEvidenceFloor] = useState<EvidenceFloor>(view.viewState.floor ?? 'any');
-  const [decade, setDecade] = useState<number | null>(null);
+  const [decade, setDecadeState] = useState<number | null>(null);
+  const setDecade = useCallback((next: number | null) => {
+    setDecadeState(next);
+    setEra(next === null ? 'all' : eraBucketFor(next));
+  }, []);
   /**
    * The story sweep's cursor: show every record whose era had begun by this decade, cumulatively.
    *
@@ -87,7 +97,13 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     // Seeded from `?sat=1` so a shared satellite view opens as satellite.
     satellite: view.viewState.sat,
   });
-  const [sort, setSort] = useState<ResultsSort>('oldest');
+  const [sort, setDisplaySort] = useState<ResultsSort>(view.viewState.sort ?? 'discovery');
+  const [bibliographySort, setBibliographySort] = useState(view.viewState.sort ?? 'discovery');
+  const setSort = useCallback((next: ResultsSort | ((current: ResultsSort) => ResultsSort)) => {
+    setDisplaySort(next);
+    if (next === 'discovery' || next === 'era' || next === 'name' || next === 'evidence')
+      setBibliographySort(next);
+  }, []);
   /**
    * A located point (the reader's device or a searched place). Narrows like any other lens
    * constraint: a chosen radius filters, and the rail sorts nearest-first while it is set.
@@ -112,41 +128,66 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     [nearby, view.allFeatures],
   );
 
-  /** Every lens constraint except the nearby radius: what the reader would see without it. */
+  const collectionState = useMemo(() => {
+    const { state: _state, floor: _floor, ...base } = view.viewState;
+    return {
+      ...base,
+      query,
+      sort: bibliographySort,
+      ...(stateCode ? { state: stateCode } : {}),
+      ...(evidenceFloor !== 'any' ? { floor: evidenceFloor } : {}),
+      filters: {
+        ...view.viewState.filters,
+        kind: exactKind ?? kindFamily ?? 'all',
+        era,
+        theme: topicId ?? 'all',
+        status: status ?? 'all',
+      },
+    } as const;
+  }, [
+    view.viewState,
+    query,
+    bibliographySort,
+    stateCode,
+    evidenceFloor,
+    exactKind,
+    kindFamily,
+    era,
+    topicId,
+    status,
+  ]);
+  /** Released members of the named collection. Absent when the collection is unresolved, which
+   *  makes a named collection match nothing rather than the whole archive. */
+  const collectionMembers = useMemo(
+    () => (view.collection ? collectionMemberIds(view.collection) : undefined),
+    [view.collection],
+  );
+  const collectionMatches = useMemo(
+    () =>
+      view.collectionFacts
+        ? matchExploreCollection(view.collectionFacts, collectionState, collectionMembers)
+        : undefined,
+    [view.collectionFacts, collectionState, collectionMembers],
+  );
+  /** Unlocated matches remain in collectionMatches; only drawable records enter the plate. */
   const lensFiltered = useMemo(() => {
-    let features = view.allFeatures;
-    if (stateCode) {
-      features = features.filter((feature) => feature.properties.statePostalCode === stateCode);
-    }
-    if (kindFamily) {
-      features = features.filter((feature) => feature.properties.kindFamily === kindFamily);
-    }
-    if (topicId) {
-      features = features.filter((feature) => effectiveTopicIds(feature).includes(topicId));
-    }
-    if (status) {
-      features = features.filter((feature) => feature.properties.status === status);
-    }
-    if (decade !== null) {
-      const bucket = eraBucketFor(decade);
-      features = features.filter((feature) => feature.properties.eraBuckets.includes(bucket));
-    }
-    if (sweepDecade !== null) {
+    let features = collectionMatches
+      ? drawableCollection(view.allFeatures, collectionMatches)
+      : view.filteredFeatures;
+    if (sweepDecade !== null)
       features = features.filter((feature) => {
         const earliest = earliestDecadeFor(feature);
         return earliest !== null && earliest <= sweepDecade;
       });
-    }
-    return applyEvidenceFloor(features, evidenceFloor);
+    return features;
   }, [
-    decade,
-    evidenceFloor,
-    kindFamily,
-    stateCode,
-    status,
-    sweepDecade,
-    topicId,
+    collectionMatches,
+    collectionState,
     view.allFeatures,
+    view.filteredFeatures,
+    stateCode,
+    evidenceFloor,
+    sweepDecade,
   ]);
 
   const filtered = useMemo(
@@ -201,6 +242,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
 
   const constraints = useMemo<readonly LensConstraint[]>(() => {
     const rows: LensConstraint[] = [];
+    if (query) rows.push({ key: 'q', label: `Matching “${query}”`, onClear: () => setQuery('') });
     if (nearby) {
       rows.push({
         key: 'near',
@@ -215,7 +257,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     if (kindFamily) {
       rows.push({
         key: 'kind',
-        label: kindFamilyEncodingFor(kindFamily).label,
+        label: exactKind ?? kindFamilyEncodingFor(kindFamily).label,
         onClear: () => setKindFamily(null),
       });
     }
@@ -237,15 +279,18 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
         onClear: () => setEvidenceFloor('any'),
       });
     }
-    if (decade !== null) {
+    if (era !== 'all') {
       rows.push({
         key: 'decade',
-        label: eraBucketFor(decade),
+        label: era,
         onClear: () => setDecade(null),
       });
     }
     return rows;
   }, [
+    query,
+    era,
+    exactKind,
     decade,
     evidenceFloor,
     kindFamily,
@@ -262,6 +307,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       (feature) => !isInternalRecordLabel(feature.properties.displayName),
     );
     if (sort === 'nearest' && distances) return sortByDistance(rows, distances);
+    if (sort === 'discovery' || sort === 'era' || sort === 'name' || sort === 'evidence')
+      return rows;
     rows.sort((a, b) => {
       const left = decadeStartYear(eraFor(a));
       const right = decadeStartYear(eraFor(b));
@@ -318,7 +365,19 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   );
 
   const resetLens = useCallback(() => {
-    const previous = { stateCode, kindFamily, evidenceFloor, decade, topicId, status, nearby };
+    const previous = {
+      stateCode,
+      kindFamily,
+      exactKind,
+      era,
+      query,
+      evidenceFloor,
+      decade,
+      topicId,
+      status,
+      nearby,
+    };
+    setQuery('');
     setNearby(null);
     setStateCode('');
     setKindFamily(null);
@@ -339,12 +398,35 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
           setDecade(previous.decade);
           setTopicId(previous.topicId);
           setStatus(previous.status);
+          setExactKind(previous.exactKind);
+          setEra(previous.era);
+          setQuery(previous.query);
         },
       },
     });
-  }, [decade, evidenceFloor, kindFamily, nearby, setNearby, stateCode, status, toasts, topicId]);
+  }, [
+    query,
+    era,
+    exactKind,
+    decade,
+    evidenceFloor,
+    kindFamily,
+    nearby,
+    setNearby,
+    setKindFamily,
+    setDecade,
+    stateCode,
+    status,
+    toasts,
+    topicId,
+  ]);
 
   return {
+    query,
+    era,
+    exactKind,
+    collectionState,
+    collectionMatched: collectionMatches?.length ?? view.totalMatched,
     stateCode,
     setStateCode: pickState,
     kindFamily,

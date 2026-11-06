@@ -5,9 +5,17 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { isAuthGatedPath } from '../auth/protected-paths';
-import { ADMIN_HOME, ADMIN_NAV_GROUPS, adminPaletteItems, type AdminQueueKey } from './admin-nav';
+import {
+  ADMIN_NAV_GROUPS,
+  ADMIN_TOP_LEVEL,
+  adminPaletteItems,
+  type AdminQueueKey,
+} from './admin-nav';
 
-const ALL_DESTINATIONS = [ADMIN_HOME, ...ADMIN_NAV_GROUPS.flatMap((group) => group.destinations)];
+const ALL_DESTINATIONS = [
+  ...ADMIN_TOP_LEVEL,
+  ...ADMIN_NAV_GROUPS.flatMap((group) => group.destinations),
+];
 
 test('the sidebar stays short enough to scan: few groups, each a real task', () => {
   assert.ok(ADMIN_NAV_GROUPS.length <= 6, `grew to ${ADMIN_NAV_GROUPS.length} groups`);
@@ -32,7 +40,8 @@ test('the palette reaches every destination', () => {
     palette.map((item) => item.id).sort(),
     ALL_DESTINATIONS.map((destination) => destination.href).sort(),
   );
-  for (const item of palette.slice(1)) {
+  // Top-level destinations sit above the groups and carry no group heading.
+  for (const item of palette.slice(ADMIN_TOP_LEVEL.length)) {
     assert.ok(item.group, `${item.id} has no palette group heading`);
   }
 });

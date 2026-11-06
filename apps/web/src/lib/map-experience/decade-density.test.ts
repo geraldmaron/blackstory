@@ -113,6 +113,13 @@ test('the sub-line carries the as-of-decade rule and pluralises', () => {
   assert.equal(decadeSubLine(null, 4078), '4,078 records');
 });
 
+test('all-time sub-line stays archive-wide and says so when a collection is narrowed', () => {
+  assert.equal(decadeSubLine(null, 4202, true), '4,202 records in the whole archive');
+  assert.equal(decadeSubLine(null, 4202, false), '4,202 records');
+  const [bar] = decadeDensityBars([{ decade: 1930, count: 340 }]);
+  assert.equal(decadeSubLine(bar!, 4202, true), decadeSubLine(bar!, 4202));
+});
+
 test('sub-line copy carries no em dash', () => {
   const [bar] = decadeDensityBars([{ decade: 1930, count: 340 }]);
   assert.ok(!decadeSubLine(bar!, 4078).includes('—'));

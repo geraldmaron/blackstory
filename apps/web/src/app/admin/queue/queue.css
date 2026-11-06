@@ -1,0 +1,91 @@
+/*
+ * Queue desk. Tokens only; the page never scrolls sideways, the table scrolls inside its card.
+ */
+.queue__scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.queue__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.queue__table :where(th, td) {
+  padding: var(--ds-space-2) var(--ds-space-4);
+  text-align: left;
+  vertical-align: top;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.queue__table thead th {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
+}
+
+.queue__table td p {
+  margin: 0;
+}
+
+.queue__item {
+  min-width: 16rem;
+}
+
+/* The j/k highlight: an inset bar plus a tint, so it reads without relying on color alone. */
+.queue__table tbody tr[data-queue-active] {
+  background: var(--ds-surface);
+  box-shadow: inset var(--ds-space-1) 0 0 var(--ds-ink);
+}
+
+.queue__badge {
+  display: inline-block;
+  margin-top: var(--ds-space-1);
+  padding: 0 var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.queue__muted {
+  color: var(--ds-ink-muted);
+}
+
+.queue__empty {
+  margin: 0;
+  padding: var(--ds-space-6) var(--ds-space-4);
+  text-align: center;
+}
+
+.queue__hint {
+  margin: var(--ds-space-2) 0 0;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.queue__assignee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.queue__assignee-label,
+.queue__assignee-hint {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.queue__assignee-option {
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-caption);
+  text-decoration: none;
+}
+
+.queue__assignee-option[aria-current='true'] {
+  border-color: var(--ds-ink);
+  font-weight: 600;
+}

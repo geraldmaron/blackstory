@@ -105,6 +105,10 @@ export default async function AdminHomePage() {
         >
           <ul className="admin-base-linklist">
             <li>
+              <Link href="/admin/queue">Queue</Link>
+              <span>Every open item, oldest first</span>
+            </li>
+            <li>
               <Link href="/admin/quick-add">Quick add</Link>
               <span>Submit a source URL with a draft case</span>
             </li>

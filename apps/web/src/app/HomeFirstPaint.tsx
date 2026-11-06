@@ -11,11 +11,10 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EntityMastMedia, RecordPhotoCredit } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
+import { RecordInvestigationReturn } from '../components/discovery/record-investigation-return';
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
 import { RecordVisitBlock } from '../components/patterns/RecordVisitBlock';
 import { shouldShowVisitBlock } from '../lib/geography/visit-handoff';
@@ -34,12 +33,14 @@ import {
   RecordGradePill,
   recordSectionIcon,
 } from '../components/entity/RecordChrome';
+import { confidenceTierPhrase } from '../lib/evidence/confidence-language';
 import { humanizeToken } from '../components/entity/format';
 import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
 import { METHODOLOGY_HOW_RECORD_GETS_IN_HREF } from '../components/evidence/editorial-links';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import {
   buildWhyThisAppearsForEntity,
+  claimTextMatcher,
   toEvidenceClaimInputs,
   whyAppearsEvidenceById,
   withoutSummaryEchoClaims,
@@ -54,6 +55,7 @@ import {
   firstPaintEraLink,
   firstPaintLocatorName,
   firstPaintRecord,
+  humanPlaceLine,
   publishableCitingStories,
   selectDoorRooms,
   walkOnPlaces,
@@ -100,6 +102,9 @@ function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRoom
   );
 }
 
+/** Kinds that land in the place family but have no meaningful geographic neighbours. */
+const NON_SPATIAL_PLACE_FAMILY_KINDS: ReadonlySet<string> = new Set(['law']);
+
 function WalkOnPlaces({
   places,
   collisions,
@@ -109,16 +114,21 @@ function WalkOnPlaces({
 }) {
   if (places.length === 0) return null;
   return (
-    <nav className="ds-home-walk-on" aria-label="Also documented">
-      {places.map((place) => {
-        const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
-        return (
-          <Link key={place.id} className="ds-relation-chip" href={href}>
-            {place.displayName}
-          </Link>
-        );
-      })}
-    </nav>
+    <section className="ds-record-beat" aria-labelledby="walk-on-heading">
+      <RecordSmallTitle id="walk-on-heading" icon="continue">
+        Also documented
+      </RecordSmallTitle>
+      <nav className="ds-home-walk-on" aria-labelledby="walk-on-heading">
+        {places.map((place) => {
+          const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
+          return (
+            <Link key={place.id} className="ds-relation-chip" href={href}>
+              {place.displayName}
+            </Link>
+          );
+        })}
+      </nav>
+    </section>
   );
 }
 
@@ -157,6 +167,19 @@ export function HomeFirstPaint({
     const rooms = selectDoorRooms(lead, citing);
     const eraLink = firstPaintEraLink(lead);
     const nextPlaces = walkOnPlaces(lead, model.also);
+    /*
+     * This family is a catch-all: `familyForKind` routes everything that is not an invention
+     * here, so most kinds arriving are genuinely spatial (place, school, church, district) and
+     * a few are not. A statute was being described as a place and offered a church and a
+     * cemetery as neighbours purely because they sit near its enactment point, which reads as
+     * a relationship the sources do not state (P-02).
+     *
+     * A deny-list, not an allow-list: the spatial kinds are open-ended and an allow-list
+     * silently demoted every one it had not heard of. Add a kind here only when nearest-place
+     * neighbours would be misleading for it.
+     */
+    const isPlaceLike = !NON_SPATIAL_PLACE_FAMILY_KINDS.has(lead.kind ?? '');
+    const glanceLabel = isPlaceLike ? 'Place at a glance' : 'Record at a glance';
     const collisions = placeSlugCollisionCounts([lead, ...model.also]);
     const locatorName = firstPaintLocatorName(lead);
     const visitInput = {
@@ -195,8 +218,22 @@ export function HomeFirstPaint({
             className={`ds-rec-tile--evidence ds-rec-tile--evidence-${confidenceTier}`}
             icon={confidenceIconFor(confidenceTier)}
             label="Confidence"
-            value={<RecordGradePill tier={confidenceTier}>{gradeWord}</RecordGradePill>}
-            support={gradeWord === 'Unrated' ? 'Not graded on this page' : 'Evidence grade'}
+            /*
+             * Plain words, not a bare letter. The reader met "Grade A" here and "Evidence
+             * grade: high" a few hundred pixels below, two vocabularies for one idea. The
+             * letter still exists where it is load-bearing: the citation string carries it,
+             * and the native app shares it through public-contracts.
+             */
+            value={
+              <RecordGradePill tier={confidenceTier}>
+                {confidenceTierPhrase(confidenceTier)}
+              </RecordGradePill>
+            }
+            support={
+              gradeWord === 'Unrated'
+                ? 'Not graded on this page'
+                : `Evidence grade ${gradeWord.replace(/^Grade /, '')}`
+            }
           />
           <RecordFactTile
             icon={recordSectionIcon('where')}
@@ -217,18 +254,18 @@ export function HomeFirstPaint({
             }
           />
         </dl>
-        <div className="ds-rec-facts__actions">
-          <Link className="ds-cta ds-cta--copper" href={returns.mapHref} scroll={false}>
-            <FontAwesomeIcon
-              icon={faMapLocationDot}
-              className="ds-rec-inline-icon"
-              aria-hidden="true"
-            />
-            {geo ? 'See it on the map' : 'Browse the map'}
-          </Link>
-        </div>
       </div>
     );
+
+    const placeLine = humanPlaceLine(lead);
+    const geographyLine =
+      placeLine?.toLocaleLowerCase() === lead.displayName.toLocaleLowerCase()
+        ? humanPlaceLine({ ...lead, locationLabel: '' })
+        : placeLine;
+
+    /* The way back into the investigation that sent the reader here: the map and the list, with
+       the narrowing they carried. Kept apart from the archive navigation (home, rooms) below. */
+    const investigationReturn = <RecordInvestigationReturn returns={returns} family="place" />;
 
     const mastMedia = hasPhoto ? (
       <EntityMastMedia
@@ -249,6 +286,7 @@ export function HomeFirstPaint({
           interactive
           neighborhood
         />
+        <p className="ds-record-mast__map-note">Published location precision: {precisionValue}.</p>
       </div>
     ) : (
       <EntityMastMedia entityId={lead.id} entityName={lead.displayName} hideCredit priority />
@@ -259,13 +297,14 @@ export function HomeFirstPaint({
         className="ds-home-first-paint"
         masthead={
           <>
+            {investigationReturn}
             <figure
               className="ds-record-mast"
               data-media={hasPhoto ? 'photo' : geo ? 'map' : 'mark'}
             >
               {mastMedia}
               <figcaption className="ds-record-mast__over">
-                <div className="ds-rec-pills" aria-label="Place at a glance">
+                <div className="ds-rec-pills" aria-label={glanceLabel}>
                   <RecordKindPill kind={lead.kind} />
                   {eraLink ? (
                     <RecordPill
@@ -278,6 +317,7 @@ export function HomeFirstPaint({
                   ) : null}
                 </div>
                 <h1 className="ds-record-mast__title">{lead.displayName}</h1>
+                {geographyLine ? <p className="ds-record-mast__where">{geographyLine}</p> : null}
                 <p className="ds-record-mast__lede">
                   <LinkedProse
                     as="span"
@@ -380,7 +420,11 @@ export function HomeFirstPaint({
               Why this is here
             </RecordSmallTitle>
             {whyThisAppears ? (
-              <WhyThisAppears result={whyThisAppears} evidenceById={whyAppearsEvidenceById(lead)} />
+              <WhyThisAppears
+                result={whyThisAppears}
+                evidenceById={whyAppearsEvidenceById(lead)}
+                isPrintedClaim={claimTextMatcher(displayClaims)}
+              />
             ) : (
               <p>An inclusion explanation with linked evidence has not been recorded.</p>
             )}
@@ -388,17 +432,6 @@ export function HomeFirstPaint({
           <TrustBlock
             label="How this record stands"
             facts={[
-              {
-                label: 'Research coverage',
-                value: lead.researchCoverage.replace(/[_-]+/g, ' '),
-              },
-              {
-                label: 'Cited sources on this page',
-                value:
-                  sourceCount === 0
-                    ? 'Not linked yet. The place still stands on its published identity.'
-                    : `${sourceCount.toLocaleString('en-US')} ${sourceCount === 1 ? 'source' : 'sources'}`,
-              },
               {
                 label: 'How a record gets in',
                 value: (
@@ -422,12 +455,18 @@ export function HomeFirstPaint({
           />
         </section>
 
-        <WalkOnPlaces places={nextPlaces} collisions={collisions} />
+        {/*
+         * Nearest places are only a meaningful "what next" for a record that is itself a
+         * place. A statute catalogued in this family was being offered a church and a cemetery
+         * as its neighbours purely because they are near its enactment point, which reads as a
+         * relationship the sources do not state (P-02).
+         */}
+        {isPlaceLike ? <WalkOnPlaces places={nextPlaces} collisions={collisions} /> : null}
 
         <DoorRooms rooms={rooms} />
 
         <WalkOffRampView
-          placeName={MAP_BACK.displayName}
+          placeName={`Back to ${MAP_BACK.displayName}`}
           href={MAP_BACK.href}
           title={
             <>
@@ -442,7 +481,6 @@ export function HomeFirstPaint({
               ? [{ href: returns.nextHref, label: returns.nextLabel }]
               : []),
             { href: returns.listHref, label: returns.listLabel },
-            { href: METHODOLOGY_HOW_RECORD_GETS_IN_HREF, label: 'How a record gets in' },
           ]}
         >
           {returns.positionLabel

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { workExecutionMode, type WorkItem } from '@repo/ops-data/management/contracts';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 import { staffRoleHasPermission } from '../auth/staff-permissions';
+import { DeskTitleBar } from '../design-system/ui';
 import './work-inbox.css';
 
 const labels: Record<WorkItem['state'], string> = {
@@ -138,10 +139,11 @@ export function WorkInbox({ workId }: { workId?: string }) {
   }
   return (
     <main id="main" className="ds-container ds-page work-inbox">
-      <header>
-        <h1>{workId ? 'Review request' : 'Requests'}</h1>
-        <p>Describe what you want changed. Review the proposed result, then approve publication.</p>
-      </header>
+      <DeskTitleBar
+        eyebrow="Research"
+        title={workId ? 'Review request' : 'Requests'}
+        description="Describe what you want changed. Review the proposed result, then approve publication."
+      />
       {error && <p role="alert">{error}</p>}
       {!workId && (
         <form

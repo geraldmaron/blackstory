@@ -43,3 +43,30 @@ test('scene pattern and methodology name unit, derived income, and modeled affor
   assert.match(method, /Modeled affordance/);
   assert.match(method, /Forbidden/);
 });
+
+/**
+ * A missing estimate is not zero. The decade bar coerced `cell.estimate ?? 0` and the track
+ * draws a 2px minimum fill, so "Withheld", "Not published" and "Not yet counted" rendered as
+ * near-zero measurements. The reason is stated in words beside the track; the track itself
+ * must stay empty.
+ */
+test('the decade bar never draws a missing estimate as a value', () => {
+  const source = readFileSync(
+    path.join(repoRoot, 'apps/web/src/components/lives/LivesMilestoneExperience.tsx'),
+    'utf8',
+  );
+  assert.doesNotMatch(
+    source,
+    /livesBarShare\(\s*cell\.estimate\s*\?\?\s*0/,
+    'a missing estimate must not be coerced to 0 for the bar',
+  );
+  assert.match(source, /cell\.estimate === undefined/, 'the bar must branch on a missing estimate');
+  assert.match(
+    source,
+    /lives-era__bar--absent/,
+    'a missing estimate must render the empty absent track',
+  );
+
+  const css = readFileSync(path.join(repoRoot, 'apps/web/src/app/lives/lives.css'), 'utf8');
+  assert.match(css, /\.lives-era__bar--absent\s*\{/, 'the absent track must be styled');
+});

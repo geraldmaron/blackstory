@@ -11,13 +11,20 @@
  * floors stay honest before the backfill lands.
  */
 import { cache } from 'react';
-import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
-import { getPublicSearchIndex } from '../../lib/public-data/source';
+import { loadDoorPinPlate } from '../../lib/map-experience/door-catalog';
+import { loadRecordsCatalog } from '../../lib/records/records-catalog';
+import { resolveStoryCollectionSource } from '../../lib/stories/source';
+import {
+  NO_COLLECTION,
+  collectionDescriptorWithoutRead,
+  resolveStoryCollection,
+  storyCollectionSlug,
+  type CollectionDescriptor,
+} from '../../lib/discovery/story-collection';
 import {
   buildRecordsIndex,
   parseRecordsQuery,
   recordsHref,
-  searchIndexReadyForRecords,
   type RecordsIndex,
   type RecordsQuery,
 } from '../../lib/records/build-records-index';
@@ -26,6 +33,8 @@ export type RecordsPageModel = {
   readonly query: RecordsQuery;
   readonly model: RecordsIndex;
   readonly catalogSource: 'search_index' | 'entities';
+  /** Resolved named collection; `unknown` means the page should redirect to `collection=missing`. */
+  readonly collection: CollectionDescriptor;
 };
 
 /** Stable key so metadata and page share one index build per request. */
@@ -46,18 +55,27 @@ export const loadRecordsIndex = cache(async function loadRecordsIndex(
   queryKey: string,
 ): Promise<RecordsPageModel> {
   const { query } = loadRecordsIndexFromKey(queryKey);
-  const { data: searchDocs } = await getPublicSearchIndex();
-  if (searchIndexReadyForRecords(searchDocs)) {
-    return {
-      query,
-      model: buildRecordsIndex(searchDocs, query),
-      catalogSource: 'search_index',
-    };
-  }
-  const { data: entities } = await getSharedPublicEntities();
+  const slug = storyCollectionSlug(query.collection);
+  const [{ data, catalogSource }, { features }, storySource] = await Promise.all([
+    loadRecordsCatalog(),
+    loadDoorPinPlate(),
+    // Only a well-formed `story:<slug>` reads the story cache; sentinels need no read.
+    slug === undefined ? Promise.resolve(undefined) : resolveStoryCollectionSource(slug),
+  ]);
+  const drawableIds = new Set(features.map((feature) => feature.properties.entityId));
+  // Membership resolves over the released bibliography only: linked ids that are not in this
+  // catalog are counted by the descriptor, never listed.
+  const collection: CollectionDescriptor =
+    storySource !== undefined
+      ? resolveStoryCollection(
+          storySource,
+          new Set((data as readonly { readonly id: string }[]).map((entry) => entry.id)),
+        )
+      : (collectionDescriptorWithoutRead(query.collection) ?? NO_COLLECTION);
   return {
     query,
-    model: buildRecordsIndex(entities, query),
-    catalogSource: 'entities',
+    model: buildRecordsIndex(data, query, drawableIds, collection),
+    catalogSource,
+    collection,
   };
 });

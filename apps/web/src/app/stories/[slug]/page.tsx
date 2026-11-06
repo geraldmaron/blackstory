@@ -2,7 +2,7 @@
  * Story detail page at `/stories/[slug]` (chapters and short entries alike). The publication
  * layout: title → hero image → summary → body (prose with inline citations, figures, stat
  * callouts, primary documents, timelines, map insets, disputes) → numbered
- * references. Emits schema.org Story JSON-LD only.
+ * references → explicitly linked records. Emits schema.org Story JSON-LD only.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -10,6 +10,8 @@ import { assertNeverClaimReview } from '@repo/domain';
 import { StoryBody } from '../../../components/story/StoryBody';
 import { StoryHeroPhoto } from '../../../components/story/StoryHeroPhoto';
 import { StoryReferences } from '../../../components/story/StoryReferences';
+import { StoryContents } from '../../../components/story/story-contents';
+import { StoryRecords } from '../../../components/story/story-records';
 import type { HydratedStory } from '../../../lib/stories/hydrate';
 import { extractChapterHeadings } from '../../../lib/stories/heading-anchors';
 import {
@@ -127,8 +129,14 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
    * not representable in an Explore URL today. A list of real record links is the same handoff
    * the reader needs and states nothing the URL vocabulary cannot back.
    */
-  const citedIds = [...storyCitedEntities(doc).keys()];
-  const citedRecords = citedIds.length > 0 ? (await listPublicEntityViewsByIds(citedIds)).data : [];
+  const linkedRecords = storyCitedEntities(doc);
+  const citedRead =
+    linkedRecords.size > 0
+      ? await listPublicEntityViewsByIds([...linkedRecords.keys()]).catch(() => ({
+          data: [],
+          source: 'failed' as const,
+        }))
+      : { data: [], source: 'none' as const };
 
   // Ink spec §4 (/stories/[slug]): the sticky right rail carries "In this chapter/entry", the
   // reference list and "Next in this collection". The references list itself, its numbering and
@@ -137,23 +145,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const hasRailContent = chapterHeadings.length > 0 || next;
   const rail = hasRailContent ? (
     <div className="ds-reading-rail">
-      {chapterHeadings.length > 0 ? (
-        <nav className="ds-room-rail-group" aria-labelledby="story-toc">
-          <p className="ds-room-rail-group__title" id="story-toc">
-            In this {noun}
-          </p>
-          <ul className="ds-room-rail-group__list">
-            {chapterHeadings.map((heading) => (
-              <li key={heading.id}>
-                <a className="ds-room-rail-group__link" href={`#${heading.id}`}>
-                  <span className="ds-room-rail-group__label">{heading.text}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      ) : null}
-
+      <StoryContents headings={chapterHeadings} noun={noun} variant="rail" />
       {next ? (
         <div className="ds-reading-rail__next">
           <p className="ds-room-rail-group__title">Next in this collection</p>
@@ -218,7 +210,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
           ) : null}
           {story.references.length > 0 ? (
             <span>
-              Cites <a href="#about-this-chapter">{story.references.length} records</a>
+              <a href="#about-this-chapter">References ({story.references.length})</a>
             </span>
           ) : null}
         </p>
@@ -245,26 +237,18 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     ? { href: `/stories/${next.slug}`, label: next.title }
     : undefined;
 
-  const recordsBehind =
-    citedRecords.length > 0 ? (
-      <section className="ds-reading-appx__records" aria-labelledby="records-behind">
-        <h3 id="records-behind">The records behind this {noun}</h3>
-        <p>
-          Every record this {noun} draws on, as the archive holds it. Open one to read its evidence,
-          or find it on the Atlas from there.
-        </p>
-        <ul className="ds-reading-appx__record-list">
-          {citedRecords.map((record) => (
-            <li key={record.id}>
-              <Link href={`/entity/${record.id}`}>{record.displayName}</Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ) : null;
+  const recordsBehind = (
+    <StoryRecords
+      noun={noun}
+      slug={doc.slug}
+      linked={linkedRecords}
+      records={citedRead.data}
+      source={citedRead.source}
+    />
+  );
 
   const apparatus =
-    story.references.length > 0 || recordsBehind || navPrevious || navNext ? (
+    story.references.length > 0 || linkedRecords.size > 0 || navPrevious || navNext ? (
       <div className="ds-reading-appx" id="about-this-chapter">
         <div className="ds-reading-appx__head">
           <h2>About this {noun}</h2>
@@ -311,6 +295,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <article className="ds-reading">
+        <StoryContents headings={chapterHeadings} noun={noun} variant="inline" />
         <StoryBody story={story} />
 
         <p className="ds-reading__footer">

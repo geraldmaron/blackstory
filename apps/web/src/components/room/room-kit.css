@@ -1110,6 +1110,16 @@ a.ds-room-chip {
   letter-spacing: -0.006em;
 }
 
+/* Availability belongs to the row: a match remains readable even without a public pin. */
+.ds-room-idx__note {
+  display: block;
+  margin-top: var(--ds-space-1);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 .ds-room-idx__place,
 .ds-room-idx__era {
   overflow: hidden;
@@ -2834,4 +2844,40 @@ a.ds-room-chip {
     z-index: 2; /* local: above the sheet it overlaps, within this masthead only */
     background: var(--ds-canvas);
   }
+}
+
+/*
+ * A field error is not a hint. Before Field owned errors, every caller rendered one with
+ * `ds-room-field__hint`, so a rejection looked exactly like help text.
+ */
+.ds-room-field__error {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-error-fg);
+  font-size: var(--ds-text-caption);
+  line-height: var(--ds-leading-body);
+}
+
+.ds-room-field[data-invalid='true'] input,
+.ds-room-field[data-invalid='true'] select,
+.ds-room-field[data-invalid='true'] textarea {
+  border-color: var(--ds-error-border);
+}
+
+/*
+ * This lives with the kit, not with a route. It was briefly in corrections.css, which
+ * /corrections/status never loads — the same trap ReceiptLookupForm already documents — so
+ * the lookup form would have rendered an unstyled error.
+ */
+
+/* Two fields side by side, wrapping on a narrow screen. Replaces the inline
+   `flex: 1 1 12rem` the submit form repeated per field. */
+.ds-room-field-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4);
+}
+
+.ds-room-field-pair > .ds-room-field {
+  flex: 1 1 12rem;
+  min-width: 0;
 }

@@ -4,6 +4,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import LoginClient from './LoginClient';
+import { LoginFallback } from './login-panel';
 
 export const metadata: Metadata = {
   title: 'Sign in',
@@ -11,15 +12,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <Suspense
-      fallback={
-        <main className="admin-login" id="main">
-          <div className="admin-login__panel">
-            <p className="admin-login__meta">Loading sign-in…</p>
-          </div>
-        </main>
-      }
-    >
+    <Suspense fallback={<LoginFallback />}>
       <LoginClient />
     </Suspense>
   );

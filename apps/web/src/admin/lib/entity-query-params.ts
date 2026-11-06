@@ -15,6 +15,7 @@ import {
   type EntitySortKey,
   type MergeStateFilter,
 } from './entity-query.js';
+import { normalizeStateFilterValue } from './footprint-attribution.js';
 
 export type QueryParamInput = Readonly<Record<string, string | readonly string[] | undefined>>;
 
@@ -75,6 +76,8 @@ export function parseEntityQuery(input: QueryParamInput): EntityQuery {
         ? 'asc'
         : 'desc';
 
+  const state = normalizeStateFilterValue(readOne(input, 'state'));
+
   const mergeRaw = readOne(input, 'merge');
   const mergeState = MERGE_STATES.includes(mergeRaw as MergeStateFilter)
     ? (mergeRaw as MergeStateFilter)
@@ -87,6 +90,7 @@ export function parseEntityQuery(input: QueryParamInput): EntityQuery {
     ...(livingStatuses.length ? { livingStatuses } : {}),
     ...(sensitivityClasses.length ? { sensitivityClasses } : {}),
     ...(readOne(input, 'noclaims') === '1' ? { withoutClaims: true } : {}),
+    ...(state ? { state } : {}),
     mergeState,
     sort,
     direction,
@@ -111,6 +115,7 @@ export function serializeEntityQuery(query: EntityQuery): string {
   setMany('living', query.livingStatuses);
   setMany('sensitivity', query.sensitivityClasses);
   if (query.withoutClaims) params.set('noclaims', '1');
+  if (query.state) params.set('state', query.state);
   if (query.mergeState && query.mergeState !== 'active') params.set('merge', query.mergeState);
   if (query.sort && query.sort !== 'updated') params.set('sort', query.sort);
 
@@ -163,6 +168,7 @@ export function hasActiveFilters(query: EntityQuery): boolean {
     query.livingStatuses?.length ||
     query.sensitivityClasses?.length ||
     query.withoutClaims ||
+    query.state ||
     (query.mergeState && query.mergeState !== 'active'),
   );
 }

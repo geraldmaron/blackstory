@@ -8,24 +8,15 @@
  */
 'use client';
 
-import {
-  FormButton,
-  FormInput,
-  FormSelect,
-  FormTextarea,
-} from '../../../../admin/design-system/fields';
+import { FormButton, FormInput, FormSelect } from '../../../../admin/design-system/fields';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { StoryResearchPacket } from '@repo/domain';
 import { useAdminAuth } from '../../../../admin/auth/AdminAuthProvider';
 import {
   STORY_REVIEW_EMPTY_COPY,
   STORY_REVIEW_INTENT_COPY,
   STORY_REVIEW_STEPS,
   storyReviewActionHelp,
-  storyReviewActionLabel,
-  type StoryReviewAction,
 } from '../../../../admin/stories/story-review-copy';
 import {
   DEFAULT_STORY_REVIEW_QUERY,
@@ -38,48 +29,28 @@ import {
   type StoryReviewSortKey,
   type StoryReviewStatusFilter,
 } from '../../../../admin/stories/story-review-queue';
+import {
+  StoryPacketDetail,
+  formatWhen,
+  reviewLabel,
+  type PacketRow,
+} from '../../../../admin/stories/StoryPacketDetail';
+import { postStoryPacketReview } from '../../../../admin/stories/story-packet-review-client';
+import { DeskTitleBar } from '../../../../admin/design-system/ui';
 import '../../../../admin/cases/case-queue.css';
 
-type ReviewState = {
-  readonly decision: string;
-  readonly reviewedAt: string;
-  readonly reviewedByEmail: string;
-};
+/** The header carries the first two sentences of the intent copy; the rest sits directly below. */
+const INTENT_SENTENCES = STORY_REVIEW_INTENT_COPY.split(/(?<=\.)\s+/);
+const INTENT_LEAD = INTENT_SENTENCES.slice(0, 2).join(' ');
+const INTENT_REST = INTENT_SENTENCES.slice(2).join(' ');
 
-export type PacketRow = {
-  readonly submissionId: string;
-  readonly createdAt: string;
-  readonly createdBy: string;
-  readonly title: string;
-  readonly decision: string;
-  readonly topicId: string;
-  readonly validationIssueCount: number;
-  readonly review: ReviewState | null;
-  readonly packet: StoryResearchPacket;
-};
+export type { PacketRow };
 
 type BulkResult = {
   readonly succeeded: number;
   readonly failed: number;
   readonly storyDrafts: readonly { submissionId: string; slug: string }[];
 };
-
-function reviewLabel(row: PacketRow): string {
-  return row.review?.decision ?? 'pending';
-}
-
-function formatWhen(iso: string): string {
-  if (!iso) return '—';
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 export type StoryReviewDeskProps = {
   readonly initialRows?: readonly PacketRow[];
@@ -100,7 +71,6 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
   const [query, setQuery] = useState<StoryReviewQueueQuery>(DEFAULT_STORY_REVIEW_QUERY);
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const [storySlug, setStorySlug] = useState<string | null>(null);
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -194,24 +164,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
       }
 
       if (submissionIds.length === 1) {
-        const response = await fetch(`/admin/api/stories/packets/${submissionIds[0]}/review`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            decision,
-            ...(note.trim() ? { note: note.trim() } : {}),
-          }),
-        });
-        const body = (await response.json()) as {
-          error?: string;
-          storyDraft?: { slug: string };
-        };
-        if (!response.ok) {
-          throw new Error(body.error ?? `Review failed (${response.status})`);
-        }
+        const body = await postStoryPacketReview(token, submissionIds[0]!, decision, note);
         if (body.storyDraft) setStorySlug(body.storyDraft.slug);
       } else {
         const response = await fetch('/admin/api/stories/packets/review-bulk', {
@@ -256,26 +209,27 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
 
   return (
     <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">From quarantine</p>
-          <h1 className="ds-page__title">Story review</h1>
-          <p className="ds-page__lede">{STORY_REVIEW_INTENT_COPY}</p>
-          <ol className="acq__steps" aria-label="How to review a story packet">
-            {STORY_REVIEW_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </div>
-        <FormButton
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading || busy}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </FormButton>
-      </header>
+      <DeskTitleBar
+        eyebrow="From quarantine"
+        title="Story review"
+        description={INTENT_LEAD}
+        actions={
+          <FormButton
+            type="button"
+            className="ds-button ds-button--secondary"
+            onClick={() => void load()}
+            disabled={loading || busy}
+          >
+            {loading ? 'Refreshing…' : 'Refresh'}
+          </FormButton>
+        }
+      />
+      {INTENT_REST ? <p>{INTENT_REST}</p> : null}
+      <ol className="acq__steps" aria-label="How to review a story packet">
+        {STORY_REVIEW_STEPS.map((step) => (
+          <li key={step}>{step}</li>
+        ))}
+      </ol>
 
       <section className="story-review__stats" aria-label="Queue counts">
         <FormButton
@@ -543,202 +497,20 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
             </p>
           ) : (
             <>
-              <p className="story-review__detail-meta ds-mono">
-                {reviewLabel(selected)} · proposal {selected.decision} ·{' '}
-                {selected.packet.draft.eraLabel} · {selected.packet.draft.placeLabel}
-              </p>
-              <h2 className="ds-section__title">{selected.packet.draft.title}</h2>
-              <p className="ds-page__lede">{selected.packet.draft.dek}</p>
               <p className="ds-sans">
-                Confidence {(selected.packet.confidence * 100).toFixed(0)}% · topic{' '}
-                <span className="ds-mono">{selected.topicId}</span>
+                <Link href={`/admin/stories/review/${selected.submissionId}`}>
+                  Open this packet on its own page
+                </Link>
               </p>
-              <p className="ds-sans">{selected.packet.rationale}</p>
-              <p className="ds-sans">
-                <FormButton
-                  onClick={async () => {
-                    try {
-                      const token = await getIdToken();
-                      const response = await fetch('/admin/api/stories/import', {
-                        method: 'POST',
-                        headers: {
-                          Authorization: `Bearer ${token}`,
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ submissionId: selected.submissionId }),
-                      });
-                      const data = await response.json();
-                      if (!response.ok) throw new Error(data.error);
-                      router.push(`/admin/stories/${data.slug}`);
-                    } catch (error) {
-                      window.alert(
-                        error instanceof Error ? error.message : 'Article import failed.',
-                      );
-                    }
-                  }}
-                >
-                  Open editable story draft
-                </FormButton>
-                {' · '}The packet remains private research. Review sources and credits in the story
-                editor.
-              </p>
-
-              {selected.packet.validationIssues.length > 0 ? (
-                <div className="story-review__issues">
-                  <h3 className="ds-section__title">Validation issues</h3>
-                  <ul>
-                    {selected.packet.validationIssues.map((issue) => (
-                      <li key={issue}>{issue}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              <h3 className="ds-section__title">Research brief</h3>
-              <dl className="story-review__brief">
-                <div>
-                  <dt>Thesis</dt>
-                  <dd>{selected.packet.brief.thesisQuestion}</dd>
-                </div>
-                <div>
-                  <dt>Conventional start</dt>
-                  <dd>{selected.packet.brief.conventionalStartLine}</dd>
-                </div>
-                <div>
-                  <dt>Relocated start</dt>
-                  <dd>{selected.packet.brief.relocatedStartLine}</dd>
-                </div>
-                {selected.packet.brief.mechanismLayers.length > 0 ? (
-                  <div>
-                    <dt>Mechanisms</dt>
-                    <dd>
-                      <ul>
-                        {selected.packet.brief.mechanismLayers.map((layer) => (
-                          <li key={`${layer.kind}-${layer.summary.slice(0, 24)}`}>
-                            <span className="ds-mono">{layer.kind}</span> — {layer.summary}
-                          </li>
-                        ))}
-                      </ul>
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
-
-              {selected.packet.anchors.length > 0 ? (
-                <>
-                  <h3 className="ds-section__title">Anchors</h3>
-                  <ul className="story-review__anchors">
-                    {selected.packet.anchors.map((anchor) => (
-                      <li key={anchor.id}>
-                        <strong>{anchor.who ?? anchor.instrument ?? anchor.id}</strong>
-                        {` — ${anchor.role}`}
-                        {anchor.whereLabel ? ` · ${anchor.whereLabel}` : ''}
-                        {anchor.whenLabel ? ` · ${anchor.whenLabel}` : ''}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : null}
-
-              <h3 className="ds-section__title">Draft</h3>
-              <div className="ds-prose">
-                {selected.packet.draft.body.map((section, index) => (
-                  <section key={section.heading ?? `s-${index}`}>
-                    {section.heading ? <h4>{section.heading}</h4> : null}
-                    {section.paragraphs.map((paragraph) => (
-                      <p key={paragraph.slice(0, 48)}>{paragraph}</p>
-                    ))}
-                  </section>
-                ))}
-              </div>
-
-              <h3 className="ds-section__title">Cite map</h3>
-              <ul className="story-review__cites ds-mono">
-                {selected.packet.citeMap.map((entry) => (
-                  <li key={entry.sentenceId}>
-                    {entry.sentenceId}: {entry.citeKind}
-                    {entry.citeId ? ` → ${entry.citeId}` : ''}
-                  </li>
-                ))}
-              </ul>
-
-              <label className="story-review__field story-review__note">
-                <span>Decision note (optional)</span>
-                <FormTextarea
-                  value={note}
-                  onChange={(event) => setNote(event.target.value)}
-                  rows={3}
-                  placeholder="Example: Strong cite map; approve for research handoff after one more primary source"
-                />
-              </label>
-
-              <div className="acq-sheet__decide">
-                <h3 className="acq-sheet__decide-title">Decide</h3>
-                <p className="acq-sheet__decide-lede">
-                  Approval records your review and may return a research handoff — it does not
-                  publish. For missing sources, <Link href="/admin/evidence">attach evidence</Link>{' '}
-                  before re-running story research.
-                </p>
-                <ul className="acq-sheet__action-help">
-                  {(
-                    [
-                      'approved',
-                      'needs_evidence',
-                      'rejected',
-                    ] as const satisfies readonly StoryReviewAction[]
-                  ).map((action) => (
-                    <li key={action}>
-                      <strong>{storyReviewActionLabel(action)}.</strong>{' '}
-                      {storyReviewActionHelp(action)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="story-review__actions">
-                <FormButton
-                  type="button"
-                  className="ds-button ds-button--primary"
-                  disabled={busy}
-                  title={storyReviewActionHelp('approved')}
-                  onClick={() => void submitReview('approved', [selected.submissionId])}
-                >
-                  Approve
-                </FormButton>
-                <FormButton
-                  type="button"
-                  className="ds-button ds-button--secondary"
-                  disabled={busy}
-                  title={storyReviewActionHelp('needs_evidence')}
-                  onClick={() => void submitReview('needs_evidence', [selected.submissionId])}
-                >
-                  Needs evidence
-                </FormButton>
-                <FormButton
-                  type="button"
-                  className="ds-button ds-button--secondary"
-                  disabled={busy}
-                  title={storyReviewActionHelp('rejected')}
-                  onClick={() => void submitReview('rejected', [selected.submissionId])}
-                >
-                  Reject
-                </FormButton>
-              </div>
-
-              {storySlug && (
-                <p>
-                  <Link href={`/admin/stories/${storySlug}`}>Continue editing the story draft</Link>
-                </p>
-              )}
-              {!!bulkResult?.storyDrafts.length && (
-                <ul>
-                  {bulkResult.storyDrafts.map((story) => (
-                    <li key={story.submissionId}>
-                      <Link href={`/admin/stories/${story.slug}`}>Edit {story.slug}</Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <StoryPacketDetail
+                row={selected}
+                note={note}
+                onNoteChange={setNote}
+                busy={busy}
+                onDecide={submitReview}
+                storySlug={storySlug}
+                bulkDrafts={bulkResult?.storyDrafts ?? []}
+              />
             </>
           )}
         </section>

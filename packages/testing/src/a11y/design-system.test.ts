@@ -304,34 +304,22 @@ for (const [name, element] of CASES) {
   });
 }
 
-test('ShellHeader is still unrenderable outside Next, and so is still unaudited', async () => {
+test('ShellWordmark is still unrenderable outside Next, and so is still unaudited', async () => {
   // The one gap in the list above, recorded as a test so it cannot be quietly forgotten.
   //
-  // `ShellHeader` and its child `ShellWordmark` are the only two components in `@repo/ui` without
-  // the `import React ... void React;` line every sibling carries. There is no tsconfig at the
-  // repo root, so tsx transpiles JSX with the classic runtime and the compiled module references
-  // a free `React`. Next's own compiler uses `jsx: preserve`, so the site header is fine in
-  // production — but it cannot be server-rendered in any Node test, which leaves the most-visited
-  // chrome on the site with no axe coverage at all.
+  // `ShellWordmark` is the only component in `@repo/ui` without the `import React ... void React;`
+  // line every sibling carries. There is no tsconfig at the repo root, so tsx transpiles JSX with
+  // the classic runtime and the compiled module references a free `React`. Next's own compiler
+  // uses `jsx: preserve`, so the command bar is fine in production — but the mark cannot be
+  // server-rendered in any Node test, which leaves it with no axe coverage.
   //
-  // The fix is one line in each of the two files, matching the siblings. That is a `packages/ui`
-  // change, deliberately not made here. When it lands, this test fails: move ShellHeader into
-  // CASES above and delete this.
-  const { ShellHeader } = await import('@repo/ui');
+  // The fix is one line in that file, matching the siblings. When it lands, this test fails: move
+  // ShellWordmark into CASES above and delete this.
+  const { ShellWordmark } = await import('@repo/ui');
   assert.throws(
-    () =>
-      renderToStaticMarkup(
-        createElement(ShellHeader, {
-          pathname: '/records',
-          homeHref: '/',
-          primaryNav: [{ href: '/records', label: 'Records' }],
-          overflowNav: [],
-          brandLockup: BRAND,
-          brandSymbol: BRAND,
-        }),
-      ),
+    () => renderToStaticMarkup(createElement(ShellWordmark, { lockup: BRAND, symbol: BRAND })),
     /React is not defined/,
-    'ShellHeader now renders under Node — audit it in CASES instead of documenting it here',
+    'ShellWordmark now renders under Node — audit it in CASES instead of documenting it here',
   );
 });
 

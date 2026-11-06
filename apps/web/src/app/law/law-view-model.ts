@@ -26,12 +26,28 @@ export type RawLawBrowseParams = {
   readonly topic?: string;
   readonly status?: string;
   readonly sort?: string;
+  readonly page?: string;
 };
 
 /**
  * Browse ordering. Chronological is the default: law reads as a sequence, and sorting
  * by title put "42 U.S.C. § 1983" above Brown v. Board purely because of the digit.
  */
+export const LAW_PAGE_SIZE = 24;
+
+/** Canonical public browse address; a new filter starts at page one unless paging explicitly. */
+export function lawBrowseHref(params: RawLawBrowseParams): string {
+  const search = new URLSearchParams();
+  for (const key of ['q', 'kind', 'topic', 'status'] as const) {
+    const value = params[key]?.trim();
+    if (value && value !== 'all') search.set(key, value);
+  }
+  if (params.sort && params.sort !== 'chronological') search.set('sort', params.sort);
+  const page = Number(params.page);
+  if (Number.isSafeInteger(page) && page > 1) search.set('page', String(Math.min(page, 1000)));
+  return search.size > 0 ? `/law?${search}` : '/law';
+}
+
 export const LAW_SORTS = ['chronological', 'recent', 'title'] as const;
 export type LawSort = (typeof LAW_SORTS)[number];
 
@@ -54,6 +70,9 @@ export type LawBrowseViewModel = {
   readonly items: readonly LegalBrowseItem[];
   readonly totalMatched: number;
   readonly totalAvailable: number;
+  readonly page: number;
+  readonly pageCount: number;
+  readonly pageSize: number;
   /** True when any facet or query narrows the catalog — drives the "showing N of M" copy. */
   readonly isFiltered: boolean;
   readonly kindOptions: readonly { readonly value: string; readonly label: string }[];
@@ -170,16 +189,27 @@ export function buildLawBrowseViewModel(
     return true;
   });
 
+  const ordered = sortItems(
+    filtered.map((snapshot) => snapshotToBrowseItem(snapshot, source)),
+    sort,
+  );
+  const pageCount = Math.max(1, Math.ceil(ordered.length / LAW_PAGE_SIZE));
+  const requestedPage = Number(raw.page);
+  const page =
+    Number.isSafeInteger(requestedPage) && requestedPage > 1
+      ? Math.min(requestedPage, pageCount)
+      : 1;
+
   return {
     q: raw.q ?? '',
     kind,
     topic,
     status,
     sort,
-    items: sortItems(
-      filtered.map((snapshot) => snapshotToBrowseItem(snapshot, source)),
-      sort,
-    ),
+    items: ordered.slice((page - 1) * LAW_PAGE_SIZE, page * LAW_PAGE_SIZE),
+    page,
+    pageCount,
+    pageSize: LAW_PAGE_SIZE,
     totalMatched: filtered.length,
     totalAvailable: allSnapshots.length,
     isFiltered: q !== '' || kind !== 'all' || topic !== 'all' || status !== 'all',
@@ -207,7 +237,10 @@ export function buildLawDetailViewModel(
   // Reuses the browse view's own unfiltered chronological order rather than re-deriving a
   // second comparator here, so a reader stepping prev/next off the detail page walks the exact
   // sequence `/law` shows by default.
-  const order = buildLawBrowseViewModel({}, source).items;
+  const order = sortItems(
+    source.snapshots.map((snapshot) => snapshotToBrowseItem(snapshot, source)),
+    'chronological',
+  );
   const index = order.findIndex((item) => item.id === snapshot.id);
   const previous = index > 0 ? order[index - 1] : undefined;
   const next = index >= 0 && index < order.length - 1 ? order[index + 1] : undefined;

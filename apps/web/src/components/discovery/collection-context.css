@@ -1,0 +1,225 @@
+/*
+ * Collection context (docs/ui/patterns-collection-context.md). A compact heading for the
+ * collection the reader is holding, with the Map / Records choice as one segmented control. The
+ * count is the heading and the notes are its caption; the view switch sits opposite it. Opaque
+ * matte surface, one hairline, kit tokens only; light and dark come from the tokens. Copper marks
+ * the active view with a bar and the current-page state, never color alone.
+ *
+ * Two placements share it: boxed over the map (`ds-collection--atlas`, below) and flat inside the
+ * Records workbench (`ds-collection--flat`), where the workbench owns the edge.
+ */
+.ds-collection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-5);
+  min-width: 0;
+  margin-block: var(--ds-space-4);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink);
+}
+
+/* The segmented control. Visually after the facts; first in the DOM so the choice is reached
+   before the prose, and still a plain pair of anchors. */
+.ds-collection__views {
+  display: inline-flex;
+  flex: none;
+  order: 2;
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-full);
+}
+
+.ds-collection__view {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--ds-space-4);
+  border: 0;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 550;
+  text-decoration: none;
+}
+
+.ds-collection__view + .ds-collection__view {
+  border-left: var(--ds-border-width) solid var(--ds-border-strong);
+}
+
+a.ds-collection__view:hover {
+  background: var(--ds-surface-raised);
+}
+
+a.ds-collection__view:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-collection__view[aria-current='page'] {
+  background: var(--ds-surface-raised);
+  color: var(--ds-accent);
+}
+
+/* The copper bar is the active marker; the text weight and aria-current carry it for the rest. */
+.ds-collection__view[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  right: var(--ds-space-3);
+  bottom: 6px;
+  left: var(--ds-space-3);
+  height: 2px;
+  background: var(--ds-accent-graphic);
+}
+
+.ds-collection__view[aria-disabled='true'] {
+  color: var(--ds-ink-muted);
+}
+
+.ds-collection__facts {
+  display: grid;
+  flex: 1 1 14rem;
+  order: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-collection__count,
+.ds-collection__note {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ds-collection__count {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+}
+
+.ds-collection__note {
+  font-size: var(--ds-text-caption);
+  line-height: 1.35;
+  color: var(--ds-ink-muted);
+}
+
+/* Map-only limits are a different claim from membership: set off with a rule and mono type. */
+.ds-collection__note--limit {
+  padding-top: var(--ds-space-1);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  letter-spacing: 0.01em;
+}
+
+/* The named story behind a story collection: a caption link back to the source, not a control. */
+.ds-collection__source a {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ds-collection__source a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Decade-range controls folded under the strip. Third row, full width, order after the views. */
+.ds-collection__period {
+  flex: 1 1 100%;
+  order: 3;
+  min-width: 0;
+}
+
+.ds-collection__period-summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: var(--ds-text-caption);
+  font-weight: 550;
+  color: var(--ds-ink);
+}
+
+.ds-collection__period-summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Inside the Records workbench: no box of its own, a rule under it instead. */
+.ds-collection--flat {
+  margin: 0;
+  padding: 0 0 var(--ds-space-3);
+  background: none;
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 0;
+}
+
+.ds-collection--flat .ds-collection__count {
+  font-size: var(--ds-text-subtitle);
+}
+
+/* Embedded in the map: a fixed strip between the Lens and Results columns. */
+.ds-atlas > .ds-collection--atlas {
+  position: fixed;
+  top: calc(var(--ds-atlas-top) + var(--ds-space-12));
+  left: calc(var(--ds-space-4) + var(--ds-rail-w) + var(--ds-space-3));
+  right: calc(var(--ds-space-4) + var(--ds-results-w) + var(--ds-space-3));
+  z-index: var(--ds-z-atlas-instruments);
+  margin: 0;
+  width: fit-content;
+  max-width: 40rem;
+  pointer-events: auto;
+}
+
+@media (max-width: 64rem) {
+  .ds-atlas > .ds-collection--atlas {
+    left: var(--ds-space-3);
+    right: var(--ds-space-3);
+    width: auto;
+    max-width: none;
+    /* The shared top offset clears the journey and map-control row at every width. */
+  }
+}
+
+/* A phone: the strip is a heading band, so the view choice goes under the count at full width
+   and the second note line stays short. Nothing here changes the strip's anchor or its width. */
+@media (max-width: 64rem) {
+  .ds-collection {
+    gap: var(--ds-space-1) var(--ds-space-3);
+    padding: var(--ds-space-2);
+  }
+
+  .ds-collection__facts {
+    flex-basis: 100%;
+  }
+
+  .ds-collection__views {
+    order: 2;
+    flex: 1 1 100%;
+  }
+
+  .ds-collection__view {
+    flex: 1 1 0;
+  }
+
+  .ds-collection--flat {
+    padding-bottom: var(--ds-space-2);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ds-collection__view {
+    transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  }
+}
