@@ -24,7 +24,7 @@
     "start": "node --conditions development --import tsx src/bin.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@repo/domain": "workspace:*",
     "pg": "^8.23.1",
     "zod": "^3.25.76",
