@@ -37,7 +37,7 @@
 }
 
 /* Narrow: one peek sheet above the tab bar, like the real single-instrument slot. */
-@media (max-width: 819px), (max-height: 559px) {
+@media (max-width: 767px), (max-height: 559px) {
   .ds-atlas-pending__panel--lens {
     top: auto;
     left: var(--ds-space-2);

@@ -44,7 +44,7 @@ body {
 .admin-home__eyebrow {
   margin: 0 0 0.5rem;
   font-family: var(--ds-font-mono), ui-monospace, monospace;
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ds-ink-subtle, #6d675f);
@@ -653,7 +653,7 @@ body {
   font-size: 0.8125rem;
   letter-spacing: normal;
   text-transform: none;
-  color: var(--ds-ink-subtle, #6d675f);
+  color: var(--ds-ink-subtle);
 }
 
 .entity-edit__check {
