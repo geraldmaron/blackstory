@@ -188,14 +188,13 @@ export function PopulationByDecadeChart({
           const showLabel = index % 2 === 0 || index === rows.length - 1;
 
           // Split decades: enslaved base + free on top; else a single ink Black-total bar.
-          const segments:
-            readonly {
-              key: string;
-              from: number;
-              to: number;
-              fill: string;
-              hatched?: boolean;
-            }[] =
+          const segments: readonly {
+            key: string;
+            from: number;
+            to: number;
+            fill: string;
+            hatched?: boolean;
+          }[] =
             row.enslavedBlackPopulation !== null && row.freeBlackPopulation !== null
               ? [
                   {

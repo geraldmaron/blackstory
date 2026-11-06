@@ -60,11 +60,7 @@ test('the decade bar never draws a missing estimate as a value', () => {
     /livesBarShare\(\s*cell\.estimate\s*\?\?\s*0/,
     'a missing estimate must not be coerced to 0 for the bar',
   );
-  assert.match(
-    source,
-    /cell\.estimate === undefined/,
-    'the bar must branch on a missing estimate',
-  );
+  assert.match(source, /cell\.estimate === undefined/, 'the bar must branch on a missing estimate');
   assert.match(
     source,
     /lives-era__bar--absent/,

@@ -2114,7 +2114,10 @@
         "default": {
           "status": "baseline",
           "reason": "Retained distinct reading-room layout (entry, stats, searchable catalog, national walk-off ramp). Rendered acceptance at 375/1280 in light and dark is not recorded.",
-          "evidence": ["apps/web/src/app/books/page.tsx", "apps/web/src/app/books/books-page.test.ts"]
+          "evidence": [
+            "apps/web/src/app/books/page.tsx",
+            "apps/web/src/app/books/books-page.test.ts"
+          ]
         },
         "loading": {
           "status": "baseline",
@@ -2404,7 +2407,10 @@
         "loading": {
           "status": "baseline",
           "reason": "The page awaits the indicator and census reads; a segment loading component announces once and hides placeholders.",
-          "evidence": ["apps/web/src/app/data/loading.tsx", "apps/web/src/app/public-route-loading.test.tsx"]
+          "evidence": [
+            "apps/web/src/app/data/loading.tsx",
+            "apps/web/src/app/public-route-loading.test.tsx"
+          ]
         },
         "error": {
           "status": "partial",
@@ -2569,7 +2575,10 @@
         "default": {
           "status": "baseline",
           "reason": "Retained distinct reverse-chronological ledger with JSON and RSS feeds built from the same entry list. Rendered acceptance at 375/1280 in light and dark is not recorded.",
-          "evidence": ["apps/web/src/app/errata/page.tsx", "apps/web/src/app/errata/errata-page.test.ts"]
+          "evidence": [
+            "apps/web/src/app/errata/page.tsx",
+            "apps/web/src/app/errata/errata-page.test.ts"
+          ]
         },
         "loading": {
           "status": "not-applicable",
@@ -2600,7 +2609,10 @@
         "selected": {
           "status": "not-applicable",
           "reason": "The log has no query, filter or paging by design (one hairline list, never disclosures). Open product threshold, not a current defect: add windowing if the log outgrows one reading; the feeds already carry the full list.",
-          "evidence": ["apps/web/src/app/errata/page.tsx", "apps/web/src/app/errata/ErrataSections.tsx"]
+          "evidence": [
+            "apps/web/src/app/errata/page.tsx",
+            "apps/web/src/app/errata/ErrataSections.tsx"
+          ]
         },
         "auth": {
           "status": "not-applicable",
@@ -3032,7 +3044,10 @@
         "loading": {
           "status": "baseline",
           "reason": "The page awaits the snapshot and story reads; a segment loading component announces once and hides placeholders.",
-          "evidence": ["apps/web/src/app/lives/loading.tsx", "apps/web/src/app/public-route-loading.test.tsx"]
+          "evidence": [
+            "apps/web/src/app/lives/loading.tsx",
+            "apps/web/src/app/public-route-loading.test.tsx"
+          ]
         },
         "error": {
           "status": "partial",
@@ -3135,7 +3150,10 @@
         "loading": {
           "status": "baseline",
           "reason": "The page awaits the area snapshot and inherits the Lives segment wait, which announces once and hides placeholders.",
-          "evidence": ["apps/web/src/app/lives/loading.tsx", "apps/web/src/app/public-route-loading.test.tsx"]
+          "evidence": [
+            "apps/web/src/app/lives/loading.tsx",
+            "apps/web/src/app/public-route-loading.test.tsx"
+          ]
         },
         "error": {
           "status": "partial",
@@ -3495,7 +3513,10 @@
         "default": {
           "status": "baseline",
           "reason": "Retained wayfinding hub whose cards and copy come from the destination registry; no second index or immersion surface. Retiring it is an optional IA and redirect decision for the owner, not an implementation gap. Rendered acceptance at 375/1280 in light and dark is not recorded.",
-          "evidence": ["apps/web/src/app/rooms/page.tsx", "apps/web/src/app/rooms/rooms-page.test.tsx"]
+          "evidence": [
+            "apps/web/src/app/rooms/page.tsx",
+            "apps/web/src/app/rooms/rooms-page.test.tsx"
+          ]
         },
         "loading": {
           "status": "not-applicable",
@@ -3653,7 +3674,10 @@
         "default": {
           "status": "baseline",
           "reason": "Retained single publication index (lead, collection shelves, flat list) at its existing address. Rendered acceptance at 375/1280 in light and dark is not recorded.",
-          "evidence": ["apps/web/src/app/stories/page.tsx", "apps/web/src/app/stories/stories-index.test.ts"]
+          "evidence": [
+            "apps/web/src/app/stories/page.tsx",
+            "apps/web/src/app/stories/stories-index.test.ts"
+          ]
         },
         "loading": {
           "status": "baseline",

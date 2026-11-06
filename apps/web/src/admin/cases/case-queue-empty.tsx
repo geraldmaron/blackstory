@@ -27,7 +27,8 @@ export function CaseQueueEmpty({ mode, filtered, clearHref }: CaseQueueEmptyProp
           </Link>
         }
       >
-        Nothing in this view fits the current search or filters. Clear them to return to the unfiltered list.
+        Nothing in this view fits the current search or filters. Clear them to return to the
+        unfiltered list.
       </EmptyState>
     );
   }

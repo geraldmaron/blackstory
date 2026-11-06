@@ -40,7 +40,11 @@ function expectedTokens(theme: ThemeName): ReadonlyArray<readonly [string, strin
   const rows: Array<readonly [string, string]> = [];
   for (const [key, value] of Object.entries(themePalettes[theme])) rows.push([kebab(key), value]);
   for (const [role, palette] of Object.entries(statusPalettes[theme])) {
-    rows.push([`${role}-fg`, palette.fg], [`${role}-bg`, palette.bg], [`${role}-border`, palette.border]);
+    rows.push(
+      [`${role}-fg`, palette.fg],
+      [`${role}-bg`, palette.bg],
+      [`${role}-border`, palette.border],
+    );
   }
   for (const [level, palette] of Object.entries(confidencePalettes[theme])) {
     rows.push(
@@ -49,7 +53,8 @@ function expectedTokens(theme: ThemeName): ReadonlyArray<readonly [string, strin
       [`confidence-${level}-border`, palette.border],
     );
   }
-  for (const [key, value] of Object.entries(mapPalettes[theme])) rows.push([`map-${kebab(key)}`, value]);
+  for (const [key, value] of Object.entries(mapPalettes[theme]))
+    rows.push([`map-${kebab(key)}`, value]);
   return rows;
 }
 

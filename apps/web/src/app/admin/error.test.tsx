@@ -46,9 +46,12 @@ test('The staff boundary drops the stack even outside production', () => {
   const prior = process.env.NEXT_PUBLIC_APP_ENV;
   delete process.env.NEXT_PUBLIC_APP_ENV;
   try {
-    const error = Object.assign(new Error('Desk query failed\n    at run (/srv/app/server.js:10:5)'), {
-      stack: 'Error: boom\n    at run (/srv/app/server.js:10:5)',
-    });
+    const error = Object.assign(
+      new Error('Desk query failed\n    at run (/srv/app/server.js:10:5)'),
+      {
+        stack: 'Error: boom\n    at run (/srv/app/server.js:10:5)',
+      },
+    );
     const html = render(error);
     assert.match(html, /Desk query failed/);
     assert.doesNotMatch(html, /server\.js|\bat run\b/);

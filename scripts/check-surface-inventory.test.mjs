@@ -156,7 +156,9 @@ describe('inventory integrity', () => {
     const route = entry(root, '/books', 'apps/web/src/app/books/page.tsx');
     const stale = validateInventory({ root, appDir, manifest: validManifest([route]) });
     assert.ok(
-      stale.some((error) => error.includes('states.loading') && error.includes('loading.tsx exists')),
+      stale.some(
+        (error) => error.includes('states.loading') && error.includes('loading.tsx exists'),
+      ),
     );
 
     route.states.loading.status = 'baseline';

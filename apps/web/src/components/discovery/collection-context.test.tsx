@@ -192,9 +192,7 @@ describe('CollectionPeriodControls disclosure', () => {
   } as const;
 
   it('stays closed with the current range as its summary and the clear link outside it', () => {
-    const html = renderToStaticMarkup(
-      <CollectionPeriodControls {...base} start="1880" end="" />,
-    );
+    const html = renderToStaticMarkup(<CollectionPeriodControls {...base} start="1880" end="" />);
     assert.doesNotMatch(html, /<details[^>]*\sopen/);
     assert.match(html, /<summary[\s\S]*Documented in the 1880s or later[\s\S]*<\/summary>/);
     assert.doesNotMatch(html, /<summary[\s\S]*<a [\s\S]*<\/summary>/);

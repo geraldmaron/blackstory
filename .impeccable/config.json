@@ -6,18 +6,14 @@
       {
         "rule": "kicker-above-heading",
         "value": "*",
-        "files": [
-          "docs/redesign/prototype/index.html"
-        ],
+        "files": ["docs/redesign/prototype/index.html"],
         "createdAt": "2026-10-31T20:54:12.427Z",
         "reason": "Claude: numbered chapter kickers (01/Reading the gaps) are the production app's existing scroll-narrative device, observed live at localhost:3048 and in door-immersive.tsx story-copy.ts. This prototype's stated purpose is preserving that effect; removing them would misrepresent the proposal. Hero eyebrow was deleted as a genuine finding."
       },
       {
         "rule": "italic-serif-display",
         "value": "*",
-        "files": [
-          "docs/redesign/prototype/index.html"
-        ],
+        "files": ["docs/redesign/prototype/index.html"],
         "createdAt": "2026-10-31T20:54:12.441Z",
         "reason": "Claude: rule's own editorial/magazine carve-out applies -- archival history product, and the italic-serif hero is the shipping app's existing treatment ('BlackStory happened *here.*'), observed live at localhost:3048."
       },

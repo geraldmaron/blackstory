@@ -218,9 +218,7 @@ export function CaseQueue({
       const openedId = openedIdRef.current;
       openedIdRef.current = null;
       if (!openedId) return;
-      document
-        .querySelector<HTMLElement>(`[data-case-open="${CSS.escape(openedId)}"]`)
-        ?.focus();
+      document.querySelector<HTMLElement>(`[data-case-open="${CSS.escape(openedId)}"]`)?.focus();
       return;
     }
     closeRef.current?.focus();

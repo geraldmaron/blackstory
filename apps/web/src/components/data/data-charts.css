@@ -552,9 +552,5 @@
 
 /* Matches the SVG hatch on the free series: colour is never the only signal (brand.md). */
 .ds-data-chart__legend-swatch--hatched {
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent 0 2px,
-    var(--ds-canvas) 2px 4.2px
-  );
+  background-image: repeating-linear-gradient(45deg, transparent 0 2px, var(--ds-canvas) 2px 4.2px);
 }

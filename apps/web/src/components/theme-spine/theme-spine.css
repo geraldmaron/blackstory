@@ -13,7 +13,8 @@
   position: relative;
   margin: var(--ds-space-5) 0;
   padding: var(--ds-space-4) var(--ds-space-5);
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
+  border: var(--ds-border-width) solid
+    color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
   border-radius: var(--ds-radius-md);
   background: color-mix(in srgb, var(--ds-accent-graphic) 7%, var(--ds-surface-raised));
 }
@@ -140,7 +141,8 @@
 .ds-map-inset-moment {
   margin: var(--ds-space-5) 0;
   padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
+  border: var(--ds-border-width) solid
+    color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
   border-radius: var(--ds-radius-md);
   background: color-mix(in srgb, var(--ds-accent-graphic) 7%, var(--ds-surface-raised));
 }

@@ -173,9 +173,7 @@ export function ChoiceField({
               value={choice.value}
               defaultChecked={defaultValue === choice.value}
               {...(required ? { required: true } : {})}
-              {...(error && index === 0
-                ? { 'aria-invalid': true as const, id: groupId }
-                : {})}
+              {...(error && index === 0 ? { 'aria-invalid': true as const, id: groupId } : {})}
             />
             <span>{choice.label}</span>
           </label>

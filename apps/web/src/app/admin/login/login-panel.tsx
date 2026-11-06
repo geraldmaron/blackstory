@@ -72,9 +72,7 @@ export function LoginPanel({
   readonly onSubmit: FormEventHandler<HTMLFormElement>;
 }) {
   const status = loginStatusMessage({ ready, busy, signedIn, error });
-  const linked = error
-    ? { 'aria-describedby': LOGIN_ERROR_ID, 'aria-invalid': true as const }
-    : {};
+  const linked = error ? { 'aria-describedby': LOGIN_ERROR_ID, 'aria-invalid': true as const } : {};
   return (
     <main className="admin-login" id="main">
       <section className="admin-login__panel" aria-labelledby="admin-login-title">

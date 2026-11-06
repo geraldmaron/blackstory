@@ -69,11 +69,7 @@ export function decadeDensityBars(counts: readonly DecadeCount[]): readonly Deca
 }
 
 /** Sub-line copy under the histogram. Carries the as-of-decade honesty rule from v6. */
-export function decadeSubLine(
-  bar: DecadeBar | null,
-  totalRecords: number,
-  scoped = false,
-): string {
+export function decadeSubLine(bar: DecadeBar | null, totalRecords: number, scoped = false): string {
   if (!bar) {
     // The slider sweeps the whole archive; a narrowed collection is stated beside it, not here.
     return `${totalRecords.toLocaleString('en-US')} records${scoped ? ' in the whole archive' : ''}`;

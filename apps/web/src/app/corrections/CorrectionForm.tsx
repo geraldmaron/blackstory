@@ -203,9 +203,7 @@ export function CorrectionForm({
         label="Which record is wrong?"
         htmlFor={targetRecordId}
         hint="Name the place or paste its page address. You do not need an internal id."
-        {...(fieldIssue('targetRecordId')
-          ? { error: fieldIssue('targetRecordId')!.message }
-          : {})}
+        {...(fieldIssue('targetRecordId') ? { error: fieldIssue('targetRecordId')!.message } : {})}
       >
         <input
           {...fieldControlProps({

@@ -297,7 +297,9 @@ export default async function QueuePage({
               </div>
             )}
           </Panel>
-          {page.rows.length > 0 ? <p className="queue__hint">j / k to move, Enter to open</p> : null}
+          {page.rows.length > 0 ? (
+            <p className="queue__hint">j / k to move, Enter to open</p>
+          ) : null}
 
           <Pagination
             page={page.page}
