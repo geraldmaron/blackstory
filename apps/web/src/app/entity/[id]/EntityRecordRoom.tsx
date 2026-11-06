@@ -82,6 +82,7 @@ import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-pro
 import { WhyThisAppears } from '../../../components/why-appears';
 import {
   buildWhyThisAppearsForEntity,
+  claimTextMatcher,
   toEvidenceClaimInputs,
   whyAppearsEvidenceById,
   withoutSummaryEchoClaims,
@@ -418,7 +419,11 @@ export async function EntityRecordRoom({
             Why this is here
           </RecordSmallTitle>
           {whyThisAppears !== undefined ? (
-            <WhyThisAppears result={whyThisAppears} evidenceById={whyAppearsEvidenceById(entity)} />
+            <WhyThisAppears
+              result={whyThisAppears}
+              evidenceById={whyAppearsEvidenceById(entity)}
+              isPrintedClaim={claimTextMatcher(displayClaims)}
+            />
           ) : (
             <p>An inclusion explanation with linked evidence has not been recorded.</p>
           )}

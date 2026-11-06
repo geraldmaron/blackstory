@@ -4,5 +4,5 @@ import { CatalogLoading } from '../../../components/room/catalog-loading';
 void React;
 
 export default function Loading() {
-  return <CatalogLoading pathname="/law" label="Opening law entry…" />;
+  return <CatalogLoading pathname="/law" label="Pulling up the entry…" />;
 }

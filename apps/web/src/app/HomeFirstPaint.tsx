@@ -11,8 +11,6 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EntityMastMedia, RecordPhotoCredit } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
@@ -42,6 +40,7 @@ import { METHODOLOGY_HOW_RECORD_GETS_IN_HREF } from '../components/evidence/edit
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import {
   buildWhyThisAppearsForEntity,
+  claimTextMatcher,
   toEvidenceClaimInputs,
   whyAppearsEvidenceById,
   withoutSummaryEchoClaims,
@@ -115,16 +114,21 @@ function WalkOnPlaces({
 }) {
   if (places.length === 0) return null;
   return (
-    <nav className="ds-home-walk-on" aria-label="Also documented">
-      {places.map((place) => {
-        const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
-        return (
-          <Link key={place.id} className="ds-relation-chip" href={href}>
-            {place.displayName}
-          </Link>
-        );
-      })}
-    </nav>
+    <section className="ds-record-beat" aria-labelledby="walk-on-heading">
+      <RecordSmallTitle id="walk-on-heading" icon="continue">
+        Also documented
+      </RecordSmallTitle>
+      <nav className="ds-home-walk-on" aria-labelledby="walk-on-heading">
+        {places.map((place) => {
+          const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
+          return (
+            <Link key={place.id} className="ds-relation-chip" href={href}>
+              {place.displayName}
+            </Link>
+          );
+        })}
+      </nav>
+    </section>
   );
 }
 
@@ -250,16 +254,6 @@ export function HomeFirstPaint({
             }
           />
         </dl>
-        <div className="ds-rec-facts__actions">
-          <Link className="ds-cta ds-cta--copper" href={returns.mapHref} scroll={false}>
-            <FontAwesomeIcon
-              icon={faMapLocationDot}
-              className="ds-rec-inline-icon"
-              aria-hidden="true"
-            />
-            {geo ? 'See it on the map' : 'Browse the map'}
-          </Link>
-        </div>
       </div>
     );
 
@@ -426,7 +420,11 @@ export function HomeFirstPaint({
               Why this is here
             </RecordSmallTitle>
             {whyThisAppears ? (
-              <WhyThisAppears result={whyThisAppears} evidenceById={whyAppearsEvidenceById(lead)} />
+              <WhyThisAppears
+                result={whyThisAppears}
+                evidenceById={whyAppearsEvidenceById(lead)}
+                isPrintedClaim={claimTextMatcher(displayClaims)}
+              />
             ) : (
               <p>An inclusion explanation with linked evidence has not been recorded.</p>
             )}
@@ -434,17 +432,6 @@ export function HomeFirstPaint({
           <TrustBlock
             label="How this record stands"
             facts={[
-              {
-                label: 'Research coverage',
-                value: lead.researchCoverage.replace(/[_-]+/g, ' '),
-              },
-              {
-                label: 'Cited sources on this page',
-                value:
-                  sourceCount === 0
-                    ? 'Not linked yet. The place still stands on its published identity.'
-                    : `${sourceCount.toLocaleString('en-US')} ${sourceCount === 1 ? 'source' : 'sources'}`,
-              },
               {
                 label: 'How a record gets in',
                 value: (
@@ -479,7 +466,7 @@ export function HomeFirstPaint({
         <DoorRooms rooms={rooms} />
 
         <WalkOffRampView
-          placeName={MAP_BACK.displayName}
+          placeName={`Back to ${MAP_BACK.displayName}`}
           href={MAP_BACK.href}
           title={
             <>
@@ -494,7 +481,6 @@ export function HomeFirstPaint({
               ? [{ href: returns.nextHref, label: returns.nextLabel }]
               : []),
             { href: returns.listHref, label: returns.listLabel },
-            { href: METHODOLOGY_HOW_RECORD_GETS_IN_HREF, label: 'How a record gets in' },
           ]}
         >
           {returns.positionLabel

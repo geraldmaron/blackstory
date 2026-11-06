@@ -30,24 +30,44 @@ void React;
 const here = dirname(fileURLToPath(import.meta.url));
 
 const LOADING_BOUNDARIES = [
-  { route: '/books', dir: 'books', Loading: BooksLoading, label: 'Opening books…' },
-  { route: '/books/[slug]', dir: 'books/[slug]', Loading: BookLoading, label: 'Opening book entry…' },
-  { route: '/law', dir: 'law', Loading: LawLoading, label: 'Opening law entries…' },
+  {
+    route: '/books',
+    dir: 'books',
+    Loading: BooksLoading,
+    label: 'Taking the books off the shelf…',
+  },
+  {
+    route: '/books/[slug]',
+    dir: 'books/[slug]',
+    Loading: BookLoading,
+    label: 'Taking the book off the shelf…',
+  },
+  { route: '/law', dir: 'law', Loading: LawLoading, label: 'Pulling the law entries…' },
   {
     route: '/law/[slug]',
     dir: 'law/[slug]',
     Loading: LawEntryLoading,
-    label: 'Opening law entry…',
+    label: 'Pulling up the entry…',
   },
-  { route: '/stories', dir: 'stories', Loading: StoriesLoading, label: 'Opening stories…' },
-  { route: '/stories/[slug]', dir: 'stories/[slug]', Loading: StoryLoading, label: 'Opening story…' },
+  { route: '/stories', dir: 'stories', Loading: StoriesLoading, label: 'Laying out the stories…' },
+  {
+    route: '/stories/[slug]',
+    dir: 'stories/[slug]',
+    Loading: StoryLoading,
+    label: 'Turning to the story…',
+  },
   {
     route: '/stories/mosaic-credits',
     dir: 'stories/mosaic-credits',
     Loading: MosaicCreditsLoading,
-    label: 'Opening image credits…',
+    label: 'Gathering the image credits…',
   },
-  { route: '/records', dir: 'records', Loading: RecordsLoading, label: 'Opening records…' },
+  {
+    route: '/records',
+    dir: 'records',
+    Loading: RecordsLoading,
+    label: 'Pulling the records together…',
+  },
   // Place and invention render the shared record room, so they reuse the record skeleton.
   { route: '/place/[slug]', dir: 'place/[slug]', Loading: PlaceLoading, label: 'Opening record' },
   {
@@ -56,9 +76,9 @@ const LOADING_BOUNDARIES = [
     Loading: InventionLoading,
     label: 'Opening record',
   },
-  { route: '/data', dir: 'data', Loading: DataLoading, label: 'Opening data…' },
+  { route: '/data', dir: 'data', Loading: DataLoading, label: 'Gathering the figures…' },
   // Also the wait for /lives/explorer, which awaits the same snapshot read.
-  { route: '/lives', dir: 'lives', Loading: LivesLoading, label: 'Opening lives…' },
+  { route: '/lives', dir: 'lives', Loading: LivesLoading, label: 'Finding the lives…' },
   {
     route: '/corrections/status/[receiptCode]',
     dir: 'corrections/status/[receiptCode]',

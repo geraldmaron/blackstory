@@ -63,8 +63,15 @@ export type ChronologySection<R> = {
 
 export type ChronologyPage<R> = {
   readonly sections: readonly ChronologySection<R>[];
-  readonly coverage: readonly { readonly decade: number; readonly count: number }[];
+  /** Decades that hold records, with the 1-based page each one starts on. */
+  readonly coverage: readonly {
+    readonly decade: number;
+    readonly count: number;
+    readonly page: number;
+  }[];
   readonly undatedCount: number;
+  /** The page the undated section starts on; `null` when every record has a decade. */
+  readonly undatedPage: number | null;
   readonly coverageLabel: string;
 };
 
@@ -84,7 +91,14 @@ export function buildChronologyPage<T extends CollectionFacts, R>(
   toRow: (facts: T) => R,
 ): ChronologyPage<R> {
   const totals = new Map<number | null, number>();
-  for (const entry of ordered) totals.set(entry.decade, (totals.get(entry.decade) ?? 0) + 1);
+  const firstIndex = new Map<number | null, number>();
+  ordered.forEach((entry, index) => {
+    totals.set(entry.decade, (totals.get(entry.decade) ?? 0) + 1);
+    if (!firstIndex.has(entry.decade)) firstIndex.set(entry.decade, index);
+  });
+  const pageSize = Math.max(1, end - start);
+  const pageOf = (decade: number | null) =>
+    Math.floor((firstIndex.get(decade) ?? 0) / pageSize) + 1;
 
   const sections: {
     decade: number | null;
@@ -109,7 +123,9 @@ export function buildChronologyPage<T extends CollectionFacts, R>(
   });
 
   const coverage = [...totals.entries()]
-    .flatMap(([decade, count]) => (decade === null ? [] : [{ decade, count }]))
+    .flatMap(([decade, count]) =>
+      decade === null ? [] : [{ decade, count, page: pageOf(decade) }],
+    )
     .sort((a, b) => a.decade - b.decade);
   const undatedCount = totals.get(null) ?? 0;
 
@@ -127,6 +143,7 @@ export function buildChronologyPage<T extends CollectionFacts, R>(
     })),
     coverage,
     undatedCount,
+    undatedPage: undatedCount > 0 ? pageOf(null) : null,
     coverageLabel:
       coverage.length === 0
         ? 'No record in this collection has a documented decade.'

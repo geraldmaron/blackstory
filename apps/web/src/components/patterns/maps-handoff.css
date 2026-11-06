@@ -114,3 +114,12 @@
     justify-content: center;
   }
 }
+
+/* Touch: the 44px target Apple's HIG asks for. Selector matches the compact override's
+   specificity so a compact card does not keep its 32px. */
+@media (pointer: coarse) {
+  .ds-maps-handoff .ds-maps-handoff__seg.ds-cta,
+  .ds-maps-handoff--compact .ds-maps-handoff__seg.ds-cta {
+    min-height: 2.75rem;
+  }
+}

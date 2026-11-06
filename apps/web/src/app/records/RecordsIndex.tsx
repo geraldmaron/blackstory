@@ -23,11 +23,20 @@ import { meterLevelForTier, RecordMeter } from '../../components/entity/RecordCh
 import { KindGlyph } from '../../components/map-experience/KindGlyph';
 import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { RecordsIndex as RecordsIndexModel } from '../../lib/records/build-records-index';
-import { RECORDS_FILTER_KEYS, recordsHref } from '../../lib/records/build-records-index';
+import {
+  RECORDS_FILTER_KEYS,
+  buildAtlasHref,
+  recordsHref,
+} from '../../lib/records/build-records-index';
+import { decadeDensityBars } from '../../lib/map-experience/decade-density';
 import { CollectionContext } from '../../components/discovery/collection-context';
 import { CollectionPeriodControls } from '../../components/discovery/collection-period-controls';
 import { RecordsChronology } from '../../components/discovery/records-chronology';
-import { documentedCoverageLabel, periodLabel } from '../../lib/discovery/collection-period';
+import {
+  documentedCoverageLabel,
+  documentedDecades,
+  periodLabel,
+} from '../../lib/discovery/collection-period';
 import type { RecordsRow } from '../../lib/records/build-records-index';
 import type { RecordsQuery } from '../../lib/records/records-query';
 
@@ -44,18 +53,25 @@ function scopeParams(query: RecordsQuery): Record<string, string> {
   };
 }
 
-function toIndexRows(rows: readonly RecordsRow[], showCoverage = false) {
+/**
+ * In chronology the section's numeral already says the decade, so the row neither repeats it in
+ * the era column nor in an "Archive bucket: 1530s" subtitle. A record documented in several
+ * decades still says so: that is information the numeral does not carry.
+ */
+function toIndexRows(rows: readonly RecordsRow[], chronology = false) {
   return rows.map((row) => ({
     href: row.href,
     name: row.name,
     note: [
       row.mappable === false ? 'Not on the map' : '',
-      showCoverage ? documentedCoverageLabel(row.documentedDecades ?? []) : '',
+      chronology && documentedDecades(row.documentedDecades ?? []).length > 1
+        ? documentedCoverageLabel(row.documentedDecades ?? [])
+        : '',
     ]
       .filter(Boolean)
       .join(' · '),
     place: row.place,
-    era: row.era,
+    era: chronology ? '' : row.era,
     glyph: (
       <KindGlyph kind={row.kind} {...(row.mapTone ? { mapTone: row.mapTone } : {})} size={13} />
     ),
@@ -267,7 +283,10 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
            * then earliest era. FindBar already renders a sort row — /law and /books both use it
            * — so this is the existing control, not a new one.
            */
-          sort={SORTS.map((option) => ({
+          sort={SORTS.filter(
+            (option) =>
+              query.layout !== 'chronology' || option.id !== 'era' || query.sort === 'era',
+          ).map((option) => ({
             label: option.label,
             // The whole query rides along, so re-ordering never drops the collection, range or
             // layout. A new order starts at page one.
@@ -364,31 +383,37 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           </div>
         </FindBar>
 
-        {/* A sibling of the find form, never nested in it. Hidden fields keep every other param. */}
-        <CollectionPeriodControls
-          action="/records"
-          preserved={periodPreserved}
-          decades={periodDecades}
-          start={query.periodStart}
-          end={query.periodEnd}
-          includeUndated={query.includeUndated}
-          clearHref={periodClearHref}
-          undatedExcluded={undatedExcluded}
-          disclosure={{
-            summary:
-              query.periodStart === '' && query.periodEnd === ''
-                ? 'Any decade'
-                : `${periodLabel({
-                    start: query.periodStart,
-                    end: query.periodEnd,
-                    includeUndated: query.includeUndated,
-                  })}${
-                    !query.includeUndated && undatedExcluded > 0
-                      ? ` · ${undatedExcluded.toLocaleString('en-US')} undated left out`
-                      : ''
-                  }`,
-          }}
-        />
+        {/* A sibling of the find form, never nested in it. Hidden fields keep every other param.
+            In chronology the decade strip is the way to reach a decade, so the "Any decade"
+            disclosure only appears when a range is already active and needs its clear control. */}
+        {query.layout === 'chronology' &&
+        query.periodStart === '' &&
+        query.periodEnd === '' ? null : (
+          <CollectionPeriodControls
+            action="/records"
+            preserved={periodPreserved}
+            decades={periodDecades}
+            start={query.periodStart}
+            end={query.periodEnd}
+            includeUndated={query.includeUndated}
+            clearHref={periodClearHref}
+            undatedExcluded={undatedExcluded}
+            disclosure={{
+              summary:
+                query.periodStart === '' && query.periodEnd === ''
+                  ? 'Any decade'
+                  : `${periodLabel({
+                      start: query.periodStart,
+                      end: query.periodEnd,
+                      includeUndated: query.includeUndated,
+                    })}${
+                      !query.includeUndated && undatedExcluded > 0
+                        ? ` · ${undatedExcluded.toLocaleString('en-US')} undated left out`
+                        : ''
+                    }`,
+            }}
+          />
+        )}
       </div>
 
       {notice !== undefined ? (
@@ -429,31 +454,87 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
               )}
             </EmptyList>
           );
-          return chronology !== undefined ? (
+          if (chronology === undefined) {
+            return (
+              <HairlineIndex
+                countLabel={
+                  pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel
+                }
+                rows={toIndexRows(rows)}
+                empty={empty}
+              />
+            );
+          }
+          const onPage = new Set(
+            chronology.sections.flatMap((section) =>
+              section.decade === null ? [] : [section.decade],
+            ),
+          );
+          const pageHref = (target: number, anchor: string) =>
+            `${recordsHref({ ...query, page: target })}#${anchor}`;
+          const pageOfDecade = new Map(chronology.coverage.map((item) => [item.decade, item.page]));
+          const countOfDecade = new Map(
+            chronology.coverage.map((item) => [item.decade, item.count]),
+          );
+          // Every decade between the first and last, so a gap in the archive reads as a gap.
+          const firstDecade = chronology.coverage[0]?.decade ?? 0;
+          const lastDecade = chronology.coverage[chronology.coverage.length - 1]?.decade ?? 0;
+          const bars = decadeDensityBars(
+            Array.from({ length: (lastDecade - firstDecade) / 10 + 1 }, (_, index) => {
+              const decade = firstDecade + index * 10;
+              return { decade, count: countOfDecade.get(decade) ?? 0 };
+            }),
+          );
+          const strip = bars.map((bar) => {
+            const startPage = pageOfDecade.get(bar.decade);
+            return {
+              key: String(bar.decade),
+              label: bar.label,
+              count: bar.count,
+              heightPercent: bar.heightPercent,
+              here: onPage.has(bar.decade),
+              page: startPage ?? 1,
+              href: startPage === undefined ? null : pageHref(startPage, `decade-${bar.decade}`),
+            };
+          });
+          const centuries = [
+            ...new Map(
+              chronology.coverage.map((item) => [Math.floor(item.decade / 100) * 100, item]),
+            ).entries(),
+          ].map(([century, first]) => ({
+            label: `${century}s`,
+            href: pageHref(first.page, `decade-${first.decade}`),
+            here: [...onPage].some((decade) => Math.floor(decade / 100) * 100 === century),
+          }));
+          return (
             <RecordsChronology
               sections={chronology.sections.map((section) => ({
                 key: section.decade === null ? 'undated' : String(section.decade),
                 label: section.label,
+                numeral: section.decade === null ? '' : `${section.decade}s`,
                 total: section.total,
                 shown: section.shown,
                 continued: section.continued,
                 undated: section.decade === null,
                 rows: toIndexRows(section.rows, true),
+                ...(section.decade === null || section.total < 2
+                  ? {}
+                  : {
+                      mapHref: buildAtlasHref({
+                        ...query,
+                        periodStart: `${section.decade}`,
+                        periodEnd: `${section.decade}`,
+                      }),
+                    }),
               }))}
-              coverageLabel={
-                pageCount > 1
-                  ? `${chronology.coverageLabel} Page ${page} of ${pageCount}.`
-                  : chronology.coverageLabel
-              }
+              strip={strip}
+              centuries={centuries}
               undatedCount={chronology.undatedCount}
-              empty={empty}
-            />
-          ) : (
-            <HairlineIndex
-              countLabel={
-                pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel
+              undatedHref={
+                chronology.undatedPage === null
+                  ? null
+                  : pageHref(chronology.undatedPage, 'decade-undated')
               }
-              rows={toIndexRows(rows)}
               empty={empty}
             />
           );

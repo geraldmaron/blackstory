@@ -5,5 +5,11 @@ void React;
 
 /** Also the wait for `/lives/explorer`, which awaits the same snapshot read. */
 export default function Loading() {
-  return <CatalogLoading pathname="/lives" label="Opening lives…" />;
+  return (
+    <CatalogLoading
+      pathname="/lives"
+      label="Finding the lives…"
+      note="Each life is traced to its sources."
+    />
+  );
 }

@@ -1,0 +1,88 @@
+/*
+ * The wait for public catalog routes: the room's masthead over a blank ruled ledger, one copper
+ * pin travelling the top rule. No filled placeholder blocks, glow, gradient or bounce
+ * (docs/ui/brand.md). The rules draw in once on arrival, then hold; only the pin keeps moving.
+ * Reduced motion shows the finished ledger with the pin parked at the start.
+ */
+
+/* A wait is not the page: the masthead keeps its frame but drops from hero scale, so the real
+   title arriving does not read as the same shout twice. */
+.ds-room--ledger .ds-wait .ds-entry__title {
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+  line-height: 1.05;
+}
+
+.ds-room--ledger .ds-wait .ds-entry--reading {
+  padding-bottom: var(--ds-space-6);
+}
+
+.ds-wait__ledger {
+  display: grid;
+  margin-top: 0;
+}
+
+.ds-wait__rule {
+  position: relative;
+  display: block;
+  height: 3.5rem;
+  border-bottom: var(--ds-border-width, 1px) solid var(--ds-rule);
+  animation: ds-wait-draw 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* The pin rides the masthead's own ink rule, which sits directly above the ledger. */
+.ds-wait__rule--lead {
+  height: 0;
+  margin-top: -1px;
+  border-bottom: 0;
+  animation: none;
+}
+
+.ds-wait__rule:nth-child(2) {
+  animation-delay: 80ms;
+}
+.ds-wait__rule:nth-child(3) {
+  animation-delay: 160ms;
+  opacity: 0.7;
+}
+.ds-wait__rule:nth-child(4) {
+  animation-delay: 240ms;
+  opacity: 0.45;
+}
+.ds-wait__rule:nth-child(5) {
+  animation-delay: 320ms;
+  opacity: 0.25;
+}
+
+.ds-wait__pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-top: calc(-1 * var(--ds-space-1) * 1.25);
+  border-radius: 50%;
+  background: var(--ds-accent);
+  animation: ds-wait-travel 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+}
+
+@keyframes ds-wait-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes ds-wait-travel {
+  to {
+    left: calc(100% - 0.625rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-wait__rule,
+  .ds-wait__pin {
+    animation: none;
+  }
+}

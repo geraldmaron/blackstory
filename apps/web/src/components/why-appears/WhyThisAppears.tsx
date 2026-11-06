@@ -34,6 +34,11 @@ export type WhyThisAppearsProps = {
   readonly variant?: 'flat' | 'card';
   /** Optional claim-id → citation map so inclusion evidence can show named, linkable sources. */
   readonly evidenceById?: Readonly<Record<string, WhyAppearsCitation>>;
+  /**
+   * True for a basis note the page already prints as an accepted claim. Those notes (and their
+   * citations) are not repeated: the reason keeps its label and points back to the claim.
+   */
+  readonly isPrintedClaim?: (note: string) => boolean;
 };
 
 type BasisGroup = {
@@ -135,15 +140,20 @@ function WhyThisAppearsBody({
   instanceId,
   showAuditableTag,
   evidenceById,
+  isPrintedClaim,
 }: {
   readonly result: PublicWhyThisAppears;
   readonly instanceId: string;
   readonly showAuditableTag: boolean;
   readonly evidenceById: Readonly<Record<string, WhyAppearsCitation>> | undefined;
+  readonly isPrintedClaim: ((note: string) => boolean) | undefined;
 }) {
   const basisHeadingId = `${instanceId}-basis-heading`;
   const coverageHeadingId = `${instanceId}-coverage-heading`;
   const basisGroups = groupBasisByCriterion(result.notabilityBasis);
+  const printed = (note: string) => isPrintedClaim?.(note) === true;
+  const pointsBack = result.notabilityBasis.some((item) => printed(item.note));
+  const allPointBack = pointsBack && result.notabilityBasis.every((item) => printed(item.note));
 
   return (
     <>
@@ -168,19 +178,40 @@ function WhyThisAppearsBody({
           </EmptyState>
         ) : (
           <div className="ds-why-appears__basis" aria-label={WHY_THIS_APPEARS_COPY.basisHeading}>
-            {basisGroups.map((group, groupIndex) => (
-              <div key={`${group.criterion}_${groupIndex}`} className="ds-why-appears__basis-group">
-                <p className="ds-mono ds-why-appears__criterion">{group.criterionLabel}</p>
-                <ul className="ds-why-appears__notes">
-                  {group.items.map((item, index) => (
-                    <li key={`${item.criterion}_${index}`} className="ds-sans">
-                      {item.note}
-                    </li>
-                  ))}
-                </ul>
-                <CitationList items={group.items} evidenceById={evidenceById} />
-              </div>
-            ))}
+            {allPointBack ? (
+              <p className="ds-mono ds-why-appears__criterion">
+                {basisGroups.map((group) => group.criterionLabel).join(' · ')}
+              </p>
+            ) : (
+              basisGroups.map((group, groupIndex) => {
+                const own = group.items.filter((item) => !printed(item.note));
+                return (
+                  <div
+                    key={`${group.criterion}_${groupIndex}`}
+                    className="ds-why-appears__basis-group"
+                  >
+                    <p className="ds-mono ds-why-appears__criterion">{group.criterionLabel}</p>
+                    {own.length > 0 ? (
+                      <>
+                        <ul className="ds-why-appears__notes">
+                          {own.map((item, index) => (
+                            <li key={`${item.criterion}_${index}`} className="ds-sans">
+                              {item.note}
+                            </li>
+                          ))}
+                        </ul>
+                        <CitationList items={own} evidenceById={evidenceById} />
+                      </>
+                    ) : null}
+                  </div>
+                );
+              })
+            )}
+            {pointsBack ? (
+              <p className="ds-sans ds-why-appears__cite-gap">
+                {WHY_THIS_APPEARS_COPY.statedAbove}
+              </p>
+            ) : null}
           </div>
         )}
       </section>
@@ -206,6 +237,7 @@ export function WhyThisAppears({
   instanceId = 'why-this-appears',
   variant = 'flat',
   evidenceById,
+  isPrintedClaim,
 }: WhyThisAppearsProps) {
   const body = (
     <WhyThisAppearsBody
@@ -213,6 +245,7 @@ export function WhyThisAppears({
       instanceId={instanceId}
       showAuditableTag={variant === 'flat'}
       evidenceById={evidenceById}
+      isPrintedClaim={isPrintedClaim}
     />
   );
 

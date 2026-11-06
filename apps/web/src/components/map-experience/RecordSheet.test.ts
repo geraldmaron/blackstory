@@ -216,8 +216,8 @@ test('visit maps exits stay quiet text; fly stays a sheet action', () => {
 
   // Each exit says which provider and which action it is. They all used to carry the same
   // accessible name, "Open <place> in maps", four times over.
-  assert.match(html, /aria-label="Open [^"]+ in Apple Maps"/);
-  assert.match(html, /aria-label="Get directions to [^"]+ in Google Maps"/);
+  assert.match(html, /aria-label="Open [^"]+ in Apple Maps \(opens in a new tab\)"/);
+  assert.match(html, /aria-label="Get directions to [^"]+ in Google Maps \(opens in a new tab\)"/);
 
   // The weight rule that the old text links were protecting: an external handoff is never the
   // filled action of a view. It may wear the quiet pill; it may not wear copper.

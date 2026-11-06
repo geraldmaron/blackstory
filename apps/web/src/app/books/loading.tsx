@@ -4,5 +4,11 @@ import { CatalogLoading } from '../../components/room/catalog-loading';
 void React;
 
 export default function Loading() {
-  return <CatalogLoading pathname="/books" label="Opening books…" />;
+  return (
+    <CatalogLoading
+      pathname="/books"
+      label="Taking the books off the shelf…"
+      note="Each entry points to its source."
+    />
+  );
 }

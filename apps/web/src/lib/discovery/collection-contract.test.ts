@@ -187,6 +187,38 @@ describe('chronology grouping', () => {
     assert.equal(page.sections[0]?.total, 2);
     assert.equal(page.sections[0]?.shown, 1);
   });
+
+  it('reports the page each decade, and the undated section, starts on', () => {
+    const ordered = chronologyOrder(
+      [
+        fact('a', ['1880s']),
+        fact('b', ['1880s']),
+        fact('c', ['1890s']),
+        fact('d', ['1890s']),
+        fact('e', ['Undated']),
+      ],
+      EMPTY_RECORDS_QUERY,
+    );
+    // Two rows per page: 1880s starts on page 1, 1890s on page 2, the undated record on page 3.
+    const page = buildChronologyPage(ordered, 0, 2, (facts) => facts.row.id);
+    assert.deepEqual(
+      page.coverage.map((item) => [item.decade, item.page]),
+      [
+        [1880, 1],
+        [1890, 2],
+      ],
+    );
+    assert.equal(page.undatedPage, 3);
+    assert.equal(
+      buildChronologyPage(
+        chronologyOrder([fact('x', ['1880s'])], EMPTY_RECORDS_QUERY),
+        0,
+        2,
+        (f) => f.row.id,
+      ).undatedPage,
+      null,
+    );
+  });
 });
 
 describe('cross-view handoffs', () => {

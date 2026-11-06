@@ -179,10 +179,15 @@ export function primaryImageSourceLine(input: {
   readonly sourceSystem?: string;
   readonly sourcePageUrl?: string;
   readonly license?: string;
+  /** The credit already shown beside this link; when it names the source system, the link says so once. */
+  readonly creditText?: string;
 }): { readonly label: string; readonly url: string } | undefined {
   const url = input.sourcePageUrl?.trim();
   const systemLabel = input.sourceSystem ? PIN_SOURCE_SYSTEM_LABELS[input.sourceSystem] : undefined;
   if (!url || !systemLabel) return undefined;
+  if (input.creditText?.toLowerCase().includes(systemLabel.toLowerCase())) {
+    return { label: 'Source page', url };
+  }
   const license = input.license?.trim();
   return {
     label: license ? `Source: ${systemLabel} · ${license}` : `Source: ${systemLabel}`,

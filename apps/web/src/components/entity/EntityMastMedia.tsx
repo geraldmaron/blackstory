@@ -61,6 +61,7 @@ export function RecordPhotoCredit({
     ...(image.sourceSystem !== undefined ? { sourceSystem: image.sourceSystem } : {}),
     ...(image.sourcePageUrl !== undefined ? { sourcePageUrl: image.sourcePageUrl } : {}),
     ...(image.license !== undefined ? { license: image.license } : {}),
+    creditText: caption.creditText,
   });
   const classes = ['ds-entity-photo__credit', 'ds-sans', className].filter(Boolean).join(' ');
 

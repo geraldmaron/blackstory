@@ -186,3 +186,13 @@ test('coverHidesTooMuch judges the crop against the real box, not orientation al
   );
   assert.equal(coverHidesTooMuch(0, 2), false, 'unknown aspect never forces contain');
 });
+
+test('primaryImageSourceLine does not name the source twice when the credit already does', () => {
+  const line = primaryImageSourceLine({
+    sourceSystem: 'wikimedia_commons',
+    sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Rosa_Parks.jpg',
+    license: 'Public domain',
+    creditText: 'Frederick Douglass · Wikimedia Commons · public domain',
+  });
+  assert.equal(line?.label, 'Source page');
+});

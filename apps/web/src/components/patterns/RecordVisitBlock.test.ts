@@ -77,7 +77,7 @@ describe('RecordVisitBlock', () => {
     // Four exits used to share one name, "Open <place> in maps", so a screen-reader reader could
     // not tell search from directions or Apple from Google.
     const names = [...html.matchAll(/aria-label="([^"]+)"/g)].map((match) => match[1]);
-    const exits = names.filter((name) => /Maps$/.test(name ?? ''));
+    const exits = names.filter((name) => /Maps \(opens in a new tab\)$/.test(name ?? ''));
     assert.equal(exits.length, 4);
     assert.equal(new Set(exits).size, 4);
   });

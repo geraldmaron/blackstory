@@ -86,6 +86,10 @@ import { useMapSync } from './hooks/use-map-sync';
 import { usePopulationChoropleth } from './hooks/use-population-choropleth';
 import { useAtlasCamera } from './hooks/use-atlas-camera';
 import { useRecordSelection } from './hooks/use-record-selection';
+import {
+  emitExplorePinSelect,
+  resolveExplorePinEntityId,
+} from '../../lib/map-experience/explore-pin-select';
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useLocateMe } from './hooks/use-locate-me';
@@ -525,9 +529,14 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     const saved = readPinContinuity();
     if (!saved) return;
     continuityRestoredRef.current = true;
-    const byId = view.allFeatures.find((feature) => feature.properties.entityId === saved.entityId);
-    if (byId) {
-      selectById(saved.entityId);
+    /*
+     * The Door's pins carry first-paint `pin-N` ids. Selecting one by id alone opened the sheet and
+     * then dropped it a second later, when the catalog replaced those ids. Going through the pin
+     * select path remembers the pin's coordinates, so the selection re-resolves to the real entity.
+     */
+    const pin = { pinId: saved.entityId, lng: saved.lng, lat: saved.lat };
+    if (resolveExplorePinEntityId(pin, view.allFeatures)) {
+      emitExplorePinSelect(pin);
     } else {
       camera.flyToRecord({
         center: [saved.lng, saved.lat],
@@ -535,7 +544,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       });
     }
     clearPinContinuity();
-  }, [camera, initial.viewState.selected, selectById, view.allFeatures]);
+  }, [camera, initial.viewState.selected, view.allFeatures]);
   const { copy, citationFor } = useReaderActions(toasts);
   /**
    * The radius chip the reader last picked, kept even before anything is located: pick "5 mi",
