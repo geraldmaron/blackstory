@@ -28,6 +28,7 @@ const SECURITY_NORMALIZED_EXACT = new Set([
 ]);
 const SECURITY_NORMALIZED_PREFIXES = [
   '/place/',
+  '/invention/',
   '/entity/',
   '/law/',
   '/legal/',
