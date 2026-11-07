@@ -59,6 +59,12 @@ function normalizePathname(pathname: string): string {
   return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
 }
 
+/** Public record families share one arrival-query and document-cache policy. */
+export function isPublicRecordPath(pathname: string): boolean {
+  const path = normalizePathname(pathname);
+  return ['/place/', '/invention/', '/entity/'].some((prefix) => path.startsWith(prefix));
+}
+
 /** Routes that may carry user-facing filters; all other paths ignore query strings for caching.  */
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
   const path = normalizePathname(pathname);
@@ -86,7 +92,7 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   }
   // `/invention/` is the same reading room as `/place/` and carries the same DiscoveryState,
   // so it must keep the same arrival keys or the edge strips return state before the page runs.
-  if (path.startsWith('/place/') || path.startsWith('/invention/') || path.startsWith('/entity/')) {
+  if (isPublicRecordPath(path)) {
     return PLACE_PAGE_PARAM_ALLOWLIST;
   }
   return [];
@@ -141,6 +147,9 @@ export function normalizeQueryString(
   if (path === RECORDS_PATH) {
     return recordsQueryString(parseRecordsQuery(bag));
   }
+  if (isPublicRecordPath(path)) {
+    return normalizeRecordArrivalQuery(bag);
+  }
 
   const normalized = new URLSearchParams();
   for (const key of Object.keys(bag).sort()) {
@@ -153,6 +162,27 @@ export function normalizeQueryString(
     }
     normalized.set(key, value);
   }
+  return normalized.toString();
+}
+
+/**
+ * Record arrival uses the same bounded collection, period and filter codecs as Records.
+ * Accept Explore's aliases, but emit one spelling so equivalent return context shares a URL.
+ * Keep this module independent of discovery-state's server-side record/catalog imports.
+ */
+function normalizeRecordArrivalQuery(bag: QueryParamBag): string {
+  const query = parseRecordsQuery({
+    ...bag,
+    topic: bag.topic ?? bag.theme,
+    evidence: bag.evidence ?? bag.floor,
+  });
+  const normalized = new URLSearchParams(recordsQueryString(query));
+  const from = firstString(bag.from);
+  if (from === 'map' || from === 'explore') normalized.set('from', 'map');
+  if (from === 'list' || from === 'records') normalized.set('from', 'list');
+  const selected = parseExploreSearchParams({ selected: bag.selected }).selected;
+  if (selected) normalized.set('selected', selected);
+  normalized.sort();
   return normalized.toString();
 }
 

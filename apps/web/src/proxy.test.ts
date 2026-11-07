@@ -100,6 +100,7 @@ test('public documents get the Vercel CDN cache header', async () => {
     '/',
     '/entity/ent_x',
     '/place/archie-edwards',
+    '/invention/carbon-process',
     '/stories/some-slug',
     '/about',
   ]) {
@@ -153,3 +154,42 @@ test('named collection documents never create shared negative cache entries', as
     assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), 'no-store');
   }
 });
+
+for (const path of ['/entity/ent_test', '/place/test-place', '/invention/test-invention']) {
+  test(`${path} normalizes collection values and never caches the redirect or arrival document`, async () => {
+    const dirty = requestFor(`${path}?collection=arbitrary-a`);
+    assert.equal(isPublicDocumentCacheable(dirty), false);
+    const redirect = await proxy(dirty);
+    assert.equal(redirect.status, 308);
+    assert.equal(new URL(redirect.headers.get('location')!).search, '?collection=invalid');
+    assert.equal(redirect.headers.get('Cache-Control'), 'no-store');
+    assert.equal(redirect.headers.get('Vercel-CDN-Cache-Control'), 'no-store');
+    for (const query of [
+      'collection=invalid',
+      'collection=story%3Athe-count',
+      'collection=story%3Aunknown-slug',
+      'q=school',
+      'from=list&state=DC',
+    ]) {
+      const request = requestFor(`${path}?${query}`);
+      assert.equal(isPublicDocumentCacheable(request), false);
+      const response = await proxy(request);
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get('Cache-Control'), 'no-store');
+      assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), 'no-store');
+    }
+    const head = new NextRequest(new URL(`${path}?collection=invalid`, 'https://example.test'), {
+      method: 'HEAD',
+    });
+    assert.equal((await proxy(head)).headers.get('Vercel-CDN-Cache-Control'), 'no-store');
+    const bare = await proxy(requestFor(path));
+    assert.equal(bare.headers.get('Vercel-CDN-Cache-Control'), PUBLIC_DOCUMENT_CDN_CACHE_CONTROL);
+  });
+
+  test(`${path} does not upgrade normalization redirects to shared caching`, async () => {
+    const response = await proxy(requestFor(`${path}?utm_source=test`));
+    assert.equal(response.status, 308);
+    assert.equal(new URL(response.headers.get('location')!).search, '');
+    assert.equal(response.headers.get('Vercel-CDN-Cache-Control'), 'no-store');
+  });
+}

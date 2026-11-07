@@ -13,6 +13,10 @@ import { handleWebSecurity } from './lib/web-security/edge-security';
 import { CSP_NONCE_HEADER } from './lib/web-security/constants';
 import { buildGlobalSecurityHeaders } from './lib/web-security/security-headers';
 import { surfaceClassFor } from './lib/nav/surface-classes';
+import {
+  isPublicRecordPath,
+  normalizeQueryString,
+} from './lib/runtime-hardening/query-normalization';
 
 /** Base64 per-request nonce for CSP `script-src 'nonce-<value>'`. Edge-runtime safe: both
  * `crypto` (Web Crypto, global) and `Buffer` (Next's edge polyfill) are available here. */
@@ -57,7 +61,7 @@ export const PUBLIC_DOCUMENT_CDN_CACHE_CONTROL =
  */
 export function isPublicDocumentCacheable(request: NextRequest): boolean {
   if (request.method !== 'GET' && request.method !== 'HEAD') return false;
-  if (isCollectionScopedDocument(request)) return false;
+  if (isUncacheableDiscoveryDocument(request)) return false;
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith('/corrections/status')) return false;
   if (pathname === '/design-system' || pathname.startsWith('/design-system/')) return false;
@@ -65,16 +69,20 @@ export function isPublicDocumentCacheable(request: NextRequest): boolean {
 }
 
 /**
- * Named-collection HTML (`/records` or `/explore` with `collection`) is never kept by a shared
- * cache. A reader or crawler can mint any `collection=story:<slug>` value, and each unknown slug
- * would otherwise become its own negative cache entry. The underlying released reads stay
- * cached; only the rendered document is no-store.
+ * Named collections and record arrival context can have arbitrarily many valid values, even
+ * after malformed values collapse through the shared codecs. Do not advertise those rendered
+ * documents as shared-cache entries. Bare record documents and released data reads retain
+ * their existing policy. An outer CDN configured to override origin headers must separately
+ * bypass these request shapes; no-store alone is not an origin rate limit.
  */
-function isCollectionScopedDocument(request: NextRequest): boolean {
+function isUncacheableDiscoveryDocument(request: NextRequest): boolean {
   const { pathname, searchParams } = request.nextUrl;
+  if (isPublicRecordPath(pathname)) {
+    return normalizeQueryString(pathname, searchParams).length > 0;
+  }
   return (
     (pathname === '/records' || pathname === '/explore') &&
-    (searchParams.get('collection') ?? '').trim().length > 0
+    searchParams.getAll('collection').some((value) => value.trim().length > 0)
   );
 }
 
@@ -82,7 +90,11 @@ function applyPublicDocumentCdnCache(request: NextRequest, response: NextRespons
   // A maintenance 503 or a crawler 403 decided here is not a document. Vercel would not keep
   // either status anyway; this just keeps the header off responses that were never candidates.
   if (response.status >= 400) return response;
-  if (isCollectionScopedDocument(request)) {
+  const isUncacheableRedirect =
+    response.status >= 300 &&
+    response.status < 400 &&
+    response.headers.get('Cache-Control') === 'no-store';
+  if (isUncacheableRedirect || isUncacheableDiscoveryDocument(request)) {
     response.headers.set('Cache-Control', 'no-store');
     response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
     return response;
@@ -212,6 +224,7 @@ const SECURITY_NORMALIZED_EXACT = new Set([
 /** Prefix forms of the `:path*` segments in the original matcher. */
 const SECURITY_NORMALIZED_PREFIXES = [
   '/place/',
+  '/invention/',
   '/entity/',
   '/law/',
   '/legal/',
