@@ -190,11 +190,44 @@ test('eligibility follows the path as sent: /place/ redirects away, /placement d
   assert.equal(bigSlash.response.status, 413, 'the size limit covers the same set');
 });
 
-
 test('named collection documents keep no-store on the site edge too', () => {
   for (const pathname of ['/records', '/explore']) {
-    assert.deepEqual(decorate(facts({ pathname, searchParams: new URLSearchParams('collection=story%3Athe-count') }), 200), {
-      'Cache-Control': 'no-store', 'Vercel-CDN-Cache-Control': 'no-store',
-    });
+    assert.deepEqual(
+      decorate(
+        facts({ pathname, searchParams: new URLSearchParams('collection=story%3Athe-count') }),
+        200,
+      ),
+      {
+        'Cache-Control': 'no-store',
+        'Vercel-CDN-Cache-Control': 'no-store',
+      },
+    );
   }
 });
+
+for (const pathname of ['/entity/ent_test', '/place/test-place', '/invention/test-invention']) {
+  test(`${pathname} collapses malformed collection URLs and keeps arrival documents no-store`, async () => {
+    const input = readRequestFacts({
+      method: 'GET',
+      url: `${pathname}?collection=arbitrary-a`,
+      headers: {},
+    });
+    const edge = await runEdge(input, { nonce: 'N', deps: { maintenanceSettings: off } });
+    assert.equal(edge.response.status, 308);
+    assert.equal(edge.response.headers.location, `${pathname}?collection=invalid`);
+    assert.equal(decorate(input, 308)['Vercel-CDN-Cache-Control'], 'no-store');
+    for (const query of [
+      'collection=invalid',
+      'collection=story%3Athe-count',
+      'q=school',
+      'from=list&state=DC',
+    ]) {
+      const clean = readRequestFacts({ method: 'GET', url: `${pathname}?${query}`, headers: {} });
+      assert.equal(
+        (await runEdge(clean, { nonce: 'N', deps: { maintenanceSettings: off } })).response,
+        null,
+      );
+      assert.equal(decorate(clean, 200)['Vercel-CDN-Cache-Control'], 'no-store');
+    }
+  });
+}

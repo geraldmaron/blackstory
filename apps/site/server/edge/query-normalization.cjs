@@ -105,6 +105,11 @@ function normalizePathname(pathname) {
   return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
 }
 
+function isPublicRecordPath(pathname) {
+  const path = normalizePathname(pathname);
+  return ['/place/', '/invention/', '/entity/'].some((prefix) => path.startsWith(prefix));
+}
+
 /** The allowlist for a path. Empty for pages that take no query, which is most of them. */
 function getAllowedQueryParamsForPath(pathname) {
   const path = normalizePathname(pathname);
@@ -115,8 +120,7 @@ function getAllowedQueryParamsForPath(pathname) {
   if (path === '/law') return LAW_PAGE_PARAM_ALLOWLIST;
   if (path === '/stories') return STORIES_PAGE_PARAM_ALLOWLIST;
   if (path === '/corrections') return CORRECTIONS_PAGE_PARAM_ALLOWLIST;
-  if (path.startsWith('/place/') || path.startsWith('/invention/') || path.startsWith('/entity/'))
-    return PLACE_PAGE_PARAM_ALLOWLIST;
+  if (isPublicRecordPath(path)) return PLACE_PAGE_PARAM_ALLOWLIST;
   return [];
 }
 
@@ -155,6 +159,7 @@ function normalizeQueryString(pathname, input) {
     return version === '3' || version === '4' ? `v=${version}` : '';
   }
   if (path === RECORDS_PATH) return recordsQueryString(parseRecordsQuery(bag));
+  if (isPublicRecordPath(path)) return normalizeRecordArrivalQuery(bag);
   const normalized = new URLSearchParams();
   for (const key of Object.keys(bag).sort()) {
     const value = firstString(bag[key]);
@@ -166,6 +171,25 @@ function normalizeQueryString(pathname, input) {
     }
     normalized.set(key, value);
   }
+  return normalized.toString();
+}
+
+/** Same bounded arrival codecs and alias precedence as the Next implementation. */
+function normalizeRecordArrivalQuery(bag) {
+  const query = parseRecordsQuery({
+    ...bag,
+    topic: bag.topic ?? bag.theme,
+    evidence: bag.evidence ?? bag.floor,
+  });
+  const normalized = new URLSearchParams(recordsQueryString(query));
+  const from = firstString(bag.from);
+  if (from === 'map' || from === 'explore') normalized.set('from', 'map');
+  if (from === 'list' || from === 'records') normalized.set('from', 'list');
+  // Explore's selected-record codec; the cross-runtime parity matrix guards this port.
+  const selected = firstString(bag.selected);
+  if (selected && /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,159}$/.test(selected))
+    normalized.set('selected', selected);
+  normalized.sort();
   return normalized.toString();
 }
 
@@ -268,6 +292,7 @@ module.exports = {
   TRACKING_QUERY_PREFIXES,
   TRACKING_QUERY_KEYS,
   isPlatformPassthroughQueryKey,
+  isPublicRecordPath,
   getAllowedQueryParamsForPath,
   normalizeQueryString,
   canonicalPathAndSearch,

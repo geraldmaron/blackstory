@@ -5,6 +5,8 @@
  * it moves whole and shrinks only when the matching Next route is retired.
  */
 
+const { isPublicRecordPath, normalizeQueryString } = require('./query-normalization.cjs');
+
 const SURFACE_CLASS_BY_PATH = new Map([
   ['/', 'door'],
   ['/explore', 'door'],
@@ -101,8 +103,12 @@ const PUBLIC_DOCUMENT_CDN_CACHE_CONTROL = 'public, s-maxage=300, stale-while-rev
  * receipt (its URL is its only protection) and never the design system.
  */
 function isCollectionScopedDocument({ pathname, searchParams }) {
-  return (pathname === '/records' || pathname === '/explore') &&
-    typeof searchParams?.get === 'function' && (searchParams.get('collection') ?? '').trim().length > 0;
+  if (!searchParams) return false;
+  if (isPublicRecordPath(pathname)) return normalizeQueryString(pathname, searchParams).length > 0;
+  return (
+    (pathname === '/records' || pathname === '/explore') &&
+    searchParams.getAll('collection').some((value) => value.trim().length > 0)
+  );
 }
 
 function isPublicDocumentCacheable(facts) {

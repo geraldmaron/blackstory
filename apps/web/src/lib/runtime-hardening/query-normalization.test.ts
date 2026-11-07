@@ -68,7 +68,7 @@ test('normalizeQueryString keeps only allowlisted /search params', () => {
   assert.equal(qs, 'era=all&kind=place&q=school&topic=education');
 });
 
-test('normalizeQueryString strips all params on entity routes', () => {
+test('normalizeQueryString strips tracking params on entity routes', () => {
   assert.equal(
     normalizeQueryString('/entity/ent_15th_st_church_001', { utm_campaign: 'x', ref: 'y' }),
     '',
@@ -549,3 +549,83 @@ test('the /stories edge allowlist names every param the stories index writes', (
   const written = [...new URL(href, 'https://blackstory.app').searchParams.keys()].sort();
   assert.deepEqual(written, [...STORIES_PAGE_PARAM_ALLOWLIST].sort());
 });
+
+for (const path of ['/entity/ent_test', '/place/test-place', '/invention/test-invention']) {
+  test(`${path} collapses arbitrary collection values before rendering`, () => {
+    for (const collection of ['arbitrary-a', 'arbitrary-b', 'x'.repeat(500)]) {
+      const url = new URL(path, 'https://example.test');
+      url.searchParams.set('collection', collection);
+      assert.equal(needsQueryNormalizationRedirect(url), true);
+      assert.equal(buildNormalizedUrl(url).search, '?collection=invalid');
+    }
+    const canonical = buildNormalizedUrl(
+      new URL(`${path}?collection=arbitrary-a`, 'https://example.test'),
+    );
+    assert.equal(needsQueryNormalizationRedirect(canonical), false);
+  });
+
+  test(`${path} canonicalizes arrival values and Explore aliases without losing return context`, () => {
+    const result = normalizeQueryString(path, {
+      from: 'records',
+      q: '  a   school  ',
+      sort: 'NAME',
+      state: 'dc',
+      theme: 'education',
+      floor: 'b',
+      kind: 'SCHOOL',
+      collection: ' STORY:THE-COUNT ',
+      periodStart: '1940',
+      periodEnd: '1920',
+      includeUndated: '1',
+      layout: 'chronology',
+      selected: 'ent_dunbar_school_001',
+    });
+    const normalized = new URLSearchParams(result);
+    assert.equal(normalized.get('from'), 'list');
+    assert.equal(normalized.get('q'), 'a school');
+    assert.equal(normalized.get('sort'), 'name');
+    assert.equal(normalized.get('state'), 'DC');
+    assert.equal(normalized.get('topic'), 'education');
+    assert.equal(normalized.get('evidence'), 'B');
+    assert.equal(normalized.get('kind'), 'school');
+    assert.equal(normalized.get('collection'), 'story:the-count');
+    assert.equal(normalized.get('periodStart'), '1920');
+    assert.equal(normalized.get('periodEnd'), '1940');
+    assert.equal(normalized.get('includeUndated'), '1');
+    assert.equal(normalized.get('layout'), 'chronology');
+    assert.equal(normalized.get('selected'), 'ent_dunbar_school_001');
+    assert.equal(normalized.has('theme'), false);
+    assert.equal(normalized.has('floor'), false);
+    assert.equal(normalizeQueryString(path, normalized), result);
+    assert.equal(
+      needsQueryNormalizationRedirect(new URL(`${path}?${result}`, 'https://example.test')),
+      false,
+    );
+    assert.equal(normalizeQueryString(path, { from: 'explore' }), 'from=map');
+  });
+
+  test(`${path} bounds free text and rejects malformed arrival values`, () => {
+    assert.equal(normalizeQueryString(path, { q: 'x'.repeat(500) }), 'q=' + 'x'.repeat(120));
+    assert.equal(
+      normalizeQueryString(path, {
+        from: 'elsewhere',
+        sort: 'random',
+        state: 'not-a-state',
+        evidence: 'D',
+        kind: 'bad!',
+        era: '<bad>',
+        topic: 'not-a-topic',
+        selected: 'bad!',
+        periodStart: 'bad',
+        periodEnd: 'bad',
+        includeUndated: '1',
+        layout: 'bad',
+      }),
+      'includeUndated=1&periodEnd=invalid&periodStart=invalid',
+    );
+    assert.equal(
+      normalizeQueryString(path, { collection: ['bad', 'story:the-count'] }),
+      'collection=invalid',
+    );
+  });
+}

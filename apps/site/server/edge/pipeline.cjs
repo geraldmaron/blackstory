@@ -13,7 +13,11 @@ const { handleMaintenance } = require('./maintenance.cjs');
 const { denyExpensiveAiCrawler } = require('./traffic.cjs');
 const { staffGate, isStaffGatePath } = require('./staff-gate.cjs');
 const { buildGlobalSecurityHeaders } = require('./security-headers.cjs');
-const { isPublicDocumentCacheable, isCollectionScopedDocument, PUBLIC_DOCUMENT_CDN_CACHE_CONTROL } = require('./surfaces.cjs');
+const {
+  isPublicDocumentCacheable,
+  isCollectionScopedDocument,
+  PUBLIC_DOCUMENT_CDN_CACHE_CONTROL,
+} = require('./surfaces.cjs');
 const { parseCookieHeader } = require('./cookies.cjs');
 const { normalizeRequestTarget } = require('./paths.cjs');
 const { handleRequestSize, isSecurityNormalizedRequest } = require('./request-limits.cjs');
@@ -82,9 +86,11 @@ async function runEdge(facts, { env = process.env, nonce, deps = {} } = {}) {
 
 /** Extra headers a rendered response earns from its status and URL. */
 function decorate(facts, status) {
-  if (isCollectionScopedDocument(facts)) return {
-    'Cache-Control': 'no-store', 'Vercel-CDN-Cache-Control': 'no-store',
-  };
+  if ((status >= 300 && status < 400) || isCollectionScopedDocument(facts))
+    return {
+      'Cache-Control': 'no-store',
+      'Vercel-CDN-Cache-Control': 'no-store',
+    };
   // A maintenance 503 or a crawler 403 is not a document; keep the header off anything >= 400.
   if (status >= 400) return {};
   if (!isPublicDocumentCacheable(facts)) return {};

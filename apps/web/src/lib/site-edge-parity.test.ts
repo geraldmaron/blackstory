@@ -375,6 +375,15 @@ const QUERY_PATHS = [
 ];
 
 const QUERIES = [
+  '?collection=arbitrary-a',
+  '?collection=STORY%3ATHE-COUNT',
+  '?collection=story%3Aunknown&from=records&layout=chronology',
+  '?collection=bad&collection=story%3Athe-count',
+  '?periodStart=1940&periodEnd=1920&includeUndated=1',
+  '?periodStart=bad&periodEnd=bad',
+  '?theme=education&floor=b&from=explore',
+  '?selected=bad!',
+  '?selected=' + 'a'.repeat(200),
   '',
   '?',
   '?x=1',
