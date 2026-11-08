@@ -29,6 +29,7 @@ import {
   confidenceLevelForSource,
   type ReviewedClaimAssessment,
 } from './confidence.ts';
+import { assessPublicTextReview, type PublicTextReview } from './public-text-review.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
 import { searchTopicsFromProjection } from './projection-divergence.ts';
 import { cityStateFromJurisdictionLabel } from './evidence-collectors/subject-identity.ts';
@@ -76,6 +77,10 @@ export type PublishGateSkipReason =
   | 'template_only'
   | 'build_failed'
   | 'claim_assessment_required'
+  /**
+   * No approved review is bound to this exact public text and claim set.
+   */
+  | 'public_text_review_required'
   /**
    * Republishing would reduce the existing claim set.
    */
@@ -1208,6 +1213,7 @@ export function gateLandscapePublishCandidate(input: {
   readonly liveDepth?: DepthAssessment;
   /** Loaded from the canonical ledger, separately from candidate/model payloads. */
   readonly reviewedClaims?: readonly ReviewedClaimAssessment[];
+  readonly publicTextReviews?: readonly PublicTextReview[];
   /**
    * Public location available for an explicit republish whose candidate lacks coordinates.
    * Omitting it does not invent a location.
@@ -1348,6 +1354,15 @@ export function gateLandscapePublishCandidate(input: {
     return { eligible: false, reason: 'claim_assessment_required', detail: assessment.detail };
   }
   entry = { ...entry, claims: assessment.claims };
+
+  // shortcut: live records predate this review, so a republish is exempt. Remove the exemption
+  // once the live catalog has been through it, or an in-place correction stays unreviewed.
+  if (!republishingLiveRow) {
+    const text = assessPublicTextReview(entry, input.publicTextReviews ?? []);
+    if (!text.ok) {
+      return { eligible: false, reason: 'public_text_review_required', detail: text.detail };
+    }
+  }
 
   const build = buildReleaseEntityArtifacts(
     entry,
