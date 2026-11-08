@@ -189,8 +189,8 @@ export function RecordIntakeDiagram() {
     },
     {
       step: '03',
-      title: 'Independent review',
-      body: ['A different model', 'checks the source'],
+      title: 'Source check',
+      body: ['A second provider', 'checks the source'],
       seed: 37,
     },
     { step: '04', title: 'Published', body: ['Citations and a', 'grade attached'], seed: 51 },
@@ -202,8 +202,8 @@ export function RecordIntakeDiagram() {
         How a record gets in
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
-        A candidate comes from a research run, gets pinned to a real place, and has each claim
-        reviewed against its source by an agent on a different model. It reaches a public page only
+        A candidate comes from a research run and gets pinned to a real place, and a model from
+        another company checks proposed claims against their sources. It reaches a public page only
         with its citations and an evidence grade attached.
       </p>
       <div className="ds-mdiag__frame">

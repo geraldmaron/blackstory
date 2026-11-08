@@ -110,10 +110,10 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
           <p>
             Candidates come in from research runs, and every one gets pinned to somewhere real
             before it can publish, whether that&apos;s a state, a city, a campus or a documented
-            site. After that, each claim goes to a reviewing agent built on a different model than
-            the one that wrote it, and where I can, on a different company&apos;s. A claim with no
-            citation behind it doesn&apos;t go live. There&apos;s more here than one person can
-            read, so I built the check and I answer for it. When it gets something wrong,
+            site. After that, I use a model from another company to check proposed claims against
+            their captured sources. That tests what a source supports, and it can still miss an
+            error in the source. There&apos;s more here than one person can read, so I built the
+            check and I answer for it. When it gets something wrong,
             that&apos;s on me, and I fix it where you can see it.
           </p>
         </Prose>
@@ -342,7 +342,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             { label: 'Source library', href: '/sources' },
           ]}
         >
-          The same rules run on every public record.
+          Here&apos;s where those rules show up, and where to tell me when they fall short.
         </WalkOffRamp>
       </div>
     </>
