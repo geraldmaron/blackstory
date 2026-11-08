@@ -48,8 +48,12 @@ First run over the 17 records (12 Divine Nine founders, 5 laws) gave 40 claims.
   the source.
 - No record has every claim approved, because each record's summary claim was rejected. Those are the
   500 to 800 character summaries that bundle facts a single source does not support.
-- Nothing has been written to the ledger. The permission check blocked the production write, so the
-  owner has to allow it or run it.
+- Written to the ledger on 2026-11-08 (steps 1 to 5 below are done). `research.review_decisions` gained
+  27 rows for `codex-review:gpt-6.1-sol`: 10 approvals, and 17 rejections. The 19 rejected claims map
+  to 17 rejection rows because two records had two rejected claims that share one artifact, so the
+  handoff's earlier figure of 29 rows was a miscount. 11 claims were refused and are not in the ledger.
+- Step 6 (publisher dry run) has not run: the permission classifier blocks
+  `publish-release-entities-incremental.ts` as a production deploy even in dry-run mode.
 
 Durable copies of the results are outside git, in
 `~/Documents/Backpack/Agent Memory/blackstory-claim-review/` (verdicts, the 17 record ids, the
