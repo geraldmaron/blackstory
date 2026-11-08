@@ -295,8 +295,8 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
         {
           heading: 'Is any of this made by AI?',
           paragraphs: [
-            'No. The facts come from sources: archives, agency databases, court reporters, library catalogs, National Register nominations, and published scholarship. Every accepted claim carries the citations it rests on.',
-            'AI is used in two places: to search and pull source material that a person then checks against the original, and in drafting the long-form writing under a written voice standard. It never decides whether a record is true, what confidence grade it carries, or whether anything goes live.',
+            'Partly. The history comes from sources: archives, agency databases, court reporters, library catalogs, National Register nominations, and published scholarship. AI does a lot of the work of finding those sources, reading them, and drafting the text. Accepted claims carry the citations they rest on.',
+            "AI finds and reads sources and drafts record summaries and long-form writing. I also use a model from another company to check proposed claims against the captured sources. That check tests what a source supports, and it can still miss an error in the source. I don't check every record by hand, so if something doesn't match its source, tell me and I'll fix it.",
           ],
         },
         {

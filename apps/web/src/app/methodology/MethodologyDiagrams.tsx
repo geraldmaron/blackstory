@@ -189,8 +189,8 @@ export function RecordIntakeDiagram() {
     },
     {
       step: '03',
-      title: 'A person reads it',
-      body: ['Before anything', 'reaches a page'],
+      title: 'Source check',
+      body: ['A second provider', 'checks the source'],
       seed: 37,
     },
     { step: '04', title: 'Published', body: ['Citations and a', 'grade attached'], seed: 51 },
@@ -202,9 +202,9 @@ export function RecordIntakeDiagram() {
         How a record gets in
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
-        A candidate surfaces from a research run, is pinned to a real place, is read by a person
-        before anything publishes, and reaches a public page only with citations and an evidence
-        grade attached.
+        A candidate surfaces from a research run, is pinned to a real place, has proposed claims
+        checked against their sources by a model from another company, and reaches a public page
+        only with citations and an evidence grade attached.
       </p>
       <div className="ds-mdiag__frame">
         <svg
