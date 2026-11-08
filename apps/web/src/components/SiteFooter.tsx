@@ -30,6 +30,16 @@ export function SiteFooter() {
               </Link>
             </p>
             <p className="ds-shell-footer__tagline">People. Places. Evidence. Context.</p>
+            {/* The one place the site says AI is part of the research and the checking. Record
+                pages carry no per-record note about it; this line, the FAQ and the methodology
+                say it for every page. */}
+            <p className="ds-shell-footer__tagline">
+              AI helps with the research here, and a different model reviews each claim before it
+              goes live. Every claim links to its source, so you can check it yourself.{' '}
+              <Link href="/methodology#how-a-record-gets-in" prefetch={false}>
+                How a record gets in
+              </Link>
+            </p>
           </div>
 
           <nav aria-label="Footer" className="ds-shell-footer__columns">

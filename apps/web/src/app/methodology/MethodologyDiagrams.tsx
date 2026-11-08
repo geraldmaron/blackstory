@@ -189,8 +189,8 @@ export function RecordIntakeDiagram() {
     },
     {
       step: '03',
-      title: 'A person reads it',
-      body: ['Before anything', 'reaches a page'],
+      title: 'Independent review',
+      body: ['A different model', 'checks the source'],
       seed: 37,
     },
     { step: '04', title: 'Published', body: ['Citations and a', 'grade attached'], seed: 51 },
@@ -202,9 +202,9 @@ export function RecordIntakeDiagram() {
         How a record gets in
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
-        A candidate surfaces from a research run, is pinned to a real place, is read by a person
-        before anything publishes, and reaches a public page only with citations and an evidence
-        grade attached.
+        A candidate comes from a research run, gets pinned to a real place, and has each claim
+        reviewed against its source by an agent on a different model. It reaches a public page only
+        with its citations and an evidence grade attached.
       </p>
       <div className="ds-mdiag__frame">
         <svg
@@ -252,7 +252,7 @@ export function RecordIntakeDiagram() {
             />
           ))}
           <text className="ds-mdiag__note" x={8} y={168}>
-            Nothing reaches a public page on a model&apos;s say-so
+            No claim goes live without a citation behind it
           </text>
         </svg>
       </div>

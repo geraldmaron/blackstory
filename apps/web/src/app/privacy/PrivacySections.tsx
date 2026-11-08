@@ -195,10 +195,10 @@ export function PrivacySections() {
       >
         <p className="ds-privacy__follow">
           When you file a correction, appeal, abuse report, or research lead, you choose what to
-          write. Submissions enter a restricted quarantine queue, are kept so they can be opened
-          later, and are never published as submitted. A screen runs over incoming mail before I
-          read it, so likely-hate is held aside and handled separately. Submissions are not used to
-          train models. The optional contact fields are used only to follow up with you about that
+          write. Submissions go into a private queue, are kept so they can be opened later, and are
+          never published as submitted. A screen runs over incoming mail before I read it, so
+          likely-hate is held aside and handled separately. Submissions are not used to train
+          models. The optional contact fields are used only to follow up with you about that
           submission, and they are never shown publicly.
         </p>
         <p className="ds-privacy__follow">

@@ -22,6 +22,8 @@ describe('SiteFooter', () => {
     assert.match(html, new RegExp(`>${PRODUCT_NAME}<`));
     assert.match(html, /People\. Places\. Evidence\. Context\./);
     assert.match(html, /History, pinned to place\./);
+    assert.match(html, /AI helps with the research here/);
+    assert.match(html, /href="\/methodology#how-a-record-gets-in"/);
     assert.match(html, /aria-label="Footer"/);
     assert.match(html, /class="ds-shell-footer__column-title">Find</);
     assert.match(html, /class="ds-shell-footer__column-title">Read deeper</);

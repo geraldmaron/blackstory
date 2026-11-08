@@ -115,9 +115,9 @@ export function SubmitLeadForm() {
        */
       <div ref={successRef} tabIndex={-1}>
         <Notice tone="success" title="Lead received">
-          Thank you. This lead (reference <code>{state.submissionId}</code>) has entered a moderated
-          review queue. It is not public, and it seeds research only after independent reviewers
-          agree it is worth pursuing. Nobody but the people doing that review sees what you sent.
+          Thank you. This lead (reference <code>{state.submissionId}</code>) has entered a review
+          queue. It&apos;s not public, and it seeds research only if I judge it worth pursuing.
+          Nobody but the people doing that review sees what you sent.
         </Notice>
       </div>
     );

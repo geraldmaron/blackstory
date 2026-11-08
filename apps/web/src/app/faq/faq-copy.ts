@@ -124,8 +124,8 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
       {
         question: 'So where is AI actually used?',
         answer: [
-          'In two places. In the research work, to search, read and pull source material that a person then checks against the original. And in drafting the long-form writing, the chapters and articles, under a written voice standard.',
-          'What it does not decide: whether a record is true, which sources a claim rests on, what confidence grade it carries, or whether any of it goes live.',
+          "More than one place, and I'd rather you hear about all of them from me. AI helps find and read sources. Then an agent running on a different model than the one that wrote a claim reviews it against its source before it goes live, and where I can, that model comes from a different company. No model reviews its own work. AI also drafts the long-form writing, the chapters and articles, working from a written style guide.",
+          "None of that lowers the evidence bar. A claim without a citation doesn't go live, and if something new turns up after a check, the claim gets checked again. I read the corrections and leads myself.",
         ],
       },
       {
@@ -164,7 +164,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
       {
         question: 'How does something end up on the map?',
         answer: [
-          'A candidate turns up, its sources are gathered, a person verifies it against them, and a publish gate decides whether it reaches a public page. Contradictions between sources are written into the record rather than smoothed away.',
+          'A candidate turns up, its sources are gathered, a reviewing agent on a different model checks each claim against them, and a publish gate decides whether it reaches a public page. Contradictions between sources are written into the record rather than smoothed away.',
         ],
         links: [
           { href: '/methodology', label: 'The full method' },
