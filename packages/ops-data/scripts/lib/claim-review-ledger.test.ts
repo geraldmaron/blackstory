@@ -221,3 +221,19 @@ test('a split summary fact is not held to the quotation check but its reviewer q
   const fabricated = approve(claim, { quotes: [{ exact: 'Test Person founded the society in 1901', locator: 'p2' }] });
   assert.equal(validateVerdict(claim, fabricated, 'reviewer-b').kind, 'refused');
 });
+
+test('a claim that names its author is attributed to that author, not the row', () => {
+  const split = row({
+    payload: {
+      summaryClaims: [
+        {
+          object: 'Test Person founded the society in 1901.',
+          citationHref: EVIDENCE_URL,
+          producedBy: { actorId: 'session-x', modelFamily: 'claude-test' },
+        },
+      ],
+    },
+  });
+  const { prepared } = buildReviewClaims(split, 'model-a drafting', new Map([[EVIDENCE_URL, capture()]]));
+  assert.equal(prepared.find((entry) => entry.paraphrase)?.producer.actorId, 'session-x');
+});
