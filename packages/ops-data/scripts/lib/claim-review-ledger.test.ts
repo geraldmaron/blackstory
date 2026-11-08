@@ -210,15 +210,23 @@ test('reviewer prompt fences untrusted source text and parsed verdicts bind to t
 test('a split summary fact is not held to the quotation check but its reviewer quote still is', () => {
   const split = row({
     payload: {
-      summaryClaims: [{ object: 'Test Person founded the society in 1901.', citationHref: EVIDENCE_URL }],
+      summaryClaims: [
+        { object: 'Test Person founded the society in 1901.', citationHref: EVIDENCE_URL },
+      ],
     },
   });
-  const { prepared } = buildReviewClaims(split, 'model-a drafting', new Map([[EVIDENCE_URL, capture()]]));
+  const { prepared } = buildReviewClaims(
+    split,
+    'model-a drafting',
+    new Map([[EVIDENCE_URL, capture()]]),
+  );
   const claim = prepared.find((entry) => entry.paraphrase);
   assert.ok(claim);
   assert.equal(claim.claim.claimRole, 'evidence');
   assert.equal(validateVerdict(claim, approve(claim), 'reviewer-b').kind, 'approve');
-  const fabricated = approve(claim, { quotes: [{ exact: 'Test Person founded the society in 1901', locator: 'p2' }] });
+  const fabricated = approve(claim, {
+    quotes: [{ exact: 'Test Person founded the society in 1901', locator: 'p2' }],
+  });
   assert.equal(validateVerdict(claim, fabricated, 'reviewer-b').kind, 'refused');
 });
 
@@ -234,6 +242,10 @@ test('a claim that names its author is attributed to that author, not the row', 
       ],
     },
   });
-  const { prepared } = buildReviewClaims(split, 'model-a drafting', new Map([[EVIDENCE_URL, capture()]]));
+  const { prepared } = buildReviewClaims(
+    split,
+    'model-a drafting',
+    new Map([[EVIDENCE_URL, capture()]]),
+  );
   assert.equal(prepared.find((entry) => entry.paraphrase)?.producer.actorId, 'session-x');
 });

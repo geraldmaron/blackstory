@@ -597,10 +597,7 @@ function inventionGrantStatusHistory(
  * entry here is one fact with the one source that states it. Null when absent or unusable, which
  * keeps the summary claim.
  */
-function summaryClaimsFromPayload(
-  raw: unknown,
-  canonicalUrl: string,
-): ReleaseSourceClaim[] | null {
+function summaryClaimsFromPayload(raw: unknown, canonicalUrl: string): ReleaseSourceClaim[] | null {
   const claims = asRecordArray(raw).flatMap((entry): ReleaseSourceClaim[] => {
     const object = readTrimmedString(entry.object);
     const href = readTrimmedString(entry.citationHref);
@@ -725,7 +722,7 @@ export function buildReleaseSourceFromLandscape(
               claimRole: 'record_index',
             },
           ]
-        : summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? [
+        : (summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? [
             {
               // Describe what the source states in the predicate. Do not encode the desired
               // inclusion criterion there and then infer that same criterion from the generated
@@ -738,7 +735,7 @@ export function buildReleaseSourceFromLandscape(
               citationLabel: hostname,
               claimRole: 'record_index',
             },
-          ];
+          ]);
 
   // Preserve quotations from documents used by enrichment. Group citations by document and
   // merge distinct quotations without counting repeated excerpts as independent sources. The

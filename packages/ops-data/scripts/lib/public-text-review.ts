@@ -51,7 +51,8 @@ export function providerOf(modelFamily: string | null): 'anthropic' | 'openai' |
   return null;
 }
 
-export type PublicTextAssessment = { readonly ok: true } | { readonly ok: false; readonly detail: string };
+export type PublicTextAssessment =
+  { readonly ok: true } | { readonly ok: false; readonly detail: string };
 
 export function assessPublicTextReview(
   entry: PublicTextEntry,
@@ -64,7 +65,10 @@ export function assessPublicTextReview(
   }
   // A later approval of unchanged text is a second opinion, not a resolution of the finding.
   if (matching.some((r) => r.decision !== 'approve')) {
-    return { ok: false, detail: 'A review rejected this exact text; it must change before re-review' };
+    return {
+      ok: false,
+      detail: 'A review rejected this exact text; it must change before re-review',
+    };
   }
   const independent = matching.some((r) => {
     const reviewer = providerOf(r.reviewerModelFamily);
@@ -73,7 +77,10 @@ export function assessPublicTextReview(
   });
   return independent
     ? { ok: true }
-    : { ok: false, detail: 'The drafter and reviewer of this text are not shown to be different providers' };
+    : {
+        ok: false,
+        detail: 'The drafter and reviewer of this text are not shown to be different providers',
+      };
 }
 
 export const PUBLIC_TEXT_REVIEWS_SQL = `
