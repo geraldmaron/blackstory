@@ -109,9 +109,11 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
         <Prose>
           <p>
             Candidates come in from research runs, and every one of them is pinned to somewhere real
-            before it can publish: a state, a city, a campus, a documented site. Nothing reaches a
-            public page on a model&apos;s say-so. A person reads it first, and on this project that
-            person is me.
+            before it can publish: a state, a city, a campus, a documented site. After that, I use a
+            model from another company to check proposed claims against their captured sources. That
+            tests what a source supports, and it can still miss an error in the source. I don&apos;t
+            read every record myself. When something is wrong, that&apos;s on me, and I fix it where
+            you can see it.
           </p>
         </Prose>
         <RecordIntakeDiagram />
