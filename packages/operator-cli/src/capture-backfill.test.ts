@@ -34,6 +34,14 @@ function fakeDb(
       if (sql.includes('release_entities')) {
         return { rows: entityRows as unknown as T[] };
       }
+      if (sql.includes('landscape_candidates')) {
+        const ids = (params?.[0] ?? []) as string[];
+        const rows = [
+          { ref_id: 'land1', url: 'https://bls.gov/b' },
+          { ref_id: 'land1', url: 'https://archive.example.org/land1' },
+        ].filter((row) => ids.includes(row.ref_id));
+        return { rows: rows as unknown as T[] };
+      }
       writes.push({ sql, params });
       if (sql.includes('INSERT INTO evidence.capture_origins'))
         return { rows: [{ source_item_id: 'fixture-item' }] as unknown as T[] };
@@ -636,5 +644,47 @@ test('--max-entities captures only the first N entities and skips packets', asyn
       deps(async () => ok('z'.repeat(64))),
     ),
     /afterUrl cannot be combined with maxEntities/,
+  );
+});
+
+test('landscape surface is opt-in and scopes the batch to the named rows', async () => {
+  const plain = fakeDb();
+  const defaultRun = await runCaptureBackfill(
+    plain,
+    { commit: false },
+    deps(async () => ok('7'.repeat(64))),
+  );
+  assert.equal(defaultRun.inventory.landscape.cited, 0);
+  assert.equal(defaultRun.totalUnique, 2);
+
+  const fetched: string[] = [];
+  const report = await runCaptureBackfill(
+    fakeDb(),
+    { commit: true, landscapeIds: ['land1'] },
+    deps(async (url) => {
+      fetched.push(url);
+      return ok(String(fetched.length).padStart(64, '8'));
+    }),
+  );
+  // Both of land1's citations, including one already cited by a published entity; nothing else.
+  assert.deepEqual(fetched.sort(), ['https://archive.example.org/land1', 'https://bls.gov/b']);
+  assert.equal(report.perSurface.landscape.attempted, 2);
+  assert.equal(report.planned, 2);
+
+  await assert.rejects(
+    runCaptureBackfill(
+      fakeDb(),
+      { commit: false, landscapeIds: ['nope'] },
+      deps(async () => ok('9'.repeat(64))),
+    ),
+    /Landscape rows missing or citing no URL: nope/,
+  );
+  await assert.rejects(
+    runCaptureBackfill(
+      fakeDb(),
+      { commit: false, landscapeIds: ['land1'], maxEntities: 1 },
+      deps(async () => ok('9'.repeat(64))),
+    ),
+    /cannot be combined/,
   );
 });

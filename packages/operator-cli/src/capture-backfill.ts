@@ -52,7 +52,11 @@ export const DEFAULT_COMMIT_CAPTURE_LIMIT = 25;
 /** Pull cited URLs from the three surfaces. Entities are scoped to the active release. */
 export async function collectCitedUrls(
   db: CaptureDb,
-  options: { readonly surfaces?: readonly CaptureSurface[] } = {},
+  options: {
+    readonly surfaces?: readonly CaptureSurface[];
+    /** Opt-in: also collect URLs cited by these landscape rows (never collected otherwise). */
+    readonly landscapeIds?: readonly string[];
+  } = {},
 ): Promise<CitedUrl[]> {
   const allowed = options.surfaces ? new Set(options.surfaces) : null;
   const refs: CitedUrl[] = [];
@@ -100,6 +104,31 @@ export async function collectCitedUrls(
     }
   }
 
+  if (options.landscapeIds?.length) {
+    const landscape = await db.query<{ ref_id: string; url: string }>(
+      `SELECT lc.id AS ref_id, btrim(cited.url) AS url
+       FROM research.landscape_candidates lc
+       CROSS JOIN LATERAL (
+         SELECT lc.canonical_url AS url
+         UNION ALL
+         SELECT citation->>'sourceUrl' FROM jsonb_array_elements(
+           CASE WHEN jsonb_typeof(lc.payload->'evidenceCitations') = 'array'
+             THEN lc.payload->'evidenceCitations' ELSE '[]'::jsonb END) citation
+       ) cited
+       WHERE lc.id = ANY($1::text[]) AND nullif(btrim(cited.url), '') IS NOT NULL
+       ORDER BY url ASC, ref_id ASC`,
+      [options.landscapeIds],
+    );
+    const found = new Set(landscape.rows.map((row) => row.ref_id));
+    const missing = options.landscapeIds.filter((id) => !found.has(id));
+    if (missing.length > 0) {
+      throw new Error(`Landscape rows missing or citing no URL: ${missing.join(', ')}`);
+    }
+    for (const row of landscape.rows) {
+      refs.push({ url: row.url, surface: 'landscape', refId: row.ref_id });
+    }
+  }
+
   return refs;
 }
 
@@ -142,6 +171,8 @@ export type BackfillOptions = {
   readonly wayback?: boolean;
   /** Capture cited URLs for the first N unique entity ids (entity surface only). */
   readonly maxEntities?: number;
+  /** Opt-in: capture only the URLs cited by these unpublished landscape rows. */
+  readonly landscapeIds?: readonly string[];
 };
 
 export type WaybackBackfillReport = {
@@ -375,12 +406,18 @@ export async function runCaptureBackfill(
   if (options.afterUrl !== undefined && options.inventoryFingerprint === undefined) {
     throw new Error('afterUrl requires the prior inventoryFingerprint');
   }
-  const refs = await collectCitedUrls(db);
+  const landscapeIds = options.landscapeIds?.length ? options.landscapeIds : undefined;
+  if (landscapeIds && (options.maxEntities !== undefined || options.afterUrl !== undefined)) {
+    throw new Error('landscapeIds cannot be combined with maxEntities or afterUrl');
+  }
+  const refs = await collectCitedUrls(db, landscapeIds ? { landscapeIds } : {});
   const inventory = buildCaptureInventory(refs);
   const batch =
     options.maxEntities !== undefined
       ? selectUrlsForEntityBatch(refs, options.maxEntities)
-      : { urls: inventory.urls, entityCount: undefined };
+      : landscapeIds
+        ? { urls: refs.filter((ref) => ref.surface === 'landscape'), entityCount: undefined }
+        : { urls: inventory.urls, entityCount: undefined };
   for (const bound of [options.maxEntities, options.maxCaptures]) {
     if (bound !== undefined && (!Number.isSafeInteger(bound) || bound < 0))
       throw new Error('Capture limits must be nonnegative integers');
@@ -424,7 +461,10 @@ export async function runCaptureBackfill(
       : sortedInventory.filter((row) => row.url > afterUrl);
   const budget =
     options.maxCaptures ??
-    (options.commit && options.maxEntities === undefined && targetUrl === undefined
+    (options.commit &&
+    options.maxEntities === undefined &&
+    targetUrl === undefined &&
+    landscapeIds === undefined
       ? DEFAULT_COMMIT_CAPTURE_LIMIT
       : uniqueBatch.urls.length);
   const target = remainingBatch.slice(0, budget);
@@ -440,6 +480,7 @@ export async function runCaptureBackfill(
     entity: { attempted: 0, captured: 0 },
     packet: { attempted: 0, captured: 0 },
     article: { attempted: 0, captured: 0 },
+    landscape: { attempted: 0, captured: 0 },
   };
 
   if (!options.commit) {
