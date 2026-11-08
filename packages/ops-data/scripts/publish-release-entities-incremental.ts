@@ -15,6 +15,7 @@ import {
   loadReviewedClaimAssessments,
   type ReviewedClaimAssessment,
 } from './lib/confidence.ts';
+import { loadPublicTextReviews, type PublicTextReview } from './lib/public-text-review.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   assessLandscapeDepth,
@@ -495,6 +496,7 @@ function preparePublish(input: {
   readonly entityId: string;
   readonly fromLandscape: boolean;
   readonly reviewedClaims: readonly ReviewedClaimAssessment[];
+  readonly publicTextReviews: readonly PublicTextReview[];
   readonly canonicalStatus?: ReturnType<typeof parseCanonicalStatusSnapshot>;
   readonly allowRepublish?: boolean;
   /**
@@ -523,6 +525,7 @@ function preparePublish(input: {
       allowRepublish: input.allowRepublish ?? false,
       ...(liveDepth !== undefined ? { liveDepth } : {}),
       reviewedClaims: input.reviewedClaims,
+      publicTextReviews: input.publicTextReviews,
       ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
@@ -672,6 +675,10 @@ async function main(): Promise<void> {
       client,
       sliced.map((item) => item.entityId),
     );
+    const publicTextReviews = await loadPublicTextReviews(
+      client,
+      sliced.map((item) => item.entityId),
+    );
 
     const canonicalRes = await client.query<CanonicalEntityPublishRow>(
       CANONICAL_STATUS_BY_IDS_SQL,
@@ -742,6 +749,7 @@ async function main(): Promise<void> {
         entityId: item.entityId,
         fromLandscape: item.fromLandscape,
         reviewedClaims,
+        publicTextReviews,
         allowRepublish,
         ...(livePublished !== undefined ? { livePublished } : {}),
         ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),

@@ -719,6 +719,7 @@ export async function writeEntityRejections(
     claimVersionId: existing.has(ids[index]!) ? ids[index] : null,
     packetHash: rejection.prepared.packet.packetHash,
     predicate: rejection.prepared.claim.predicate,
+    object: rejection.prepared.claim.object,
     objectSha256: sha256(rejection.prepared.claim.object),
     citationHref: rejection.prepared.claim.citationHref,
     reason: rejection.reason,
