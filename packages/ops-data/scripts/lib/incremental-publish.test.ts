@@ -214,6 +214,29 @@ test('buildReleaseSourceFromLandscape produces claims from canonical_url', () =>
   );
 });
 
+test('buildReleaseSourceFromLandscape emits payload.summaryClaims as single-fact claims instead of the whole summary', () => {
+  const base = baseRow();
+  const canonical = base.canonical_url!;
+  const entry = buildReleaseSourceFromLandscape({
+    ...base,
+    payload: {
+      ...base.payload,
+      summaryClaims: [
+        { object: 'First fact.', citationHref: canonical },
+        { object: 'Second fact.', citationHref: 'https://example.org/other' },
+        { object: 'No citation.', citationHref: 'not a url' },
+      ],
+    },
+  });
+  assert.deepEqual(
+    entry?.claims?.map((c) => [c.object, c.claimRole]),
+    [
+      ['First fact.', 'record_index'],
+      ['Second fact.', 'evidence'],
+    ],
+  );
+});
+
 test('buildReleaseSourceFromLandscape anchors an invention with payload.grantDate to a day-precision statusHistory', () => {
   const entry = buildReleaseSourceFromLandscape(
     inventionRow({ payload: { eraBuckets: ['1920s'], grantDate: '1923-11-20' } }),

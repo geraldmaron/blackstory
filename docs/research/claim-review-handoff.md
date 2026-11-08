@@ -77,12 +77,30 @@ saved, because they hold third-party source text. They are rebuilt from the stor
 6. Run the publisher dry run on the 17 (`publish-release-entities-incremental.ts --ids=<ids>`, dry run
    is the default). Expect them still blocked until the summary claims are fixed.
 
+## Split of the summary claims (2026-11-08, second pass)
+
+The owner chose to split each summary into single-fact claims.
+
+- `payload.summaryClaims` on a landscape row (`[{ object, citationHref }]`) replaces the one claim that
+  restated the whole summary (`summaryClaimsFromPayload` in `lib/incremental-publish.ts`). A row without
+  the key behaves as before.
+- 181 facts across the 17 records were reviewed by Sol: 129 approved, 52 rejected. The 52 were removed
+  from `summaryClaims` (copies in the vault, `pruned-summary-facts-2026-11-08.json`); their rejections
+  stay in the ledger. 129 split facts remain, all approved.
+- Split facts are paraphrases, so the ledger skips the "claim is a verbatim quote" check for them
+  (`PreparedClaim.paraphrase`). The reviewer's own quote must still be verbatim.
+- Gate result (the publisher's own `assessPublicationClaims`, read only): 5 records pass: Arizona Cleaver
+  Stemons, Myrtle Tyler Faithful, Pearl Anna Neal, Viola Tyler Goings, Massachusetts school integration
+  act of 1855. 12 are blocked by one stored evidence quote each that is not verbatim in its source.
+- The record's public summary text is unchanged and still contains facts that were pruned from the
+  claims. Whether to trim it is the owner's call.
+- The publisher dry run is blocked by the permission classifier, so it has not run.
+
 ## Then
 
-- Decide how to unblock the summaries: split each into single-fact claims, or rewrite each to what its
-  sources support. The owner has not chosen yet.
-- Research the 11 claims whose quotations are not in their sources. They may be paraphrases presented
-  as quotes.
+- Repair the 12 blocking evidence quotes in `payload.evidenceCitations`: find the passage in the stored
+  capture, use its exact text, and send those claims back through the reviewer step.
+- Decide whether to trim summaries to the facts that survived.
 - Backlog burn-down order, from the earlier analysis. Close dead weight (77 name duplicates, 140
   relationship proposals, 3 duplicate cases), which needs the owner's approval. Enrich tier A (250 rows,
   scored by how many live records already mention them). Then tiers B and C. Policy waves last: people
