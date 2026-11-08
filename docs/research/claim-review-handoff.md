@@ -108,8 +108,12 @@ The owner chose to split each summary into single-fact claims.
 
 ## Then
 
-- Run the publisher dry run on the 17 (blocked by the permission classifier; the owner runs it or adds a
-  rule), then publish.
+- **Do not publish the 17.** The publisher dry run reported 17 of 17 eligible, but the gate checks structured
+  claims only: the summaries still carry the 52 rejected facts, every accepted claim has one source (53 on
+  Wikipedia alone), and the split and repaired claims are credited to the wrong producer. A bulk apply of the
+  incremental publisher would now include them, so the hold is by convention only until the gate is fixed.
+  Adversarial review and the proposed redesign are in the vault (`sol-critique-round1-2026-11-08.md`,
+  `sol-critique-round2-2026-11-08.md`, `opus-blind-audit-2026-11-08.jsonl`).
 - Source the three facts named above that lost their quote.
 - Re-running enrichment staging (`apply-enrichment-to-landscape.ts`) could overwrite the repaired
   `evidenceCitations`. Check before running it on these rows.
