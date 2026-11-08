@@ -17,8 +17,11 @@ import { normalizeCitationUrl } from '@repo/domain';
 import type { WaybackAnchor } from './wayback-anchor.js';
 import type { WaybackLookup } from './wayback-lookup.js';
 
-/** The three cited-URL surfaces the backfill walks. */
-export type CaptureSurface = 'entity' | 'packet' | 'article';
+/**
+ * The cited-URL surfaces the backfill walks. `landscape` is opt-in only: URLs cited by named,
+ * unpublished landscape rows, so their claims can be reviewed against a capture before publish.
+ */
+export type CaptureSurface = 'entity' | 'packet' | 'article' | 'landscape';
 
 /**
  * retrieval_events.source_id is a foreign key into evidence.evidence_sources — a
@@ -64,6 +67,7 @@ const EMPTY_SURFACES: Record<CaptureSurface, { cited: number; unique: number }> 
   entity: { cited: 0, unique: 0 },
   packet: { cited: 0, unique: 0 },
   article: { cited: 0, unique: 0 },
+  landscape: { cited: 0, unique: 0 },
 };
 
 /** Collapse raw cited URLs from every surface into a deduped inventory with per-surface tallies. */
@@ -72,12 +76,14 @@ export function buildCaptureInventory(refs: readonly CitedUrl[]): CaptureInvento
     entity: { ...EMPTY_SURFACES.entity },
     packet: { ...EMPTY_SURFACES.packet },
     article: { ...EMPTY_SURFACES.article },
+    landscape: { ...EMPTY_SURFACES.landscape },
   };
   const seen = new Set<string>();
   const bySurface = {
     entity: new Set<string>(),
     packet: new Set<string>(),
     article: new Set<string>(),
+    landscape: new Set<string>(),
   };
   const urls: CitedUrl[] = [];
   for (const ref of refs) {
