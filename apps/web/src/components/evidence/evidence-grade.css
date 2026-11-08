@@ -1,0 +1,75 @@
+/*
+ * Evidence grade mark. One flat object: three drawn segments, then the grade in words, then the
+ * source count. No pill, no fill behind the words, so the grade reads as a measurement beside a
+ * claim and not as a button. The tier sets the segment tone from the confidence tokens; the words
+ * stay in ink, so contrast never depends on the tone and the mark survives forced colors.
+ */
+
+.ds-grade {
+  --grade-tone: var(--ds-ink-muted);
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta, 0.8125rem);
+  line-height: 1.25;
+  color: var(--ds-ink);
+}
+
+.ds-grade--high {
+  --grade-tone: var(--ds-confidence-high-border);
+}
+
+.ds-grade--medium {
+  --grade-tone: var(--ds-confidence-medium-border);
+}
+
+.ds-grade--low {
+  --grade-tone: var(--ds-confidence-low-border);
+}
+
+.ds-grade__meter {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.ds-grade__meter > i {
+  display: block;
+  inline-size: 1.125rem;
+  block-size: 0.4375rem;
+  border-radius: var(--ds-radius-full);
+  box-shadow: inset 0 0 0 1px var(--grade-tone);
+}
+
+.ds-grade__meter > i[data-on='true'] {
+  background: var(--grade-tone);
+}
+
+.ds-grade__word {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.ds-grade__count {
+  color: var(--ds-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A middle dot between the grade and the count, drawn so it is not read aloud. */
+.ds-grade__word + .ds-grade__count::before {
+  content: '\00b7';
+  margin-inline-end: var(--ds-space-2);
+}
+
+@media (forced-colors: active) {
+  .ds-grade__meter > i {
+    forced-color-adjust: none;
+    box-shadow: inset 0 0 0 1px CanvasText;
+  }
+
+  .ds-grade__meter > i[data-on='true'] {
+    background: CanvasText;
+  }
+}

@@ -1,8 +1,0 @@
-/* The one line that says what a release id is, so a bare identifier is never left on a
-   public page with no explanation. */
-.ds-rec-file__note {
-  margin: var(--ds-space-3) 0 0;
-  font-size: var(--ds-text-caption);
-  line-height: var(--ds-leading-body);
-  color: var(--ds-ink-muted);
-}

@@ -436,39 +436,26 @@
 }
 
 /* —— Accepted claims ————————————————————————————————————————————————————————————
-   A claim is a row, not a card: `.ds-card` is the shared bordered-panel primitive, right for a
-   standalone surface and wrong for a stack of them. Each claim after the first gets a hairline
-   top, matching `.ds-record-beat + .ds-record-beat`. The confidence tier is carried by the
-   claim's own pill (color, glyph and words together), so the row needs no tone bar of its own:
-   a colored stripe down the edge said the same thing a second time, in color alone. Sizes are
-   the record scale (`--rec-*`, record-room.css). */
-.ds-entity-evidence .ds-card {
-  background: none;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
+   A claim is a statement with its receipt beside it, not a card. The statement sets the line. The
+   receipt (the grade mark, the source, any assessment score) is its own column on a wide page and
+   folds under the statement on a phone, so the reader always sees what was said and what carries
+   it together. Everything else (notes, the quoted passage, a preserved dispute, coverage, history)
+   stays under the statement. Each claim after the first gets a hairline top. Sizes are the record
+   scale (`--rec-*`, record-room.css). */
+.ds-entity-evidence .ds-evidence-claim {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--ds-space-3);
 }
 
-.ds-entity-evidence .ds-stack > .ds-card + .ds-card {
+.ds-entity-evidence .ds-stack > .ds-evidence-claim + .ds-evidence-claim {
   margin-top: var(--ds-space-5);
   padding-top: var(--ds-space-5);
   border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
 }
 
-/* The predicate is a quiet label above the claim, not a card title. */
-.ds-entity-evidence .ds-card__title {
-  margin: 0 0 var(--ds-space-1);
-  font-family: var(--ds-font-mono);
-  font-size: var(--rec-eyebrow, 0.6875rem);
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
 .ds-evidence-claim__body {
-  margin: 0 0 var(--ds-space-3);
+  margin: 0;
   font-family: var(--ds-font-editorial);
   font-size: var(--rec-body, 0.9375rem);
   font-weight: 400;
@@ -476,25 +463,28 @@
   color: var(--ds-ink);
 }
 
-.ds-evidence-claim__meta {
+/* The receipt is one line under the statement: the grade, then the source. The statement keeps the
+   full text measure, so a claim reads at the same width as the prose around it. Beside the
+   statement it was squeezed to under 300px, a third of the measure. */
+.ds-evidence-claim__receipt {
+  display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  margin: 0 0 var(--ds-space-3);
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  min-width: 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
 }
 
-/* The confidence badge as a pill on the record scale. */
-.ds-entity-evidence .ds-confidence {
-  height: var(--rec-pill-h, 1.75rem);
-  padding: 0 0.7rem;
-  border-radius: var(--ds-radius-full);
-  font-family: var(--ds-font-sans);
+.ds-evidence-claim__receipt > .ds-evidence-claim__source {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.ds-evidence-claim__score {
+  margin: 0;
   font-size: var(--rec-meta, 0.8125rem);
-  line-height: 1;
-}
-
-.ds-entity-evidence .ds-confidence__mark {
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
+  color: var(--ds-ink-muted);
 }
 
 .ds-evidence-claim__notes {
@@ -535,6 +525,12 @@
   font-family: var(--ds-font-sans);
   font-size: var(--rec-meta, 0.8125rem);
   line-height: 1.5;
+}
+
+/* Inside the receipt the container already draws the hairline, so the citation draws none of its own. */
+.ds-evidence-claim__receipt .ds-citation {
+  padding-top: 0;
+  border-top: 0;
 }
 
 /* The label is the source's own title, so it reads as a title: sans, sentence case. The link
@@ -646,4 +642,14 @@
 .ds-entity-evidence .ds-entity-meta-list__row dd,
 .ds-entity-evidence .ds-aside-block__meta {
   font-size: var(--rec-meta, 0.8125rem);
+}
+
+/* The one line that says what a release id is, so a bare identifier is never left on a public page
+   with no explanation. It lived in app/entity/entity-page.css, which nothing imports, so it never
+   applied and the line printed at body size in full ink. */
+.ds-rec-file__note {
+  margin: var(--ds-space-3) 0 0;
+  font-size: var(--ds-text-caption);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink-muted);
 }

@@ -136,6 +136,8 @@ export type EvidenceClaimView = {
   readonly confidenceLabel: string;
   readonly confidenceLevel: ConfidenceLevel;
   readonly confidenceScore?: number;
+  /** "Assessment score 0.78 of 1.00", present only when a score was supplied. */
+  readonly confidenceScoreNote?: string;
   readonly citation: EvidenceCitationView;
   readonly excerpt?: EvidenceExcerptView;
   readonly dispute?: EvidenceDisputeView;
