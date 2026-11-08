@@ -192,6 +192,22 @@ export function producerForLandscapeRow(
   return null;
 }
 
+/** The author a claim names for itself, when it was written after the row's original producer. */
+function claimAuthors(row: LandscapePublishRow): Map<string, Producer> {
+  const entries = [row.payload.summaryClaims, row.payload.evidenceCitations].flatMap((list) =>
+    Array.isArray(list) ? (list as Record<string, unknown>[]) : [],
+  );
+  const authors = new Map<string, Producer>();
+  for (const entry of entries) {
+    const by = entry.producedBy as { actorId?: unknown; modelFamily?: unknown } | undefined;
+    const text = entry.object ?? entry.quote;
+    if (typeof by?.actorId !== 'string' || typeof by.modelFamily !== 'string') continue;
+    if (typeof text !== 'string') continue;
+    authors.set(text.trim(), { actorId: by.actorId, actorType: 'model', modelFamily: by.modelFamily });
+  }
+  return authors;
+}
+
 export function buildReviewClaims(
   row: LandscapePublishRow,
   enrichmentModelId: string | null,
@@ -209,7 +225,8 @@ export function buildReviewClaims(
     });
     return { prepared, blocked };
   }
-  const producer = producerForLandscapeRow(row, enrichmentModelId);
+  const rowProducer = producerForLandscapeRow(row, enrichmentModelId);
+  const authors = claimAuthors(row);
   const paraphrases = new Set(
     (Array.isArray(row.payload.summaryClaims) ? row.payload.summaryClaims : []).map((raw) =>
       String((raw as { object?: unknown }).object ?? '').trim(),
@@ -224,6 +241,7 @@ export function buildReviewClaims(
       citationSource: built.citationSource ?? '',
       citationLabel: built.citationLabel ?? '',
     };
+    const producer = authors.get(claim.object) ?? rowProducer;
     const base = { entityId: row.id, predicate: claim.predicate, citationHref: claim.citationHref };
     if (!producer) {
       blocked.push({ ...base, reason: 'no_attributable_producer' });
@@ -473,15 +491,23 @@ function singleEntity(prepared: readonly PreparedClaim[]): PreparedClaim {
  * Case, run, producer activity, artifact and its claim membership, then the decision. Membership
  * must precede the decision: reviewed artifact membership is immutable.
  */
-async function recordDecision(
+export async function recordDecision(
   db: Query,
   input: {
-    readonly first: PreparedClaim;
+    readonly first: Pick<PreparedClaim, 'row' | 'producer'>;
     readonly decision: 'approve' | 'reject';
     readonly claimVersionIds: readonly string[];
     readonly findings: readonly unknown[];
     readonly reviewer: Reviewer;
     readonly profile: Profile;
+    /** Overrides for an artifact that is not a claim packet (see public-text-review.ts). */
+    readonly artifact?: {
+      readonly type: string;
+      readonly schemaId: string;
+      readonly contentHash: string;
+      readonly extensions: Record<string, unknown>;
+      readonly independenceBasis: string;
+    };
   },
 ): Promise<string> {
   const { row, producer } = input.first;
@@ -510,15 +536,17 @@ async function recordDecision(
     [activityId, runId, producer.actorId, producer.actorType, producer.modelFamily],
   );
   await db.query(
-    `SELECT research.submit_artifact($1, $2, $3, 'claim-review-packet', $4, 'ClaimReviewPacket', '1', $5, $6::jsonb, $7)`,
+    `SELECT research.submit_artifact($1, $2, $3, $8, $4, $9, '1', $5, $6::jsonb, $7)`,
     [
       artifactId,
       runId,
       activityId,
-      sha256(JSON.stringify(input.findings)),
+      input.artifact?.contentHash ?? sha256(JSON.stringify(input.findings)),
       `landscape://${row.id}`,
-      JSON.stringify({ entityId: row.id }),
+      JSON.stringify(input.artifact?.extensions ?? { entityId: row.id }),
       `claim-review:${runKey}`,
+      input.artifact?.type ?? 'claim-review-packet',
+      input.artifact?.schemaId ?? 'ClaimReviewPacket',
     ],
   );
   for (const versionId of input.claimVersionIds) {
@@ -527,7 +555,7 @@ async function recordDecision(
       [artifactId, versionId],
     );
   }
-  const basis = independenceBasis(input.reviewer, producer);
+  const basis = input.artifact?.independenceBasis ?? independenceBasis(input.reviewer, producer);
   if (input.decision === 'approve') {
     await db.query(
       `SELECT research.approve_artifact($1, $2, $3, $4, $5::jsonb, $6, 'independent_review', $7)`,
@@ -758,10 +786,13 @@ export type ClaimReviewReport = {
 };
 
 const groupByEntity = <T extends { prepared: PreparedClaim }>(items: readonly T[]) => {
+  // One write covers one producer, and a record's claims can have more than one.
   const groups = new Map<string, T[]>();
-  for (const item of items)
-    groups.set(item.prepared.row.id, [...(groups.get(item.prepared.row.id) ?? []), item]);
-  return groups;
+  for (const item of items) {
+    const key = `${item.prepared.row.id}\u0000${item.prepared.producer.actorId}`;
+    groups.set(key, [...(groups.get(key) ?? []), item]);
+  }
+  return [...groups.values()].map((group) => [group[0]!.prepared.row.id, group] as const);
 };
 
 /**
