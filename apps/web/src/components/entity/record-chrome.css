@@ -18,7 +18,7 @@
 .ds-sheet {
   --rec-eyebrow: 0.6875rem; /* mono caps: labels, indices, counts */
   --rec-meta: 0.8125rem; /* sans: supporting lines, TOC, file rows */
-  --rec-body: 0.96875rem; /* editorial: claims, notes */
+  --rec-body: 1.0625rem; /* editorial: claims, notes. One clear step under the lede (up to 1.25rem) */
   --rec-lede: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
   --rec-value: 1.0625rem; /* display: tile values */
   --rec-h3: 0.875rem; /* sans 600: small titles */

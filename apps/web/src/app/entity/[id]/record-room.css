@@ -221,7 +221,7 @@
    other. Record masts hide the in-photo caption and render this line in the overlay instead. */
 .ds-record-mast__credit {
   margin: var(--ds-space-4) 0 0;
-  max-width: 54ch;
+  max-width: var(--rec-text-w);
   font-family: var(--ds-font-mono);
   font-size: var(--rec-eyebrow);
   font-weight: 400;
@@ -274,7 +274,7 @@
 
 .ds-record-mast__lede {
   margin: var(--ds-space-4) 0 0;
-  max-width: 54ch;
+  max-width: var(--rec-text-w);
   font-family: var(--ds-font-editorial);
   font-size: var(--rec-lede);
   line-height: 1.5;
@@ -553,7 +553,7 @@
 .ds-record-beat + .ds-record-beat,
 .ds-rec-session {
   margin-top: var(--ds-space-10);
-  padding-top: var(--ds-space-7);
+  padding-top: var(--ds-space-8);
   border-top: var(--ds-border-width) solid var(--room-rule-2);
 }
 
@@ -617,8 +617,9 @@
 
 .ds-record-beat__standfirst {
   grid-area: standfirst;
-  margin: var(--ds-space-2) 0 0;
-  max-width: 62ch;
+  margin: var(--ds-space-3) 0 0;
+  /* Small supporting type keeps a short line: past about 62 characters it stops being read. */
+  max-width: min(62ch, var(--rec-text-w));
   font-family: var(--ds-font-sans);
   font-size: var(--rec-meta);
   line-height: 1.55;
@@ -852,7 +853,7 @@
 .ds-record-toc {
   display: flex;
   flex-direction: column;
-  margin-top: var(--ds-space-7);
+  margin-top: var(--ds-space-6);
 }
 
 .ds-record-toc__title {
@@ -903,7 +904,7 @@
 
 /* The record file: four facts about the record itself, as ruled rows. */
 .ds-rec-file {
-  margin-top: var(--ds-space-7);
+  margin-top: var(--ds-space-6);
   padding-top: var(--ds-space-5);
   border-top: var(--ds-border-width) solid var(--room-rule-2);
 }
@@ -984,7 +985,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--ds-space-2) var(--ds-space-4);
-  margin-bottom: var(--ds-space-7);
+  margin-bottom: var(--ds-space-6);
 }
 
 .ds-record-appx__head h2 {
@@ -1005,7 +1006,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   column-gap: var(--ds-space-10);
-  row-gap: var(--ds-space-7);
+  row-gap: var(--ds-space-6);
   align-items: start;
 }
 

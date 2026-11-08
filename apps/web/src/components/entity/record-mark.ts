@@ -160,7 +160,27 @@ export function primaryImageCreditCaption(input: {
   readonly rightsLabel: string;
   readonly showRightsLabel: boolean;
 } {
-  return sanitizePrimaryImageCreditForDisplay(input);
+  const caption = sanitizePrimaryImageCreditForDisplay(input);
+  return { ...caption, creditText: decodeStoredEntities(caption.creditText) };
+}
+
+/**
+ * Credits stored before ingestion decoded them still carry HTML entities ("Kingkongphoto
+ * &amp; www.celebrity-photos.com"), and React prints those literally. One pass over a closed list,
+ * so `&amp;lt;` reads as the text `&lt;` and never decodes twice. The result is rendered as text,
+ * never as markup.
+ */
+const STORED_ENTITIES: Readonly<Record<string, string>> = {
+  amp: '&',
+  quot: '"',
+  apos: "'",
+  '#39': "'",
+};
+
+function decodeStoredEntities(text: string): string {
+  return text.replace(/&(amp|quot|apos|#39);/gi, (_match, name: string) => {
+    return STORED_ENTITIES[name.toLowerCase()] ?? _match;
+  });
 }
 
 const PIN_SOURCE_SYSTEM_LABELS: Readonly<Record<string, string>> = {

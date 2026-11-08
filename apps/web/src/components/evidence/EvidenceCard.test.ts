@@ -23,12 +23,25 @@ const BASE_CLAIM: EvidenceClaimInput = {
   },
 };
 
-test('renders an evidence-score label rather than probability language (AC1)', () => {
+test('renders the grade in the shared language, with the score apart and no probability wording (AC1)', () => {
   const html = renderToStaticMarkup(
     createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }),
   );
-  assert.match(html, /Evidence score: high \(0\.78 of 1\.00\)/);
+  assert.match(html, /class="ds-grade__word">Grade A</);
+  assert.match(html, /Assessment score 0\.78 of 1\.00/);
   assert.doesNotMatch(html, /probability/i);
+  assert.doesNotMatch(html, /Evidence (grade|score): /);
+});
+
+test('draws the meter from three segments and never types the glyphs', () => {
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, {
+      card: buildEvidenceCard({ ...BASE_CLAIM, confidenceLevel: 'medium' }),
+    }),
+  );
+  assert.equal((html.match(/<i data-on="true"/g) ?? []).length, 2);
+  assert.equal((html.match(/<i data-on="false"/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /[●○]/);
 });
 
 test('associates the claim card with its citation block via aria-describedby (WCAG claim<->citation)', () => {
@@ -190,7 +203,7 @@ test('does not surface raw claim ids on the public card surface', () => {
   assert.match(html, /Primary archival/);
 });
 
-test('keeps claim prose in body text, not the Card title (quiet typography)', () => {
+test('prints the statement as the claim and never the pipeline predicate above it', () => {
   const longObject =
     'During spring and summer 1800, Gabriel organized enslaved people across Henrico County to march on Richmond.';
   const html = renderToStaticMarkup(
@@ -202,9 +215,12 @@ test('keeps claim prose in body text, not the Card title (quiet typography)', ()
       }),
     }),
   );
-  assert.match(html, /<h3 class="ds-card__title">Organized<\/h3>/);
-  assert.doesNotMatch(html, /ds-card__title">Organized: During/);
-  assert.match(html, /class="ds-evidence-claim__body">During spring and summer 1800/);
+  assert.doesNotMatch(html, /ds-card__title|>Organized</);
+  assert.match(html, /<article id="claim_seed_001"[^>]*aria-labelledby="claim_seed_001-statement"/);
+  assert.match(
+    html,
+    /id="claim_seed_001-statement" class="ds-evidence-claim__body">During spring and summer 1800/,
+  );
 });
 
 test('strips editorial wikilink markup from claim object prose', () => {
