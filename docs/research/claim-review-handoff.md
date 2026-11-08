@@ -89,17 +89,30 @@ The owner chose to split each summary into single-fact claims.
   stay in the ledger. 129 split facts remain, all approved.
 - Split facts are paraphrases, so the ledger skips the "claim is a verbatim quote" check for them
   (`PreparedClaim.paraphrase`). The reviewer's own quote must still be verbatim.
-- Gate result (the publisher's own `assessPublicationClaims`, read only): 5 records pass: Arizona Cleaver
-  Stemons, Myrtle Tyler Faithful, Pearl Anna Neal, Viola Tyler Goings, Massachusetts school integration
-  act of 1855. 12 are blocked by one stored evidence quote each that is not verbatim in its source.
+- Gate result after the split (the publisher's own `assessPublicationClaims`, read only): 5 of 17 passed.
+  The other 12 were each blocked by one stored evidence quote that was not verbatim in its capture.
+- Quote repair (same day): 13 quotes in `payload.evidenceCitations` were replaced with verbatim spans
+  from the stored capture (originals in the vault, `evidence-citations-before-repair-2026-11-08.json`).
+  Sol approved all 13. Result: 17 of 17 pass the claim gate. This is the claim check only, not full
+  publish eligibility (depth, template and location checks are separate).
+- Three repairs changed what the quote says, because the source never stated the original wording:
+  Illinois (chicagohistory.org) now quotes the 1853 prohibition, not the 1865 repeal; Oklahoma grandfather
+  clause (okhistory.org) now quotes the Guinn ruling, not the 1910 and 1915 dates; New York (albany
+  review) now quotes the 1846, 1860 and 1869 referenda and the 1821 convention. The Illinois repeal date,
+  the Oklahoma 1910 enforcement date and the New York 1874 amendment still need a source of their own.
+- The SGR founders quote on six records no longer names Mary Lou Allison Gardner Little: the capture
+  has stray spaces around her link, so only the clean part of the sentence is verbatim.
 - The record's public summary text is unchanged and still contains facts that were pruned from the
   claims. Whether to trim it is the owner's call.
 - The publisher dry run is blocked by the permission classifier, so it has not run.
 
 ## Then
 
-- Repair the 12 blocking evidence quotes in `payload.evidenceCitations`: find the passage in the stored
-  capture, use its exact text, and send those claims back through the reviewer step.
+- Run the publisher dry run on the 17 (blocked by the permission classifier; the owner runs it or adds a
+  rule), then publish.
+- Source the three facts named above that lost their quote.
+- Re-running enrichment staging (`apply-enrichment-to-landscape.ts`) could overwrite the repaired
+  `evidenceCitations`. Check before running it on these rows.
 - Decide whether to trim summaries to the facts that survived.
 - Backlog burn-down order, from the earlier analysis. Close dead weight (77 name duplicates, 140
   relationship proposals, 3 duplicate cases), which needs the owner's approval. Enrich tier A (250 rows,
