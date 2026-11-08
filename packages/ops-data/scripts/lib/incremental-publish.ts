@@ -29,6 +29,7 @@ import {
   confidenceLevelForSource,
   type ReviewedClaimAssessment,
 } from './confidence.ts';
+import { assessPublicTextReview, type PublicTextReview } from './public-text-review.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
 import { searchTopicsFromProjection } from './projection-divergence.ts';
 import { cityStateFromJurisdictionLabel } from './evidence-collectors/subject-identity.ts';
@@ -76,6 +77,10 @@ export type PublishGateSkipReason =
   | 'template_only'
   | 'build_failed'
   | 'claim_assessment_required'
+  /**
+   * No approved review is bound to this exact public text and claim set.
+   */
+  | 'public_text_review_required'
   /**
    * Republishing would reduce the existing claim set.
    */
@@ -586,6 +591,38 @@ function inventionGrantStatusHistory(
   ];
 }
 
+/**
+ * Single-fact claims that stand in for the one claim restating a whole summary. A summary bundles
+ * facts no single source states, so reviewing it as one claim fails on its weakest clause; each
+ * entry here is one fact with the one source that states it. Null when absent or unusable, which
+ * keeps the summary claim.
+ */
+function summaryClaimsFromPayload(raw: unknown, canonicalUrl: string): ReleaseSourceClaim[] | null {
+  const claims = asRecordArray(raw).flatMap((entry): ReleaseSourceClaim[] => {
+    const object = readTrimmedString(entry.object);
+    const href = readTrimmedString(entry.citationHref);
+    let host: string;
+    try {
+      host = new URL(href).hostname;
+    } catch {
+      return []; // an unparseable url cannot be cited
+    }
+    if (object.length === 0) return [];
+    return [
+      {
+        predicate: 'source states',
+        object,
+        confidenceLevel: confidenceLevelForSource(href),
+        citationSource: host,
+        citationHref: href,
+        citationLabel: host,
+        claimRole: href === canonicalUrl ? 'record_index' : 'evidence',
+      },
+    ];
+  });
+  return claims.length > 0 ? claims : null;
+}
+
 export function buildReleaseSourceFromLandscape(
   row: LandscapePublishRow,
 ): ReleaseSourceEntity | null {
@@ -685,7 +722,7 @@ export function buildReleaseSourceFromLandscape(
               claimRole: 'record_index',
             },
           ]
-        : [
+        : (summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? [
             {
               // Describe what the source states in the predicate. Do not encode the desired
               // inclusion criterion there and then infer that same criterion from the generated
@@ -698,7 +735,7 @@ export function buildReleaseSourceFromLandscape(
               citationLabel: hostname,
               claimRole: 'record_index',
             },
-          ];
+          ]);
 
   // Preserve quotations from documents used by enrichment. Group citations by document and
   // merge distinct quotations without counting repeated excerpts as independent sources. The
@@ -1173,6 +1210,7 @@ export function gateLandscapePublishCandidate(input: {
   readonly liveDepth?: DepthAssessment;
   /** Loaded from the canonical ledger, separately from candidate/model payloads. */
   readonly reviewedClaims?: readonly ReviewedClaimAssessment[];
+  readonly publicTextReviews?: readonly PublicTextReview[];
   /**
    * Public location available for an explicit republish whose candidate lacks coordinates.
    * Omitting it does not invent a location.
@@ -1313,6 +1351,15 @@ export function gateLandscapePublishCandidate(input: {
     return { eligible: false, reason: 'claim_assessment_required', detail: assessment.detail };
   }
   entry = { ...entry, claims: assessment.claims };
+
+  // shortcut: live records predate this review, so a republish is exempt. Remove the exemption
+  // once the live catalog has been through it, or an in-place correction stays unreviewed.
+  if (!republishingLiveRow) {
+    const text = assessPublicTextReview(entry, input.publicTextReviews ?? []);
+    if (!text.ok) {
+      return { eligible: false, reason: 'public_text_review_required', detail: text.detail };
+    }
+  }
 
   const build = buildReleaseEntityArtifacts(
     entry,

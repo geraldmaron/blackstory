@@ -1218,6 +1218,10 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           throw new Error('--max-entities must be a non-negative integer');
         }
         const targetUrl = optionalFlag(flags, '--url');
+        const landscapeIds = (optionalFlag(flags, '--landscape-ids') ?? '')
+          .split(',')
+          .map((id) => id.trim())
+          .filter(Boolean);
         const afterUrl = optionalFlag(flags, '--after-url');
         const inventoryFingerprint = optionalFlag(flags, '--inventory-fingerprint');
         const decisionsPath = optionalFlag(flags, '--preservation-decisions');
@@ -1253,6 +1257,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             ...(maxCaptures !== undefined ? { maxCaptures } : {}),
             ...(maxEntities !== undefined ? { maxEntities } : {}),
             ...(targetUrl !== undefined ? { targetUrl } : {}),
+            ...(landscapeIds.length > 0 ? { landscapeIds } : {}),
             ...(afterUrl !== undefined ? { afterUrl } : {}),
             ...(inventoryFingerprint !== undefined ? { inventoryFingerprint } : {}),
             ...(wayback ? { wayback: true } : {}),
@@ -2383,7 +2388,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             'For model-report: [--since <ISO date>] [--json]\n' +
             'For harness-run: --theme <theme> [--metro <metro>] [--subjects <source-records.json> | --url <url> | --connectors dpla,nps_network_to_freedom,web_search] [--nps-csv <file>] [--dpla-json <file>] [--max-subjects 25] [--max-relations 25] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
-            'For capture-backfill: [--commit] [--wayback] [--url CITED_URL | --max-captures N [--after-url URL --inventory-fingerprint SHA256] | --max-entities N]\n' +
+            'For capture-backfill: [--commit] [--wayback] [--url CITED_URL | --max-captures N [--after-url URL --inventory-fingerprint SHA256] | --max-entities N | --landscape-ids ID,ID]\n' +
             'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never canonical\n' +
             'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] [--run-id <id> --preservation-decisions <path> --worker-id <id> --max-tasks <n> --commit]\n' +
             'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows; --deficit with --limit returns the next N matching entities in priority order, not a deficit filter over the first N by id\n' +

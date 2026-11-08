@@ -29,6 +29,7 @@ import {
   type PublishCatalogDecision,
   type LiveLocationInheritance,
 } from './incremental-publish.ts';
+import { publicTextHash } from './public-text-review.ts';
 import {
   buildReleaseEntityArtifacts,
   deriveCatalogEntityStatus,
@@ -76,14 +77,30 @@ function reviewedClaimsFor(row: LandscapePublishRow, score = 0.9): ReviewedClaim
   }));
 }
 
+function reviewedTextFor(row: LandscapePublishRow) {
+  const entry = buildReleaseSourceFromLandscape(row);
+  if (!entry) return [];
+  return [
+    {
+      entityId: entry.id,
+      textHash: publicTextHash(entry),
+      decision: 'approve',
+      reviewerModelFamily: 'openai',
+      producerModelFamily: 'claude-test',
+    },
+  ];
+}
+
 function gateWithReviewedClaims(input: Parameters<typeof gateLandscapePublishCandidate>[0]) {
+  const located = {
+    ...input.row,
+    lat: input.row.lat ?? input.liveLocation?.lat ?? null,
+    lng: input.row.lng ?? input.liveLocation?.lng ?? null,
+  };
   return gateLandscapePublishCandidate({
     ...input,
-    reviewedClaims: reviewedClaimsFor({
-      ...input.row,
-      lat: input.row.lat ?? input.liveLocation?.lat ?? null,
-      lng: input.row.lng ?? input.liveLocation?.lng ?? null,
-    }),
+    reviewedClaims: reviewedClaimsFor(located),
+    publicTextReviews: reviewedTextFor(located),
   });
 }
 
@@ -212,6 +229,46 @@ test('buildReleaseSourceFromLandscape produces claims from canonical_url', () =>
     entry?.claims?.[0]?.citationHref,
     'https://historicsites.dcpreservation.org/items/show/1055',
   );
+});
+
+test('buildReleaseSourceFromLandscape emits payload.summaryClaims as single-fact claims instead of the whole summary', () => {
+  const base = baseRow();
+  const canonical = base.canonical_url!;
+  const entry = buildReleaseSourceFromLandscape({
+    ...base,
+    payload: {
+      ...base.payload,
+      summaryClaims: [
+        { object: 'First fact.', citationHref: canonical },
+        { object: 'Second fact.', citationHref: 'https://example.org/other' },
+        { object: 'No citation.', citationHref: 'not a url' },
+      ],
+    },
+  });
+  assert.deepEqual(
+    entry?.claims?.map((c) => [c.object, c.claimRole]),
+    [
+      ['First fact.', 'record_index'],
+      ['Second fact.', 'evidence'],
+    ],
+  );
+});
+
+test('a new record whose claims are reviewed still needs a review of its exact public text', () => {
+  const row = enrichedRow();
+  const input = { row, releaseId: 'rel_seed_001', generatedAt: '2026-07-22T00:00:00.000Z' };
+  const noText = gateLandscapePublishCandidate({
+    ...input,
+    reviewedClaims: reviewedClaimsFor(row),
+  });
+  assert.equal(noText.eligible, false);
+  if (!noText.eligible) assert.equal(noText.reason, 'public_text_review_required');
+  const stale = gateLandscapePublishCandidate({
+    ...input,
+    reviewedClaims: reviewedClaimsFor(row),
+    publicTextReviews: reviewedTextFor({ ...row, summary: `${row.summary} An earlier draft.` }),
+  });
+  assert.equal(stale.eligible, false);
 });
 
 test('buildReleaseSourceFromLandscape anchors an invention with payload.grantDate to a day-precision statusHistory', () => {
@@ -2254,6 +2311,7 @@ test('independent review of every exact claim permits publication and keeps cano
   const result = gateLandscapePublishCandidate({
     row,
     reviewedClaims,
+    publicTextReviews: reviewedTextFor(row),
     releaseId: 'test',
     generatedAt: '2026-01-01T00:00:00Z',
   });
@@ -2267,6 +2325,7 @@ test('an uncalibrated numeric interval neither blocks nor authorizes independent
   const result = gateLandscapePublishCandidate({
     row,
     reviewedClaims: reviewedClaimsFor(row, 0.7),
+    publicTextReviews: reviewedTextFor(row),
     releaseId: 'test',
     generatedAt: '2026-01-01T00:00:00Z',
     allowRepublish: true,
