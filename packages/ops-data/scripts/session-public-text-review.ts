@@ -118,7 +118,9 @@ async function buildPackets(
 }
 
 async function prepare(): Promise<void> {
-  const ids = readFileSync(flag('ids-file'), 'utf8').trim().split(/[\s,]+/u);
+  const ids = readFileSync(flag('ids-file'), 'utf8')
+    .trim()
+    .split(/[\s,]+/u);
   const rejectedPath = flag('rejected-file', '');
   const rejected = rejectedPath ? JSON.parse(readFileSync(rejectedPath, 'utf8')) : {};
   mkdirSync(workDir, { recursive: true });
@@ -140,8 +142,20 @@ function review(): void {
     const result = spawnSync(
       'codex',
       [
-        'exec', '-m', model, '-s', 'read-only', '--skip-git-repo-check', '--ephemeral',
-        '-C', workDir, '--output-schema', schemaPath, '-o', output, '-',
+        'exec',
+        '-m',
+        model,
+        '-s',
+        'read-only',
+        '--skip-git-repo-check',
+        '--ephemeral',
+        '-C',
+        workDir,
+        '--output-schema',
+        schemaPath,
+        '-o',
+        output,
+        '-',
       ],
       // Stdin closes after the prompt; an open stdin makes codex wait forever.
       {
@@ -157,7 +171,14 @@ function review(): void {
       continue;
     }
     const verdict = JSON.parse(readFileSync(output, 'utf8')) as PublicTextVerdict;
-    lines.push(JSON.stringify({ entityId: packet.entityId, textHash: packet.textHash, reviewerActorId: `codex-review:${model}`, verdict }));
+    lines.push(
+      JSON.stringify({
+        entityId: packet.entityId,
+        textHash: packet.textHash,
+        reviewerActorId: `codex-review:${model}`,
+        verdict,
+      }),
+    );
     console.log(`${packet.entityId}: ${verdict.decision}`);
   }
   writeFileSync(verdictsPath, `${lines.join('\n')}\n`);
@@ -174,7 +195,10 @@ async function apply(): Promise<void> {
   const write = process.env.DRY_RUN === '0' && process.env.PUBLIC_TEXT_REVIEW_APPLY === '1';
   const drafter = { actorId: flag('drafter-actor'), modelFamily: flag('drafter-family') };
   const reviewerFamily = flag('reviewer-family', 'openai');
-  if (!providerOf(drafter.modelFamily) || providerOf(drafter.modelFamily) === providerOf(reviewerFamily)) {
+  if (
+    !providerOf(drafter.modelFamily) ||
+    providerOf(drafter.modelFamily) === providerOf(reviewerFamily)
+  ) {
     throw new Error('Drafter and reviewer must be known, different providers');
   }
   const lines = readJsonl<VerdictLine>(verdictsPath);
@@ -185,14 +209,24 @@ async function apply(): Promise<void> {
       if (write) await client.query('SET LOCAL ROLE service_role');
       const { packets, rows } = await buildPackets(client, ids, {});
       const stored = new Map(readJsonl<PublicTextPacket>(packetsPath).map((p) => [p.entityId, p]));
-      const profiles = (await client.query(`SELECT id, version FROM research.research_profiles WHERE active`)).rows;
-      if (profiles.length !== 1) throw new Error(`Expected one active research profile, found ${profiles.length}`);
-      const report = { approved: [] as string[], changesRequested: [] as unknown[], refused: [] as unknown[] };
+      const profiles = (
+        await client.query(`SELECT id, version FROM research.research_profiles WHERE active`)
+      ).rows;
+      if (profiles.length !== 1)
+        throw new Error(`Expected one active research profile, found ${profiles.length}`);
+      const report = {
+        approved: [] as string[],
+        changesRequested: [] as unknown[],
+        refused: [] as unknown[],
+      };
       for (const line of lines) {
         const current = packets.find((packet) => packet.entityId === line.entityId);
         const reviewed = stored.get(line.entityId);
         if (!current || !reviewed || current.textHash !== line.textHash) {
-          report.refused.push({ entityId: line.entityId, errors: ['text or claims changed since review'] });
+          report.refused.push({
+            entityId: line.entityId,
+            errors: ['text or claims changed since review'],
+          });
           continue;
         }
         // Validate against the packet the reviewer actually saw, which also holds the rejected facts.
@@ -203,12 +237,20 @@ async function apply(): Promise<void> {
         }
         const approved = line.verdict.decision === 'approve';
         if (approved) report.approved.push(line.entityId);
-        else report.changesRequested.push({ entityId: line.entityId, findings: line.verdict.findings });
+        else
+          report.changesRequested.push({
+            entityId: line.entityId,
+            findings: line.verdict.findings,
+          });
         if (!write) continue;
         await recordDecision(client, {
           first: {
             row: rows.get(line.entityId) as never,
-            producer: { actorId: drafter.actorId, actorType: 'model', modelFamily: drafter.modelFamily },
+            producer: {
+              actorId: drafter.actorId,
+              actorType: 'model',
+              modelFamily: drafter.modelFamily,
+            },
           },
           decision: approved ? 'approve' : 'reject',
           claimVersionIds: [],
@@ -237,7 +279,8 @@ async function apply(): Promise<void> {
 }
 
 const step = flag('step');
-const done = step === 'prepare' ? prepare() : step === 'apply' ? apply() : Promise.resolve(review());
+const done =
+  step === 'prepare' ? prepare() : step === 'apply' ? apply() : Promise.resolve(review());
 done.catch((error) => {
   console.error(error);
   process.exitCode = 1;

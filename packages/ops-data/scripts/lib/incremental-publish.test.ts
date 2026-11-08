@@ -257,7 +257,10 @@ test('buildReleaseSourceFromLandscape emits payload.summaryClaims as single-fact
 test('a new record whose claims are reviewed still needs a review of its exact public text', () => {
   const row = enrichedRow();
   const input = { row, releaseId: 'rel_seed_001', generatedAt: '2026-07-22T00:00:00.000Z' };
-  const noText = gateLandscapePublishCandidate({ ...input, reviewedClaims: reviewedClaimsFor(row) });
+  const noText = gateLandscapePublishCandidate({
+    ...input,
+    reviewedClaims: reviewedClaimsFor(row),
+  });
   assert.equal(noText.eligible, false);
   if (!noText.eligible) assert.equal(noText.reason, 'public_text_review_required');
   const stale = gateLandscapePublishCandidate({

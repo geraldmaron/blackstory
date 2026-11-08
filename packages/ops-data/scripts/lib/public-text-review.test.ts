@@ -15,7 +15,9 @@ const entry: PublicTextEntry = {
   id: 'e1',
   displayName: 'Test Person',
   summary: 'Test Person founded the society in 1901.',
-  claims: [{ predicate: 'source states', object: 'Founded in 1901.', citationHref: 'https://a.example/x' }],
+  claims: [
+    { predicate: 'source states', object: 'Founded in 1901.', citationHref: 'https://a.example/x' },
+  ],
 };
 const review = (over: Partial<PublicTextReview> = {}): PublicTextReview => ({
   entityId: 'e1',
@@ -39,11 +41,17 @@ test('no review, changed prose and an omitted claim all block', () => {
 
 test('a rejection of unchanged text cannot be outvoted by a later approval', () => {
   assert.equal(assessPublicTextReview(entry, [review({ decision: 'reject' }), review()]).ok, false);
-  assert.equal(assessPublicTextReview(entry, [review({ decision: 'request_changes' }), review()]).ok, false);
+  assert.equal(
+    assessPublicTextReview(entry, [review({ decision: 'request_changes' }), review()]).ok,
+    false,
+  );
 });
 
 test('a review needs two known, different providers', () => {
-  assert.equal(assessPublicTextReview(entry, [review({ reviewerModelFamily: 'claude-sonnet-5' })]).ok, false);
+  assert.equal(
+    assessPublicTextReview(entry, [review({ reviewerModelFamily: 'claude-sonnet-5' })]).ok,
+    false,
+  );
   assert.equal(assessPublicTextReview(entry, [review({ producerModelFamily: null })]).ok, false);
   assert.equal(providerOf('gpt-6.1-sol'), 'openai');
   assert.equal(providerOf('mystery'), null);
@@ -58,7 +66,10 @@ const packet: PublicTextPacket = {
   sources: [{ url: 'https://a.example/x', text: 'Founded in 1901 by Test Person.' }],
   rejectedFacts: ['She died in 1950.'],
 };
-const clause = (text: string, status: PublicTextVerdict['clauses'][number]['status'] = 'supported') => ({
+const clause = (
+  text: string,
+  status: PublicTextVerdict['clauses'][number]['status'] = 'supported',
+) => ({
   text,
   claimRefs: ['C1'],
   status,
@@ -90,12 +101,21 @@ test('an approval cannot carry an unsupported clause, a rejected fact or an unco
     ],
   });
   assert.equal(validatePublicTextVerdict(packet, unsupported).ok, false);
-  assert.equal(validatePublicTextVerdict(packet, approval({ rejectedFactsPresent: [0] })).ok, false);
+  assert.equal(
+    validatePublicTextVerdict(packet, approval({ rejectedFactsPresent: [0] })).ok,
+    false,
+  );
   assert.equal(validatePublicTextVerdict(packet, approval({ identityConfirmed: false })).ok, false);
 });
 
 test('asking for changes needs a stated finding', () => {
-  assert.equal(validatePublicTextVerdict(packet, approval({ decision: 'request_changes' })).ok, false);
-  const withFinding = approval({ decision: 'request_changes', findings: ['Remove the 1950 date.'] });
+  assert.equal(
+    validatePublicTextVerdict(packet, approval({ decision: 'request_changes' })).ok,
+    false,
+  );
+  const withFinding = approval({
+    decision: 'request_changes',
+    findings: ['Remove the 1950 date.'],
+  });
   assert.equal(validatePublicTextVerdict(packet, withFinding).ok, true);
 });

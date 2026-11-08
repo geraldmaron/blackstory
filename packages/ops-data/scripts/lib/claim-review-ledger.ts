@@ -203,7 +203,11 @@ function claimAuthors(row: LandscapePublishRow): Map<string, Producer> {
     const text = entry.object ?? entry.quote;
     if (typeof by?.actorId !== 'string' || typeof by.modelFamily !== 'string') continue;
     if (typeof text !== 'string') continue;
-    authors.set(text.trim(), { actorId: by.actorId, actorType: 'model', modelFamily: by.modelFamily });
+    authors.set(text.trim(), {
+      actorId: by.actorId,
+      actorType: 'model',
+      modelFamily: by.modelFamily,
+    });
   }
   return authors;
 }
