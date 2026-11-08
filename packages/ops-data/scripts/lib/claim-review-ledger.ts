@@ -153,6 +153,8 @@ export type PreparedClaim = {
   readonly claim: ClaimUnderReview;
   readonly capture: CaptureText;
   readonly producer: Producer;
+  /** A split-out summary fact restated in our words, not a quotation; kept out of the packet hash. */
+  readonly paraphrase?: true;
 };
 
 export type BlockedClaim = {
@@ -208,6 +210,11 @@ export function buildReviewClaims(
     return { prepared, blocked };
   }
   const producer = producerForLandscapeRow(row, enrichmentModelId);
+  const paraphrases = new Set(
+    (Array.isArray(row.payload.summaryClaims) ? row.payload.summaryClaims : []).map((raw) =>
+      String((raw as { object?: unknown }).object ?? '').trim(),
+    ),
+  );
   for (const built of entry.claims) {
     const claim: ClaimUnderReview = {
       predicate: built.predicate,
@@ -256,6 +263,7 @@ export function buildReviewClaims(
       claim,
       capture,
       producer,
+      ...(paraphrases.has(claim.object) ? { paraphrase: true as const } : {}),
     });
   }
   return { prepared, blocked };
@@ -404,7 +412,7 @@ export function validateVerdict(
     if (!located) errors.push(`quote ${index + 1} does not occur verbatim in the capture text`);
     else quotes.push({ ...located, locator });
   }
-  if (prepared.claim.claimRole === 'evidence') {
+  if (prepared.claim.claimRole === 'evidence' && !prepared.paraphrase) {
     for (const passage of prepared.claim.object.split(MERGED_QUOTE_SEPARATOR)) {
       if (!locateQuote(source, passage)) {
         errors.push('the evidence claim’s own quotation does not occur verbatim in its capture');

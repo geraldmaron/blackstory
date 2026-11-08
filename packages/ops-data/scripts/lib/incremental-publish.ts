@@ -586,6 +586,41 @@ function inventionGrantStatusHistory(
   ];
 }
 
+/**
+ * Single-fact claims that stand in for the one claim restating a whole summary. A summary bundles
+ * facts no single source states, so reviewing it as one claim fails on its weakest clause; each
+ * entry here is one fact with the one source that states it. Null when absent or unusable, which
+ * keeps the summary claim.
+ */
+function summaryClaimsFromPayload(
+  raw: unknown,
+  canonicalUrl: string,
+): ReleaseSourceClaim[] | null {
+  const claims = asRecordArray(raw).flatMap((entry): ReleaseSourceClaim[] => {
+    const object = readTrimmedString(entry.object);
+    const href = readTrimmedString(entry.citationHref);
+    let host: string;
+    try {
+      host = new URL(href).hostname;
+    } catch {
+      return []; // an unparseable url cannot be cited
+    }
+    if (object.length === 0) return [];
+    return [
+      {
+        predicate: 'source states',
+        object,
+        confidenceLevel: confidenceLevelForSource(href),
+        citationSource: host,
+        citationHref: href,
+        citationLabel: host,
+        claimRole: href === canonicalUrl ? 'record_index' : 'evidence',
+      },
+    ];
+  });
+  return claims.length > 0 ? claims : null;
+}
+
 export function buildReleaseSourceFromLandscape(
   row: LandscapePublishRow,
 ): ReleaseSourceEntity | null {
@@ -685,7 +720,7 @@ export function buildReleaseSourceFromLandscape(
               claimRole: 'record_index',
             },
           ]
-        : [
+        : summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? [
             {
               // Describe what the source states in the predicate. Do not encode the desired
               // inclusion criterion there and then infer that same criterion from the generated
