@@ -50,3 +50,18 @@ test('listingQuotes finds a 1956 row by its street address prefix', () => {
   );
   assert.match(listingClaim(facts), /^Listed in the 1956 edition/u);
 });
+
+test('listingQuotes matches a 1956 address that contains a quote or a backslash as the file writes it', () => {
+  const address = 'Rear of 12 "Old" Road \\ Annex';
+  const rows = `{"rows": [["Odd Inn", ${JSON.stringify(`${address}, Erie, PA 16501`)}, "Hotel", "1956", [1, 2]]]}`;
+  const facts: ListingFacts = {
+    name: 'Odd Inn',
+    address,
+    category: 'Hotel',
+    year: 1956,
+    city: 'Erie',
+    state: 'PA',
+  };
+  const quotes = listingQuotes(rows, facts);
+  assert.ok(quotes && rows.includes(quotes[0] as string));
+});
