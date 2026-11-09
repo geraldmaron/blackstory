@@ -36,7 +36,6 @@ import {
   type PublicVisit,
 } from '@repo/domain';
 import { mapPostgresSearchIndexRow } from '@repo/schemas';
-import { GREENBOOK_SUMMARY_CONTEXT } from '@repo/domain';
 import { divergentFieldsForRow, expectedSearchTopics } from './projection-divergence.ts';
 
 import type { ReviewedClaimAssessment } from './confidence.ts';
@@ -353,8 +352,7 @@ test('gateLandscapePublishCandidate rejects greenbook lane', () => {
 test('gateLandscapePublishCandidate admits a reviewed Green Book listing without depth or a 400-char summary', () => {
   const listing = {
     summary:
-      'Pelican was a hotel at 4613 John R. St., Detroit, Michigan, listed in the 1947 edition of the Negro Motorist Green Book. ' +
-      GREENBOOK_SUMMARY_CONTEXT,
+      'Pelican was listed in the 1947 edition of the Negro Motorist Green Book as a hotel at 4613 John R. St., Detroit, Michigan.',
     canonical_url:
       'https://raw.githubusercontent.com/NYPL-publicdomain/greenbooks/x/geojson/1947.geojson',
   };

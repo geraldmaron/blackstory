@@ -9,8 +9,6 @@
  *   1956  {"rows": [["X", "Y, City, ST ZIP", "K", "1956", [lat, lng]], ...]}
  * Anything that does not match exactly once returns null, so the caller fails closed.
  */
-import { GREENBOOK_SUMMARY_CONTEXT } from '@repo/domain';
-
 export type ListingFacts = {
   readonly name: string;
   readonly address: string;
@@ -71,5 +69,5 @@ export function listingClaim(facts: ListingFacts): string {
 }
 
 export function listingSummary(facts: ListingFacts): string {
-  return `${facts.name} was ${listingClaim(facts).replace(/^Listed/u, 'listed')} ${GREENBOOK_SUMMARY_CONTEXT}`;
+  return `${facts.name} was ${listingClaim(facts).replace(/^Listed/u, 'listed')}`;
 }

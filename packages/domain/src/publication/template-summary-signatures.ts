@@ -35,18 +35,10 @@ export const NRHP_SUMMARY_FILLER =
   ` It is one of thousands of properties nationwide the National Register has formally recognized ` +
   `for preserving African American history and heritage.`;
 
-/**
- * The one fixed sentence the Green Book listing stager appends to every listing-tier summary so
- * it clears the 120-character projection floor. Same role as the NRHP sentences above.
- */
-export const GREENBOOK_SUMMARY_CONTEXT =
-  'The Green Book was a travel guide that listed businesses where Black travelers could expect to be served during segregation.';
-
 /** Every known generated-summary fingerprint, in the form consumers substring-match. */
 export const LANE_TEMPLATE_SIGNATURES: readonly string[] = [
   NRHP_SUMMARY_TRAILER.trim(),
   NRHP_SUMMARY_FILLER.trim(),
-  GREENBOOK_SUMMARY_CONTEXT,
 ];
 
 /**

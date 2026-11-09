@@ -118,6 +118,11 @@ async function main(): Promise<void> {
         skip('state cap');
         continue;
       }
+      // The projection schema floors a summary at 120 characters; nothing pads a short one.
+      if (listingSummary(facts).length < 120) {
+        skip('summary under 120 characters');
+        continue;
+      }
       if (!PLAIN_ADDRESS.test(facts.address)) {
         skip('address not plain');
         continue;

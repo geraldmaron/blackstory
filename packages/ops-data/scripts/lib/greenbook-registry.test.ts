@@ -44,9 +44,9 @@ test('listingQuotes finds a 1956 row by its street address prefix', () => {
   };
   const quotes = listingQuotes(rows, facts);
   assert.ok(quotes && rows.includes(quotes[0] as string));
-  assert.match(
+  assert.equal(
     listingSummary(facts),
-    /^Spencer Hotel was listed in the 1956 edition .* Chicago, Illinois\. The Green Book was/u,
+    'Spencer Hotel was listed in the 1956 edition of the Negro Motorist Green Book as a hotel at 300 East Garfield Boulevard, Chicago, Illinois.',
   );
   assert.match(listingClaim(facts), /^Listed in the 1956 edition/u);
 });
