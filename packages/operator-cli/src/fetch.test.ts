@@ -15,6 +15,7 @@ import {
   buildCitationPrefill,
   nodePinnedTransport,
   nodeResolveHost,
+  parseTextOnlyHtml,
   planSelectiveCapture,
 } from './fetch.ts';
 
@@ -106,4 +107,12 @@ test('planSelectiveCapture documents the Wayback integration point without calli
   assert.equal(plan.snapshotMode, 'selective');
   assert.equal(plan.contentHash, 'a'.repeat(64));
   assert.ok(/no wayback/iu.test(plan.notes));
+});
+
+test('parseTextOnlyHtml keeps 100k characters of a web page but more of a JSON body served as text/plain', async () => {
+  const bytes = (text: string) => new TextEncoder().encode(text);
+  const page = await parseTextOnlyHtml(bytes(`<p>${'a'.repeat(150_000)}</p>`), 'text/html');
+  assert.equal(page.extractedText.length, 100_000);
+  const json = await parseTextOnlyHtml(bytes(`{"rows": ["${'a'.repeat(150_000)}"]}`), 'text/plain');
+  assert.ok(json.extractedText.length > 150_000);
 });

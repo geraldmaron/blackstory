@@ -24,6 +24,7 @@ import {
   findTemplateSummarySignature,
 } from '@repo/domain';
 import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts';
+import { isRestatedListing } from './greenbook-registry.ts';
 import {
   assessPublicationClaims,
   confidenceLevelForSource,
@@ -1372,7 +1373,21 @@ export function gateLandscapePublishCandidate(input: {
   // shortcut: live records predate this review, so a republish is exempt. Remove the exemption
   // once the live catalog has been through it, or an in-place correction stays unreviewed.
   if (!republishingLiveRow) {
-    const text = assessPublicTextReview(entry, input.publicTextReviews ?? []);
+    // A listing-tier record whose text is exactly its one verified claim has no prose for a model
+    // to catch; anything else still needs the cross-provider text review.
+    const restated =
+      listingTier &&
+      isRestatedListing({
+        displayName: entry.displayName,
+        provenance: { ...asRecord(row.payload.provenance), ...row.provenance },
+        summary: entry.summary,
+        historicalContext: entry.historicalContext,
+        impactStatement: entry.impactStatement,
+        claims: entry.claims ?? [],
+      });
+    const text = restated
+      ? ({ ok: true } as const)
+      : assessPublicTextReview(entry, input.publicTextReviews ?? []);
     if (!text.ok) {
       return { eligible: false, reason: 'public_text_review_required', detail: text.detail };
     }

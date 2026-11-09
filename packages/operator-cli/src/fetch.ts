@@ -105,7 +105,13 @@ export async function parseTextOnlyHtml(
   return {
     safe: indicators.length === 0,
     indicators,
-    extractedText: extractedText.slice(0, 100_000),
+    // Registry files (NYPL's Green Book geojson/json) are 1 MB or more and a claim can only be
+    // reviewed against text that was kept, so JSON gets a larger cap than web pages. GitHub's raw
+    // host labels them text/plain, so the body is sniffed too.
+    extractedText: extractedText.slice(
+      0,
+      contentType.includes('json') || /^[{[]/u.test(extractedText) ? 3_000_000 : 100_000,
+    ),
   };
 }
 

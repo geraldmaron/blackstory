@@ -18,9 +18,9 @@ import pg from 'pg';
 import { connectWithDeadline, normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   listingClaim,
+  listingFactsFromRow,
   listingQuotes,
   listingSummary,
-  stateName,
   type ListingFacts,
 } from './lib/greenbook-registry.ts';
 
@@ -100,16 +100,7 @@ async function main(): Promise<void> {
     for (const row of rows) {
       if (picked.length >= limit) break;
       const p = row.provenance;
-      const facts: ListingFacts = {
-        name: row.display_name,
-        address: String(p.historicAddress ?? '')
-          .split(',')[0]!
-          .trim(),
-        category: String(p.sourceCategory ?? ''),
-        year: Number(p.editionYear),
-        city: String(p.sourceCity ?? '').trim(),
-        state: stateName(String(p.sourceState ?? '')),
-      };
+      const facts = listingFactsFromRow(row.display_name, p);
       if (!THIN_STATES.has(facts.state)) {
         skip('state');
         continue;
