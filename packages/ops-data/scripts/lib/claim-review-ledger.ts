@@ -81,10 +81,14 @@ export type QuoteLocation = {
   readonly suffix: string;
 };
 
-/** Find `quote` in `text`, treating any whitespace run in either as one space. */
-export function locateQuote(text: string, quote: string): QuoteLocation | null {
-  const needle = quote.replace(/\s+/gu, ' ').trim();
-  if (needle.length === 0) return null;
+type Haystack = { points: string[]; normalized: string; origin: number[] };
+// A review run searches the same capture text for every claim; preparing it dominates the cost on
+// large registry files, so keep the last few prepared texts.
+const haystacks = new Map<string, Haystack>();
+
+function prepareHaystack(text: string): Haystack {
+  const cached = haystacks.get(text);
+  if (cached) return cached;
   // Normalized haystack plus, for each normalized code unit, the code point it came from.
   const points = Array.from(text);
   let normalized = '';
@@ -96,6 +100,17 @@ export function locateQuote(text: string, quote: string): QuoteLocation | null {
     normalized += kept;
     for (let unit = 0; unit < kept.length; unit += 1) origin.push(index);
   });
+  if (haystacks.size >= 3) haystacks.clear();
+  const prepared = { points, normalized, origin };
+  haystacks.set(text, prepared);
+  return prepared;
+}
+
+/** Find `quote` in `text`, treating any whitespace run in either as one space. */
+export function locateQuote(text: string, quote: string): QuoteLocation | null {
+  const needle = quote.replace(/\s+/gu, ' ').trim();
+  if (needle.length === 0) return null;
+  const { points, normalized, origin } = prepareHaystack(text);
   const at = normalized.indexOf(needle);
   if (at < 0) return null;
   const start = origin[at]!;
@@ -310,7 +325,8 @@ JOIN evidence.retrieval_passages p ON p.capture_id = o.capture_id
   AND p.source_item_id = o.source_item_id AND p.withdrawn_at IS NULL AND p.retention_expires_at > now()
 WHERE si.url = ANY($1::text[])
 GROUP BY si.url, o.capture_id, o.source_item_id, c.content_hash_digest, p.document_text_hash, o.observed_at
-ORDER BY si.url, o.observed_at DESC, o.capture_id`;
+-- A document stored more than once (an earlier extraction cut at a text cap) resolves to its longest text.
+ORDER BY si.url, o.observed_at DESC, max(p.end_offset) DESC, o.capture_id`;
 
 /** Rebuild review claims from the database. Prepare and apply both call this; apply never trusts a packet file. */
 export async function loadReviewClaims(

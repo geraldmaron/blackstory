@@ -34,10 +34,22 @@ export function stateName(raw: string): string {
   return STATE_NAMES[trimmed.toUpperCase()] ?? trimmed;
 }
 
+// The same two source files are searched once per listing, so keep their collapsed form.
+const normalizedCache = new Map<string, string>();
+function normalized(raw: string): string {
+  let hit = normalizedCache.get(raw);
+  if (hit === undefined) {
+    if (normalizedCache.size >= 4) normalizedCache.clear();
+    hit = raw.replace(/\s+/gu, ' ');
+    normalizedCache.set(raw, hit);
+  }
+  return hit;
+}
+
 /** Verbatim passages from `source` that together state name, address, category, year and city. */
 export function listingQuotes(rawSource: string, facts: ListingFacts): string[] | null {
   // The ledger compares quotes with whitespace runs collapsed, and the 1947 file is pretty-printed.
-  const source = rawSource.replace(/\s+/gu, ' ');
+  const source = normalized(rawSource);
   const name = JSON.stringify(facts.name);
   const category = JSON.stringify(facts.category);
   if (facts.year === 1947) {
@@ -70,4 +82,44 @@ export function listingClaim(facts: ListingFacts): string {
 
 export function listingSummary(facts: ListingFacts): string {
   return `${facts.name} was ${listingClaim(facts).replace(/^Listed/u, 'listed')}`;
+}
+
+/** The listing facts as imported from the NYPL file; the only input every Green Book check reads. */
+export function listingFactsFromRow(
+  displayName: string,
+  provenance: Readonly<Record<string, unknown>>,
+): ListingFacts {
+  return {
+    name: displayName,
+    address: String(provenance.historicAddress ?? '')
+      .split(',')[0]!
+      .trim(),
+    category: String(provenance.sourceCategory ?? ''),
+    year: Number(provenance.editionYear),
+    city: String(provenance.sourceCity ?? '').trim(),
+    state: stateName(String(provenance.sourceState ?? '')),
+  };
+}
+
+/**
+ * True when the public text is nothing but the verified listing restated: the summary is exactly
+ * the generated sentence and the record carries exactly the one generated claim. Any extra word
+ * or claim returns false, so that text goes to the model reviewer instead.
+ */
+export function isRestatedListing(input: {
+  readonly displayName: string;
+  readonly provenance: Readonly<Record<string, unknown>>;
+  readonly summary: string;
+  readonly historicalContext?: string | undefined;
+  readonly impactStatement?: string | undefined;
+  readonly claims: readonly { readonly object: unknown }[];
+}): boolean {
+  const facts = listingFactsFromRow(input.displayName, input.provenance);
+  return (
+    input.summary.trim() === listingSummary(facts) &&
+    (input.historicalContext ?? '').trim() === '' &&
+    (input.impactStatement ?? '').trim() === '' &&
+    input.claims.length === 1 &&
+    input.claims[0]?.object === listingClaim(facts)
+  );
 }
