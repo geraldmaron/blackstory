@@ -339,7 +339,20 @@ export function canonicalUpsertParamsFromLandscape(
  * bad approval stays attributable after the fact.
  */
 export function personReviewApproved(payload: Readonly<Record<string, unknown>>): boolean {
-  const review = asRecord(payload.personReview);
+  return reviewMarkerApproved(asRecord(payload.personReview));
+}
+
+/**
+ * Green Book rows stay blocked unless payload.listingReview records a living/residence review of
+ * that row: approved=true plus approvedBy/approvedAt/basis. An approved row publishes as a
+ * listing-only record, which skips the depth and 400-char summary gates (a registry listing has
+ * no second source and no prose to lengthen) and keeps the claim and public-text review gates.
+ */
+export function listingReviewApproved(payload: Readonly<Record<string, unknown>>): boolean {
+  return reviewMarkerApproved(asRecord(payload.listingReview));
+}
+
+function reviewMarkerApproved(review: Readonly<Record<string, unknown>>): boolean {
   return (
     review.approved === true &&
     typeof review.approvedBy === 'string' &&
@@ -1271,7 +1284,8 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'sourceCategory=People requires privacy review',
     };
   }
-  if (row.lane === 'greenbook') {
+  const listingTier = row.lane === 'greenbook' && listingReviewApproved(row.payload);
+  if (row.lane === 'greenbook' && !listingTier) {
     return {
       eligible: false,
       reason: 'greenbook_lane',
@@ -1325,7 +1339,10 @@ export function gateLandscapePublishCandidate(input: {
   const locationOverride = inherited?.locationOverride;
   // Uses the enrichment module's shared summary bounds. Short best-effort drafts remain flagged
   // in the ledger but this publication gate does not automatically admit them.
-  if (entry.summary.length < SUMMARY_MIN_CHARS || entry.summary.length > SUMMARY_MAX_CHARS) {
+  // shortcut: a listing-tier summary keeps only the upper bound here; the 120-char projection
+  // floor still applies in the build below. Revisit if listing records ever need a floor of their own.
+  const summaryMin = listingTier ? 0 : SUMMARY_MIN_CHARS;
+  if (entry.summary.length < summaryMin || entry.summary.length > SUMMARY_MAX_CHARS) {
     return {
       eligible: false,
       reason: 'summary_too_short',
@@ -1338,7 +1355,7 @@ export function gateLandscapePublishCandidate(input: {
   // New admission requires depth. Republishing compares candidate and current content so a
   // shallow correction can replace an already-shallow record, while a deep record cannot become
   // shallow. Template disclosures and reviewed-claim requirements remain independent gates.
-  const depth = assessLandscapeDepth(entry, row);
+  const depth = listingTier ? { deep: true as const } : assessLandscapeDepth(entry, row);
   if (!depth.deep) {
     const liveIsShallow = input.liveDepth !== undefined && !input.liveDepth.deep;
     if (!republishingLiveRow || !liveIsShallow) {
