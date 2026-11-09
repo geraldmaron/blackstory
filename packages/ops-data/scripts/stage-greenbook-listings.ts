@@ -62,7 +62,7 @@ async function main(): Promise<void> {
   };
   const features = (
     JSON.parse(text[1947] as string) as {
-      features: { properties: Record<string, any>; geometry: { coordinates: number[] } }[];
+      features: { properties: Record<string, unknown>; geometry: { coordinates: number[] } }[];
     }
   ).features;
   const rows1956 = (
