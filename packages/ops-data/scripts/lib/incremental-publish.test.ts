@@ -36,6 +36,7 @@ import {
   type PublicVisit,
 } from '@repo/domain';
 import { mapPostgresSearchIndexRow } from '@repo/schemas';
+import { GREENBOOK_SUMMARY_CONTEXT } from '@repo/domain';
 import { divergentFieldsForRow, expectedSearchTopics } from './projection-divergence.ts';
 
 import type { ReviewedClaimAssessment } from './confidence.ts';
@@ -347,6 +348,42 @@ test('gateLandscapePublishCandidate rejects greenbook lane', () => {
   });
   assert.equal(result.eligible, false);
   if (!result.eligible) assert.equal(result.reason, 'greenbook_lane');
+});
+
+test('gateLandscapePublishCandidate admits a reviewed Green Book listing without depth or a 400-char summary', () => {
+  const listing = {
+    summary:
+      'Pelican was a hotel at 4613 John R. St., Detroit, Michigan, listed in the 1947 edition of the Negro Motorist Green Book. ' +
+      GREENBOOK_SUMMARY_CONTEXT,
+    canonical_url:
+      'https://raw.githubusercontent.com/NYPL-publicdomain/greenbooks/x/geojson/1947.geojson',
+  };
+  const reviewed = {
+    listingReview: {
+      approved: true,
+      approvedBy: 'owner',
+      approvedAt: '2026-11-08',
+      basis: 'business listing, no personal name, edition 1947',
+    },
+  };
+  const gate = (row: LandscapePublishRow) =>
+    gateWithReviewedClaims({
+      row,
+      releaseId: 'rel_seed_001',
+      generatedAt: '2026-07-22T00:00:00.000Z',
+    });
+
+  const ok = gate(baseRow({ lane: 'greenbook', ...listing, payload: reviewed }));
+  assert.equal(ok.eligible, true);
+
+  // Without the recorded review the lane hold still applies.
+  const held = gate(baseRow({ lane: 'greenbook', ...listing }));
+  assert.equal(held.eligible, false);
+  if (!held.eligible) assert.equal(held.reason, 'greenbook_lane');
+
+  // The same short, single-source row in any other lane is still refused.
+  const other = gate(baseRow({ lane: 'dc-sites', ...listing, payload: reviewed }));
+  assert.equal(other.eligible, false);
 });
 
 test('gateLandscapePublishCandidate rejects already-in-public rows', () => {
