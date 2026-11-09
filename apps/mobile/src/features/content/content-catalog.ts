@@ -296,7 +296,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
           heading: 'Is any of this made by AI?',
           paragraphs: [
             'Partly. The history comes from sources: archives, agency databases, court reporters, library catalogs, National Register nominations, and published scholarship. AI does a lot of the work of finding those sources, reading them, and drafting the text. Accepted claims carry the citations they rest on.',
-            "AI finds and reads sources and drafts record summaries and long-form writing. I also use a model from another company to check proposed claims against the captured sources. That check tests what a source supports, and it can still miss an error in the source. I don't check every record by hand, so if something doesn't match its source, tell me and I'll fix it.",
+            "AI finds and reads sources and drafts record summaries and long-form writing. For most records I also use a model from another company to check proposed claims against the captured sources. Green Book listings skip that check, and a program confirms the listing appears exactly in the library's digitized listing data instead. That check tests what a source supports, and it can still miss an error in the source. I don't check every record by hand, so if something doesn't match its source, tell me and I'll fix it.",
           ],
         },
         {

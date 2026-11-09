@@ -72,7 +72,7 @@ test('the AI question is answered plainly, including what no person checks', () 
     /I don't read every record against its sources myself/,
     'and it says no person checks everything',
   );
-  assert.match(all, /written voice standard/, 'the writing standard is mentioned');
+  assert.match(all, /written style guide/, 'the writing standard is mentioned');
   assert.doesNotMatch(all, /\.md\b|docs\//, 'no internal file path reaches a reader');
   assert.match(all, /scan of a drawing/, 'the covers are drawn, and the page says so');
 });
