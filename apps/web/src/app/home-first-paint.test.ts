@@ -362,6 +362,24 @@ test('seed Dunbar place record shows sourced claims without catalog chrome', () 
   );
 });
 
+test('every link in "On this record" lands on a heading the place page renders', () => {
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  assert.ok(dunbar);
+  const html = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: { lead: dunbar, also: [], story: undefined, citing: [], source: 'seed' },
+    }),
+  );
+  const toc = html.match(/<nav class="ds-record-toc"[\s\S]*?<\/nav>/)?.[0];
+  assert.ok(toc, 'the place page carries an "On this record" list in its rail');
+  const targets = [...toc.matchAll(/href="#([^"]+)"/g)].map((match) => match[1] as string);
+  assert.ok(targets.length >= 2, 'it lists more than one section');
+  for (const id of targets) {
+    assert.match(html, new RegExp(`id="${id}"`), `#${id} exists on the page`);
+  }
+  assert.doesNotMatch(toc, /Status and history/, 'the place page renders no status beat');
+});
+
 test('the church locator names the place, not a pin taxonomy', () => {
   const church = getPublicEntity('ent_15th_st_church_001');
   assert.ok(church);

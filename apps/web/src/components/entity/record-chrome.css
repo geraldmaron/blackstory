@@ -187,3 +187,16 @@ a.ds-rec-pill:focus-visible {
   flex: none;
   color: var(--ds-accent-graphic);
 }
+
+/* A pill that links is 28px tall; the tap area reaches 44 without changing how it looks. */
+@media (pointer: coarse) {
+  a.ds-rec-pill {
+    position: relative;
+  }
+
+  a.ds-rec-pill::after {
+    content: '';
+    position: absolute;
+    inset: -0.5rem 0;
+  }
+}
