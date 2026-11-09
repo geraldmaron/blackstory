@@ -44,6 +44,14 @@
    * width these blocks behave exactly as they did before: full bleed, one gutter in.
    */
   --record-shell-pad: max(var(--ds-gutter), calc((100% - var(--record-shell-w)) / 2));
+  /*
+   * THE TEXT MEASURE. The width the reading column's text actually renders at, derived from the
+   * column and not typed. The lede, the photo credit, the section standfirsts and the body prose
+   * all use it, so every line of running text on a record ends on the same vertical line. They used
+   * to cap themselves at 54ch, 54ch and 62ch, three different widths narrower than the column the
+   * prose below them sets in, which left the intro a third shorter than the page around it.
+   */
+  --rec-text-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
 }
 
 [data-surface='record'] .ds-room__mast {
@@ -53,6 +61,18 @@
 /* The reading column sits on canvas so the page-field grid cannot run through type and beat plates. */
 [data-surface='record'] .ds-room__doc {
   background: var(--ds-canvas);
+}
+
+/*
+ * The kit narrows every room's column to a 12px inset below 560px. A record's masthead and fact strip
+ * keep the 16px gutter, so on a phone the prose sat 4px left of the title above it. The record column
+ * holds the same gutter, and one left edge runs down the page at every width.
+ */
+@media (max-width: 639px) {
+  [data-surface='record'] .ds-room__doc {
+    --room-doc-pad: var(--ds-gutter);
+    padding-inline: var(--room-doc-pad);
+  }
 }
 
 /*
@@ -68,7 +88,8 @@
 
 /* The record's own prose is a caption register, not a chapter register. */
 [data-surface='record'] .ds-room-prose {
-  font-size: 15.5px;
+  font-size: var(--ds-text-subtitle);
+  line-height: 1.65;
 }
 
 [data-surface='record'] .ds-room-anat {

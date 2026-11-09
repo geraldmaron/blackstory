@@ -3,19 +3,32 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { EVIDENCE_DIMENSION_COPY, formatEvidenceScoreLabel } from './confidence-language';
+import {
+  EVIDENCE_DIMENSION_COPY,
+  assessmentScoreNote,
+  claimGradeLabel,
+} from './confidence-language';
 
-test('formats an uncalibrated confidence label as an evidence score, never a probability', () => {
-  const label = formatEvidenceScoreLabel(0.78, 'high');
-  assert.match(label, /^Evidence score: high \(0\.78 of 1\.00\)$/);
-  assert.doesNotMatch(label, /probability/i);
+test('spells a claim grade in the contract language shared with the map sheet and the app', () => {
+  assert.equal(claimGradeLabel('high'), 'Grade A');
+  assert.equal(claimGradeLabel('medium', 2), 'Grade B · 2 sources');
+  assert.equal(claimGradeLabel('low', 1), 'Grade C · 1 source');
+  for (const label of [claimGradeLabel('high'), claimGradeLabel('low', 3)]) {
+    assert.doesNotMatch(label, /probability|confidence|\b(high|medium|low)\b/i);
+  }
 });
 
-test('shows a qualitative grade when no valid measurement is supplied', () => {
+test('words a supplied score as an assessment score, never a probability', () => {
+  const note = assessmentScoreNote(0.78);
+  assert.equal(note, 'Assessment score 0.78 of 1.00');
+  assert.doesNotMatch(note ?? '', /probability/i);
+  assert.equal(assessmentScoreNote(0), 'Assessment score 0.00 of 1.00');
+});
+
+test('prints no score note when no valid measurement is supplied', () => {
   for (const score of [undefined, NaN, Infinity, -1, 2]) {
-    assert.equal(formatEvidenceScoreLabel(score, 'low'), 'Evidence grade: low');
+    assert.equal(assessmentScoreNote(score), undefined);
   }
-  assert.equal(formatEvidenceScoreLabel(0, 'low'), 'Evidence score: low (0.00 of 1.00)');
 });
 
 test('EVIDENCE_DIMENSION_COPY gives confidence, relevance, connection strength, and research coverage each a distinct label and description', () => {

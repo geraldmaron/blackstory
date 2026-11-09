@@ -41,12 +41,8 @@ export type CitationArchiveQueryable = {
   ): Promise<{ rows: T[] }>;
 };
 
-/** A signed release is immutable; archive hydration belongs in a newly built release. */
-export function assertArchiveHydrationTargetIsUnsigned(
-  signedManifest: unknown,
-  writeCount: number,
-): void {
-  if (writeCount === 0) return;
+/** True when the release carries a signed manifest. Throws when that cannot be determined. */
+export function releaseIsSigned(signedManifest: unknown): boolean {
   if (
     signedManifest === null ||
     typeof signedManifest !== 'object' ||
@@ -54,8 +50,20 @@ export function assertArchiveHydrationTargetIsUnsigned(
   ) {
     throw new Error('Cannot verify whether the archive hydration target is signed');
   }
-  const manifest = asRecord(signedManifest);
-  if (Object.keys(manifest).length > 0) {
+  return Object.keys(asRecord(signedManifest)).length > 0;
+}
+
+/**
+ * A signed manifest lists the release's entity entries, so changing an existing entry of a signed
+ * release belongs in a newly built release. `writeCount` is the number of writes that change an
+ * existing entry; appending new entities does not alter any listed entry and is not counted.
+ */
+export function assertArchiveHydrationTargetIsUnsigned(
+  signedManifest: unknown,
+  writeCount: number,
+): void {
+  if (writeCount === 0) return;
+  if (releaseIsSigned(signedManifest)) {
     throw new Error(
       'Incremental writes require a new release; the target release is already signed',
     );

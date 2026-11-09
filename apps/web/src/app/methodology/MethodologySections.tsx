@@ -108,12 +108,17 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
       >
         <Prose>
           <p>
-            Candidates come in from research runs, and every one of them is pinned to somewhere real
-            before it can publish: a state, a city, a campus, a documented site. After that, I use a
-            model from another company to check proposed claims against their captured sources. That
-            tests what a source supports, and it can still miss an error in the source. I don&apos;t
-            read every record myself. When something is wrong, that&apos;s on me, and I fix it where
-            you can see it.
+            Candidates come in from research runs, and every one gets pinned to somewhere real
+            before it can publish, whether that&apos;s a state, a city, a campus or a documented
+            site. After that, I use a model from another company to check proposed claims against
+            their captured sources. That tests what a source supports, and it can still miss an
+            error in the source. The Negro Motorist Green Book listings don&apos;t go through that
+            model check. A program confirms that the name, address, kind of business and edition
+            year on each one appear exactly in the New York Public Library&apos;s digitized listing
+            data for the directory, and each is marked as a registry listing. The address is the one
+            printed in that edition, and the business may be long gone. There&apos;s more here than
+            one person can read, so I built these checks and I answer for them. When one gets
+            something wrong, that&apos;s on me, and I fix it where you can see it.
           </p>
         </Prose>
         <RecordIntakeDiagram />
@@ -341,7 +346,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             { label: 'Source library', href: '/sources' },
           ]}
         >
-          The same rules run on every public record.
+          Here&apos;s where those rules show up, and where to tell me when they fall short.
         </WalkOffRamp>
       </div>
     </>

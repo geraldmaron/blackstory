@@ -117,6 +117,22 @@ test('primaryImageCreditCaption drops unknown author and duplicate public domain
   assert.equal(unknown.showRightsLabel, true);
 });
 
+test('primaryImageCreditCaption prints stored HTML entities as the characters they stand for', () => {
+  const stored = primaryImageCreditCaption({
+    credit: 'Kingkongphoto &amp; www.celebrity-photos.com from Laurel Maryland, USA · CC BY-SA 2.0',
+    rightsStatus: 'licensed',
+  });
+  assert.match(stored.creditText, /^Kingkongphoto & www\.celebrity-photos\.com/);
+  assert.doesNotMatch(stored.creditText, /&amp;/);
+
+  // One pass over a closed list: an escaped ampersand before "lt;" is text, never a second decode.
+  const twice = primaryImageCreditCaption({
+    credit: 'A &amp;lt; B',
+    rightsStatus: 'licensed',
+  });
+  assert.equal(twice.creditText, 'A &lt; B');
+});
+
 test('primaryImageFocalClass biases person portraits toward the upper frame', () => {
   assert.equal(primaryImageFocalClass('person'), 'ds-entity-photo--focal-upper');
   assert.equal(primaryImageFocalClass('place'), 'ds-entity-photo--focal-center');

@@ -1,15 +1,24 @@
 /** Public evidence grades and supplied heuristic scores are never probabilities. */
 import type { ConfidenceLevel } from '@repo/ui';
+import { evidenceLabel } from '@repo/public-contracts/evidence';
 
-/** A qualitative grade cannot be converted into a measured score. */
-export function formatEvidenceScoreLabel(
-  score: number | undefined,
-  level: ConfidenceLevel,
-): string {
-  if (score === undefined || !Number.isFinite(score) || score < 0 || score > 1) {
-    return `Evidence grade: ${level}`;
-  }
-  return `Evidence score: ${level} (${score.toFixed(2)} of 1.00)`;
+/**
+ * A claim's grade in the one language both platforms speak ("Grade B · 2 sources"). The record
+ * page used to print the stored tier word ("Evidence grade: medium") while the map sheet, the
+ * results rail and the app printed the letter, so one record read as two assessments.
+ */
+export function claimGradeLabel(level: ConfidenceLevel, sourceCount?: number): string {
+  return evidenceLabel(level, sourceCount);
+}
+
+/**
+ * A supplied assessment score, kept beside the grade and never inside it. It is not a
+ * probability, so the wording names what it is. Undefined when none was supplied or it is out of
+ * range.
+ */
+export function assessmentScoreNote(score: number | undefined): string | undefined {
+  if (score === undefined || !Number.isFinite(score) || score < 0 || score > 1) return undefined;
+  return `Assessment score ${score.toFixed(2)} of 1.00`;
 }
 
 export type EvidenceDimensionKey =

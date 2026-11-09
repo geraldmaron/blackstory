@@ -204,6 +204,15 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   color: var(--ds-ink-muted);
 }
 
+.ds-shell-footer__tagline a {
+  color: var(--ds-accent);
+}
+
+.ds-shell-footer__tagline a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: var(--ds-focus-offset);
+}
+
 .ds-shell-footer__columns {
   display: grid;
   gap: var(--ds-space-8);

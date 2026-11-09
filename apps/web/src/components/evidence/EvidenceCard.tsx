@@ -1,22 +1,27 @@
 /**
- * Renders one evidence card for a claim: an evidence-score confidence badge (never
- * probability language unless calibrated), a claim↔citation aria association matching the
- * entity page's existing claims-section pattern, a rights-limited excerpt (or an explicit
- * withheld notice), a preserved contradiction/dispute notice when one exists, source-lineage /
- * research-coverage / last-checked metadata kept visually and structurally distinct from the
- * confidence badge, a collapsible revision history, and a retraction notice when the claim has
- * been retracted or corrected.
+ * Renders one claim with its receipt: the statement first, then the evidence grade in the one
+ * shared language (never probability wording), the source it was taken from, a rights-limited
+ * excerpt (or an explicit withheld notice), a preserved contradiction notice when one exists,
+ * source-lineage / research-coverage / last-checked metadata kept apart from the grade, a
+ * collapsible revision history, and a retraction notice when the claim has been retracted or
+ * corrected.
  *
- * Pure presentation over `../../lib/evidence`'s `EvidenceClaimView` — no derivation logic lives
- * here; see `buildEvidenceCard` for that. Layout is class-driven (`entity-page.css`'s
+ * The claim is an `article` named by its own statement, and the statement is described by the
+ * citation block, so a screen reader hears the claim and then where it came from. The pipeline's
+ * predicate token is never printed: it was a generated label above the sentence that said less than
+ * the sentence did.
+ *
+ * Pure presentation over `../../lib/evidence`'s `EvidenceClaimView`; no derivation logic lives
+ * here, see `buildEvidenceCard` for that. Layout is class-driven (`entity-page.css`'s
  * `.ds-evidence-claim__*`) so the record page can set the claim register once.
  */
 
 import React from 'react';
-import { Card, Citation, Confidence, Notice } from '@repo/ui';
+import { Citation, Notice } from '@repo/ui';
 import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { formatIsoDate, humanizeToken, type EvidenceClaimView } from '../../lib/evidence';
 import { ArchivedSourceLinks } from '../room/Evidence';
+import { EvidenceGradeMark } from './EvidenceGradeMark';
 
 export type EvidenceCardProps = {
   readonly card: EvidenceClaimView;
@@ -24,23 +29,49 @@ export type EvidenceCardProps = {
 
 export function EvidenceCard({ card }: EvidenceCardProps) {
   const citationId = `${card.id}-evidence-citation`;
+  const statementId = `${card.id}-statement`;
   const hasCoverageMeta = Boolean(
     card.sourceLineage || card.researchCoverage || card.lastCheckedAt,
   );
   const lastChecked = card.lastCheckedAt ?? card.researchCoverage?.lastCheckedAt;
-  const predicateLabel = humanizeToken(card.predicate);
 
   return (
-    <Card
+    <article
       id={card.id}
-      title={predicateLabel}
       className={`ds-evidence-claim ds-evidence-claim--${card.confidenceLevel}`}
+      aria-labelledby={statementId}
       aria-describedby={citationId}
     >
-      <p className="ds-evidence-claim__body">{sanitizePublicProseText(card.object)}</p>
+      <p id={statementId} className="ds-evidence-claim__body">
+        {sanitizePublicProseText(card.object)}
+      </p>
 
-      <div className="ds-row ds-evidence-claim__meta">
-        <Confidence level={card.confidenceLevel} label={card.confidenceLabel} />
+      <div className="ds-evidence-claim__receipt">
+        <EvidenceGradeMark level={card.confidenceLevel} label={card.confidenceLabel} />
+        {card.confidenceScoreNote ? (
+          <p className="ds-sans ds-evidence-claim__score">{card.confidenceScoreNote}</p>
+        ) : null}
+
+        <div id={citationId} className="ds-evidence-claim__source">
+          <Citation
+            source={card.citation.source}
+            label={card.citation.label}
+            {...(card.citation.href && !card.citation.archivedUrl
+              ? { href: card.citation.href }
+              : {})}
+          />
+          {card.citation.archivedUrl && card.citation.archivedAt && card.citation.href ? (
+            <ArchivedSourceLinks
+              archivedUrl={card.citation.archivedUrl}
+              archivedAt={card.citation.archivedAt}
+              originalUrl={card.citation.href}
+              className="ds-evidence-claim__archive-links"
+            />
+          ) : null}
+          {card.citation.withheldReason ? (
+            <p className="ds-sans ds-evidence-claim__withheld">{card.citation.withheldReason}</p>
+          ) : null}
+        </div>
       </div>
 
       {(card.relevanceNote || card.connectionStrengthNote) && (
@@ -59,27 +90,6 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
           ) : null}
         </dl>
       )}
-
-      <div id={citationId} className="ds-evidence-claim__source">
-        <Citation
-          source={card.citation.source}
-          label={card.citation.label}
-          {...(card.citation.href && !card.citation.archivedUrl
-            ? { href: card.citation.href }
-            : {})}
-        />
-        {card.citation.archivedUrl && card.citation.archivedAt && card.citation.href ? (
-          <ArchivedSourceLinks
-            archivedUrl={card.citation.archivedUrl}
-            archivedAt={card.citation.archivedAt}
-            originalUrl={card.citation.href}
-            className="ds-evidence-claim__archive-links"
-          />
-        ) : null}
-        {card.citation.withheldReason ? (
-          <p className="ds-sans ds-evidence-claim__withheld">{card.citation.withheldReason}</p>
-        ) : null}
-      </div>
 
       {card.excerpt ? (
         card.excerpt.visible ? (
@@ -162,6 +172,6 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
           </Notice>
         </div>
       ) : null}
-    </Card>
+    </article>
   );
 }

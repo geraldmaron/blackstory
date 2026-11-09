@@ -202,9 +202,10 @@ export function RecordIntakeDiagram() {
         How a record gets in
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
-        A candidate surfaces from a research run, is pinned to a real place, has proposed claims
-        checked against their sources by a model from another company, and reaches a public page
-        only with citations and an evidence grade attached.
+        A candidate comes from a research run and gets pinned to a real place, and a model from
+        another company checks proposed claims against their sources, except for Green Book
+        listings, which a program matches to the library's digitized listing data. It reaches a
+        public page only with its citations and an evidence grade attached.
       </p>
       <div className="ds-mdiag__frame">
         <svg
@@ -252,7 +253,7 @@ export function RecordIntakeDiagram() {
             />
           ))}
           <text className="ds-mdiag__note" x={8} y={168}>
-            Nothing reaches a public page on a model&apos;s say-so
+            No claim goes live without a citation behind it
           </text>
         </svg>
       </div>

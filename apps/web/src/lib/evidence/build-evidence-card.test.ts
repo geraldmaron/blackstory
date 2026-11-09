@@ -26,10 +26,19 @@ const BASE_CLAIM: EvidenceClaimInput = {
   },
 };
 
-test('builds an evidence-score label (AC1) distinct from probability language', () => {
+test('builds a grade label in the shared language (AC1) with the score kept apart from it', () => {
   const card = buildEvidenceCard(BASE_CLAIM);
-  assert.equal(card.confidenceLabel, 'Evidence score: high (0.78 of 1.00)');
-  assert.doesNotMatch(card.confidenceLabel, /probability/i);
+  assert.equal(card.confidenceLabel, 'Grade A');
+  assert.equal(card.confidenceScoreNote, 'Assessment score 0.78 of 1.00');
+  assert.doesNotMatch(`${card.confidenceLabel} ${card.confidenceScoreNote}`, /probability/i);
+});
+
+test('adds the independent source count to the grade label when it is known', () => {
+  const card = buildEvidenceCard({
+    ...BASE_CLAIM,
+    sourceLineage: { independentLineageCount: 2, supportingEvidenceCount: 3 },
+  });
+  assert.equal(card.confidenceLabel, 'Grade A · 2 sources');
 });
 
 test('carries research coverage and source lineage as separate fields from confidence (AC2)', () => {

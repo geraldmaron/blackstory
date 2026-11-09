@@ -1,11 +1,15 @@
 /** Build evidence cards without inferring scores or independent source lineages. */
-import { formatEvidenceScoreLabel } from './confidence-language';
+import { assessmentScoreNote, claimGradeLabel } from './confidence-language';
 import { buildDisputeView } from './contradiction-view';
 import { resolveCitationForDisplay, resolveExcerptForDisplay } from './rights-guard';
 import type { EvidenceClaimInput, EvidenceClaimView, EvidenceSourceLineageInput } from './types';
 
 export function buildEvidenceCard(input: EvidenceClaimInput): EvidenceClaimView {
-  const confidenceLabel = formatEvidenceScoreLabel(input.confidenceScore, input.confidenceLevel);
+  const confidenceLabel = claimGradeLabel(
+    input.confidenceLevel,
+    input.sourceLineage?.independentLineageCount,
+  );
+  const scoreNote = assessmentScoreNote(input.confidenceScore);
   const citation = resolveCitationForDisplay(input.citation);
   const excerpt = input.excerpt ? resolveExcerptForDisplay(input.excerpt) : undefined;
   const dispute = input.dispute ? buildDisputeView(input.dispute) : undefined;
@@ -17,6 +21,7 @@ export function buildEvidenceCard(input: EvidenceClaimInput): EvidenceClaimView 
     confidenceLabel,
     confidenceLevel: input.confidenceLevel,
     ...(input.confidenceScore !== undefined ? { confidenceScore: input.confidenceScore } : {}),
+    ...(scoreNote ? { confidenceScoreNote: scoreNote } : {}),
     citation,
     ...(excerpt ? { excerpt } : {}),
     ...(dispute ? { dispute } : {}),
