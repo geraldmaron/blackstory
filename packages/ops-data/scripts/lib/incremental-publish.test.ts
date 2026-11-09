@@ -10,6 +10,7 @@ import {
   buildArtifactsForEntry,
   canonicalUpsertParamsFromLandscape,
   carryLiveClaims,
+  locationLabelFromProvenance,
   catalogDecisionFromRow,
   claimCountRegressed,
   liveSourceClaims,
@@ -425,6 +426,51 @@ test('a restated Green Book listing skips the model text review but extra prose 
   const padded = gateWithoutTextReview(make(`${listingSummary(facts)} It was a famous stop.`));
   assert.equal(padded.eligible, false);
   if (!padded.eligible) assert.equal(padded.reason, 'public_text_review_required');
+});
+
+test('locationLabelFromProvenance does not repeat a city the address already names', () => {
+  const label = (historicAddress: string) =>
+    locationLabelFromProvenance('Pope Hotel', {
+      historicAddress,
+      sourceCity: 'Erie',
+      sourceState: 'PA',
+    });
+  // 1956 Green Book addresses carry their own city, state and ZIP.
+  assert.equal(label('1318 French Street, Erie, PA 16501'), '1318 French Street, Erie, PA 16501');
+  // A street address alone still gets the city and state.
+  assert.equal(label('4613 John R. St.'), '4613 John R. St., Erie, PA');
+  // A street that shares the city's name is not the city.
+  assert.equal(
+    locationLabelFromProvenance('Inn', {
+      historicAddress: '100 Washington Street',
+      sourceCity: 'Washington',
+      sourceState: 'DC',
+    }),
+    '100 Washington Street, Washington, DC',
+  );
+});
+
+test('a summary claim can name its own source label and source instead of the host', () => {
+  const row = baseRow({
+    payload: {
+      summaryClaims: [
+        {
+          object: 'Listed in the 1956 edition of the Negro Motorist Green Book as a hotel.',
+          citationHref: 'https://raw.githubusercontent.com/NYPL-publicdomain/greenbooks/x/g.json',
+          citationLabel: 'Negro Motorist Green Book, 1956 edition',
+          citationSource: 'New York Public Library',
+        },
+        {
+          object: 'A second fact with no label of its own.',
+          citationHref: 'https://example.org/page',
+        },
+      ],
+    },
+  });
+  const claims = buildReleaseSourceFromLandscape(row)?.claims ?? [];
+  assert.equal(claims[0]?.citationLabel, 'Negro Motorist Green Book, 1956 edition');
+  assert.equal(claims[0]?.citationSource, 'New York Public Library');
+  assert.equal(claims[1]?.citationLabel, 'example.org');
 });
 
 test('gateLandscapePublishCandidate rejects already-in-public rows', () => {

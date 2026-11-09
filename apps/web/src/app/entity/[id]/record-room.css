@@ -480,6 +480,17 @@
   .ds-rec-tile__support {
     margin-top: 0;
   }
+
+  /*
+   * The visit block sits above the first beat at this width and is not a beat itself, so the beat
+   * after it would butt against the map buttons. Same separation as between beats. The block is
+   * hidden from 68rem up (record-visit.css), where this would add a stray rule.
+   */
+  .ds-record-visit--main + .ds-record-beat {
+    margin-top: var(--ds-space-10);
+    padding-top: var(--ds-space-8);
+    border-top: var(--ds-border-width) solid var(--room-rule-2);
+  }
 }
 
 @media (max-width: 47.9375rem) {

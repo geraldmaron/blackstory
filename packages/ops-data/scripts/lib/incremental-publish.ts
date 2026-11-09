@@ -543,6 +543,11 @@ export function locationLabelFromProvenance(
   const city = readTrimmedString(provenance.sourceCity);
   const state = readTrimmedString(provenance.sourceState);
   if (historicAddress.length > 0) {
+    // The 1956 Green Book prints "1318 French Street, Erie, PA 16501"; appending the city and state
+    // again reads "..., Erie, PA". A city that is one of the address's own comma-separated parts
+    // is already named (a street called Washington does not count).
+    const parts = historicAddress.split(',').map((part) => part.trim().toLowerCase());
+    if (city.length > 0 && parts.includes(city.toLowerCase())) return historicAddress;
     const suffix = [city, state].filter((part) => part.length > 0).join(', ');
     return suffix.length > 0 ? `${historicAddress}, ${suffix}` : historicAddress;
   }
@@ -627,9 +632,9 @@ function summaryClaimsFromPayload(raw: unknown, canonicalUrl: string): ReleaseSo
         predicate: 'source states',
         object,
         confidenceLevel: confidenceLevelForSource(href),
-        citationSource: host,
+        citationSource: readTrimmedString(entry.citationSource) || host,
         citationHref: href,
-        citationLabel: host,
+        citationLabel: readTrimmedString(entry.citationLabel) || host,
         claimRole: href === canonicalUrl ? 'record_index' : 'evidence',
       },
     ];
