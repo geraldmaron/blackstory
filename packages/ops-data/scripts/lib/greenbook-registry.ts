@@ -123,3 +123,11 @@ export function isRestatedListing(input: {
     input.claims[0]?.object === listingClaim(facts)
   );
 }
+
+/** How the listing's source reads on the page, in place of the raw file host it is fetched from. */
+export function listingCitation(year: number): { citationSource: string; citationLabel: string } {
+  return {
+    citationSource: 'New York Public Library',
+    citationLabel: `Negro Motorist Green Book, ${year} edition`,
+  };
+}

@@ -18,6 +18,7 @@ import pg from 'pg';
 import { connectWithDeadline, normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   listingClaim,
+  listingCitation,
   listingFactsFromRow,
   listingQuotes,
   listingSummary,
@@ -186,7 +187,13 @@ async function main(): Promise<void> {
           [
             item.id,
             item.summary,
-            JSON.stringify([{ object: item.claim, citationHref: item.sourceUrl }]),
+            JSON.stringify([
+              {
+                object: item.claim,
+                citationHref: item.sourceUrl,
+                ...listingCitation(item.facts.year),
+              },
+            ]),
             JSON.stringify(review),
           ],
         );
