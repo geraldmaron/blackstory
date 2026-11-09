@@ -27,6 +27,7 @@ import {
 } from './lib/greenbook-registry.ts';
 
 export const REGISTRY_EXACT_ACTOR = 'script:registry-exact';
+const CAPTURE_TEXT_CAP = 100_000;
 
 function flag(name: string): string {
   const hit = process.argv.find((arg) => arg.startsWith(`--${name}=`));
@@ -63,7 +64,7 @@ async function main(): Promise<void> {
     );
     await client.query('ROLLBACK');
     const byId = new Map(rows.map((row) => [row.id, row]));
-    const verdicts = packets.map((packet) => {
+    const decided = packets.map((packet) => {
       const base = {
         packetId: packet.packetId,
         packetHash: packet.packetHash,
@@ -90,6 +91,9 @@ async function main(): Promise<void> {
       if (packet.claim.object !== listingClaim(facts))
         return reject('the claim is not the one these listing facts produce');
       const quotes = listingQuotes(packet.sourceText, facts);
+      // fetch.ts keeps only the first 100,000 characters of a document. A miss in a capture that
+      // long says nothing about the listing, so it gets no verdict instead of a false rejection.
+      if (!quotes && packet.sourceText.length >= CAPTURE_TEXT_CAP) return null;
       if (!quotes)
         return reject(
           'the capture does not state this name, address, category and year exactly once',
@@ -110,13 +114,20 @@ async function main(): Promise<void> {
           'and the city appears in the same entry; checked by exact match, not by a model.',
       };
     });
+    const verdicts = decided.filter((verdict) => verdict !== null);
     writeFileSync(
       flag('out'),
       verdicts.map((verdict) => JSON.stringify(verdict)).join('\n') + '\n',
     );
     const counts = { approve: 0, reject: 0 };
     for (const verdict of verdicts) counts[verdict.decision] += 1;
-    console.log(JSON.stringify({ packets: packets.length, ...counts }));
+    console.log(
+      JSON.stringify({
+        packets: packets.length,
+        ...counts,
+        noVerdictCaptureTruncated: packets.length - verdicts.length,
+      }),
+    );
   } finally {
     client.release();
     await pool.end();

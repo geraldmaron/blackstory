@@ -114,6 +114,11 @@ export async function collectCitedUrls(
          SELECT citation->>'sourceUrl' FROM jsonb_array_elements(
            CASE WHEN jsonb_typeof(lc.payload->'evidenceCitations') = 'array'
              THEN lc.payload->'evidenceCitations' ELSE '[]'::jsonb END) citation
+         UNION ALL
+         -- summaryClaims name the source each split fact is reviewed against.
+         SELECT claim->>'citationHref' FROM jsonb_array_elements(
+           CASE WHEN jsonb_typeof(lc.payload->'summaryClaims') = 'array'
+             THEN lc.payload->'summaryClaims' ELSE '[]'::jsonb END) claim
        ) cited
        WHERE lc.id = ANY($1::text[]) AND nullif(btrim(cited.url), '') IS NOT NULL
        ORDER BY url ASC, ref_id ASC`,

@@ -184,6 +184,7 @@ async function main(): Promise<void> {
           `UPDATE research.landscape_candidates
               SET summary = $2,
                   payload = payload || jsonb_build_object('summaryClaims', $3::jsonb, 'listingReview', $4::jsonb),
+                  provenance = provenance || jsonb_build_object('generatedBy', 'stage-greenbook-listings.ts'),
                   updated_at = now()
             WHERE id = $1 AND lane = 'greenbook' AND status = 'pending'`,
           [
