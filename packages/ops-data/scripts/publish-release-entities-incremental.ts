@@ -57,6 +57,7 @@ import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-r
 import {
   attachPublicCitationArchives,
   assertArchiveHydrationTargetIsUnsigned,
+  releaseIsSigned,
   loadPublicCitationArchives,
   type ReviewedCitationCapture,
 } from './lib/citation-archive-publication.ts';
@@ -890,9 +891,35 @@ async function main(): Promise<void> {
         'SELECT signed_manifest FROM publication.releases WHERE id=$1 FOR UPDATE',
         [releaseId],
       );
-      // Every incremental upsert mutates the release, even when archive hydration itself is a
-      // no-op. Missing or malformed release state reaches the guard unchanged and fails closed.
-      assertArchiveHydrationTargetIsUnsigned(release.rows[0]?.signed_manifest, prepared.length);
+      // A write that changes an entity already in the release is refused on a signed release.
+      // Appending new entities leaves every signed entry untouched, so it is allowed. Missing or
+      // malformed release state reaches the guard unchanged and fails closed.
+      const signedManifest = release.rows[0]?.signed_manifest;
+      const appendedIds = new Set(
+        prepared
+          .filter((row) => row.landscapeRow?.exact_in_release === false)
+          .map((row) => row.entityRow.entity_id),
+      );
+      assertArchiveHydrationTargetIsUnsigned(
+        signedManifest,
+        prepared.filter((row) => !appendedIds.has(row.entityRow.entity_id)).length,
+      );
+      const signedRelease = prepared.length > 0 && releaseIsSigned(signedManifest);
+      const assertNoExistingEntityChanged = (
+        step: string,
+        changed: readonly { entityId: string }[],
+      ) => {
+        const existing = changed.filter((row) => !appendedIds.has(row.entityId));
+        if (signedRelease && existing.length > 0) {
+          throw new Error(
+            `${step} would change ${existing.length} existing entities of a signed release ` +
+              `(${existing
+                .slice(0, 3)
+                .map((row) => row.entityId)
+                .join(', ')}); resolve that drift first`,
+          );
+        }
+      };
 
       if (prepared.length > 0) {
         const transactionReviewedClaims = await loadReviewedClaimAssessments(
@@ -933,6 +960,7 @@ async function main(): Promise<void> {
       // cannot freeze the release between these derived writes.
       if (prepared.length > 0) {
         const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
+        assertNoExistingEntityChanged('Taxonomy re-sync', taxonomyPlan.changed);
         if (taxonomyPlan.changed.length > 0) {
           await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
           console.log(
@@ -944,6 +972,7 @@ async function main(): Promise<void> {
         // transaction. Do this before rebuilding the graph, which reads projection.related;
         // source rows do not carry canonical edges.
         const relatedPlan = await planReleaseRelatedSync(client, releaseId);
+        assertNoExistingEntityChanged('Related re-sync', relatedPlan.changed);
         if (relatedPlan.changed.length > 0) {
           await applyReleaseRelatedSync(client, releaseId, relatedPlan);
           console.log(
@@ -977,6 +1006,22 @@ async function main(): Promise<void> {
           client,
           prepared.map((row) => row.entityRow.entity_id),
           { releaseId },
+        );
+      }
+      if (signedRelease && appendedIds.size > 0) {
+        // The manifest cannot list what was appended, so the append is recorded where the
+        // activation of this release was.
+        await client.query(
+          `INSERT INTO audit.events (id, action, category, actor, subject, reason, request_id,
+             correlation_id, release_id, idempotency_key, occurred_at)
+           VALUES (gen_random_uuid()::text, 'publication.entities_appended', 'publication',
+             jsonb_build_object('id', 'incremental-publisher', 'type', 'service'),
+             jsonb_build_object('type', 'release', 'id', $1::text, 'path', 'publication.releases/' || $1::text,
+               'entityIds', $2::jsonb),
+             'New entities appended to a signed release; no listed entry changed',
+             gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
+             'append:' || $1::text || ':' || extract(epoch from now())::text, now())`,
+          [releaseId, JSON.stringify([...appendedIds].sort())],
         );
       }
       await client.query('COMMIT');

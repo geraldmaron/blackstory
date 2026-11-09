@@ -3,6 +3,7 @@ import { describe, test } from 'node:test';
 import {
   attachPublicCitationArchives,
   assertArchiveHydrationTargetIsUnsigned,
+  releaseIsSigned,
   loadPublicCitationArchives,
   selectPublicCitationArchives,
   type CitationArchiveCandidateRow,
@@ -284,4 +285,12 @@ describe('public citation archive selection', () => {
       /already signed/u,
     );
   });
+});
+
+test('releaseIsSigned reads the manifest, and appending is not counted as a write that needs an unsigned release', () => {
+  assert.equal(releaseIsSigned({}), false);
+  assert.equal(releaseIsSigned({ manifestHash: 'signed' }), true);
+  assert.throws(() => releaseIsSigned(null), /Cannot verify/u);
+  // The publisher passes only writes that change existing entries; zero of them is allowed.
+  assert.doesNotThrow(() => assertArchiveHydrationTargetIsUnsigned({ manifestHash: 'signed' }, 0));
 });
