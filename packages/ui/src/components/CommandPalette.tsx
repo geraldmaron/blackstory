@@ -129,7 +129,9 @@ export function isCommandPaletteChord(event: {
 export function useCommandPaletteHotkey(onOpen: () => void): void {
   useEffect(() => {
     function handle(event: KeyboardEvent) {
-      if (!isCommandPaletteChord(event)) return;
+      // A focused editor that already handled the chord (Mod-K inserts a link in the story
+      // studio) keeps it; the palette opens everywhere else.
+      if (event.defaultPrevented || !isCommandPaletteChord(event)) return;
       event.preventDefault();
       onOpen();
     }
