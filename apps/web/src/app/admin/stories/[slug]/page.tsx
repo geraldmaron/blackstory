@@ -1,16 +1,24 @@
 import { randomUUID } from 'node:crypto';
 import { notFound, redirect } from 'next/navigation';
-import { readStory, listContributors } from '@/admin/editorial/store';
+import { readStory, listContributors, listStories } from '@/admin/editorial/store';
 import { readVerifiedAdminIdentity } from '@/admin/auth/supabase-server';
 import { queryPostgres } from '@/admin/lib/canonical-postgres-client';
 import { StoryEditor } from '@/admin/editorial/story-editor';
 import type { EditorialStory } from '@repo/schemas';
 import '../stories.css';
+import '../studio.css';
 export default async function StoryPage({ params }: { params: Promise<{ slug: string }> }) {
-  if (!(await readVerifiedAdminIdentity())) redirect('/admin/login');
+  const identity = await readVerifiedAdminIdentity();
+  if (!identity) redirect('/admin/login');
   const { slug } = await params;
-  // The contributor list does not depend on the story, so it loads alongside it.
-  const contributors = listContributors();
+  // These do not depend on the story, so they load alongside it.
+  const contributors = listContributors(identity.uid);
+  const stories = listStories();
+  const tagsInUse = queryPostgres<{ tag: string }>(
+    'SELECT DISTINCT unnest(tags) AS tag FROM reference.stories ORDER BY 1',
+  );
+  // New stories start with Neo as author; the writer adds themselves from the byline.
+  const neo = (await contributors).find((c) => c.id === 'neo');
   const story: EditorialStory | null =
     slug === 'new'
       ? {
@@ -27,7 +35,9 @@ export default async function StoryPage({ params }: { params: Promise<{ slug: st
             references: [],
             relatedEntityIds: [],
             tags: [],
-            contributors: [],
+            contributors: neo
+              ? [{ id: neo.id, name: neo.name, kind: neo.kind, roles: ['author'] }]
+              : [],
           },
           revision: 0,
           status: 'draft',
@@ -36,16 +46,24 @@ export default async function StoryPage({ params }: { params: Promise<{ slug: st
         }
       : await readStory(slug);
   if (!story) notFound();
-  const [profiles, relatedRecords] = await Promise.all([
+  const [profiles, relatedRecords, allStories, tags] = await Promise.all([
     contributors,
     queryPostgres<{ id: string; display_name: string }>(
       'SELECT id,display_name FROM canonical.entities WHERE id=ANY($1::text[])',
       [story.draft.relatedEntityIds],
     ),
+    stories,
+    tagsInUse,
   ]);
   return (
     <main className="ds-container" id="main">
-      <StoryEditor initial={story} profiles={profiles} relatedRecords={relatedRecords} />
+      <StoryEditor
+        initial={story}
+        profiles={profiles}
+        relatedRecords={relatedRecords}
+        otherStories={allStories.filter((s) => s.id !== story.draft.id).map((s) => s.slug)}
+        tagsInUse={tags.map((t) => t.tag)}
+      />
     </main>
   );
 }

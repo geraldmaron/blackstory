@@ -5,6 +5,7 @@
  * explicit content hash.
  */
 
+import { adminFramingHeaders } from './lib/web-security/admin-framing';
 import { type NextRequest, NextResponse } from 'next/server';
 import { adminAuthGate } from './admin/admin-auth-gate';
 import { handleMaintenance } from './lib/maintenance/maintenance-gate';
@@ -123,6 +124,11 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // it does not append.
   for (const { key, value } of securityHeaders) {
     response.headers.set(key, value);
+  }
+  const framing = adminFramingHeaders(request.nextUrl.pathname, contentSecurityPolicy);
+  if (framing) {
+    response.headers.set('Content-Security-Policy', framing.csp);
+    if (framing.frameOptions) response.headers.set('X-Frame-Options', framing.frameOptions);
   }
   return applyPublicDocumentCdnCache(request, response);
 }

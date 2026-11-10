@@ -76,6 +76,7 @@ function currentLocation(pathname: string): string | null {
 export function AdminShellChrome({ children }: { readonly children: React.ReactNode }) {
   const pathname = usePathname() || '/admin',
     router = useRouter();
+  const embedded = pathname.endsWith('/preview/embed');
   const { email, role, signOut, user, ready, getIdToken } = useAdminAuth();
   const counts = useQueueCounts(ready && !!user, getIdToken);
   const [paletteOpen, setPaletteOpen] = useState(false),
@@ -202,6 +203,8 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
       />
     </Link>
   );
+  // The story studio embeds its preview in an iframe, which needs the page without the chrome.
+  if (embedded) return <>{children}</>;
   return (
     <div className={`admin-base-shell${login ? ' admin-base-shell--login' : ''}`}>
       {!login && (

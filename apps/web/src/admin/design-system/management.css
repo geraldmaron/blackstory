@@ -168,6 +168,13 @@
 .admin-base-panel h2 {
   margin-top: 0;
 }
+/* Story studio focus mode: the sidebar steps aside so the manuscript has the width. */
+[data-admin-focus='true'] .admin-base-shell {
+  grid-template-columns: minmax(0, 1fr);
+}
+[data-admin-focus='true'] .admin-base-sidebar {
+  display: none;
+}
 @media (max-width: 1000px) {
   .admin-base-shell {
     grid-template-columns: minmax(0, 1fr);

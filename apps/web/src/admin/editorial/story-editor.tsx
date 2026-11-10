@@ -1,45 +1,75 @@
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'baseui/button';
 import { Drawer } from 'baseui/drawer';
-import { Checkbox } from 'baseui/checkbox';
-import { Select } from 'baseui/select';
 import { Notification } from 'baseui/notification';
-import { FileUploaderBasic as FileUploader } from 'baseui/file-uploader-basic';
-import { STORY_THEME_IDS } from '@repo/schemas/public-stories';
-import { TextField, TextAreaField, ChoiceField } from '../design-system/fields';
-import { AdminRecordPicker } from '@/components/patterns/admin-record-picker';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faDownLeftAndUpRightToCenter,
+  faUpRightAndDownLeftFromCenter,
+} from '@fortawesome/free-solid-svg-icons';
 import { RichDocument } from './rich-document';
-import type {
-  StoryDraft,
-  EditorialStory,
-  EditorialContributor,
-  StoryBodyBlockDoc,
-} from '@repo/schemas';
+import type { StoryDraft, EditorialStory, StoryBodyBlockDoc } from '@repo/schemas';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 import { staffRoleHasPermission } from '../auth/staff-permissions';
-import { BlockEditor, newBlock } from './block-editor';
-const sections = [
-  'Writing',
-  'Sources',
-  'Contributors',
-  'Records',
-  'Cover',
-  'History',
-  'Review',
-] as const;
-type Section = (typeof sections)[number];
+import { newBlock } from './block-editor';
+import { ManuscriptHeader, type StudioProfile } from './studio/manuscript-header';
+import { StudioMargin } from './studio/margin';
+import { PreviewPane } from './studio/preview-pane';
+import { useMedia, useNow, useRecordMeta, useStoredState } from './studio/hooks';
+import {
+  readinessItems,
+  type BodyIssue,
+  type SectionId,
+  type ShowTarget,
+} from './studio/readiness';
+import { slugifyTitle, uniqueSlug } from './studio/slug';
+import { mentionedRecordIds, suggestTags } from './studio/tag-suggestions';
+
+const DEFAULT_SECTIONS: Record<SectionId, boolean> = {
+  readiness: true,
+  address: true,
+  topics: false,
+  credits: false,
+  sources: false,
+  records: false,
+  collection: false,
+  history: false,
+  archive: false,
+};
+const STATUS_WORDS: Record<string, string> = {
+  draft: 'Draft',
+  review: 'In review',
+  published: 'Published',
+  archived: 'Archived',
+};
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function relativeTime(from: number, now: number): string {
+  const seconds = Math.max(0, Math.round((now - from) / 1000));
+  if (seconds < 45) return 'just now';
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+  const hours = Math.round(minutes / 60);
+  return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+}
+
 export function StoryEditor({
   initial,
   profiles,
   relatedRecords = [],
+  otherStories = [],
+  tagsInUse = [],
 }: {
   initial: EditorialStory;
-  profiles: EditorialContributor[];
+  profiles: StudioProfile[];
   relatedRecords: readonly { id: string; display_name: string }[];
+  /** Addresses of every other story, for the uniqueness check. */
+  otherStories?: readonly string[];
+  /** Tags already used across stories, offered as the writer types. */
+  tagsInUse?: readonly string[];
 }) {
   const { getIdToken, user, role, ready } = useAdminAuth();
   const router = useRouter();
@@ -47,8 +77,7 @@ export function StoryEditor({
   const [draft, setDraft] = useState(initial.draft),
     [revision, setRevision] = useState(initial.revision),
     [saved, setSaved] = useState(JSON.stringify(initial.draft));
-  const [section, setSection] = useState<Section>('Writing'),
-    [message, setMessage] = useState(''),
+  const [message, setMessage] = useState(''),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [suspended, setSuspended] = useState(false);
@@ -56,31 +85,37 @@ export function StoryEditor({
     [reason, setReason] = useState('Edit story draft'),
     [checks, setChecks] = useState({ facts: false, rights: false, prose: false });
   const [uploadCredit, setUploadCredit] = useState(''),
-    [uploadRights, setUploadRights] = useState('public_domain');
+    [uploadRights, setUploadRights] = useState('');
   const [archiveReason, setArchiveReason] = useState(''),
     [archiveConfirmed, setArchiveConfirmed] = useState(false);
   const [recordLabels, setRecordLabels] = useState<Record<string, string>>(() =>
     Object.fromEntries(relatedRecords.map((entity) => [entity.id, entity.display_name])),
   );
   const saving = useRef(false);
-  const [compact, setCompact] = useState(false),
-    [inspectorOpen, setInspectorOpen] = useState(false);
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 1000px)');
-    const update = () => setCompact(media.matches);
-    update();
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, []);
-  function openInspector(next: Section) {
-    setSection(next);
-    setInspectorOpen(true);
-  }
+  const latestRevision = useRef(revision);
+  latestRevision.current = revision;
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const now = useNow(30_000);
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null);
-  const inspectorPanel = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (inspectorPanel.current) inspectorPanel.current.scrollTop = 0;
-  }, [section]);
+  // Studio layout state. Focus and open sections are remembered across visits.
+  const [focus, setFocus] = useStoredState('studio:focus', false);
+  const [storedSections, setStoredSections] = useStoredState<Partial<Record<SectionId, boolean>>>(
+    'studio:sections',
+    {},
+  );
+  const sections = { ...DEFAULT_SECTIONS, ...storedSections };
+  const [previewOn, setPreviewOn] = useState(false),
+    [sheetOpen, setSheetOpen] = useState(false),
+    [slugTouched, setSlugTouched] = useState(false),
+    [dismissed, setDismissed] = useState<ReadonlySet<string>>(new Set()),
+    [focusSource, setFocusSource] = useState<number | null>(null);
+  // TODO(orchestrator): RichDocument will report lint issues through `onIssues`; feed them here.
+  const [bodyIssues] = useState<BodyIssue[]>([]);
+  const wide = useMedia('(min-width: 1280px)'),
+    narrow = useMedia('(max-width: 1099px)');
+  const showSplit = previewOn && wide,
+    showPreviewOnly = previewOn && !wide,
+    marginAsSheet = narrow || showSplit;
   const editable =
       !record.archivedAt && role !== null && staffRoleHasPermission(role, 'research:write'),
     canReview =
@@ -155,8 +190,8 @@ export function StoryEditor({
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
-  async function save() {
-    if (saving.current || !editable) return;
+  async function save(): Promise<boolean> {
+    if (saving.current || !editable) return false;
     saving.current = true;
     setBusy(true);
     setError('');
@@ -169,6 +204,7 @@ export function StoryEditor({
       );
       setRevision(data.revision);
       setSaved(sent);
+      setSavedAt(Date.now());
       setSuspended(false);
       setMessage(`Saved revision ${data.revision}.`);
       if (storageKey && sessionStorage.getItem(storageKey) === sent)
@@ -176,9 +212,11 @@ export function StoryEditor({
       // Updating the address without a route transition keeps keystrokes typed during save.
       window.history.replaceState(null, '', `/admin/stories/${data.slug}`);
       await refreshRecord();
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Save failed.');
       setSuspended(true);
+      return false;
     } finally {
       saving.current = false;
       setBusy(false);
@@ -286,7 +324,10 @@ export function StoryEditor({
       setBusy(false);
     }
   }
-  async function upload(file: File, target?: Extract<StoryBodyBlockDoc, { type: 'image' }>) {
+  async function upload(
+    file: File,
+    target?: Extract<StoryBodyBlockDoc, { type: 'image' }>,
+  ): Promise<boolean> {
     setBusy(true);
     setError('');
     try {
@@ -315,11 +356,19 @@ export function StoryEditor({
         }));
       } else patch('heroImage', image);
       setMessage('Image uploaded privately. Add its description and save the story.');
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Upload failed.');
+      return false;
     } finally {
       setBusy(false);
     }
+  }
+  /** The upload API needs a saved story, so a first cover saves the draft before uploading. */
+  async function uploadCover(file: File): Promise<boolean> {
+    while (saving.current) await sleep(100);
+    if (!latestRevision.current && !(await save())) return false;
+    return upload(file);
   }
   async function publish() {
     setBusy(true);
@@ -362,27 +411,111 @@ export function StoryEditor({
     [next[index], next[other]] = [next[other]!, next[index]!];
     patch('body', next);
   }
-  const metadataField = (
-    key: 'title' | 'summary' | 'eraLabel' | 'placeLabel' | 'slug' | 'publishedAt' | 'updatedAt',
-    label: string,
-    area = false,
-  ) =>
-    area ? (
-      <TextAreaField
-        label={label}
-        value={draft[key] ?? ''}
-        onChange={(value) => patch(key, value)}
-        disabled={!editable}
-        rows={key === 'title' ? 2 : 3}
-      />
-    ) : (
-      <TextField
-        label={label}
-        value={draft[key] ?? ''}
-        onChange={(value) => patch(key, key === 'updatedAt' && !value ? undefined : value)}
-        disabled={!editable}
-      />
-    );
+
+  // Before the first save the address follows the title; the writer can take it over.
+  const taken = useMemo(() => new Set(otherStories), [otherStories]);
+  useEffect(() => {
+    if (revision || slugTouched || !editable) return;
+    const base = uniqueSlug(slugifyTitle(draft.title), taken);
+    if (base && base !== draft.slug) setDraft((d) => ({ ...d, slug: base }));
+  }, [draft.title, draft.slug, revision, slugTouched, editable, taken]);
+
+  // Records the story links to, by text and by list, drive suggestions and the "mentioned" list.
+  const mentioned = useMemo(() => mentionedRecordIds(draft.body), [draft.body]);
+  const linkedIds = useMemo(
+    () => [...new Set([...mentioned, ...draft.relatedEntityIds])],
+    [mentioned, draft.relatedEntityIds],
+  );
+  const meta = useRecordMeta(linkedIds, getIdToken);
+  const suggestions = useMemo(
+    () =>
+      suggestTags(
+        linkedIds.flatMap((id) => (meta[id] ? [meta[id]] : [])),
+        { existing: draft.tags, dismissed },
+      ),
+    [linkedIds, meta, draft.tags, dismissed],
+  );
+  const mentionedUnlinked = mentioned
+    .filter((id) => !draft.relatedEntityIds.includes(id))
+    .map((id) => ({ id, label: recordLabels[id] ?? meta[id]?.displayName ?? id }));
+  const readiness = useMemo(() => {
+    const items = readinessItems(draft, record.blockers, bodyIssues);
+    if (taken.has(draft.slug))
+      items.push({
+        key: 'slug-taken',
+        text: 'Another story already uses this address.',
+        target: { kind: 'section', section: 'address' },
+      });
+    return items;
+  }, [draft, record.blockers, bodyIssues, taken]);
+
+  // Opening a margin section from anywhere: leave focus mode, open the sheet if the margin is one.
+  const openMargin = useCallback(
+    (id: SectionId) => {
+      setFocus(false);
+      if (marginAsSheet) setSheetOpen(true);
+      setStoredSections({ ...storedSections, [id]: true });
+      setTimeout(
+        () =>
+          document
+            .getElementById(`studio-section-${id}`)
+            ?.scrollIntoView({ block: 'start', behavior: motion() }),
+        80,
+      );
+    },
+    [marginAsSheet, setFocus, setStoredSections, storedSections],
+  );
+  function show(target: ShowTarget) {
+    if (target.kind === 'section') return openMargin(target.section);
+    if (target.kind === 'block') {
+      setSelectedBlock(target.index);
+      return openMargin('sources');
+    }
+    setSheetOpen(false);
+    if (showPreviewOnly) setPreviewOn(false);
+    setTimeout(() => {
+      const el = document.getElementById(target.id);
+      el?.scrollIntoView({ block: 'center', behavior: motion() });
+      el?.focus({ preventScroll: true });
+    }, 80);
+  }
+  function addReference() {
+    const taken = new Set(draft.references.map((ref) => ref.id));
+    let n = draft.references.length + 1;
+    while (taken.has(`source-${n}`)) n += 1;
+    patch('references', [...draft.references, { id: `source-${n}`, label: '', url: '' }]);
+    setFocusSource(draft.references.length);
+    openMargin('sources');
+  }
+  function linkRecords(items: readonly { id: string; label: string }[]) {
+    setRecordLabels((previous) => ({
+      ...previous,
+      ...Object.fromEntries(items.map((item) => [item.id, item.label])),
+    }));
+    const add = items.map((i) => i.id).filter((id) => !draft.relatedEntityIds.includes(id));
+    if (add.length) patch('relatedEntityIds', [...draft.relatedEntityIds, ...add]);
+  }
+
+  // Focus mode hides the admin sidebar through a root attribute that the shell styles read.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (focus) root.dataset.adminFocus = 'true';
+    else delete root.dataset.adminFocus;
+    return () => {
+      delete root.dataset.adminFocus;
+    };
+  }, [focus]);
+  useEffect(() => {
+    const keys = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === '.') {
+        event.preventDefault();
+        setFocus(!focus);
+      } else if (event.key === 'Escape' && focus && !event.defaultPrevented) setFocus(false);
+    };
+    window.addEventListener('keydown', keys);
+    return () => window.removeEventListener('keydown', keys);
+  }, [focus, setFocus]);
+
   const wordCount = draft.body
     .flatMap((block) =>
       block.type === 'paragraph' || block.type === 'pullquote'
@@ -395,851 +528,271 @@ export function StoryEditor({
     .trim()
     .split(/\s+/)
     .filter(Boolean).length;
-  const inspector = (
-    <aside className="editorial-inspector" aria-label="Story management">
-      <nav className="editorial-inspector__tabs" aria-label="Story settings">
-        {sections.map((s) => (
-          <Button
-            key={s}
-            size="compact"
-            kind={section === s ? 'primary' : 'tertiary'}
-            isSelected={section === s}
-            aria-pressed={section === s}
-            onClick={() => setSection(s)}
-          >
-            {s === 'Writing'
-              ? 'Settings'
-              : s === 'Contributors'
-                ? 'Credits'
-                : s === 'Cover'
-                  ? 'Media'
-                  : s}
-          </Button>
-        ))}
-      </nav>
-      <div className="editorial-inspector__panel" ref={inspectorPanel}>
-        {section === 'Writing' && (
-          <section>
-            <h2>Story settings</h2>
-            {metadataField('slug', 'URL slug')}
-            {metadataField('eraLabel', 'Historical period')}
-            {metadataField('placeLabel', 'Place')}
-            <ChoiceField
-              label="Format"
-              value={draft.format}
-              options={[
-                { id: 'entry', label: 'Entry' },
-                { id: 'chapter', label: 'Chapter' },
-              ]}
-              onChange={(value) => patch('format', value as StoryDraft['format'])}
-              disabled={!editable}
-            />
-            {metadataField('publishedAt', 'Publication date (YYYY-MM-DD)')}
-            {metadataField('updatedAt', 'Correction date (optional)')}
-            <TextAreaField
-              label="Tags"
-              value={draft.tags.join('\n')}
-              onChange={(value) => patch('tags', value.split('\n').filter(Boolean))}
-              disabled={!editable}
-              caption="One tag per line"
-            />
-            <ChoiceField
-              label="Theme"
-              value={draft.themeId ?? ''}
-              options={[
-                { id: '', label: 'No theme' },
-                ...STORY_THEME_IDS.map((id) => ({ id, label: id.replaceAll('_', ' ') })),
-              ]}
-              onChange={(value) =>
-                patch('themeId', value ? (value as StoryDraft['themeId']) : undefined)
-              }
-              disabled={!editable}
-            />
-            {draft.collection ? (
-              <section className="editorial-inspector__group">
-                <h3>Collection</h3>
-                {(['id', 'label', 'positionLabel'] as const).map((key) => (
-                  <TextField
-                    key={key}
-                    label={`Collection ${key}`}
-                    value={draft.collection?.[key] ?? ''}
-                    onChange={(value) =>
-                      patch('collection', { ...draft.collection!, [key]: value || undefined })
-                    }
-                    disabled={!editable}
-                  />
-                ))}
-                <TextField
-                  label="Collection position"
-                  type="number"
-                  min={0}
-                  value={String(draft.collection.position)}
-                  onChange={(value) =>
-                    patch('collection', { ...draft.collection!, position: Number(value) })
-                  }
-                  disabled={!editable}
-                />
-                <Button
-                  kind="tertiary"
-                  onClick={() => patch('collection', undefined)}
-                  disabled={!editable}
-                >
-                  Remove collection
-                </Button>
-              </section>
-            ) : (
-              <Button
-                kind="secondary"
-                onClick={() =>
-                  patch('collection', { id: 'new-collection', label: '', position: 0 })
-                }
-                disabled={!editable}
-              >
-                Add to collection
-              </Button>
-            )}
-            {!!revision && (
-              <section className="editorial-inspector__group">
-                <h3>{record.archivedAt ? 'Archived story' : 'Archive story'}</h3>
-                <p>
-                  {record.archivedAt
-                    ? 'Restore this story to edit it. Its history is preserved.'
-                    : record.activePublicReleaseId
-                      ? 'Archiving removes this story from public stories in a new signed release. Saved revisions remain available.'
-                      : 'Remove this draft from the active library. You can restore it from Archived stories.'}
-                </p>
-                {!canManage && (
-                  <p>
-                    Your role cannot change this story’s library state. Removing a public story
-                    requires publication authority.
-                  </p>
-                )}
-                <TextAreaField
-                  label="Reason for library change"
-                  value={archiveReason}
-                  onChange={setArchiveReason}
-                  disabled={busy}
-                  rows={2}
-                />
-                {record.activePublicReleaseId && !record.archivedAt && (
-                  <Checkbox
-                    checked={archiveConfirmed}
-                    onChange={(event) => setArchiveConfirmed(event.currentTarget.checked)}
-                    disabled={busy}
-                  >
-                    Remove the current public story
-                  </Checkbox>
-                )}
-                <Button
-                  kind="secondary"
-                  disabled={
-                    busy ||
-                    dirty ||
-                    !archiveReason.trim() ||
-                    !canManage ||
-                    (!!record.activePublicReleaseId && !archiveConfirmed)
-                  }
-                  onClick={() => void manageArchive()}
-                >
-                  {record.archivedAt ? 'Restore to drafts' : 'Archive story'}
-                </Button>
-              </section>
-            )}
-          </section>
-        )}
-        {section === 'Sources' && (
-          <section>
-            <h2>Sources and evidence</h2>
-            <p>
-              Attach the sources supporting the prose. Insert citations from the writing toolbar.
-            </p>
-            {selectedBlock !== null && draft.body[selectedBlock] && (
-              <div className="editorial-inspector__group">
-                <h3>Selected block</h3>
-                <BlockEditor
-                  disabled={!editable || busy}
-                  block={draft.body[selectedBlock]!}
-                  index={selectedBlock}
-                  onChange={(block) =>
-                    patch(
-                      'body',
-                      draft.body.map((b, i) => (i === selectedBlock ? block : b)),
-                    )
-                  }
-                  move={(delta) => {
-                    move(selectedBlock, delta);
-                    setSelectedBlock((index) =>
-                      index === null
-                        ? null
-                        : Math.max(0, Math.min(draft.body.length - 1, index + delta)),
-                    );
-                  }}
-                  remove={() => {
-                    patch(
-                      'body',
-                      draft.body.filter((_, i) => i !== selectedBlock),
-                    );
-                    setSelectedBlock(null);
-                  }}
-                />
-                {draft.body[selectedBlock]!.type === 'image' && (
-                  <div>
-                    <p>Upload an image for this block after adding its credit and rights above.</p>
-                    <FileUploader
-                      accept="image/png,image/jpeg,image/webp"
-                      maxSize={5242880}
-                      multiple={false}
-                      disabled={
-                        !editable ||
-                        busy ||
-                        !revision ||
-                        !(
-                          draft.body[selectedBlock] as Extract<StoryBodyBlockDoc, { type: 'image' }>
-                        ).image.credit.trim()
-                      }
-                      onDrop={(files) => {
-                        const target = draft.body[selectedBlock];
-                        if (files[0] && target?.type === 'image') void upload(files[0], target);
-                      }}
-                      onDropRejected={() =>
-                        setError('Choose a PNG, JPEG or WebP image up to 5 MB.')
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-            {draft.references.map((reference, index) => (
-              <section className="editorial-inspector__group" key={index}>
-                <h3>Source {index + 1}</h3>
-                {(['id', 'label', 'url', 'locator'] as const).map((key) => (
-                  <TextField
-                    key={key}
-                    label={
-                      key === 'id'
-                        ? 'Citation ID'
-                        : key === 'label'
-                          ? 'Source title'
-                          : key === 'url'
-                            ? 'Source URL'
-                            : 'Page or locator'
-                    }
-                    value={reference[key] ?? ''}
-                    onChange={(value) =>
-                      patch(
-                        'references',
-                        draft.references.map((ref, i) =>
-                          i === index ? { ...ref, [key]: value } : ref,
-                        ),
-                      )
-                    }
-                    disabled={!editable}
-                  />
-                ))}
-                {reference.scholarlyCitation && (
-                  <>
-                    <h4>Scholarly citation</h4>
-                    {(['doi', 'title', 'firstAuthorSurname', 'venue'] as const).map((key) => (
-                      <TextField
-                        key={key}
-                        label={key}
-                        value={reference.scholarlyCitation?.[key] ?? ''}
-                        onChange={(value) =>
-                          patch(
-                            'references',
-                            draft.references.map((ref, i) =>
-                              i === index
-                                ? {
-                                    ...ref,
-                                    scholarlyCitation: {
-                                      ...ref.scholarlyCitation!,
-                                      [key]: value,
-                                    },
-                                  }
-                                : ref,
-                            ),
-                          )
-                        }
-                        disabled={!editable}
-                      />
-                    ))}
-                    <Button
-                      kind="tertiary"
-                      onClick={() =>
-                        patch(
-                          'references',
-                          draft.references.map((ref, i) =>
-                            i === index ? { ...ref, scholarlyCitation: undefined } : ref,
-                          ),
-                        )
-                      }
-                      disabled={!editable}
-                    >
-                      Remove scholarly details
-                    </Button>
-                  </>
-                )}
-                {!reference.scholarlyCitation && (
-                  <Button
-                    kind="tertiary"
-                    onClick={() =>
-                      patch(
-                        'references',
-                        draft.references.map((ref, i) =>
-                          i === index
-                            ? {
-                                ...ref,
-                                scholarlyCitation: {
-                                  doi: '',
-                                  title: '',
-                                  firstAuthorSurname: '',
-                                  venue: '',
-                                },
-                              }
-                            : ref,
-                        ),
-                      )
-                    }
-                    disabled={!editable}
-                  >
-                    Add scholarly details
-                  </Button>
-                )}
-                <Button
-                  kind="tertiary"
-                  onClick={() =>
-                    patch(
-                      'references',
-                      draft.references.filter((_, i) => i !== index),
-                    )
-                  }
-                  disabled={!editable}
-                >
-                  Remove source
-                </Button>
-              </section>
-            ))}
-            <Button
-              kind="secondary"
-              onClick={() =>
-                patch('references', [
-                  ...draft.references,
-                  { id: `source-${draft.references.length + 1}`, label: '', url: '' },
-                ])
-              }
-              disabled={!editable}
-            >
-              Add source
-            </Button>
-            <p>
-              <Link href="/admin/sources" target="_blank">
-                Open source library
-              </Link>
-            </p>
-          </section>
-        )}
-        {section === 'Contributors' && (
-          <section>
-            <h2>Contributor credits</h2>
-            <p>Credits belong to this revision. Neo is the house editorial identity.</p>
-            {draft.contributors.map((credit, index) => (
-              <section className="editorial-inspector__group" key={credit.id}>
-                <h3>
-                  {index + 1}. {credit.name}
-                </h3>
-                {(['author', 'researcher', 'editor'] as const).map((role) => (
-                  <Checkbox
-                    key={role}
-                    checked={credit.roles.includes(role)}
-                    disabled={!editable}
-                    onChange={(event) =>
-                      patch(
-                        'contributors',
-                        draft.contributors.map((c, i) =>
-                          i === index
-                            ? {
-                                ...c,
-                                roles: event.currentTarget.checked
-                                  ? [...c.roles, role]
-                                  : c.roles.filter((r) => r !== role),
-                              }
-                            : c,
-                        ),
-                      )
-                    }
-                  >
-                    {role}
-                  </Checkbox>
-                ))}
-                <div className="admin-base-actions">
-                  <Button
-                    kind="tertiary"
-                    size="compact"
-                    disabled={!editable || index === 0}
-                    onClick={() => {
-                      const next = [...draft.contributors];
-                      [next[index - 1], next[index]] = [next[index]!, next[index - 1]!];
-                      patch('contributors', next);
-                    }}
-                  >
-                    Move up
-                  </Button>
-                  <Button
-                    kind="tertiary"
-                    size="compact"
-                    disabled={!editable}
-                    onClick={() =>
-                      patch(
-                        'contributors',
-                        draft.contributors.filter((_, i) => i !== index),
-                      )
-                    }
-                  >
-                    Remove
-                  </Button>
-                </div>
-              </section>
-            ))}
-            <Select
-              aria-label="Add contributor"
-              placeholder="Add contributor"
-              value={[]}
-              clearable={false}
-              disabled={!editable}
-              options={profiles
-                .filter((profile) => !draft.contributors.some((c) => c.id === profile.id))
-                .map((profile) => ({ id: profile.id, label: profile.name }))}
-              onChange={({ value }) => {
-                const profile = profiles.find((p) => p.id === value[0]?.id);
-                if (profile)
-                  patch('contributors', [
-                    ...draft.contributors,
-                    {
-                      id: profile.id,
-                      name: profile.name,
-                      kind: profile.kind,
-                      roles: ['author'],
-                    },
-                  ]);
-              }}
-            />
-            <p>
-              <Link href="/admin/stories/contributors" target="_blank">
-                Manage contributors
-              </Link>
-            </p>
-          </section>
-        )}
-        {section === 'Records' && (
-          <section>
-            <h2>Related records</h2>
-            <p>Editorial associations are separate from historical relationships.</p>
-            {draft.relatedEntityIds.map((id) => (
-              <div key={id} className="editorial-inspector__group">
-                <Link href={`/admin/catalog/${encodeURIComponent(id)}`} target="_blank">
-                  {recordLabels[id] ?? id}
-                </Link>
-                <Button
-                  kind="tertiary"
-                  size="compact"
-                  disabled={!editable}
-                  onClick={() =>
-                    patch(
-                      'relatedEntityIds',
-                      draft.relatedEntityIds.filter((other) => other !== id),
-                    )
-                  }
-                >
-                  Unlink
-                </Button>
-              </div>
-            ))}
-            <AdminRecordPicker
-              label="Link an existing record"
-              disabled={!editable}
-              onSelect={(entity) => {
-                setRecordLabels((previous) => ({ ...previous, [entity.id]: entity.display_name }));
-                if (!draft.relatedEntityIds.includes(entity.id))
-                  patch('relatedEntityIds', [...draft.relatedEntityIds, entity.id]);
-              }}
-            />
-            <p>
-              <Link href="/admin/quick-add" target="_blank">
-                Propose a new record
-              </Link>
-            </p>
-          </section>
-        )}
-        {section === 'Cover' && (
-          <section>
-            <h2>Cover and media</h2>
-            <p>
-              Uploads stay private until publication. Record credit and rights before uploading.
-            </p>
-            <TextField
-              label="Image credit"
-              value={uploadCredit}
-              onChange={setUploadCredit}
-              disabled={!editable}
-            />
-            <ChoiceField
-              label="Rights"
-              value={uploadRights}
-              options={[
-                { id: 'public_domain', label: 'Public domain' },
-                { id: 'licensed', label: 'Licensed' },
-                { id: 'fair_use', label: 'Fair use' },
-              ]}
-              onChange={setUploadRights}
-              disabled={!editable}
-            />
-            <FileUploader
-              accept="image/png,image/jpeg,image/webp"
-              maxSize={5242880}
-              disabled={!editable || busy || !revision || !uploadCredit.trim()}
-              onDrop={(files) => {
-                if (files[0]) void upload(files[0]);
-              }}
-              onDropRejected={() => setError('Choose a PNG, JPEG or WebP image up to 5 MB.')}
-            />
-            {!revision && <p>Save the draft before uploading media.</p>}
-            {draft.heroImage && (
-              <div className="editorial-inspector__group">
-                <Image
-                  unoptimized
-                  width={draft.heroImage.width ?? 800}
-                  height={draft.heroImage.height ?? 600}
-                  style={{ width: '100%', height: 'auto' }}
-                  src={draft.heroImage.url}
-                  alt={draft.heroImage.alt || 'Private cover preview'}
-                />
-                <TextAreaField
-                  label="Image description"
-                  value={draft.heroImage.alt}
-                  onChange={(value) => patch('heroImage', { ...draft.heroImage!, alt: value })}
-                  disabled={!editable}
-                />
-                <p>{draft.heroImage.credit}</p>
-                <Button
-                  kind="tertiary"
-                  onClick={() => patch('heroImage', undefined)}
-                  disabled={!editable}
-                >
-                  Remove cover
-                </Button>
-              </div>
-            )}
-          </section>
-        )}
-        {section === 'History' && (
-          <section>
-            <h2>Revision history</h2>
-            <p>
-              Restoring creates a new draft. Public content stays unchanged until review and
-              publication.
-            </p>
-            {record.history.map((history) => (
-              <div key={history.revision} className="editorial-inspector__group">
-                <h3>Revision {history.revision}</h3>
-                <p>{new Date(history.createdAt).toLocaleString()}</p>
-                <p>{history.reason}</p>
-                <Button
-                  kind="secondary"
-                  size="compact"
-                  disabled={!editable || busy || dirty}
-                  onClick={() => void restore(history.revision)}
-                >
-                  Restore revision {history.revision}
-                </Button>
-              </div>
-            ))}
-          </section>
-        )}
-        {section === 'Review' && (
-          <section>
-            <h2>Review and publication</h2>
-            <p>
-              {dirty
-                ? 'Save the current edits before review.'
-                : `Review applies to saved revision ${revision}.`}
-            </p>
-            {!!record.blockers?.length && (
-              <div className="editorial-inspector__group">
-                <h3>Needs attention</h3>
-                <ul>
-                  {record.blockers.map((blocker, index) => (
-                    <li key={index}>{blocker}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <p>Latest decision: {record.review?.decision ?? 'Not reviewed'}</p>
-            {canReview && (
-              <>
-                <TextAreaField
-                  label="Reason for changes or review"
-                  value={reason}
-                  onChange={setReason}
-                />
-                {(['facts', 'rights', 'prose'] as const).map((key) => (
-                  <Checkbox
-                    key={key}
-                    checked={checks[key]}
-                    disabled={busy || dirty || !revision}
-                    onChange={(event) =>
-                      setChecks({ ...checks, [key]: event.currentTarget.checked })
-                    }
-                  >
-                    {key === 'facts'
-                      ? 'Every factual sentence and evidence qualifier checked'
-                      : key === 'rights'
-                        ? 'Media and quotation rights checked'
-                        : 'Final prose, credits and dignity reviewed'}
-                  </Checkbox>
-                ))}
-                <div className="admin-base-actions">
-                  <Button
-                    kind="secondary"
-                    disabled={
-                      busy ||
-                      dirty ||
-                      !revision ||
-                      !checks.facts ||
-                      !checks.rights ||
-                      !checks.prose ||
-                      !reason.trim() ||
-                      !!record.blockers?.length
-                    }
-                    onClick={() => void decide('approved')}
-                  >
-                    Approve revision
-                  </Button>
-                  <Button
-                    kind="tertiary"
-                    disabled={busy || dirty || !revision}
-                    onClick={() => void decide('needs_evidence')}
-                  >
-                    Needs evidence
-                  </Button>
-                  <Button
-                    kind="tertiary"
-                    disabled={busy || dirty || !revision}
-                    onClick={() => void decide('rejected')}
-                  >
-                    Reject
-                  </Button>
-                </div>
-                <Button
-                  disabled={
-                    busy ||
-                    dirty ||
-                    record.review?.decision !== 'approved' ||
-                    record.revision !== revision
-                  }
-                  isLoading={busy}
-                  onClick={() => void publish()}
-                >
-                  Publish approved revision
-                </Button>
-              </>
-            )}
-            {record.publication && (
-              <div className="editorial-inspector__group">
-                <h3>Publication history</h3>
-                <p>Last published revision {record.publication.revision}</p>
-                {record.activePublicReleaseId ? (
-                  <Link href={`/stories/${draft.slug}`} target="_blank">
-                    Open public story
-                  </Link>
-                ) : (
-                  <p>No current public story.</p>
-                )}
-                {canReview && record.publication.canRollback && (
-                  <Button
-                    kind="secondary"
-                    disabled={busy || dirty || !reason.trim()}
-                    onClick={() => void rollback()}
-                  >
-                    Restore previous public story
-                  </Button>
-                )}
-              </div>
-            )}
-            <p className="editorial-inspector__note">
-              Publication creates a signed release. A failed operation leaves the public version
-              intact.
-            </p>
-          </section>
-        )}
-      </div>
-    </aside>
+
+  const saveState = !editable
+    ? null
+    : busy
+      ? 'Saving…'
+      : suspended
+        ? 'Not saved'
+        : dirty
+          ? 'Unsaved changes'
+          : revision
+            ? 'Saved'
+            : 'Nothing to save yet';
+  const status = record.archivedAt ? 'Archived' : (STATUS_WORDS[record.status] ?? 'Draft');
+  const margin = (
+    <StudioMargin
+      draft={draft}
+      patch={patch}
+      record={record}
+      revision={revision}
+      editable={editable}
+      busy={busy}
+      dirty={dirty}
+      canReview={canReview}
+      canManage={canManage}
+      profiles={profiles}
+      otherStories={otherStories}
+      tagsInUse={tagsInUse}
+      suggestions={suggestions}
+      onDismissSuggestion={(tag) => setDismissed(new Set([...dismissed, tag.toLowerCase()]))}
+      readiness={readiness}
+      onShow={show}
+      sections={sections}
+      onToggleSection={(id) => setStoredSections({ ...storedSections, [id]: !sections[id] })}
+      onSlugEdit={(value) => {
+        setSlugTouched(true);
+        patch('slug', value.toLowerCase().replace(/\s+/g, '-'));
+      }}
+      reason={reason}
+      setReason={setReason}
+      checks={checks}
+      setChecks={setChecks}
+      decide={decide}
+      publish={publish}
+      rollback={rollback}
+      restore={restore}
+      archiveReason={archiveReason}
+      setArchiveReason={setArchiveReason}
+      archiveConfirmed={archiveConfirmed}
+      setArchiveConfirmed={setArchiveConfirmed}
+      manageArchive={manageArchive}
+      recordLabels={recordLabels}
+      onLinkRecords={linkRecords}
+      mentionedUnlinked={mentionedUnlinked}
+      selectedBlock={selectedBlock}
+      setSelectedBlock={(updater) => setSelectedBlock(updater)}
+      moveBlock={move}
+      uploadBlockImage={(file, target) => void upload(file, target)}
+      onProblem={setError}
+      addReference={addReference}
+      focusSource={focusSource}
+      clearFocusSource={() => setFocusSource(null)}
+    />
   );
-  return (
-    <div className="editorial-editor">
-      <header className="editorial-editor__header">
-        <div>
-          <nav aria-label="Breadcrumb">
-            <Link href="/admin/stories">Stories</Link>
-            <span aria-hidden="true"> / </span>
-            <span>{draft.title || 'Untitled story'}</span>
-          </nav>
-          <p className="editorial-editor__save-status" role="status">
-            {busy
-              ? 'Saving or processing…'
-              : dirty
-                ? 'Unsaved changes'
-                : revision
-                  ? `Saved · revision ${revision}`
-                  : 'New draft'}
-            {!editable
-              ? ' · Read only'
-              : suspended
-                ? ' · Automatic saving paused'
-                : ' · Automatic saving on'}
-          </p>
-        </div>
-        <div className="admin-base-actions">
-          <Button
-            kind="secondary"
-            disabled={busy || !editable || !dirty}
-            onClick={() => void save()}
-          >
-            Save draft
-          </Button>
-          <Button
-            kind="secondary"
-            href={revision ? `/admin/stories/${draft.slug}/preview?revision=${revision}` : null}
-            target="_blank"
-            disabled={!revision}
-          >
-            Preview
-          </Button>
-          <Button onClick={() => openInspector('Review')}>Review and publish</Button>
-        </div>
-      </header>
-      {record.archivedAt && (
-        <p role="status" className="editorial-editor__message">
-          Archived story. Restore it from Settings to resume editing.
-        </p>
-      )}
-      {ready && !user && (
-        <Notification closeable={false}>
-          Your session ended.{' '}
-          <Link href="/admin/login" target="_blank">
-            Sign in again
-          </Link>{' '}
-          to continue. Your edits remain in this tab.
-        </Notification>
-      )}
-      {error && (
-        <div role="alert">
-          <Notification closeable={false}>
-            {error} Your edits remain here.
-            {suspended && (
-              <Button kind="tertiary" href={`/admin/stories/${draft.id}`} target="_blank">
-                Compare saved version
-              </Button>
-            )}
-          </Notification>
-        </div>
-      )}
-      {message && (
-        <p role="status" className="editorial-editor__message">
-          {message}
-        </p>
-      )}
-      {recovery && (
-        <section className="admin-base-panel" aria-label="Recover edits">
-          <h2>Recover your work</h2>
-          <p>This tab has unsaved edits from an earlier session.</p>
-          <div className="admin-base-actions">
-            <Button
-              onClick={() => {
-                try {
-                  setDraft(JSON.parse(recovery));
-                  setRecovery(null);
-                } catch {
-                  setError('The recovery copy could not be read.');
-                }
-              }}
-            >
-              Recover my edits
-            </Button>
-            <Button
-              kind="secondary"
-              onClick={() => {
-                setRecovery(null);
-                if (storageKey) sessionStorage.removeItem(storageKey);
-              }}
-            >
-              Use saved version
-            </Button>
-          </div>
-        </section>
-      )}
-      {compact && (
-        <Button kind="secondary" onClick={() => setInspectorOpen(true)}>
-          Story settings, sources and review
-        </Button>
-      )}
-      <div className="editorial-compose">
-        <section className="editorial-compose__document" aria-label="Story composition">
-          <div className="editorial-compose__masthead">
-            <div className="editorial-editor__title">{metadataField('title', 'Title', true)}</div>
-            {metadataField('summary', 'Summary', true)}
-          </div>
-          <RichDocument
-            body={draft.body}
-            onChange={(body) => patch('body', body)}
-            editable={editable}
-            references={draft.references}
-            onEditBlock={(index) => {
-              setSelectedBlock(index);
-              openInspector('Sources');
-            }}
-            onInsertBlock={(type, index) => {
-              // Placed after the block the cursor was in; appended when the cursor never was.
-              const at = index === null ? draft.body.length : index;
-              const next = [...draft.body];
-              next.splice(at, 0, newBlock(type));
-              setSelectedBlock(at);
-              patch('body', next);
-              openInspector('Sources');
-            }}
-            onError={(message) => {
-              setError(message);
-              setSuspended(true);
-            }}
-          />
-          <div className="editorial-compose__insert">
-            <p>
-              {wordCount} {wordCount === 1 ? 'word' : 'words'} · {draft.references.length}{' '}
-              {draft.references.length === 1 ? 'source' : 'sources'} ·{' '}
-              {draft.relatedEntityIds.length} related{' '}
-              {draft.relatedEntityIds.length === 1 ? 'record' : 'records'}
-            </p>
-          </div>
-        </section>
-        {compact ? (
-          <Drawer
-            isOpen={inspectorOpen}
-            onClose={() => setInspectorOpen(false)}
-            anchor="right"
-            size="full"
-            animate={false}
-            overrides={{
-              DrawerContainer: {
-                props: { role: 'dialog', 'aria-modal': true, 'aria-label': 'Story management' },
-              },
-            }}
-          >
-            <h2>Story management</h2>
-            {inspector}
-          </Drawer>
-        ) : (
-          inspector
-        )}
-      </div>
+  const manuscript = (
+    <div className="studio-manuscript" aria-label="Story composition">
+      <ManuscriptHeader
+        draft={draft}
+        patch={patch}
+        editable={editable}
+        busy={busy}
+        profiles={profiles}
+        credit={uploadCredit}
+        rights={uploadRights}
+        setCredit={setUploadCredit}
+        setRights={setUploadRights}
+        onUploadCover={uploadCover}
+        onProblem={setError}
+      />
+      <RichDocument
+        body={draft.body}
+        onChange={(body) => patch('body', body)}
+        editable={editable}
+        references={draft.references}
+        onEditBlock={(index) => {
+          setSelectedBlock(index);
+          openMargin('sources');
+        }}
+        onInsertBlock={(type, index) => {
+          // Placed after the block the cursor was in; appended when the cursor never was.
+          const at = index === null ? draft.body.length : index;
+          const next = [...draft.body];
+          next.splice(at, 0, newBlock(type));
+          setSelectedBlock(at);
+          patch('body', next);
+          openMargin('sources');
+        }}
+        onError={(message) => {
+          setError(message);
+          setSuspended(true);
+        }}
+        // TODO(orchestrator): once RichDocument gains them, pass `onImageFile={(file, index) => ...}`,
+        // `onAddReference={addReference}`, `onIssues={setBodyIssues}` and
+        // `onShowIssues={() => openMargin('readiness')}`.
+      />
+      <p className="studio-wordcount">
+        {wordCount} {wordCount === 1 ? 'word' : 'words'} · {draft.references.length}{' '}
+        {draft.references.length === 1 ? 'source' : 'sources'} · {draft.relatedEntityIds.length}{' '}
+        related {draft.relatedEntityIds.length === 1 ? 'record' : 'records'}
+      </p>
     </div>
   );
+  return (
+    <div className="studio" data-focus={focus} data-split={showSplit}>
+      <header className="studio-bar">
+        <div className="studio-bar__start">
+          <Link href="/admin/stories">Stories</Link>
+          <span className="studio-bar__status">{status}</span>
+        </div>
+        <div className="studio-bar__end">
+          {saveState ? (
+            <p
+              className="studio-bar__save"
+              role="status"
+              aria-live="polite"
+              title={
+                suspended && error
+                  ? error
+                  : savedAt
+                    ? `Saved ${relativeTime(savedAt, now)}`
+                    : undefined
+              }
+            >
+              {saveState}
+            </p>
+          ) : (
+            <p className="studio-bar__save">Read only</p>
+          )}
+          {marginAsSheet && !focus && (
+            <button type="button" className="studio-btn" onClick={() => setSheetOpen(true)}>
+              Details
+            </button>
+          )}
+          <button
+            type="button"
+            className="studio-btn studio-btn--icon"
+            aria-pressed={focus}
+            aria-label="Focus mode"
+            aria-keyshortcuts="Control+. Meta+."
+            title="Focus mode (Ctrl or Cmd and period)"
+            onClick={() => setFocus(!focus)}
+          >
+            <FontAwesomeIcon
+              icon={focus ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter}
+              aria-hidden="true"
+            />
+          </button>
+          <button
+            type="button"
+            className="studio-btn"
+            aria-pressed={previewOn}
+            onClick={() => setPreviewOn(!previewOn)}
+          >
+            Preview
+          </button>
+          {editable && (
+            <button
+              type="button"
+              className="studio-btn studio-btn--solid"
+              onClick={() => openMargin('readiness')}
+            >
+              Publish…
+            </button>
+          )}
+        </div>
+      </header>
+      <div className="studio-notices">
+        {record.archivedAt && (
+          <p role="status" className="studio-notice">
+            Archived story. Restore it from the Archive section to resume editing.
+          </p>
+        )}
+        {ready && !user && (
+          <Notification closeable={false}>
+            Your session ended.{' '}
+            <Link href="/admin/login" target="_blank">
+              Sign in again
+            </Link>{' '}
+            to continue. Your edits remain in this tab.
+          </Notification>
+        )}
+        {error && (
+          <div role="alert">
+            <Notification closeable={false}>
+              {error} Your edits remain here.
+              {suspended && (
+                <Button kind="tertiary" href={`/admin/stories/${draft.id}`} target="_blank">
+                  Compare saved version
+                </Button>
+              )}
+            </Notification>
+          </div>
+        )}
+        {message && (
+          <p role="status" className="studio-notice">
+            {message}
+          </p>
+        )}
+        {recovery && (
+          <section className="studio-notice studio-recovery" aria-label="Recover edits">
+            <h2>Recover your work</h2>
+            <p>This tab has unsaved edits from an earlier session.</p>
+            <div className="admin-base-actions">
+              <Button
+                onClick={() => {
+                  try {
+                    setDraft(JSON.parse(recovery));
+                    setRecovery(null);
+                  } catch {
+                    setError('The recovery copy could not be read.');
+                  }
+                }}
+              >
+                Recover my edits
+              </Button>
+              <Button
+                kind="secondary"
+                onClick={() => {
+                  setRecovery(null);
+                  if (storageKey) sessionStorage.removeItem(storageKey);
+                }}
+              >
+                Use saved version
+              </Button>
+            </div>
+          </section>
+        )}
+      </div>
+      <div className="studio-body" data-margin={!marginAsSheet && !focus}>
+        {!showPreviewOnly && manuscript}
+        {previewOn && (
+          <PreviewPane slug={record.draft.slug} revision={revision} pending={dirty || busy} />
+        )}
+        {!marginAsSheet && !focus && <aside className="studio-aside">{margin}</aside>}
+      </div>
+      {marginAsSheet && (
+        <Drawer
+          isOpen={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          anchor="right"
+          size="min(420px, 100vw)"
+          animate={false}
+          overrides={{
+            DrawerContainer: {
+              props: { role: 'dialog', 'aria-modal': true, 'aria-label': 'Story details' },
+            },
+          }}
+        >
+          {margin}
+        </Drawer>
+      )}
+    </div>
+  );
+}
+
+/** Smooth scrolling unless the reader asked for less motion. */
+function motion(): ScrollBehavior {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 }
