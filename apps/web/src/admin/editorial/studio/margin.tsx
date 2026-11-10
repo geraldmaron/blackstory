@@ -631,14 +631,8 @@ export function StudioMargin(props: MarginProps) {
                     draft.body.map((b, i) => (i === props.selectedBlock ? block : b)),
                   )
                 }
-                move={(delta) => {
-                  props.moveBlock(props.selectedBlock!, delta);
-                  props.setSelectedBlock((index) =>
-                    index === null
-                      ? null
-                      : Math.max(0, Math.min(draft.body.length - 1, index + delta)),
-                  );
-                }}
+                // The studio follows the moved block to its new index (followSelectedBlock).
+                move={(delta) => props.moveBlock(props.selectedBlock!, delta)}
                 remove={() => {
                   patch(
                     'body',

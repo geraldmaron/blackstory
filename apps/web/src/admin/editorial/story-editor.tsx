@@ -15,6 +15,7 @@ import type { StoryDraft, EditorialStory, StoryBodyBlockDoc } from '@repo/schema
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 import { staffRoleHasPermission } from '../auth/staff-permissions';
 import { newBlock } from './block-editor';
+import { followSelectedBlock } from './studio/follow-block';
 import { ManuscriptFront, type StudioProfile } from './studio/manuscript-header';
 import { StudioMargin } from './studio/margin';
 import { PreviewPane } from './studio/preview-pane';
@@ -97,6 +98,19 @@ export function StoryEditor({
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const now = useNow(30_000);
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null);
+  // Card moves and removals happen in the body editor; keep the panel on the same block.
+  const previousBody = useRef(initial.draft.body);
+  // Set when the studio inserts a block and selects it in the same update.
+  const selectionPlaced = useRef(false);
+  useEffect(() => {
+    const previous = previousBody.current;
+    previousBody.current = draft.body;
+    if (selectionPlaced.current) {
+      selectionPlaced.current = false;
+      return;
+    }
+    setSelectedBlock((selected) => followSelectedBlock(previous, draft.body, selected));
+  }, [draft.body]);
   // Studio layout state. Focus and open sections are remembered across visits.
   const [focus, setFocus] = useStoredState('studio:focus', false);
   const [storedSections, setStoredSections] = useStoredState<Partial<Record<SectionId, boolean>>>(
@@ -625,6 +639,7 @@ export function StoryEditor({
           const at = index === null ? draft.body.length : index;
           const next = [...draft.body];
           next.splice(at, 0, newBlock(type));
+          selectionPlaced.current = true;
           setSelectedBlock(at);
           patch('body', next);
           openMargin('sources');
@@ -643,6 +658,7 @@ export function StoryEditor({
           const next = [...draft.body];
           next.splice(index, 0, newBlock('image'));
           patch('body', next);
+          selectionPlaced.current = true;
           setSelectedBlock(index);
           openMargin('sources');
           setMessage(
