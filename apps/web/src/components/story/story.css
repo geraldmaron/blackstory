@@ -996,8 +996,7 @@
 .ds-reading-video__plate {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
+  gap: var(--ds-space-2);
   padding: var(--ds-space-5);
 }
 
@@ -1018,6 +1017,7 @@
 }
 
 .ds-reading-video__actions {
+  margin-top: auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

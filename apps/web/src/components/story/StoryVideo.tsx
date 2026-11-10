@@ -42,7 +42,7 @@ export function StoryVideo({
             <iframe
               src={source.src}
               title={title}
-              allow="fullscreen; picture-in-picture"
+              allow="fullscreen"
               allowFullScreen
               loading="lazy"
               referrerPolicy="strict-origin-when-cross-origin"
