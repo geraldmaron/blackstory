@@ -82,6 +82,13 @@ wrong block. The fifth is listed under "Still open".
   including the nav, row titles, facets, pagination and Today's own ink links. It is now wrapped
   in `:where()`, so it only colors plain links. Checked on 11 desks in the browser: no page
   errors, and only classed links changed.
+- **Attach evidence made you type a case id.** The case field now suggests the 200 most
+  recently updated open cases by title and still takes any id; every case page links to the
+  form with its case filled in. The form also gets the Quick add styles it was written for.
+- **Releases could not show what agents publish.** The desk listed three manifests, the newest
+  from September, while records go live daily through the incremental publisher. It now lists
+  the 50 records most recently added to the live release, by first-live date, and links the
+  publication audit log for the why. In-place corrections still show only in the audit log.
 - **Kill switches stay read-only.** `docs/runbooks/incident-response.md` makes the read-only view
   deliberate; a toggle would be a security change, not a design fix.
 
@@ -94,7 +101,7 @@ wrong block. The fifth is listed under "Still open".
 
 | Item | Why it is open |
 |---|---|
-| Catalog, quick add, evidence, sources, releases and switches desks | Not rebuilt in this pass; SURFACES.md 3.5 lists their defects (three table implementations, no conflict UI, raw filter forms, switches with no toggle UI) |
+| Catalog and sources desks | Not rebuilt in this pass; SURFACES.md 3.5 lists their defects (three table implementations, no conflict UI, raw filter forms, switches with no toggle UI) |
 | The citation link check has never run | `citation-link-health-sweep` has no runner and no results table, so none of the 12,358 published citations has a recorded link status. Running it means fetching every cited host weekly and letting it repoint dead links to archived copies; that is an owner call |
 | Unlinking a staff account from a contributor profile | `access_control.contributor_accounts.user_id` is unique and has no unlink path |
 | Story slug redirects | None exist; renaming a published story's slug breaks its links |

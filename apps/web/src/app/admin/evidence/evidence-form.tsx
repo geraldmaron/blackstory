@@ -10,7 +10,15 @@ import { submitEvidenceAttach } from './actions';
 import { EVIDENCE_ATTACH_INITIAL } from './form-state';
 import { EVIDENCE_ATTACH_STEPS, evidenceSubmitLabel } from './evidence-intake-copy';
 
-export function EvidenceAttachForm() {
+type CaseOption = { readonly id: string; readonly title: string };
+
+export function EvidenceAttachForm({
+  cases,
+  defaultCaseId,
+}: {
+  readonly cases: readonly CaseOption[];
+  readonly defaultCaseId: string;
+}) {
   const [commit, setCommit] = useState(false);
   const [state, formAction, isPending] = useActionState(
     submitEvidenceAttach,
@@ -27,8 +35,26 @@ export function EvidenceAttachForm() {
 
       <form action={formAction} className="quick-add-form">
         <div className="quick-add-field">
-          <label htmlFor="ev-case">Research case id</label>
-          <FormInput id="ev-case" name="researchCaseId" type="text" required autoComplete="off" />
+          <label htmlFor="ev-case">Research case</label>
+          <FormInput
+            id="ev-case"
+            name="researchCaseId"
+            type="text"
+            required
+            autoComplete="off"
+            list="ev-case-options"
+            defaultValue={defaultCaseId}
+            aria-describedby="ev-case-hint"
+          />
+          <datalist id="ev-case-options">
+            {cases.map((c) => (
+              <option key={c.id} value={c.id} label={c.title} />
+            ))}
+          </datalist>
+          <p className="quick-add-note" id="ev-case-hint">
+            Type part of a title to pick from the {cases.length} most recently updated open cases,
+            or paste any case id.
+          </p>
         </div>
         <div className="quick-add-field">
           <label htmlFor="ev-url">Source URL</label>

@@ -99,3 +99,38 @@ export async function listPublicationReleasesPostgres(limit: number): Promise<Re
 
   return { items, activeRelease };
 }
+
+export type RecentlyPublishedEntity = {
+  readonly entityId: string;
+  readonly displayName: string;
+  readonly kind: string;
+  readonly firstPublishedAt: string;
+};
+
+/**
+ * Records most recently added to the live release, newest first. `created_at` is set when a
+ * record first enters the release; an in-place correction does not move it.
+ */
+export async function listRecentlyPublishedEntitiesPostgres(
+  limit = 50,
+): Promise<readonly RecentlyPublishedEntity[]> {
+  const rows = await queryPostgres<{
+    readonly entity_id: string;
+    readonly display_name: string | null;
+    readonly kind: string | null;
+    readonly created_at: Date | string;
+  }>(
+    `SELECT e.entity_id, e.display_name, e.kind, e.created_at
+     FROM published.release_entities e
+     JOIN published.v_active_release_id a ON a.release_id = e.release_id
+     ORDER BY e.created_at DESC, e.entity_id ASC
+     LIMIT $1`,
+    [limit],
+  );
+  return rows.map((row) => ({
+    entityId: row.entity_id,
+    displayName: row.display_name ?? row.entity_id,
+    kind: row.kind ?? '',
+    firstPublishedAt: new Date(row.created_at).toISOString(),
+  }));
+}
