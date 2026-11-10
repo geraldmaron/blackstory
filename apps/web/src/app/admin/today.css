@@ -33,15 +33,17 @@
   border-top: 0;
 }
 
-.today__link {
+.admin-base-shell .today .today__link {
   color: var(--ds-ink);
   text-decoration: none;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 
-.today__link:hover {
+.admin-base-shell .today .today__link:hover {
+  color: var(--ds-accent);
   text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .today__link:focus-visible {

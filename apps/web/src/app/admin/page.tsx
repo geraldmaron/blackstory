@@ -2,7 +2,6 @@
  * Today: pick up the writing in progress, then see what is waiting on a decision.
  */
 import Link from 'next/link';
-import { Button } from 'baseui/button';
 import { redirect } from 'next/navigation';
 import { DeskTitleBar, Panel } from '../../admin/design-system/ui';
 import { readVerifiedAdminIdentity } from '../../admin/auth/supabase-server';
@@ -25,6 +24,9 @@ const STORY_STATUS: Readonly<Record<string, string>> = {
   review: 'In review',
   published: 'Published',
 };
+
+/** Queue type labels are regular nouns ("lead", "story packet", "research case"). */
+const plural = (label: string, count: number) => (count === 1 ? label : `${label}s`);
 
 export default async function AdminHomePage() {
   // Gate before the reads: this route sits outside every route-group layout, so it has no
@@ -66,7 +68,11 @@ export default async function AdminHomePage() {
       <div className="today">
         <Panel
           title="Pick up where I left off"
-          actions={<Button href="/admin/stories/new">New story</Button>}
+          actions={
+            <Link className="ds-cta ds-cta--solid ds-cta--sm" href="/admin/stories/new">
+              New story
+            </Link>
+          }
         >
           {stories.length === 0 ? (
             <p className="today__empty">
@@ -117,9 +123,12 @@ export default async function AdminHomePage() {
                   href={toggleQueueFacetHref('/admin/queue', {}, 'types', bucket.value as never)}
                 >
                   {bucket.count.toLocaleString()}{' '}
-                  {QUEUE_TYPE_LABELS[
-                    bucket.value as keyof typeof QUEUE_TYPE_LABELS
-                  ]?.toLowerCase() ?? bucket.value}
+                  {plural(
+                    QUEUE_TYPE_LABELS[
+                      bucket.value as keyof typeof QUEUE_TYPE_LABELS
+                    ]?.toLowerCase() ?? bucket.value,
+                    bucket.count,
+                  )}
                 </Link>
               ))}
               <Link className="today__foot-open" href="/admin/queue">
