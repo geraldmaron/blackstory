@@ -280,11 +280,6 @@
 .studio-cover__line .studio-cover__alt {
   flex-basis: 100%;
 }
-.studio-facts input {
-  field-sizing: content;
-  min-width: 6ch;
-  max-width: 100%;
-}
 .studio-facts {
   display: flex;
   align-items: center;
@@ -295,8 +290,10 @@
   font-size: var(--ds-text-caption);
 }
 .studio-facts input {
-  width: 100%;
-  min-width: 8rem;
+  /* Sized to the text, so period and place read as one line. */
+  field-sizing: content;
+  min-width: 6ch;
+  max-width: 100%;
   padding: 0;
   border-color: transparent;
   background: transparent;

@@ -15,7 +15,7 @@ import type { StoryDraft, EditorialStory, StoryBodyBlockDoc } from '@repo/schema
 import { useAdminAuth } from '../auth/AdminAuthProvider';
 import { staffRoleHasPermission } from '../auth/staff-permissions';
 import { newBlock } from './block-editor';
-import { ManuscriptHeader, type StudioProfile } from './studio/manuscript-header';
+import { ManuscriptFront, type StudioProfile } from './studio/manuscript-header';
 import { StudioMargin } from './studio/margin';
 import { PreviewPane } from './studio/preview-pane';
 import { useMedia, useNow, useRecordMeta, useStoredState } from './studio/hooks';
@@ -109,8 +109,7 @@ export function StoryEditor({
     [slugTouched, setSlugTouched] = useState(false),
     [dismissed, setDismissed] = useState<ReadonlySet<string>>(new Set()),
     [focusSource, setFocusSource] = useState<number | null>(null);
-  // TODO(orchestrator): RichDocument will report lint issues through `onIssues`; feed them here.
-  const [bodyIssues] = useState<BodyIssue[]>([]);
+  const [bodyIssues, setBodyIssues] = useState<readonly BodyIssue[]>([]);
   const wide = useMedia('(min-width: 1280px)'),
     narrow = useMedia('(max-width: 1099px)');
   const showSplit = previewOn && wide,
@@ -137,11 +136,17 @@ export function StoryEditor({
     const token = await getIdToken();
     if (!token)
       throw new Error('Your session expired. Sign in again; your edits remain in this tab.');
-    const response = await fetch(path, {
-      method,
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    let response: Response;
+    try {
+      response = await fetch(path, {
+        method,
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } catch {
+      // The browser's own wording ("Failed to fetch") says nothing a writer can act on.
+      throw new Error('The archive could not be reached. Check the connection and save again.');
+    }
     const data = await response.json();
     if (!response.ok) throw new Error(data.error ?? 'The request failed.');
     return data;
@@ -593,7 +598,7 @@ export function StoryEditor({
   );
   const manuscript = (
     <div className="studio-manuscript" aria-label="Story composition">
-      <ManuscriptHeader
+      <ManuscriptFront
         draft={draft}
         patch={patch}
         editable={editable}
@@ -628,12 +633,26 @@ export function StoryEditor({
           setError(message);
           setSuspended(true);
         }}
-        // TODO(orchestrator): once RichDocument gains them, pass `onImageFile={(file, index) => ...}`,
-        // `onAddReference={addReference}`, `onIssues={setBodyIssues}` and
-        // `onShowIssues={() => openMargin('readiness')}`.
+        onWarning={setMessage}
+        onAddReference={addReference}
+        onIssues={setBodyIssues}
+        onShowIssues={() => openMargin('readiness')}
+        onImageFile={(_file, index) => {
+          // Uploads need a credit and rights first (the media API refuses without them), so a
+          // pasted image becomes an image block whose details ask for both before the upload.
+          const next = [...draft.body];
+          next.splice(index, 0, newBlock('image'));
+          patch('body', next);
+          setSelectedBlock(index);
+          openMargin('sources');
+          setMessage(
+            'Image block added. Give it a credit and rights in the details, then add the file there to upload it.',
+          );
+        }}
       />
       <p className="studio-wordcount">
-        {wordCount} {wordCount === 1 ? 'word' : 'words'} · {draft.references.length}{' '}
+        {wordCount.toLocaleString()} {wordCount === 1 ? 'word' : 'words'} · about{' '}
+        {Math.max(1, Math.round(wordCount / 230))} min read · {draft.references.length}{' '}
         {draft.references.length === 1 ? 'source' : 'sources'} · {draft.relatedEntityIds.length}{' '}
         related {draft.relatedEntityIds.length === 1 ? 'record' : 'records'}
       </p>

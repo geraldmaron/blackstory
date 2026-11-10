@@ -529,7 +529,7 @@ function Byline({
   );
 }
 
-export function ManuscriptHeader({
+export function ManuscriptFront({
   draft,
   patch,
   editable,
