@@ -69,3 +69,29 @@ test('StoryProse resolves citations and entity links in one paragraph, in order'
   assert.ok(entityAt > -1 && citeAt > -1, 'both markers render');
   assert.ok(entityAt < citeAt, 'entity link precedes the citation, matching source order');
 });
+
+test('StoryProse renders marks, wrapped entity links and safe external links', () => {
+  const html = renderToStaticMarkup(
+    createElement(StoryProse, {
+      text: '**Strong** and _soft_ with **[[ent_x|Ida B. Wells]]** and [the act](https://example.org/a).',
+      refNumberById: NO_REFS,
+    }),
+  );
+  assert.match(html, /<strong>Strong<\/strong>/);
+  assert.match(html, /<em>soft<\/em>/);
+  assert.match(html, /<strong><a [^>]*href="\/entity\/ent_x"[^>]*>Ida B\. Wells<\/a><\/strong>/);
+  assert.match(html, /href="https:\/\/example\.org\/a"[^>]*rel="noopener noreferrer external"/);
+  assert.match(html, /target="_blank"/);
+  assert.match(html, /\(opens in a new tab\)/);
+});
+
+test('StoryProse leaves an http link and snake_case literal', () => {
+  const html = renderToStaticMarkup(
+    createElement(StoryProse, {
+      text: 'ent_a_b [x](http://example.org)',
+      refNumberById: NO_REFS,
+    }),
+  );
+  assert.doesNotMatch(html, /<a |<em>/);
+  assert.match(html, /ent_a_b \[x\]\(http:\/\/example\.org\)/);
+});

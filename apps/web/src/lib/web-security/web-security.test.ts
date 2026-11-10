@@ -36,6 +36,20 @@ const NEXT_CONFIG_PATH = join(__dirname, '../../../next.config.mjs');
 // tests only need a fixed, recognizable token to assert the directive shape around it.
 const TEST_NONCE = 'dGVzdC1ub25jZS12YWx1ZQ==';
 
+test('CSP frame-src names exactly the story video providers and tile.loc.gov stays media-only', () => {
+  const csp = buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE });
+  const directive = (name: string) =>
+    csp
+      .split(';')
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(`${name} `));
+  assert.equal(
+    directive('frame-src'),
+    'frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://archive.org',
+  );
+  assert.match(directive('media-src') ?? '', /https:\/\/tile\.loc\.gov/);
+});
+
 test('CSP includes strict defaults and frame-ancestors none', () => {
   const csp = buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE });
   assert.match(csp, /default-src 'self'/);

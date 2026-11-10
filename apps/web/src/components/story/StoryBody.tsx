@@ -24,7 +24,9 @@ import type {
   HydratedStoryStat,
 } from '../../lib/stories/hydrate';
 import { extractChapterHeadings } from '../../lib/stories/heading-anchors';
-import { StoryCitationMarks, StoryProse } from './StoryProse';
+import { storyVideoSource, storyVideoWatchUrl } from '@repo/schemas';
+import { StoryCitationMarks, StoryInline, StoryProse } from './StoryProse';
+import { StoryVideo } from './StoryVideo';
 import { ArchiveFigure } from '../room/Evidence';
 import { DestinationIcon } from '../patterns/DestinationIcon';
 
@@ -50,6 +52,19 @@ export function headingAnchorId(index: number, text: string): string {
     .slice(0, 60);
   return slug.length > 0 ? `section-${index}-${slug}` : `section-${index}`;
 }
+
+const VIDEO_PROVIDER_LABEL = {
+  youtube: 'YouTube',
+  vimeo: 'Vimeo',
+  archive: 'Internet Archive',
+  loc: 'Library of Congress',
+} as const;
+
+const VIDEO_RIGHTS_LABEL = {
+  public_domain: 'In the public domain',
+  licensed: 'Used under license',
+  fair_use: 'Used under fair use',
+} as const;
 
 function SourceLine({ numbers }: { readonly numbers: readonly number[] }) {
   if (numbers.length === 0) return null;
@@ -165,7 +180,7 @@ function Block({
     case 'pullquote':
       return (
         <blockquote className="ds-reading__pullquote">
-          <p>{block.text}</p>
+          <StoryProse text={block.text} refNumberById={refNumberById} />
           {block.attribution ? (
             <cite className="ds-reading__pullquote-cite">{block.attribution}</cite>
           ) : null}
@@ -245,8 +260,76 @@ function Block({
       );
     case 'image':
       return (
-        <ArchiveFigure image={block.image} {...(block.caption ? { caption: block.caption } : {})} />
+        <ArchiveFigure
+          image={block.image}
+          {...(block.caption
+            ? { caption: <StoryInline text={block.caption} refNumberById={refNumberById} /> }
+            : {})}
+        />
       );
+    case 'table': {
+      const [first, ...rest] = block.rows;
+      const bodyRows = block.header ? rest : block.rows;
+      const cell = (text: string) => (
+        <StoryProse as="span" text={text} refNumberById={refNumberById} />
+      );
+      return (
+        <figure className="ds-reading-table">
+          <div
+            className="ds-reading-table__scroll"
+            tabIndex={0}
+            role="region"
+            aria-label={block.caption}
+          >
+            <table>
+              {block.header && first ? (
+                <thead>
+                  <tr>
+                    {first.map((text, c) => (
+                      <th key={c} scope="col">
+                        {cell(text)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+              ) : null}
+              <tbody>
+                {bodyRows.map((row, r) => (
+                  <tr key={r}>
+                    {row.map((text, c) => (
+                      <td key={c}>{cell(text)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <figcaption className="ds-reading__figcaption">
+            <StoryProse as="span" text={block.caption} refNumberById={refNumberById} />
+          </figcaption>
+        </figure>
+      );
+    }
+    case 'video':
+      return (
+        <StoryVideo
+          title={block.title}
+          providerLabel={VIDEO_PROVIDER_LABEL[block.provider]}
+          credit={block.credit}
+          rights={VIDEO_RIGHTS_LABEL[block.rightsStatus]}
+          watchUrl={storyVideoWatchUrl(block)}
+          source={storyVideoSource(block)}
+          {...(block.caption
+            ? {
+                caption: (
+                  <StoryProse as="span" text={block.caption} refNumberById={refNumberById} />
+                ),
+              }
+            : {})}
+        />
+      );
+    case 'divider':
+      return <hr className="ds-reading-divider" />;
     default:
       return null;
   }

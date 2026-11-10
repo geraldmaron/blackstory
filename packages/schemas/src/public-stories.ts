@@ -199,6 +199,45 @@ const storyListBlockSchema = z.object({
   items: z.array(z.string().min(1).max(600)).min(1).max(24),
 });
 
+const storyRightsStatusSchema = storyImageSchema.shape.rightsStatus;
+
+/**
+ * A table of short prose cells (inline grammar applies). Equal row length is enforced by
+ * `storyBodyBlockIssues` on the story body, because a refinement here would turn the block
+ * into an effect and a discriminated union only takes plain objects.
+ */
+const storyTableBlockSchema = z.object({
+  type: z.literal('table'),
+  caption: z.string().min(1).max(400),
+  header: z.boolean().default(true),
+  rows: z
+    .array(z.array(z.string().max(600)).min(1).max(12))
+    .min(1)
+    .max(60),
+});
+
+export const STORY_VIDEO_PROVIDERS = ['youtube', 'vimeo', 'archive', 'loc'] as const;
+const VIDEO_ID_PATTERNS: Record<(typeof STORY_VIDEO_PROVIDERS)[number], RegExp> = {
+  youtube: /^[A-Za-z0-9_-]{11}$/,
+  vimeo: /^\d{6,12}$/,
+  archive: /^[A-Za-z0-9._-]{1,200}$/,
+  loc: /^storage-services\/[A-Za-z0-9/._-]{1,400}\.(mp4|m4v|webm)$/,
+};
+
+/** A video by provider id, never an embed URL. Rendered click-to-load by the public reader. */
+const storyVideoBlockSchema = z.object({
+  type: z.literal('video'),
+  provider: z.enum(STORY_VIDEO_PROVIDERS),
+  videoId: z.string().min(1).max(500),
+  title: z.string().min(1).max(240),
+  caption: z.string().max(400).optional(),
+  credit: z.string().min(1).max(240),
+  rightsStatus: storyRightsStatusSchema,
+});
+
+/** A section break. */
+const storyDividerBlockSchema = z.object({ type: z.literal('divider') });
+
 export const storyBodyBlockSchema = z.discriminatedUnion('type', [
   storyHeadingBlockSchema,
   storyParagraphBlockSchema,
@@ -211,8 +250,131 @@ export const storyBodyBlockSchema = z.discriminatedUnion('type', [
   storyMapInsetBlockSchema,
   storyDisputeBlockSchema,
   storyImageBlockSchema,
+  storyTableBlockSchema,
+  storyVideoBlockSchema,
+  storyDividerBlockSchema,
 ]);
 export type StoryBodyBlockDoc = z.infer<typeof storyBodyBlockSchema>;
+export type StoryVideoBlockDoc = Extract<StoryBodyBlockDoc, { type: 'video' }>;
+
+/** Cross-field rules a discriminated-union member cannot carry. Empty when the block is valid. */
+export function storyBodyBlockIssues(block: StoryBodyBlockDoc): string[] {
+  if (block.type === 'table') {
+    const width = block.rows[0]?.length ?? 0;
+    return block.rows.every((row) => row.length === width)
+      ? []
+      : ['table rows must all have the same number of cells'];
+  }
+  if (block.type === 'video') {
+    return VIDEO_ID_PATTERNS[block.provider].test(block.videoId)
+      ? []
+      : [`videoId is not a valid ${block.provider} id`];
+  }
+  return [];
+}
+
+const storyBodySchema = z
+  .array(storyBodyBlockSchema)
+  .min(1)
+  .superRefine((blocks, ctx) => {
+    blocks.forEach((block, index) => {
+      for (const message of storyBodyBlockIssues(block)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message, path: [index] });
+      }
+    });
+  });
+
+/** Where a video plays from. Never an embed URL in storage; built here from the id. */
+export function storyVideoSource(
+  block: Pick<StoryVideoBlockDoc, 'provider' | 'videoId'>,
+): { kind: 'iframe'; src: string } | { kind: 'file'; src: string } {
+  switch (block.provider) {
+    case 'youtube':
+      return { kind: 'iframe', src: `https://www.youtube-nocookie.com/embed/${block.videoId}` };
+    case 'vimeo':
+      return { kind: 'iframe', src: `https://player.vimeo.com/video/${block.videoId}?dnt=1` };
+    case 'archive':
+      return { kind: 'iframe', src: `https://archive.org/embed/${block.videoId}` };
+    case 'loc':
+      return { kind: 'file', src: `https://tile.loc.gov/${block.videoId}` };
+  }
+}
+
+/** The provider's own watch page, for readers without JavaScript. */
+export function storyVideoWatchUrl(
+  block: Pick<StoryVideoBlockDoc, 'provider' | 'videoId'>,
+): string {
+  switch (block.provider) {
+    case 'youtube':
+      return `https://www.youtube.com/watch?v=${block.videoId}`;
+    case 'vimeo':
+      return `https://vimeo.com/${block.videoId}`;
+    case 'archive':
+      return `https://archive.org/details/${block.videoId}`;
+    case 'loc':
+      return `https://tile.loc.gov/${block.videoId}`;
+  }
+}
+
+/** Recognize a pasted video URL and reduce it to provider + id, or null. */
+export function parseStoryVideoUrl(
+  input: string,
+): { provider: StoryVideoBlockDoc['provider']; videoId: string } | null {
+  let url: URL;
+  try {
+    url = new URL(input.trim());
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'https:' || url.username || url.password) return null;
+  const host = url.hostname.toLowerCase().replace(/^www\./, '');
+  const parts = url.pathname.split('/').filter(Boolean);
+  let found: { provider: StoryVideoBlockDoc['provider']; videoId: string } | null = null;
+  if (host === 'youtube.com' || host === 'm.youtube.com') {
+    if (parts[0] === 'watch')
+      found = { provider: 'youtube', videoId: url.searchParams.get('v') ?? '' };
+    else if (parts[0] === 'embed' && parts[1]) found = { provider: 'youtube', videoId: parts[1] };
+  } else if (host === 'youtube-nocookie.com' && parts[0] === 'embed' && parts[1]) {
+    found = { provider: 'youtube', videoId: parts[1] };
+  } else if (host === 'youtu.be' && parts[0]) {
+    found = { provider: 'youtube', videoId: parts[0] };
+  } else if (host === 'vimeo.com' && parts[0]) {
+    found = { provider: 'vimeo', videoId: parts[0] };
+  } else if (host === 'player.vimeo.com' && parts[0] === 'video' && parts[1]) {
+    found = { provider: 'vimeo', videoId: parts[1] };
+  } else if (
+    host === 'archive.org' &&
+    (parts[0] === 'details' || parts[0] === 'embed') &&
+    parts[1]
+  ) {
+    found = { provider: 'archive', videoId: parts[1] };
+  } else if (host === 'tile.loc.gov' && parts[0] === 'storage-services') {
+    found = { provider: 'loc', videoId: parts.join('/') };
+  }
+  return found && VIDEO_ID_PATTERNS[found.provider].test(found.videoId) ? found : null;
+}
+
+/**
+ * Every author-written prose string in a block, in reading order. This is the one place that
+ * says which block fields use the inline grammar; citation numbering and the publish gates
+ * enumerate through it. Figure and stat captions are data captions and stay out.
+ */
+export function storyBlockProseTexts(block: StoryBodyBlockDoc): string[] {
+  switch (block.type) {
+    case 'paragraph':
+    case 'pullquote':
+      return [block.text];
+    case 'list':
+      return [...block.items];
+    case 'table':
+      return [block.caption, ...block.rows.flat()];
+    case 'image':
+    case 'video':
+      return block.caption ? [block.caption] : [];
+    default:
+      return [];
+  }
+}
 
 /* ------------------------------------------------------------------------- *
  * Story projection.
@@ -291,7 +453,7 @@ export const publicStoryProjectionSchema = z.object({
   collection: storyCollectionSchema.optional(),
   /** Free facet labels the index groups and filters on (era grouping, subject class). */
   tags: z.array(z.string().min(1).max(80)).max(12).default([]),
-  body: z.array(storyBodyBlockSchema).min(1),
+  body: storyBodySchema,
   references: z.array(storyReferenceSchema).default([]),
   relatedEntityIds: z.array(z.string().min(1)).default([]),
   contributors: z.array(storyContributorSchema).max(24).default([]),
@@ -341,14 +503,9 @@ export function collectStoryCitationIssues(
   const issues: StoryCitationIntegrityIssue[] = [];
 
   for (const block of story.body) {
-    // Every block that carries author-written prose is scanned. `list` items are prose
-    // too: a call-out bullet is exactly where an uncited claim would otherwise hide.
-    const texts =
-      block.type === 'paragraph' || block.type === 'pullquote'
-        ? [block.text]
-        : block.type === 'list'
-          ? block.items
-          : [];
+    // Every block that carries author-written prose is scanned: a call-out bullet or a
+    // table cell is exactly where an uncited claim would otherwise hide.
+    const texts = storyBlockProseTexts(block);
     for (const text of texts) {
       for (const refId of extractInlineCitationIds(text)) {
         usedIds.add(refId);

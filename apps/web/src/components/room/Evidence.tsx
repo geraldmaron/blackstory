@@ -28,7 +28,7 @@ export function ArchiveFigure({
   children,
 }: {
   readonly image: { readonly url: string; readonly alt: string; readonly credit: string };
-  readonly caption?: string;
+  readonly caption?: ReactNode;
   readonly href?: string;
   readonly rights?: string;
   readonly children?: ReactNode;

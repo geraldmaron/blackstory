@@ -24,6 +24,7 @@ import { Note, RecordNav, Room } from '../../../components/room';
 import type { RecordNavTarget } from '../../../components/room';
 import { storyCitedEntities } from '../../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
+import { IMPLICIT_AUTHOR_NAME, storyBylineLines } from '../../../lib/stories/byline';
 import '../../reading-room.css';
 import '../../../components/story/story.css';
 import '../../../components/theme-spine/theme-spine.css';
@@ -60,9 +61,11 @@ function buildStoryJsonLd(story: HydratedStory) {
     datePublished: doc.publishedAt,
     ...(doc.updatedAt ? { dateModified: doc.updatedAt } : {}),
     '@id': `/stories/${doc.slug}`,
-    author: doc.contributors
-      .filter((c) => c.roles.includes('author'))
-      .map((c) => ({ '@type': c.kind === 'person' ? 'Person' : 'Organization', name: c.name })),
+    author: doc.contributors.some((c) => c.roles.includes('author'))
+      ? doc.contributors
+          .filter((c) => c.roles.includes('author'))
+          .map((c) => ({ '@type': c.kind === 'person' ? 'Person' : 'Organization', name: c.name }))
+      : [{ '@type': 'Organization', name: IMPLICIT_AUTHOR_NAME }],
     ...(doc.heroImage ? { image: doc.heroImage.url } : {}),
   };
   assertNeverClaimReview(jsonLd);
@@ -189,17 +192,9 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
         <h1 className="ds-reading-mast__title">{doc.title}</h1>
         <p className="ds-reading-mast__lede">{doc.summary}</p>
         <p className="ds-reading-mast__byline">
-          <span>
-            {doc.contributors.length
-              ? doc.contributors.map((credit, index) => (
-                  <span key={credit.id}>
-                    {index > 0 ? '; ' : ''}
-                    {credit.name} ({credit.roles.join(', ')}
-                    {credit.kind === 'editorial' ? ', house editorial identity' : ''})
-                  </span>
-                ))
-              : 'Contributor credits not recorded'}
-          </span>
+          {storyBylineLines(doc.contributors).map((line) => (
+            <span key={line}>{line}</span>
+          ))}
           <span>
             Published <span className="ds-mono">{doc.publishedAt}</span>
           </span>
