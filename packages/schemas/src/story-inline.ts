@@ -22,7 +22,7 @@ type Mark = 'strong' | 'em';
 // Same entity pattern as ENTITY_PROSE_LINK_RE in @repo/domain (sticky, non-global here).
 const CITE_RE = /\[ref:([a-z0-9]+(?:-[a-z0-9]+)*)\]/y;
 const ENTITY_RE = /\[\[([^|\][]+)(?:\|([^\][]+))?\]\]/y;
-const LINK_RE = /\[([^\][\n]+)\]\((https:\/\/[^\s)]+)\)/y;
+const LINK_RE = /\[((?:\\[\\\[\]*_]|[^\][\n\\]|\\(?![\\\[\]*_]))+)\]\((https:\/\/[^\s)]+)\)/y;
 const LINK_LIKE_RE = /\[([^\][\n]+)\]\(([^\s)]+)\)/g;
 
 /** https only, parses as a URL, no embedded credentials, no whitespace. */
@@ -67,7 +67,7 @@ function lex(s: string): Token[] {
     const c = s[i]!;
     if (c === '\\') {
       const n = s[i + 1];
-      if (n === '\\' || n === '*' || n === '_') {
+      if (n === '\\' || n === '*' || n === '_' || n === '[' || n === ']') {
         buf += n;
         i += 2;
       } else {
@@ -239,16 +239,23 @@ function normalize(nodes: readonly StoryInlineNode[]): StoryInlineNode[] {
   return out;
 }
 
-function escapeText(text: string): string {
-  return text.replace(/[\\*_]/g, '\\$&');
+type Mode = 'plain' | 'escaped';
+
+/**
+ * `escaped` escapes every character the grammar could read as markup; `plain` escapes nothing
+ * outside link labels (whose brackets must always be escaped).
+ */
+function escapeText(text: string, mode: Mode, inLink: boolean): string {
+  if (mode === 'escaped') return text.replace(/[\\*_[\]]/g, '\\$&');
+  return inLink ? text.replace(/[\\[\]]/g, '\\$&') : text;
 }
 
-export function serializeStoryInline(nodes: readonly StoryInlineNode[]): string {
+function render(nodes: readonly StoryInlineNode[], mode: Mode, inLink = false): string {
   let out = '';
-  for (const node of normalize(nodes)) {
+  for (const node of nodes) {
     switch (node.type) {
       case 'text':
-        out += escapeText(node.text);
+        out += escapeText(node.text, mode, inLink);
         break;
       case 'break':
         out += '\n';
@@ -260,17 +267,33 @@ export function serializeStoryInline(nodes: readonly StoryInlineNode[]): string 
         out += node.label === '' ? `[[${node.entityId}]]` : `[[${node.entityId}|${node.label}]]`;
         break;
       case 'link':
-        out += `[${serializeStoryInline(node.children)}](${node.href.replace(/\s/g, encodeURIComponent).replace(/\)/g, '%29')})`;
+        out += `[${render(node.children, mode, true)}](${node.href.replace(/\s/g, encodeURIComponent).replace(/\)/g, '%29')})`;
         break;
       case 'strong':
-        out += `**${serializeStoryInline(node.children)}**`;
+        out += `**${render(node.children, mode, inLink)}**`;
         break;
       case 'em':
-        out += `_${serializeStoryInline(node.children)}_`;
+        out += `_${render(node.children, mode, inLink)}_`;
         break;
     }
   }
   return out;
+}
+
+/**
+ * Canonical text for a node tree. The unescaped form is kept whenever it reads back as the same
+ * tree, so prose written before this grammar (and ordinary punctuation such as `5 * 3`,
+ * `snake_case` or `[sic]`) is stored exactly as typed; escapes appear only where a character
+ * would otherwise be read as markup.
+ */
+export function serializeStoryInline(nodes: readonly StoryInlineNode[]): string {
+  const tree = normalize(nodes);
+  const escaped = render(tree, 'escaped');
+  const plainText = render(tree, 'plain');
+  if (plainText === escaped) return plainText;
+  return render(normalize(parseStoryInline(plainText)), 'escaped') === escaped
+    ? plainText
+    : escaped;
 }
 
 function plain(nodes: readonly StoryInlineNode[]): string {

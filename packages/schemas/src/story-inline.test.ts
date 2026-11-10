@@ -106,7 +106,25 @@ test('external links: https only, safe href, label may carry marks', () => {
 
 test('escapes', () => {
   assert.deepEqual(parseStoryInline('\\*a\\* \\_b\\_ \\\\ \\n'), [t('*a* _b_ \\ \\n')]);
-  assert.equal(serializeStoryInline([t('a*b_c\\d')]), 'a\\*b\\_c\\\\d');
+  // Text that cannot be misread is stored exactly as typed.
+  assert.equal(serializeStoryInline([t('a*b_c\\d')]), 'a*b_c\\d');
+  // Escapes appear only when the plain form would read back as markup.
+  for (const text of [
+    '**not bold**',
+    '_not em_',
+    'see [ref:a] literally',
+    '[[ent_x|not a link]]',
+    '[x](https://x.org)',
+  ]) {
+    const stored = serializeStoryInline([t(text)]);
+    assert.deepEqual(parseStoryInline(stored), [t(text)], `${text} -> ${stored}`);
+  }
+});
+
+test('a link label keeps brackets and markup characters through a round trip', () => {
+  const tree = [{ type: 'link' as const, href: 'https://x.org', children: [t('A]B [sic] 5*3')] }];
+  const stored = serializeStoryInline(tree);
+  assert.deepEqual(parseStoryInline(stored), tree, stored);
 });
 
 test('plain text keeps labels, drops citations and marks', () => {
@@ -117,8 +135,12 @@ test('plain text keeps labels, drops citations and marks', () => {
 });
 
 test('old-style strings round-trip byte for byte', () => {
-  for (const s of ['plain.[ref:a][ref:b] Next [[e|L]] text\nline', 'It is 5 * 3? no.', '']) {
-    if (/[\\*_]/.test(s)) continue;
+  for (const s of [
+    'plain.[ref:a][ref:b] Next [[e|L]] text\nline',
+    'It is 5 * 3? no.',
+    'snake_case and a\\b and [sic]',
+    '',
+  ]) {
     assert.equal(serializeStoryInline(parseStoryInline(s)), s);
   }
 });

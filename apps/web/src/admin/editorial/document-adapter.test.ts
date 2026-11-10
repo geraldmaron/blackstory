@@ -147,7 +147,8 @@ test('canonical inline markup survives a rebuild from nothing but the document',
     'Mark atoms **[[ent_a|Ada]]** and _[ref:one]_',
     'Read [the archive](https://www.loc.gov/item/1) now',
     'A **[link in bold](https://example.org/a)** here',
-    'Escapes \\\\ \\* \\_ stay literal',
+    'Plain \\ * _ characters stay as typed',
+    'Literal \\*\\*not bold\\*\\* and \\[ref:x\\] stay literal',
     'Line one\nline two **bold\nacross**',
   ]) {
     assert.equal(proseOf(text), text, text);
