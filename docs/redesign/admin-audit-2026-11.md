@@ -73,6 +73,18 @@ wrong block. The fifth is listed under "Still open".
   under the selection highlight. A new admin API route had no permission rule. Formatting the
   contract cannot store would have paused autosave.
 
+## Second pass (2026-11-10)
+
+- **Citation health showed invented numbers.** Its rot-rate table was computed from sample
+  fixtures and looked measured. The desk now gives the live count of published citations and
+  hosts, says plainly that none has been checked, and labels the dead-link preview as a sample.
+- **Every admin link was copper.** `.admin-base-shell a:not(...)` outranked every classed link,
+  including the nav, row titles, facets, pagination and Today's own ink links. It is now wrapped
+  in `:where()`, so it only colors plain links. Checked on 11 desks in the browser: no page
+  errors, and only classed links changed.
+- **Kill switches stay read-only.** `docs/runbooks/incident-response.md` makes the read-only view
+  deliberate; a toggle would be a security change, not a design fix.
+
 ## Owner decisions recorded
 
 - 2026-11-10: AI agents may publish entities, and an approval may be granted from an agent session. Entity publishing therefore does not need an admin button; the admin's job is to show what was published and why.
@@ -82,8 +94,8 @@ wrong block. The fifth is listed under "Still open".
 
 | Item | Why it is open |
 |---|---|
-| The shell-wide rule `.admin-base-shell a:not([data-baseweb="button"])` makes every admin link copper | Changing it touches every desk; Today overrides it locally for now |
-| Catalog, quick add, evidence, sources, citation health, releases and switches desks | Not rebuilt in this pass; SURFACES.md 3.5 lists their defects (three table implementations, no conflict UI, raw filter forms, switches with no toggle UI) |
+| Catalog, quick add, evidence, sources, releases and switches desks | Not rebuilt in this pass; SURFACES.md 3.5 lists their defects (three table implementations, no conflict UI, raw filter forms, switches with no toggle UI) |
+| The citation link check has never run | `citation-link-health-sweep` has no runner and no results table, so none of the 12,358 published citations has a recorded link status. Running it means fetching every cited host weekly and letting it repoint dead links to archived copies; that is an owner call |
 | Unlinking a staff account from a contributor profile | `access_control.contributor_accounts.user_id` is unique and has no unlink path |
 | Story slug redirects | None exist; renaming a published story's slug breaks its links |
 | A pasted or dropped image creates an image block but does not keep the file | Uploads need a credit and rights first; the block's details ask for both, then the file is added there |

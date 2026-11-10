@@ -1,9 +1,6 @@
 /**
- * Deterministic fixture citations for the citation-health dashboard tile, matching the
- * `/console` shell's convention: fixture data, no live mutation handlers. Real telemetry would
- * come from the citation store the `citation-link-health-sweep` scheduled job
- * (packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts) writes to; nothing here
- * connects to a live service.
+ * Sample citations for the citation health desk's reader-facing preview of a dead and a drifted
+ * link. They are not live data and must never feed a rate or count.
  */
 import type { Citation } from '@repo/domain';
 

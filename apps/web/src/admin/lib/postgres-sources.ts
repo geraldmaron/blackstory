@@ -304,6 +304,25 @@ export async function getSourceLibraryTotalsPostgres(): Promise<SourceLibraryTot
   };
 }
 
+/** Published citations and the distinct hosts they point at, for the citation health desk. */
+export async function getPublishedCitationTotalsPostgres(): Promise<{
+  readonly citationCount: number;
+  readonly hostCount: number;
+}> {
+  const rows = await queryPostgres<{
+    readonly citation_count: number | string;
+    readonly host_count: number | string;
+  }>(
+    `SELECT count(*) AS citation_count, count(DISTINCT host) AS host_count
+     FROM evidence.published_citations`,
+    [],
+  );
+  return {
+    citationCount: readCount(rows[0]?.citation_count),
+    hostCount: readCount(rows[0]?.host_count),
+  };
+}
+
 export async function getSourceLibraryEntryPostgres(
   organizationId: string,
 ): Promise<SourceLibraryEntry | null> {
