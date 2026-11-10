@@ -59,6 +59,11 @@ body {
   padding-top: 0;
 }
 
+/* Admin renders no public shell bar, so there is nothing to clear. */
+.ds-shell-body:has(.admin-base-shell) {
+  padding-top: 0;
+}
+
 /*
  * The static map ground shared by every Albers locator surface — the Door board, the Explore
  * first-paint underlay and the record locator — is the live plate's ground. The locator SVG is a

@@ -33,7 +33,7 @@ export function StoryList({ items }: { items: readonly Story[] }) {
               Research packets
             </Button>
             <Button kind="tertiary" href="/admin/stories/contributors">
-              Contributors
+              People &amp; bylines
             </Button>
           </>
         }

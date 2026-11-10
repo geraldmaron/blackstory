@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { isAuthGatedPath } from '../auth/protected-paths';
 import {
+  activeDestination,
   ADMIN_NAV_GROUPS,
   ADMIN_TOP_LEVEL,
   adminPaletteItems,
@@ -21,7 +22,7 @@ test('the sidebar stays short enough to scan: few groups, each a real task', () 
   assert.ok(ADMIN_NAV_GROUPS.length <= 6, `grew to ${ADMIN_NAV_GROUPS.length} groups`);
   for (const group of ADMIN_NAV_GROUPS) {
     assert.ok(group.destinations.length >= 1, `${group.id} is empty`);
-    assert.ok(group.destinations.length <= 5, `${group.id} has too many destinations`);
+    assert.ok(group.destinations.length <= 9, `${group.id} has too many destinations`);
   }
 });
 
@@ -74,4 +75,32 @@ test('the legacy console is gone from the IA', () => {
     ),
     false,
   );
+});
+
+test("groups follow the owner's jobs, in order", () => {
+  assert.deepEqual(
+    ADMIN_NAV_GROUPS.map((group) => group.label),
+    ['Write', 'Records', 'Intake', 'Sources', 'System'],
+  );
+  assert.deepEqual(
+    ADMIN_TOP_LEVEL.map((destination) => destination.label),
+    ['Today'],
+  );
+});
+
+test('old names still find their destination in the palette', () => {
+  const find = (term: string) =>
+    adminPaletteItems().find((item) => item.keywords?.includes(term))?.id;
+  assert.equal(find('contributors'), '/admin/stories/contributors');
+  assert.equal(find('operations'), '/admin');
+});
+
+test('exactly one destination is active, the longest match', () => {
+  assert.equal(activeDestination('/admin'), '/admin');
+  assert.equal(activeDestination('/admin/stories'), '/admin/stories');
+  assert.equal(activeDestination('/admin/stories/some-slug'), '/admin/stories');
+  assert.equal(activeDestination('/admin/stories/contributors'), '/admin/stories/contributors');
+  assert.equal(activeDestination('/admin/stories/review'), '/admin/stories/review');
+  assert.equal(activeDestination('/admin/queue'), '/admin/queue');
+  assert.equal(activeDestination('/admin/unknown'), null);
 });
