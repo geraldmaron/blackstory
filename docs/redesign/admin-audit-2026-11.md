@@ -73,16 +73,19 @@ wrong block. The fifth is listed under "Still open".
   under the selection highlight. A new admin API route had no permission rule. Formatting the
   contract cannot store would have paused autosave.
 
+## Owner decisions recorded
+
+- 2026-11-10: AI agents may publish entities, and an approval may be granted from an agent session. Entity publishing therefore does not need an admin button; the admin's job is to show what was published and why.
+
 ## Still open
 
 | Item | Why it is open |
 |---|---|
 | The shell-wide rule `.admin-base-shell a:not([data-baseweb="button"])` makes every admin link copper | Changing it touches every desk; Today overrides it locally for now |
 | Catalog, quick add, evidence, sources, citation health, releases and switches desks | Not rebuilt in this pass; SURFACES.md 3.5 lists their defects (three table implementations, no conflict UI, raw filter forms, switches with no toggle UI) |
-| Entity publish from the admin | Still a CLI step; needs a decision on whether the admin should publish entities at all |
 | Unlinking a staff account from a contributor profile | `access_control.contributor_accounts.user_id` is unique and has no unlink path |
 | Story slug redirects | None exist; renaming a published story's slug breaks its links |
-| Publishing through the admin requires a human author credit | Existing rule since 2026-10-14 (`store.ts` storyBlockers); kept, and stated in Readiness. Neo-only stories still publish through the CLI pipeline. Owner decision whether that should change |
+| Publishing through the admin requires a human author credit | Existing rule since 2026-10-14 (`store.ts` storyBlockers); kept, and stated in Readiness. Neo-only stories still publish through agent sessions. Owner decision whether the admin should drop it |
 | A pasted or dropped image creates an image block but does not keep the file | Uploads need a credit and rights first; the block's details ask for both, then the file is added there |
 | Citation numbers in the editor ignore data-block provenance | They can read one or two lower than the published numbers on stories with figures or stats |
 | Figure and stat captions and dispute claims are outside the citation, voice and link gates | True before this branch too; they render as plain text. Whether evidence captions must carry citations is a policy call |
