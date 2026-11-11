@@ -115,7 +115,7 @@ export function LinkPopover({
               Remove link
             </button>
           ) : null}
-          {'href' in checked && checked.href.startsWith('https://') ? (
+          {'href' in checked && /^https:\/\//.test(checked.href) ? (
             <a
               className="rd-btn rd-btn--text"
               href={checked.href}
