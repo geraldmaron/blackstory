@@ -1,20 +1,5 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
-
-## Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-```
-
-There is **no Dolt remote on this project and there is not going to be one.** Do not run
-`bd dolt push`. Beads data reaches the remote via the pre-commit hook, which exports
-`.beads/issues.jsonl` so an ordinary `git push` carries it.
-
 ## Non-Interactive Shell Commands
 
 **ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
@@ -130,8 +115,8 @@ overclaims.
 User-visible string and assets come from `@repo/config` identity helpers / `apps/web/public/brand/`
 role-based paths (`lockup-*.png`, `symbol-*.png`, …).
 
-**Beads are internal ops only.** Never put bead ids in user-facing copy, admin chrome, error
-strings, or product source comments. Cite ADRs or capability names. Tracker prefix is `repo-`.
+**Issue ids are internal only.** Never put legacy tracker ids (`repo-…`) in user-facing copy, admin
+chrome, error strings, or product source comments. Cite ADRs or capability names.
 
 **Color.** Black and paper lead; copper points.
 
@@ -232,44 +217,23 @@ The base image ships an older `/exec-daemon/node` (v22.14.0) that lacks `module.
 ### Optional services (not needed for core web dev)
 Local database integration tests use an isolated Supabase instance when Docker is available. Firebase emulators and the parked database stack are removed. Native iOS QA requires macOS/Xcode; `apps/mobile` uses its own npm graph.
 
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
-## Beads Issue Tracker
-
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
-
-### Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
-```
-
-### Rules
-
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
-- Run `bd prime` for detailed command reference and session close protocol
-- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
-
 ## Session Completion
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
+1. **Record remaining work** - Name anything that needs follow-up in your final report
 2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
+3. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase
    git push
    git status  # MUST show "up to date with origin"
    ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+4. **Clean up** - Clear stashes, prune remote branches
+5. **Verify** - All changes committed AND pushed
+6. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
 - Work is NOT complete until `git push` succeeds
@@ -285,8 +249,6 @@ fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
 `.github/workflows/ci.yml` lane-for-lane instead of guessing. The script requires Node 22
 (the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
 24 — running it on 24 can pass locally and still not match what CI reports.
-<!-- END BEADS INTEGRATION -->
-
 ## Agent coordination (Claude Code ↔ Codex)
 
 The cross-agent coordination model and handoff protocol for this repo live in

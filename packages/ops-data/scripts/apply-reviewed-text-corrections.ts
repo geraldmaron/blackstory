@@ -191,16 +191,48 @@ async function main(): Promise<void> {
         );
       }
 
-      // Read back every copy and refuse to keep any wrong phrase.
-      const after = (
-        await client.query(
-          `SELECT (SELECT row_to_json(e)::text FROM published.release_entities e WHERE e.release_id = $1 AND e.entity_id = $2)
-                  || coalesce((SELECT facets::text FROM published.search_index WHERE release_id = $1 AND entity_id = $2), '')
-                  || coalesce((SELECT kind_detail::text FROM canonical.entities WHERE id = $2), '')
-                  || coalesce((SELECT summary || payload::text FROM research.landscape_candidates WHERE id = $2), '') AS text`,
-          [releaseId, c.entityId],
-        )
-      ).rows[0].text as string;
+      // Read back every copy and refuse to keep any wrong phrase. Claim excerpts and evidence
+      // quotes are verbatim source quotations and keep the source's own words, so the guard
+      // skips them; everything else, including notability notes and keywords, is checked.
+      const readBack = async (sql: string): Promise<unknown[]> =>
+        (await client.query(sql, [releaseId, c.entityId])).rows.map((row) => Object.values(row)[0]);
+      const strings: string[] = [];
+      const collect = (value: unknown, path: string): void => {
+        if (typeof value === 'string') strings.push(value);
+        else if (Array.isArray(value)) value.forEach((item) => collect(item, path));
+        else if (value && typeof value === 'object') {
+          for (const [key, item] of Object.entries(value)) {
+            if (path.endsWith('claims') && key === 'object') continue;
+            if (path.endsWith('evidenceCitations') && key === 'quote') continue;
+            collect(item, `${path}.${key}`);
+          }
+        }
+      };
+      collect(
+        await readBack(
+          `SELECT projection FROM published.release_entities WHERE release_id = $1 AND entity_id = $2`,
+        ),
+        'projection',
+      );
+      collect(
+        await readBack(
+          `SELECT facets FROM published.search_index WHERE release_id = $1 AND entity_id = $2`,
+        ),
+        'facets',
+      );
+      collect(
+        await readBack(
+          `SELECT kind_detail FROM canonical.entities WHERE id = $2 AND $1::text IS NOT NULL`,
+        ),
+        'canonical',
+      );
+      collect(
+        await readBack(
+          `SELECT jsonb_build_object('summary', summary, 'payload', payload) FROM research.landscape_candidates WHERE id = $2 AND $1::text IS NOT NULL`,
+        ),
+        'landscape',
+      );
+      const after = strings.join('\n');
       const survivors = c.mustNotContain.filter((phrase) =>
         after.toLowerCase().includes(phrase.toLowerCase()),
       );

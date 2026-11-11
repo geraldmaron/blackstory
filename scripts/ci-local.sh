@@ -88,7 +88,7 @@ PYTHON=false
 SECURITY_CODE=false
 CHANGED_COUNT=0
 
-is_noise() { [[ "$1" =~ ^(docs/|\.beads/|brand/) || "$1" =~ \.md$ || "$1" == LICENSE* ]]; }
+is_noise() { [[ "$1" =~ ^(docs/|brand/) || "$1" =~ \.md$ || "$1" == LICENSE* ]]; }
 is_mobile() { [[ "$1" =~ ^(apps/mobile/|packages/public-contracts/|brand/) ]]; }
 is_python() {
   [[ "$1" == pyproject.toml || "$1" == uv.lock || "$1" == uv.toml ]] && return 0

@@ -20,14 +20,22 @@ narrative arc overrides evidence.
 3. Choose the structure the material supports: direct answer, chronology, documented
    scene or comparison. Do not manufacture an opening person, imagined experience,
    obstacle/pathway pair, present-day lesson or agency ending.
-4. Draft with concrete nouns, precise verbs and varied natural sentences. Preserve
-   decisive qualifiers and uncertainty in the visible text. Mark interpretations
-   and attribute testimony. Avoid generic praise, repeated moral summaries and
-   claims of significance that the facts do not establish.
-5. Read aloud, then compare with neighboring records. Remove repetitive templates,
+4. For longer work, name the reader, the question, and the one sentence each section
+   should leave. Understand the events, then write from your own account of what
+   happened and why, using the closed fact base. Allowed wording is a limit on what
+   may be claimed, not text to assemble. Trace every clause back afterward.
+5. Draft with concrete nouns, precise verbs and varied natural sentences. Someone is
+   telling this: explain why things happened, connect what the record keeps apart, and
+   notice what a document does and doesn't say, using connective sentences as the
+   contract defines them. Study its paired samples first. Preserve decisive qualifiers
+   and uncertainty in the visible text. Mark interpretations and attribute testimony.
+   Avoid generic praise, repeated moral summaries and claims of significance that the
+   facts do not establish.
+6. Read aloud, then compare with neighboring records. Remove repetitive templates,
    redundant conclusions and decorative detail. No fixed rhetorical quotas or
-   sentence-length pattern. Short, accurate prose is preferable to padding.
-6. Apply [prose review](../blackstory-prose-review/SKILL.md), then the proportionate
+   sentence-length pattern. Short, accurate prose is preferable to padding, and a
+   draft that passes every check can still have nobody telling it.
+7. Apply [prose review](../blackstory-prose-review/SKILL.md), then the proportionate
    [adversarial review](../blackstory-ringer-review/SKILL.md). A factual change returns to
    evidence review. Run the actual surface's gates, not story commands for an entity.
 
@@ -43,7 +51,7 @@ equate fluent prose with publication readiness.
 
 **Input:** Reviewed assertions, their qualifiers and the reader surface.
 
-**Output:** Natural draft prose with a sentence-to-evidence map.
+**Output:** Natural draft prose with a sentence-to-evidence map that marks connective sentences and the facts they join.
 
 **Boundary and handoff:** Hand copy to prose and ringer review. New factual detail reopens claim review; no mandatory padding or narrative template.
 

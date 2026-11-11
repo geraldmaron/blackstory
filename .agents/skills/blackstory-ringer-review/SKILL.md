@@ -34,8 +34,10 @@ review lenses, not six required agents or paid model runs.
 6. **Standalone meaning:** read the title, card, summary, caption, chart and mobile
    excerpt without the story. Do they still carry the qualifiers needed to be true?
 
-For each finding record the passage, evidence, strongest defense, verdict and smallest
-fix. Use **correction-forcing** for factual or materially misleading claims; **craft**
+For each finding record the passage, evidence, strongest defense, verdict and the limit
+of the supported meaning. Name the defect and don't write the replacement sentence,
+except for a quotation or wording a source fixes exactly; the writer rewrites the
+passage and it's rechecked. Use **correction-forcing** for factual or materially misleading claims; **craft**
 for clarity improvements; **unsupported objection** when the criticism lacks evidence.
 Do not manufacture disagreement or give a weak objection equal weight to strong evidence.
 

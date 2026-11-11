@@ -1,38 +1,4 @@
 #!/usr/bin/env sh
-# --- BEGIN BEADS INTEGRATION v1.0.3 ---
-# This section is managed by beads. Do not remove these markers.
-if command -v bd >/dev/null 2>&1; then
-  export BD_GIT_HOOK=1
-  _bd_timeout=${BEADS_HOOK_TIMEOUT:-300}
-  if command -v timeout >/dev/null 2>&1; then
-    timeout "$_bd_timeout" bd hooks run pre-commit "$@"
-    _bd_exit=$?
-    if [ $_bd_exit -eq 124 ]; then
-      echo >&2 "beads: hook 'pre-commit' timed out after ${_bd_timeout}s — continuing without beads"
-      _bd_exit=0
-    fi
-  else
-    bd hooks run pre-commit "$@"
-    _bd_exit=$?
-  fi
-  if [ $_bd_exit -eq 3 ]; then
-    echo >&2 "beads: database not initialized — skipping hook 'pre-commit'"
-    _bd_exit=0
-  fi
-  if [ $_bd_exit -ne 0 ]; then exit $_bd_exit; fi
-fi
-# --- END BEADS INTEGRATION v1.0.3 ---
-
-# --- Give memory records in the staged beads export a stable sort key, so an export with
-# no real content change stops producing a large reorder-only diff every session.
-# Runs AFTER the beads integration above, so it sees the export that block just staged, and
-# BEFORE the checks below that also read it. ---
-"$(dirname "$0")/stabilize-beads-export.py" || exit 1
-
-# --- repo-wzz3: block drafter-model provenance in the staged beads export ---
-# Runs AFTER the beads integration above, so it sees the export that block just staged.
-"$(dirname "$0")/check-model-identifiers.py" --staged || exit 1
-
 # --- Dependabot GHSA-w3rx-r6r6-pgpr / GHSA-5p2g-fcmc-qvqq: keep unparseable image formats out
 # of the mobile bundle. No upstream fix exists, so the asset tree is the only control. ---
 "$(dirname "$0")/check-metro-image-assets.py" || exit 1

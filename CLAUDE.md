@@ -2,27 +2,6 @@
 
 This file provides instructions and context for AI coding agents working on this project.
 
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
-
-## Beads Issue Tracker
-
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
-
-### Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
-```
-
-### Rules
-
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
-- Run `bd prime` for detailed command reference and session close protocol
-- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
-
 ## Running subagents that edit files
 
 **Concurrent agents must not share one git working tree.** Spawn them with
@@ -42,8 +21,6 @@ Rules for any file-editing subagent:
   the agent's first command `git reset --hard <staging tip sha>` or its whole analysis runs on stale code.
 - Tell it explicitly not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore` —
   the orchestrator owns version control.
-- Tell it not to run `bd` — the orchestrator owns issue bookkeeping, and concurrent writers churn
-  `.beads/issues.jsonl`.
 - Review the actual `git diff` before believing the report. In that same run, one agent reported
   "no non-comment modifications" while having edited a test assertion, and another reported success
   on an edit that introduced a user-visible regression.
@@ -60,8 +37,8 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-   1a. **Then work the follow-ups you just filed.** A follow-up that is bounded data or
+1. **Record remaining work** - Name anything that needs follow-up in your final report
+   1a. **Then work the follow-ups you just recorded.** A follow-up that is bounded data or
    validation work inside the session's own epic (a second source, a dead link, a stale
    facet, a floor that now passes, a record the pass could not reach) is the next step of
    the same job, not a hand-off. Fan out and finish it in this session, measured the same
@@ -69,8 +46,7 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
    (policy, scope, an irreversible change) or lies outside the epic, and say which. The
    operator should never have to reply "now do the follow-ups".
 2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY. Push to `staging`, never directly to `main`
+3. **PUSH TO REMOTE** - This is MANDATORY. Push to `staging`, never directly to `main`
    (see **Branching & Release Policy** below):
 
    ```bash
@@ -79,14 +55,9 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
    git status  # MUST show local branch is up to date with what you pushed
    ```
 
-   There is **no Dolt remote on this project and there is not going to be one.** Do not run
-   `bd dolt push` and do not report its "no remote is configured" output as a problem to solve.
-   Beads data reaches the remote the same way everything else does: the pre-commit hook exports
-   `.beads/issues.jsonl`, and `git push` carries it.
-
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+4. **Clean up** - Clear stashes, prune remote branches
+5. **Verify** - All changes committed AND pushed
+6. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
 
@@ -103,8 +74,6 @@ fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
 `.github/workflows/ci.yml` lane-for-lane instead of guessing. The script requires Node 22
 (the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
 24 — running it on 24 can pass locally and still not match what CI reports.
-<!-- END BEADS INTEGRATION -->
-
 ## Branching & Release Policy
 
 `main` is GitHub-branch-protected: no direct pushes, no force-pushes, no deletions (PR required

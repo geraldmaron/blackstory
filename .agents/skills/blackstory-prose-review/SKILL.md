@@ -37,11 +37,21 @@ Do not assume upstream fact review covers words introduced during drafting.
 
 ## Findings and decision
 
-Give the exact passage, reader impact, evidence or rule, and smallest correction.
-Distinguish **factual blocker**, **clarity/dignity blocker**, and **optional craft note**.
-Every rewrite must preserve or narrow the supported meaning. A mistaken finding can
-be rebutted with evidence; record the resolution. Unresolved consequential disputes
-go to the responsible reviewer. Style preference is not a factual veto.
+Give the exact passage, reader impact, evidence or rule, and the limit of the supported
+meaning. Name the defect and don't supply the sentence, except for a quotation or wording
+a source fixes exactly; the writer rewrites the paragraph and it's rechecked.
+Distinguish **factual blocker**, **clarity/dignity blocker**, **no person is telling
+this**, and **optional craft note**. Every rewrite must preserve or narrow the supported
+meaning. A mistaken finding can be rebutted with evidence; record the resolution.
+Unresolved consequential disputes go to the responsible reviewer. Style preference is
+not a factual veto.
+
+**No person is telling this** blocks longform when, tested against the paired samples
+in the voice contract, a passage is only facts in a row: no explanation of why, nothing
+connected, nothing noticed, or an event with no buildup. Quote the passage and say which
+move is missing. It ranks below factual blockers and can't justify an unsupported
+sentence. It doesn't apply to short records. For each connective sentence, check that it
+adds no fact and that a careful reader wouldn't take it as more than its facts support.
 
 Verdict: **pass / revise / blocked on evidence**. Name the draft revision reviewed,
 coverage, uninspected surfaces and open findings. Then use

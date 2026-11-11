@@ -19,6 +19,12 @@ For each factual clause record:
 - Verdict (supported, qualified/attributed, contradicted, insufficient), allowed wording,
   reviewer and the exact draft revision reviewed.
 
+A connective sentence, as defined in [voice](../content/neo-voice.md), adds no fact, so
+it needs no new source. Record the facts it joins and give it inference review: would a
+careful reader take it as more than those facts support? If it reads as cause, the
+causation rule applies. Write first and trace afterward; a claim's allowed wording
+limits what may be said and isn't text to assemble.
+
 Use fetched evidence, not model memory or snippets as substitutes for a document.
 Do not infer a fact's truth merely because a matching quote exists. Check its context,
 source fallibility, later corrections, and competing evidence. Inaccessible sources are
@@ -63,8 +69,11 @@ when the record permits one; otherwise attribute the disagreement at its actual 
 Missing support is **insufficient**, not **false**. A confirmed counterexample may refute a
 universal claim without settling every alternative formulation.
 
-After integration, compare the final draft to the reviewed version. Any factual alteration
-invalidates the affected assessment until rechecked. Keep the evidence map and findings
+Reviewers state the defect and the limit of the supported meaning, and the writer
+rewrites the passage. After integration, compare the final draft to the reviewed version.
+Any factual alteration invalidates the affected assessment until rechecked. A true
+loosening from day to month or year is not an alteration unless the day is disputed or
+does work in the sentence. Keep the evidence map and findings
 outside public prose; don't publish editing instructions or session history.
 
 ## 4. What the machine checks do and do not prove

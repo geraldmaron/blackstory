@@ -64,8 +64,8 @@ Black Book. This runbook is the pattern; the census/ACS/Opportunity-Atlas/HOLC i
    ~3,220 counties, 52 state fan-outs); per-request row count must equal docs written;
    `rejected` surfaced, never dropped; spot-check known values (Cook County 2000 =
    5,376,741).
-10. **Track in beads.** One bead per source ingestion referencing the registry id
-    (`external-data:<id>`); `bd remember` for cross-session facts.
+10. **Record the ingestion.** Reference the registry id (`external-data:<id>`) wherever the
+    ingestion is logged.
 
 ## Tool selection (are we using a scraper package? — mostly no, deliberately)
 

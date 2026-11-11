@@ -56,7 +56,6 @@ fi
 #                — not shipped, but a lockfile-adjacent change here is not worth the risk.
 # ---------------------------------------------------------------------------
 SHARED_SKIP=(
-  '.beads/'
   '.claude/'
   '.github/'
   '.cursor/'
