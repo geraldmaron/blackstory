@@ -57,7 +57,7 @@ npm run lint && npm run format:check
 ## Known issues
 
 - `tsc` reports style-prop errors (alignItems, padding, maxWidth) under Expo's tsconfig even with the
-  stock Tamagui config. Tracked in beads; runtime is unaffected.
+  stock Tamagui config. Runtime is unaffected.
 - `/methodology` imports its copy from `apps/web/src/app/methodology` (watched in `metro.config.js`)
   until the Next app is removed.
 

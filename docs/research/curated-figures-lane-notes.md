@@ -7,8 +7,7 @@ quarantine pipeline exactly like repo-xez5.12's Lorde/Baldwin/hooks/Hansberry
 batch. Nothing was written to `canonical`; every row below is
 `submissions.intake_items.status = 'quarantined'` with
 `payload.moderationState = 'pending_review'`, and the paired
-`research.cases` row is `state = 'candidate'`. No git commit/push, no
-`bd dolt push`.
+`research.cases` row is `state = 'candidate'`. No git commit/push.
 
 ## Why these names
 

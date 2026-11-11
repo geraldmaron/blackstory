@@ -21,7 +21,6 @@ current system and desired constraints; neither prose nor code is exempt from ch
 | Research wire contracts | `packages/research-kernel/schemas/research-kernel.v1.schema.json` |
 | Product policy | `packages/schemas/constitution/` |
 | UI and brand | `docs/ui/README.md`, `docs/ui/PROTECTED-EXPERIENCES.md`, `brand/` |
-| Work status and next actions | Beads; `bd ready`, `bd show <id>` |
 
 Historical ADRs, PRDs, dated audits, and generated public docs are supporting evidence, never a
 second authority. Do not recover an old decision merely because code cites its number. If the

@@ -33,7 +33,7 @@ Module: `packages/testing/src/adversarial-integrity/`
 1. **False submissions cannot directly change public content** — every scenario sets `publicContentMutated: false` and blocks the attack path.
 2. **Lineage detection prevents volume-based confidence inflation** — coordinated/laundering scenarios assert collapsed independent lineage counts.
 3. **High-impact language remains constrained** — procedural inflation and identity-framing scenarios fail closed on public language.
-4. **Gaps** — `DOCUMENTED_CONTROL_GAPS` in the harness is empty; existing controls held. File `bd create` remediation beads only when a scenario exposes a real gap.
+4. **Gaps** — `DOCUMENTED_CONTROL_GAPS` in the harness is empty; existing controls held. Open a remediation item only when a scenario exposes a real gap.
 
 ## Parent wiring
 

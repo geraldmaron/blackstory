@@ -4,23 +4,4 @@ BlackStory project skills live in `.agents/skills/<skill-name>/SKILL.md` and use
 open Agent Skills format. Read `AGENTS.md` and
 `docs/research/README.md#skills-and-harness-portability` for selection and explicit
 file loading if automatic discovery is unavailable. Use those shared files directly;
-their research and review methods do not require Construct or a particular harness.
-
-<!-- BEGIN CONSTRUCT AGENTS -->
-## Construct Agent Prompts
-
-Select `construct` from the chat mode dropdown to enter the orchestrator: describe an outcome and it classifies the request and dispatches the required Worker Profiles through the `construct-mcp` tools (`orchestration_policy` then `orchestration_run`). You ask for outcomes; Construct routes internally. Requires the `construct-mcp` server (wired in `.vscode/mcp.json`); if its tools are unavailable, the mode cannot route and will say so rather than guess.
-
-- `construct`: use `.github/prompts/construct.prompt.md`.
-- `architect`: use `.github/prompts/architect.prompt.md`.
-- `data-analyst`: use `.github/prompts/data-analyst.prompt.md`.
-- `debugger`: use `.github/prompts/debugger.prompt.md`.
-- `designer`: use `.github/prompts/designer.prompt.md`.
-- `engineer`: use `.github/prompts/engineer.prompt.md`.
-- `operations`: use `.github/prompts/operations.prompt.md`.
-- `product-manager`: use `.github/prompts/product-manager.prompt.md`.
-- `qa`: use `.github/prompts/qa.prompt.md`.
-- `researcher`: use `.github/prompts/researcher.prompt.md`.
-- `reviewer`: use `.github/prompts/reviewer.prompt.md`.
-- `security`: use `.github/prompts/security.prompt.md`.
-<!-- END CONSTRUCT AGENTS -->
+their research and review methods do not require a particular harness.

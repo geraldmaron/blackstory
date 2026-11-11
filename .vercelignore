@@ -1,5 +1,3 @@
 apps/mobile/ios/
 apps/mobile/android/build/
 **/.terraform/
-.beads/embeddeddolt/
-.beads/backup/

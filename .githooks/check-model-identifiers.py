@@ -5,7 +5,7 @@ Policy: no record of WHICH MODEL produced WHICH catalog content belongs on a pub
 surface. That provenance lives in bb_research.entity_enrichment, which is not published.
 
 What this blocks: a *versioned* model identifier (claude-..-4-5, deepseek-r1-0528,
-gpt-4o, qwen3-32b) appearing in the staged .beads export or in a commit message. A
+gpt-4o, qwen3-32b) appearing in a commit message. A
 versioned id is the unambiguous signal that a concrete model was recorded rather than a
 tier being discussed.
 
@@ -14,17 +14,15 @@ What this deliberately does NOT block: tier shorthand ("cheap tier", "sonnet-cla
 metadata, not content provenance, and the repo is full of them by design.
 
 ALLOWLIST: identifiers that are already committed in tracked source or config. Scrubbing a
-name from beads while it sits in .env.example buys nothing, so it is allowed there too.
+name from a commit message while it sits in .env.example buys nothing, so it is allowed there too.
 
 Usage:
-  check-model-identifiers.py --staged            # staged .beads/issues.jsonl
   check-model-identifiers.py --message <file>    # commit message file
 """
 
 from __future__ import annotations
 
 import re
-import subprocess
 import sys
 
 # Versioned model id: family, a separator, then something containing a digit.
@@ -65,17 +63,6 @@ def offenders(text: str) -> list[str]:
     return sorted(set(found))
 
 
-def staged_beads_export() -> str:
-    result = subprocess.run(
-        ["git", "show", ":.beads/issues.jsonl"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    # Not staged (or not present) — nothing to check.
-    return result.stdout if result.returncode == 0 else ""
-
-
 def report(found: list[str], where: str) -> int:
     if not found:
         return 0
@@ -87,15 +74,13 @@ def report(found: list[str], where: str) -> int:
         "bb_research.entity_enrichment, not on a published surface.\n\n"
         "Fix by naming the TIER instead of the model ('cheap tier', 'a reasoning model').\n"
         "If the identifier is already committed in tracked source or config, add it to\n"
-        "ALLOWLIST in .beads/hooks/check-model-identifiers.py and say why.\n",
+        "ALLOWLIST in .githooks/check-model-identifiers.py and say why.\n",
         file=sys.stderr,
     )
     return 1
 
 
 def main() -> int:
-    if "--staged" in sys.argv:
-        return report(offenders(staged_beads_export()), "the staged .beads export")
     if "--message" in sys.argv:
         path = sys.argv[sys.argv.index("--message") + 1]
         with open(path, encoding="utf-8") as handle:
@@ -104,7 +89,7 @@ def main() -> int:
                 line for line in handle.read().splitlines() if not line.startswith("#")
             )
         return report(offenders(body), "the commit message")
-    print("usage: check-model-identifiers.py --staged | --message <file>", file=sys.stderr)
+    print("usage: check-model-identifiers.py --message <file>", file=sys.stderr)
     return 2
 
 
