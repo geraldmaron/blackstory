@@ -101,22 +101,26 @@ export function CollectionGuidance({
         <p>No matching collection guidance. Broaden the query and search beyond the library.</p>
       ) : (
         result.items.map((item) => (
-          <article key={`${item.policyId}:${item.policyVersion}`} className="story-review__notice">
+          <article
+            key={`${item.policyId}:${item.policyVersion}`}
+            className="story-review__notice collection-card"
+          >
             <h3>{item.collection}</h3>
-            <p>
+            <p className="collection-card__meta">
               {item.publisher ?? 'Publisher association not established'} ·{' '}
               {item.guidance.reviewStatus.replaceAll('_', ' ')} · Version {item.policyVersion}
             </p>
             {!!item.matchReasons.length && <p>{item.matchReasons.join('. ')}.</p>}
-            <p>
-              <strong>Useful for:</strong>{' '}
-              {item.guidance.suitableEvidenceNeeds
-                .map((need) => need.replaceAll('_', ' '))
-                .join(', ')}
-            </p>
-            <p>
-              <strong>Limits:</strong> {item.guidance.limitations.join(' ')}
-            </p>
+            <dl className="collection-card__facts">
+              <dt>Useful for</dt>
+              <dd>
+                {item.guidance.suitableEvidenceNeeds
+                  .map((need) => need.replaceAll('_', ' '))
+                  .join(', ')}
+              </dd>
+              <dt>Limits</dt>
+              <dd>{item.guidance.limitations.join(' ')}</dd>
+            </dl>
             <details>
               <summary>Search methods, coverage and provenance</summary>
               <p>
