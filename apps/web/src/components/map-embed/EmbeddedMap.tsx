@@ -302,6 +302,15 @@ export function EmbeddedMap({
         });
         mapRef.current = map;
         map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+        // MapLibre opens a compact credit while the map is wide enough, and in a 300px rail card
+        // that covers a fifth of the map. Start it as the "i" button; the same text opens on tap.
+        const collapseAttribution = () => {
+          const credit = container.querySelector('.maplibregl-ctrl-attrib');
+          credit?.classList.remove('maplibregl-compact-show');
+          credit?.removeAttribute('open');
+        };
+        collapseAttribution();
+        map.once('load', collapseAttribution);
         applyEmbeddedGestures(map, false);
         guard = attachSafariPageZoomGuard(container);
         const active = map;

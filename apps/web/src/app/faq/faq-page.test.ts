@@ -67,7 +67,11 @@ test('the AI question is answered plainly, including what no person checks', () 
   assert.match(generated.answer[0] ?? '', /^Partly/, 'the answer leads with the answer');
   const all = FAQ_ENTRIES.flatMap((entry) => entry.answer).join(' ');
   assert.match(all, /The history comes from sources/, 'the answer says where facts do come from');
-  assert.match(all, /I don't read every record against its sources myself/, 'and it says no person checks everything');
+  assert.match(
+    all,
+    /I don't read every record against its sources myself/,
+    'and it says no person checks everything',
+  );
   assert.match(all, /written style guide/, 'the writing standard is mentioned');
   assert.doesNotMatch(all, /\.md\b|docs\//, 'no internal file path reaches a reader');
   assert.match(all, /scan of a drawing/, 'the covers are drawn, and the page says so');

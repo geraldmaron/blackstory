@@ -18,6 +18,7 @@ import pg from 'pg';
 import { connectWithDeadline, normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   listingClaim,
+  listingCitation,
   listingFactsFromRow,
   listingQuotes,
   listingSummary,
@@ -62,7 +63,7 @@ async function main(): Promise<void> {
   };
   const features = (
     JSON.parse(text[1947] as string) as {
-      features: { properties: Record<string, any>; geometry: { coordinates: number[] } }[];
+      features: { properties: Record<string, unknown>; geometry: { coordinates: number[] } }[];
     }
   ).features;
   const rows1956 = (
@@ -186,7 +187,13 @@ async function main(): Promise<void> {
           [
             item.id,
             item.summary,
-            JSON.stringify([{ object: item.claim, citationHref: item.sourceUrl }]),
+            JSON.stringify([
+              {
+                object: item.claim,
+                citationHref: item.sourceUrl,
+                ...listingCitation(item.facts.year),
+              },
+            ]),
             JSON.stringify(review),
           ],
         );

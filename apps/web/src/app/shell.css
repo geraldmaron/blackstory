@@ -209,6 +209,15 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   color: var(--ds-ink-muted);
 }
 
+.ds-shell-footer__tagline a {
+  color: var(--ds-accent);
+}
+
+.ds-shell-footer__tagline a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: var(--ds-focus-offset);
+}
+
 .ds-shell-footer__columns {
   display: grid;
   gap: var(--ds-space-8);
@@ -2489,4 +2498,30 @@ main[tabindex='-1']:focus {
 main[tabindex='-1']:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: calc(var(--ds-focus-offset) * -1);
+}
+
+/*
+ * Touch targets. The logo, the search pill and the footer links were 24 to 40px tall; a thumb needs
+ * 44. Only on touch devices, so the desktop bar and footer keep their proportions.
+ */
+@media (pointer: coarse) {
+  .ds-bar__brand {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .ds-bar__search {
+    min-height: 2.75rem;
+  }
+
+  .ds-shell-footer__wordmark a,
+  .ds-shell-footer__policy a,
+  .ds-shell-footer__operator,
+  .ds-shell-footer .ds-maker-credit__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
 }

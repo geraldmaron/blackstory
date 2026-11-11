@@ -64,7 +64,7 @@ export function listingQuotes(rawSource: string, facts: ListingFacts): string[] 
   }
   if (facts.year === 1956) {
     const pattern = new RegExp(
-      `\\[${escape(name)}, "${escape(facts.address.replace(/"/gu, '\\"'))}[^"]*", ${escape(category)}, "1956"`,
+      `\\[${escape(name)}, "${escape(JSON.stringify(facts.address).slice(1, -1))}[^"]*", ${escape(category)}, "1956"`,
       'gu',
     );
     const hits = source.match(pattern);
@@ -122,4 +122,12 @@ export function isRestatedListing(input: {
     input.claims.length === 1 &&
     input.claims[0]?.object === listingClaim(facts)
   );
+}
+
+/** How the listing's source reads on the page, in place of the raw file host it is fetched from. */
+export function listingCitation(year: number): { citationSource: string; citationLabel: string } {
+  return {
+    citationSource: 'New York Public Library',
+    citationLabel: `Negro Motorist Green Book, ${year} edition`,
+  };
 }

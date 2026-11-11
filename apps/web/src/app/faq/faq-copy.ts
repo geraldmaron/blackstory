@@ -125,6 +125,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
         question: 'So where is AI actually used?',
         answer: [
           "More than one place, and I'd rather you hear about all of them from me. AI helps find and read sources, and it drafts the record summaries and the long-form writing, working from a written style guide. I also use a model from another company to check proposed claims against the captured sources. That check tests what a source supports, and it can still miss an error in the source.",
+          "One kind of record skips that model check. Listings copied from the Negro Motorist Green Book, a printed directory the New York Public Library has digitized, give a name, the kind of business, a street address and the edition year, and nothing beyond what the directory printed. A program confirms those four details appear exactly in the library's digitized listing data, and each record is marked as a registry listing.",
           "I don't check every record by hand. I read the corrections and leads myself, and when something is wrong I fix it where you can see it.",
         ],
       },
@@ -164,7 +165,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
       {
         question: 'How does something end up on the map?',
         answer: [
-          'A candidate turns up, its sources are gathered, a model from another company checks proposed claims against them, and a publish gate decides whether it reaches a public page. Contradictions between sources are written into the record rather than smoothed away.',
+          'A candidate turns up, its sources are gathered, a model from another company checks proposed claims against them (a Green Book listing is instead matched by a program to the digitized directory data), and a publish gate decides whether it reaches a public page. Contradictions between sources are written into the record rather than smoothed away.',
         ],
         links: [
           { href: '/methodology', label: 'The full method' },

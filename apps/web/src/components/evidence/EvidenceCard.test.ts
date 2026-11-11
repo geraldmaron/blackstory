@@ -23,11 +23,12 @@ const BASE_CLAIM: EvidenceClaimInput = {
   },
 };
 
-test('renders the grade in the shared language, with the score apart and no probability wording (AC1)', () => {
+test('renders the grade in plain words, with the score apart and no probability wording (AC1)', () => {
   const html = renderToStaticMarkup(
     createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }),
   );
-  assert.match(html, /class="ds-grade__word">Grade A</);
+  assert.match(html, /class="ds-grade__word">Well evidenced</);
+  assert.doesNotMatch(html, />Grade [ABC]</);
   assert.match(html, /Assessment score 0\.78 of 1\.00/);
   assert.doesNotMatch(html, /probability/i);
   assert.doesNotMatch(html, /Evidence (grade|score): /);

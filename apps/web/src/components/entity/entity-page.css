@@ -653,3 +653,18 @@
   line-height: var(--ds-leading-body);
   color: var(--ds-ink-muted);
 }
+
+@media (pointer: coarse) {
+  .ds-evidence-legend__summary {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  /* The source link in a claim's receipt is its own row, not a link inside a sentence. */
+  .ds-evidence-claim__source a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}

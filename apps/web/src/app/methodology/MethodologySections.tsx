@@ -112,9 +112,13 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             before it can publish, whether that&apos;s a state, a city, a campus or a documented
             site. After that, I use a model from another company to check proposed claims against
             their captured sources. That tests what a source supports, and it can still miss an
-            error in the source. There&apos;s more here than one person can read, so I built the
-            check and I answer for it. When it gets something wrong,
-            that&apos;s on me, and I fix it where you can see it.
+            error in the source. The Negro Motorist Green Book listings don&apos;t go through that
+            model check. A program confirms that the name, address, kind of business and edition
+            year on each one appear exactly in the New York Public Library&apos;s digitized listing
+            data for the directory, and each is marked as a registry listing. The address is the one
+            printed in that edition, and the business may be long gone. There&apos;s more here than
+            one person can read, so I built these checks and I answer for them. When one gets
+            something wrong, that&apos;s on me, and I fix it where you can see it.
           </p>
         </Prose>
         <RecordIntakeDiagram />

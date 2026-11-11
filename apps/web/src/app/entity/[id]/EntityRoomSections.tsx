@@ -62,10 +62,13 @@ export function recordSectionIndex({
   entity,
   evidenceClaims,
   crossReferences = [],
+  firstPaint = false,
 }: {
   readonly entity: PublicEntityView;
   readonly evidenceClaims: readonly EvidenceClaimInput[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
+  /** The place page renders no status beat and words the related beat its own way. */
+  readonly firstPaint?: boolean;
 }): readonly RecordSection[] {
   const sections: RecordSection[] = [];
   if (entity.historicalContext.trim().length > 0) {
@@ -94,7 +97,7 @@ export function recordSectionIndex({
       count: archiveSources.length,
     });
   }
-  if (hasStatusFor(entity)) {
+  if (!firstPaint && hasStatusFor(entity)) {
     sections.push({
       id: 'status-heading',
       label: entity.kind === 'event' ? 'When this happened' : 'Status and history',
@@ -113,15 +116,18 @@ export function recordSectionIndex({
       count: graph.nodes.length,
     });
   } else {
-    const connectionCount = toConnections(entity, false).length;
-    if (connectionCount > 0) {
+    const relatedHeading = firstPaint
+      ? firstPaintRelatedHeading(entity.relatedNeighbors ?? [])
+      : 'Records this one touches';
+    const connectionCount = toConnections(entity, firstPaint).length;
+    if (connectionCount > 0 && relatedHeading) {
       sections.push({
         id: 'related-heading',
-        label: 'Records this one touches',
+        label: relatedHeading,
         count: connectionCount,
       });
     }
-    const continueCount = toSuggestedConnections(entity, false).length;
+    const continueCount = toSuggestedConnections(entity, firstPaint).length;
     if (continueCount > 0) {
       sections.push({
         id: 'continue-heading',

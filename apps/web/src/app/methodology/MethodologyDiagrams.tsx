@@ -203,8 +203,9 @@ export function RecordIntakeDiagram() {
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
         A candidate comes from a research run and gets pinned to a real place, and a model from
-        another company checks proposed claims against their sources. It reaches a public page only
-        with its citations and an evidence grade attached.
+        another company checks proposed claims against their sources, except for Green Book
+        listings, which a program matches to the library's digitized listing data. It reaches a
+        public page only with its citations and an evidence grade attached.
       </p>
       <div className="ds-mdiag__frame">
         <svg

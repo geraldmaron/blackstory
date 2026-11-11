@@ -34,9 +34,9 @@ export function SiteFooter() {
                 pages carry no per-record note about it; this line, the FAQ and the methodology
                 say it for every page. */}
             <p className="ds-shell-footer__tagline">
-              AI helps with the research and drafting here, and a model from another company checks
-              proposed claims against their sources. Claims link to their sources, so you can
-              check them yourself.{' '}
+              AI helps with the research and drafting here, and for most records a model from
+              another company checks proposed claims against their sources. Claims link to their
+              sources, so you can check them yourself.{' '}
               <Link href="/methodology#how-a-record-gets-in" prefetch={false}>
                 How a record gets in
               </Link>

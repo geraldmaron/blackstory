@@ -37,7 +37,7 @@ import { confidenceTierPhrase } from '../lib/evidence/confidence-language';
 import { humanizeToken } from '../components/entity/format';
 import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
 import { METHODOLOGY_HOW_RECORD_GETS_IN_HREF } from '../components/evidence/editorial-links';
-import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
+import { EntityRoomSections, recordSectionIndex } from './entity/[id]/EntityRoomSections';
 import {
   buildWhyThisAppearsForEntity,
   claimTextMatcher,
@@ -267,7 +267,14 @@ export function HomeFirstPaint({
        the narrowing they carried. Kept apart from the archive navigation (home, rooms) below. */
     const investigationReturn = <RecordInvestigationReturn returns={returns} family="place" />;
 
-    const mastMedia = hasPhoto ? (
+    const showVisit = shouldShowVisitBlock(visitInput);
+    /*
+     * The mast carries the record's photograph, or the kind mark when there is none, exactly as the
+     * entity room does. The neighbourhood map used to sit beside the headline in a third of the
+     * 632px column and left the title 385px wide; it now lives in the rail with the Visit block,
+     * where the entity room keeps it.
+     */
+    const mastMedia = (
       <EntityMastMedia
         entityId={lead.id}
         entityName={lead.displayName}
@@ -276,32 +283,74 @@ export function HomeFirstPaint({
         hideCredit
         priority
       />
-    ) : geo && locatorName ? (
-      <div className="ds-record-mast__map">
-        <RecordPlacePreview
-          lat={geo.lat}
-          lng={geo.lng}
-          label={locatorName}
-          accessibleName={locatorName}
-          interactive
-          neighborhood
-        />
-        <p className="ds-record-mast__map-note">Published location precision: {precisionValue}.</p>
-      </div>
-    ) : (
-      <EntityMastMedia entityId={lead.id} entityName={lead.displayName} hideCredit priority />
+    );
+
+    const sectionsOnThisRecord = [
+      ...recordSectionIndex({ entity: lead, evidenceClaims, firstPaint: true }),
+      ...(citing.length > 0
+        ? [{ id: 'stories-heading', label: 'Stories', count: citing.length }]
+        : []),
+      { id: 'trust-heading', label: 'Can I trust this' },
+    ];
+
+    /* Where the record is, and what is on the page. A place with a pin but nothing to visit still
+       gets its map, as it did in the mast. */
+    const rail = (
+      <>
+        {showVisit ? (
+          <RecordVisitBlock
+            className="ds-record-visit--rail"
+            showLocator={geo !== undefined}
+            {...(locatorName !== undefined ? { locatorLabel: locatorName } : {})}
+            {...visitInput}
+          />
+        ) : geo && locatorName ? (
+          <div className="ds-record-rail-map">
+            <RecordPlacePreview
+              lat={geo.lat}
+              lng={geo.lng}
+              label={locatorName}
+              accessibleName={locatorName}
+              interactive
+              neighborhood
+            />
+            <p className="ds-record-mast__map-note">
+              Published location precision: {precisionValue}.
+            </p>
+          </div>
+        ) : null}
+
+        <nav className="ds-record-toc" aria-label="On this record">
+          <RecordSmallTitle as="span" icon="toc" className="ds-record-toc__title">
+            On this record
+          </RecordSmallTitle>
+          <ol className="ds-record-toc__list">
+            {sectionsOnThisRecord.map((section, index) => (
+              <li key={section.id}>
+                <a className="ds-record-toc__link" href={`#${section.id}`}>
+                  <span className="ds-record-toc__index" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="ds-record-toc__label">{section.label}</span>
+                  {'count' in section && section.count !== undefined ? (
+                    <span className="ds-rec-count">{section.count}</span>
+                  ) : null}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </>
     );
 
     return (
       <Room
         className="ds-home-first-paint"
+        rail={rail}
         masthead={
           <>
             {investigationReturn}
-            <figure
-              className="ds-record-mast"
-              data-media={hasPhoto ? 'photo' : geo ? 'map' : 'mark'}
-            >
+            <figure className="ds-record-mast" data-media={hasPhoto ? 'photo' : 'mark'}>
               {mastMedia}
               <figcaption className="ds-record-mast__over">
                 <div className="ds-rec-pills" aria-label={glanceLabel}>
@@ -361,13 +410,7 @@ export function HomeFirstPaint({
       >
         {/* Visit / maps handoff only when there is something to visit. The mast already
             carries the one map affordance (pin → atlas). */}
-        {shouldShowVisitBlock(visitInput) ? (
-          <RecordVisitBlock
-            className="ds-record-beat"
-            {...(locatorName !== undefined ? { locatorLabel: locatorName } : {})}
-            {...visitInput}
-          />
-        ) : null}
+        {showVisit ? <RecordVisitBlock className="ds-record-visit--main" {...visitInput} /> : null}
 
         {lead.sensitivity ? (
           <EntitySensitivityBanner sensitivity={lead.sensitivity} entityKind={lead.kind} />

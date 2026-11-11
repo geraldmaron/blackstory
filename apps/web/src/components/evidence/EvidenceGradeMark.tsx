@@ -1,17 +1,18 @@
 /**
  * The evidence grade mark: a drawn three-segment meter, the grade in words, and the source count.
  *
- * It spells the one language `@repo/public-contracts/evidence` owns ("Grade B · 2 sources"), so a
- * claim reads the same here as on the map sheet, the results rail and the app. The meter is never
- * the only cue: the words always sit beside it, and an ungraded claim draws an empty meter under
- * "Not graded" rather than inventing a low grade.
+ * The words are the plain-word tier the record's own confidence tile uses ("Well evidenced"),
+ * not the bare letter from the contract label ("Grade B · 2 sources"), so one record page does not
+ * carry two vocabularies for the same thing (see `confidenceTierPhrase`). The count still comes
+ * from the contract label. The meter is never the only cue: the words always sit beside it, and an
+ * ungraded claim draws an empty meter under "Not graded" rather than inventing a low grade.
  */
 import React from 'react';
 import type { ConfidenceLevel } from '@repo/ui';
+import { confidenceTierPhrase } from '../../lib/evidence/confidence-language';
 import {
   EVIDENCE_METER_SEGMENTS,
   evidenceCountPhrase,
-  evidenceGradeWord,
   meterLevelForTier,
 } from '../../lib/map-experience/evidence-grade';
 import './evidence-grade.css';
@@ -25,7 +26,7 @@ export type EvidenceGradeMarkProps = {
 
 export function EvidenceGradeMark({ level, label, className }: EvidenceGradeMarkProps) {
   const filled = meterLevelForTier(level);
-  const word = evidenceGradeWord(label);
+  const word = confidenceTierPhrase(level);
   const count = evidenceCountPhrase(label);
   const rootClass = ['ds-grade', `ds-grade--${level}`, className ?? '']
     .filter((part) => part.length > 0)

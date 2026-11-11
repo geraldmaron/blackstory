@@ -78,13 +78,13 @@ test('other allowlisted pages: sorted, first value wins, empty values dropped', 
   assert.equal(location('/stories', '?q=&tag=x'), '/stories?tag=x');
   assert.equal(location('/corrections', '?targetType=place&target=p1'), null, 'already sorted');
   assert.equal(
-    location('/place/x', '?from=list&theme=t&selected=s&q=1'),
+    location('/place/x', '?from=list&topic=education&selected=s&q=1'),
     null,
     'allowlisted keys in any order are canonical',
   );
   assert.equal(
     location('/place/x', '?theme=t&junk=1&from=list&q=1&selected=s'),
-    '/place/x?from=list&q=1&selected=s&theme=t',
+    '/place/x?from=list&q=1&selected=s',
     'a redirect sorts the keys',
   );
 });
@@ -165,7 +165,13 @@ test('a slash-terminated prefix route and a slash on an exact route both redirec
 });
 
 test('record arrival retains collection query and bibliography order; catalog cache version survives', () => {
-  assert.equal(q.normalizeQueryString('/place/zulu-school', sp('from=map&q=Shared+needle&kind=school&sort=name')), 'from=map&kind=school&q=Shared+needle&sort=name');
+  assert.equal(
+    q.normalizeQueryString(
+      '/place/zulu-school',
+      sp('from=map&q=Shared+needle&kind=school&sort=name'),
+    ),
+    'from=map&kind=school&q=Shared+needle&sort=name',
+  );
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=3&utm_source=test')), 'v=3');
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=4&utm_source=test')), 'v=4');
   assert.equal(q.normalizeQueryString('/atlas/catalog', sp('v=arbitrary')), '');
