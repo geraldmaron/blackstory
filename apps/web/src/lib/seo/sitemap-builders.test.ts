@@ -50,6 +50,44 @@ test('the sitemap never lists the same URL twice', () => {
   assert.deepEqual([...new Set(urls)].sort(), [...urls].sort());
 });
 
+test('published stories are listed at their own address, once each', () => {
+  const entries = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
+    stories: [
+      { slug: 'the-count', publishedAt: '2026-08-01', updatedAt: '2026-09-02' },
+      { slug: 'george-washington', publishedAt: '2026-08-07' },
+      { slug: 'the-count', publishedAt: '2026-08-01' },
+      { slug: '  ' },
+      { slug: 'mosaic-credits', publishedAt: '2026-08-01' },
+    ],
+  });
+  const staticUrls = new Set(
+    buildPublicSitemapEntries({ siteUrl: 'https://blackbook.example' }).map((entry) => entry.url),
+  );
+  const storyEntries = entries.filter((entry) => !staticUrls.has(entry.url));
+  assert.deepEqual(
+    storyEntries.map((entry) => entry.url),
+    [
+      'https://blackbook.example/stories/the-count',
+      'https://blackbook.example/stories/george-washington',
+    ],
+  );
+  // The newest date the story carries is its lastmod; a story never edited falls back to its
+  // publication date rather than to the release stamp.
+  assert.equal(storyEntries[0]?.lastModified, '2026-09-02');
+  assert.equal(storyEntries[1]?.lastModified, '2026-08-07');
+  assert.match(serializeSitemapXml(storyEntries), /<lastmod>2026-09-02T00:00:00\.000Z<\/lastmod>/);
+});
+
+test('a story slug that is also a static route is listed once', () => {
+  const urls = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    stories: [{ slug: 'mosaic-credits', publishedAt: '2026-08-01' }],
+  }).map((entry) => entry.url);
+  assert.equal(urls.filter((url) => url.endsWith('/stories/mosaic-credits')).length, 1);
+});
+
 /**
  * Every static route the App Router actually serves, read off disk.
  *

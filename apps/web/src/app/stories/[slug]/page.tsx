@@ -25,6 +25,7 @@ import type { RecordNavTarget } from '../../../components/room';
 import { storyCitedEntities } from '../../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
 import { IMPLICIT_AUTHOR_NAME, storyBylineLines } from '../../../lib/stories/byline';
+import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
 import '../../reading-room.css';
 import '../../../components/story/story.css';
 import '../../../components/theme-spine/theme-spine.css';
@@ -60,7 +61,12 @@ function buildStoryJsonLd(story: HydratedStory) {
     description: doc.summary,
     datePublished: doc.publishedAt,
     ...(doc.updatedAt ? { dateModified: doc.updatedAt } : {}),
-    '@id': `/stories/${doc.slug}`,
+    '@id': absolutePublicUrl(`/stories/${doc.slug}`),
+    url: absolutePublicUrl(`/stories/${doc.slug}`),
+    mainEntityOfPage: absolutePublicUrl(`/stories/${doc.slug}`),
+    ...(doc.collection
+      ? { isPartOf: { '@type': 'CreativeWorkSeries', name: doc.collection.label } }
+      : {}),
     author: doc.contributors.some((c) => c.roles.includes('author'))
       ? doc.contributors
           .filter((c) => c.roles.includes('author'))
