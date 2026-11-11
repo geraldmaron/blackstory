@@ -7,7 +7,7 @@
   align-items: start;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 64rem) {
   .contributors {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   }

@@ -912,8 +912,8 @@
 }
 
 .ds-reading__extlink-icon {
-  margin-left: 0.25em;
-  font-size: 0.7em;
+  margin-left: var(--ds-space-1);
+  font-size: var(--ds-text-micro);
 }
 
 .ds-reading-divider {

@@ -1,5 +1,5 @@
 /*
- * Today. Writing on the left, decisions on the right; one column below 1100px. Tokens only.
+ * Today. Writing on the left, decisions on the right; one column below 64rem. Tokens only.
  */
 .today {
   display: grid;
@@ -8,7 +8,7 @@
   align-items: start;
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 64rem) {
   .today {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   }
