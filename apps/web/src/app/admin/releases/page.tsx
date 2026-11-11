@@ -115,7 +115,7 @@ export default async function ReleasesPage() {
                         >
                           {row.displayName}
                         </Link>
-                        <div className="ds-mono">{row.entityId}</div>
+                        <p className="story-review__row-meta ds-mono">{row.entityId}</p>
                       </td>
                       <td className="ds-mono">{row.kind}</td>
                       <td className="ds-mono">{formatWhen(row.firstPublishedAt)}</td>
