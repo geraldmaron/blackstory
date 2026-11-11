@@ -115,16 +115,15 @@ export function LinkPopover({
               Remove link
             </button>
           ) : null}
-          {'href' in checked && /^https:\/\//.test(checked.href) ? (
-            <a
+          {'href' in checked ? (
+            <button
+              type="button"
               className="rd-btn rd-btn--text"
-              href={checked.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => window.open(checked.href, '_blank', 'noopener,noreferrer')}
             >
               Open in new tab
               <FontAwesomeIcon icon={faArrowUpRightFromSquare} aria-hidden="true" />
-            </a>
+            </button>
           ) : null}
         </div>
       </form>
