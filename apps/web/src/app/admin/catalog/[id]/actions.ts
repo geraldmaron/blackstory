@@ -24,7 +24,7 @@ import {
   editValuesFromFormData,
   parseEntityFieldEdit,
 } from '@/admin/lib/entity-edit';
-import type { EntityEditState } from './edit-state';
+import { staleEditMessage, type EntityEditState } from './edit-state';
 
 export async function saveEntityField(
   _previous: EntityEditState,
@@ -47,6 +47,8 @@ export async function saveEntityField(
   if (!current) {
     return { status: 'error', message: 'That entity no longer exists.' };
   }
+  const stale = staleEditMessage(String(formData.get('loadedUpdatedAt') ?? ''), current.updatedAt);
+  if (stale) return { status: 'error', message: stale };
 
   const statements = buildEditStatements(entityId, edit, { newId: randomUUID() });
 

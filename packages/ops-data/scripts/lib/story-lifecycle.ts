@@ -2,7 +2,13 @@
 import { assertReviewedPublicationAnchors } from './reviewed-anchors.js';
 import { safeFetchIsReachable } from './safe-fetch.js';
 import { createHash } from 'node:crypto';
-import { assertStoryCitationIntegrity, publicStoryProjectionSchema } from '@repo/schemas';
+import {
+  assertStoryCitationIntegrity,
+  findUnsafeStoryLinkHrefs,
+  publicStoryProjectionSchema,
+  storyBlockProseTexts,
+  storyInlinePlainText,
+} from '@repo/schemas';
 import {
   checkDoiCitation,
   lookupSourceTier,
@@ -57,18 +63,11 @@ function gateLoadBearingAnchors(story: StoryAuthoring): { warnings: string[] } {
 }
 
 /** Word count is diagnostic; evidence and editorial review determine sufficiency. */
-function visibleProse(text: string): string {
-  return text
-    .replace(/\[ref:[a-z0-9-]+\]/g, ' ')
-    .replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '$1')
-    .replace(/\[\[([^\]]+)\]\]/g, '$1');
-}
-
 export function countProseWords(story: StoryAuthoring): number {
   let words = 0;
   for (const block of story.body) {
     if (block.type !== 'paragraph') continue;
-    const visible = visibleProse((block as { text?: string }).text ?? '');
+    const visible = storyInlinePlainText((block as { text?: string }).text ?? '');
     words += visible.split(/\s+/).filter(Boolean).length;
   }
   return words;
@@ -87,7 +86,7 @@ function gateCalloutCitations(story: StoryAuthoring): { warnings: string[] } {
     if (block.type !== 'list') return;
     block.items.forEach((item, itemIndex) => {
       if (/\[ref:[a-z0-9-]+\]/.test(item)) return;
-      const excerpt = visibleProse(item).slice(0, 80).replace(/\s+/g, ' ');
+      const excerpt = storyInlinePlainText(item).slice(0, 80).replace(/\s+/g, ' ');
       findings.push(
         `${story.id} / body[${index}].items[${itemIndex}]: call-out carries no [ref:id] citation — "${excerpt}…"`,
       );
@@ -135,12 +134,7 @@ export function gateCollectionPositions(stories: readonly StoryAuthoring[]): voi
 function gateStandaloneProse(story: StoryAuthoring): { warnings: string[] } {
   const findings: string[] = [];
   story.body.forEach((block, index) => {
-    const texts =
-      block.type === 'paragraph' || block.type === 'pullquote'
-        ? [(block as { text?: string }).text ?? '']
-        : block.type === 'list'
-          ? block.items
-          : [];
+    const texts = storyBlockProseTexts(block);
     for (const text of texts) {
       let flagged = false;
       for (const { label, pattern } of SELF_REFERENCE_PATTERNS) {
@@ -176,12 +170,11 @@ function gateStandaloneProse(story: StoryAuthoring): { warnings: string[] } {
 function gateProseVoice(story: StoryAuthoring): { warnings: string[] } {
   const warnings: string[] = [];
   story.body.forEach((block, index) => {
+    // Pull quotes are quoted testimony and captions are not narration.
     const texts =
-      block.type === 'paragraph'
-        ? [(block as { text?: string }).text ?? '']
-        : block.type === 'list'
-          ? block.items
-          : [];
+      block.type === 'paragraph' || block.type === 'list' || block.type === 'table'
+        ? storyBlockProseTexts(block)
+        : [];
     for (const text of texts) {
       for (const finding of findProseVoiceIssues(text)) {
         if (finding.rule !== 'em-dash' && finding.rule !== 'expanded-contraction') continue;
@@ -192,6 +185,28 @@ function gateProseVoice(story: StoryAuthoring): { warnings: string[] } {
     }
   });
   return { warnings };
+}
+
+/**
+ * External links must be https with no credentials. Published violations fail; drafts warn.
+ * Anything else written as `[label](href)` would render as literal text, which is never intended.
+ */
+function gateExternalLinks(story: StoryAuthoring): { warnings: string[] } {
+  const findings: string[] = [];
+  story.body.forEach((block, index) => {
+    for (const text of storyBlockProseTexts(block)) {
+      for (const href of findUnsafeStoryLinkHrefs(text)) {
+        findings.push(
+          `${story.id} / body[${index}] (${block.type}): unsafe link ${JSON.stringify(href)} (https only, no credentials)`,
+        );
+      }
+    }
+  });
+  if (findings.length === 0) return { warnings: [] };
+  if (story.status === 'published') {
+    throw new Error(`external link gate failed (published stories):\n  ${findings.join('\n  ')}`);
+  }
+  return { warnings: findings };
 }
 
 /**
@@ -210,6 +225,8 @@ export function validateStoryOffline(story: StoryAuthoring): void {
   for (const warning of voiceWarnings) console.warn(`warning: ${warning}`);
   const { warnings: calloutWarnings } = gateCalloutCitations(story);
   for (const warning of calloutWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: linkWarnings } = gateExternalLinks(story);
+  for (const warning of linkWarnings) console.warn(`warning: ${warning}`);
 }
 
 type PacketRow = {

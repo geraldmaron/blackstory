@@ -197,12 +197,12 @@ export function WorkInbox({ workId }: { workId?: string }) {
       {loaded && !items.length && <p>No requests yet.</p>}
       {!workId &&
         items.map((item) => (
-          <article key={item.id}>
-            <h2>
-              <Link href={`/admin/work/${item.id}`}>{item.request.request}</Link>
-            </h2>
-            <p>{labels[item.state]}</p>
-            {item.error && <p>{item.error}</p>}
+          <article key={item.id} className="work-inbox__row">
+            <Link href={`/admin/work/${item.id}`} className="work-inbox__row-title">
+              {item.request.request}
+            </Link>
+            <span className="work-inbox__row-state">{labels[item.state]}</span>
+            {item.error && <p className="work-inbox__row-error">{item.error}</p>}
           </article>
         ))}
       {work && (

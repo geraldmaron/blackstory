@@ -18,6 +18,7 @@ import { ENTITY_EDIT_INITIAL, type EntityEditState } from './edit-state';
 
 export function FieldForm({
   entityId,
+  loadedUpdatedAt,
   field,
   reason,
   submitLabel = 'Save',
@@ -25,6 +26,8 @@ export function FieldForm({
   children,
 }: {
   readonly entityId: string;
+  /** The record's updatedAt when this form rendered; the save is refused if it has moved. */
+  readonly loadedUpdatedAt: string;
   readonly field: string;
   readonly reason: string;
   readonly submitLabel?: string;
@@ -40,7 +43,7 @@ export function FieldForm({
     <InlineEdit
       className="entity-edit__form"
       action={formAction}
-      hiddenFields={{ entityId, field, reason }}
+      hiddenFields={{ entityId, loadedUpdatedAt, field, reason }}
       submitLabel={submitLabel}
       pending={pending}
       disabled={disabled}

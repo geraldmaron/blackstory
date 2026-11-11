@@ -11,6 +11,8 @@
 import type { Metadata } from 'next';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
 import { listPublicationReleases } from '../../../admin/releases/releases-store';
+import { listRecentlyPublishedEntitiesPostgres } from '../../../admin/lib/postgres-publication';
+import Link from 'next/link';
 import { DeskTitleBar } from '../../../admin/design-system/ui';
 import { ReleasesDesk } from './ReleasesDesk';
 
@@ -36,7 +38,11 @@ function formatWhen(iso: string): string {
 }
 
 export default async function ReleasesPage() {
-  const outcome = await readPostgresOrDegrade(() => listPublicationReleases(50), 'releases');
+  const [outcome, recentOutcome] = await Promise.all([
+    readPostgresOrDegrade(() => listPublicationReleases(50), 'releases'),
+    readPostgresOrDegrade(() => listRecentlyPublishedEntitiesPostgres(50), 'recent publishes'),
+  ]);
+  const recent = recentOutcome.status === 'ok' ? recentOutcome.value : null;
   const rows = outcome.status === 'ok' ? outcome.value.items : [];
   const activeRelease = outcome.status === 'ok' ? (outcome.value.activeRelease ?? null) : null;
   const degradedReason = outcome.status === 'degraded' ? outcome.reason : undefined;
@@ -69,6 +75,58 @@ export default async function ReleasesPage() {
           No active release pointer found in{' '}
           <span className="ds-mono">publicMeta/activeRelease</span>.
         </p>
+      )}
+
+      {degradedReason || !activeRelease ? null : (
+        <section aria-labelledby="recent-publishes-heading">
+          <h2 id="recent-publishes-heading">Recently added to the live release</h2>
+          <p className="ds-sans">
+            The newest records first, by the date each one first went live. Corrections made in
+            place do not appear here; the{' '}
+            <Link href="/admin/audit?category=publication">publication audit log</Link> records each
+            publish run and why.
+          </p>
+          {recent === null ? (
+            <p className="story-review__alert" role="alert">
+              Recent publishes are unavailable because the database did not answer. Reload to retry.
+            </p>
+          ) : recent.length === 0 ? (
+            <p className="ds-sans">Nothing has been added to the live release yet.</p>
+          ) : (
+            <div className="story-review__table-wrap">
+              <table className="story-review__table">
+                <caption className="ds-visually-hidden">
+                  Records most recently added to the live release
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Record</th>
+                    <th scope="col">Kind</th>
+                    <th scope="col">First live</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recent.map((row) => (
+                    <tr key={row.entityId}>
+                      <td>
+                        <Link
+                          className="story-review__row-title"
+                          href={`/admin/catalog/${encodeURIComponent(row.entityId)}`}
+                        >
+                          {row.displayName}
+                        </Link>
+                        <p className="story-review__row-meta ds-mono">{row.entityId}</p>
+                      </td>
+                      <td className="ds-mono">{row.kind}</td>
+                      <td className="ds-mono">{formatWhen(row.firstPublishedAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="story-review__queue-foot ds-mono">Latest {recent.length}</p>
+            </div>
+          )}
+        </section>
       )}
 
       {degradedReason ? null : <ReleasesDesk rows={rows} activeRelease={activeRelease} />}

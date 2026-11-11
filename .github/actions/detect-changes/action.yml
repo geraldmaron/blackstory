@@ -6,7 +6,7 @@ description: Emit code/mobile/python/security_code outputs for job-level if cond
 
 outputs:
   code:
-    description: Monorepo JS/TS/infra/scripts (excludes docs/beads/md/brand and apps/mobile-only)
+    description: Monorepo JS/TS/infra/scripts (excludes docs/md/brand and apps/mobile-only)
     value: ${{ steps.filter.outputs.code }}
   mobile:
     description: apps/mobile, packages/public-contracts, or brand (mobile token source)
@@ -77,7 +77,7 @@ runs:
 
         is_noise() {
           local f="$1"
-          [[ "$f" =~ ^(docs/|\.beads/|brand/) ]] && return 0
+          [[ "$f" =~ ^(docs/|brand/) ]] && return 0
           [[ "$f" =~ \.md$ ]] && return 0
           [[ "$f" == "LICENSE" || "$f" == "LICENSE.txt" ]] && return 0
           return 1

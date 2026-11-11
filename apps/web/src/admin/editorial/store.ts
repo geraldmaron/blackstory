@@ -85,10 +85,23 @@ export async function editorialWrite<T>(
   });
   return value;
 }
-export async function listContributors(): Promise<EditorialContributor[]> {
+export type ContributorListing = EditorialContributor & {
+  /** Stories whose credits name this profile (archived stories excluded). */
+  credited: number;
+  /** True when the signed-in user's account is the one linked to this profile. */
+  linkedToMe: boolean;
+};
+export async function listContributors(actorUid?: string): Promise<ContributorListing[]> {
   return [
-    ...(await queryPostgres<EditorialContributor>(
-      'SELECT id,name,kind,biography FROM reference.contributors ORDER BY name',
+    ...(await queryPostgres<ContributorListing>(
+      `SELECT c.id,c.name,c.kind,c.biography,
+        (SELECT count(*)::int FROM reference.stories s
+          WHERE s.archived_at IS NULL AND jsonb_typeof(s.contributors)='array'
+            AND s.contributors @> jsonb_build_array(jsonb_build_object('id',c.id))) AS credited,
+        EXISTS(SELECT 1 FROM access_control.contributor_accounts a
+          WHERE a.contributor_id=c.id AND a.user_id::text=$1) AS "linkedToMe"
+      FROM reference.contributors c ORDER BY c.name`,
+      [actorUid ?? ''],
     )),
   ];
 }

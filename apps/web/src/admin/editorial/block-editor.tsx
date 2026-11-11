@@ -179,6 +179,25 @@ export const newBlock = (type: StoryBodyBlockDoc['type']): StoryBodyBlockDoc => 
     primaryDocument: { type, packetId: '', refId: '', quote: '' },
     timeline: { type, packetId: '' },
     mapInset: { type, entityId: '' },
+    table: {
+      type,
+      caption: '',
+      header: true,
+      rows: [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+      ],
+    },
+    video: {
+      type,
+      provider: 'youtube',
+      videoId: '',
+      title: '',
+      credit: '',
+      rightsStatus: 'licensed',
+    },
+    divider: { type },
     dispute: {
       type,
       label: '',

@@ -1,9 +1,9 @@
 /**
  * Single source of truth for admin information architecture.
  *
- * Surfaces are grouped by where they sit in the work an operator does, in pipeline order: material
- * arrives (Intake), is researched (Research), lands in the Catalog, is backed by Sources, and is
- * published (Publish); System holds the audit trail and kill switches. The sidebar, the mobile
+ * Surfaces are grouped by the job the owner is doing: Write (stories and bylines), Records (the
+ * entity catalog), Intake (everything that arrives and waits for a decision), Sources, and System
+ * (releases, audit trail, kill switches). Today sits above the groups. The sidebar, the mobile
  * drawer and the command palette all render from this list, so adding a surface means adding it to
  * a group here and nothing else.
  */
@@ -30,42 +30,63 @@ export type AdminNavGroup = {
 
 export const ADMIN_HOME: AdminNavDestination = {
   href: '/admin',
-  label: 'Work',
-  keywords: ['ops', 'home', 'queue', 'dashboard', 'overview'],
-};
-
-/**
- * Every open item across intake, research, story review and requests. It sits beside Work rather
- * than in a group because it spans all of them, and the groups stay short enough to scan.
- */
-export const ADMIN_QUEUE: AdminNavDestination = {
-  href: '/admin/queue',
-  label: 'Queue',
-  keywords: ['open work', 'todo', 'pending', 'oldest', 'triage'],
+  label: 'Today',
+  keywords: ['work', 'ops', 'operations', 'home', 'dashboard', 'overview', 'pick up'],
 };
 
 /** Destinations shown above the groups, in order. */
-export const ADMIN_TOP_LEVEL: readonly AdminNavDestination[] = [ADMIN_HOME, ADMIN_QUEUE];
+export const ADMIN_TOP_LEVEL: readonly AdminNavDestination[] = [ADMIN_HOME];
 
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
+  {
+    id: 'write',
+    label: 'Write',
+    destinations: [
+      { href: '/admin/stories', label: 'Stories', keywords: ['writing', 'editor', 'drafts'] },
+      {
+        href: '/admin/stories/review',
+        label: 'Story review',
+        queue: 'storyReview',
+        keywords: ['packets'],
+      },
+      {
+        href: '/admin/stories/contributors',
+        label: 'People & bylines',
+        keywords: ['contributors', 'author', 'profile', 'byline', 'neo'],
+      },
+    ],
+  },
+  {
+    id: 'records',
+    label: 'Records',
+    destinations: [
+      {
+        href: '/admin/catalog',
+        label: 'Entities',
+        keywords: ['catalog', 'people', 'places', 'merge'],
+      },
+      {
+        href: '/admin/footprint',
+        label: 'Footprint',
+        keywords: ['map', 'coverage', 'states', 'gaps', 'geography'],
+      },
+    ],
+  },
   {
     id: 'intake',
     label: 'Intake',
     destinations: [
+      {
+        href: '/admin/queue',
+        label: 'Queue',
+        keywords: ['open work', 'todo', 'pending', 'oldest', 'triage'],
+      },
       {
         href: '/admin/submissions',
         label: 'Submissions',
         queue: 'submissions',
         keywords: ['intake', 'quarantine', 'leads', 'corrections', 'appeals', 'abuse'],
       },
-      { href: '/admin/graylist', label: 'Graylist', keywords: ['blocked', 'held', 'suppressed'] },
-      { href: '/admin/discovery', label: 'Discovery runs', keywords: ['crawl', 'harvest'] },
-    ],
-  },
-  {
-    id: 'research',
-    label: 'Research',
-    destinations: [
       {
         href: '/admin/inbox',
         label: 'Inbox',
@@ -73,25 +94,15 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
         keywords: ['triage', 'pending', 'incoming', 'cases'],
       },
       { href: '/admin/cases', label: 'Research cases', keywords: ['queue', 'promote', 'all'] },
-      { href: '/admin/work', label: 'Requests', keywords: ['research', 'review', 'approve'] },
-      { href: '/admin/evidence', label: 'Attach evidence', keywords: ['citation', 'proof'] },
+      {
+        href: '/admin/work',
+        label: 'Requests',
+        keywords: ['work', 'operations', 'research', 'review', 'approve'],
+      },
+      { href: '/admin/graylist', label: 'Graylist', keywords: ['blocked', 'held', 'suppressed'] },
+      { href: '/admin/discovery', label: 'Discovery runs', keywords: ['crawl', 'harvest'] },
       { href: '/admin/quick-add', label: 'Quick add', keywords: ['create', 'new entity'] },
-    ],
-  },
-  {
-    id: 'catalog',
-    label: 'Catalog',
-    destinations: [
-      {
-        href: '/admin/footprint',
-        label: 'Footprint',
-        keywords: ['map', 'coverage', 'states', 'gaps', 'geography'],
-      },
-      {
-        href: '/admin/catalog',
-        label: 'Entities',
-        keywords: ['catalog', 'people', 'places', 'merge'],
-      },
+      { href: '/admin/evidence', label: 'Attach evidence', keywords: ['citation', 'proof'] },
     ],
   },
   {
@@ -107,37 +118,32 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     ],
   },
   {
-    id: 'publish',
-    label: 'Publish',
-    destinations: [
-      {
-        href: '/admin/stories',
-        label: 'Stories',
-        keywords: ['writing', 'editor', 'drafts'],
-      },
-      {
-        href: '/admin/stories/review',
-        label: 'Story review',
-        queue: 'storyReview',
-        keywords: ['packets'],
-      },
-      {
-        href: '/admin/stories/contributors',
-        label: 'Contributors',
-        keywords: ['author', 'profile', 'byline', 'neo'],
-      },
-      { href: '/admin/releases', label: 'Releases', keywords: ['ship', 'publish'] },
-    ],
-  },
-  {
     id: 'system',
     label: 'System',
     destinations: [
+      { href: '/admin/releases', label: 'Releases', keywords: ['ship', 'publish'] },
       { href: '/admin/audit', label: 'Audit log', keywords: ['history', 'who did'] },
       { href: '/admin/switches', label: 'Switches', keywords: ['flags', 'toggles', 'kill switch'] },
     ],
   },
 ];
+
+/**
+ * The one destination a path belongs to: the longest href that is the path or a parent of it, so
+ * /admin/stories/contributors lights People & bylines and not Stories. /admin matches only itself.
+ */
+export function activeDestination(pathname: string): string | null {
+  let best: string | null = null;
+  for (const { href } of [
+    ...ADMIN_TOP_LEVEL,
+    ...ADMIN_NAV_GROUPS.flatMap((group) => group.destinations),
+  ]) {
+    const matches =
+      href === '/admin' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+    if (matches && (!best || href.length > best.length)) best = href;
+  }
+  return best;
+}
 
 /**
  * Every admin destination as a palette command. The palette is the navigator, so nothing is left

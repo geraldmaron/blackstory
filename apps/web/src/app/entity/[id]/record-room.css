@@ -155,7 +155,7 @@
 .ds-record-mast[data-media='mark'] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--record-mark-w, 180px);
-  align-items: end;
+  align-items: start;
   column-gap: var(--ds-space-8);
   min-height: 0;
   padding: var(--ds-space-10) var(--record-shell-pad) 0;
@@ -190,30 +190,6 @@
   grid-row: 1;
   padding: 0;
   background: none;
-}
-
-@media (max-width: 47.9375rem) {
-  .ds-record-mast[data-media='mark'] {
-    grid-template-columns: minmax(0, 1fr);
-    padding-top: var(--ds-space-8);
-  }
-
-  .ds-record-mast[data-media='mark'] > *:first-child {
-    grid-column: 1;
-    grid-row: 1;
-    width: var(--record-mark-w, 160px);
-    max-width: 100%;
-    margin-bottom: var(--ds-space-6);
-  }
-
-  .ds-record-mast[data-media='mark'] .ds-record-mast__over {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .ds-record-mast[data-media='mark'] .ds-entity-photo__credit {
-    text-align: left;
-  }
 }
 
 /* The credit is a rights obligation, in flow under the lede. It used to sit absolutely in the
@@ -453,6 +429,33 @@
 
   .ds-rec-facts__tiles--glance {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /*
+   * Where the shell collapses to the text measure the column beside the emblem is the measure
+   * minus the emblem: 420px, with a hole to its right. The emblem stacks above the name instead,
+   * as it always did on a phone, and the text takes the whole measure.
+   */
+  .ds-record-mast[data-media='mark'] {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: var(--ds-space-8);
+  }
+
+  .ds-record-mast[data-media='mark'] > *:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    width: var(--record-mark-w, 160px);
+    max-width: 100%;
+    margin-bottom: var(--ds-space-6);
+  }
+
+  .ds-record-mast[data-media='mark'] .ds-record-mast__over {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .ds-record-mast[data-media='mark'] .ds-entity-photo__credit {
+    text-align: left;
   }
 
   .ds-rec-tile {
@@ -1148,5 +1151,11 @@
 
   .ds-rec-beat-head__index {
     display: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .ds-record-toc__link {
+    min-height: 2.75rem;
   }
 }

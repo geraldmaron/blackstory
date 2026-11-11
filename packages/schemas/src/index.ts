@@ -8,6 +8,7 @@ export * from './constitution/index.js';
 export * from './public-projections.js';
 export * from './search-index-row.js';
 export * from './public-stories.js';
+export * from './story-inline.js';
 export * from './banned-books.js';
 export * from './archive-pointer.js';
 

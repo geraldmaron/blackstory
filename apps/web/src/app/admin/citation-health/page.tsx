@@ -1,27 +1,30 @@
 /**
- * Citation health: operator dashboard tile showing rot rate by source class, plus a
- * preview of the reader-facing degraded-citation treatment. Fixture data only, matching the
- * `/console` shell's and `/admin/quick-add`'s conventions for this new, sibling route no live
- * service connection, no mutation handlers.
+ * Citation health. No link check has ever been recorded for a published citation: the
+ * `citation-link-health-sweep` job (packages/config/src/scheduled-jobs/jobs/) is defined but has
+ * no runner and no store. This desk says so with live counts instead of showing sample rot rates
+ * as if they were measured. The reader-facing treatment below is a labeled sample.
  */
 import Link from 'next/link';
-import { computeRotRateBySourceClass, buildTrySearchingForSuggestion } from '@repo/domain';
+import { buildTrySearchingForSuggestion } from '@repo/domain';
 import { Citation } from '@repo/ui';
 import { DeskTitleBar } from '../../../admin/design-system/ui';
+import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { getPublishedCitationTotalsPostgres } from '../../../admin/lib/postgres-sources';
 import { CITATION_HEALTH_FIXTURES } from './fixtures';
 import './citation-health.css';
 
 export const metadata = {
   title: 'Citation health',
-  description: 'Rot rate by source class and the reader-facing degraded-citation treatment.',
+  description: 'Whether published citation links have been checked, and how a dead link reads.',
 };
 
-function formatPercent(value: number): string {
-  return `${(value * 100).toFixed(1)}%`;
-}
+export const dynamic = 'force-dynamic';
 
-export default function CitationHealthPage() {
-  const rotRates = computeRotRateBySourceClass(CITATION_HEALTH_FIXTURES);
+export default async function CitationHealthPage() {
+  const totals = await readPostgresOrDegrade(
+    () => getPublishedCitationTotalsPostgres(),
+    'published citation totals',
+  );
   const deadCitation = CITATION_HEALTH_FIXTURES.find((citation) => citation.linkStatus === 'dead');
   const driftedCitation = CITATION_HEALTH_FIXTURES.find(
     (citation) => citation.linkStatus === 'drifted',
@@ -32,59 +35,35 @@ export default function CitationHealthPage() {
       <DeskTitleBar
         eyebrow="Evidence quality"
         title="Citation health"
-        description="Rot rate by source class from the scheduled citation link-health sweep, plus a preview of the reader-facing degraded-citation treatment. This desk reads fixture telemetry only — it does not repair links, mutate citations, or publish catalog changes."
+        description="Whether the links behind published citations still work."
       />
 
-      <section aria-labelledby="rot-rate-heading">
-        <div className="citation-health-section-heading">
-          <h2 id="rot-rate-heading">Rot rate by source class</h2>
-          <span>{rotRates.length} source classes</span>
-        </div>
-        <div className="citation-health-table-wrap">
-          <table>
-            <caption className="ds-visually-hidden">
-              Citation rot rate by source classification
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Source class</th>
-                <th scope="col">Citations</th>
-                <th scope="col">Dead</th>
-                <th scope="col">Drifted</th>
-                <th scope="col">Rot rate</th>
-                <th scope="col">Attention rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rotRates.map((row) => (
-                <tr key={row.sourceClassification}>
-                  <th scope="row">{row.sourceClassification}</th>
-                  <td>{row.totalCitations}</td>
-                  <td>{row.deadCount}</td>
-                  <td>{row.driftedCount}</td>
-                  <td>{formatPercent(row.rotRate)}</td>
-                  <td>{formatPercent(row.attentionRate)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="citation-health-note">
-          Rot rate also feeds an additive confidence-engine authority signal —{' '}
-          <code>citationRotRateAuthoritySignal</code> in
-          packages/domain/src/confidence-engine/engine.ts — as a durability signal for confidence
-          durability, without changing the existing weighted confidence computation.
+      <section aria-labelledby="link-checks-heading">
+        <h2 id="link-checks-heading">Link checks</h2>
+        {totals.status === 'ok' ? (
+          <p role="status">
+            {totals.value.citationCount.toLocaleString()} published citations point at{' '}
+            {totals.value.hostCount.toLocaleString()} hosts. None has been checked yet.
+          </p>
+        ) : (
+          <p role="alert">
+            Citation counts are unavailable because the database did not answer. Reload to retry.
+          </p>
+        )}
+        <p>
+          The weekly link check is written but nothing runs it, and there is no table for its
+          results. Until it runs, this desk has no rot rate to show. The job is{' '}
+          <span className="ds-mono">citation-link-health-sweep</span>; when it runs, the only change
+          it may make on its own is pointing a dead link at an archived copy.
         </p>
       </section>
 
       <section aria-labelledby="degraded-citation-heading">
-        <div className="citation-health-section-heading">
-          <h2 id="degraded-citation-heading">Reader-facing degraded citation preview</h2>
-        </div>
+        <h2 id="degraded-citation-heading">How a dead link reads (sample)</h2>
         <p>
-          When a citation&apos;s link dies, the reader sees a clearly marked notice with the date,
-          an archived copy when one exists, and a deterministic &ldquo;Try searching for&rdquo;
-          suggestion built from stored citation metadata — never an LLM call.
+          When a link dies, the reader sees the date it was found dead, an archived copy when one
+          exists, and a search suggestion built from the citation&apos;s own details. These two
+          examples are samples, not live citations.
         </p>
         {deadCitation ? (
           <Citation
@@ -108,7 +87,7 @@ export default function CitationHealthPage() {
       </section>
 
       <p className="citation-health-footer">
-        <Link href="/admin">Back to operations</Link>
+        <Link href="/admin/sources">Source library</Link>
       </p>
     </main>
   );

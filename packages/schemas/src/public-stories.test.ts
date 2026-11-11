@@ -7,6 +7,8 @@ import {
   assertStoryCitationIntegrity,
   collectStoryCitationIssues,
   extractInlineCitationIds,
+  parseStoryVideoUrl,
+  storyVideoSource,
   publicStoryProjectionSchema,
   type PublicStoryProjectionDoc,
 } from './public-stories.ts';
@@ -106,4 +108,83 @@ test('unused reference is reported unless data-backed', () => {
   ]);
   // A reference attached to a data block counts as used.
   assert.deepEqual(collectStoryCitationIssues(story, ['orphan']), []);
+});
+
+test('table, video and divider blocks validate; cross-field rules reject bad ones', () => {
+  const ok = [
+    {
+      type: 'table',
+      caption: 'c',
+      rows: [
+        ['a', 'b'],
+        ['', '[ref:fha-manual-1938]'],
+      ],
+    },
+    {
+      type: 'video',
+      provider: 'youtube',
+      videoId: 'dQw4w9WgXcQ',
+      title: 't',
+      credit: 'c',
+      rightsStatus: 'licensed',
+    },
+    { type: 'divider' },
+  ];
+  const parse = (body: unknown[]) =>
+    publicStoryProjectionSchema.safeParse({ ...baseStory, body: [...baseStory.body, ...body] });
+  assert.equal(parse(ok).success, true);
+  assert.equal(parse([{ type: 'table', caption: 'c', rows: [['a'], ['a', 'b']] }]).success, false);
+  const video = { type: 'video', title: 't', credit: 'c', rightsStatus: 'licensed' };
+  assert.equal(parse([{ ...video, provider: 'youtube', videoId: 'short' }]).success, false);
+  assert.equal(
+    parse([{ ...video, provider: 'loc', videoId: 'storage-services/a/b.mp4' }]).success,
+    true,
+  );
+});
+
+test('citations in table cells and captions count, and unknown ones are reported', () => {
+  const issues = collectStoryCitationIssues({
+    references: baseStory.references,
+    body: [
+      { type: 'table', caption: 'x [ref:nope]', header: true, rows: [['[ref:fha-manual-1938]']] },
+    ],
+  });
+  assert.deepEqual(issues, [{ kind: 'unknown_reference', refId: 'nope' }]);
+});
+
+test('storyVideoSource and parseStoryVideoUrl', () => {
+  assert.deepEqual(storyVideoSource({ provider: 'youtube', videoId: 'dQw4w9WgXcQ' }), {
+    kind: 'iframe',
+    src: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+  });
+  assert.equal(
+    storyVideoSource({ provider: 'vimeo', videoId: '123456789' }).src,
+    'https://player.vimeo.com/video/123456789?dnt=1',
+  );
+  assert.equal(
+    storyVideoSource({ provider: 'archive', videoId: 'abc.def' }).src,
+    'https://archive.org/embed/abc.def',
+  );
+  assert.deepEqual(storyVideoSource({ provider: 'loc', videoId: 'storage-services/x/y.mp4' }), {
+    kind: 'file',
+    src: 'https://tile.loc.gov/storage-services/x/y.mp4',
+  });
+  const yt = { provider: 'youtube', videoId: 'dQw4w9WgXcQ' };
+  const cases: [string, unknown][] = [
+    ['https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=3', yt],
+    ['https://youtu.be/dQw4w9WgXcQ', yt],
+    ['https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ', yt],
+    ['https://vimeo.com/123456789', { provider: 'vimeo', videoId: '123456789' }],
+    ['https://archive.org/details/some_item-1', { provider: 'archive', videoId: 'some_item-1' }],
+    ['https://archive.org/embed/some_item-1', { provider: 'archive', videoId: 'some_item-1' }],
+    [
+      'https://tile.loc.gov/storage-services/a/b.mp4',
+      { provider: 'loc', videoId: 'storage-services/a/b.mp4' },
+    ],
+    ['http://youtu.be/dQw4w9WgXcQ', null],
+    ['https://youtube.com/watch?v=short', null],
+    ['https://example.org/watch?v=dQw4w9WgXcQ', null],
+    ['not a url', null],
+  ];
+  for (const [url, want] of cases) assert.deepEqual(parseStoryVideoUrl(url), want, url);
 });

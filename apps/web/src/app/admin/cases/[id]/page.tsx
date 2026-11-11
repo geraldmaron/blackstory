@@ -170,7 +170,10 @@ export default function CaseDetailPage() {
       ) : (
         <>
           <p>
-            <span className="acq__badge">{stateLabel(detail.state)}</span>
+            <span className="acq__badge">{stateLabel(detail.state)}</span>{' '}
+            <Link href={`/admin/evidence?case=${encodeURIComponent(detail.id)}`}>
+              Attach evidence to this case
+            </Link>
           </p>
           <dl className="acq-sheet__dl">
             <div>

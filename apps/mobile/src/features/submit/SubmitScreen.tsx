@@ -68,8 +68,8 @@ export function SubmitScreen() {
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>New leads</LedgerSectionLabel>
           <Text variant="body" colorRole="ink">
-            Lead intake (closed groups, family papers, oral accounts) runs through a moderated
-            quarantine queue on the website. A native lead form is not available in this release.
+            Lead intake (closed groups, family papers, oral accounts) goes through a private review
+            queue on the website. A native lead form is not available in this release.
           </Text>
           <View style={styles.actions}>
             <Button

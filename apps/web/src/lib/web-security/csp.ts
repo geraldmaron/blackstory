@@ -85,6 +85,12 @@ const ARTICLE_MEDIA_IMG_SRC = [
  * range support and rights: docs/research/lives-audio-sources.md. Add a host here only with the
  * same record for it.
  */
+export const STORY_VIDEO_FRAME_SRC = [
+  'https://www.youtube-nocookie.com',
+  'https://player.vimeo.com',
+  'https://archive.org',
+];
+
 export const ARCHIVAL_MEDIA_SRC = ['https://tile.loc.gov'];
 
 /**
@@ -196,7 +202,8 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
     'media-src': ["'self'", ...ARCHIVAL_MEDIA_SRC],
     'font-src': DEFAULT_FONT_SRC,
     'connect-src': resolvedConnectSrc,
-    'frame-src': ["'none'"],
+    // Story video embeds only; each provider is named, no wildcards.
+    'frame-src': STORY_VIDEO_FRAME_SRC,
     'manifest-src': ["'self'"],
     'worker-src': workerSrc,
     'child-src': ["'self'", 'blob:'],

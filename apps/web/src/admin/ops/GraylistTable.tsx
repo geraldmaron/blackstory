@@ -33,8 +33,8 @@ export function GraylistTable({
       cell: (row) => (
         <>
           <span className="story-review__row-title">{row.candidateId}</span>
-          <p className="story-review__row-meta ds-mono">
-            {row.id}
+          <p className="story-review__row-meta ds-mono" title={row.id}>
+            {row.id.slice(0, 8)}
             {row.adapterId ? ` · ${row.adapterId}` : ''}
           </p>
           <p className="ds-sans">{row.reason}</p>

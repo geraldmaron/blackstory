@@ -20,13 +20,15 @@ export default async function Preview({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ revision?: string }>;
+  searchParams: Promise<{ revision?: string; embed?: string }>;
 }) {
   if (!(await readVerifiedAdminIdentity())) redirect('/admin/login');
   const { slug } = await params,
     current = await readStory(slug);
   if (!current) notFound();
-  const revision = Number((await searchParams).revision ?? current.revision);
+  const query = await searchParams;
+  const embed = query.embed === '1';
+  const revision = Number(query.revision ?? current.revision);
   const rows = await queryPostgres<{ snapshot: StoryRow }>(
     'SELECT snapshot FROM reference.story_revisions WHERE story_id=$1 AND revision=$2',
     [current.draft.id, revision],
@@ -46,8 +48,12 @@ export default async function Preview({
       : null;
   return (
     <main className="ds-container ds-page" id="main">
-      <p>Private preview · revision {revision} · publication requires approval</p>
-      <Link href={`/admin/stories/${slug}`}>Return to editor</Link>
+      {!embed && (
+        <>
+          <p>Private preview · revision {revision} · publication requires approval</p>
+          <Link href={`/admin/stories/${slug}`}>Return to editor</Link>
+        </>
+      )}
       {parsed.success && parsed.data.heroImage && (
         <figure>
           <StoryHeroPhoto url={parsed.data.heroImage.url} alt={parsed.data.heroImage.alt} />

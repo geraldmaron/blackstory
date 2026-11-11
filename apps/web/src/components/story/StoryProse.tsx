@@ -1,12 +1,15 @@
 /**
- * Renders story prose, replacing inline `[ref:<id>]` citation markers with
- * superscript reference numbers that link down to the references section, and
- * `[[entityId|Label]]` markup with links to the entity record (the same
- * convention `LinkedProse` renders on entity and theme surfaces).
+ * Renders story prose through the shared inline grammar (`@repo/schemas` story-inline):
+ * `[ref:<id>]` citations become superscript reference numbers that link down to the references
+ * section, `[[entityId|Label]]` becomes a link to the entity record (the same convention
+ * `LinkedProse` renders on entity and theme surfaces), `**strong**` / `_em_` become marks and
+ * `[label](https://url)` becomes an external link.
  * Unknown citation markers (no resolved number) are dropped from the output.
  */
 import React from 'react';
-import { ENTITY_PROSE_LINK_RE } from '@repo/domain/editorial';
+import { parseStoryInline, type StoryInlineNode } from '@repo/schemas';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EntityLink, humanizeEntityId } from '../entity/EntityLink';
 
 void React;
@@ -21,48 +24,6 @@ export type StoryProseProps = {
    */
   readonly as?: 'p' | 'span';
 };
-
-const CITE_MARKER_SOURCE = String.raw`\[ref:([a-z0-9]+(?:-[a-z0-9]+)*)\]`;
-
-/**
- * One pass over both markup forms, so a paragraph carrying a citation and an
- * entity link resolves each in document order. The entity half is composed from
- * `@repo/domain`'s shared pattern rather than restated here: capture groups are
- * 1 = citation id, 2 = entity id, 3 = optional entity label.
- */
-const MARKER = new RegExp(`${CITE_MARKER_SOURCE}|${ENTITY_PROSE_LINK_RE.source}`, 'g');
-
-type Segment =
-  | { readonly kind: 'text'; readonly value: string }
-  | { readonly kind: 'cite'; readonly number: number }
-  | { readonly kind: 'entity'; readonly entityId: string; readonly label: string };
-
-function segmentize(text: string, refNumberById: ReadonlyMap<string, number>): Segment[] {
-  const segments: Segment[] = [];
-  let lastIndex = 0;
-  for (const match of text.matchAll(MARKER)) {
-    const start = match.index ?? 0;
-    if (start > lastIndex) {
-      segments.push({ kind: 'text', value: text.slice(lastIndex, start) });
-    }
-    const citeId = match[1];
-    if (citeId !== undefined) {
-      const number = refNumberById.get(citeId);
-      if (number !== undefined) segments.push({ kind: 'cite', number });
-    } else {
-      const entityId = match[2]?.trim() ?? '';
-      if (entityId) {
-        const label = match[3]?.trim() || humanizeEntityId(entityId);
-        segments.push({ kind: 'entity', entityId, label });
-      }
-    }
-    lastIndex = start + match[0].length;
-  }
-  if (lastIndex < text.length) {
-    segments.push({ kind: 'text', value: text.slice(lastIndex) });
-  }
-  return segments;
-}
 
 export function StoryCitationMarks({ numbers }: { readonly numbers: readonly number[] }) {
   if (numbers.length === 0) return null;
@@ -80,24 +41,64 @@ export function StoryCitationMarks({ numbers }: { readonly numbers: readonly num
   );
 }
 
+function renderNodes(
+  nodes: readonly StoryInlineNode[],
+  refNumberById: ReadonlyMap<string, number>,
+): React.ReactNode[] {
+  return nodes.map((node, index) => {
+    switch (node.type) {
+      case 'text':
+        return <React.Fragment key={index}>{node.text}</React.Fragment>;
+      case 'break':
+        return <React.Fragment key={index}>{'\n'}</React.Fragment>;
+      case 'cite': {
+        const number = refNumberById.get(node.refId);
+        return number === undefined ? null : <StoryCitationMarks key={index} numbers={[number]} />;
+      }
+      case 'entity': {
+        const entityId = node.entityId.trim();
+        if (!entityId) return null;
+        return (
+          <EntityLink key={index} entityId={entityId}>
+            {node.label.trim() || humanizeEntityId(entityId)}
+          </EntityLink>
+        );
+      }
+      case 'strong':
+        return <strong key={index}>{renderNodes(node.children, refNumberById)}</strong>;
+      case 'em':
+        return <em key={index}>{renderNodes(node.children, refNumberById)}</em>;
+      case 'link':
+        return (
+          <a
+            key={index}
+            className="ds-reading__extlink"
+            href={node.href}
+            rel="noopener noreferrer external"
+            target="_blank"
+          >
+            {renderNodes(node.children, refNumberById)}
+            <span className="ds-visually-hidden"> (opens in a new tab)</span>
+            <FontAwesomeIcon
+              icon={faArrowUpRightFromSquare}
+              className="ds-reading__extlink-icon"
+              aria-hidden="true"
+            />
+          </a>
+        );
+    }
+  });
+}
+
+/** The same rendering with no wrapping element, for callers that already own the tag. */
+export function StoryInline({
+  text,
+  refNumberById,
+}: Pick<StoryProseProps, 'text' | 'refNumberById'>) {
+  return <>{renderNodes(parseStoryInline(text), refNumberById)}</>;
+}
+
 export function StoryProse({ text, refNumberById, className, as }: StoryProseProps) {
-  const segments = segmentize(text, refNumberById);
   const Tag = as ?? 'p';
-  return (
-    <Tag className={className}>
-      {segments.map((segment, index) => {
-        if (segment.kind === 'text') {
-          return <React.Fragment key={index}>{segment.value}</React.Fragment>;
-        }
-        if (segment.kind === 'entity') {
-          return (
-            <EntityLink key={index} entityId={segment.entityId}>
-              {segment.label}
-            </EntityLink>
-          );
-        }
-        return <StoryCitationMarks key={index} numbers={[segment.number]} />;
-      })}
-    </Tag>
-  );
+  return <Tag className={className}>{renderNodes(parseStoryInline(text), refNumberById)}</Tag>;
 }

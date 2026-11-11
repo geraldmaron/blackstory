@@ -14,6 +14,7 @@ import { useAdminAuth } from '../auth/AdminAuthProvider';
 import {
   ADMIN_NAV_GROUPS,
   ADMIN_TOP_LEVEL,
+  activeDestination,
   adminPaletteItems,
   type AdminQueueKey,
 } from './admin-nav';
@@ -60,28 +61,22 @@ function useQueueCounts(enabled: boolean, getIdToken: () => Promise<string | nul
   return counts;
 }
 
-/** "Research / Inbox" for the current path, so the top bar says where you are. */
+/** "Intake / Inbox" for the current path, so the top bar says where you are. */
 function currentLocation(pathname: string): string | null {
-  let best: { group: string | null; label: string; length: number } | null = null;
-  const consider = (group: string | null, href: string, label: string) => {
-    const matches =
-      href === '/admin'
-        ? pathname === '/admin'
-        : pathname === href || pathname.startsWith(`${href}/`);
-    if (matches && (!best || href.length > best.length))
-      best = { group, label, length: href.length };
-  };
-  for (const destination of ADMIN_TOP_LEVEL) consider(null, destination.href, destination.label);
+  const href = activeDestination(pathname);
+  if (!href) return null;
+  const top = ADMIN_TOP_LEVEL.find((destination) => destination.href === href);
+  if (top) return top.label;
   for (const group of ADMIN_NAV_GROUPS) {
-    for (const destination of group.destinations)
-      consider(group.label, destination.href, destination.label);
+    const found = group.destinations.find((destination) => destination.href === href);
+    if (found) return `${group.label} / ${found.label}`;
   }
-  const found = best as { group: string | null; label: string } | null;
-  return found ? (found.group ? `${found.group} / ${found.label}` : found.label) : null;
+  return null;
 }
 export function AdminShellChrome({ children }: { readonly children: React.ReactNode }) {
   const pathname = usePathname() || '/admin',
     router = useRouter();
+  const embedded = pathname.endsWith('/preview/embed');
   const { email, role, signOut, user, ready, getIdToken } = useAdminAuth();
   const counts = useQueueCounts(ready && !!user, getIdToken);
   const [paletteOpen, setPaletteOpen] = useState(false),
@@ -141,13 +136,8 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
     >
       <Navigation
         items={items}
-        activeItemId={pathname}
-        activePredicate={(item, active) =>
-          !!item.itemId &&
-          (item.itemId === '/admin'
-            ? active === '/admin'
-            : active === item.itemId || active.startsWith(`${item.itemId}/`))
-        }
+        activeItemId={activeDestination(pathname) ?? pathname}
+        activePredicate={(item, active) => !!item.itemId && item.itemId === active}
         onChange={({ item, event }) => {
           if (
             'metaKey' in event &&
@@ -213,6 +203,8 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
       />
     </Link>
   );
+  // The story studio embeds its preview in an iframe, which needs the page without the chrome.
+  if (embedded) return <>{children}</>;
   return (
     <div className={`admin-base-shell${login ? ' admin-base-shell--login' : ''}`}>
       {!login && (

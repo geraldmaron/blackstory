@@ -102,16 +102,9 @@ plan.md
 # Operator/local drop folders at repo root only — do not ignore apps/admin/src/app/inbox
 /inbox/
 
-# Beads / Dolt files (added by bd init)
-.dolt/
+# Local database files
 *.db
-.beads-credential-key
 
-# Construct — generated adapters, launcher, and runtime state.
-# Machine-specific, recreated by `construct sync`; never source (ADR-0027).
-# `.claude/` contents stay ignored by the block above, except project skill
-# discovery links. Do not re-ignore the parent directory here.
-.construct/
 # Anchored to the repo root on purpose. As a bare `inbox/` this rule matched EVERY directory
 # named inbox at any depth, which silently kept `apps/web/src/app/admin/inbox/` — a real admin
 # route — out of the repo entirely. Leading slash means "the top-level inbox/ only".

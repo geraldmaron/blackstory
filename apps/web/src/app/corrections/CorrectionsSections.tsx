@@ -48,9 +48,8 @@ export function CorrectionsSections(props: CorrectionFormProps) {
          */}
         <Disclosure summary="What happens to what you send">
           <p>
-            Corrections enter a restricted quarantine queue. Nothing you submit changes the public
-            record until it passes independent review and promotion controls.{' '}
-            {CORRECTION_PRIVACY_NOTICE.body}
+            Corrections go into a private queue. Nothing you submit changes the public record until
+            a person has read it against the sources. {CORRECTION_PRIVACY_NOTICE.body}
           </p>
           <p>
             Save your receipt code. It is the only credential for a status lookup, and a submission

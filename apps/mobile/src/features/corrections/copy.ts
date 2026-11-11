@@ -16,11 +16,11 @@ import type { PublicCorrectionPhase } from './contract';
 
 export const CORRECTION_PRIVACY_NOTICE = {
   title: 'Privacy and review',
-  body: 'Corrections are never published as submitted. Every submission enters a restricted quarantine queue for human review. We do not show your contact details publicly. Moderators may reach out using optional contact information you provide. Do not include anyone’s home address or other sensitive personal details about a living person unless strictly necessary for the correction.',
+  body: 'Corrections are never published as submitted. Every submission goes into a private queue, and a person reads it. Your contact details are never shown publicly. Moderators may reach out using optional contact information you provide. Do not include anyone’s home address or other sensitive personal details about a living person unless strictly necessary for the correction.',
 } as const;
 
 export const CORRECTION_FORM_INTRO =
-  'Challenge a published record, suggest missing evidence, or report a precision issue. Nothing you submit here changes the public record until it passes independent review.';
+  'Challenge a published record, suggest missing evidence, or report a precision issue. Nothing you submit here changes the public record until a person has read it against the sources.';
 
 export const CONTACT_CONSENT_LABEL =
   'A moderator may contact me about this correction using the details above. (Optional. Leave the contact field blank to stay anonymous.)';

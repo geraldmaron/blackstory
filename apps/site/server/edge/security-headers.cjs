@@ -20,6 +20,12 @@ const ARTICLE_MEDIA_IMG_SRC = [
   'https://www.archives.gov',
 ];
 const ARCHIVAL_MEDIA_SRC = ['https://tile.loc.gov'];
+// Click-to-load story video embeds; mirrors STORY_VIDEO_FRAME_SRC in apps/web csp.ts.
+const STORY_VIDEO_FRAME_SRC = [
+  'https://www.youtube-nocookie.com',
+  'https://player.vimeo.com',
+  'https://archive.org',
+];
 const BOOK_COVER_IMG_SRC = [
   'https://covers.openlibrary.org',
   'https://archive.org',
@@ -107,7 +113,7 @@ function buildContentSecurityPolicy(options = {}) {
     'media-src': ["'self'", ...ARCHIVAL_MEDIA_SRC],
     'font-src': DEFAULT_FONT_SRC,
     'connect-src': resolvedConnectSrc,
-    'frame-src': ["'none'"],
+    'frame-src': STORY_VIDEO_FRAME_SRC,
     'manifest-src': ["'self'"],
     'worker-src': ["'self'", 'blob:'],
     'child-src': ["'self'", 'blob:'],

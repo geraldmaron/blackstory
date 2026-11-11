@@ -116,7 +116,8 @@
   font-size: 12px;
   border-top: 1px solid var(--ds-border);
 }
-.admin-base-shell a:not([data-baseweb='button']) {
+/* Zero specificity: a default for plain links, so any classed link keeps its own color. */
+:where(.admin-base-shell a:not([data-baseweb='button'])) {
   color: var(--ds-accent);
 }
 .admin-base-shell :where(button, input, textarea, [role='combobox'], a):focus-visible {
@@ -167,6 +168,13 @@
 }
 .admin-base-panel h2 {
   margin-top: 0;
+}
+/* Story studio focus mode: the sidebar steps aside so the manuscript has the width. */
+[data-admin-focus='true'] .admin-base-shell {
+  grid-template-columns: minmax(0, 1fr);
+}
+[data-admin-focus='true'] .admin-base-sidebar {
+  display: none;
 }
 @media (max-width: 1000px) {
   .admin-base-shell {

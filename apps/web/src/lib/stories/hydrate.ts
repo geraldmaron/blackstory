@@ -9,6 +9,7 @@
  * throwing — the rest of the story still renders. This mirrors the moment
  * hydration in lib/theme-impact/source.ts, generalized to typed body blocks.
  */
+import { storyBlockProseTexts } from '@repo/schemas';
 import type {
   StoryBodyBlockDoc,
   StoryImageDoc,
@@ -123,6 +124,17 @@ export type HydratedStoryImage = {
   readonly caption?: string;
 };
 
+export type HydratedStoryTable = {
+  readonly type: 'table';
+  readonly caption: string;
+  readonly header: boolean;
+  readonly rows: readonly (readonly string[])[];
+};
+
+export type HydratedStoryVideo = Extract<StoryBodyBlockDoc, { type: 'video' }>;
+
+export type HydratedStoryDivider = { readonly type: 'divider' };
+
 export type HydratedStoryBlock =
   | HydratedStoryHeading
   | HydratedStoryParagraph
@@ -134,7 +146,10 @@ export type HydratedStoryBlock =
   | HydratedStoryTimeline
   | HydratedStoryMapInset
   | HydratedStoryDispute
-  | HydratedStoryImage;
+  | HydratedStoryImage
+  | HydratedStoryTable
+  | HydratedStoryVideo
+  | HydratedStoryDivider;
 
 export type HydratedStory = {
   readonly doc: PublicStoryProjectionDoc;
@@ -234,14 +249,9 @@ export function buildStoryReferences(
   };
 
   for (const block of doc.body) {
-    // Every block carrying author prose contributes citation numbers, list items
-    // included — a call-out's reference has to land in the numbered list like any other.
-    const proseTexts =
-      block.type === 'paragraph' || block.type === 'pullquote'
-        ? [block.text]
-        : block.type === 'list'
-          ? block.items
-          : [];
+    // Every block carrying author prose contributes citation numbers (list items, table
+    // cells and captions included), so a reference lands in the numbered list wherever it is cited.
+    const proseTexts = storyBlockProseTexts(block);
     if (proseTexts.length > 0) {
       for (const text of proseTexts) {
         for (const match of text.matchAll(INLINE_CITATION_PATTERN)) {
@@ -318,7 +328,16 @@ function hydrateBlock(
     case 'heading':
     case 'paragraph':
     case 'dispute':
+    case 'video':
+    case 'divider':
       return block;
+    case 'table':
+      return {
+        type: 'table',
+        caption: block.caption,
+        header: block.header ?? true,
+        rows: block.rows,
+      };
     case 'list':
       return { type: 'list', style: block.style ?? 'bullet', items: block.items };
     case 'pullquote':

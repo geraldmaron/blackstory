@@ -43,6 +43,7 @@ export const ADMIN_ROUTE_RULES: readonly AdminRouteRule[] = [
   { method: 'POST', pattern: '/admin/api/stories/import', access: 'research:write' },
   { method: 'POST', pattern: '/admin/api/stories/:id/publish', access: 'publication:publish' },
   { method: 'GET', pattern: '/admin/api/editorial/entities', access: STAFF_READ },
+  { method: 'GET', pattern: '/admin/api/editorial/entities/meta', access: STAFF_READ },
   { method: 'GET', pattern: '/admin/api/stories', access: STAFF_READ },
   { method: 'POST', pattern: '/admin/api/stories', access: 'research:write' },
   { method: 'GET', pattern: '/admin/api/stories/:id', access: STAFF_READ },

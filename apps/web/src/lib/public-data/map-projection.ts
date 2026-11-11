@@ -397,7 +397,7 @@ export function mapProjectionToPublicEntityView(
     ...(projection.visit !== undefined ? { visit: projection.visit } : {}),
     relevanceExplanation:
       claims.length > 0
-        ? 'Included in the active public release; each accepted claim below cites its source.'
+        ? 'Included in the active public release; each accepted claim cites its source.'
         : 'No sourced claims have been accepted for this record yet. It is listed because it is part of the active public release, and it will carry its evidence here as research lands.',
     /*
      * Empty, not a note about the publication pipeline. Substituting build-status prose here

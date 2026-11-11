@@ -22,7 +22,7 @@ export default function QuickAddPage() {
       />
       <QuickAddForm />
       <p className="quick-add-footer">
-        <Link href="/admin">Back to operations</Link>
+        <Link href="/admin">Today</Link>
         {' · '}
         <Link href="/admin/inbox">Open inbox</Link>
       </p>

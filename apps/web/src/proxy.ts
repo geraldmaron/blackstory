@@ -5,6 +5,7 @@
  * explicit content hash.
  */
 
+import { adminFramingHeaders } from './lib/web-security/admin-framing';
 import { type NextRequest, NextResponse } from 'next/server';
 import { adminAuthGate } from './admin/admin-auth-gate';
 import { handleMaintenance } from './lib/maintenance/maintenance-gate';
@@ -122,10 +123,14 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   if (!contentSecurityPolicy) {
     throw new Error('Global security headers must include Content-Security-Policy');
   }
+  // Admin pages may frame same-origin documents; the studio's embedded preview may be framed.
+  // Decided here so the request copy Next reads and the response header agree.
+  const framing = adminFramingHeaders(request.nextUrl.pathname, contentSecurityPolicy);
+  const policy = framing?.csp ?? contentSecurityPolicy;
   request.headers.set(CSP_NONCE_HEADER, nonce);
   // Next parses the request CSP before rendering and copies its nonce onto framework scripts.
   // x-nonce remains available to Server Components that render manual scripts.
-  request.headers.set('Content-Security-Policy', contentSecurityPolicy);
+  request.headers.set('Content-Security-Policy', policy);
 
   const response = await resolveProxyResponse(request);
   // Applied last and unconditionally so CSP (with this request's nonce) reaches every response
@@ -135,6 +140,10 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // it does not append.
   for (const { key, value } of securityHeaders) {
     response.headers.set(key, value);
+  }
+  if (framing) {
+    response.headers.set('Content-Security-Policy', policy);
+    if (framing.frameOptions) response.headers.set('X-Frame-Options', framing.frameOptions);
   }
   return applyPublicDocumentCdnCache(request, response);
 }

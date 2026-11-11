@@ -15,6 +15,11 @@
       "import": "./dist/relationship-vocabulary.js"
     },
     "./package.json": "./package.json",
+    "./story-inline": {
+      "development": "./src/story-inline.ts",
+      "types": "./dist/story-inline.d.ts",
+      "import": "./dist/story-inline.js"
+    },
     "./public-stories": {
       "development": "./src/public-stories.ts",
       "types": "./dist/public-stories.d.ts",
@@ -29,7 +34,7 @@
     "prebuild": "node ./scripts/sync-policy-json.mjs",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/constitution.test.ts src/banned-books.test.ts src/public-projections.test.ts src/public-stories.test.ts src/editorial.test.ts src/relationship-vocabulary.test.ts",
+    "test": "node --conditions development --import tsx --test src/constitution.test.ts src/banned-books.test.ts src/public-projections.test.ts src/public-stories.test.ts src/story-inline.test.ts src/editorial.test.ts src/relationship-vocabulary.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

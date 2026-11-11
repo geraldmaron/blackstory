@@ -33,9 +33,11 @@ test('a record photo sits in its own band, clipped, with the type below on the c
   assert.ok(
     recordCss.indexOf(".ds-record-mast[data-media='photo'] {\n  display: block;") < firstMedia,
   );
-  assert.match(
+  // Place masts take the shared record-room heights. A floor of their own made a mark mast a
+  // hollow 30vw tall, and a photo needed a rule to cancel it.
+  assert.doesNotMatch(
     placeCss,
-    /\.ds-home-first-paint \.ds-record-mast\[data-media='photo'\] \{\s*min-height:\s*0/,
+    /\.ds-home-first-paint \.ds-record-mast(?:\[[^\]]*\])? \{[^}]*min-height/,
   );
 });
 

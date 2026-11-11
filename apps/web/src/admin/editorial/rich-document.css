@@ -1,0 +1,677 @@
+/*
+ * The manuscript editor. Tokens only. The text column reads like /stories/[slug]: Newsreader at
+ * the public size and leading, headings in Schibsted, the same paragraph rhythm.
+ */
+:root {
+  /* Text that stays readable on --ds-accent-muted, which is the same copper in both themes. */
+  --rd-on-accent: var(--ds-ink);
+}
+
+[data-theme='dark'] {
+  --rd-on-accent: var(--ds-canvas);
+}
+
+.rd-document {
+  --rd-measure: 68ch;
+  position: relative;
+}
+
+/* ---------- Toolbar ---------- */
+.rd-toolbar {
+  position: sticky;
+  top: var(--studio-bar-h, 3.5rem);
+  z-index: var(--ds-z-typeahead);
+  background: var(--ds-canvas);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.rd-toolbar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-2) 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+}
+
+.rd-toolbar__row--table {
+  padding-top: 0;
+}
+
+.rd-toolbar__rule {
+  align-self: stretch;
+  width: var(--ds-border-width);
+  margin: var(--ds-space-1) 2px;
+  background: var(--ds-rule);
+}
+
+.rd-toolbar__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-4);
+  margin-left: auto;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.rd-toolbar__issues {
+  min-height: 36px;
+  padding: 0 var(--ds-space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--ds-warning-fg);
+  background: var(--ds-warning-bg);
+  border: var(--ds-border-width) solid var(--ds-warning-border);
+  border-radius: var(--ds-radius-md);
+}
+
+button.rd-toolbar__issues {
+  cursor: pointer;
+}
+
+.rd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 var(--ds-space-2);
+  font: inherit;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1;
+  color: var(--ds-ink);
+  background: transparent;
+  border: var(--ds-border-width) solid transparent;
+  border-radius: var(--ds-radius-md);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--ds-duration-fast) var(--ds-ease-standard),
+    border-color var(--ds-duration-fast) var(--ds-ease-standard);
+}
+
+.rd-btn--text {
+  padding: 0 var(--ds-space-1);
+}
+/* Fixed so the formatting row fits one line at the manuscript measure. */
+.rd-toolbar__row > .rd-select {
+  width: 8rem;
+}
+
+.rd-btn:hover:not(:disabled) {
+  background: var(--ds-surface-sunken);
+}
+
+.rd-btn[aria-pressed='true'],
+.rd-btn[aria-expanded='true'] {
+  color: var(--rd-on-accent);
+  background: var(--ds-accent-muted);
+  border-color: var(--ds-border);
+}
+
+.rd-btn:disabled {
+  color: var(--ds-ink-subtle);
+  cursor: default;
+}
+
+.rd-btn--primary {
+  color: var(--ds-canvas);
+  background: var(--ds-ink);
+}
+
+.rd-btn--primary:hover:not(:disabled) {
+  background: var(--ds-accent);
+}
+
+.rd-btn:focus-visible,
+.rd-select:focus-visible,
+.rd-field:focus-visible,
+.rd-toolbar__issues:focus-visible,
+.rd-prose:focus-visible,
+.rd-list__option:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.rd-select,
+.rd-field {
+  min-height: 36px;
+  padding: 0 var(--ds-space-3);
+  font: inherit;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+.rd-field {
+  width: 100%;
+}
+
+.rd-field[aria-invalid='true'] {
+  border-color: var(--ds-error-border);
+}
+
+.rd-select:disabled {
+  color: var(--ds-ink-subtle);
+}
+
+.rd-bubble {
+  display: flex;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-1);
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 var(--ds-space-1) var(--ds-space-4) var(--ds-overlay);
+  z-index: var(--ds-z-modal-sheet);
+}
+
+/* ---------- Floating panels and menus ---------- */
+.rd-panel {
+  position: fixed;
+  z-index: var(--ds-z-modal-sheet);
+  width: min(26rem, calc(100vw - var(--ds-space-4)));
+  max-height: min(24rem, 70vh);
+  overflow-y: auto;
+  padding: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 var(--ds-space-1) var(--ds-space-4) var(--ds-overlay);
+  animation: rd-rise var(--ds-duration-fast) var(--ds-ease-standard);
+}
+
+@keyframes rd-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rd-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+.rd-form__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+.rd-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.rd-problem {
+  margin: 0;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-error-fg);
+}
+
+.rd-problem:empty {
+  display: none;
+}
+
+.rd-hint {
+  margin: 0;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.rd-list {
+  list-style: none;
+  margin: var(--ds-space-2) 0 0;
+  padding: 0;
+}
+
+.rd-panel--suggest .rd-list {
+  margin-top: 0;
+}
+
+.rd-list__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  cursor: pointer;
+}
+
+.rd-list__option--rule {
+  margin-top: var(--ds-space-2);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  padding-top: var(--ds-space-3);
+  border-radius: 0 0 var(--ds-radius-sm) var(--ds-radius-sm);
+}
+
+.rd-list__option--active {
+  background: var(--ds-surface-sunken);
+}
+
+.rd-list__icon {
+  flex: none;
+  width: 1.25em;
+  margin-top: var(--ds-space-1);
+  color: var(--ds-ink-muted);
+}
+
+.rd-list__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.rd-list__name {
+  display: block;
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.rd-list__line {
+  display: block;
+  font-size: var(--ds-text-caption);
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.rd-list__flag {
+  color: var(--ds-warning-fg);
+  font-weight: 600;
+}
+
+.rd-list__status {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* ---------- The manuscript ---------- */
+.rd-prose {
+  max-width: var(--rd-measure);
+  margin: var(--ds-space-8) auto var(--ds-space-24);
+  font-family: var(--ds-font-editorial);
+  font-size: 19.5px;
+  line-height: var(--ds-leading-editorial);
+  color: var(--ds-ink);
+  caret-color: var(--ds-accent);
+  outline: none;
+  overflow-wrap: break-word;
+}
+
+.rd-prose:focus-visible {
+  outline: none;
+}
+
+.rd-prose ::selection,
+.rd-prose::selection {
+  color: var(--rd-on-accent);
+  background: var(--ds-accent-muted);
+}
+/* A selected card is shown by its outline, so the native highlight (which would repaint its
+   text in the on-accent color) stays off it. Text inside its fields still selects normally. */
+.rd-prose .rd-card {
+  user-select: none;
+}
+
+.rd-prose > * + * {
+  margin-top: var(--ds-space-5);
+}
+
+.rd-prose li p,
+.rd-prose blockquote p:first-child,
+.rd-prose td p,
+.rd-prose th p {
+  margin: 0;
+}
+
+.rd-prose p.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--ds-ink-subtle);
+  pointer-events: none;
+}
+
+.rd-prose h2,
+.rd-prose h3 {
+  margin-bottom: 0;
+  font-family: var(--ds-font-display);
+  color: var(--ds-ink);
+}
+
+.rd-prose h2 {
+  margin-top: var(--ds-space-8);
+  padding-top: var(--ds-space-6);
+  font-size: 30px;
+  line-height: 1.15;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.rd-prose h3 {
+  margin-top: var(--ds-space-6);
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+
+.rd-prose > :first-child {
+  margin-top: 0;
+}
+
+.rd-prose ul,
+.rd-prose ol {
+  padding-left: var(--ds-space-6);
+}
+
+.rd-prose li + li {
+  margin-top: var(--ds-space-2);
+}
+
+.rd-prose blockquote {
+  margin: var(--ds-space-2) 0;
+  padding-left: var(--ds-space-5);
+  font-style: italic;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.rd-prose blockquote p + p {
+  margin-top: var(--ds-space-3);
+}
+
+.rd-prose hr {
+  width: 100%;
+  margin: var(--ds-space-6) 0;
+  border: 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  cursor: pointer;
+}
+
+.rd-prose hr.ProseMirror-selectednode {
+  border-top-color: var(--ds-accent);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-space-2);
+}
+
+/* A block that breaks a contract limit. The title carries the reason; the outline is not color alone. */
+.rd-lint {
+  outline: var(--ds-border-width) dashed var(--ds-warning-border);
+  outline-offset: var(--ds-space-1);
+}
+
+/* ---------- Inline atoms and links ---------- */
+.rd-prose a.rd-link {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: text;
+}
+
+/* A record link reads as the public page does: ink text with a copper dotted underline. */
+.rd-entity {
+  color: var(--ds-ink);
+  text-decoration: underline dotted var(--ds-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.rd-entity.ProseMirror-selectednode {
+  color: var(--rd-on-accent);
+  background: var(--ds-accent-muted);
+  border-radius: var(--ds-radius-sm);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+
+.rd-cite {
+  margin-left: 2px;
+  padding: 0 2px;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  font-weight: 600;
+  line-height: 0;
+  color: var(--ds-accent);
+  white-space: nowrap;
+  cursor: default;
+}
+
+.rd-cite--selected {
+  color: var(--rd-on-accent);
+  background: var(--ds-accent-muted);
+  border-radius: var(--ds-radius-sm);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+}
+
+/* An unknown source: warning colors, an icon and words, so it never rests on red alone. */
+.rd-cite--missing {
+  display: inline-block;
+  vertical-align: baseline;
+  font-size: var(--ds-text-micro);
+  color: var(--ds-warning-fg);
+  background: var(--ds-warning-bg);
+  border: var(--ds-border-width) solid var(--ds-warning-border);
+  border-radius: var(--ds-radius-sm);
+  line-height: 1.4;
+}
+
+/* ---------- Cards: evidence, image, video ---------- */
+.rd-card {
+  position: relative;
+  padding: var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+.rd-card--selected {
+  border-color: var(--ds-accent);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.rd-card__type {
+  margin: 0 0 var(--ds-space-2);
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.rd-card__summary,
+.rd-card__caption {
+  margin: 0;
+}
+
+.rd-card__image {
+  margin: 0;
+}
+
+.rd-card__image img {
+  display: block;
+  max-width: 100%;
+  max-height: 20rem;
+  object-fit: contain;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+}
+
+.rd-card__image figcaption {
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* Controls appear on hover and keyboard focus, and stay while the card is selected. */
+.rd-card__actions {
+  position: absolute;
+  top: var(--ds-space-2);
+  right: var(--ds-space-2);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-1);
+  background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-md);
+  opacity: 0;
+  transition: opacity var(--ds-duration-fast) var(--ds-ease-standard);
+}
+
+.rd-card:hover .rd-card__actions,
+.rd-card:focus-within .rd-card__actions,
+.rd-card--selected .rd-card__actions {
+  opacity: 1;
+}
+
+.rd-video__plate {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  min-height: 9rem;
+  padding: var(--ds-space-5);
+  background: var(--ds-surface-sunken);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+.rd-video__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  line-height: 1.2;
+}
+
+.rd-video__meta {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.rd-video__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-3);
+}
+
+.rd-video__form > :first-child,
+.rd-video__form > .rd-problem,
+.rd-video__form > .rd-hint {
+  grid-column: 1 / -1;
+}
+
+/* ---------- Tables ---------- */
+.rd-table {
+  margin: var(--ds-space-2) 0;
+  font-family: var(--ds-font-sans);
+}
+
+.rd-table .tableWrapper {
+  overflow-x: auto;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.rd-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+
+.rd-table th,
+.rd-table td {
+  position: relative;
+  min-width: 5rem;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  text-align: left;
+  vertical-align: top;
+  color: var(--ds-ink);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.rd-table th {
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+  border-bottom-color: var(--ds-border-strong);
+}
+
+.rd-table td p,
+.rd-table th p {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.rd-table .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ds-accent-muted);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.rd-table__caption {
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.rd-table__caption.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--ds-warning-fg);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-panel {
+    animation: none;
+  }
+
+  .rd-btn,
+  .rd-card__actions {
+    transition: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .rd-prose {
+    font-size: 18px;
+  }
+
+  .rd-video__form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

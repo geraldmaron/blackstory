@@ -37,9 +37,9 @@ export function SubmissionsTable({
           <a className="story-review__row-title" href={`${basePath}/${row.id}`}>
             {row.title}
           </a>
-          <p className="story-review__row-meta ds-mono">
-            {row.id}
-            {row.sourceUrl ? ` · ${row.sourceUrl}` : ''}
+          <p className="story-review__row-meta ds-mono" title={`${row.id} ${row.sourceUrl ?? ''}`}>
+            {row.id.slice(0, 8)}
+            {row.sourceUrl ? ` · ${row.sourceUrl.replace(/^https?:\/\//, '')}` : ''}
           </p>
         </>
       ),

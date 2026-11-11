@@ -62,7 +62,6 @@ const BANNED = [
 const SKIP_PREFIXES = [
   'supabase/migrations/', // applied history is immutable
   'supabase/rehearsal/', // the rehearsal record names the legacy objects it renames
-  '.beads/',
   'docs/admin/admin-surface-audit-2026-10.md', // dated audits describe the system as it was
   'docs/admin/editorial-production-rollout.md',
   'docs/research/lives-archive-verification.md', // dated verification record
