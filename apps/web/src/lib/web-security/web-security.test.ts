@@ -47,7 +47,7 @@ test('CSP frame-src names exactly the story video providers and tile.loc.gov sta
     directive('frame-src'),
     'frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://archive.org',
   );
-  assert.ok(directive('media-src')?.split(' ').includes('https://tile.loc.gov'));
+  assert.equal(directive('media-src'), "media-src 'self' https://tile.loc.gov");
 });
 
 test('CSP includes strict defaults and frame-ancestors none', () => {
