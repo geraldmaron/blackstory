@@ -55,7 +55,13 @@ export function EntityRecordEditor({
       </div>
 
       <h2 className="ds-section__title">Display name</h2>
-      <FieldForm entityId={entity.id} field="displayName" reason={reason} disabled={!reasonGiven}>
+      <FieldForm
+        entityId={entity.id}
+        loadedUpdatedAt={entity.updatedAt}
+        field="displayName"
+        reason={reason}
+        disabled={!reasonGiven}
+      >
         <label className="story-review__field">
           <span>Name</span>
           <FormInput type="text" name="value" defaultValue={entity.displayName} required />
@@ -63,7 +69,13 @@ export function EntityRecordEditor({
       </FieldForm>
 
       <h2 className="ds-section__title">Kind</h2>
-      <FieldForm entityId={entity.id} field="kind" reason={reason} disabled={!reasonGiven}>
+      <FieldForm
+        entityId={entity.id}
+        loadedUpdatedAt={entity.updatedAt}
+        field="kind"
+        reason={reason}
+        disabled={!reasonGiven}
+      >
         <label className="story-review__field">
           <span>Kind</span>
           <FormSelect name="value" defaultValue={entity.kind} aria-label="Kind">
@@ -81,7 +93,13 @@ export function EntityRecordEditor({
       </FieldForm>
 
       <h2 className="ds-section__title">Living status</h2>
-      <FieldForm entityId={entity.id} field="livingStatus" reason={reason} disabled={!reasonGiven}>
+      <FieldForm
+        entityId={entity.id}
+        loadedUpdatedAt={entity.updatedAt}
+        field="livingStatus"
+        reason={reason}
+        disabled={!reasonGiven}
+      >
         <label className="story-review__field">
           <span>Status</span>
           <FormSelect name="value" defaultValue={entity.livingStatus} aria-label="Status">
@@ -95,7 +113,13 @@ export function EntityRecordEditor({
       </FieldForm>
 
       <h2 className="ds-section__title">Aliases</h2>
-      <FieldForm entityId={entity.id} field="aliases" reason={reason} disabled={!reasonGiven}>
+      <FieldForm
+        entityId={entity.id}
+        loadedUpdatedAt={entity.updatedAt}
+        field="aliases"
+        reason={reason}
+        disabled={!reasonGiven}
+      >
         <label className="story-review__field">
           <span>One alias per line</span>
           <FormTextarea name="value" rows={4} defaultValue={entity.aliases.join('\n')} />
@@ -107,7 +131,13 @@ export function EntityRecordEditor({
       </FieldForm>
 
       <h2 className="ds-section__title">Sensitivity</h2>
-      <FieldForm entityId={entity.id} field="sensitivity" reason={reason} disabled={!reasonGiven}>
+      <FieldForm
+        entityId={entity.id}
+        loadedUpdatedAt={entity.updatedAt}
+        field="sensitivity"
+        reason={reason}
+        disabled={!reasonGiven}
+      >
         <fieldset className="entity-edit__checks">
           <legend>Classes</legend>
           {sensitivityClasses.map((sensitivityClass) => (
@@ -142,6 +172,7 @@ export function EntityRecordEditor({
               </span>
               <FieldForm
                 entityId={entity.id}
+                loadedUpdatedAt={entity.updatedAt}
                 field="identifierRemove"
                 reason={reason}
                 submitLabel="Remove"
@@ -156,6 +187,7 @@ export function EntityRecordEditor({
 
       <FieldForm
         entityId={entity.id}
+        loadedUpdatedAt={entity.updatedAt}
         field="identifierAdd"
         reason={reason}
         submitLabel="Add identifier"

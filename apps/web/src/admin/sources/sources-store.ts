@@ -5,6 +5,7 @@ import {
   listSourceEntitiesPostgres,
   listSourceLibraryFitnessPostgres,
   listSourceLibraryPostgres,
+  countSourceLibraryPostgres,
   listSourceOrganizationsPostgres,
   listUnmappedHostsPostgres,
   type SourceEntityPage,
@@ -57,9 +58,14 @@ export async function listSourceLibrary(
     readonly sort?: SourceLibrarySort;
     readonly q?: string;
     readonly limit?: number;
+    readonly offset?: number;
   } = {},
 ): Promise<readonly SourceLibraryListItem[]> {
   return listSourceLibraryPostgres(options);
+}
+
+export async function countSourceLibrary(q?: string): Promise<number> {
+  return countSourceLibraryPostgres(q);
 }
 
 export async function getSourceLibraryTotals(): Promise<SourceLibraryTotals> {

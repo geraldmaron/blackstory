@@ -255,8 +255,10 @@ export async function listSourceLibraryPostgres(options: {
   readonly sort?: SourceLibrarySort;
   readonly q?: string;
   readonly limit?: number;
+  readonly offset?: number;
 }): Promise<readonly SourceLibraryListItem[]> {
   const limit = Math.min(500, Math.max(1, options.limit ?? 200));
+  const offset = Math.max(0, Math.floor(options.offset ?? 0));
   const sort = options.sort ?? 'entities';
   const q = options.q?.trim();
 
@@ -267,18 +269,30 @@ export async function listSourceLibraryPostgres(options: {
     where = `WHERE name ILIKE $${params.length}`;
   }
   const orderBy = sort === 'name' ? 'name ASC' : 'published_entities DESC NULLS LAST, name ASC';
-  params.push(limit);
+  params.push(limit, offset);
 
   const rows = await queryPostgres<SourceLibraryRow>(
     `SELECT ${SOURCE_LIBRARY_COLUMNS}
      FROM evidence.source_library
      ${where}
      ORDER BY ${orderBy}
-     LIMIT $${params.length}`,
+     LIMIT $${params.length - 1} OFFSET $${params.length}`,
     params,
   );
 
   return rows.map(mapSourceLibraryListRow);
+}
+
+/** Publishers matching the same name filter as listSourceLibraryPostgres, for paging. */
+export async function countSourceLibraryPostgres(q?: string): Promise<number> {
+  const term = q?.trim();
+  const rows = await queryPostgres<{ readonly n: number | string }>(
+    term
+      ? `SELECT count(*) AS n FROM evidence.source_library WHERE name ILIKE $1`
+      : `SELECT count(*) AS n FROM evidence.source_library`,
+    term ? [`%${term}%`] : [],
+  );
+  return readCount(rows[0]?.n);
 }
 
 export async function getSourceLibraryTotalsPostgres(): Promise<SourceLibraryTotals> {

@@ -9,7 +9,9 @@ import { CollectionGuidance } from './collection-guidance';
  */
 import type { Metadata } from 'next';
 import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { Pagination } from '@repo/ui';
 import {
+  countSourceLibrary,
   getSourceLibraryTotals,
   listSourceLibrary,
   listUnmappedHosts,
@@ -26,11 +28,26 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 const BASE_PATH = '/admin/sources';
+const PAGE_SIZE = 50;
+const COLLECTION_KEYS = [
+  'question',
+  'assertionClass',
+  'subject',
+  'geography',
+  'period',
+  'reviewStatus',
+  'offset',
+] as const;
 
-function sortHref(sort: 'entities' | 'name', q: string | undefined): string {
+/** The two searches share one URL; each link and form changes only its own keys. */
+function hrefWith(
+  current: Readonly<Record<string, string>>,
+  changes: Readonly<Record<string, string | undefined>>,
+): string {
   const params = new URLSearchParams();
-  if (q) params.set('q', q);
-  if (sort !== 'entities') params.set('sort', sort);
+  for (const [key, value] of Object.entries({ ...current, ...changes })) {
+    if (value) params.set(key, value);
+  }
   const qs = params.toString();
   return qs ? `${BASE_PATH}?${qs}` : BASE_PATH;
 }
@@ -46,17 +63,23 @@ export default async function SourcesPage({
   const rawSort = params.sort;
   const sortParam = Array.isArray(rawSort) ? rawSort[0] : rawSort;
   const sort: 'entities' | 'name' = sortParam === 'name' ? 'name' : 'entities';
+  const rawPage = Number(Array.isArray(params.page) ? params.page[0] : params.page);
+  const requestedPage = Number.isInteger(rawPage) && rawPage > 1 ? rawPage : 1;
+
+  const current: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(params)) {
+    const value = (Array.isArray(raw) ? raw[0] : raw)?.trim();
+    if (value) current[key] = value;
+  }
+  const collectionParams = Object.fromEntries(
+    Object.entries(current).filter(([key]) => (COLLECTION_KEYS as readonly string[]).includes(key)),
+  );
+  const libraryParams = Object.fromEntries(
+    Object.entries(current).filter(([key]) => ['q', 'sort', 'page'].includes(key)),
+  );
 
   const collectionQuery: Record<string, unknown> = {};
-  for (const key of [
-    'question',
-    'assertionClass',
-    'subject',
-    'geography',
-    'period',
-    'reviewStatus',
-    'offset',
-  ]) {
+  for (const key of COLLECTION_KEYS) {
     const raw = params[key];
     const value = Array.isArray(raw) ? raw[0] : raw;
     if (value?.trim()) collectionQuery[key] = key === 'offset' ? Number(value) : value.trim();
@@ -66,16 +89,25 @@ export default async function SourcesPage({
     () => querySourceLibrary(getPostgresPool(), collectionQuery),
     'collection guidance',
   );
-  const [libraryOutcome, totalsOutcome, unmappedOutcome] = await Promise.all([
+  const [libraryOutcome, countOutcome, totalsOutcome, unmappedOutcome] = await Promise.all([
     readPostgresOrDegrade(
-      () => listSourceLibrary({ sort, limit: 200, ...(q ? { q } : {}) }),
+      () =>
+        listSourceLibrary({
+          sort,
+          limit: PAGE_SIZE,
+          offset: (requestedPage - 1) * PAGE_SIZE,
+          ...(q ? { q } : {}),
+        }),
       'source library',
     ),
+    readPostgresOrDegrade(() => countSourceLibrary(q), 'source library count'),
     readPostgresOrDegrade(() => getSourceLibraryTotals(), 'source library totals'),
     readPostgresOrDegrade(() => listUnmappedHosts(50), 'unmapped citation hosts'),
   ]);
 
   const rows = libraryOutcome.status === 'ok' ? libraryOutcome.value : [];
+  const matchCount = countOutcome.status === 'ok' ? countOutcome.value : rows.length;
+  const pageCount = Math.max(1, Math.ceil(matchCount / PAGE_SIZE));
   const totals =
     totalsOutcome.status === 'ok'
       ? totalsOutcome.value
@@ -114,7 +146,7 @@ export default async function SourcesPage({
       ) : null}
 
       {collections.status === 'ok' ? (
-        <CollectionGuidance result={collections.value} />
+        <CollectionGuidance result={collections.value} keep={libraryParams} />
       ) : (
         <p role="alert">Collection guidance is unavailable. Reload to retry.</p>
       )}
@@ -124,7 +156,11 @@ export default async function SourcesPage({
         discovery hints.
       </p>
       <form className="ds-toolbar" action={BASE_PATH} method="get" role="search">
-        {sort !== 'entities' ? <input type="hidden" name="sort" value={sort} /> : null}
+        {Object.entries({ ...collectionParams, ...(sort !== 'entities' ? { sort } : {}) }).map(
+          ([key, value]) => (
+            <input key={key} type="hidden" name={key} value={value} />
+          ),
+        )}
         <label className="ds-toolbar__field">
           <span className="ds-toolbar__field-label">Search</span>
           <FormInput type="search" name="q" defaultValue={q ?? ''} placeholder="Publisher name…" />
@@ -134,7 +170,10 @@ export default async function SourcesPage({
             Search
           </FormButton>
           {q ? (
-            <a className="ds-button ds-button--secondary" href={sortHref(sort, undefined)}>
+            <a
+              className="ds-button ds-button--secondary"
+              href={hrefWith(current, { q: undefined, page: undefined })}
+            >
               Clear
             </a>
           ) : null}
@@ -145,8 +184,21 @@ export default async function SourcesPage({
         <SourceLibraryTable
           rows={rows}
           sort={sort}
-          sortHrefs={{ entities: sortHref('entities', q), name: sortHref('name', q) }}
+          sortHrefs={{
+            entities: hrefWith(current, { sort: undefined, page: undefined }),
+            name: hrefWith(current, { sort: 'name', page: undefined }),
+          }}
         />
+        {matchCount > 0 ? (
+          <Pagination
+            page={Math.min(requestedPage, pageCount)}
+            pageCount={pageCount}
+            pageSize={PAGE_SIZE}
+            total={matchCount}
+            itemLabel="publishers"
+            hrefForPage={(page) => hrefWith(current, { page: page > 1 ? String(page) : undefined })}
+          />
+        ) : null}
       </section>
 
       <UnmappedHostsSection rows={unmappedHosts} />

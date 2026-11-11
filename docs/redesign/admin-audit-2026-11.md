@@ -89,6 +89,13 @@ wrong block. The fifth is listed under "Still open".
   from September, while records go live daily through the incremental publisher. It now lists
   the 50 records most recently added to the live release, by first-live date, and links the
   publication audit log for the why. In-place corrections still show only in the audit log.
+- **Sources hid 582 of 782 publishers.** The table stopped at 200 with no paging. It now pages
+  50 at a time with the true total, and the collection search and publisher search keep each
+  other's filters instead of resetting them. The page went from about 18,000px to 7,500px.
+- **An entity edit could overwrite a change its author never saw.** Each field form now carries
+  the record's `updatedAt` from when it rendered; a save after anyone else's write is refused
+  with "reload to see the change". Every field edit already bumped `updated_at`. Not driven in
+  the browser: the observer identity cannot see the editor.
 - **Kill switches stay read-only.** `docs/runbooks/incident-response.md` makes the read-only view
   deliberate; a toggle would be a security change, not a design fix.
 
@@ -101,7 +108,8 @@ wrong block. The fifth is listed under "Still open".
 
 | Item | Why it is open |
 |---|---|
-| Catalog and sources desks | Not rebuilt in this pass; SURFACES.md 3.5 lists their defects (three table implementations, no conflict UI, raw filter forms, switches with no toggle UI) |
+| A second field save in the same visit relies on the page refreshing after the first | The save action revalidates the record page, which re-renders the forms with the new `updatedAt`; not exercised with a writable login. If it fails, the second save is refused with a reload message and nothing is lost |
+| Admin tables still come in three styles | Cosmetic; no job is blocked by it |
 | The citation link check has never run | `citation-link-health-sweep` has no runner and no results table, so none of the 12,358 published citations has a recorded link status. Running it means fetching every cited host weekly and letting it repoint dead links to archived copies; that is an owner call |
 | Unlinking a staff account from a contributor profile | `access_control.contributor_accounts.user_id` is unique and has no unlink path |
 | Story slug redirects | None exist; renaming a published story's slug breaks its links |

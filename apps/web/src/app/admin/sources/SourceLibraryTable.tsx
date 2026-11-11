@@ -91,7 +91,6 @@ export function SourceLibraryTable({
           ))}
         </tbody>
       </table>
-      <p className="story-review__queue-foot ds-mono">{rows.length} publishers</p>
     </div>
   );
 }

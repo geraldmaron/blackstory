@@ -1,12 +1,22 @@
 /** Versioned collection profiles follow docs/ui/patterns-source-library.md. Server-only. */
 import { FormInput, FormSelect, FormButton } from '../../../admin/design-system/fields';
 import type { SourceLibraryResult } from '@repo/ops-data/source-library';
-export function CollectionGuidance({ result }: { result: SourceLibraryResult }) {
+/** `keep` carries the publisher table's own params, so searching collections does not reset it. */
+export function CollectionGuidance({
+  result,
+  keep,
+}: {
+  readonly result: SourceLibraryResult;
+  readonly keep: Readonly<Record<string, string>>;
+}) {
   const offset = result.query.offset ?? 0,
     limit = result.query.limit ?? 20;
   const pageHref = (next: number) => {
     const params = new URLSearchParams(
-      Object.entries({ ...result.query, offset: next }).map(([key, value]) => [key, String(value)]),
+      Object.entries({ ...keep, ...result.query, offset: next }).map(([key, value]) => [
+        key,
+        String(value),
+      ]),
     );
     return `/admin/sources?${params}`;
   };
@@ -24,6 +34,9 @@ export function CollectionGuidance({ result }: { result: SourceLibraryResult }) 
         role="search"
         aria-label="Find collections"
       >
+        {Object.entries(keep).map(([key, value]) => (
+          <input key={key} type="hidden" name={key} value={value} />
+        ))}
         <label className="ds-toolbar__field">
           <span className="ds-toolbar__field-label">Research question</span>
           <FormInput
@@ -72,7 +85,10 @@ export function CollectionGuidance({ result }: { result: SourceLibraryResult }) 
           <FormButton className="ds-button ds-button--secondary" type="submit">
             Find collections
           </FormButton>
-          <a className="ds-button ds-button--secondary" href="/admin/sources">
+          <a
+            className="ds-button ds-button--secondary"
+            href={`/admin/sources?${new URLSearchParams(keep)}`}
+          >
             Clear
           </a>
         </div>
