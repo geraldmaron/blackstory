@@ -22,8 +22,10 @@ type Mark = 'strong' | 'em';
 // Same entity pattern as ENTITY_PROSE_LINK_RE in @repo/domain (sticky, non-global here).
 const CITE_RE = /\[ref:([a-z0-9]+(?:-[a-z0-9]+)*)\]/y;
 const ENTITY_RE = /\[\[([^|\][]+)(?:\|([^\][]+))?\]\]/y;
-const LINK_RE = /\[((?:\\[\\[\]*_]|[^\][\n\\]|\\(?![\\[\]*_]))+)\]\((https:\/\/[^\s)]+)\)/y;
-const LINK_LIKE_RE = /\[([^\][\n]+)\]\(([^\s)]+)\)/g;
+// Bounded so a long run of `[` cannot make each start position scan to the end (polynomial ReDoS).
+const LINK_RE =
+  /\[((?:\\[\\[\]*_]|[^\][\n\\]|\\(?![\\[\]*_])){1,500})\]\((https:\/\/[^\s)]{1,2048})\)/y;
+const LINK_LIKE_RE = /\[([^\][\n]{1,500})\]\(([^\s)]{1,2048})\)/g;
 
 /** https only, parses as a URL, no embedded credentials, no whitespace. */
 export function isSafeStoryLinkHref(href: string): boolean {
