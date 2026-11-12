@@ -47,11 +47,8 @@ Canonical case promotion and research-artifact release have different actor rule
 publication-role user may promote a case they proposed after final review. The
 `publication.activate_research_release` SQL path still requires its reviewer and
 publisher each to differ from the producer; it does not require the reviewer and
-publisher to differ from each other. The admin release route currently stages a decision
-without activating it; the route authorizer does not enforce recent reauthentication.
-Fresh reauthentication remains an operating requirement for activation, not a verified
-runtime gate. Do not treat a staged response or a direct service-role database call as
-proof that this control ran.
+publisher to differ from each other. The admin release route stages a decision
+without activating it.
 
 ## Deployment verification
 

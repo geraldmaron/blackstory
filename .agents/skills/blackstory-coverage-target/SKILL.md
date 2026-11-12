@@ -5,9 +5,6 @@ description: Chooses where research attention should go next from catalog-relati
 
 # Coverage target
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 Judgment playbook for _where to look_, not _what is true_. A thin catalog cell is a research
 question. It is never a claim that a community lacks history.
 
@@ -20,7 +17,7 @@ Do not load generic recency-research skills here.
 | Which counties are thin vs documented Black population?                    | Geographic gap scanner | [`docs/research/geographic-gap-scanner.md`](../../../docs/research/geographic-gap-scanner.md), `packages/domain/src/discovery/geographic-gap-scanner.ts` |
 | Which decades are thin vs this catalog's own average?                      | Temporal gap           | [`docs/research/temporal-gap-discovery.md`](../../../docs/research/temporal-gap-discovery.md)                                                            |
 | Of candidates we already found, which are obscure relative to the catalog? | Obscurity ranking      | discovery pipeline / community-obscurity                                                                                                                 |
-| What is already parked and weak?                                           | Graylist               | [`blackstory-triage-graylist`](../blackstory-triage-graylist/SKILL.md)                                                                                   |
+| What is already parked and weak?                                           | Graylist               | [`triage-graylist`](../../../docs/research/research-operations.md#triage-graylist)                                                                                   |
 | Where do federal aggregators miss local micro-records?                     | County archive ladder  | [`docs/research/county-archive-ladder.md`](../../../docs/research/county-archive-ladder.md)                                                              |
 
 Obscurity ranks survivors. The gap scanner decides the next county. They compose: gap-zone
@@ -48,8 +45,8 @@ maximally thin"; the functions report no relative gap signal.
 3. Run the research-directive loop: plan → gather → extract → decide
    (`docs/research/research-directive-framework.md`). Decide is
    `stage_for_review` / `hold` / `reject` only.
-4. Hand staged briefs to [`blackstory-research-intake`](../blackstory-research-intake/SKILL.md) or
-   [`blackstory-discovery-run`](../blackstory-discovery-run/SKILL.md). Confirming a pin is
+4. Hand staged briefs to [`research-intake`](../../../docs/research/research-operations.md#research-intake) or
+   [`discovery-run`](../../../docs/research/research-operations.md#discovery-run). Confirming a pin is
    [`blackstory-entity-verify`](../blackstory-entity-verify/SKILL.md).
 
 Staff-only coverage view: `ops.coverage_gap_by_county_decade`. Brief helper:
@@ -68,21 +65,3 @@ underrepresentation.
 
 - Empty-quadrant vision: `docs/methodology/empty-quadrant-and-aggregators.md`
 - Query packs / era terms: `docs/research/query-packs.md`
-
-## Working contract
-
-**Input:** Catalog coverage, scope and the research budget.
-
-**Output:** A bounded set of research targets and reasons, with catalog gaps distinguished from historical absence.
-
-**Boundary and handoff:** Hand targets to research intake or discovery. Citation volume must not crowd out community archives or poorly documented subjects.
-
-Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
-for the evidence need, pin returned policy versions and explain why the collection should
-contain the needed evidence. Search authorized captures, citation trails and outside sources;
-the library is a starting point. Record access failures and unknown coverage. Its reviewed
-status describes guidance, not the truth of a historical assertion.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

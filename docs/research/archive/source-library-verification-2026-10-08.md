@@ -133,7 +133,7 @@ approval or publication was performed.
   The GovInfo collection guided inspection of Public Law 88-352. Its approval notation was
   saved; statute creation was explicitly held because management currently writes places.
 
-The earlier [school packet](historic-black-secondary-schools-2026-10-07.md) is development
+The earlier [school packet](../historic-black-secondary-schools-2026-10-07.md) is development
 material. Compared with that packet, the fresh pass distinguishes Atlanta's September 8, 1924
 opening from construction, omits Lincoln's disputed 1865/1867 founding, keeps Howard's
 construction/opening/dedication separate, and retains its supported Claymont/Belton/Brown account.

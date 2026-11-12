@@ -1,29 +1,5 @@
 # Agent Instructions
 
-## Non-Interactive Shell Commands
-
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
-
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
-
-**Use these forms instead:**
-```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
-
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
-```
-
-**Other commands that may prompt:**
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
-
 ## Mobile local QA (agents)
 
 **Default for mobile smoke / "app works locally": Path A (prod-like).** Production never uses Metro; do not open the Debug dev client and expect prod behavior.
@@ -48,7 +24,6 @@ Start at [`docs/architecture.md`](docs/architecture.md) and
 [`docs/research/README.md`](docs/research/README.md). These define current authority and the
 challenge procedure. Inspect code and evidence before accepting a design claim. Historical
 ADRs/PRDs and dated audits are supporting records, not competing operating instructions.
-Research is explicit manual/headless work; do not use Corsair or install a schedule.
 Code comments explain behavior and constraints, not session history or incidental dates.
 
 
@@ -58,18 +33,15 @@ Read [skill loading and capability requirements](docs/research/README.md#skills-
 when the harness does not discover that directory. `.claude/skills/` contains discovery
 links to the same files, not another implementation.
 
-Two BlackStory skill kinds live there:
+Operator-cli verbs have no skill of their own; `research-framework` routes to
+[`docs/research/research-operations.md`](docs/research/research-operations.md).
 
-- **CLI pointers** (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
-  `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) match a verb and then read
-  [`docs/research/research-operations.md`](docs/research/research-operations.md). They do not
-  duplicate command flags.
-- **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
+**Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
   `ringer-review`, `surface-triage`, `intake-review`, `experience-review`) carry decision order, source ladders, and Do/Never. They
   have no operator-cli verb of their own.
 
-`blackstory-locate` Census-geocodes a sourced address (no LLM). Finding the place, confirming
+The `locate` verb Census-geocodes a sourced address (no LLM). Finding the place, confirming
 which namesake, and assigning era is `blackstory-entity-verify`.
 
 `blackstory-surface-triage` is the other direction: the data exists and a published surface
@@ -77,6 +49,10 @@ disagrees with it. It carries the projection / search-doc split, the `facets` wh
 replace, and the 30-minute release cache that makes a correct fix look like no fix.
 
 All commands: `node --conditions development --import tsx packages/operator-cli/src/bin.ts <verb> [flags]`. Every verb accepts `--json`; entity targets use `--entity-id`, case targets use `--case-id`. Read the operations doc before running a verb.
+
+Session execution with the harness's own web and document tools is the default
+(`docs/research/README.md`, "One request and one approval"). Use these verbs when a command is
+actually needed; hosted providers are optional.
 
 | Lane | When to use | Exact command |
 |---|---|---|
@@ -118,51 +94,12 @@ role-based paths (`lockup-*.png`, `symbol-*.png`, …).
 **Issue ids are internal only.** Never put legacy tracker ids (`repo-…`) in user-facing copy, admin
 chrome, error strings, or product source comments. Cite ADRs or capability names.
 
-**Color.** Black and paper lead; copper points.
-
-| Role | Hex |
-|---|---|
-| Black Ink (primary ink; dark canvas) | `#0A0A0A` |
-| Charcoal (dark surface) | `#161616` |
-| Archive Paper (light canvas) | `#F4EFE5` |
-| Surface (raised light surface) | `#FBF8F2` |
-| Copper Pin (graphic accent only) | `#B86B2A` |
-| Copper text on light | `#8E4F2A` |
-| Copper text on dark | `#D07A32` |
-| Page Sand (decorative fill) | `#D8A178` |
-| Stone (secondary text) | `#6D675F` |
-| Rule (hairlines) | `#D7D0C4` |
-
-Copper is a navigational signal, not a decorative wash: roughly 10–15% of any composition,
-reserved for the moment of orientation (active locations, selected filters, primary actions,
-evidence markers). Raw Copper Pin never carries body-size text on light canvas. Dark theme is
-first-class, not an afterthought.
-
-**Type.** Schibsted Grotesk SemiBold display; Geist UI/body; Newsreader editorial/longform; Geist
-Mono for data, citations, dates, confidence, and technical labels. All open-source; no licensed
-fonts. The binding source is `brand/tokens/typography.json`, which `packages/ui/src/styles/
-tokens.css` and `apps/mobile/scripts/generate-brand-tokens.ts` both generate from — this line
-described the pre-migration families (Sora / Inter / Source Serif 4 / IBM Plex Mono) for months
-after neither the tokens nor the native font loader used them.
-
-**Shape.** Radii 8/16/28px (sm/md/lg). Flat matte fills only — no bevels, shadows, glows,
-gradients, 3D, or ornamental motion, anywhere, ever.
+Color, type, radii, imagery and map rules live in `docs/ui/brand.md` and the `brand/` token
+files; the numbered rules under "Rules for agents shipping UI" are the short form.
 
 **The mark.** A standalone book-and-pin symbol beside the BlackStory wordmark. Lockup and symbol
 are artwork — never reconstruct either by typing the wordmark next to a bare symbol render.
 Serve from `apps/web/public/brand/` (masters in root `brand/`).
-
-**Imagery and people.** Place first; evidence visible; people with context — a person is always
-identified (PERSON / ROLE / PLACE / YEAR), never anonymous decoration. Avoid generic "Black
-history" stock imagery, automatic sepia filters, AI images presented as documentary material,
-and maps without source/precision context.
-
-**Map dignity rules.** No red or alarm hues for violence-adjacent records; no crime-heat
-rendering; color is never the only signal (confidence stays glyph-encoded); points render no
-sharper than stored precision and a coarsened point is never labeled as an exact address.
-
-**File naming.** Lowercase-kebab file names everywhere, including docs and asset packs —
-no uppercase file names in new work.
 
 ## UI Design Patterns
 
@@ -198,59 +135,7 @@ Kit implementation: `@repo/ui` (`packages/ui`). Where a pattern doc and the kit 
 
 When adding a reusable control, prefer `apps/web/src/components/patterns/` + a pattern doc + a row in `patterns-registry.md`. Surface-specific layout stays in route folders (`app/`, `components/home/`, etc.) but must cite its binding direction doc.
 
-## Cursor Cloud specific instructions
+## Session completion and branching
 
-Notes for Cloud Agents running in this VM. The startup update script already runs `pnpm install --frozen-lockfile` + `uv sync --all-packages --frozen`; toolchains (`node`, `pnpm`, `uv`) are on PATH via the agent's `~/.bashrc`. Standard commands live in `README.md` and root `package.json` scripts; only the non-obvious caveats are here.
-
-### Node version gotcha (load-bearing)
-The base image ships an older `/exec-daemon/node` (v22.14.0) that lacks `module.registerHooks`, which `apps/web` tests require (`test/css-stub.mjs`). `~/.bashrc` prepends nvm's default Node 22 (currently v22.22.2, satisfies `.nvmrc`'s `22` and `>=22.15`) ahead of it, so interactive shells get the right node. If a shell ever resolves `node -v` to 22.14.0 (e.g. a non-login shell), fix PATH with:
-`export PATH="$(dirname "$(nvm which default)"):$PATH"` (after sourcing nvm).
-
-### Running the web app without a database
-- `PUBLIC_DATA_SOURCE=seed pnpm dev:web` starts `@repo/web` on port 3048. `/admin` is a route group inside this same app (`apps/web/src/app/admin`, gated by `apps/web/src/middleware.ts`), not a separate server — there is nothing to skip. Visiting `/admin/**` without Supabase/Postgres env configured just fails the edge auth gate and redirects to `/admin/login`; it does not affect the public routes.
-- The live catalog/map pages (`/`, `/explore`, `/records`, `/memorial`, `/themes`) require live Postgres (`PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` + `DATABASE_SSL=1`). Without a DB they return HTTP 500: `apps/web/src/lib/public-data/source.ts` has no seed fallback, despite older README/`public-seed.ts` comments implying a "Dunbar seed" home page.
-- Editorial/utility pages render fine with no DB: `/about`, `/methodology`, `/stories`, `/data`, `/books`, `/law`, `/support`, `/privacy`, `/errata`, `/design-system`, `/corrections`, `/submit`, `/locate`.
-
-### Corrections/submit intake in dev
-`/corrections` and `/submit` use an in-memory store (`apps/web/src/app/corrections/store.ts`), so a submission succeeds and returns a receipt code with no DB. The `/corrections/status/<receipt>` lookup will report "Receipt not found" in dev because the in-memory store is not shared across route handlers/process boundaries (production persists via the `submissionInbox` backing). This is expected locally, not a bug.
-
-### Optional services (not needed for core web dev)
-Local database integration tests use an isolated Supabase instance when Docker is available. Firebase emulators and the parked database stack are removed. Native iOS QA requires macOS/Xcode; `apps/mobile` uses its own npm graph.
-
-## Session Completion
-
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
-
-**MANDATORY WORKFLOW:**
-
-1. **Record remaining work** - Name anything that needs follow-up in your final report
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-4. **Clean up** - Clear stashes, prune remote branches
-5. **Verify** - All changes committed AND pushed
-6. **Hand off** - Provide context for next session
-
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
-
-**Before opening a staging → main PR**, run `fnm exec --using=22 -- ./scripts/ci-local.sh`.
-`pnpm test` is not equivalent: CI decides which lanes run from the changed paths, and two of
-those predicates are easy to miss by inspection — touching `packages/public-contracts` fires
-the whole mobile lane (it is the mobile token source), and touching `packages/research-kernel`
-fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
-`.github/workflows/ci.yml` lane-for-lane instead of guessing. The script requires Node 22
-(the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
-24 — running it on 24 can pass locally and still not match what CI reports.
-## Agent coordination (Claude Code ↔ Codex)
-
-The cross-agent coordination model and handoff protocol for this repo live in
-`COORDINATION.md` — the single source of truth (do not duplicate it here). Read
-`COORDINATION.md` at session start, and `HANDOFF.md` for live session state.
+Follow `CLAUDE.md`: "Session Completion" and "Branching & Release Policy". Push to `staging`,
+never `main`. Run `fnm exec --using=22 -- ./scripts/ci-local.sh` before a staging → main PR.

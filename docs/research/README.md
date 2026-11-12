@@ -3,7 +3,7 @@
 Start here when conducting research, adapting the framework to another subject, or improving the
 engine. Read [operations](./research-operations.md) only for the commands needed. The
 [architecture challenge procedure](../architecture.md#challenge-procedure) applies to every rule
-here. Work status lives in Beads, not in duplicate checklists or another PRD.
+here.
 
 ## Purpose and status
 
@@ -23,9 +23,9 @@ within explicit bounds. It does not mean searching forever or producing more flu
 | Preservation          | `capture-backfill`, safe fetch, Supabase capture sink, Wayback lookup and resumable SPN2 jobs, explicit retention/disposal | Local metadata is not a full archived page; current release citations have no measured capture overlap or production Wayback pointers      |
 | Evidence retrieval    | Private capture passages, full text + pgvector/RRF, exact selectors, model/text revision checks                            | 768 dimensions; small live pilot measured retrieval recall with substantial false positives; representative-scale quality remains unproven |
 | Headless use          | Immutable run manifests, scoped leases, dependencies, attempt reservations, accounting and proposal artifacts              | Built-in acquisition/model execution and external lease handoff; automatic model admission requires independent evaluation                 |
-| Scheduling            | Job registry, worker entry points, manual Actions dispatch                                                                 | No research schedule should be active; no Corsair dependency                                                                               |
+| Scheduling            | Job registry, worker entry points, manual Actions dispatch                                                                 | Manual dispatch only                                                                               |
 
-The [audit evidence](./framework-audit.md) records observations and source research. Do not infer
+The [audit evidence](./archive/framework-audit.md) records observations and source research. Do not infer
 production readiness from a schema, test fixture, function name, or an old statement of completion.
 
 ## One request and one approval
@@ -42,6 +42,16 @@ Saved work survives a stopped session; independent execution requires a configur
 The durable inbox is deployed; remote client acceptance is still unverified; see [management operations](./research-operations.md#account-owned-management-work)
 for deployment prerequisites and limits. No mobile/client compatibility is implied by the
 presence of an MCP endpoint. Research is not complete until its usable outcome is verified.
+
+## Publication authority
+
+One operator runs BlackStory, so no rule requires a second person. The owner or an agent
+session may publish entity records and stories and record approvals (owner decisions of 2026-09-03,
+2026-11-08 and 2026-11-10). The gate is the claim-review ledger: a reviewing agent whose actor
+differs from the drafter checks each claim against the stored source text, and its quoted
+passage must occur in that text (`packages/ops-data/scripts/lib/claim-review-ledger.ts`).
+Record the acting session and reason, and label self-review as self-review. Privacy, rights,
+dignity and geo checks apply unchanged.
 
 ## One research loop
 
@@ -183,7 +193,7 @@ archiving does not establish truth.
 
 The canonical skills are plain Agent Skills folders at
 `.agents/skills/<skill-name>/SKILL.md`: `research-framework` and the `blackstory-*` playbooks.
-Each folder matches its frontmatter name. The method, CLI pointers and review rules have
+Each folder matches its frontmatter name. The method and review rules have
 one maintained source; `.claude/skills/<skill-name>` contains only relative directory
 symlinks to it. Do not fork the content into harness-specific versions.
 
@@ -224,14 +234,14 @@ Format/discovery references inspected 2026-10-07:
 [OpenAI skill discovery](https://learn.chatgpt.com/docs/build-skills), and
 [Claude Code project skills and symlinks](https://code.claude.com/docs/en/skills#choose-where-skills-load).
 
-Judgment playbooks specialize the research method. CLI pointer skills link to
-operations rather than duplicating flags. Skills describe the decision to make and its evidence
+Judgment playbooks specialize the research method. Command flags live in
+[operations](./research-operations.md), not in skills. Skills describe the decision to make and its evidence
 requirements. They must not silently publish, invent sources, infer approval requirements beyond
 the user's authorization, or turn one failure/example into a universal rule.
 
 For factual and editorial skill changes, use the [development review cases](skill-review-cases.md)
 and the [evaluation-family limits](gold-corpus.md). The
-[2026-10-07 audit](skill-audit-2026-10-07.md) records observed errors, scope and remaining controls.
+[2026-10-07 audit](archive/skill-audit-2026-10-07.md) records observed errors, scope and remaining controls.
 Interface changes use `blackstory-experience-review` and the UI pattern catalog; a precise
 claim still fails readers if its qualifier or source cannot be reached on mobile.
 

@@ -5,9 +5,6 @@ description: Review BlackStory summaries, context, stories, captions and narrati
 
 # Prose review
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 Use [Neo's voice contract](../../../docs/content/neo-voice.md) and the
 [fact protocol](../../../docs/methodology/chapter-fact-validation.md).
 Do not assume upstream fact review covers words introduced during drafting.
@@ -57,15 +54,3 @@ Verdict: **pass / revise / blocked on evidence**. Name the draft revision review
 coverage, uninspected surfaces and open findings. Then use
 [ringer review](../blackstory-ringer-review/SKILL.md) for publication readiness. This is an
 editorial check, not an AI-authorship detector; no phrase blacklist proves quality.
-
-## Working contract
-
-**Input:** The exact draft revision, evidence map and neighboring records.
-
-**Output:** Pass, revise or evidence-blocked findings with precise affected text.
-
-**Boundary and handoff:** Return new assertions to claim corroboration. Editorial review cannot manufacture support or certify uninspected surfaces.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

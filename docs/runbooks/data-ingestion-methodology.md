@@ -105,7 +105,7 @@ and the admin console. The bar for a researched entity is unchanged:
   (NPS/NRHP, institutions themselves, state encyclopedias, university archives).
 - Locations follow `docs/security/location-precision-standard.md`. Place an entity with
   `operator-cli locate --entity-id … --address …` (see
-  `.agents/skills/blackstory-locate/SKILL.md`); live geocoders are enrichment-only and the
+  `docs/research/research-operations.md#locate`); live geocoders are enrichment-only and the
   public map reads `EntityLocation`, never a live API. Never snap to US state/city centroids;
   when a sourced address is missing, keep the pin and downgrade precision honestly. Finding or
   confirming a place without a sourced address is `.agents/skills/blackstory-entity-verify`.

@@ -19,4 +19,4 @@ queries are in `packages/config/src/scheduled-jobs/data/web-search-queries.json`
 caller selects its queries explicitly.
 
 See [research framework](../research/README.md) for the method, [operations](../research/research-operations.md)
-for verb details, and [audit](../research/framework-audit.md) for execution and ledger gaps.
+for verb details, and [audit](../research/archive/framework-audit.md) for execution and ledger gaps.

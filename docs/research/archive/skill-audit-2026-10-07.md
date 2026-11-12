@@ -198,7 +198,7 @@ Verification record
 - Formatting: a forced Prettier check (normally Markdown is ignored by root formatting)
   initially identified 14 files needing normalization. Final result recorded below.
 - Factual/browser evidence: read-only release and live page checks described above; the
-  [development case walkthrough](skill-review-cases.md) records decisions and self-review limits.
+  [development case walkthrough](../skill-review-cases.md) records decisions and self-review limits.
 - Not run: paid/blind model evaluation, native/device QA, comprehensive accessibility and
   catalog-wide historical adjudication. No claim of passing those checks is made.
 
@@ -214,7 +214,7 @@ All 21 folders match their declared names. Claude discovery uses relative symlin
 same files; the old nested source layout is removed. Project instructions and references
 point to the shared source. Research and editorial procedures are unchanged by this move.
 
-The [portability contract](README.md#skills-and-harness-portability) documents explicit
+The [portability contract](../README.md#skills-and-harness-portability) documents explicit
 file loading for hosts without discovery, checkout dependencies, capability mapping and
 missing-tool behavior. Only `name` and `description` are needed in frontmatter. Environment
 requirements live in ordinary Markdown, avoiding an optional field rejected by the installed

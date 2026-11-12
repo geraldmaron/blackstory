@@ -5,9 +5,6 @@ description: Confirms which entity a record is, sources a period-honest place, s
 
 # Entity verify (identity, place, period)
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 Judgment playbook. Commands live in
 [`docs/research/research-operations.md`](../../../docs/research/research-operations.md).
 Do not load `perspectives/researcher` or `docs/research-workflow` recency rules here.
@@ -91,7 +88,7 @@ site. If the surface cannot show that distinction, withhold the point or repair 
 display; do not sharpen the stored precision. A centroid without sourced city membership
 is still a guess.
 
-When you have a sourced address, use [`blackstory-locate`](../blackstory-locate/SKILL.md).
+When you have a sourced address, use [`locate`](../../../docs/research/research-operations.md#locate).
 For batch proposals, inspect `packages/ops-data/scripts/backfill-location-coordinates.ts`
 and its dry-run output before applying any correction.
 
@@ -127,8 +124,8 @@ After a pin exists:
    Mismatches are an audit list. Do not auto-rewrite coordinates to pass.
 2. Catalog fixtures: `evaluateGeoIntegrityPublishGate` with sourced jurisdiction polygons and
    precision checks.
-3. Re-publish so projections pick up `EntityLocation` overrides. This skill still cannot
-   promote. That is a separate publication-role action.
+3. Re-publish so projections pick up `EntityLocation` overrides. Publishing follows
+   [publication authority](../../../docs/research/README.md#publication-authority).
 
 ## Output
 
@@ -146,21 +143,3 @@ For each entity report:
 - Completeness (images, related, context): [`blackstory-entity-complete`](../blackstory-entity-complete/SKILL.md)
 - Corroboration of claims: [`blackstory-claim-corroborate`](../blackstory-claim-corroborate/SKILL.md)
 - Gold-corpus geographic-ambiguity cases: [`docs/research/gold-corpus.md`](../../../docs/research/gold-corpus.md)
-
-## Working contract
-
-**Input:** A candidate identity, aliases, historical period and place evidence.
-
-**Output:** An identity disposition, period-honest location/precision and explicit unresolved alternatives.
-
-**Boundary and handoff:** Hand a sourced address to locate; ambiguity returns to the case. Keep institution, building, namesake and successor separate.
-
-Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
-for the evidence need, pin returned policy versions and explain why the collection should
-contain the needed evidence. Search authorized captures, citation trails and outside sources;
-the library is a starting point. Record access failures and unknown coverage. Its reviewed
-status describes guidance, not the truth of a historical assertion.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

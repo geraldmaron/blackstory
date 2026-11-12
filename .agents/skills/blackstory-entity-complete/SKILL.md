@@ -5,9 +5,6 @@ description: Fills gaps on a public entity record (image, related, historical co
 
 # Entity complete
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 Judgment playbook for the fields the public entity page actually renders. Do not publish.
 Stage, then stop.
 
@@ -23,14 +20,14 @@ and the view-models: `apps/web/src/app/entity/[id]/entity-anatomy-facts.ts`,
 | `whereLabel` / geo       | Place withheld or missing pin                                            | [`blackstory-entity-verify`](../blackstory-entity-verify/SKILL.md)                   |
 | `eraLabel`               | Era undocumented                                                         | `blackstory-entity-verify` (designation years are not era)                           |
 | `evidenceLabel`          | Unrated / zero sources                                                   | [`blackstory-claim-corroborate`](../blackstory-claim-corroborate/SKILL.md)           |
-| `summary`                | Should not be blank on a released record                                 | `blackstory-editorial-enrichment` (`backfill-entity` / `prose-run`)                  |
+| `summary`                | Should not be blank on a released record                                 | [`editorial-enrichment`](../../../docs/research/research-operations.md#editorial-enrichment-editorial-run--enrichment-run) (`backfill-entity` / `prose-run`)                  |
 | `historicalContext`      | Missing era/place paragraph                                              | `prose-run` / `backfill-entity`, citation-gated                                      |
 | `topicTags` / `topicIds` | Topics missing                                                           | Canonical classification, then re-publish. Do not invent a parallel taxonomy column. |
 | `primaryImage`           | Optional; inspect current coverage rather than reusing an old percentage | Image lane below                                                                     |
 | `related`                | Related rail empty                                                       | `propose-edge` (see below). `expand` finds candidates; it does not make edges.       |
 
 Minimum publishable _case_ (identity, relevance, source citation, public summary, rights
-clearance) is [`blackstory-case-drafting`](../blackstory-case-drafting/SKILL.md). Geography, dates,
+clearance) is [`case-drafting`](../../../docs/research/research-operations.md#case-drafting). Geography, dates,
 corroboration beyond the support needed for each assertion, and context are enrichment.
 Factual support is never optional. The public anatomy still shows Where and Era
 first, so treat those as verify work even when the case is technically minimum.
@@ -73,7 +70,7 @@ and `packages/operator-cli/src/cli.ts` (`propose-edge`).
 ## Backfill copy
 
 Short-form `historicalContext` / summary drafts: `prose-run` or `backfill-entity` under
-[`blackstory-editorial-enrichment`](../blackstory-editorial-enrichment/SKILL.md). Linked prose uses
+[`editorial-enrichment`](../../../docs/research/research-operations.md#editorial-enrichment-editorial-run--enrichment-run). Linked prose uses
 `[[ent_id|Display Name]]`. Citation rules stay `blackstory-claim-corroborate`. Never call
 this ready to publish. Use `blackstory-neo-voice`, `blackstory-prose-review` and the
 proportionate `blackstory-ringer-review` pass for summary/context as well as longform.
@@ -84,22 +81,4 @@ quota: leave a field absent rather than invent detail or repeat the summary.
 ## Output
 
 Per entity: field checklist (present / blank / blocked), proposed fills with source URLs,
-and what must wait for a publication-role human.
-
-## Working contract
-
-**Input:** An identified record and requested missing fields.
-
-**Output:** Supported field proposals with rights, precision and relationship evidence.
-
-**Boundary and handoff:** Identity or central factual uncertainty returns to verification. Optional enrichment is not a compulsory completeness quota.
-
-Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
-for the evidence need, pin returned policy versions and explain why the collection should
-contain the needed evidence. Search authorized captures, citation trails and outside sources;
-the library is a starting point. Record access failures and unknown coverage. Its reviewed
-status describes guidance, not the truth of a historical assertion.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.
+and what still blocks publication.

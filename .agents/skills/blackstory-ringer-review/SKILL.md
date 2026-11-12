@@ -5,9 +5,6 @@ description: Challenge BlackStory entity copy, stories and standalone factual ar
 
 # Ringer review
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 The aim is to find what would make the work wrong or misleading. A critic's politics,
 sympathy or credentials neither validate nor invalidate their evidence. Read the exact
 draft and its evidence, not only the writer's explanation of it. For contested longform,
@@ -58,24 +55,12 @@ Do not manufacture disagreement or give a weak objection equal weight to strong 
 
 ## Output and independence
 
-Return **ready for publication-role review / revise / hold**, findings and dispositions,
+Return **ready to publish / revise / hold**, findings and dispositions,
 draft revision, evidence inspected and limits. Record whether this was self-review or
 an independent review. Repeating a prompt or changing a model does not establish
 independence of sources or reviewers. Request a separate reviewer for unresolved or
 consequential disputed claims; do not claim one ran when none did.
 
-Publication-role separation still applies. No research agent can approve its own
-release. Truthful claims need not be weakened to avoid controversy; unsupported claims
+Who may publish is set in [publication authority](../../../docs/research/README.md#publication-authority).
+Truthful claims need not be weakened to avoid controversy; unsupported claims
 must not survive because they fit the project's purpose.
-
-## Working contract
-
-**Input:** A finished revision, evidence map, search bounds and contrary findings.
-
-**Output:** Concrete attempted disproofs, unresolved risks and a verdict tied to the revision.
-
-**Boundary and handoff:** Declare self-review when sharing author context. A different model family alone is not independent review; review grants no publication authority.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

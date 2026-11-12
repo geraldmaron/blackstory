@@ -5,9 +5,6 @@ description: Judge and propose relationships between entities, expand a research
 
 # Entity relate
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 Judgment playbook for the edges of the graph: whether a relationship exists, how
 strong the evidence for it is, and what language it licenses. Edge mechanics
 (`propose-edge`) live in [`blackstory-entity-complete`](../blackstory-entity-complete/SKILL.md);
@@ -52,7 +49,7 @@ This skill decides the judgment those tools execute.
 6. **Record negative and ambiguous results.** "Searched the case file, no co-plaintiff
    named" is a search outcome; record collection coverage and access limits before interpreting absence. Log it so the next researcher does not re-run the dead end.
    Same-name candidates that cannot be disambiguated go to the graylist
-   ([`blackstory-triage-graylist`](../blackstory-triage-graylist/SKILL.md)), never into the graph.
+   ([`triage-graylist`](../../../docs/research/research-operations.md#triage-graylist)), never into the graph.
 
 ## Do / Never
 
@@ -63,21 +60,3 @@ expanding through it; log dead ends.
 **Never:** infer relationships from proximity alone; chain unverified hops; let an
 LLM's plausibility judgment stand in for a record; write a causal edge without a
 gated claim; merge same-name entities without disambiguating evidence.
-
-## Working contract
-
-**Input:** Identified endpoints, the exact relation and its time/place qualifiers.
-
-**Output:** Proposed edges with their own passages and every intermediate node retained.
-
-**Boundary and handoff:** Hand new identities to entity verification. Endpoint citations and proximity cannot establish a relationship.
-
-Before acquisition, use the [shared collection-library method](../../../docs/research/research-operations.md#source-library)
-for the evidence need, pin returned policy versions and explain why the collection should
-contain the needed evidence. Search authorized captures, citation trails and outside sources;
-the library is a starting point. Record access failures and unknown coverage. Its reviewed
-status describes guidance, not the truth of a historical assertion.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

@@ -5,9 +5,7 @@ the actual command shapes, invocation rules, and guardrails live.
 
 Agent skills live under `.agents/skills/`:
 
-- **CLI pointers** (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
-  `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) exist for skill-matching
-  UX. They point here and carry no command detail of their own.
+- **Verbs** below have no skill of their own; `research-framework` routes here.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
   `ringer-review`, `surface-triage`, `intake-review`, `experience-review`) are not verbs. Their decision order lives in the
@@ -39,8 +37,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   paper over.
 - **Explicit endpoints.** Set `SEARXNG_BASE_URL` for an operator-controlled search service,
   or configure Brave through the search router. Set `OLLAMA_BASE_URL` only when intentionally
-  using a local provider. There are no personal-host aliases or Corsair fallback. No research
-  schedule is enabled by invoking these commands.
+  using a local provider. There are no personal-host aliases.
 - **Reaching a search provider.** Two things are true at once and the split between them is the
   whole design. The operator's SearXNG is _private on purpose_ — loopback, or a Tailscale
   `100.64.0.0/10` address — so `executeSafeFetch` refuses it, correctly: every other caller of
@@ -75,7 +72,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
 - **Ledger logging.** `model-routing.ts` and `model-invocation-log.ts` are the existing model
   policy and logging modules. Presence is not integration: the audit found no persisted model
   invocations or frontier tasks in the initial production observation. The durable protocol below
-  now has real local Postgres tests; older verbs do not inherit its guarantees automatically. See [audit](./framework-audit.md).
+  now has real local Postgres tests; older verbs do not inherit its guarantees automatically. See [audit](./archive/framework-audit.md).
 
 ---
 
@@ -499,7 +496,7 @@ call `research.approve_artifact`; authenticated admin/publication review owns th
 ## story-craft (`story-research-run`)
 
 **When to use:** draft or recommend longform `/stories` stories from archive evidence using
-citation-gated story research packets. LLM drafts stay proposals; human approval maps an
+citation-gated story research packets. LLM drafts stay proposals; approval (owner or agent session) maps an
 approved packet onto `publicStoryProjection`. There is no auto-publish.
 
 Brand register: [`docs/ui/story.md`](../ui/story.md) — place-first, evidence before assertion,
@@ -522,7 +519,7 @@ OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
   --operator-id "$USER" --session-id "research-$(date +%s)" --identity-source cli
 ```
 
-`--commit` stages quarantine `story_packet` proposals only. Human approval:
+`--commit` stages quarantine `story_packet` proposals only. Approval:
 `http://localhost:3048/admin/login` → **Story review** (`/admin/stories/review`) → approve
 creates an editable story draft in `/admin/stories`. Nothing auto-publishes from the CLI or
 the portal.
@@ -857,7 +854,7 @@ belong to that adapter, not to research performed by a session. Consumer chat su
 not supply unattended inference credentials. Hosted publication uses separate publication,
 Storage and registered P-256 signing credentials. Verify the management migrations and configured
 credentials before using either path. Do not give research a database-owner login and rely on
-`SET ROLE` as the access boundary. No schedule or Corsair dependency is introduced.
+`SET ROLE` as the access boundary.
 
 ### Supported scope and current limits
 
@@ -945,7 +942,7 @@ create a new policy version. Unknown item membership remains unbound.
 Every story `stat`, `figure` or `pullquote` block and every published theme observation needs
 reviewed anchors. Missing declarations and `replicationVerified` do not grant an exception.
 Compute `publicationAssertionDigest` from `@repo/ops-data`'s existing
-`scripts/lib/reviewed-anchors.ts` over the complete block or observation. Its canonicalization
+`packages/ops-data/scripts/lib/reviewed-anchors.ts` over the complete block or observation. Its canonicalization
 excludes only transport fields `anchors` and `replicationVerified`. Save that digest as an exact
 canonical claim with predicate `publication_assertion_sha256`; anchors identify its current
 `claimId`, `claimVersionId` and `selectorId` plus the actual source URL. Accepted source-specific
