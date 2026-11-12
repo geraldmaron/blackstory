@@ -117,7 +117,7 @@
   justify-self: center;
   width: 100%;
   max-width: 520px;
-  min-height: 38px;
+  min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-full);

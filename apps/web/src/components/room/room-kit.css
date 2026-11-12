@@ -1181,7 +1181,7 @@ a.ds-room-chip {
 .ds-records-find__input {
   flex: 1 1 auto;
   min-width: 0;
-  height: 40px;
+  height: 2.75rem;
   padding: 0 var(--ds-space-4);
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border-control);
@@ -1199,7 +1199,7 @@ a.ds-room-chip {
 /* Paints the room's own ground rather than going transparent: inside the kit, a transparent box
    is reserved for the live map-moment window onto the plate. */
 .ds-records-find__go {
-  height: 40px;
+  height: 2.75rem;
   padding: 0 var(--ds-space-4);
   background: var(--ds-canvas);
   border: var(--ds-border-width) solid var(--ds-border-strong);

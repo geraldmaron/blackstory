@@ -156,7 +156,7 @@ export const lightStatus: Record<'warning' | 'dispute' | 'error', StatusPalette>
   warning: {
     fg: '#6B4A17',
     bg: '#F3E4C6',
-    border: '#B87A2A',
+    border: '#AD7226',
     cue: 'Warning',
   },
   dispute: {
@@ -205,7 +205,7 @@ export const lightConfidence: ConfidencePalette = {
   medium: {
     fg: '#6B6A17',
     bg: '#EBEBC6',
-    border: '#8B8A2E',
+    border: '#83822A',
     cue: 'Medium confidence',
   },
   low: {
@@ -307,5 +307,14 @@ export function criticalUiPairs(
     ['confidence-high-border/canvas', confidence.high.border, p.canvas],
     ['confidence-medium-border/canvas', confidence.medium.border, p.canvas],
     ['confidence-low-border/canvas', confidence.low.border, p.canvas],
+    // Status edges also sit in sunken wells and against their own fill.
+    ['warning-border/surfaceSunken', status.warning.border, p.surfaceSunken],
+    ['warning-border/own-bg', status.warning.border, status.warning.bg],
+    ['dispute-border/surfaceSunken', status.dispute.border, p.surfaceSunken],
+    ['error-border/surfaceSunken', status.error.border, p.surfaceSunken],
+    ['confidence-high-border/surfaceSunken', confidence.high.border, p.surfaceSunken],
+    ['confidence-medium-border/surfaceSunken', confidence.medium.border, p.surfaceSunken],
+    ['confidence-medium-border/own-bg', confidence.medium.border, confidence.medium.bg],
+    ['confidence-low-border/surfaceSunken', confidence.low.border, p.surfaceSunken],
   ];
 }
