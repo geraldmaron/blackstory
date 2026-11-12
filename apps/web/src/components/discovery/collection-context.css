@@ -172,7 +172,8 @@ a.ds-collection__view:focus-visible {
 /* Embedded in the map: a fixed strip between the Lens and Results columns. */
 .ds-atlas > .ds-collection--atlas {
   position: fixed;
-  top: calc(var(--ds-atlas-top) + var(--ds-space-12));
+  /* One 44px control row, the journey pill's 8px drop, and a gap under both. */
+  top: calc(var(--ds-atlas-top) + var(--ds-space-12) + var(--ds-space-2));
   left: calc(var(--ds-space-4) + var(--ds-rail-w) + var(--ds-space-3));
   right: calc(var(--ds-space-4) + var(--ds-results-w) + var(--ds-space-3));
   z-index: var(--ds-z-atlas-instruments);
@@ -189,6 +190,17 @@ a.ds-collection__view:focus-visible {
     width: auto;
     max-width: none;
     /* The shared top offset clears the journey and map-control row at every width. */
+  }
+}
+
+/*
+ * 820px is where the atlas stops docking its panels as sheets (atlas.css), so from there up the
+ * filter rail is a left column again and the strip starts beside it instead of across it. Off the
+ * breakpoint grid on purpose: it has to match the boundary the rail itself uses.
+ */
+@media (min-width: 820px) and (max-width: 64rem) {
+  .ds-atlas > .ds-collection--atlas {
+    left: calc(var(--ds-space-4) + var(--ds-rail-w) + var(--ds-space-3));
   }
 }
 

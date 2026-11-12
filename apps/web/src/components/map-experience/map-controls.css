@@ -30,6 +30,15 @@
   --ds-map-controls-lift-now: var(--ds-map-controls-lift, 0px);
 }
 
+/*
+ * With the collection strip up, the group is one row. As a column its second button hung below
+ * the row the strip clears and sat on top of the strip's view switch.
+ */
+.ds-atlas[data-collection='shown'] .ds-map-controls {
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
 .ds-map-controls__stack {
   display: flex;
   flex-direction: column;
@@ -115,6 +124,12 @@
     --ds-map-controls-lift: calc(var(--ds-atlas-sheet-peek) + var(--ds-space-2));
   }
 
+  /* Low on the right edge there is no strip beside it, so it stays a column. */
+  .ds-atlas[data-collection='shown'] .ds-map-controls {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
   /*
    * Compact, collection strip up, sheet open: the lift would carry the group onto the strip's
    * caption, so the group steps aside until the sheet closes. Hidden (not just faded) so it also
@@ -129,7 +144,8 @@
 /* Landscape phone: the open instrument docks to the left edge, so the controls stay low-right. */
 @media (max-height: 559px) and (orientation: landscape) {
   /* The dock hugs the bottom edge here (atlas.css), 54px tall; the controls sit just above it. */
-  .ds-map-controls {
+  .ds-map-controls,
+  .ds-atlas[data-collection='shown'] .ds-map-controls {
     bottom: calc(var(--ds-space-2) * 2 + 54px + env(safe-area-inset-bottom, 0px));
     flex-direction: row-reverse;
     align-items: flex-end;

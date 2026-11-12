@@ -131,6 +131,7 @@
       "apps/web/src/app/shell.css": 1,
       "apps/web/src/app/stories/stories.css": 3,
       "apps/web/src/components/data/data-charts.css": 1,
+      "apps/web/src/components/discovery/collection-context.css": 1,
       "apps/web/src/components/map-experience/camera-console.css": 1,
       "apps/web/src/components/map-experience/lens-panel.css": 1,
       "apps/web/src/components/map-experience/map-controls.css": 1,
