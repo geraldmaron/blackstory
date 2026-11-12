@@ -10,7 +10,7 @@
 #   PORT=3050 ./scripts/dev-web.sh    # alternate port (docs also claim :3050 — only one wins)
 #
 # Env loading (first match wins for DATABASE_URL if already unset):
-#   1. Existing process env
+#   1. Existing process env (`pnpm dev:web:op` sets it from 1Password via `op run`)
 #   2. apps/web/.env.local
 #   3. $BLACKSTORY_DATABASE_ENV_FILE (optional path to a migrate/local env file)
 #   4. Sibling ~/Developer/Projects/blackstory/.env.migrate.local (when present)

@@ -40,6 +40,7 @@
     "validate:web-entity-visibility": "node scripts/check-web-entity-visibility-guards.mjs",
     "validate:governance": "node scripts/validate-github-governance.mjs",
     "dev:web": "./scripts/dev-web.sh",
+    "dev:web:op": "DATABASE_URL=op://orsmn55mjwru7jkycit6p3cmne/3vvt7hah7xe5s6nclzyf5gdkvm/connection_string op run -- ./scripts/dev-web.sh",
     "mobile:seeds": "node --conditions=development --import tsx apps/mobile/scripts/generate-seeds.mjs",
     "mobile:seeds:check": "node --conditions=development --import tsx apps/mobile/scripts/generate-seeds.mjs --check",
     "mobile:ios:release": "./scripts/mobile-ios-release.sh",
