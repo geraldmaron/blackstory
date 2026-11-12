@@ -552,60 +552,80 @@
   line-height: 1;
 }
 
+/*
+ * The tone lives in the edge, the tint and the cue. The title and body stay in ink: a paragraph
+ * set entirely in the status color reads as an alarm and is harder to read than the page around
+ * it. The cue sits above the title, not in a column beside it, so the text keeps the full width.
+ */
 .ds-notice {
+  --ds-notice-fg: var(--ds-ink-muted);
+  --ds-notice-bg: var(--ds-surface);
+  --ds-notice-edge: var(--ds-border);
+
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--ds-space-3);
-  align-items: flex-start;
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid transparent;
-  border-radius: var(--ds-radius-md);
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  border: var(--ds-border-width) solid var(--ds-notice-edge);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-notice-bg);
+  color: var(--ds-ink);
   font-family: var(--ds-font-sans);
 }
 
 .ds-notice--warning {
-  color: var(--ds-warning-fg);
-  background: var(--ds-warning-bg);
-  border-color: var(--ds-warning-border);
+  --ds-notice-fg: var(--ds-warning-fg);
+  --ds-notice-bg: var(--ds-warning-bg);
+  --ds-notice-edge: var(--ds-warning-border);
 }
 
 .ds-notice--dispute {
-  color: var(--ds-dispute-fg);
-  background: var(--ds-dispute-bg);
-  border-color: var(--ds-dispute-border);
+  --ds-notice-fg: var(--ds-dispute-fg);
+  --ds-notice-bg: var(--ds-dispute-bg);
+  --ds-notice-edge: var(--ds-dispute-border);
 }
 
 .ds-notice--error {
-  color: var(--ds-error-fg);
-  background: var(--ds-error-bg);
-  border-color: var(--ds-error-border);
+  --ds-notice-fg: var(--ds-error-fg);
+  --ds-notice-bg: var(--ds-error-bg);
+  --ds-notice-edge: var(--ds-error-border);
 }
 
 /* Success reuses the confidence-high family: the palette already carries a settled green in
    both themes, so a confirmation does not need a new colour pair invented for it. */
 .ds-notice--success {
-  color: var(--ds-confidence-high-fg);
-  background: var(--ds-confidence-high-bg);
-  border-color: var(--ds-confidence-high-border);
+  --ds-notice-fg: var(--ds-confidence-high-fg);
+  --ds-notice-bg: var(--ds-confidence-high-bg);
+  --ds-notice-edge: var(--ds-confidence-high-border);
 }
 
 .ds-notice__cue {
+  color: var(--ds-notice-fg);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-micro);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .ds-notice__title {
   margin: 0 0 var(--ds-space-1);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 600;
+  line-height: var(--ds-leading-title);
 }
 
 .ds-notice__body {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+}
+
+.ds-notice__body > :first-child {
+  margin-top: 0;
+}
+
+.ds-notice__body > :last-child {
+  margin-bottom: 0;
 }
 
 /* Collapsed-by-default locate disclosure: quiet summary, not a warning card. */
@@ -737,6 +757,29 @@
   flex-wrap: wrap;
   gap: var(--ds-space-3);
   align-items: center;
+}
+
+/* A checkbox or radio and its label are one control. Left to wrap, a long label drops under the
+   box and the box sits alone on its own line. */
+.ds-row:has(> input:is([type='checkbox'], [type='radio'])) {
+  flex-wrap: nowrap;
+  gap: var(--ds-space-1);
+  align-items: flex-start;
+}
+
+.ds-row > input:is([type='checkbox'], [type='radio']) {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--ds-accent-graphic);
+}
+
+.ds-row > input:is([type='checkbox'], [type='radio']) + label {
+  flex: 1 1 0;
+  min-width: 0;
+  line-height: var(--ds-leading-body);
+  cursor: pointer;
 }
 
 @media (min-width: 48rem) {

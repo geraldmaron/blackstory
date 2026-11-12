@@ -34,7 +34,7 @@ export default function SubmitLeadPage() {
       />
 
       <RoomSection id="lead" icon="submit" kicker="Lead" title="What you know" tone="sunk">
-        <Notice tone="warning" title="This is not a public post">
+        <Notice tone="note" title="This is not a public post">
           Leads submitted here are never published as sent. I read every lead. A submission that is
           worth pursuing still has to clear the full research and fact-checking process before
           anything about it is public. Please do not include anyone's home address or other

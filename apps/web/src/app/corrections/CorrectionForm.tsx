@@ -290,7 +290,7 @@ export function CorrectionForm({
         <input id={contactId} name="contact" type="email" placeholder="you@example.org" />
       </Field>
 
-      <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
+      <Notice tone="note" title={CORRECTION_PRIVACY_NOTICE.title}>
         {CORRECTION_PRIVACY_NOTICE.body}
       </Notice>
 

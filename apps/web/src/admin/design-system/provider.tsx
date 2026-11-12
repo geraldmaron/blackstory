@@ -35,7 +35,7 @@ const colors = {
   inputFillActive: 'var(--ds-surface)',
   inputText: 'var(--ds-ink)',
   inputPlaceholder: 'var(--ds-ink-subtle)',
-  inputBorder: 'var(--ds-border)',
+  inputBorder: 'var(--ds-border-control)',
   inputBorderFocus: 'var(--ds-accent)',
   menuFill: 'var(--ds-surface)',
   menuFillHover: 'var(--ds-canvas)',
@@ -47,7 +47,7 @@ const colors = {
   tickFill: 'var(--ds-ink)',
   tickFillHover: 'var(--ds-ink)',
   tickFillActive: 'var(--ds-ink)',
-  tickBorder: 'var(--ds-border)',
+  tickBorder: 'var(--ds-border-control)',
   tickMarkFill: 'var(--ds-canvas)',
   tableHeadBackgroundColor: 'var(--ds-canvas)',
   tableBackground: 'var(--ds-surface)',
@@ -85,8 +85,8 @@ const overrides = {
     radius500: '28px',
     buttonBorderRadius: '8px',
     inputBorderRadius: '8px',
-    surfaceBorderRadius: '16px',
-    popoverBorderRadius: '16px',
+    surfaceBorderRadius: '14px',
+    popoverBorderRadius: '14px',
   },
 };
 // Checkbox marks are embedded SVG data URLs, where CSS variables cannot resolve.

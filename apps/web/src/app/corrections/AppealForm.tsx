@@ -188,7 +188,7 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
         <input className="ds-filters__control" id={contactId} name="contact" type="text" />
       </div>
 
-      <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
+      <Notice tone="note" title={CORRECTION_PRIVACY_NOTICE.title}>
         {CORRECTION_PRIVACY_NOTICE.body}
       </Notice>
 

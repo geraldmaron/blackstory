@@ -38,7 +38,7 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
       (part): part is string => Boolean(part),
     );
     return (
-      <Notice tone="warning" title="Location resolved">
+      <Notice tone="note" title="Location resolved">
         <p className="ds-sans">
           {parts.length > 0 ? parts.join(', ') : 'A U.S. jurisdiction was resolved for this input.'}
         </p>

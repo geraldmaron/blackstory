@@ -77,7 +77,7 @@ export function AbuseReportForm({ receiptCode }: { readonly receiptCode?: string
 
   if (state.status === 'success') {
     return (
-      <Notice tone="warning" title="Report received">
+      <Notice tone="success" title="Report received">
         Thank you. Abuse reports are reviewed separately, and they never expose another submitter.
       </Notice>
     );
@@ -133,7 +133,7 @@ export function AbuseReportForm({ receiptCode }: { readonly receiptCode?: string
         <input className="ds-filters__control" id={sourceUrlId} name="sourceUrl" type="url" />
       </div>
 
-      <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
+      <Notice tone="note" title={CORRECTION_PRIVACY_NOTICE.title}>
         {CORRECTION_PRIVACY_NOTICE.body}
       </Notice>
 

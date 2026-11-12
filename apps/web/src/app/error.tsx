@@ -37,7 +37,7 @@ export default function Error({
       <Notice tone="error" title={display.title}>
         {display.detail}
       </Notice>
-      <div className="ds-row">
+      <div className="ds-row" style={{ marginTop: 'var(--ds-space-4)' }}>
         <button type="button" className="ds-button ds-button--primary" onClick={reset}>
           Try again
         </button>

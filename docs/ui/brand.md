@@ -1,3 +1,7 @@
+
+A `Notice` takes the tone that matches what it says. `note` is for information such as a privacy
+explanation, `success` for a receipt, and `warning` only for something the reader has to act on.
+The tone shows in the edge, the tint and the cue; the title and body stay in ink.
 # Brand: usage contract
 
 > **Binding source (2026-07-18):** root `brand/` — BlackStory full polished kit

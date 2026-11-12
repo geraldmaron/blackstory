@@ -113,7 +113,7 @@
       "apps/web/src/components/theme-spine/theme-spine.css": 5,
       "apps/web/src/components/trust/research-pipeline-sketch.css": 10,
       "packages/ui/src/styles/base.css": 3,
-      "packages/ui/src/styles/components.css": 31,
+      "packages/ui/src/styles/components.css": 28,
       "packages/ui/src/styles/workbench.css": 25
     },
     "breakpoint": {
