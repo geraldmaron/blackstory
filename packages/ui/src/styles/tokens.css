@@ -1,6 +1,6 @@
 /**
  * CSS custom properties for BlackStory themes, focus, motion, and layout tokens.
- * Import via `@black-book/ui/styles.css` in consuming apps.
+ * Import via `@repo/ui/styles.css` in consuming apps.
  * Palette: Archive Paper Black Ink primaries with Copper Pin Page Sand accents.
  * Mirrors packages/ui/src/tokens/colors.ts keep the two in sync.
  */
@@ -25,6 +25,9 @@
   --ds-ink-subtle: #6d675f;
   --ds-border: #d7d0c4;
   --ds-rule: #d7d0c4;
+  /* The edge of a form control. Rule is a divider at about 1.4:1; an input whose only boundary is
+     its border needs 3:1 on every surface step (WCAG 1.4.11). */
+  --ds-border-control: #878073;
   --ds-border-strong: #0a0a0a;
   --ds-focus-ring: #0a0a0a;
   --ds-focus-ring-offset: #f4efe5;
@@ -123,6 +126,7 @@
   --ds-ink-subtle: #bdb5a9;
   --ds-border: #2c2823;
   --ds-rule: #2c2823;
+  --ds-border-control: #746e65;
   --ds-border-strong: #f4efe5;
   --ds-focus-ring: #f4efe5;
   --ds-focus-ring-offset: #0a0a0a;

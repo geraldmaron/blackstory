@@ -85,7 +85,7 @@
 }
 
 .ds-datafig__source.ds-citation--compact .ds-citation__label {
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
 }
 
 /* The numbers: a native disclosure, closed by default. The summary reads like the source line
@@ -252,7 +252,7 @@
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
 }
 
 .ds-data-chart__table thead th:not(:first-child) {

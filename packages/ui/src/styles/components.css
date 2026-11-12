@@ -90,7 +90,7 @@
 }
 
 .ds-citation--compact .ds-citation__label {
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
 }
 
 .ds-confidence {

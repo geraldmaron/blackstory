@@ -33,7 +33,7 @@ One person runs it. Records are published from a Postgres-backed catalog (about 
 
 ## Brand Commitments
 
-Name BlackStory, official book-and-pin lockup used as artwork only (never retyped). Type: Schibsted Grotesk for headlines, Geist for UI, Newsreader for editorial text, Geist Mono for data, citations, dates and confidence. Black and paper lead, copper points (about 10 to 15 percent of a composition). Radii 8, 16 and 28 px. No gradients, glows, bevels, glass or 3D. Dark theme is first class. Copy rules in docs/ui/story.md: two speakers only (the archive, or the owner as "I"), never "we"; no em dashes, limited colons, no marketing superlatives; internal pipeline words (quarantine, promotion, research case, maturity enums) never public.
+Name BlackStory, official book-and-pin lockup used as artwork only (never retyped). Type: Schibsted Grotesk for headlines, Geist for UI, Newsreader for editorial text, Geist Mono for data, citations, dates and confidence. Black and paper lead, copper points (about 10 to 15 percent of a composition). Radii 8, 14 and 28 px. No gradients, glows, bevels, glass or 3D. Dark theme is first class. Copy rules in docs/ui/story.md: two speakers only (the archive, or the owner as "I"), never "we"; no em dashes, limited colons, no marketing superlatives; internal pipeline words (quarantine, promotion, research case, maturity enums) never public.
 
 ## Evidence on Hand
 

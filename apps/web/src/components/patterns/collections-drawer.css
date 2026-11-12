@@ -140,7 +140,7 @@
 
 .ds-saved__rowmeta {
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   color: var(--ds-ink-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -199,7 +199,7 @@
   flex-basis: 100%;
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }

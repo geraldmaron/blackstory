@@ -1184,7 +1184,7 @@ a.ds-room-chip {
   height: 40px;
   padding: 0 var(--ds-space-4);
   background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-full);
   color: var(--ds-ink);
   font-family: var(--ds-font-ui);
@@ -1598,7 +1598,7 @@ a.ds-room-chip {
   min-height: 48px;
   padding: 13px var(--ds-space-4);
   background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
   outline: none;
   font-family: var(--ds-font-sans);

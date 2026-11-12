@@ -172,7 +172,7 @@
   align-items: center;
   min-height: 44px;
   padding: 0 var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
   background: var(--ds-canvas);
 }

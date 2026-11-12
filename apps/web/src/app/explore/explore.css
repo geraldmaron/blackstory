@@ -824,7 +824,7 @@
   width: 100%;
   min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
   background: var(--ds-surface);
   color: var(--ds-ink);
@@ -945,7 +945,7 @@
 
 .ds-explore-place__rec-kind {
   flex-shrink: 0;
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);
@@ -1015,7 +1015,7 @@
 }
 
 .ds-explore-stage__instruments .ds-pill-select__label {
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
 }
 
@@ -1024,7 +1024,7 @@
   min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
   border-radius: var(--ds-radius-sm);
-  border-color: var(--ds-rule);
+  border-color: var(--ds-border-control);
   background: var(--ds-surface-raised);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -1366,7 +1366,7 @@
 }
 
 .ds-explore-stage__results .ds-result-meta dt {
-  font-size: 0.5625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.07em;
 }
 
@@ -1398,7 +1398,7 @@
 .ds-result-meta dt {
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;

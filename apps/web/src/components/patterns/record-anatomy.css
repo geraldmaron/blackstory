@@ -65,7 +65,7 @@
   gap: var(--ds-space-2);
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;

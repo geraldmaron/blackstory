@@ -152,7 +152,7 @@
   padding: 0;
   list-style: none;
   font-family: var(--ds-font-mono);
-  font-size: 0.59375rem;
+  font-size: var(--ds-text-micro);
   color: var(--ds-ink-subtle);
 }
 

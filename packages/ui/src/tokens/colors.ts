@@ -18,6 +18,8 @@ export type ConfidenceLevel = (typeof confidenceLevels)[number];
 
 /** Semantic surface/text/border colors shared by both themes (hex). */
 export type ThemePalette = {
+  /** The well a plate or inset list sits in; one value step below canvas. */
+  readonly surfaceSunken: string;
   readonly canvas: string;
   readonly surface: string;
   readonly surfaceRaised: string;
@@ -25,6 +27,8 @@ export type ThemePalette = {
   readonly inkMuted: string;
   readonly inkSubtle: string;
   readonly border: string;
+  /** Form-control edge; 3:1 on every surface step (WCAG 1.4.11). */
+  readonly borderControl: string;
   readonly borderStrong: string;
   readonly focusRing: string;
   readonly focusRingOffset: string;
@@ -52,6 +56,7 @@ export type ConfidencePalette = Record<ConfidenceLevel, StatusPalette>;
 export const lightTheme: ThemePalette = {
   // Canvas and raised plate sit one value step either side of the brand Archive Paper swatch
   // (tokens.css four-step surface set), so they are literals rather than brand swatches.
+  surfaceSunken: '#EDE7DA',
   canvas: '#F8F4EC',
   surface: brandPalette.surface,
   surfaceRaised: '#FFFDF8',
@@ -59,6 +64,7 @@ export const lightTheme: ThemePalette = {
   inkMuted: brandPalette.stone,
   inkSubtle: brandPalette.stone,
   border: brandPalette.rule,
+  borderControl: '#878073',
   borderStrong: brandPalette.blackInk,
   focusRing: brandPalette.blackInk,
   focusRingOffset: brandPalette.archivePaper,
@@ -73,6 +79,7 @@ export const lightTheme: ThemePalette = {
 export const darkTheme: ThemePalette = {
   // "Ink" direction: warmer than brandPalette.blackInk/charcoal by design, so these are
   // theme-specific overrides rather than brand swatches — see tokens.css [data-theme='dark'].
+  surfaceSunken: '#0C0B0A',
   canvas: '#131110',
   surface: '#1B1917',
   surfaceRaised: '#232019',
@@ -80,6 +87,7 @@ export const darkTheme: ThemePalette = {
   inkMuted: '#BDB5A9',
   inkSubtle: '#BDB5A9',
   border: '#2C2823',
+  borderControl: '#746E65',
   borderStrong: brandPalette.archivePaper,
   focusRing: brandPalette.archivePaper,
   focusRingOffset: brandPalette.blackInk,
@@ -257,6 +265,11 @@ export function criticalTextPairs(
     ['ink/surfaceRaised', p.ink, p.surfaceRaised],
     ['inkMuted/canvas', p.inkMuted, p.canvas],
     ['inkMuted/surface', p.inkMuted, p.surface],
+    ['ink/surfaceSunken', p.ink, p.surfaceSunken],
+    ['inkMuted/surfaceSunken', p.inkMuted, p.surfaceSunken],
+    ['accent/surfaceSunken', p.accent, p.surfaceSunken],
+    ['accent/surfaceRaised', p.accent, p.surfaceRaised],
+    ['inkMuted/surfaceRaised', p.inkMuted, p.surfaceRaised],
     ['inkSubtle/canvas', p.inkSubtle, p.canvas],
     ['inverseInk/inverse', p.inverseInk, p.inverse],
     ['accent/canvas', p.accent, p.canvas],
@@ -278,9 +291,16 @@ export function criticalUiPairs(
   const confidence = confidencePalettes[theme];
   return [
     ['borderStrong/canvas', p.borderStrong, p.canvas],
+    ['borderControl/surfaceSunken', p.borderControl, p.surfaceSunken],
+    ['borderControl/canvas', p.borderControl, p.canvas],
+    ['borderControl/surface', p.borderControl, p.surface],
+    ['borderControl/surfaceRaised', p.borderControl, p.surfaceRaised],
     ['focusRing/canvas', p.focusRing, p.canvas],
     ['focusRing/surface', p.focusRing, p.surface],
     ['accentGraphic/canvas', p.accentGraphic, p.canvas],
+    ['accentGraphic/surfaceSunken', p.accentGraphic, p.surfaceSunken],
+    ['accentGraphic/surface', p.accentGraphic, p.surface],
+    ['accentGraphic/surfaceRaised', p.accentGraphic, p.surfaceRaised],
     ['warning-border/canvas', status.warning.border, p.canvas],
     ['dispute-border/canvas', status.dispute.border, p.canvas],
     ['error-border/canvas', status.error.border, p.canvas],

@@ -119,7 +119,7 @@
   max-width: 520px;
   min-height: 38px;
   padding: 0 var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-full);
   background: var(--ds-canvas);
   color: var(--ds-ink-muted);
@@ -376,7 +376,7 @@ span.ds-bar__mode-link {
   background: var(--ds-accent-graphic);
   color: var(--ds-inverse-ink);
   font-family: var(--ds-font-mono);
-  font-size: 0.5625rem;
+  font-size: var(--ds-text-micro);
   line-height: 15px;
   font-variant-numeric: tabular-nums;
 }

@@ -23,7 +23,7 @@ export const grid = {
   gutter: space[4],
   gutterLg: space[6],
   maxWidth: '72rem',
-  contentWidth: '42rem',
+  contentWidth: '38rem',
   breakpoints: {
     sm: '40rem',
     md: '48rem',

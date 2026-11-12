@@ -68,7 +68,7 @@
 
 .ds-typeahead__secondary {
   flex-shrink: 0;
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);

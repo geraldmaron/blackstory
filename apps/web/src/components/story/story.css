@@ -226,7 +226,7 @@
 .ds-reading__drawer-kind {
   flex: none;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
@@ -372,7 +372,7 @@
 .ds-reading-source-line {
   margin: var(--ds-space-1) 0 0;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   color: var(--ds-ink-subtle);
 }
 
@@ -601,7 +601,7 @@
 .ds-reading-mast__credit {
   margin-top: var(--ds-space-4);
   max-width: 66ch;
-  font-size: 10px;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.1em;
   line-height: 1.5;
   text-transform: uppercase;
@@ -854,7 +854,7 @@
 .ds-reading-rail__next-position {
   margin: var(--ds-space-1) 0 0;
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   color: var(--ds-accent);
 }
 

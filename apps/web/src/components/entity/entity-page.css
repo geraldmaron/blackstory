@@ -186,7 +186,7 @@
 }
 
 .ds-entity-location-map__frame .maplibregl-ctrl-attrib {
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   background: color-mix(in srgb, var(--ds-canvas) 88%, transparent);
 }
 
