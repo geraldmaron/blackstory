@@ -9,7 +9,7 @@
 
 export { Room, type RoomProps, type RoomWidth } from './Room';
 export { DocumentColophon, type EntryPosture, type DocumentColophonProps } from './EntryPosture';
-export { RailGroup, type RailGroupProps, type RailEntry } from './RoomRail';
+export type { RailEntry } from './RoomRail';
 export { Breadcrumb, type BreadcrumbProps } from './Breadcrumb';
 export { parentCrumb, resolveTrail, roomLabelFor, type RoomCrumb } from './room-trail';
 export {
@@ -28,11 +28,9 @@ export {
   type RoomFact,
   type RoomHandoffProps,
 } from './RoomSection';
-export { DocumentPlate, type DocumentPlateProps } from './DocumentPlate';
 export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
 export {
   FindBar,
-  FindBarChips,
   FindBarFilters,
   type FindBarFiltersProps,
   type FindBarProps,

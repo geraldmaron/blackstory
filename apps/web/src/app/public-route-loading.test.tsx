@@ -42,7 +42,7 @@ const LOADING_BOUNDARIES = [
     Loading: BookLoading,
     label: 'Opening record',
   },
-  { route: '/law', dir: 'law', Loading: LawLoading, label: 'Pulling the law entries…' },
+  { route: '/law', dir: 'law', Loading: LawLoading, label: 'Pulling the laws together…' },
   {
     route: '/law/[slug]',
     dir: 'law/[slug]',

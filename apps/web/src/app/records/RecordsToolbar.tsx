@@ -1,5 +1,6 @@
 /**
- * The register's one toolbar row: a FilterButton per facet, the Sort button and List | Timeline.
+ * The register's one toolbar row: a FilterButton per facet, the Sort button and an optional
+ * Segmented view switch. /records, /law and /books all use it.
  *
  * No JavaScript. Every menu is a native `popover` opened by its button through `popovertarget`,
  * so it light-dismisses, closes on Escape and sits in the top layer by itself, and every value in
@@ -8,7 +9,7 @@
  * its own sheet over it.
  */
 import React from 'react';
-import { FilterButton, Segmented, buttonClassName } from '@repo/ui';
+import { FilterButton, Segmented, buttonClassName, type SegmentedOption } from '@repo/ui';
 
 void React;
 
@@ -36,11 +37,13 @@ export type ToolbarMenu = {
 
 export type RecordsToolbarProps = {
   readonly filters: readonly ToolbarMenu[];
-  readonly sort: ToolbarMenu;
-  readonly view: {
+  /** Absent where order means nothing, such as a figure. */
+  readonly sort?: ToolbarMenu;
+  /** The one Segmented switch between views of the same data (List | Timeline), if any. */
+  readonly view?: {
+    readonly label: string;
     readonly value: string;
-    readonly listHref: string;
-    readonly timelineHref: string;
+    readonly options: readonly SegmentedOption[];
   };
   readonly activeCount: number;
   readonly clearAllHref?: string;
@@ -106,6 +109,30 @@ function ChevronGlyph() {
   );
 }
 
+function CloseGlyph() {
+  return (
+    <svg className="ds-records-toolbar__glyph" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="m4 4 8 8m0-8-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Closes a menu or the sheet. Shown only where they are sheets, since on touch neither Escape
+ * nor an outside click is obvious. */
+function CloseButton({ target }: { readonly target: string }) {
+  return (
+    <button
+      className={buttonClassName('quiet', 'ds-records-menu__close')}
+      type="button"
+      popoverTarget={target}
+      popoverTargetAction="hide"
+      aria-label="Close"
+    >
+      <CloseGlyph />
+    </button>
+  );
+}
+
 function Menu({ menu }: { readonly menu: ToolbarMenu }) {
   const id = menuId(menu.key);
   return (
@@ -126,14 +153,7 @@ function Menu({ menu }: { readonly menu: ToolbarMenu }) {
             Clear
           </a>
         )}
-        <button
-          className="ds-records-menu__close"
-          type="button"
-          popoverTarget={id}
-          popoverTargetAction="hide"
-        >
-          Close
-        </button>
+        <CloseButton target={id} />
       </div>
       {menu.options.length === 0 ? (
         <p className="ds-records-menu__empty">No {menu.title.toLowerCase()} to narrow by here.</p>
@@ -197,23 +217,20 @@ export function RecordsToolbar({
         </FilterButton>
 
         <div className="ds-records-toolbar__end">
-          <FilterButton
-            className="ds-records-toolbar__facet ds-records-toolbar__sort"
-            data-key={sort.key}
-            popoverTarget={menuId(sort.key)}
-            aria-label={`Sort: ${sort.value}`}
-          >
-            <SortGlyph />
-            {sort.value}
-          </FilterButton>
-          <Segmented
-            label="Show records as"
-            value={view.value}
-            options={[
-              { value: 'list', label: 'List', href: view.listHref },
-              { value: 'timeline', label: 'Timeline', href: view.timelineHref },
-            ]}
-          />
+          {sort === undefined ? null : (
+            <FilterButton
+              className="ds-records-toolbar__facet ds-records-toolbar__sort"
+              data-key={sort.key}
+              popoverTarget={menuId(sort.key)}
+              aria-label={`Sort: ${sort.value}`}
+            >
+              <SortGlyph />
+              {sort.value}
+            </FilterButton>
+          )}
+          {view === undefined ? null : (
+            <Segmented label={view.label} value={view.value} options={view.options} />
+          )}
         </div>
       </div>
 
@@ -234,9 +251,10 @@ export function RecordsToolbar({
               Clear all
             </a>
           )}
+          <CloseButton target={SHEET_ID} />
         </div>
         <ul className="ds-records-sheet__list">
-          {[sort, ...filters].map((menu) => (
+          {(sort === undefined ? filters : [sort, ...filters]).map((menu) => (
             <li key={menu.key}>
               <button
                 className="ds-records-sheet__row"
@@ -263,7 +281,7 @@ export function RecordsToolbar({
         </div>
       </div>
 
-      {[...filters, sort].map((menu) => (
+      {(sort === undefined ? filters : [...filters, sort]).map((menu) => (
         <Menu key={menu.key} menu={menu} />
       ))}
     </div>

@@ -5,6 +5,7 @@
 import React from 'react';
 import { PageHeader } from '@repo/ui';
 import { Room } from '../../components/room';
+import '../reading-room.css';
 import './records-index.css';
 
 void React;

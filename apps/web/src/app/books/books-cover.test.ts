@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { coverInitialsForTitle, coverIsbnForBook, openLibraryCoverUrl } from './books-cover';
+import { coverIsbnForBook, openLibraryCoverUrl } from './books-cover';
 
 test('coverIsbnForBook prefers isbn-13 over isbn-10', () => {
   assert.equal(
@@ -22,9 +22,4 @@ test('openLibraryCoverUrl builds ISBN cover path with fail-closed default', () =
     openLibraryCoverUrl('9780307278449', 'M'),
     'https://covers.openlibrary.org/b/isbn/9780307278449-M.jpg?default=false',
   );
-});
-
-test('coverInitialsForTitle returns up to two initials', () => {
-  assert.equal(coverInitialsForTitle('The Bluest Eye'), 'TB');
-  assert.equal(coverInitialsForTitle('Beloved'), 'BE');
 });

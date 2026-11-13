@@ -1,109 +1,95 @@
 /**
- * Banned-books catalog browse: cover-led kit rows, GET facets, census limit on the page.
- *
- * Browse tools live on `/books`. `/books/browse` is a retired redirect.
+ * The /books catalog as rendered: a cover wall of links whose accessible name is the title, the
+ * states view as a decorative tile grid beside a ranked list of links, designed empty states,
+ * and the census limit on the page.
  */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
 import { test } from 'node:test';
-import { fileURLToPath } from 'node:url';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { getBannedBooksListingSnapshot } from '../../data/banned-books-seed';
 import { BooksCoverArt } from './BooksCoverArt';
 import { BooksBrowseSections } from './BooksBrowseSections';
 import { buildBooksBrowseViewModel } from './books-view-model';
-import { BOOKS_ABOUT, BOOKS_READ_FACTS } from './books-copy';
 
 void React;
 
-const here = dirname(fileURLToPath(import.meta.url));
-const indexSource = readFileSync(join(here, 'page.tsx'), 'utf8');
-const sectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
-
-function readerText(markup: string): string {
-  return markup
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&#x27;|&apos;|[‘’]/g, "'")
-    .replace(/&amp;/g, '&')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 const SNAPSHOT = getBannedBooksListingSnapshot();
-const VIEW = buildBooksBrowseViewModel(SNAPSHOT, {});
-const HTML = renderToStaticMarkup(
-  <BooksBrowseSections view={VIEW} suggestCorpus={[]} snapshot={SNAPSHOT} />,
-);
-const TEXT = readerText(HTML);
+const render = (params: Parameters<typeof buildBooksBrowseViewModel>[1]) =>
+  renderToStaticMarkup(<BooksBrowseSections view={buildBooksBrowseViewModel(SNAPSHOT, params)} />);
 
-test('cover art is aria-hidden by default and carries no competing accessible name', () => {
-  const html = renderToStaticMarkup(<BooksCoverArt title="The Bluest Eye" size="S" />);
+test('a decorative cover is hidden from assistive tech and carries no competing name', () => {
+  const html = renderToStaticMarkup(
+    <BooksCoverArt title="The Bluest Eye" isbn="9780307278449" size="S" />,
+  );
   assert.match(html, /aria-hidden="true"/);
-  assert.doesNotMatch(html, /alt="[^"]+"/, 'a decorative cover must not set a non-empty alt');
+  assert.match(html, /alt=""/);
 });
 
-test('a catalog row is a link whose accessible name leads with the title, not the cover', () => {
-  assert.match(HTML, /<span class="ds-room-idx__glyph" aria-hidden="true">/);
-  assert.match(HTML, /<span class="ds-room-idx__name">/);
-  assert.ok(VIEW.items.length > 0, 'seed catalog should have titles');
-  assert.ok(TEXT.includes(VIEW.items[0]!.title), 'first page title never reached the reader');
+test('with no ISBN the cover is typeset with the title and author, never initials', () => {
+  const html = renderToStaticMarkup(<BooksCoverArt title="Beloved" author="Toni Morrison" />);
+  assert.match(html, /ds-book-cover--typeset/);
+  assert.match(html, /<span class="ds-book-cover__title">Beloved<\/span>/);
+  assert.match(html, /<span class="ds-book-cover__author">Toni Morrison<\/span>/);
+  assert.doesNotMatch(html, />BE</);
 });
 
-test('facet chips render in the shared room-kit chip vocabulary, not a bespoke one', () => {
-  assert.match(HTML, /class="ds-room-chip"/);
-  assert.match(HTML, /ds-room-num/);
-  assert.doesNotMatch(HTML, /ds-books-edition__filter-chip/);
-  assert.doesNotMatch(sectionsSource, /ds-books-edition__filter-chip/);
+test('the wall shows every title as one link: cover, title, and the states it is challenged in', () => {
+  const html = render({});
+  const links = html.match(/class="ds-books-wall__link"/g) ?? [];
+  assert.equal(links.length, SNAPSHOT.books.length);
+  assert.match(html, /href="\/books\/the-bluest-eye"/);
+  assert.match(html, /Challenged in \d+ states?/);
+  assert.doesNotMatch(html, /Page \d+ of/);
 });
 
-test('the browse sections keep kit chips and a state select, not HairlineIndex', () => {
-  assert.match(sectionsSource, /from '\.\.\/\.\.\/components\/room'/);
-  assert.match(sectionsSource, /ds-books-idx/);
-  assert.match(sectionsSource, /sortOptions\.map/);
-  // Chips, active constraints and the sort are the kit's FindBar; the state select rides in its form.
-  assert.match(sectionsSource, /<FindBar/);
-  assert.match(sectionsSource, /name="state"/);
-  assert.doesNotMatch(sectionsSource, /HairlineIndex/);
-  assert.doesNotMatch(sectionsSource, /ds-books-edition/);
-});
-
-test('how-to-read is on the page, with the census limit and the affiliate bound', () => {
-  assert.ok(TEXT.includes(BOOKS_ABOUT.title));
-  assert.ok(TEXT.includes(BOOKS_ABOUT.lede.slice(0, 40)));
-  for (const fact of BOOKS_READ_FACTS) {
-    assert.ok(TEXT.includes(fact.title), `missing fact "${fact.title}"`);
+test('the toolbar carries State, Author, Sort and Covers | States, all as links', () => {
+  const html = render({});
+  for (const key of ['state', 'author', 'sort']) {
+    assert.match(html, new RegExp(`id="records-menu-${key}"`));
   }
-  assert.match(HTML, /id="read"/);
-  assert.match(HTML, /id="browse"/);
+  assert.match(html, /aria-label="Show books as"/);
+  assert.match(html, /href="\/books\?view=states"/);
+  assert.doesNotMatch(html, /<form|<input|<select/);
 });
 
-test('the rail dump of three states and the Keep going handoffs are gone', () => {
-  assert.doesNotMatch(indexSource, /OrientationInstrument/);
-  assert.doesNotMatch(HTML, /icon="place"|id="place"|id="related"/);
+test('the states view: a decorative tile grid and a ranked list that filters the wall', () => {
+  const html = render({ view: 'states' });
+  assert.match(html, /<div class="ds-books-tiles" aria-hidden="true">/);
+  assert.match(html, /<ol class="ds-books-ranks" aria-label="States by challenged titles">/);
+  assert.match(html, /href="\/books\?state=FL"/);
+  // Order means nothing on a figure, so the Sort control is not offered there.
+  assert.doesNotMatch(html, /records-menu-sort/);
+  // A tile is a code and a shade step; the counts are printed once, in the ranked list.
+  assert.match(html, /class="ds-books-tiles__tile" data-step="4"[^>]*>FL<\/span>/);
+  assert.doesNotMatch(html, /ds-books-tiles__count/);
 });
 
-test('no link on the catalog page points at /history or another redirect endpoint', () => {
-  for (const source of [indexSource, sectionsSource]) {
-    assert.doesNotMatch(source, /href=["'`]\/history/);
-    assert.doesNotMatch(source, /href=["'`]\/explore/);
-    assert.doesNotMatch(source, /href=["'`]\/locate/);
-    assert.doesNotMatch(source, /href=["'`]\/search["'`]/);
-    assert.doesNotMatch(source, /href=["'`]\/map["'`]/);
-  }
+test('a state or author no title carries is dropped, not echoed back', () => {
+  const html = render({ state: 'zz', author: 'Nobody At All' });
+  assert.doesNotMatch(html, /aria-label="Active filters"/);
+  assert.doesNotMatch(html, /No titles match/);
 });
 
-test('the unavailable-snapshot notice and the no-results empty state carry different copy', () => {
-  assert.match(indexSource, /Notice/);
-  assert.match(indexSource, /snapshot is unavailable/);
-  assert.doesNotMatch(indexSource, /No titles matched/);
-  assert.match(sectionsSource, /BOOKS_CATALOG\.emptyTitle/);
+test('the filtered state is echoed as a removable chip and marked in the states list', () => {
+  const html = render({ state: 'FL', view: 'states' });
+  assert.match(html, /aria-label="Active filters"/);
+  assert.match(html, /class="ds-books-ranks__row" href="\/books\?state=FL" aria-current="true"/);
+  assert.match(html, /data-current="true"/);
 });
 
-test('books-edition.css and books-panel-chrome.ts are gone', () => {
-  assert.doesNotMatch(indexSource, /books-edition\.css/);
-  assert.doesNotMatch(indexSource, /books-panel-chrome/);
-  assert.doesNotMatch(sectionsSource, /books-edition\.css/);
-  assert.doesNotMatch(sectionsSource, /books-panel-chrome/);
+test('no match is a designed outcome that names what was asked and clears it', () => {
+  const html = render({ q: 'zzzz-not-a-book' });
+  assert.match(html, /No titles match/);
+  assert.match(html, /Nothing in the catalog matches “zzzz-not-a-book”/);
+  assert.match(html, /href="\/books"/);
+  const states = render({ q: 'zzzz-not-a-book', view: 'states' });
+  assert.match(states, /No states to show/);
+});
+
+test('the census limit and what a state means are on the page as visible text', () => {
+  const html = render({});
+  assert.match(html, /not a complete national census/);
+  assert.match(html, /not a claim that the book left every school in that state/);
+  assert.match(html, /href="\/methodology"/);
 });

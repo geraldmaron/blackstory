@@ -1797,25 +1797,9 @@ body:has(.ds-explore-stage[data-results='open']) {
   }
 }
 
-/*
- * Target size (WCAG 2.5.8). A document plate's "Open the entry" rendered 17–21px tall: fine for a
- * mouse, a miss for a thumb. It keeps its type; only the hit box grows.
- */
-.ds-room-plate__link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-}
-
 /* The header lockup is 24px of ink; its link is the bar's full height on every pointer. */
 .ds-bar__brand {
   min-height: 44px;
-}
-
-@media (pointer: coarse) {
-  .ds-room-plate__link {
-    min-height: 44px;
-  }
 }
 
 /*

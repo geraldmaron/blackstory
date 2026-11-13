@@ -1,26 +1,146 @@
 /**
- * Rooms hub layout. Destination glyphs on cards; sections come from the shared room kit.
+ * `/rooms`: three groups of ruled rows. At desktop widths the group name sits in a left column
+ * beside its rows; on phone it stacks above them. Spacing uses the shared scale only.
  */
 
-.ds-rooms-band__standfirst {
-  margin: 0 0 var(--ds-space-5);
-  max-width: 44rem;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body, 1rem);
-  line-height: 1.5;
+.ds-rooms__group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-3) var(--ds-space-8);
+  padding-block: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-rooms__group:last-child {
+  padding-bottom: var(--ds-space-12);
+}
+
+.ds-rooms__heading {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
+  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-4));
+}
+
+.ds-rooms__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-rooms__list > li + li {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-rooms__row {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr) 1rem;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-6);
+  min-height: 2.75rem;
+  margin-inline: calc(var(--ds-space-2) * -1);
+  padding: var(--ds-space-4) var(--ds-space-2);
+  color: var(--ds-ink);
+  text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-rooms__list > li:first-child .ds-rooms__row {
+  padding-top: var(--ds-space-1);
+}
+
+.ds-rooms__row:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-rooms__row:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-rooms__name {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.5rem;
+  letter-spacing: var(--ds-tracking-title);
+}
+
+.ds-rooms__row:hover .ds-rooms__name {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-rooms__purpose {
   color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.25rem;
+  text-wrap: pretty;
 }
 
-.ds-rooms-card__glyph {
-  width: 0.9em;
-  height: 0.9em;
-  margin-right: 0.5em;
-  vertical-align: -0.05em;
-  color: var(--ds-ink-subtle, var(--ds-ink-muted));
-  transition: color var(--ds-duration-fast) var(--ds-easing);
+.ds-rooms__arrow {
+  align-self: center;
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-subtle);
+  transition:
+    transform var(--ds-duration-fast) var(--ds-easing),
+    color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-room-card:hover .ds-rooms-card__glyph,
-.ds-room-card:focus-visible .ds-rooms-card__glyph {
-  color: var(--ds-accent);
+.ds-rooms__row:hover .ds-rooms__arrow {
+  color: var(--ds-ink);
+  transform: translateX(var(--ds-space-1));
+}
+
+@media (min-width: 64rem) {
+  .ds-rooms__group {
+    grid-template-columns: 16rem minmax(0, 1fr);
+  }
+
+  .ds-rooms__heading {
+    position: sticky;
+    top: calc(var(--ds-island-clearance) + var(--ds-space-4));
+    align-self: start;
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-rooms .ds-page-header {
+    padding-block: var(--ds-space-8) var(--ds-space-4);
+  }
+
+  .ds-rooms__group {
+    padding-block: var(--ds-space-6);
+  }
+
+  .ds-rooms__row {
+    grid-template-columns: minmax(0, 1fr) 1rem;
+    grid-template-areas:
+      'name arrow'
+      'purpose purpose';
+    padding-block: var(--ds-space-3);
+  }
+
+  .ds-rooms__name {
+    grid-area: name;
+  }
+
+  .ds-rooms__purpose {
+    grid-area: purpose;
+  }
+
+  .ds-rooms__arrow {
+    grid-area: arrow;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-rooms__row:hover .ds-rooms__arrow {
+    transform: none;
+  }
 }

@@ -1,0 +1,57 @@
+/**
+ * BooksCoverArt: the cover wall on /books and the cover in a book page's rail.
+ * The frame holds 2:3 before the art arrives, so nothing moves when it does.
+ */
+.ds-book-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 3;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+  /* An inner hairline, so a pale cover still has an edge on the paper theme. */
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-rule);
+}
+
+.ds-book-cover__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Letterbox an off-ratio cover on the sunken frame rather than crop its own title off. */
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.ds-book-cover--typeset {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4) var(--ds-space-3);
+  container-type: inline-size;
+}
+
+.ds-book-cover__title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: clamp(0.875rem, 11cqi, 1.5rem);
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: var(--ds-tracking-title);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+}
+
+.ds-book-cover__author {
+  overflow: hidden;
+  color: var(--ds-ink-muted);
+  font-size: clamp(0.6875rem, 7cqi, 0.8125rem);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,12 +1,11 @@
 /**
- * Law room kit page wiring: room kit chrome, preserved browse URL contract.
+ * Law index and detail page wiring: the chronology's frame and the browse URL contract.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const indexPageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
@@ -14,45 +13,43 @@ const browseSectionsSource = readFileSync(join(here, 'LawBrowseSections.tsx'), '
 const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailViewSource = readFileSync(join(here, '[slug]', 'LawRecordView.tsx'), 'utf8');
 
-test('law index is the catalog room; /law/browse is a config redirect only', () => {
+test('law index is the chronology: page header, the register toolbar, no edition chrome', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
   assert.match(indexPageSource, /<PageHeader/);
-  assert.match(indexPageSource, /<Room width="wide">/);
+  assert.match(indexPageSource, /<Room width="wide"/);
+  assert.match(indexPageSource, /title="Law"/);
+  assert.match(indexPageSource, /title: 'Law'/);
   assert.doesNotMatch(indexPageSource, /OrientationInstrument|RoomStats|WalkOffRamp|rail=/);
-  assert.doesNotMatch(indexPageSource, /how-it-works|LawHubSections/);
+  assert.doesNotMatch(indexPageSource, /how-it-works|LawHubSections|DocumentPlate/);
   assert.doesNotMatch(indexPageSource, /EditionAtmosphereMosaic|LAW_EDITION_MOSAIC_SEED/);
+  assert.doesNotMatch(indexPageSource, /Civil rights law/i);
+  assert.match(browseSectionsSource, /<RecordsToolbar/);
+  for (const gone of [
+    'FindBar',
+    'RoomSection',
+    'RoomJump',
+    'KeepGoing',
+    'LegalDisclaimer',
+    'Pagination',
+  ]) {
+    assert.doesNotMatch(browseSectionsSource, new RegExp(gone), `${gone} is back on /law`);
+  }
 });
 
-/**
- * The params /law submits. `q` is the FindBar's own field; the rest ride along as the hidden
- * fields it renders from `preserved`, so a search refines the view instead of resetting it.
- */
-function lawSubmittedParams(): string[] {
-  const preserved = /preserved=\{\{([\s\S]*?)\}\}/.exec(browseSectionsSource)?.[1] ?? '';
-  return ['q', ...[...preserved.matchAll(/^\s*([a-z]+):/gm)].map((m) => m[1] as string)];
-}
+/** The params /law writes into its links: every lawBrowseHref key. */
+const LAW_LINK_PARAMS = ['q', 'kind', 'topic', 'status', 'sort'] as const;
 
-test('law browse preserves GET URL contract at /law', () => {
-  // The form itself (method="get", name="q", no Apply button) is the FindBar's, and is asserted
-  // on the rendered component in room-kit.test.tsx.
-  assert.match(browseSectionsSource, /<FindBar/);
-  assert.match(browseSectionsSource, /action="\/law#browse"/);
-  assert.match(browseSectionsSource, /id="browse"/);
-  assert.deepEqual(lawSubmittedParams(), ['q', 'kind', 'topic', 'sort', 'status']);
-  assert.match(browseSectionsSource, /sortOptions\.map/);
-  assert.match(browseSectionsSource, /clearHref="\/law"/);
-});
-
-test('every rendered browse control is in the edge param allowlist', async () => {
+test('every param the law index links with is in the edge param allowlist', async () => {
   // A control whose param is missing from the allowlist is stripped by middleware before the
   // page runs, so the filter silently does nothing. `sort` shipped broken exactly that way.
   const { LAW_PAGE_PARAM_ALLOWLIST } = await import('../../lib/runtime-hardening/constants');
-  const rendered = lawSubmittedParams();
-  assert.ok(rendered.length > 1);
-  for (const param of rendered) {
+  const { lawBrowseHref } = await import('./law-view-model');
+  const href = lawBrowseHref({ q: 'x', kind: 'k', topic: 't', status: 's', sort: 'recent' });
+  assert.deepEqual([...new URL(href, 'http://x').searchParams.keys()], [...LAW_LINK_PARAMS]);
+  for (const param of LAW_LINK_PARAMS) {
     assert.ok(
       (LAW_PAGE_PARAM_ALLOWLIST as readonly string[]).includes(param),
-      `browse submits "${param}" but it is not in LAW_PAGE_PARAM_ALLOWLIST`,
+      `the index links with "${param}" but it is not in LAW_PAGE_PARAM_ALLOWLIST`,
     );
   }
 });
@@ -64,16 +61,6 @@ test('law detail page renders the shared record anatomy, with no edition chrome 
     assert.doesNotMatch(src, /EditionAtmosphereMosaic|law-panel-chrome|law-edition\.css/);
     assert.doesNotMatch(src, /LawAnatomyStrip|RoomJump|LegalDisclaimer/);
   }
-});
-
-test('law browse lede preserved without em dashes, and the room is not titled civil rights law', () => {
-  assert.match(indexPageSource, /LAW_EDITION_BROWSE_LEDE/);
-  assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /—/);
-  assert.doesNotMatch(indexPageSource, /Civil rights/);
-  // The room keeps the noun where a reader scans for it (tab, nav, crumb); the headline is a sentence.
-  assert.match(indexPageSource, /title: 'Law'/);
-  assert.match(indexPageSource, /title="What the law actually said"/);
-  assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /civil rights/i);
 });
 
 // `[slug]/law-record.test.tsx` exercises the real seed data through the real `buildLensHandoff`

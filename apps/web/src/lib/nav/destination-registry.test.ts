@@ -8,14 +8,13 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { CLASSIFIED_PATHS, ENDPOINT_ROUTES, surfaceClassFor } from './surface-classes';
+import { CLASSIFIED_PATHS, ENDPOINT_ROUTES } from './surface-classes';
 import {
   DESTINATION_GROUPS,
   ROOMS_CARD_GROUPS,
   allDestinations,
   browsableDestinations,
   cardTitleFor,
-  classLabelFor,
   destinationById,
   destinationFor,
   destinationsInGroup,
@@ -121,29 +120,10 @@ describe('destination registry · card content', () => {
       const destinations = destinationsInGroup(group);
       assert.ok(destinations.length > 0, `group "${group}" would render an empty card grid`);
       for (const destination of destinations) {
-        assert.ok(destination.kind, `${destination.path} has no mono kind tag`);
+        assert.ok(destination.kind, `${destination.path} has no kind`);
         assert.ok(destination.description, `${destination.path} has no card description`);
       }
     }
-  });
-
-  it('the class label is read from the surface class, not stored beside it', () => {
-    // Reclassifying a route must change what its card advertises. Asserting the two agree is the
-    // only way a stale `READING ROOM` on a route the shell now renders as Utility gets caught.
-    for (const destination of browsableDestinations()) {
-      const label = classLabelFor(destination);
-      const surfaceClass = surfaceClassFor(destination.path);
-      assert.notEqual(surfaceClass, null, `${destination.path} resolves to no surface class`);
-      if (surfaceClass === 'reading') assert.match(label, /^READING ROOM/);
-      if (surfaceClass === 'utility') assert.match(label, /^UTILITY/);
-      if (surfaceClass === 'instrument') assert.match(label, /^INSTRUMENT/);
-    }
-  });
-
-  it('the modifier is appended to the class rather than replacing it', () => {
-    assert.equal(classLabelFor(destinationFor('/law')!), 'READING ROOM · PLAIN LANGUAGE');
-    assert.equal(classLabelFor(destinationFor('/memorial')!), 'READING ROOM · STILL');
-    assert.equal(classLabelFor(destinationFor('/stories')!), 'READING ROOM');
   });
 
   it('a card title may be a verb where the breadcrumb label cannot be', () => {

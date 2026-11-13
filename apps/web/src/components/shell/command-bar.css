@@ -162,7 +162,7 @@
 
 /*
  * "Suggestions are unavailable", in the same place as the list it stands in for. Styled here
- * because the bar does not load typeahead.css (the books catalog alone imports it).
+ * because the bar owns every typeahead style it uses.
  */
 .ds-bar__search .ds-typeahead__note {
   position: absolute;

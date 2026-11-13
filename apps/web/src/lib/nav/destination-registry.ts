@@ -6,7 +6,7 @@
  * TWO LAYERS, ONE TABLE. The product semantics — stable id, canonical label, canonical path,
  * parent, family, icon, public, browsable — live once in `@repo/public-contracts/destinations`,
  * where native and admin read them too. This file adds only what the web surface itself decides:
- * card copy, the mono class modifier, crawl facts, and noindex. A field
+ * card copy, crawl facts, and noindex. A field
  * that only the web app can act on belongs here; a field about what a destination IS belongs in
  * the catalog.
  *
@@ -36,7 +36,7 @@ import {
   type SemanticDestination,
 } from '@repo/public-contracts/destinations';
 
-import { CLASSIFIED_PATHS, surfaceClassFor, type SurfaceClass } from './surface-classes';
+import { CLASSIFIED_PATHS } from './surface-classes';
 
 /**
  * The card groups Rooms renders, in order, plus `find`.
@@ -65,29 +65,6 @@ export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> =
   'take-part': 'Add to it',
 });
 
-/**
- * Rooms hub page copy. The footer keeps {@link GROUP_HEADINGS}; the hub page uses
- * these longer headings plus standfirsts so it reads as kinds of knowledge, not a settings menu.
- */
-export const ROOMS_GROUP_COPY: Readonly<
-  Record<DestinationGroup, { readonly heading: string | null; readonly standfirst: string | null }>
-> = Object.freeze({
-  find: { heading: null, standfirst: null },
-  read: {
-    heading: 'Rooms for reading',
-    standfirst: 'Law, data, lives across the decades, banned books, and the memorial wall.',
-  },
-  check: {
-    heading: 'How a record gets in',
-    standfirst:
-      'Origin, methods, the source library, plain answers, and the log of what was corrected.',
-  },
-  'take-part': {
-    heading: 'Add what is missing',
-    standfirst: 'Leads, corrections, and how to reach the archive.',
-  },
-});
-
 /** Rooms' card groups, in render order. The axes are not among them. */
 export const ROOMS_CARD_GROUPS: readonly DestinationGroup[] = ['read', 'check', 'take-part'];
 
@@ -102,16 +79,9 @@ type WebPresentation = {
    */
   readonly cardTitle?: string;
   /**
-   * What sort of thing this room is. `/rooms` cases it into `RoomCard`'s `tag`, which takes the
-   * index row's third column, and the palette still reads the field as stored.
+   * What sort of thing this room is, for the About page's room cards.
    */
   readonly kind?: string;
-  /**
-   * Appended to the surface-class name in the card's mono footer: `READING ROOM · PLAIN LANGUAGE`.
-   * The class itself is never written here — it is read from `surface-classes.ts`, so a room that
-   * is reclassified cannot keep advertising the old class on its card.
-   */
-  readonly modifier?: string;
   /**
    * Crawl facts, present exactly when this route belongs in the sitemap.
    *
@@ -149,17 +119,14 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
 
   law: {
     kind: 'REFERENCE',
-    modifier: 'PLAIN LANGUAGE',
     crawl: { changeFrequency: 'weekly', priority: 0.7 },
   },
   data: {
     kind: 'INDICATORS',
-    modifier: 'TABULAR',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   lives: {
     kind: 'TIMELINE',
-    modifier: 'IMMERSIVE',
     crawl: { changeFrequency: 'monthly', priority: 0.6 },
   },
   books: {
@@ -168,7 +135,6 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   },
   memorial: {
     kind: 'NAMES',
-    modifier: 'STILL',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
 
@@ -182,7 +148,6 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   },
   methodology: {
     kind: 'TRANSPARENCY',
-    modifier: 'RECEIPT',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   sources: {
@@ -191,20 +156,17 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   },
   errata: {
     kind: 'CORRECTIONS',
-    modifier: 'FEED AVAILABLE',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
 
   submit: {
     cardTitle: 'Submit a lead',
     kind: 'CONTRIBUTE',
-    modifier: 'FORM',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   corrections: {
     cardTitle: 'Request a correction',
     kind: 'CORRECT',
-    modifier: 'FORM · TRACKED',
     crawl: { changeFrequency: 'monthly', priority: 0.6 },
   },
   support: {
@@ -336,26 +298,6 @@ export function browsableDestinations(): readonly Destination[] {
 /** The card title: the verb form when there is one, the crumb label otherwise. */
 export function cardTitleFor(destination: Destination): string {
   return destination.cardTitle ?? destination.label;
-}
-
-const SURFACE_CLASS_NAMES: Readonly<Record<SurfaceClass, string>> = Object.freeze({
-  door: 'DOOR',
-  instrument: 'INSTRUMENT',
-  reading: 'READING ROOM',
-  record: 'RECORD',
-  utility: 'UTILITY',
-});
-
-/**
- * The card's mono footer: the surface class this route actually resolves to, plus any modifier.
- *
- * Read from `surface-classes.ts` rather than stored, so a card cannot advertise `READING ROOM`
- * for a route the shell now renders as Utility.
- */
-export function classLabelFor(destination: Destination): string {
-  const surfaceClass = surfaceClassFor(destination.path);
-  const base = surfaceClass === null ? 'ENDPOINT' : SURFACE_CLASS_NAMES[surfaceClass];
-  return destination.modifier === undefined ? base : `${base} · ${destination.modifier}`;
 }
 
 /** The parent path for any route, dynamic or not. `/` has none. */

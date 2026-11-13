@@ -1,332 +1,296 @@
 /**
- * `/books` catalog body: how to read the list, GET search and facets, then cover-led rows
- * with author, summary, cited states and source count. Related rooms leave as handoffs.
+ * The `/books` index body: the register's toolbar (State, Author, Sort, and a Covers | States
+ * switch), the active narrowing as removable chips, then either the cover wall or the states by
+ * challenge count.
  *
- * Rows reuse `ds-room-idx-*` slots plus books-specific copy/facts styled in `reading-room.css`
- * (`ds-books-idx`), with subgrid alignment like `/law`. Cover art is decorative; the row's
- * accessible name is the title.
+ * Server-rendered and JavaScript-free apart from the cover's image fallback: menus are the
+ * register's native popovers of GET links, and every cover and state is an anchor.
  */
 import React from 'react';
 import Link from 'next/link';
-import type { BannedBooksListingSnapshot } from '@repo/domain';
-import { bannedBookReportedStates } from '@repo/domain';
+import { Chip, buttonClassName } from '@repo/ui';
+import { RecordsToolbar, type ToolbarMenu } from '../records/RecordsToolbar';
+import { Outcome } from '../records/RecordsIndex';
 import {
-  EmptyList,
-  Prose,
-  FindBar,
-  FindBarFilters,
-  RoomFactList,
-  RoomSection,
-} from '../../components/room';
-import type { BannedBookSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
-import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect.js';
-import {
+  BOOKS_SORT_PRESETS,
+  bookStateName,
   buildBooksBrowseHref,
-  stateLabel,
   type BooksBrowseItem,
   type BooksBrowseViewModel,
+  type BooksView,
 } from './books-view-model';
 import { BooksCoverArt } from './BooksCoverArt';
-import { BooksSearchTypeahead } from './BooksSearchTypeahead';
-import { BOOKS_ABOUT, BOOKS_CATALOG, BOOKS_READ_FACTS } from './books-copy';
-import '../typeahead.css';
-import { formatResultSummary } from '../../lib/discovery/result-summary';
+import { STATE_TILES } from './state-tiles';
+import { BOOKS_INDEX_NOTE } from './books-copy';
 
 void React;
 
 export type BooksBrowseSectionsProps = {
   readonly view: BooksBrowseViewModel;
-  readonly suggestCorpus: readonly BannedBookSuggestCorpusItem[];
-  readonly snapshot: BannedBooksListingSnapshot;
 };
 
-type StateChip = {
-  readonly id: string;
-  readonly label: string;
-  readonly count: number;
-  readonly href: string;
-};
+type Params = Parameters<typeof buildBooksBrowseHref>[0];
 
-/** State facet chips, counted across the full catalog rather than the current page. */
-function buildStateChips(
-  snapshot: BannedBooksListingSnapshot,
-  view: BooksBrowseViewModel,
-): readonly StateChip[] {
-  const counts = new Map<string, number>();
-  for (const book of snapshot.books) {
-    for (const code of bannedBookReportedStates(book)) {
-      counts.set(code, (counts.get(code) ?? 0) + 1);
-    }
-  }
-
-  const hrefFor = (state: string) =>
-    `${buildBooksBrowseHref({
-      q: view.q,
-      state,
-      author: view.author,
-      sort: view.sort,
-      dir: view.dir,
-    })}#browse`;
-
-  const all: StateChip = {
-    id: 'all',
-    label: 'All states',
-    count: snapshot.books.length,
-    href: hrefFor('all'),
+function currentParams(view: BooksBrowseViewModel): Params {
+  return {
+    q: view.q,
+    state: view.state,
+    author: view.author,
+    sort: view.sort,
+    dir: view.dir,
+    view: view.view,
   };
-
-  const ranked = [...counts.entries()].sort(
-    (left, right) => right[1] - left[1] || left[0].localeCompare(right[0]),
-  );
-  const topCodes = new Set(ranked.slice(0, 8).map(([code]) => code));
-  if (view.state !== 'all' && counts.has(view.state)) {
-    topCodes.add(view.state);
-  }
-
-  const states = ranked
-    .filter(([code]) => topCodes.has(code))
-    .map(([code, count]): StateChip => ({
-      id: code,
-      label: stateLabel(code),
-      count,
-      href: hrefFor(code),
-    }));
-
-  return [all, ...states];
 }
 
-/** What was searched for, in words, so the empty state can say why. */
-function activeFacetWords(view: BooksBrowseViewModel): readonly string[] {
-  const words: string[] = [];
-  if (view.q.trim()) words.push(`the search "${view.q.trim()}"`);
-  if (view.state !== 'all') {
-    const label =
-      view.stateOptions.find((entry) => entry.value === view.state)?.label ?? view.state;
-    words.push(label);
-  }
-  if (view.author !== 'all') words.push(view.author);
-  return words;
+function statesPhrase(count: number): string {
+  if (count === 0) return 'State not recorded';
+  return `Challenged in ${count} ${count === 1 ? 'state' : 'states'}`;
 }
 
-function buildActiveChips(
-  view: BooksBrowseViewModel,
-): readonly { readonly key: string; readonly label: string; readonly href: string }[] {
-  const chips: { readonly key: string; readonly label: string; readonly href: string }[] = [];
-  if (view.q.trim()) {
-    chips.push({
-      key: 'q',
-      label: `Search: ${view.q.trim()}`,
-      href: `${buildBooksBrowseHref({
-        q: '',
-        state: view.state,
-        author: view.author,
-        sort: view.sort,
-        dir: view.dir,
-      })}#browse`,
-    });
-  }
-  if (view.state !== 'all') {
-    const label =
-      view.stateOptions.find((entry) => entry.value === view.state)?.label ?? view.state;
-    chips.push({
+function titlesPhrase(count: number): string {
+  return `${count.toLocaleString('en-US')} ${count === 1 ? 'title' : 'titles'}`;
+}
+
+function filterMenus(view: BooksBrowseViewModel): ToolbarMenu[] {
+  const params = currentParams(view);
+  const states = [...view.stateCounts].sort((a, b) => a.name.localeCompare(b.name));
+  return [
+    {
       key: 'state',
-      label,
-      href: `${buildBooksBrowseHref({
-        q: view.q,
-        state: 'all',
-        author: view.author,
-        sort: view.sort,
-        dir: view.dir,
-      })}#browse`,
+      title: 'State',
+      value: view.state === 'all' ? 'Any' : bookStateName(view.state),
+      active: view.state === 'all' ? 0 : 1,
+      options: states.map((entry) => ({
+        id: entry.code,
+        label: entry.name,
+        count: entry.count,
+        href: buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' }),
+        current: entry.code === view.state,
+      })),
+      ...(view.state === 'all'
+        ? {}
+        : { clearHref: buildBooksBrowseHref({ ...params, state: 'all' }) }),
+    },
+    {
+      key: 'author',
+      title: 'Author',
+      value: view.author === 'all' ? 'Any' : view.author,
+      active: view.author === 'all' ? 0 : 1,
+      options: view.authorCounts.map((entry) => ({
+        id: entry.name,
+        label: entry.name,
+        count: entry.count,
+        href: buildBooksBrowseHref({ ...params, author: entry.name }),
+        current: entry.name === view.author,
+      })),
+      ...(view.author === 'all'
+        ? {}
+        : { clearHref: buildBooksBrowseHref({ ...params, author: 'all' }) }),
+    },
+  ];
+}
+
+function sortMenu(view: BooksBrowseViewModel): ToolbarMenu {
+  const params = currentParams(view);
+  return {
+    key: 'sort',
+    title: 'Sort',
+    value: view.sortLabel,
+    active: 0,
+    options: BOOKS_SORT_PRESETS.map((preset) => ({
+      id: `${preset.sort}-${preset.dir}`,
+      label: preset.label,
+      href: buildBooksBrowseHref({ ...params, sort: preset.sort, dir: preset.dir }),
+      current: preset.sort === view.sort && preset.dir === view.dir,
+    })),
+  };
+}
+
+type ActiveFilter = { readonly key: string; readonly label: string; readonly href: string };
+
+function activeFilters(view: BooksBrowseViewModel): ActiveFilter[] {
+  const params = currentParams(view);
+  const active: ActiveFilter[] = [];
+  const q = view.q.trim();
+  // The header search lands on /records; a `q` here comes from an older link, and still narrows.
+  if (q)
+    active.push({ key: 'q', label: `“${q}”`, href: buildBooksBrowseHref({ ...params, q: '' }) });
+  if (view.state !== 'all') {
+    active.push({
+      key: 'state',
+      label: bookStateName(view.state),
+      href: buildBooksBrowseHref({ ...params, state: 'all' }),
     });
   }
   if (view.author !== 'all') {
-    chips.push({
+    active.push({
       key: 'author',
       label: view.author,
-      href: `${buildBooksBrowseHref({
-        q: view.q,
-        state: view.state,
-        author: 'all',
-        sort: view.sort,
-        dir: view.dir,
-      })}#browse`,
+      href: buildBooksBrowseHref({ ...params, author: 'all' }),
     });
   }
-  return chips;
+  return active;
 }
 
-function sourcesLabel(count: number): string {
-  return `${count.toLocaleString('en-US')} source${count === 1 ? '' : 's'}`;
-}
-
-function BooksCatalogRow({ item }: { readonly item: BooksBrowseItem }) {
-  const statesOnFile =
-    item.states.length > 0 ? item.states.map((state) => state.code).join(' ') : 'None on file';
-  const summary = item.summary.trim();
-
+function CoverWall({ items }: { readonly items: readonly BooksBrowseItem[] }) {
   return (
-    <Link className="ds-room-idx__row" href={`/books/${item.slug}`}>
-      <span className="ds-room-idx__glyph" aria-hidden="true">
-        <BooksCoverArt
-          title={item.title}
-          size="M"
-          {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
-        />
-      </span>
-      <span className="ds-books-idx__copy">
-        <span className="ds-room-idx__name">{item.title}</span>
-        <span className="ds-books-idx__byline">
-          {item.authorNames}
-          {item.publishedDate ? ` · ${item.publishedDate}` : ''}
-        </span>
-        {summary ? <span className="ds-books-idx__gloss">{summary}</span> : null}
-      </span>
-      <span className="ds-books-idx__facts">
-        <span
-          className="ds-room-idx__grade"
-          title={item.states.map((state) => state.name).join(', ')}
-        >
-          {statesOnFile}
-        </span>
-        <span className="ds-books-idx__cites">{sourcesLabel(item.citationCount)}</span>
-      </span>
-    </Link>
+    <ul className="ds-books-wall" aria-label="Challenged titles">
+      {items.map((item) => (
+        <li key={item.id}>
+          <Link className="ds-books-wall__link" href={`/books/${item.slug}`}>
+            <BooksCoverArt
+              className="ds-books-wall__cover"
+              title={item.title}
+              author={item.authorNames}
+              {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
+            />
+            <span className="ds-books-wall__title">{item.title}</span>
+            <span className="ds-books-wall__states">{statesPhrase(item.states.length)}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrowseSectionsProps) {
-  const countLabel = formatResultSummary({
-    matched: view.totalMatched,
-    total: view.totalMatched,
-    singular: 'title',
-    plural: 'titles',
-    page: view.pagination.page,
-    pageCount: view.pagination.totalPages,
+/** Shade steps for the tile grid; the two darkest carry paper-colored codes (books.css). */
+const TILE_STEPS = 4;
+
+/**
+ * The states by how many titles carry a cited challenge there. The tile grid is the picture: a
+ * state code and a shade, decorative, since the ranked list beside it prints every number. The
+ * list is the control, each row a link to the cover wall filtered to that state.
+ */
+function StateView({ view }: { readonly view: BooksBrowseViewModel }) {
+  const params = currentParams(view);
+  const counts = new Map(view.stateCounts.map((entry) => [entry.code, entry.count]));
+  const max = Math.max(...view.stateCounts.map((entry) => entry.count));
+  return (
+    <div className="ds-books-states">
+      <div className="ds-books-tiles" aria-hidden="true">
+        {Object.entries(STATE_TILES).map(([code, [row, column]]) => {
+          const count = counts.get(code) ?? 0;
+          // Square root, so the states behind one outlier still read apart from each other.
+          const step = count === 0 ? 0 : Math.ceil(Math.sqrt(count / max) * TILE_STEPS);
+          return (
+            <span
+              key={code}
+              className="ds-books-tiles__tile"
+              data-step={step}
+              data-current={code === view.state ? 'true' : undefined}
+              style={{ gridRow: row + 1, gridColumn: column + 1 }}
+            >
+              {code}
+            </span>
+          );
+        })}
+      </div>
+
+      <ol className="ds-books-ranks" aria-label="States by challenged titles">
+        {view.stateCounts.map((entry) => (
+          <li key={entry.code}>
+            <a
+              className="ds-books-ranks__row"
+              href={buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' })}
+              aria-current={entry.code === view.state ? 'true' : undefined}
+            >
+              <span className="ds-books-ranks__name">{entry.name}</span>
+              <span className="ds-books-ranks__bar" aria-hidden="true">
+                <span style={{ width: `${(entry.count / max) * 100}%` }} />
+              </span>
+              <span className="ds-books-ranks__count">{titlesPhrase(entry.count)}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
+  const params = currentParams(view);
+  const active = activeFilters(view);
+  const facets = active.filter((filter) => filter.key !== 'q').length;
+  const viewHref = (value: BooksView) => buildBooksBrowseHref({ ...params, view: value });
+  const clearHref = buildBooksBrowseHref({
+    q: '',
+    state: 'all',
+    author: 'all',
+    sort: view.sort,
+    dir: view.dir,
+    view: view.view,
   });
-  const activeWords = activeFacetWords(view);
-  const activeChips = buildActiveChips(view);
-  const stateChips = buildStateChips(snapshot, view);
+
+  const empty = view.view === 'states' ? view.stateCounts.length === 0 : view.items.length === 0;
+  let body: React.ReactNode;
+  if (view.view === 'states') {
+    body =
+      view.stateCounts.length === 0 ? (
+        <Outcome title="No states to show" action={{ href: clearHref, label: 'Clear filters' }}>
+          No title matching {active.map((filter) => filter.label).join(', ')} carries a cited
+          challenge with a state.
+        </Outcome>
+      ) : (
+        <StateView view={view} />
+      );
+  } else {
+    body =
+      view.items.length === 0 ? (
+        <Outcome title="No titles match" action={{ href: clearHref, label: 'Clear filters' }}>
+          Nothing in the catalog matches {active.map((filter) => filter.label).join(', ')}.
+        </Outcome>
+      ) : (
+        <CoverWall items={view.items} />
+      );
+  }
 
   return (
     <>
-      <RoomSection id="read" title={BOOKS_ABOUT.title}>
-        <Prose>
-          <p>{BOOKS_ABOUT.lede}</p>
-        </Prose>
-        <RoomFactList
-          items={BOOKS_READ_FACTS.map((fact) => ({
-            title: fact.title,
-            body: fact.body,
-          }))}
-        />
-      </RoomSection>
-
-      <RoomSection id="browse" title={BOOKS_CATALOG.title}>
-        <Prose>
-          <p>{BOOKS_CATALOG.lede}</p>
-        </Prose>
-
-        <div className="ds-find-anchor">
-          <FindBar
-            id="books"
-            action="/books#browse"
-            queryLabel="Search titles, authors and summaries"
-            placeholder="Title, author, or summary…"
-            query={view.q}
-            searchSlot={<BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />}
-            formFields={
-              <FindBarFilters
-                label="State and author"
-                activeCount={(view.state === 'all' ? 0 : 1) + (view.author === 'all' ? 0 : 1)}
-              >
-                <AutoSubmitSelect
-                  id="state"
-                  name="state"
-                  label="State"
-                  defaultValue={view.state}
-                  options={view.stateOptions}
-                />
-                <AutoSubmitSelect
-                  id="author"
-                  name="author"
-                  label="Author"
-                  defaultValue={view.author}
-                  options={view.authorOptions}
-                />
-              </FindBarFilters>
+      <RecordsToolbar
+        filters={filterMenus(view)}
+        {...(view.view === 'covers' ? { sort: sortMenu(view) } : {})}
+        view={{
+          label: 'Show books as',
+          value: view.view,
+          options: [
+            { value: 'covers', label: 'Covers', href: viewHref('covers') },
+            { value: 'states', label: 'States', href: viewHref('states') },
+          ],
+        }}
+        activeCount={facets}
+        showLabel={`Show ${titlesPhrase(view.totalMatched)}`}
+        {...(facets > 0
+          ? {
+              clearAllHref: buildBooksBrowseHref({ ...params, state: 'all', author: 'all' }),
             }
-            preserved={{ sort: view.sort, dir: view.dir }}
-            active={activeChips}
-            clearHref="/books#browse"
-            rows={[
-              {
-                label: 'Filter by state',
-                chips: stateChips.map((chip) => ({
-                  label: chip.label,
-                  href: chip.href,
-                  active: (view.state === 'all' ? 'all' : view.state) === chip.id,
-                  count: chip.count,
-                })),
-              },
-            ]}
-            sort={view.sortOptions.map((option) => ({
-              label: option.label,
-              href: `${option.href}#browse`,
-              active: option.active,
-              mark: option.active ? (view.dir === 'asc' ? '↑' : '↓') : undefined,
-            }))}
-            summary={countLabel}
-          />
+          : {})}
+      />
 
-          {view.items.length === 0 ? (
-            activeWords.length > 0 ? (
-              <EmptyList title={BOOKS_CATALOG.emptyTitle}>
-                Nothing in the catalog matches {activeWords.join(', ')}.{' '}
-                <Link href="/books#browse">Clear every facet</Link> to see all{' '}
-                {snapshot.books.length.toLocaleString('en-US')} titles, or{' '}
-                <Link href="/submit">tell the archive about a title it is missing</Link>.
-              </EmptyList>
-            ) : (
-              <EmptyList title={BOOKS_CATALOG.emptyTitle}>
-                No titles are on file yet. <Link href="/submit">Tell the archive about one</Link>.
-              </EmptyList>
-            )
-          ) : (
-            <div className="ds-books-idx ds-room-idx__list" aria-labelledby="books-results-heading">
-              {view.items.map((item) => (
-                <BooksCatalogRow item={item} key={item.id} />
-              ))}
-            </div>
-          )}
-
-          {view.pagination.totalPages > 1 ? (
-            <nav className="ds-room-idx__bar" aria-label="Books catalog pages">
-              {view.pagination.previousHref ? (
-                <Link
-                  className="ds-cta ds-cta--quiet ds-cta--sm"
-                  href={`${view.pagination.previousHref}#browse`}
-                  rel="prev"
-                >
-                  Previous
-                </Link>
-              ) : null}
-              <span className="ds-room-idx__count">
-                Page {view.pagination.page} of {view.pagination.totalPages}
-              </span>
-              {view.pagination.nextHref ? (
-                <Link
-                  className="ds-cta ds-cta--quiet ds-cta--sm"
-                  href={`${view.pagination.nextHref}#browse`}
-                  rel="next"
-                >
-                  Next
-                </Link>
-              ) : null}
-            </nav>
+      {active.length > 0 ? (
+        <div className="ds-records-active">
+          <ul className="ds-records-active__chips" aria-label="Active filters">
+            {active.map((filter) => (
+              <li key={filter.key}>
+                <Chip removable href={filter.href} label={filter.label}>
+                  {filter.label}
+                </Chip>
+              </li>
+            ))}
+          </ul>
+          {/* The empty state carries its own Clear filters; one control per job. */}
+          {active.length > 1 && !empty ? (
+            <a className={buttonClassName('quiet')} href={clearHref}>
+              Clear all
+            </a>
           ) : null}
         </div>
-      </RoomSection>
+      ) : null}
+
+      {body}
+
+      <p className="ds-books-note">
+        {BOOKS_INDEX_NOTE} <Link href="/methodology">How this list is built</Link>
+      </p>
     </>
   );
 }

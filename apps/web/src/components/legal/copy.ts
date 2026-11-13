@@ -1,7 +1,6 @@
 /**
  * Presentation copy for legal landscape web components.
  */
-export const LEGAL_DISCLAIMER_TITLE = 'Not legal advice';
 export const LEGAL_DISCLAIMER_BODY =
   'BlackStory explains public laws and court decisions in plain language. This is general information, not legal advice. ' +
   'For advice about your specific situation, consult a licensed attorney or a qualified legal aid organization.';
@@ -13,9 +12,6 @@ export const LEGAL_SECTION_LABELS = {
   rightsToday: 'Your rights today',
   primarySources: 'Primary sources',
 } as const;
-
-export const LAW_BROWSE_LEDE =
-  'Statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for. Each entry is in plain language, quotes the operative text, and links to the official source it was checked against.';
 
 export const LEGAL_KIND_LABELS: Readonly<Record<string, string>> = {
   'federal-statute': 'Federal statute',

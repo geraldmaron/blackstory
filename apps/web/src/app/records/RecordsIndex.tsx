@@ -140,7 +140,7 @@ function ArrowGlyph({ direction }: { readonly direction: 'prev' | 'next' }) {
   );
 }
 
-function Outcome({
+export function Outcome({
   title,
   children,
   action,
@@ -242,9 +242,12 @@ export function RecordsIndexRoom({ model }: RecordsIndexProps) {
       filters={filters}
       sort={sortMenu(query)}
       view={{
+        label: 'Show records as',
         value: timeline ? 'timeline' : 'list',
-        listHref: indexHref,
-        timelineHref: chronologyHref,
+        options: [
+          { value: 'list', label: 'List', href: indexHref },
+          { value: 'timeline', label: 'Timeline', href: chronologyHref },
+        ],
       }}
       activeCount={filterCount}
       showLabel={`Show ${countPhrase(model.totalMatched)}`}

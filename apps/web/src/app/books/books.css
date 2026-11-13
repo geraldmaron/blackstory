@@ -1,0 +1,294 @@
+/**
+ * `/books`: the cover wall, the states view and the closing note. The toolbar, menus, active
+ * chips and outcome states are the register's (records-index.css); the cover is
+ * book-cover.css. Spacing uses the shared scale only (4, 8, 12, 16, 24, 32, 48, 72).
+ */
+
+/* An index is scanned, not read front to back: no reading-progress bar. */
+body:has(.ds-books) .ds-reading-progress {
+  display: none;
+}
+
+.ds-books {
+  --records-bar-h: 68px;
+}
+
+/* The register anchors each menu to its button by key; Author is a key it does not have. */
+.ds-records-toolbar__facet[data-key='author'] {
+  anchor-name: --records-author;
+}
+
+.ds-records-menu[data-key='author'] {
+  position-anchor: --records-author;
+}
+
+/* —— cover wall ——————————————————————————————————————————————————————————————— */
+.ds-books-wall {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--ds-space-8) var(--ds-space-6);
+  margin: 0;
+  padding: var(--ds-space-8) 0 0;
+  list-style: none;
+}
+
+.ds-books-wall__link {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-1);
+  color: var(--ds-ink);
+  text-decoration: none;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-books-wall__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-space-1);
+}
+
+.ds-books-wall__cover {
+  margin-bottom: var(--ds-space-2);
+  transition: transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-books-wall__link:hover .ds-books-wall__cover {
+  transform: translateY(calc(var(--ds-space-1) * -1));
+}
+
+.ds-books-wall__title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-body);
+  font-weight: 600;
+  line-height: 1.25rem;
+  letter-spacing: var(--ds-tracking-title);
+  overflow-wrap: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.ds-books-wall__link:hover .ds-books-wall__title {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-books-wall__states {
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  line-height: 1rem;
+}
+
+/* —— states view —————————————————————————————————————————————————————————————— */
+.ds-books-states {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: start;
+  gap: var(--ds-space-12);
+  padding-top: var(--ds-space-8);
+}
+
+.ds-books-tiles {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--records-bar-h) + var(--ds-space-6));
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  grid-template-rows: repeat(8, auto);
+  gap: var(--ds-space-1);
+}
+
+.ds-books-tiles__tile {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink-subtle);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1;
+}
+
+/* Four steps from the paper toward ink by the square root of each state's share of the busiest.
+   The code flips to paper on the two darkest steps, so every step keeps 4.5:1. */
+.ds-books-tiles__tile:not([data-step='0']) {
+  border-color: transparent;
+  color: var(--ds-ink);
+}
+
+.ds-books-tiles__tile[data-step='1'] {
+  background: color-mix(in oklab, var(--ds-ink) 14%, var(--ds-surface-raised));
+}
+
+.ds-books-tiles__tile[data-step='2'] {
+  background: color-mix(in oklab, var(--ds-ink) 32%, var(--ds-surface-raised));
+}
+
+.ds-books-tiles__tile[data-step='3'] {
+  background: color-mix(in oklab, var(--ds-ink) 64%, var(--ds-surface-raised));
+  color: var(--ds-canvas);
+}
+
+.ds-books-tiles__tile[data-step='4'] {
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+}
+
+/* The state the wall is filtered to: an outline, not a color. */
+.ds-books-tiles__tile[data-current='true'] {
+  outline: 2px solid var(--ds-ink);
+  outline-offset: 2px;
+}
+
+.ds-books-ranks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books-ranks > li {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books-ranks__row {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr) 5.5rem;
+  align-items: center;
+  gap: var(--ds-space-4);
+  min-height: 2.75rem;
+  margin-inline: calc(var(--ds-space-2) * -1);
+  padding: var(--ds-space-1) var(--ds-space-2);
+  color: var(--ds-ink);
+  font-size: var(--ds-text-body-sm);
+  text-decoration: none;
+}
+
+.ds-books-ranks__row:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-books-ranks__row:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-books-ranks__row[aria-current='true'] {
+  font-weight: 700;
+}
+
+.ds-books-ranks__name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-books-ranks__row:hover .ds-books-ranks__name {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-books-ranks__bar {
+  height: var(--ds-space-2);
+}
+
+.ds-books-ranks__bar > span {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  background: var(--ds-ink-muted);
+}
+
+.ds-books-ranks__row:hover .ds-books-ranks__bar > span,
+.ds-books-ranks__row[aria-current='true'] .ds-books-ranks__bar > span {
+  background: var(--ds-ink);
+}
+
+.ds-books-ranks__count {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.ds-books-note {
+  max-width: var(--ds-width-read);
+  margin: var(--ds-space-12) 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+}
+
+/* —— narrower ————————————————————————————————————————————————————————————————— */
+@media (max-width: 79.9375rem) {
+  .ds-books-wall {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 63.9375rem) {
+  .ds-books-wall {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .ds-books-states {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-8);
+  }
+
+  .ds-books-tiles {
+    position: static;
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-books .ds-page-header {
+    padding-block: var(--ds-space-8) var(--ds-space-4);
+  }
+
+  .ds-books-wall {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-space-6) var(--ds-space-4);
+    padding-top: var(--ds-space-6);
+  }
+
+  /* Eleven columns of tiles shrink past reading at phone width; the ranked list says it all. */
+  .ds-books-tiles {
+    display: none;
+  }
+
+  /* With no figure beside it, the toolbar's rule already tops the list. */
+  .ds-books-ranks {
+    border-top: 0;
+  }
+
+  .ds-books-states {
+    padding-top: var(--ds-space-2);
+  }
+
+  .ds-books-ranks__row {
+    grid-template-columns: 7.5rem minmax(0, 1fr) 4.5rem;
+    gap: var(--ds-space-3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-books-wall__cover {
+    transition: none;
+  }
+
+  .ds-books-wall__link:hover .ds-books-wall__cover {
+    transform: none;
+  }
+}
+
+/* The wait: a blank cover frame keeps its 2:3 under the register's placeholder pulse. */
+.ds-books-wall__cover.ds-records-wait {
+  display: block;
+  height: auto;
+  width: 100%;
+}

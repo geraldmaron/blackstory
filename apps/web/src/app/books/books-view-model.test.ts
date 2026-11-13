@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getBannedBooksListingSnapshot } from '../../data/banned-books-seed';
 import {
-  BOOKS_BROWSE_PAGE_SIZE,
+  BOOKS_SORT_PRESETS,
+  buildBooksBrowseHref,
   buildBooksBrowseViewModel,
   buildBooksDetailViewModel,
   buildBooksRelatedItems,
@@ -30,7 +31,9 @@ test('buildBooksBrowseViewModel returns all seed entries by default', () => {
   assert.equal(view.totalMatched, 77);
   assert.equal(view.state, 'all');
   assert.equal(view.author, 'all');
-  assert.equal(view.items.length, Math.min(BOOKS_BROWSE_PAGE_SIZE, view.totalMatched));
+  // The whole catalog is one page: the wall shows every title.
+  assert.equal(view.items.length, view.totalMatched);
+  assert.equal(view.view, 'covers');
 });
 
 test('buildBooksBrowseViewModel filters by q on title', () => {
@@ -109,9 +112,7 @@ test('buildBooksBrowseViewModel defaults to title ascending', () => {
     left.localeCompare(right, undefined, { sensitivity: 'base' }),
   );
   assert.deepEqual(titles, sorted);
-  const titleOpt = view.sortOptions.find((option) => option.key === 'title');
-  assert.equal(titleOpt?.ariaSort, 'ascending');
-  assert.match(titleOpt?.href ?? '', /dir=desc/);
+  assert.equal(view.sortLabel, 'Title, A to Z');
 });
 
 test('buildBooksBrowseViewModel sorts by author descending', () => {
@@ -132,44 +133,68 @@ test('buildBooksBrowseViewModel sorts by citation count', () => {
   }
 });
 
-test('sort option hrefs preserve active filters and reset page', () => {
-  const view = buildBooksBrowseViewModel(SNAPSHOT, {
-    q: 'eye',
-    state: 'FL',
-    author: 'Toni Morrison',
-    sort: 'year',
-    dir: 'asc',
-    page: '2',
-  });
-  const yearOpt = view.sortOptions.find((option) => option.key === 'year');
-  assert.ok(yearOpt);
-  assert.match(yearOpt.href, /q=eye/);
-  assert.match(yearOpt.href, /state=FL/);
-  assert.match(yearOpt.href, /author=Toni(\+|%20)Morrison/);
-  assert.match(yearOpt.href, /dir=desc/);
-  assert.doesNotMatch(yearOpt.href, /page=/);
+test('every sort preset is a real order, and an order only an old link carries still reads', () => {
+  for (const preset of BOOKS_SORT_PRESETS) {
+    const view = buildBooksBrowseViewModel(SNAPSHOT, { sort: preset.sort, dir: preset.dir });
+    assert.equal(view.sortLabel, preset.label);
+  }
+  assert.equal(
+    buildBooksBrowseViewModel(SNAPSHOT, { sort: 'title', dir: 'desc' }).sortLabel,
+    'Title, descending',
+  );
 });
 
-test('buildBooksBrowseViewModel paginates results', () => {
-  const page1 = buildBooksBrowseViewModel(SNAPSHOT, {});
-  assert.equal(page1.page, 1);
-  assert.equal(page1.items.length, BOOKS_BROWSE_PAGE_SIZE);
-  assert.ok(page1.pagination.totalPages >= 2);
-  assert.equal(page1.pagination.previousHref, undefined);
-  assert.ok(page1.pagination.nextHref);
-
-  const page2 = buildBooksBrowseViewModel(SNAPSHOT, { page: '2' });
-  assert.equal(page2.page, 2);
-  assert.ok(page2.items.length >= 1);
-  assert.notEqual(page2.items[0]?.id, page1.items[0]?.id);
-  assert.ok(page2.pagination.previousHref);
-  assert.match(page2.pagination.previousHref ?? '', /\/books$/);
+test('the browse href keeps every narrowing and the view, and drops defaults', () => {
+  assert.equal(
+    buildBooksBrowseHref({
+      q: 'x',
+      state: 'FL',
+      author: 'Toni Morrison',
+      sort: 'year',
+      dir: 'desc',
+      view: 'states',
+    }),
+    '/books?q=x&state=FL&author=Toni+Morrison&sort=year&dir=desc&view=states',
+  );
+  assert.equal(
+    buildBooksBrowseHref({ q: '', state: 'all', author: 'all', sort: 'title', dir: 'asc' }),
+    '/books',
+  );
 });
 
-test('buildBooksBrowseViewModel clamps out-of-range pages', () => {
-  const view = buildBooksBrowseViewModel(SNAPSHOT, { page: '999' });
-  assert.equal(view.page, view.pagination.totalPages);
-  assert.equal(view.pagination.nextHref, undefined);
+test('state counts are counted within search and author, not narrowed by the state itself', () => {
+  const all = buildBooksBrowseViewModel(SNAPSHOT, {});
+  const florida = buildBooksBrowseViewModel(SNAPSHOT, { state: 'FL', view: 'states' });
+  assert.equal(florida.view, 'states');
+  assert.deepEqual(florida.stateCounts, all.stateCounts);
+  const fl = all.stateCounts.find((entry) => entry.code === 'FL');
+  assert.equal(fl?.count, florida.totalMatched, 'a state count is what its link shows');
+  for (let i = 1; i < all.stateCounts.length; i += 1) {
+    assert.ok(all.stateCounts[i - 1]!.count >= all.stateCounts[i]!.count);
+  }
+  const morrison = buildBooksBrowseViewModel(SNAPSHOT, { author: 'Toni Morrison' });
+  const sum = morrison.stateCounts.reduce((total, entry) => total + entry.count, 0);
+  assert.equal(
+    sum,
+    morrison.items.reduce((total, item) => total + item.states.length, 0),
+  );
+});
+
+test('every state on the tile grid is a real USPS code, at its own square', async () => {
+  const { STATE_TILES } = await import('./state-tiles');
+  const { US_STATES } = await import('@repo/domain/map/geography');
+  const codes = new Set(US_STATES.map((state) => state.postalCode));
+  const squares = new Set<string>();
+  for (const [code, [row, column]] of Object.entries(STATE_TILES)) {
+    assert.ok(codes.has(code), `${code} is not a state code`);
+    assert.ok(row >= 0 && row < 8 && column >= 0 && column < 11);
+    squares.add(`${row},${column}`);
+  }
+  assert.equal(Object.keys(STATE_TILES).length, 51);
+  assert.equal(squares.size, 51, 'two states share a square');
+  for (const entry of buildBooksBrowseViewModel(SNAPSHOT, {}).stateCounts) {
+    assert.ok(STATE_TILES[entry.code], `${entry.code} has no tile`);
+  }
 });
 
 test('buildBooksDetailViewModel resolves a known slug', () => {

@@ -1,0 +1,277 @@
+/**
+ * `/law`: the time axis, the era groups and the chronology rows. The toolbar, menus, active
+ * chips and outcome states are the register's (records-index.css). Spacing uses the shared
+ * scale only (4, 8, 12, 16, 24, 32, 48, 72).
+ */
+
+/* An index is scanned, not read front to back: no reading-progress bar. */
+body:has(.ds-law) .ds-reading-progress {
+  display: none;
+}
+
+.ds-law {
+  /* Records' toolbar height, which sticky era headings and jump targets clear. */
+  --records-bar-h: 68px;
+}
+
+/* —— time axis ———————————————————————————————————————————————————————————— */
+.ds-law-axis {
+  padding-top: var(--ds-space-8);
+}
+
+.ds-law-axis__track {
+  position: relative;
+  height: 4.5rem;
+  /* Room for the end tick labels, so they never overhang the gutter. */
+  margin-inline: var(--ds-space-6);
+}
+
+/* The baseline every mark stands on. */
+.ds-law-axis__track::before {
+  content: '';
+  position: absolute;
+  right: calc(var(--ds-space-6) * -1);
+  bottom: var(--ds-space-6);
+  left: calc(var(--ds-space-6) * -1);
+  height: var(--ds-border-width);
+  background: var(--ds-border-strong);
+}
+
+.ds-law-axis__mark {
+  position: absolute;
+  bottom: calc(var(--ds-space-6) + var(--ds-border-width) + var(--law-stack, 0) * 1.75rem);
+  width: 3px;
+  height: 1.5rem;
+  background: var(--ds-ink);
+  transform: translateX(-50%);
+}
+
+.ds-law-axis__tick {
+  position: absolute;
+  bottom: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: 1rem;
+  transform: translateX(-50%);
+}
+
+/* A short tick up to the baseline. */
+.ds-law-axis__tick::before {
+  content: '';
+  position: absolute;
+  bottom: calc(1rem + var(--ds-space-1));
+  left: 50%;
+  width: var(--ds-border-width);
+  height: var(--ds-space-1);
+  background: var(--ds-border-strong);
+}
+
+/* —— era groups ————————————————————————————————————————————————————————————— */
+.ds-law-era__title {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--records-bar-h));
+  z-index: 1; /* local: above the rows it scrolls over, under the sticky toolbar */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: var(--ds-space-12) 0 0;
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-canvas);
+  font-family: var(--ds-font-display);
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
+  scroll-margin-top: calc(var(--ds-island-clearance) + var(--records-bar-h));
+}
+
+/* The axis already sits a step below the toolbar; the first era follows it one step closer. */
+.ds-law-axis + .ds-law-era .ds-law-era__title {
+  margin-top: var(--ds-space-8);
+}
+
+.ds-law-era__span {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 400;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* —— rows ————————————————————————————————————————————————————————————————————— */
+.ds-law-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The flat A to Z list has no era heading above it to draw its top rule. */
+.ds-law-axis + .ds-law-list,
+.ds-records-active + .ds-law-list,
+.ds-records-toolbar + .ds-law-list {
+  margin-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-law-row {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-law-row__link {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr) minmax(6rem, auto);
+  grid-template-areas:
+    'year name where'
+    '. gloss gloss';
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-6);
+  margin-inline: calc(var(--ds-space-2) * -1);
+  padding: var(--ds-space-4) var(--ds-space-2);
+  color: var(--ds-ink);
+  text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-law-row__link:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-law-row__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-law-row__year {
+  grid-area: year;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-law-row__name {
+  grid-area: name;
+  min-width: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.5rem;
+  letter-spacing: var(--ds-tracking-title);
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+.ds-law-row__link:hover .ds-law-row__name {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-law-row__where {
+  grid-area: where;
+  justify-self: end;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  white-space: nowrap;
+}
+
+.ds-law-row__gloss {
+  grid-area: gloss;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.25rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-law-note {
+  max-width: var(--ds-width-read);
+  margin: var(--ds-space-8) 0 var(--ds-space-12);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+}
+
+/* —— phone ———————————————————————————————————————————————————————————————————— */
+@media (max-width: 47.9375rem) {
+  .ds-law .ds-page-header {
+    padding-block: var(--ds-space-8) var(--ds-space-4);
+  }
+
+  .ds-law-axis {
+    padding-top: var(--ds-space-6);
+  }
+
+  .ds-law-axis__track {
+    height: 4rem;
+    margin-inline: var(--ds-space-4);
+  }
+
+  .ds-law-axis__track::before {
+    right: calc(var(--ds-space-4) * -1);
+    left: calc(var(--ds-space-4) * -1);
+  }
+
+  .ds-law-axis__mark {
+    width: 2px;
+    height: 1.25rem;
+  }
+
+  .ds-law-axis__tick--minor {
+    display: none;
+  }
+
+  .ds-law-era__title {
+    margin-top: var(--ds-space-8);
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+  }
+
+  .ds-law-row__link {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'year where'
+      'name name'
+      'gloss gloss';
+    padding-block: var(--ds-space-3);
+  }
+
+  .ds-law-row__year {
+    font-size: var(--ds-text-caption);
+  }
+
+  .ds-law-row__where {
+    font-size: var(--ds-text-caption);
+  }
+
+  .ds-law-row__gloss {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* Each era that holds entries, as a band under the baseline. */
+.ds-law-axis__band {
+  position: absolute;
+  bottom: calc(var(--ds-space-6) - 3px);
+  height: 3px;
+  background: var(--ds-ink-subtle);
+}
+
+.ds-law-list--waiting {
+  margin-top: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-law-list--waiting .ds-law-row__link:hover {
+  background: none;
+}

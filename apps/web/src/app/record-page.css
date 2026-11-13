@@ -507,8 +507,8 @@ a.ds-evidence__title:hover,
   margin: 0;
 }
 
-/* A cover that fails to load leaves no initials plate behind. */
-.ds-recpage .ds-books-edition__cover--placeholder {
+/* A cover that fails to load leaves no typeset stand-in behind on the record page. */
+.ds-recpage .ds-book-cover--typeset {
   display: none;
 }
 

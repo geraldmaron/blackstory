@@ -24,9 +24,10 @@ describe('/rooms · the room renders without JavaScript', () => {
     assert.doesNotMatch(pageSource, /onClick=/);
   });
 
-  it('cards come from the registry rather than being written out here', () => {
+  it('rows come from the registry rather than being written out here', () => {
     assert.match(pageSource, /destinationsInGroup\(group\)/);
-    assert.match(pageSource, /DestinationIcon/);
+    // A plain ruled index: no cards, and no internal surface-class tags shown to readers.
+    assert.doesNotMatch(pageSource, /RoomCard|CardGrid|RoomSection|classLabelFor/);
     // A hand-written card is the failure this room exists to prevent, so the room must not
     // contain a literal href for any of the routes it lists.
     for (const group of ROOMS_CARD_GROUPS) {
@@ -34,7 +35,7 @@ describe('/rooms · the room renders without JavaScript', () => {
         assert.doesNotMatch(
           pageSource,
           new RegExp(`href="${destination.path}"`),
-          `${destination.path} is hand-linked in the rooms hub; it should come from the registry`,
+          `${destination.path} is hand-linked in the rooms index; it should come from the registry`,
         );
       }
     }

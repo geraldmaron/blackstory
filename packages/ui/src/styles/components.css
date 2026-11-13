@@ -711,11 +711,18 @@ span.ds-tabs__tab {
   max-width: var(--ds-width-read);
 }
 
+/* A 44px target that keeps its 20px line's place: the negative block margin gives back the
+   extra height, so the title does not move. */
 .ds-page-header__crumb {
+  display: inline-flex;
+  align-items: center;
   justify-self: start;
+  min-height: 2.75rem;
+  margin-block: -0.75rem;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
+  line-height: 1.25rem;
   text-decoration: none;
 }
 
