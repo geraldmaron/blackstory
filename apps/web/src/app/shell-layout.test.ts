@@ -137,8 +137,15 @@ describe('horizontal overflow guards', () => {
       assert.doesNotMatch(source, /min\(\s*\d+vw/);
     }
     // The column and the histogram dock are inset from the viewport edges, never sized to it.
-    assert.match(columnCss, /\.ds-xcol\s*\{[^}]*left:\s*0;[^}]*width:\s*var\(--ds-xcol-w\)/s);
-    assert.match(columnCss, /\.ds-xdock\s*\{[^}]*right:\s*0;[^}]*left:\s*var\(--ds-xcol-w\)/s);
+    // Both float one gutter in from the edges.
+    assert.match(
+      columnCss,
+      /\.ds-xcol\s*\{[^}]*left:\s*var\(--ds-xfloat[^}]*width:\s*var\(--ds-xcol-w\)/s,
+    );
+    assert.match(
+      columnCss,
+      /\.ds-xdock\s*\{[^}]*right:\s*var\(--ds-xfloat\)[^}]*left:\s*calc\(var\(--ds-xcol-w\)/s,
+    );
   });
 
   it('Explore chrome is matte surface, not shop blur or elevation', () => {

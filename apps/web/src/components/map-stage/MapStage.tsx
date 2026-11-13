@@ -1467,11 +1467,17 @@ export function MapStageProvider({
       }
 
       /** A place token opens its place: the camera closes in to the next level, and the surface
-       * (Explore) scopes its list to the place. Never opens a record. */
+       * (Explore) scopes its list to the place. Never opens a record. A surface that listens for
+       * `placeSelect` owns the move (it knows the chrome the place must clear); otherwise the
+       * stage closes in itself. */
       function drillIntoPlace(
         hit: Extract<NonNullable<ReturnType<typeof pointerHitAt>>, { kind: 'place' }>,
       ): void {
         notify(listenersRef.current, 'deselect');
+        if (listenersRef.current.placeSelect.size > 0) {
+          notify(listenersRef.current, 'placeSelect', hit.placeKey);
+          return;
+        }
         const [west, south, east, north] = hit.bounds;
         const framed = activeMap.cameraForBounds(
           [

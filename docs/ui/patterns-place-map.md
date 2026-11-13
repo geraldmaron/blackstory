@@ -1,7 +1,7 @@
 # Place map (Explore)
 
 **Status:** binding for how `/explore` groups records on the map, and for the home Door, which paints the same plate. Supersedes the pixel clustering the older `patterns-map-entity-encoding.md` described. That doc now covers point marks by precision only.
-**Code:** `packages/domain/src/map/place-groups.ts` (the rules, shared by web and mobile), `apps/web/src/lib/map-experience/place-map.ts` (the web adapter), `apps/web/src/app/map/explore-style.ts` (layers), `apps/web/src/components/map-stage/place-labels.ts` (the names in the house type), `apps/web/src/components/map-stage/MapStage.tsx` (token tap), `apps/web/src/app/explore/hooks/use-place-scope.ts` (list scoping).
+**Code:** `packages/domain/src/map/place-groups.ts` (the rules, shared by web and mobile), `apps/web/src/lib/map-experience/place-map.ts` (the web adapter), `apps/web/src/app/map/explore-style.ts` (layers), `apps/web/src/components/map-stage/place-labels.ts` (the names in the house type), `apps/web/src/components/map-stage/MapStage.tsx` (token tap), `apps/web/src/app/explore/hooks/use-place-scope.ts` (list scoping and Back/Forward), `apps/web/src/app/explore/hooks/use-place-focus.ts` (the entered place's outline and veil), `apps/web/src/components/map-experience/explore-column.css` (the floating chrome).
 
 ---
 
@@ -24,9 +24,22 @@ Three promises follow:
 | State | 0 | 6 | National and regional views |
 | County | 6 | 8 | One state |
 | City | 8 | 11 | One metro area |
-| Site | 11 | map maximum | A city's streets |
+| Square | 11 | 14 | A city's districts |
+| Site | 14 | map maximum (14) | A city's streets |
 
-The thresholds are integers on purpose. MapLibre evaluates zoom inside a layer filter at integer zoom levels only, so a fractional threshold would not hold. County starts at 6 because that is where the state labels hand off to county names (`STATE_LABEL_FADE_END_ZOOM` 6.2, `COUNTY_LABELS_MIN_ZOOM` 6.2), and because a thousand county tokens at a zoom-5 multi-state frame read as noise. Sites start at 11, one step past the zoom a city-precision record frames at (10), so a framed city never shows street-level dots before the reader asks for them.
+The thresholds are integers on purpose. MapLibre evaluates zoom inside a layer filter at integer zoom levels only, so a fractional threshold would not hold. County starts at 6 because that is where the state labels hand off to county names (`STATE_LABEL_FADE_END_ZOOM` 6.2, `COUNTY_LABELS_MIN_ZOOM` 6.2), and because a thousand county tokens at a zoom-5 multi-state frame read as noise. Squares start at 11, one step past the zoom a city-precision record frames at (10), so a framed city never shows street-level dots before the reader asks for them. A site alone in its square draws as its own dot from 11; sites that share a square draw from 14, the map's street zoom.
+
+### Grid squares (city density)
+
+At city framing a dense city used to draw every site at once: Washington's 272 exact sites read as about 300 stacked dots. Between the city and the street, site-precision records are now counted in **grid squares**: a fixed, global grid of `SQUARE_STEP_DEG` (0.02 degrees of latitude and longitude, about 2.2 km north to south, 58px at zoom 11). The rule:
+
+1. A site-precision record's square is the grid cell its public point falls in (`squareKey`: column and row counted from 180W and 90S).
+2. A square that holds two or more sites is a place: a count tab at the square's fixed center, from zoom 11 to 14. A square holding one site is not a place; that site draws as its own dot from 11.
+3. Only site-precision records enter squares. City-, county- and state-precision records stay in their city, county or state token at these zooms, so nothing is drawn sharper than stored precision.
+4. Every record is counted once at every zoom: the square level's tokens plus the lone sites add up to the whole set (`place-groups.test.ts`).
+5. The grid never moves with the frame or with the filters, so a square's key and members are stable. Whether a square has two members is read from the records on the map, so a filter can turn a square of two into one dot.
+
+A square has no name of its own on the plate (its tab sits among named streets); the column calls it "A square in Washington, DC", naming the city, county or state of its first member. City anchors round to the even hundredths of a degree and square centers sit on the odd hundredths, so a city's tab and a square's tab never stack.
 
 ---
 
@@ -57,7 +70,8 @@ A token sits at a canonical anchor for its place, never at one record's point.
 
 - **State:** the state label point (`state-labels.ts`).
 - **County:** the middle of the bounding box of the county's largest polygon in `public/geo/us-counties-20m.geojson`.
-- **City:** the median of the city's city-scale records (the geocoded city point they share), or of all its records when none are city-scale, rounded to two decimal places (about a kilometer). Rounding keeps a one-record city from putting its token on a street address.
+- **City:** the median of the city's city-scale records (the geocoded city point they share), or of all its records when none are city-scale, rounded to the even hundredths of a degree (about two kilometers). Rounding keeps a one-record city from putting its token on a street address.
+- **Square:** the square's own center, a fixed grid point, never a record's point.
 
 Until the county geometry loads (it is fetched from zoom 4), the county level falls back to state tokens; the plate regroups when the geometry arrives.
 
@@ -113,9 +127,13 @@ Values live in `mapPalettes` (`packages/ui/src/tokens/colors.ts`, mirrored as `-
 
 Map glyphs cannot set Schibsted or Geist Mono, so the names are DOM (`components/map-stage/place-labels.ts`). MapLibre still does the cartography: the count, name and site-name symbol layers are invisible and only place their text. Every frame the DOM layer prints exactly the symbols MapLibre placed, at the same anchor. Collision, the always-drawn count, hit testing and the place tap all stay on the map layers, so the labels take no pointer event and the canvas behaves as before. Counts sit above names in the style, so in MapLibre's top-down placement every count claims its tab before any name is placed.
 
+### The chrome floats on the plate
+
+The map runs full bleed under the whole viewport; the header stays a solid bar for legibility, since the brand bans the blur that would let the plate show through it. Every other piece of chrome is a plate of the table's own ground (`data-ground="ink"`): ink on the night atlas, the paper table on the day one. The 380px column sits one 12px gutter (`--ds-xfloat`) in from the left, top and bottom; the decade histogram floats along the bottom beside it; the zoom and locate stack sits above the histogram. Each is separated from the map by the gutter, a 14px radius and one hairline, never by a cast shadow. The attribution sits on the map just inside the column and above the histogram. On a phone the column is the same ground as a bottom sheet with a 28px top radius. `chromePadding` mirrors this geometry so a framed place lands in the map the reader can see.
+
 ### Motion
 
-- A token tap eases the camera into the place's frame (420ms, never short of the next level) and scopes the list. The column then names the place the way the plate does: the level in a copper tab, the place in the display face, the precision mix in one plain sentence.
+- Entering a place is the one authored move (above).
 - Labels fade in on the duration tokens as places regroup by zoom; reduced motion collapses them to a cut.
 
 ### Known limits
@@ -127,7 +145,7 @@ Map glyphs cannot set Schibsted or Geist Mono, so the names are DOM (`components
 
 ## Coincident sites
 
-Site dots that share one stored coordinate spread on a Fermat spiral around it, ordered by record id so the layout is the same on every render. The step is 14px at zoom 11 and widens as the reader zooms in. A thin ink leader runs from each spread dot back to the stored point. The stored coordinate is never changed, and the spread never implies a sharper location than the record holds: only site-precision records spread, and only around a point the archive already publishes.
+Site dots that share one stored coordinate spread on a Fermat spiral around it, ordered by record id so the layout is the same on every render. Coincident sites always share a grid square, so they spread only from zoom 14, where the step is about 28px on the 512px world. A thin ink leader runs from each spread dot back to the stored point. The stored coordinate is never changed, and the spread never implies a sharper location than the record holds: only site-precision records spread, and only around a point the archive already publishes.
 
 City-scale records do not spread. They stay counted in their city token, because a ring of 80 rings around a city centroid would suggest 80 locations the archive does not have.
 
@@ -135,10 +153,22 @@ City-scale records do not spread. They stay counted in their city token, because
 
 ## Interaction and the URL
 
-- **Tap a token:** the camera frames the place's records, never short of the next level's first zoom, so one tap always goes one level deeper. The stage fires `placeSelect`.
-- **`?place=<key>`:** the address of a place. Keys are `state-<postal>`, `county-<5-digit FIPS>` and `city-<postal>-<slug>` (pattern `PLACE_KEY_PATTERN`). A shared link frames the place on arrival.
-- **List scoping:** with a place selected, the list column and the map both show exactly that place's records, inside whatever filters are on. A chip names the place and clears it. A note above the list states the precision mix in words.
+- **Tap a token:** the stage fires `placeSelect` and Explore enters the place (below). On a surface that does not listen for `placeSelect`, the stage closes in on its own, never short of the next level.
+- **`?place=<key>`:** the address of a place. Keys are `state-<postal>`, `county-<5-digit FIPS>` `city-<postal>-<slug>` and `square-<column>-<row>` (pattern `PLACE_KEY_PATTERN`). A shared link enters the place on arrival.
+- **List scoping:** with a place selected, the list column and the map both show exactly that place's records, inside whatever filters are on. A chip names the place and clears it. The column heads the list with the places that hold it (a trail of buttons back up: "District of Columbia / Washington"), the level in a copper tab, the place in the display face, and the precision mix in words.
 - **Clear:** the chip, or Clear all.
+- **History:** entering or leaving a place pushes a history entry (`useExploreUrlSync`); every other lens edit replaces the current one. Back and Forward walk the places the reader entered and re-enter each one.
+
+### Entering a place
+
+Every way into a place (a token tap, a `?place=` link, a trail step, Back or Forward) runs one move:
+
+1. The column swaps to the place's header and records at once, the header rising into place from already visible. The list is usable before the camera lands.
+2. The camera flies to the place in the map the chrome leaves visible (`chromePadding`), in 700ms, never short of the next level's first zoom and never more than two levels past it. Reduced motion cuts.
+3. The place resolves on the plate: its outline in copper (a state or county is its own polygon, a city its records' extent with a 0.01 degree margin, a square its square), and everything outside recedes under a flat veil of the plate's water color at 55% (ink on the night atlas, stone sand on the day one). No gradient, glow or blur.
+4. Only the place's records are on the map, so the other places' tokens are gone, not dimmed.
+
+Leaving the place reverses it: the veil and outline fade, and the camera flies back to the frame the reader entered from (or to the country, after a cold link).
 
 ---
 
@@ -165,3 +195,5 @@ Color is never the only signal. Token counts and names are text, the precision m
 3. **Mobile.** `apps/mobile` still uses its own clustering (`features/explore/clustering.ts`). The rules live in `@repo/domain/map/place-groups` so mobile can adopt them with its own county lookup.
 4. **Record embeds.** `RecordMap` still shows one record with no neighbors (it runs ungrouped).
 5. **Spread-site flag.** The selection flag on a spread site sits at the stored point, not at the spread dot.
+6. **Square names.** A square is named by its city, not its neighborhood. Records carry no neighborhood field (the jurisdiction label names a city at most), so a period neighborhood name would have to come from the gazetteer above.
+7. **Square at small widths.** A square fits the free map at zoom 14 on a laptop; on a tablet in portrait or a phone the camera still lands at 14 and the square's outline runs past the frame.

@@ -16,7 +16,12 @@ void React;
 export function AtlasPending() {
   return (
     <div className="ds-atlas" role="status" aria-live="polite">
-      <aside className="ds-xcol ds-xcol--pending" aria-label="Records on the map" aria-busy="true">
+      <aside
+        className="ds-xcol ds-xcol--pending"
+        data-ground="ink"
+        aria-label="Records on the map"
+        aria-busy="true"
+      >
         <div className="ds-xcol__head">
           <h2 className="ds-xcol__count">Loading records</h2>
         </div>

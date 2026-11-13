@@ -1,7 +1,7 @@
 /**
  * The Explore column: the one panel on the map.
  *
- * Wide screens: flush to the left edge under the header, 380px, full height. Phones: the same
+ * Wide screens: a 380px plate floating one gutter in from the left, top and bottom. Phones: the same
  * element is a bottom sheet over a full-screen map, with three heights (peek shows the count and
  * the top row, half, full) that a drag on its top edge moves between. The header carries the only
  * record count on the page; what sits under it (filters and list, list, or the inspector) is the
@@ -137,7 +137,7 @@ export function ExploreColumn({
     <aside
       ref={rootRef}
       className={cx('ds-xcol', sheet && 'ds-xcol--sheet')}
-      data-ground="paper"
+      data-ground="ink"
       aria-label="Records on the map"
       aria-busy={busy || undefined}
       data-view={view}

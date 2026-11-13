@@ -1,8 +1,10 @@
 /*
- * The Explore layout (ExploreColumn.tsx, AtlasExperience.tsx): a full-canvas map, one flush
- * 380px column on the left (a PAPER sheet on the ink table, `data-ground="paper"`, its page bands
- * on its inner edge against the map), the decade histogram docked on the map's bottom edge, and the zoom
- * and locate stack bottom-right. Below 768px the column is a bottom sheet over the map.
+ * The Explore layout (ExploreColumn.tsx, AtlasExperience.tsx): the map runs full bleed under the
+ * whole viewport, and the chrome floats on it as plates of the table's own ground
+ * (`data-ground="ink"`: the night atlas's ink in the dark theme, the paper table in the light one).
+ * A 380px column inset from the left edge, the decade histogram inset along the bottom, and the
+ * zoom and locate stack bottom-right, each separated from the map by the gutter and one hairline,
+ * never by blur or a cast shadow. Below 768px the column is a bottom sheet of the same ground.
  *
  * `--ds-xcol-detent-h` (set on `.ds-atlas` by AtlasExperience) is the sheet's resting height, so
  * the controls and the attribution can sit on top of it. `--ds-xcol-sheet-h` is the live height
@@ -10,24 +12,24 @@
  */
 .ds-atlas {
   --ds-xcol-w: 380px;
+  /* The gutter every floating plate keeps from the viewport edge and from its neighbors. */
+  --ds-xfloat: var(--ds-space-3);
 }
 
 /* —— The column ——————————————————————————————————————————————————————————————— */
 .ds-xcol {
   position: fixed;
-  top: var(--ds-island-clearance);
-  bottom: 0;
-  left: 0;
+  top: calc(var(--ds-island-clearance) + var(--ds-xfloat, 12px));
+  bottom: var(--ds-xfloat, 12px);
+  left: var(--ds-xfloat, 12px);
   z-index: var(--ds-z-atlas-instruments);
   display: flex;
   flex-direction: column;
   width: var(--ds-xcol-w);
-  padding-right: calc(var(--ds-band-w) * 3);
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
   background: var(--ds-canvas);
-  box-shadow:
-    inset calc(var(--ds-band-w) * -1) 0 0 var(--ds-band-1),
-    inset calc(var(--ds-band-w) * -2) 0 0 var(--ds-band-2),
-    inset calc(var(--ds-band-w) * -3) 0 0 var(--ds-band-3);
   color: var(--ds-ink);
   pointer-events: auto;
 }
@@ -167,8 +169,10 @@
   white-space: nowrap;
 }
 
-/* The place the map scoped the list to, named the way the plate names it: the level in a copper
-   tab, the place in the display face, the precision mix in a plain sentence under it. */
+/* The place the map scoped the list to, named the way the plate names it: the trail of places
+   that hold it, the level in a copper tab, the place in the display face at the column's largest
+   size, the precision mix in a plain sentence under it. It enters with the camera's flight (keyed
+   on the place in AtlasExperience), from already visible: the list under it is usable at once. */
 .ds-xcol[data-view='filters'] .ds-xcol__place {
   display: none;
 }
@@ -177,21 +181,75 @@
   flex: none;
   display: grid;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-5);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  animation: ds-xcol-place-in var(--ds-duration-slow, 320ms) var(--ds-ease-entrance) both;
+}
+
+.ds-xcol__trail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: calc(var(--ds-space-2) * -1) 0 0 calc(var(--ds-space-2) * -1);
+}
+
+.ds-xcol__trail-step {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--ds-space-2);
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* A slash between steps, drawn, not typed into the label a screen reader reads. */
+.ds-xcol__trail-step + .ds-xcol__trail-step::before {
+  content: '';
+  width: 1px;
+  height: 12px;
+  margin: 0 var(--ds-space-3) 0 calc(var(--ds-space-2) * -1);
+  background: var(--ds-rule);
+  rotate: 20deg;
+}
+
+.ds-xcol__trail-step:hover {
+  color: var(--ds-ink);
+  text-decoration: underline 1.5px var(--ds-accent-graphic);
+  text-underline-offset: 3px;
+}
+
+.ds-xcol__trail-step:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+@media (pointer: coarse) {
+  .ds-xcol__trail-step {
+    min-height: 44px;
+  }
 }
 
 .ds-xcol__place-name {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-2);
   margin: 0;
+}
+
+.ds-xcol__place-title {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
+  font-size: var(--ds-text-display-3);
   font-weight: 650;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .ds-xcol__place-level {
@@ -209,11 +267,19 @@
 }
 
 .ds-xcol__place-mix {
+  max-width: 34ch;
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
+  font-size: var(--ds-text-body-sm);
   line-height: 1.45;
+}
+
+@keyframes ds-xcol-place-in {
+  from {
+    opacity: 0.35;
+    translate: 0 10px;
+  }
 }
 
 /* Loading: rule-separated placeholder rows in the list's own geometry. */
@@ -258,19 +324,21 @@
    the light one. Its bars and brushed range take their colors from that ground. */
 .ds-xdock {
   position: fixed;
-  right: 0;
-  bottom: 0;
-  left: var(--ds-xcol-w);
+  right: var(--ds-xfloat);
+  bottom: var(--ds-xfloat);
+  left: calc(var(--ds-xcol-w) + var(--ds-xfloat) * 2);
   z-index: var(--ds-z-atlas-instruments);
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
   background: var(--ds-canvas);
-  box-shadow: inset 0 var(--ds-border-width) 0 var(--ds-ground-edge);
   pointer-events: auto;
 }
 
-/* —— Attribution: one collapsed "i", in the map's bottom-left corner ———————— */
+/* —— Attribution: one collapsed "i", on the map just inside the column and above the dock —— */
 body:has(.ds-atlas .ds-xcol) {
-  --ds-map-attrib-left: calc(var(--ds-xcol-w, 380px) + var(--ds-space-3));
-  --ds-map-attrib-bottom: calc(56px + var(--ds-space-3));
+  --ds-map-attrib-left: calc(var(--ds-xcol-w, 380px) + var(--ds-space-3) * 2);
+  --ds-map-attrib-bottom: calc(56px + var(--ds-space-3) * 3);
 }
 
 /* —— Phone: full-screen map, one bottom sheet ——————————————————————————————— */
@@ -280,11 +348,10 @@ body:has(.ds-atlas .ds-xcol) {
     right: 0;
     bottom: var(--ds-tabbar-h);
     width: auto;
+    left: 0;
     height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 176px));
-    padding-right: 0;
-    border-top: var(--ds-border-width) solid var(--ds-material-ink);
-    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
-    box-shadow: none;
+    border-width: var(--ds-border-width) 0 0;
+    border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
     transition: height var(--ds-duration-base) var(--ds-ease-entrance);
   }
 
@@ -328,8 +395,15 @@ body:has(.ds-atlas .ds-xcol) {
 
   /* At peek the sheet shows its count and the top row; nothing scrolls under a finger. */
   .ds-xcol--sheet[data-detent='peek'] .ds-xcol__echoes,
-  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__note {
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__note,
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__trail,
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__place-mix {
     display: none;
+  }
+
+  /* At peek a selected place takes the top row's place: its level and name are what show. */
+  .ds-xcol--sheet .ds-xcol__place {
+    padding-block: var(--ds-space-3) var(--ds-space-4);
   }
 
   /* Inside Filters on a phone the range reads above its bars, never truncated beside them. */
@@ -357,7 +431,8 @@ body:has(.ds-atlas .ds-xcol) {
     transition: none;
   }
 
-  .ds-xcol__loading span {
+  .ds-xcol__loading span,
+  .ds-xcol__place {
     animation: none;
   }
 }
@@ -371,8 +446,8 @@ body:has(.ds-atlas .ds-xcol) {
     width: auto;
     height: 176px;
     overflow: hidden;
-    border-top: var(--ds-border-width) solid var(--ds-rule);
-    border-right: 0;
-    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+    left: 0;
+    border-width: var(--ds-border-width) 0 0;
+    border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
   }
 }

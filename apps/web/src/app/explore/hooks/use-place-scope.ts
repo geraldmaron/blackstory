@@ -1,9 +1,11 @@
 /**
  * The place the map and list are scoped to (`?place=`, `docs/ui/patterns-place-map.md`).
  *
- * A place token tap on the plate selects it (the stage's `placeSelect`); the echo chip clears it.
- * While a place is selected, the map and the list both show exactly that place's records, so the
- * list is the keyboard and screen-reader path through what the map shows.
+ * A place token tap on the plate selects it (the stage's `placeSelect`), as does a step back up
+ * the column's trail; the echo chip clears it. While a place is selected, the map and the list
+ * both show exactly that place's records, so the list is the keyboard and screen-reader path
+ * through what the map shows. Each place is its own history entry (`useExploreUrlSync` pushes on
+ * a place change), so Back and Forward walk the places the reader entered.
  */
 'use client';
 
@@ -11,7 +13,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { breakdownInWords, precisionBandFor } from '@repo/domain/map/place-groups';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import type { CountyGeometryCollection } from '../../../lib/map-experience/county-hatch';
-import { placeGroupsFor, placeMemberIds } from '../../../lib/map-experience/place-map';
+import {
+  placeGroupsFor,
+  placeMemberIds,
+  placeTrail,
+  type PlaceInfo,
+} from '../../../lib/map-experience/place-map';
 import {
   fetchCountyPolygons,
   loadedCountyPolygons,
@@ -21,8 +28,16 @@ import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 export type PlaceScope = {
   readonly key: string;
   readonly name: string;
+  readonly level: PlaceInfo['level'];
   readonly ids: ReadonlySet<string>;
+  /** The places that hold this one, widest first, for the column's trail back up. */
+  readonly trail: readonly PlaceInfo[];
 };
+
+/** The `?place=` the address bar holds now (after Back or Forward). */
+function placeInAddress(): string | undefined {
+  return new URLSearchParams(window.location.search).get('place') ?? undefined;
+}
 
 export function usePlaceScope(
   stage: MapStageHandle,
@@ -35,11 +50,16 @@ export function usePlaceScope(
   );
 
   useEffect(() => stage.subscribe('placeSelect', setPlaceKey), [stage]);
-
-  // County membership needs the county geometry; the stage usually has it by county zoom, but a
-  // cold `?place=county-…` link arrives before the camera gets there.
   useEffect(() => {
-    if (counties || !placeKey?.startsWith('county-')) return;
+    const onPop = () => setPlaceKey(placeInAddress());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // County membership, the trail and a county's outline need the county geometry; the stage has it
+  // by county zoom, but a cold `?place=` link arrives before the camera gets there. One shared fetch.
+  useEffect(() => {
+    if (counties || !placeKey) return;
     let live = true;
     fetchCountyPolygons()
       .then((loaded) => {
@@ -61,10 +81,23 @@ export function usePlaceScope(
     if (!placeKey) return undefined;
     const place = placeGroupsFor(all, counties).places.get(placeKey);
     if (!place) return undefined;
-    return { key: placeKey, name: place.name, ids: placeMemberIds(all, placeKey, counties) };
+    // D.C. is a state, a county and a city of one name: say each name once.
+    const bare = (name: string) => name.replace(/,\s*[A-Z]{2}$/, '');
+    const trail = placeTrail(all, placeKey, counties).filter(
+      (parent, index, list) =>
+        bare(parent.name) !== bare(place.name) &&
+        list.findIndex((other) => bare(other.name) === bare(parent.name)) === index,
+    );
+    return {
+      key: placeKey,
+      name: place.name,
+      level: place.level,
+      ids: placeMemberIds(all, placeKey, counties),
+      trail,
+    };
   }, [all, counties, placeKey]);
 
-  return { placeKey, setPlaceKey, scope };
+  return { placeKey, setPlaceKey, scope, counties };
 }
 
 /** "180 sit at exact sites, 110 are placed within a city, and 22 are known only by county". */

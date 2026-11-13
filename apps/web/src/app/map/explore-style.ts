@@ -42,6 +42,7 @@ import {
 import {
   placeLeaderCollection,
   placeMapCollection,
+  PLACE_LEVEL_MIN_ZOOM,
   SITE_MIN_ZOOM,
 } from '../../lib/map-experience/place-map';
 import type { CountyGeometryCollection } from '../../lib/map-experience/county-hatch';
@@ -1318,7 +1319,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_PLACE_LEADER_LAYER_ID,
         type: 'line',
         source: EXPLORE_PLACE_LEADERS_SOURCE_ID,
-        minzoom: SITE_MIN_ZOOM,
+        // Only sites sharing a grid square spread, and those draw from the site level.
+        minzoom: PLACE_LEVEL_MIN_ZOOM.site,
         paint: { 'line-color': plate.markInk, 'line-width': 1, 'line-opacity': 0.55 },
       },
       {

@@ -44,7 +44,12 @@ export function MapControls({
     Math.abs(((bearing % 360) + 360) % 360) < 360 - COMPASS_THRESHOLD_DEGREES;
 
   return (
-    <div className={cx('ds-map-controls', className)} role="group" aria-label="Map controls">
+    <div
+      className={cx('ds-map-controls', className)}
+      data-ground="ink"
+      role="group"
+      aria-label="Map controls"
+    >
       <div className="ds-map-controls__stack">
         <button
           type="button"

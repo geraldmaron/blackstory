@@ -8,8 +8,9 @@
  */
 .ds-map-controls {
   position: fixed;
-  right: var(--ds-space-4);
-  bottom: calc(56px + var(--ds-space-4));
+  /* Floating plates share one gutter: the stack sits above the floating histogram. */
+  right: var(--ds-xfloat, 12px);
+  bottom: calc(56px + var(--ds-xfloat, 12px) * 2);
   z-index: var(--ds-z-atlas-instruments);
   display: flex;
   flex-direction: column;
@@ -26,7 +27,6 @@
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-sm);
   background: var(--ds-canvas);
-  box-shadow: var(--ds-contact-plate);
 }
 
 .ds-map-controls__stack .ds-map-controls__btn {
@@ -48,7 +48,6 @@
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-sm);
   background: var(--ds-canvas);
-  box-shadow: var(--ds-contact-plate);
   color: var(--ds-ink);
   cursor: pointer;
   transition: background-color var(--ds-duration-fast) var(--ds-easing);

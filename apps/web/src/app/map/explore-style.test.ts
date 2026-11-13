@@ -96,7 +96,7 @@ test('the entities source groups records by place, never by pixel clustering', (
   const tokens = entitiesSource.data.features.filter((f) => 'point_count' in f.properties);
   assert.ok(tokens.length > 0, 'place tokens are in the source');
   for (const token of tokens) {
-    assert.match(String(token.properties.placeKey), /^(state|county|city)-/);
+    assert.match(String(token.properties.placeKey), /^(state|county|city|square)-/);
     assert.ok(Number(token.properties.minZoom) < Number(token.properties.maxZoom));
   }
   // Every token, record mark and count layer is cut to its zoom band.

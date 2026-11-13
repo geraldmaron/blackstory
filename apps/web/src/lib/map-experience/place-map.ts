@@ -31,14 +31,23 @@ import { stateLabelPoints } from './state-labels';
 export { PLACE_LEVEL_MIN_ZOOM };
 export type { PlaceInfo };
 
-/** Records draw on their own from this zoom; below it they are inside a place token. */
-export const SITE_MIN_ZOOM = PLACE_LEVEL_MIN_ZOOM.site;
+/**
+ * The first zoom a site record can draw on its own (a site alone in its grid square); below it
+ * every record is inside a place token. Sites sharing a square draw from `PLACE_LEVEL_MIN_ZOOM.site`.
+ */
+export const SITE_MIN_ZOOM = PLACE_LEVEL_MIN_ZOOM.square;
 
 const NEXT_LEVEL_MIN_ZOOM: Readonly<Record<PlaceToken['level'], number>> = {
   state: PLACE_LEVEL_MIN_ZOOM.county,
   county: PLACE_LEVEL_MIN_ZOOM.city,
-  city: PLACE_LEVEL_MIN_ZOOM.site,
+  city: PLACE_LEVEL_MIN_ZOOM.square,
+  square: PLACE_LEVEL_MIN_ZOOM.site,
 };
+
+/** The zoom that opens a place one level deeper (`placeDrillZoom`'s floor). */
+export function placeNextLevelZoom(level: PlaceToken['level']): number {
+  return NEXT_LEVEL_MIN_ZOOM[level];
+}
 
 /**
  * The zoom a token tap lands on: the place's own frame, but never short of the next level, so
@@ -108,6 +117,8 @@ function abbreviate(count: number): string {
  * "County" and state suffix (the frame already says which state), a city without its state.
  */
 export function placeMapName(level: PlaceToken['level'], name: string): string {
+  // A grid square has no name of its own: its count tab sits among the named streets.
+  if (level === 'square') return '';
   const bare = name.replace(/,\s*[A-Z]{2}$/, '');
   return level === 'county' ? bare.replace(/\s+County$/, '') : bare;
 }
@@ -166,6 +177,7 @@ export function placeMapCollection(
   const cached = collectionCache.get(groups);
   if (cached) return cached;
   const drawnAt = new Map(groups.sites.map((site) => [site.id, site.drawnPoint] as const));
+  const squared = (id: string) => groups.pathById.get(id)?.square !== undefined;
   const features: PlaceMapFeature[] = [];
   for (const token of groups.tokens) {
     const count = token.memberIds.length;
@@ -201,7 +213,12 @@ export function placeMapCollection(
       geometry: { type: 'Point', coordinates: drawn ?? feature.geometry.coordinates },
       properties: {
         ...feature.properties,
-        minZoom: band === 'site' ? SITE_MIN_ZOOM : PLACE_NEVER_ZOOM,
+        minZoom:
+          band !== 'site'
+            ? PLACE_NEVER_ZOOM
+            : squared(feature.properties.entityId)
+              ? PLACE_LEVEL_MIN_ZOOM.site
+              : SITE_MIN_ZOOM,
         maxZoom: PLACE_NEVER_ZOOM,
       } as ExploreMapFeature['properties'],
     });
@@ -261,4 +278,28 @@ export function placeDescription(
   const token = groups.tokens.find((t) => t.id === `${place.level}:${placeKey}`);
   if (!token) return undefined;
   return { place, summary: placeSummary(place.name, token.breakdown), bounds: token.bounds };
+}
+
+/**
+ * The places that hold a place, widest first (state, county, city), for the column's trail back
+ * up. Read from one member's path: every member of a county or city shares its state, and every
+ * member of a square shares its city only when the square sits wholly in one, so the trail stops
+ * at the first level the members disagree on.
+ */
+export function placeTrail(
+  collection: ExploreMapFeatureCollection,
+  placeKey: string,
+  counties: CountyGeometryCollection | undefined,
+): readonly PlaceInfo[] {
+  const groups = placeGroupsFor(collection, counties);
+  const paths = [...groups.pathById.values()].filter((path) => pathIncludes(path, placeKey));
+  if (paths.length === 0) return [];
+  const trail: PlaceInfo[] = [];
+  for (const level of ['state', 'county', 'city'] as const) {
+    const key = paths[0]![level];
+    if (!key || key === placeKey || paths.some((path) => path[level] !== key)) break;
+    const place = groups.places.get(key);
+    if (place) trail.push(place);
+  }
+  return trail;
 }

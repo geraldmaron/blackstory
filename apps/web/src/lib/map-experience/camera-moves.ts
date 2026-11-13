@@ -33,7 +33,15 @@ export type CameraMove = 'wide' | 'push' | 'orbit' | 'tilt' | 'spotlight' | 'tra
 /** What `frameArea` lands on: an explicit box (a search radius, or "you plus your nearest
  * records"), or a single point at a zoom. */
 export type AreaFrame =
-  | { readonly kind: 'bounds'; readonly bounds: readonly [LngLat, LngLat]; readonly label: string }
+  | {
+      readonly kind: 'bounds';
+      readonly bounds: readonly [LngLat, LngLat];
+      readonly label: string;
+      /** Never land short of this zoom (a place opens one level deeper, `placeDrillZoom`). */
+      readonly minZoom?: number;
+      /** With `minZoom`: never closer than this, however small the box. */
+      readonly maxZoom?: number;
+    }
   | {
       readonly kind: 'center';
       readonly center: LngLat;
@@ -447,7 +455,27 @@ export function createCamera(deps: CameraDeps): CameraApi {
     setSpotlight(null);
     const duration = durationFor(options?.durationMs, LOCATE_DURATION);
     const essential = isEssential(options);
-    if (frame.kind === 'bounds') {
+    if (frame.kind === 'bounds' && frame.minZoom !== undefined && map.cameraForBounds) {
+      // A place: fly to its frame in the unobscured map, never short of the next level.
+      const inset = padding();
+      const fitted = map.cameraForBounds(frame.bounds, { padding: inset })?.zoom;
+      const [[west, south], [east, north]] = frame.bounds;
+      map.flyTo({
+        center: [(west + east) / 2, (south + north) / 2],
+        zoom: Math.min(
+          frame.maxZoom ?? MAP_MAX_ZOOM,
+          MAP_MAX_ZOOM,
+          Math.max(frame.minZoom, fitted ?? frame.minZoom),
+        ),
+        pitch: 0,
+        bearing: 0,
+        padding: inset,
+        curve: CAMERA_FLY_CURVE,
+        easing: CAMERA_EASING_SLOW_OUT,
+        duration,
+        essential,
+      });
+    } else if (frame.kind === 'bounds') {
       try {
         map.fitBounds(frame.bounds, {
           padding: padding(),

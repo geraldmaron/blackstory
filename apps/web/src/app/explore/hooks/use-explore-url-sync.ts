@@ -1,7 +1,8 @@
 /**
  * Keep the Explore address bar in sync with live Lens narrowing (v10 DiscoveryState).
  *
- * Uses `history.replaceState` so changing filters does not remount the map. Viewport
+ * Uses `history.replaceState` so changing filters does not remount the map; a place change is
+ * the one `pushState`, so Back and Forward walk the places the reader entered. Viewport
  * (lat/lng/zoom) stays out of the bar (`docs/decisions-carryover.md`, "Persistent map canvas":
  * viewport policy). Panel chrome stays out too.
  */
@@ -85,13 +86,21 @@ export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSync
 
 export function useExploreUrlSync(base: ExploreViewState, lens: ExploreUrlSyncLens): void {
   const lastPushed = useRef<string | null>(null);
+  const lastPlace = useRef(lens.placeKey);
   const href = exploreHrefFromLens(base, lens);
+  const placeKey = lens.placeKey;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // Entering or leaving a place is a step the reader can take back; every other lens edit
+    // rewrites the current entry. A Back or Forward already put the place in the bar, so the
+    // live check below lets it through without a second entry.
+    const placeChanged = lastPlace.current !== placeKey;
+    lastPlace.current = placeKey;
     const live = `${window.location.pathname}${window.location.search}`;
     if (live === href || lastPushed.current === href) return;
-    window.history.replaceState(window.history.state, '', href);
+    if (placeChanged) window.history.pushState(window.history.state, '', href);
+    else window.history.replaceState(window.history.state, '', href);
     lastPushed.current = href;
-  }, [href]);
+  }, [href, placeKey]);
 }

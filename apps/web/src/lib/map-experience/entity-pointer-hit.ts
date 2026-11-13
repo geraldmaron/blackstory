@@ -61,7 +61,7 @@ export function entityIdFromProperties(properties: unknown): string | undefined 
   return typeof entityId === 'string' && entityId.length > 0 ? entityId : undefined;
 }
 
-const PLACE_LEVELS = new Set(['state', 'county', 'city']);
+const PLACE_LEVELS = new Set(['state', 'county', 'city', 'square']);
 
 /** A place token's key, level and extent, when every part is well formed. */
 function placeFromProperties(

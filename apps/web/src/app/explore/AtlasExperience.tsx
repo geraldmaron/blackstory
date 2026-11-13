@@ -95,7 +95,9 @@ import { useReaderActions } from './hooks/use-reader-actions';
 import { useLocateMe } from './hooks/use-locate-me';
 import { useCommandContext } from './hooks/use-command-context';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
-import { scopedBounds, scopedMixInWords, usePlaceScope } from './hooks/use-place-scope';
+import { scopedMixInWords, usePlaceScope } from './hooks/use-place-scope';
+import { usePlaceFocus } from './hooks/use-place-focus';
+import { placeNextLevelZoom } from '../../lib/map-experience/place-map';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
@@ -106,6 +108,8 @@ void React;
 
 /** A zoom button step: short, ease-out, a cut under reduced motion. */
 const ZOOM_STEP_MS = 250;
+/** Entering or leaving a place: one quick flight, a cut under reduced motion. */
+const PLACE_FLIGHT_MS = 700;
 
 /**
  * Basemap symbol layers the "Hide place names" layer chip governs (state/city and street names:
@@ -264,7 +268,25 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     placeKey,
     setPlaceKey,
     scope: placeScope,
+    counties,
   } = usePlaceScope(stage, view.allFeatures, initial.viewState.place);
+  /** The place's records' extent, whatever filters are on: a city's frame and outline. */
+  const placeMemberBounds = useMemo(() => {
+    if (!placeScope) return undefined;
+    let west = Infinity;
+    let south = Infinity;
+    let east = -Infinity;
+    let north = -Infinity;
+    for (const feature of view.allFeatures) {
+      if (!placeScope.ids.has(feature.properties.entityId)) continue;
+      const [lng, lat] = feature.geometry.coordinates;
+      west = Math.min(west, lng);
+      east = Math.max(east, lng);
+      south = Math.min(south, lat);
+      north = Math.max(north, lat);
+    }
+    return west <= east ? ([west, south, east, north] as const) : undefined;
+  }, [placeScope, view.allFeatures]);
   const inPlace = useCallback(
     (features: readonly ExploreMapFeature[]) =>
       placeScope ? features.filter((f) => placeScope.ids.has(f.properties.entityId)) : features,
@@ -465,16 +487,72 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   }, [plateReady, selectById, view.allFeatures]);
 
   /**
-   * A shared `?place=` link frames its place once the plate is live and the place resolves. A tap
-   * on a token already moved the camera itself (MapStage), so only the arrival frames here.
+   * Entering a place is one choreographed move, whatever asked for it (a token tap, a shared
+   * `?place=` link, a step up the column's trail, Back or Forward): the camera flies to the place
+   * (a cut under reduced motion), its outline resolves on the plate while everything outside it
+   * recedes (`usePlaceFocus`), and the column swaps to the place's header and records at once.
+   * Leaving the place flies back to the frame the reader entered from. Nothing waits on the
+   * camera: the list is scoped the moment the place is chosen.
    */
+  const placeOutlineBounds = usePlaceFocus(
+    stage,
+    placeScope?.key,
+    placeMemberBounds,
+    counties,
+    reducedMotion,
+    plateReady,
+  );
   const placeArrivalRef = useRef(initial.viewState.place);
+  const framedPlaceRef = useRef<string | undefined>(undefined);
+  const enteredFromRef = useRef<{ center: [number, number]; zoom: number } | null>(null);
   useEffect(() => {
-    if (!plateReady || !placeScope || placeArrivalRef.current !== placeScope.key) return;
+    if (!plateReady) return;
+    const key = placeScope?.key;
+    if (key === framedPlaceRef.current) return;
+    const map = stage.getMap();
+    if (!key) {
+      // A place that has not resolved yet (a cold county link) is not a departure.
+      if (placeKey) return;
+      framedPlaceRef.current = undefined;
+      const back = enteredFromRef.current;
+      enteredFromRef.current = null;
+      if (back) {
+        camera.frameArea(
+          { kind: 'center', center: back.center, zoom: back.zoom, label: 'The map' },
+          { trigger: 'reader', durationMs: PLACE_FLIGHT_MS },
+        );
+      } else {
+        // Arrived on a shared place link: there is no frame to return to, so open the country.
+        camera.wide({ trigger: 'reader', durationMs: PLACE_FLIGHT_MS });
+      }
+      return;
+    }
+    // A state frames its outline; wait the moment it takes to arrive rather than frame twice.
+    if (placeScope?.level === 'state' && !placeOutlineBounds) return;
+    const bounds = placeOutlineBounds ?? placeMemberBounds;
+    if (!bounds || !placeScope) return;
+    if (framedPlaceRef.current === undefined && placeArrivalRef.current !== key && map) {
+      const center = map.getCenter();
+      enteredFromRef.current = { center: [center.lng, center.lat], zoom: map.getZoom() };
+    }
+    framedPlaceRef.current = key;
     placeArrivalRef.current = undefined;
-    const bounds = scopedBounds(placeFiltered);
-    if (bounds) camera.frameArea({ kind: 'bounds', bounds, label: placeScope.name });
-  }, [camera, placeFiltered, placeScope, plateReady]);
+    const [west, south, east, north] = bounds;
+    camera.frameArea(
+      {
+        kind: 'bounds',
+        bounds: [
+          [west, south],
+          [east, north],
+        ],
+        label: placeScope.name,
+        minZoom: placeNextLevelZoom(placeScope.level),
+        // A one-record place would fit at street zoom; open it, do not dive past it.
+        maxZoom: placeNextLevelZoom(placeScope.level) + 2,
+      },
+      { trigger: 'reader', durationMs: PLACE_FLIGHT_MS },
+    );
+  }, [camera, placeKey, placeMemberBounds, placeOutlineBounds, placeScope, plateReady, stage]);
 
   /**
    * The home hand-off: a pin (or an overlapping group of pins) the reader chose on the Door. A
@@ -789,13 +867,30 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           {unresolvedScope}
         </p>
       ) : null}
-      {placeScope && !overlapIds && listed.length > 0 ? (
-        <div className="ds-xcol__place">
+      {placeScope && !overlapIds ? (
+        /* Keyed on the place, so the header enters with the camera on every place change. */
+        <div className="ds-xcol__place" key={placeScope.key}>
+          {placeScope.trail.length > 0 ? (
+            <nav className="ds-xcol__trail" aria-label="Places that hold this one">
+              {placeScope.trail.map((parent) => (
+                <button
+                  key={parent.key}
+                  type="button"
+                  className="ds-xcol__trail-step"
+                  onClick={() => setPlaceKey(parent.key)}
+                >
+                  {parent.name.replace(/,\s*[A-Z]{2}$/, '')}
+                </button>
+              ))}
+            </nav>
+          ) : null}
           <p className="ds-xcol__place-name">
-            <span className="ds-xcol__place-level">{placeScope.key.split('-')[0]}</span>
-            {placeScope.name}
+            <span className="ds-xcol__place-level">{placeScope.level}</span>
+            <span className="ds-xcol__place-title">{placeScope.name}</span>
           </p>
-          <p className="ds-xcol__place-mix">{scopedMixInWords(listed)}.</p>
+          {listed.length > 0 ? (
+            <p className="ds-xcol__place-mix">{scopedMixInWords(listed)}.</p>
+          ) : null}
         </div>
       ) : null}
       <ExploreRecordList

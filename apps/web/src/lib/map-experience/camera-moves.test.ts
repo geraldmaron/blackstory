@@ -549,6 +549,34 @@ test('frameArea fits a bounds frame and degrades instead of throwing', () => {
   assert.equal(broken.calls.at(-1)?.method, 'easeTo');
 });
 
+test('a place frame flies padded for the chrome, never short of its next level nor past its cap', () => {
+  const place = (fitZoom: number, reducedMotion = false) => {
+    const h = harness({ fitZoom, reducedMotion });
+    h.camera.frameArea(
+      {
+        kind: 'bounds',
+        bounds: [
+          [-77.04, 38.88],
+          [-77.02, 38.9],
+        ],
+        label: 'A city',
+        minZoom: 11,
+        maxZoom: 13,
+      },
+      { durationMs: 700 },
+    );
+    return h.calls.at(-1)!;
+  };
+  assert.equal(place(9).method, 'flyTo');
+  assert.equal(place(9).options.zoom, 11);
+  assert.equal(place(12.2).options.zoom, 12.2);
+  assert.equal(place(20).options.zoom, 13);
+  assert.deepEqual(place(9).options.center, [-77.03, 38.89]);
+  assert.ok(place(9).options.padding);
+  assert.equal(place(9).options.duration, 700);
+  assert.equal(place(9, true).options.duration, 0, 'reduced motion cuts');
+});
+
 test('the ambient establishing shot moves the camera without announcing itself', () => {
   const h = harness();
   h.camera.wide({ trigger: 'ambient' });

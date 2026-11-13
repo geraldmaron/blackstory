@@ -11,6 +11,9 @@ import {
   cityFromJurisdictionLabel,
   pathIncludes,
   PLACE_KEY_PATTERN,
+  PLACE_LEVEL_MIN_ZOOM,
+  squareKey,
+  SQUARE_STEP_DEG,
   type CountyRef,
   type PlaceLookups,
   type PlaceRecordInput,
@@ -66,7 +69,7 @@ const RECORDS: readonly PlaceRecordInput[] = [
 
 test('every record is counted exactly once at every level', () => {
   const groups = buildPlaceGroups(RECORDS, lookups);
-  for (const level of ['state', 'county', 'city'] as const) {
+  for (const level of ['state', 'county', 'city', 'square'] as const) {
     const ids = groups.tokens
       .filter((t) => t.id.startsWith(`${level}:`))
       .flatMap((t) => t.memberIds);
@@ -115,7 +118,7 @@ test('a city anchor comes from its city-scale records, rounded to city scale', (
   const groups = buildPlaceGroups(RECORDS, lookups);
   const atlanta = groups.places.get('city-ga-atlanta')!;
   assert.equal(atlanta.name, 'Atlanta, GA');
-  assert.deepEqual(atlanta.anchor, [-84.39, 33.75]);
+  assert.deepEqual(atlanta.anchor, [-84.38, 33.74]);
   assert.ok(pathIncludes(groups.pathById.get('a-site')!, 'county-13121'));
 });
 
@@ -148,4 +151,68 @@ test('city parsing reads the segment before the state and refuses counties', () 
   assert.equal(cityFromJurisdictionLabel('Anything', 'DC'), 'Washington');
   assert.ok(PLACE_KEY_PATTERN.test('city-ga-atlanta'));
   assert.ok(!PLACE_KEY_PATTERN.test('city-GA-<x>'));
+});
+
+test('a dense city groups its sites into fixed grid squares, a lone site draws on its own', () => {
+  const extra = [
+    ga({
+      id: 'f-site',
+      lng: -84.327,
+      lat: 33.712,
+      precision: 'site',
+      jurisdictionLabel: 'Atlanta, Georgia',
+    }),
+    ga({
+      id: 'g-site',
+      lng: -84.335,
+      lat: 33.705,
+      precision: 'site',
+      jurisdictionLabel: 'Atlanta, Georgia',
+    }),
+    ga({
+      id: 'h-site',
+      lng: -84.2,
+      lat: 33.6,
+      precision: 'site',
+      jurisdictionLabel: 'Atlanta, Georgia',
+    }),
+  ];
+  const all = [...RECORDS, ...extra];
+  const groups = buildPlaceGroups(all, lookups);
+  const square = squareKey(-84.39, 33.75);
+  assert.equal(square, 'square-4780-6187');
+  assert.ok(PLACE_KEY_PATTERN.test(square));
+  assert.equal(squareKey(-84.327, 33.712), squareKey(-84.335, 33.705));
+
+  // Two shared squares, and the lone site stays out of every square.
+  const squares = groups.tokens.filter((t) => t.id.startsWith('square:square-'));
+  assert.deepEqual(squares.map((t) => [...t.memberIds].sort()).sort(), [
+    ['a-site', 'b-site'],
+    ['f-site', 'g-site'],
+  ]);
+  assert.equal(groups.pathById.get('h-site')!.square, undefined);
+  assert.equal(groups.places.get(square)!.name, 'A square in Atlanta, GA');
+
+  // The anchor is the square's fixed center, never a record's point.
+  const anchor = groups.places.get(square)!.anchor;
+  assert.ok(Math.abs((((anchor[0] + 180) / SQUARE_STEP_DEG) % 1) - 0.5) < 1e-6);
+  const other = groups.places.get(squareKey(-84.327, 33.712))!.anchor;
+  assert.deepEqual(other, [-84.33, 33.71]);
+  assert.notDeepEqual(other, [-84.327, 33.712]);
+
+  // Squares show between the city frame and the street; every record is counted once there.
+  const band = squares[0]!;
+  assert.equal(band.minZoom, PLACE_LEVEL_MIN_ZOOM.square);
+  assert.equal(band.maxZoom, PLACE_LEVEL_MIN_ZOOM.site);
+  const counted = groups.tokens
+    .filter((t) => t.id.startsWith('square:'))
+    .flatMap((t) => t.memberIds);
+  assert.deepEqual([...counted, 'h-site'].sort(), all.map((r) => r.id).sort());
+
+  // Selecting a square scopes to exactly its sites; city-scale records are never in a square.
+  const inSquare = all
+    .filter((r) => pathIncludes(groups.pathById.get(r.id)!, square))
+    .map((r) => r.id);
+  assert.deepEqual(inSquare.sort(), ['a-site', 'b-site']);
+  assert.equal(groups.pathById.get('c-city')!.square, undefined);
 });

@@ -9,21 +9,36 @@
  * point; nothing in this module sharpens a location.
  */
 
-/** The four levels a reader moves through as the camera closes in. */
-export type PlaceLevel = 'state' | 'county' | 'city' | 'site';
+/**
+ * The five levels a reader moves through as the camera closes in. `square` is a fixed geographic
+ * grid square (`SQUARE_STEP_DEG`) that holds a dense city's sites between the city frame and the
+ * street, so a city of 300 sites reads as a dozen counted squares, never 300 stacked dots.
+ */
+export type PlaceLevel = 'state' | 'county' | 'city' | 'square' | 'site';
 
 /**
  * The integer zoom each level starts at. Integers on purpose: MapLibre evaluates zoom inside a
  * layer filter at integer zoom levels only, so a fractional threshold would not hold.
  * State until 6 (national and regional frames), county from 6 (a single-state frame, where state
- * labels hand off to county names), city from 8 (a metro frame), sites from 11 (a city's streets).
+ * labels hand off to county names), city from 8 (a metro frame), grid squares from 11 (a city's
+ * districts), every site on its own from 14 (a city's streets). A site alone in its square draws
+ * on its own from 11; only squares holding two or more sites are grouped.
  */
 export const PLACE_LEVEL_MIN_ZOOM: Readonly<Record<PlaceLevel, number>> = {
   state: 0,
   county: 6,
   city: 8,
-  site: 11,
+  square: 11,
+  site: 14,
 };
+
+/**
+ * The grid square's side in degrees of latitude and longitude: about 2.2 km north to south, 58px
+ * on MapLibre's 512px world at zoom 11 (where squares start), and small enough that a selected
+ * square fits a laptop frame at zoom 14, where its sites draw. Fixed and global, so a square's key and its records never
+ * depend on the frame or on the filters that are on.
+ */
+export const SQUARE_STEP_DEG = 0.02;
 
 /** Never inside the map's zoom range: a feature carrying it stays in the source, undrawn. */
 export const PLACE_NEVER_ZOOM = 99;
@@ -85,6 +100,8 @@ export type PlacePath = {
   readonly state?: string;
   readonly county?: string;
   readonly city?: string;
+  /** Site band only, and only when the square holds two or more sites (`buildPlaceGroups`). */
+  readonly square?: string;
 };
 
 /** A place a record belongs to, keyed by the slug `?place=` carries. */
@@ -172,6 +189,21 @@ export function cityKey(postalCode: string, city: string): string {
   return `city-${postalCode.toLowerCase()}-${slug(city)}`;
 }
 
+/** The grid square a point falls in: column and row counted from 180W and 90S, never negative. */
+function squareCell(lng: number, lat: number): readonly [number, number] {
+  return [Math.floor((lng + 180) / SQUARE_STEP_DEG), Math.floor((lat + 90) / SQUARE_STEP_DEG)];
+}
+export function squareKey(lng: number, lat: number): string {
+  const [column, row] = squareCell(lng, lat);
+  return `square-${column}-${row}`;
+}
+/** A square's center: a fixed grid point, never a record's point. */
+function squareCenter(key: string): readonly [number, number] {
+  const [, column, row] = key.split('-').map(Number) as [number, number, number];
+  const round = (value: number) => Math.round(value * 1000) / 1000;
+  return [round((column + 0.5) * SQUARE_STEP_DEG - 180), round((row + 0.5) * SQUARE_STEP_DEG - 90)];
+}
+
 /** Where a record sits in the hierarchy. County and state records never get a city. */
 export function placePathFor(record: PlaceRecordInput, lookups: PlaceLookups): PlacePath {
   const band = precisionBandFor(record.precision);
@@ -196,6 +228,7 @@ export function placePathFor(record: PlaceRecordInput, lookups: PlaceLookups): P
  */
 export function placeAtLevel(path: PlacePath, level: PlaceLevel): string | undefined {
   if (level === 'site' && path.band === 'site') return undefined;
+  if (level === 'square' && path.band === 'site') return path.square;
   if (level === 'state') return path.state;
   if (level === 'county') return path.county ?? path.state;
   return path.city ?? path.county ?? path.state;
@@ -203,10 +236,15 @@ export function placeAtLevel(path: PlacePath, level: PlaceLevel): string | undef
 
 /** Whether a record belongs to a place (inclusive: a city's records are its county's too). */
 export function pathIncludes(path: PlacePath, placeKey: string): boolean {
-  return path.state === placeKey || path.county === placeKey || path.city === placeKey;
+  return (
+    path.state === placeKey ||
+    path.county === placeKey ||
+    path.city === placeKey ||
+    path.square === placeKey
+  );
 }
 
-const LEVELS: readonly PlaceLevel[] = ['state', 'county', 'city', 'site'];
+const LEVELS: readonly PlaceLevel[] = ['state', 'county', 'city', 'square', 'site'];
 
 function levelRange(level: PlaceLevel): { minZoom: number; maxZoom: number } {
   const index = LEVELS.indexOf(level);
@@ -223,14 +261,19 @@ function median(values: number[]): number {
   return sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
 }
 
-/** City-scale rounding (about a kilometer): a city anchor never reads as a street address. */
+/**
+ * City-scale rounding to the even hundredths of a degree (about two kilometers): a city anchor
+ * never reads as a street address, and never lands on a grid square's center, which sits on the
+ * odd hundredths, so a city's tab and a square's tab never stack.
+ */
 function cityScale(value: number): number {
-  return Math.round(value * 100) / 100;
+  return Math.round(value * 50) / 50;
 }
 
 /**
  * Spread step for coincident sites, in degrees of longitude: 14px at the site level's first
- * zoom (360 degrees over 256px tiles times 2^11). Spacing grows as the reader zooms in.
+ * zoom (360 degrees over 256px tiles times 2^14). Spacing grows as the reader zooms in. Coincident
+ * sites always share a square, so they are never drawn on their own before that zoom.
  */
 export const SITE_SPREAD_STEP_DEG = (14 * 360) / (256 * 2 ** PLACE_LEVEL_MIN_ZOOM.site);
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
@@ -322,6 +365,30 @@ export function buildPlaceGroups(
         );
       }
     }
+  }
+
+  // Squares: a site shares a square with at least one other site, or it is drawn on its own.
+  const squareMembers = new Map<string, string[]>();
+  for (const record of records) {
+    if (pathById.get(record.id)!.band !== 'site') continue;
+    const key = squareKey(record.lng, record.lat);
+    squareMembers.set(key, [...(squareMembers.get(key) ?? []), record.id]);
+  }
+  for (const [key, ids] of squareMembers) {
+    if (ids.length < 2) continue;
+    const first = pathById.get(ids[0]!)!;
+    const within =
+      (first.city && places.get(first.city)?.name) ??
+      (first.city ? cityNames.get(first.city) : undefined) ??
+      (first.county && places.get(first.county)?.name) ??
+      (first.state && places.get(first.state)?.name);
+    places.set(key, {
+      key,
+      level: 'square',
+      name: within ? `A square in ${within}` : 'A grid square',
+      anchor: squareCenter(key),
+    });
+    for (const id of ids) pathById.set(id, { ...pathById.get(id)!, square: key });
   }
 
   // A city's anchor is the middle of its city-scale records (the geocoded city point they
@@ -419,4 +486,4 @@ export function placeSummary(name: string, breakdown: PlaceBreakdown): string {
 }
 
 /** The `?place=` value shape: a level prefix and a slug. */
-export const PLACE_KEY_PATTERN = /^(state|county|city)-[a-z0-9-]{1,80}$/;
+export const PLACE_KEY_PATTERN = /^(state|county|city)-[a-z0-9-]{1,80}$|^square-\d{1,4}-\d{1,4}$/;

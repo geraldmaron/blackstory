@@ -3,8 +3,9 @@
  * record or area lands in the map a reader can actually see.
  *
  * Two layouts, one per breakpoint (explore-column.css):
- *  - Wide (768px and up): the flush 380px left column, the 56px decade histogram on the map's
- *    bottom edge, the zoom and locate stack bottom-right, and the header above it all.
+ *  - Wide (768px and up): the 380px column floating 12px in from the left edge, the 56px decade
+ *    histogram floating 12px above the bottom edge, the zoom and locate stack bottom-right, and
+ *    the header above it all. The map runs under all of it, so the padding is what they cover.
  *  - Phone: the header on top, the bottom sheet at its current (or about to be) height, and the
  *    tab bar under the sheet. The sides take only a slim gutter: the controls sit in the corner
  *    above the sheet, never across the middle of the map.
@@ -29,8 +30,10 @@ export type ChromeState = {
 /** Below this width Explore is a full-screen map with a bottom sheet (explore-column.css). */
 export const EXPLORE_PHONE_MAX_WIDTH = 767;
 
-/** The flush left column. */
+/** The floating left column. */
 export const EXPLORE_COLUMN_WIDTH = 380;
+/** The gutter every floating plate keeps from the viewport edge (`--ds-xfloat`). */
+export const EXPLORE_FLOAT_GUTTER = 12;
 /** The decade histogram docked on the map's bottom edge. */
 export const EXPLORE_HISTOGRAM_HEIGHT = 56;
 
@@ -38,8 +41,8 @@ const WIDE_HEADER = 56;
 const PHONE_HEADER = 48;
 /** Air between the framed thing and the chrome around it. */
 const GAP = 24;
-/** The 44px zoom and locate stack plus its 16px gutter. */
-const CONTROLS = 60;
+/** The 44px zoom and locate stack plus its gutter. */
+const CONTROLS = 44 + EXPLORE_FLOAT_GUTTER;
 
 /** Share of each axis the padding may consume before it gets scaled back. */
 const MAX_HORIZONTAL_SHARE = 0.6;
@@ -62,8 +65,8 @@ export function chromePadding(state: ChromeState): ChromeInset {
   } else {
     top = WIDE_HEADER + GAP;
     right = CONTROLS + GAP / 2;
-    left = EXPLORE_COLUMN_WIDTH + GAP;
-    bottom = EXPLORE_HISTOGRAM_HEIGHT + GAP;
+    left = EXPLORE_FLOAT_GUTTER + EXPLORE_COLUMN_WIDTH + GAP;
+    bottom = EXPLORE_FLOAT_GUTTER + EXPLORE_HISTOGRAM_HEIGHT + GAP;
   }
 
   // Horizontal clamp: scale both sides by one factor so the camera stays centered on the free area.
