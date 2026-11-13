@@ -339,7 +339,7 @@
   grid-row: 1 / span 3;
   width: var(--flow-node);
   height: var(--flow-node);
-  margin-top: 4px;
+  margin-top: var(--ds-space-1);
   box-sizing: border-box;
   border: 2px solid var(--ds-numeral-soft);
   background: var(--ds-canvas);

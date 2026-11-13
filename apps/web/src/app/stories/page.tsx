@@ -94,11 +94,21 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
     <Room
       width="wide"
       className="ds-stories"
-      {...(front?.lead ? { masthead: <LeadCover item={front.lead} /> } : {})}
+      {...(front?.lead
+        ? {
+            masthead: (
+              <>
+                {/* First in the outline, ahead of the lead cover's h2. */}
+                <h1 className="ds-visually-hidden">Stories</h1>
+                <LeadCover item={front.lead} />
+              </>
+            ),
+          }
+        : {})}
     >
       {/* The covers (or the list head) lead in every state; the h1 is for the outline only, so
           the toolbar never moves when the reader narrows the list. */}
-      <h1 className="ds-visually-hidden">Stories</h1>
+      {front?.lead ? null : <h1 className="ds-visually-hidden">Stories</h1>}
 
       {front && front.covers.length > 0 ? (
         <section className="ds-stories-covers" aria-label="More chapters">

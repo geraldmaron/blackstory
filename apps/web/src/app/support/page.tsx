@@ -34,10 +34,7 @@ export default function SupportPage() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast
-          tone="copper"
-          numeral={{ value: '1', label: 'person reads everything that comes in', decorative: true }}
-        >
+        <TrustMast tone="copper">
           <PageHeader
             display
             crumb={parentCrumb('/support')}

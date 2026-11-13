@@ -41,7 +41,7 @@ export default function MethodologyPage() {
           tone="sand"
           numeral={{
             value: String(ADMISSION_STEPS.length),
-            label: 'steps between a lead and a public page',
+            label: 'steps from a lead to a public page',
           }}
         >
           <PageHeader

@@ -20,7 +20,7 @@ import {
   type RawLivesSearchParams,
 } from '../../lib/lives/lives-url-state';
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
-import { DataSections } from './DataSections';
+import { DataSections, millionsFigure } from './DataSections';
 import { loadDataPageModel } from './load-data-page-model';
 import '../reading-room.css';
 import './data-page.css';
@@ -64,10 +64,10 @@ export default async function DataPage({
             latest === undefined
               ? undefined
               : {
-                  value: `${(latest.blackPopulation / 1_000_000).toLocaleString('en-US', {
-                    maximumFractionDigits: 1,
-                  })}M`,
-                  label: `Black Americans counted in ${latest.decade}`,
+                  // The figure the population chart's finding states ("41.3 million in 2020"), with
+                  // the census category the chart's table scopes it to.
+                  value: `${millionsFigure(latest.blackPopulation)}M`,
+                  label: `${latest.raceCategoryLabel}, counted in ${latest.decade}`,
                 }
           }
         >

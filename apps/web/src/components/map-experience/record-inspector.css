@@ -43,7 +43,7 @@
 }
 
 .ds-inspector__photo + .ds-inspector__body .ds-inspector__numeral {
-  margin-top: calc(var(--ds-space-6) * -1 - 0.45em);
+  margin-top: calc(var(--ds-space-6) * -1 - var(--ds-space-8));
 }
 
 .ds-inspector__meta {
@@ -53,7 +53,7 @@
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.4;
 }
 
@@ -69,7 +69,7 @@
   flex: none;
   color: var(--ds-ink);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
 }
 
@@ -100,7 +100,7 @@
   overflow: hidden;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.55;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -125,14 +125,14 @@
 .ds-inspector__fact dt {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-inspector__fact dd {
   margin: 0;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-inspector__evidence {
@@ -194,7 +194,7 @@
   min-width: 5.5rem;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
   text-align: center;
 }

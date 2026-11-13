@@ -1,8 +1,10 @@
 /*
- * The header (CommandBar.tsx). From 48rem up: a flush, full-bleed 56px bar fixed to the top on an
- * ink ground in both themes (`data-ground="ink"`), its content on the wide container. The search
- * is a paper field, the one bright instrument on the bar; the current tab is a copper block. Below 48rem: an in-flow 48px
- * bar (lockup, search button, theme), and the search opens full screen.
+ * The header (CommandBar.tsx). From 48rem up: a flush, full-bleed 52px bar fixed to the top on an
+ * ink ground in both themes (`data-ground="ink"`), its content on the wide container. Lockup, then
+ * the tabs as plain text links (the current one heavier, with the copper pin under it), then at
+ * the right a compact search that opens in place to a paper field, and the theme icon. Nothing is
+ * boxed or filled at rest. Below 48rem: an in-flow 48px bar (lockup, search button, theme), and
+ * the search opens full screen.
  *
  * `--ds-header-h` and `--ds-island-clearance` live in @repo/ui shell-header.css.
  */
@@ -15,31 +17,42 @@
   z-index: var(--ds-z-command-bar);
   padding-top: env(safe-area-inset-top, 0px);
   background: var(--ds-canvas);
+  /* One hairline: it separates the bar from an ink page and disappears into a color block. */
+  box-shadow: inset 0 calc(-1 * var(--ds-border-width)) 0 var(--ds-border);
 }
 
 .ds-bar__inner {
   display: flex;
   align-items: center;
-  gap: var(--ds-space-6);
+  gap: var(--ds-space-8);
   width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
   height: var(--ds-header-h);
   margin-inline: auto;
 }
 
 .ds-bar__brand {
-  --ds-lockup-size: 4rem;
+  --ds-lockup-size: 3.75rem;
   color: var(--ds-ink);
 }
 
 /* ---- search ------------------------------------------------------------- */
 
+/* At rest a compact control with a hairline edge on the ink; focused, or holding a query, the
+   same field widens in place to the paper search. One input at every state. */
 .ds-bar__search-region {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   align-items: center;
   gap: var(--ds-space-2);
+  width: 14rem;
   min-width: 0;
-  max-width: 520px;
+  margin-left: auto;
+  transition: width var(--ds-duration-base) var(--ds-ease-entrance);
+}
+
+.ds-bar__search-region:focus-within,
+.ds-bar__search-region:has(.ds-bar__search-input:not(:placeholder-shown)) {
+  width: min(30rem, 42vw);
 }
 
 .ds-bar__search-form {
@@ -52,37 +65,67 @@
   flex: 1 1 auto;
   align-items: center;
   min-width: 0;
-  height: 40px;
-  border: var(--ds-border-width) solid var(--ds-canvas);
+  height: 36px;
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 40%, transparent);
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-canvas);
-  color: var(--ds-ink);
+  background: transparent;
+  color: var(--ds-fixed-paper);
   cursor: text;
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+  transition:
+    border-color var(--ds-duration-fast) var(--ds-easing),
+    background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-/* The magnifier, drawn by mask so it takes the field's ink in both themes. */
+/* The magnifier, drawn by mask so it takes the field's color at rest and open. */
 .ds-bar__search::before {
   content: '';
   flex: none;
   width: 16px;
   height: 16px;
   margin-inline: var(--ds-space-3) var(--ds-space-2);
-  background: var(--ds-ink-muted);
+  background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='4.6' fill='none' stroke='black' stroke-width='1.5'/%3E%3Cpath d='m10.6 10.6 3 3' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")
     center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='4.6' fill='none' stroke='black' stroke-width='1.5'/%3E%3Cpath d='m10.6 10.6 3 3' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")
     center / contain no-repeat;
 }
 
+/* The key hint, at rest only. Its alt text is empty: the shortcut is a convenience, not a name. */
+.ds-bar__search::after {
+  content: '/' / '';
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-right: var(--ds-space-2);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 32%, transparent);
+  border-radius: calc(var(--ds-radius-sm) / 2);
+  color: var(--ds-fixed-stone);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  line-height: 1;
+}
+
 .ds-bar__search:hover {
-  border-color: var(--ds-border-strong);
+  border-color: var(--ds-fixed-stone);
+}
+
+.ds-bar__search:focus-within,
+.ds-bar__search:has(.ds-bar__search-input:not(:placeholder-shown)) {
+  border-color: var(--ds-canvas);
+  background: var(--ds-canvas);
+  color: var(--ds-ink-muted);
+}
+
+.ds-bar__search:focus-within::after,
+.ds-bar__search:has(.ds-bar__search-input:not(:placeholder-shown))::after {
+  display: none;
 }
 
 /* The ring sits on the field, not on the bare input inside it. The field is paper on the ink
    bar, so its ring is copper (6.1:1 on ink), not the paper ground's ink ring. */
 .ds-bar__search:focus-within {
-  border-color: var(--ds-border-strong);
   outline: var(--ds-focus-width) solid var(--ds-fixed-accent);
   outline-offset: var(--ds-focus-offset);
 }
@@ -94,13 +137,24 @@
   padding: 0 var(--ds-space-3) 0 0;
   border: 0;
   background: none;
-  color: var(--ds-ink);
+  color: inherit;
   font-family: var(--ds-font-sans);
   font-size: 0.875rem;
+  font-weight: 500;
   outline: none;
 }
 
 .ds-bar__search-input::placeholder {
+  color: var(--ds-fixed-stone);
+  opacity: 1;
+}
+
+.ds-bar__search:focus-within .ds-bar__search-input,
+.ds-bar__search-input:not(:placeholder-shown) {
+  color: var(--ds-ink);
+}
+
+.ds-bar__search:focus-within .ds-bar__search-input::placeholder {
   color: var(--ds-ink-muted);
 }
 
@@ -116,10 +170,9 @@
   padding: var(--ds-space-1);
   overflow-y: auto;
   list-style: none;
-  border: var(--ds-border-width) solid var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
-  box-shadow: var(--ds-contact-plate);
+  background: var(--ds-canvas);
 }
 
 .ds-bar__search-list .ds-typeahead__option {
@@ -157,7 +210,7 @@
   flex: none;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   letter-spacing: normal;
   text-transform: capitalize;
 }
@@ -178,7 +231,7 @@
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface-raised);
   color: var(--ds-ink-muted);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 /* Phone-only controls. */
@@ -189,26 +242,34 @@
 
 /* ---- tabs and tools ----------------------------------------------------- */
 
-/* The tabs run the bar's full height, so the current tab is a copper block from edge to edge. */
+/* The tabs are plain text links grouped beside the lockup: no fills, no boxes. The kit marks the
+   current one with weight and the copper pin (components.css `.ds-tabs__tab`). */
 .ds-bar__tabs {
-  align-self: stretch;
-  margin-left: auto;
-}
-
-.ds-bar__tabs {
-  gap: 0;
+  gap: var(--ds-space-2);
 }
 
 .ds-bar__tabs .ds-tabs__tab {
   min-height: var(--ds-header-h);
-  padding-inline: var(--ds-space-6);
+  padding-inline: var(--ds-space-3);
+  color: var(--ds-ink-muted);
   font-size: var(--ds-text-body-sm);
+  letter-spacing: 0.01em;
+}
+
+.ds-bar__tabs .ds-tabs__tab:hover,
+.ds-bar__tabs .ds-tabs__tab[aria-current='page'] {
+  color: var(--ds-ink);
+}
+
+.ds-bar__tabs .ds-tabs__tab[aria-current='page']::after {
+  bottom: var(--ds-space-2);
 }
 
 .ds-bar__tools {
   display: flex;
   align-items: center;
   gap: var(--ds-space-1);
+  margin-left: calc(var(--ds-space-8) * -1 + var(--ds-space-2));
   margin-right: calc(var(--ds-space-3) * -1);
 }
 
@@ -283,6 +344,7 @@
 
   /* The search sheet: the same field, full screen. */
   .ds-bar[data-search-open] .ds-bar__search-region {
+    width: auto;
     position: fixed;
     inset: 0;
     z-index: var(--ds-z-command-overlay);
@@ -314,7 +376,7 @@
     background: none;
     color: var(--ds-ink);
     font-family: var(--ds-font-sans);
-    font-size: 0.9375rem;
+    font-size: var(--ds-text-body-sm);
     font-weight: 600;
     cursor: pointer;
   }
@@ -334,6 +396,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ds-bar__search-region,
   .ds-bar__search,
   .ds-bar__tool {
     transition-duration: 0.01ms;

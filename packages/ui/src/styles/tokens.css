@@ -41,6 +41,9 @@
   --ds-accent: #8e4f2a;
   --ds-accent-graphic: #b86b2a;
   --ds-accent-muted: #d8a178;
+  /* The primary button's hover plate: copper a step toward paper, so its ink label gains contrast
+     (6.8:1) instead of losing it. */
+  --ds-primary-hover: #c98a55;
 
   --ds-warning-fg: #6b4a17;
   --ds-warning-bg: #f3e4c6;
@@ -140,6 +143,7 @@
   --ds-accent: #d07a32;
   --ds-accent-graphic: #d07a32;
   --ds-accent-muted: #d8a178;
+  --ds-primary-hover: #dd955d;
 
   --ds-warning-fg: #f0ce8e;
   --ds-warning-bg: #3a2a0e;
@@ -302,6 +306,8 @@
   --ds-accent-graphic: #0a0a0a;
   --ds-primary-bg: #0a0a0a;
   --ds-primary-ink: #f4efe5;
+  /* The ink plate's hover lifts a step toward charcoal; its paper label stays at 13:1. */
+  --ds-primary-hover: #2a2622;
   --ds-numeral-accent: #0a0a0a;
   --ds-numeral-soft: #0a0a0a;
 }
@@ -388,7 +394,9 @@
   --ds-text-display-numeral: clamp(4.5rem, 1.6rem + 11vw, 12.5rem);
   --ds-text-display-title: clamp(3.5rem, 1.9rem + 5.6vw, 7.5rem);
   --ds-tracking-numeral: -0.04em;
-  --ds-leading-numeral: 0.82;
+  /* Tall enough that the line box holds the digits and a count's comma: a rule or a line set
+     under a numeral meets the glyphs' edge, never cuts them. */
+  --ds-leading-numeral: 0.92;
   --ds-text-display-hero: clamp(2.75rem, 1.3rem + 6vw, 6rem);
   --ds-text-display-1: clamp(2.5rem, 1.4rem + 4.6vw, 5rem);
   --ds-text-display-2: clamp(2rem, 1.35rem + 2.7vw, 3.25rem);

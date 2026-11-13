@@ -10,18 +10,25 @@
   overflow: hidden;
   border-radius: var(--ds-radius-sm);
   /* A paper mat in both themes: an off-ratio cover sits on it with a visible edge, not in a hole. */
-  background: #f4efe5;
+  background: var(--ds-material-paper);
   /* An inner hairline, so a pale cover still has an edge on the paper theme. */
   box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-rule);
 }
 
 .ds-book-cover__img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   /* Mat an off-ratio cover, centered, rather than crop its own title off. */
   object-fit: contain;
   object-position: center;
+}
+
+/* Until the art has loaded it sits invisible over the typeset cover, which is what shows. */
+.ds-book-cover[data-art='pending'] .ds-book-cover__img {
+  opacity: 0;
 }
 
 .ds-book-cover--typeset {

@@ -84,10 +84,12 @@ test('below 48rem the header is in flow and the tab bar takes the tabs; never at
 
 test('the current tab is marked by more than color', () => {
   const tabCss = read('tab-bar.css');
-  // A copper block tile with a heavier label: shape and weight, not the hue alone.
+  // A heavier label and the copper pin under it: shape and weight, not the hue alone, no fill.
+  assert.match(tabCss, /\.ds-tabbar__tab\[aria-current='page'\] \{[^}]*font-weight:\s*650/s);
   assert.match(
     tabCss,
-    /\.ds-tabbar__tab\[aria-current='page'\] \{[^}]*background:\s*var\(--ds-primary-bg\)[^}]*font-weight:\s*650/s,
+    /\.ds-tabbar__tab\[aria-current='page'\]::after \{[^}]*border-radius:\s*var\(--ds-radius-full\)/s,
   );
+  assert.doesNotMatch(tabCss, /\[aria-current='page'\] \{[^}]*background:/s);
   assert.match(read('PhoneTabBar.tsx'), /aria-label="Main"/);
 });

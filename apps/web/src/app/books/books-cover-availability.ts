@@ -1,17 +1,29 @@
 /**
- * Which Open Library covers exist, decided on the server so the cover wall never asks the
- * browser for one that 404s (each such request is a console error). A HEAD request to the same
- * `default=false` URL the page would load; a missing cover answers 404.
+ * Which Open Library covers are known to be missing, so the cover wall stops asking the browser
+ * for covers that 404 (each such request is a console error).
  *
- * Fails open: a timeout or network error counts as "has a cover", and the image's own onError
- * still swaps in the typeset cover.
+ * Never on the render path: a page reads what is already known and gets on with rendering. An
+ * ISBN nobody has checked yet, or whose answer has expired, renders as usual (the typeset cover
+ * first, the art over it once it loads, `BooksCoverArt`) and is checked in the background, a few
+ * HEAD requests at a time, for the next render. A HEAD to the same `default=false` URL the page
+ * loads answers 404 when the cover is missing.
+ *
+ * Fails open: a timeout or network error is not recorded, so it is asked again later.
  */
 import { openLibraryCoverUrl } from './books-cover';
 
-// shortcut: per-process memory, never expires; a cover added upstream shows after a restart or redeploy.
-const known = new Map<string, Promise<boolean>>();
+/** How long an answer holds. Open Library adds covers; a day is soon enough to show one. */
+export const COVER_ANSWER_TTL_MS = 24 * 60 * 60 * 1000;
+/** Background checks in flight at once, so a cold cache never fans out to one per title. */
+const MAX_IN_FLIGHT = 6;
 
-async function probe(url: string): Promise<boolean> {
+type Answer = { readonly exists: boolean; readonly at: number };
+const answers = new Map<string, Answer>();
+const queued = new Set<string>();
+const queue: string[] = [];
+let inFlight = 0;
+
+async function probe(url: string): Promise<boolean | undefined> {
   try {
     const response = await fetch(url, {
       method: 'HEAD',
@@ -20,26 +32,46 @@ async function probe(url: string): Promise<boolean> {
     });
     return response.status !== 404;
   } catch {
-    return true;
+    return undefined;
   }
 }
 
-/** The ISBNs among `isbns` whose cover at `size` loads. */
-export async function isbnsWithCovers(
+function drain(): void {
+  while (inFlight < MAX_IN_FLIGHT && queue.length > 0) {
+    const url = queue.shift()!;
+    inFlight += 1;
+    void probe(url).then((exists) => {
+      if (exists !== undefined) answers.set(url, { exists, at: Date.now() });
+      queued.delete(url);
+      inFlight -= 1;
+      drain();
+    });
+  }
+}
+
+/**
+ * The ISBNs among `isbns` whose cover is known to be missing at `size`. Schedules a background
+ * check for every ISBN with no fresh answer; never waits for one.
+ */
+export function isbnsKnownWithoutCovers(
   isbns: readonly (string | undefined)[],
   size: 'S' | 'M' | 'L' = 'M',
-): Promise<ReadonlySet<string>> {
-  const unique = [...new Set(isbns.filter((isbn): isbn is string => !!isbn))];
-  const results = await Promise.all(
-    unique.map((isbn) => {
-      const url = openLibraryCoverUrl(isbn, size);
-      let pending = known.get(url);
-      if (!pending) {
-        pending = probe(url);
-        known.set(url, pending);
-      }
-      return pending;
-    }),
-  );
-  return new Set(unique.filter((_, index) => results[index]));
+  now: number = Date.now(),
+): ReadonlySet<string> {
+  const missing = new Set<string>();
+  for (const isbn of new Set(isbns)) {
+    if (!isbn) continue;
+    const url = openLibraryCoverUrl(isbn, size);
+    const answer = answers.get(url);
+    if (answer && now - answer.at < COVER_ANSWER_TTL_MS) {
+      if (!answer.exists) missing.add(isbn);
+      continue;
+    }
+    if (!queued.has(url)) {
+      queued.add(url);
+      queue.push(url);
+    }
+  }
+  drain();
+  return missing;
 }

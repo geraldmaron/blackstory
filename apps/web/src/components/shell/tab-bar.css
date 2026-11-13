@@ -54,6 +54,7 @@
     font-family: var(--ds-font-sans);
     font-size: 0.75rem;
     font-weight: 500;
+    letter-spacing: 0.01em;
     line-height: 1;
     text-decoration: none;
     cursor: pointer;
@@ -65,11 +66,23 @@
     height: 20px;
   }
 
-  /* Current: a copper block tile with an ink label and heavier weight. Never color alone. */
+  /* Current: the label in ink at a heavier weight, and the site's pin, a small copper dot, under
+     it. Weight and shape carry it, never color alone, and nothing is filled. */
   .ds-tabbar__tab[aria-current='page'] {
-    background: var(--ds-primary-bg);
-    color: var(--ds-primary-ink);
+    color: var(--ds-ink);
     font-weight: 650;
+  }
+
+  .ds-tabbar__tab[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    bottom: var(--ds-space-1);
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: var(--ds-radius-full);
+    background: var(--ds-accent-graphic);
+    transform: translateX(-50%);
   }
 
   .ds-tabbar__tab:focus-visible {

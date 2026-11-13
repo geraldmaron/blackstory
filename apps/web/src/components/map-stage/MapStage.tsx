@@ -1094,7 +1094,13 @@ export function MapStageProvider({
   useEffect(() => {
     const syncPlateToTheme = () => {
       const map = mapRef.current;
-      if (!map || !map.isStyleLoaded()) return;
+      if (!map) return;
+      // isStyleLoaded() is false while any tile is still loading; a switch made then would be
+      // dropped and leave the plate in the other theme, so wait for the map to settle.
+      if (!map.isStyleLoaded()) {
+        map.once('idle', syncPlateToTheme);
+        return;
+      }
       const cfg = configRef.current;
       const scheme = readDocumentColorScheme();
       const style = buildStyleForScheme(cfg, scheme);

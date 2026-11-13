@@ -65,7 +65,7 @@ import {
   exploreRadiusPresetById,
   type ExploreRadiusPresetId,
 } from '../../lib/map-experience/explore-place-radius';
-import { usePhotoIndex } from '../../lib/map-experience/use-photo-index';
+import { usePhotos } from '../../lib/map-experience/use-photo-index';
 import {
   PinPhotoLayer,
   type PinPhotoHoverTarget,
@@ -134,6 +134,7 @@ function BackIcon() {
   );
 }
 
+const ATLAS_PHOTOS_URL = '/atlas/photos';
 export type AtlasExperienceProps = {
   readonly initial: SerializableExploreViewModel;
   /**
@@ -611,16 +612,18 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setSavedOpen,
   });
 
-  /* The photo index feeds the list's thumbnails, the inspector's image and the pin hover card. It
-     waits for the plate to be ready, so it never competes with the map's first paint. */
-  const photos = usePhotoIndex(
-    '/atlas/photos',
-    plateReady || selectedId !== undefined || atlasHoverTarget !== null,
+  /* Photos are asked for by id (`usePhotos`): the inspected record here, the rows in view in the
+     list, the hovered pin in the card. The whole index is never fetched. */
+  const inspectorPhotos = usePhotos(
+    ATLAS_PHOTOS_URL,
+    inspectorRecord && plateReady ? [inspectorRecord.id] : [],
   );
   const inspector = inspectorRecord
     ? {
         ...inspectorRecord,
-        ...(photos?.[inspectorRecord.id]?.url ? { photoUrl: photos[inspectorRecord.id]!.url } : {}),
+        ...(inspectorPhotos[inspectorRecord.id]?.url
+          ? { photoUrl: inspectorPhotos[inspectorRecord.id]!.url }
+          : {}),
       }
     : null;
 
@@ -748,7 +751,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         period={periodIsActive(period) ? period : undefined}
         selectedId={selectedId}
         onSelect={select}
-        photos={photos}
+        photosUrl={plateReady ? ATLAS_PHOTOS_URL : undefined}
         distanceLabels={distanceLabels}
         emptyState={
           <EmptyState
@@ -961,7 +964,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
       {/* Hover only: a selected record's photo is in the inspector, and a card over the pin would
           hide the copper mark that says which record is selected. */}
-      <PinPhotoLayer target={atlasHoverTarget} photosUrl="/atlas/photos" />
+      <PinPhotoLayer target={atlasHoverTarget} photosUrl={ATLAS_PHOTOS_URL} />
 
       <CommandPalette
         open={paletteOpen}

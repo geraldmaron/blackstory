@@ -16,7 +16,7 @@ import {
   type RawBooksBrowseParams,
 } from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
-import { isbnsWithCovers } from './books-cover-availability';
+import { isbnsKnownWithoutCovers } from './books-cover-availability';
 import { BOOKS_PAGE_DESCRIPTION } from './books-copy';
 import '../reading-room.css';
 import './books.css';
@@ -69,12 +69,13 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   }
 
   const built = buildBooksBrowseViewModel(snapshot, params);
-  // A title with no cover upstream gets no ISBN, so it renders typeset without a failing request.
-  const covered = await isbnsWithCovers(built.items.map((item) => item.coverIsbn));
+  // A title known to have no cover upstream gets no ISBN, so it renders typeset without a failing
+  // request. Unchecked titles render as usual and are checked in the background.
+  const uncovered = isbnsKnownWithoutCovers(built.items.map((item) => item.coverIsbn));
   const view = {
     ...built,
     items: built.items.map((item) =>
-      item.coverIsbn && !covered.has(item.coverIsbn) ? { ...item, coverIsbn: undefined } : item,
+      item.coverIsbn && uncovered.has(item.coverIsbn) ? { ...item, coverIsbn: undefined } : item,
     ),
   };
 

@@ -25,10 +25,7 @@ export default function PrivacyPage() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast
-          tone="sand"
-          numeral={{ value: '0', label: 'user accounts, ad identifiers or tracking prompts' }}
-        >
+        <TrustMast tone="sand">
           <PageHeader
             display
             crumb={parentCrumb('/privacy')}

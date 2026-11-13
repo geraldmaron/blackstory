@@ -23,7 +23,7 @@
 .ds-xbrush__range {
   overflow: hidden;
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -116,7 +116,7 @@
   top: calc(var(--ds-space-2) * -1);
   bottom: calc(var(--ds-space-4) * -1);
   width: 44px;
-  margin-left: -22px;
+  margin-left: calc(var(--ds-space-5) * -1 - 2px);
   padding: 0;
   border: 0;
   background: transparent;
@@ -173,7 +173,7 @@
   justify-content: space-between;
   color: var(--ds-ink-subtle);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }

@@ -39,8 +39,10 @@ export const EXPLORE_GHOSTS_SOURCE_ID = 'explore-ghosts';
 export const EXPLORE_GHOST_POINT_LAYER_ID = 'explore-ghost-point';
 /** The lower-48 one paper step off its neighbors, so the country reads on the chart. */
 export const EXPLORE_US_LAND_LAYER_ID = 'plate-us-land';
-/** Area precision shown as an area: a sand hatch over states holding county/state records. */
+/** Area precision shown as an area: a sand hatch over states holding state-precision records. */
 export const EXPLORE_JURISDICTION_HATCH_LAYER_ID = 'explore-jurisdiction-hatch';
+/** The same hatch over a county holding county-precision records (`county-hatch.ts`). */
+export const EXPLORE_COUNTY_HATCH_LAYER_ID = 'explore-jurisdiction-county-hatch';
 /** The hatch pattern image, added to the map at runtime (`hatch-image.ts`). */
 export const JURISDICTION_HATCH_IMAGE_ID = 'bs-sand-hatch';
 /** The selected record: the same shape, 1.6x, copper with an ink ring. */

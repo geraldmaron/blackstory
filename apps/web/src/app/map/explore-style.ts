@@ -36,7 +36,11 @@ import {
   drawnRecordCollection,
   jurisdictionTagCollection,
 } from '../../lib/map-experience/record-marks';
-import { precisionsWithMark, type RecordMark } from '../../lib/map-experience/geo-precision';
+import {
+  precisionsWithMark,
+  recordMarkFor,
+  type RecordMark,
+} from '../../lib/map-experience/geo-precision';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -81,6 +85,7 @@ import {
   EXPLORE_GHOST_POINT_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  EXPLORE_COUNTY_HATCH_LAYER_ID,
   JURISDICTION_HATCH_IMAGE_ID,
 } from './explore-layer-ids';
 import {
@@ -447,9 +452,26 @@ export type BuildExploreMapStyleInput = {
    * the map (a brushed-out pin fades rather than vanishes); never hittable, never grouped.
    */
   readonly ghostCollection?: ExploreMapFeatureCollection;
+  /**
+   * The counties holding county-precision records (`hatchedCountyKeys`), once the county
+   * geometry has loaded. Until then a county record hatches nothing; its state's tag counts it.
+   */
+  readonly hatchedCountyKeys?: readonly string[];
 };
 
-/** Paint for one state's hatch: on where the state holds county- or state-precision records. */
+/** Paint for one county's hatch: on where the county holds county-precision records. */
+function countyHatchOpacityExpression(keys: readonly string[]): ExpressionSpecification | number {
+  if (keys.length === 0) return 0;
+  return [
+    'match',
+    ['concat', ['get', 'stateFips'], ['get', 'countyFips']],
+    [...keys],
+    0.7,
+    0,
+  ] as unknown as ExpressionSpecification;
+}
+
+/** Paint for one state's hatch: on where the state holds state-precision records. */
 function hatchOpacityExpression(postalCodes: readonly string[]): ExpressionSpecification | number {
   if (postalCodes.length === 0) return 0;
   return [
@@ -511,7 +533,19 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   const ghosts = input.ghostCollection
     ? drawnRecordCollection(input.ghostCollection)
     : { type: 'FeatureCollection' as const, features: [] };
-  const hatchedStates = tags.features.map((tag) => tag.properties.postalCode);
+  // Only a statewide record hatches its state; a county record hatches its own county below.
+  const hatchedStates = [
+    ...new Set(
+      input.featureCollection.features
+        .filter(
+          (feature) =>
+            recordMarkFor(feature.properties.precision) === 'none' &&
+            feature.properties.precision !== 'county' &&
+            feature.properties.statePostalCode,
+        )
+        .map((feature) => feature.properties.statePostalCode!),
+    ),
+  ];
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =
     input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
@@ -690,11 +724,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: { 'fill-color': plate.land },
       },
       {
-        /* Area precision shown as an area: a state holding county- or state-precision records
-           carries a sand hatch, and its tag gives the count. County polygons load only past
-           `COUNTY_LINES_MIN_ZOOM`, so the hatch is the state's (never a county's). Under the water
-           layer, so rivers and coast cut it; gone past regional zoom, where a whole-state hatch
-           says nothing about the streets in view. */
+        /* Area precision shown as an area, never larger than the data: a state holding
+           state-precision records carries a sand hatch, a county holding county-precision records
+           carries its own (the next layer), and the state's tag gives the count. Under the water
+           layer, so rivers and coast cut it; gone past regional zoom, where an area hatch says
+           nothing about the streets in view. */
         id: EXPLORE_JURISDICTION_HATCH_LAYER_ID,
         type: 'fill',
         source: EXPLORE_STATE_DENSITY_SOURCE_ID,
@@ -703,6 +737,20 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           'fill-pattern': JURISDICTION_HATCH_IMAGE_ID,
           'fill-opacity': hatchOpacityExpression(hatchedStates),
+          'fill-opacity-transition': { duration: 0 },
+        },
+      },
+      {
+        // County precision hatches the county. The county geometry loads before this zoom
+        // (`COUNTY_LINES_MIN_ZOOM` < `JURISDICTION_TAG_MIN_ZOOM`).
+        id: EXPLORE_COUNTY_HATCH_LAYER_ID,
+        type: 'fill',
+        source: EXPLORE_COUNTY_LINES_SOURCE_ID,
+        minzoom: JURISDICTION_TAG_MIN_ZOOM,
+        maxzoom: HATCH_MAX_ZOOM,
+        paint: {
+          'fill-pattern': JURISDICTION_HATCH_IMAGE_ID,
+          'fill-opacity': countyHatchOpacityExpression(input.hatchedCountyKeys ?? []),
           'fill-opacity-transition': { duration: 0 },
         },
       },

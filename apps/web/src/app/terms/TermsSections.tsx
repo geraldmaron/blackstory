@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { CORRECTION_PRIVACY_NOTICE } from '../corrections/copy';
 import { RoomJump, RoomSection } from '../../components/room';
+import { TAKEDOWN_ACKNOWLEDGEMENT_SLA_HOURS, TAKEDOWN_RESOLUTION_SLA_DAYS } from '@repo/domain';
 
 void React;
 
@@ -32,8 +33,8 @@ const LICENSE_DEED = 'https://creativecommons.org/licenses/by/4.0/';
  * The takedown windows published here are the ones the routing model already holds
  * (`packages/domain/src/rights/takedown.ts`), not a softer pair invented for a policy page.
  */
-export const ACKNOWLEDGEMENT_HOURS = 72;
-const RESOLUTION_DAYS = 30;
+export const ACKNOWLEDGEMENT_HOURS = TAKEDOWN_ACKNOWLEDGEMENT_SLA_HOURS;
+const RESOLUTION_DAYS = TAKEDOWN_RESOLUTION_SLA_DAYS;
 
 const PAGE_SECTIONS: readonly {
   readonly id: string;

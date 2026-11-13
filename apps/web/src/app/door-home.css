@@ -1399,17 +1399,11 @@ body:has(.ds-door) .ds-door-journey {
 
 .ds-door-ch__bar {
   position: relative;
-  flex: 1 1 0;
-  height: 100%;
-  min-width: 0;
-}
-
-.ds-door-ch__bar a {
   display: flex;
+  flex: 1 1 0;
   align-items: flex-end;
   height: 100%;
-  color: inherit;
-  text-decoration: none;
+  min-width: 0;
 }
 
 .ds-door-ch__bar-fill {
@@ -1419,12 +1413,11 @@ body:has(.ds-door) .ds-door-journey {
   height: max(2px, calc(var(--bar) * 100%));
   background: var(--ds-ink);
   transform-origin: bottom;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-door-ch__bar a:hover .ds-door-ch__bar-fill,
-.ds-door-ch__bar a:focus-visible .ds-door-ch__bar-fill {
-  background: var(--ds-material-copper);
+/* A decade with no records is a gap on the time scale, not a sliver. */
+.ds-door-ch__bar[data-empty] .ds-door-ch__bar-fill {
+  height: 0;
 }
 
 .ds-door-ch__bar-year {

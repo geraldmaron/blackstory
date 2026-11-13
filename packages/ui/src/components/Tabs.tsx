@@ -1,6 +1,6 @@
 /**
- * Navigation between places: plain labels, 44px hit area, the current one in ink with a 2px
- * copper bar under it and `aria-current="page"`. For options on the same data use
+ * Navigation between places: plain labels, 44px hit area, the current one in ink at a heavier
+ * weight with a small copper dot under it and `aria-current="page"`. For options on the same data use
  * {@link Segmented}.
  *
  * `linkAs` lets a framework link (Next's `Link`) render the anchors. A tab with `onClick` and no

@@ -129,7 +129,7 @@ describe('CommandBar destinations', () => {
 
   it('does not greet with the catalog count', () => {
     const source = code('components/shell/CommandBar.tsx');
-    assert.match(source, /Search records, places, eras/);
+    assert.match(source, /<CommandBarSearch placeholder="Search" /);
     assert.doesNotMatch(source, /toLocaleString/);
     assert.doesNotMatch(source, /Search \$\{/);
   });

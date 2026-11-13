@@ -123,14 +123,28 @@ export function formatRecordDate(value: string | undefined): string | undefined 
 }
 
 /**
- * The display numeral beside the title: the first year or decade the When fact states ("1670s"
- * from "1670s to 1940s", "1968", "2022" from "2022-2023"). Nothing when the record is undated.
- * It repeats the citation line, so it is decorative.
+ * The display numeral beside the title, and what it must say so it never says less than the When
+ * fact: the first year or decade it states, captioned with the end of a range ("to 1940s" for
+ * "1670s to 1940s", "to 2023" for "2022-2023", "to present") and "circa" when the date is
+ * approximate. Nothing when the record is undated. It repeats the citation line, so it is
+ * decorative.
  */
-export function recordNumeral(facts: readonly RecordFact[]): string | undefined {
+export function recordNumeral(
+  facts: readonly RecordFact[],
+): { readonly value: string; readonly caption?: string } | undefined {
   const when = facts.find((fact) => fact.label === 'When')?.value;
   if (typeof when !== 'string') return undefined;
-  return /\b\d{4}s?\b/.exec(when)?.[0];
+  const years = [...when.matchAll(/\b\d{4}s?\b/g)].map((match) => match[0]);
+  const first = years[0];
+  if (first === undefined) return undefined;
+  const last = years.at(-1);
+  const end =
+    last !== undefined && last !== first ? last : /\bpresent\b/i.test(when) ? 'present' : undefined;
+  const circa = /\b(?:circa|ca\.|c\.)\s*\d/i.test(when) || /\bcirca\b/i.test(when);
+  const caption = [circa ? 'circa' : undefined, end ? `to ${end}` : undefined]
+    .filter((part): part is string => part !== undefined)
+    .join(', ');
+  return caption ? { value: first, caption } : { value: first };
 }
 
 function wordCount(text: string): number {
@@ -296,23 +310,23 @@ export function RecordPage({
   file,
   pager,
 }: RecordPageProps) {
-  const numeral = numeralOverride?.value ?? recordNumeral(facts);
+  const numeral = numeralOverride ?? recordNumeral(facts);
   return (
     <main className="ds-room ds-recpage" id="main">
       <div className="ds-recpage__desk ds-wrap">
         <Sheet as="article" className="ds-recpage__grid" aria-labelledby="record-title">
           <header className="ds-recpage__head">
-            {numeral && numeralOverride ? (
+            {numeral?.caption ? (
               <div
                 className="ds-recpage__numeral ds-recpage__numeral--captioned"
                 aria-hidden="true"
               >
-                <DisplayNumeral tone="soft">{numeral}</DisplayNumeral>
-                <span className="ds-recpage__numeral-caption">{numeralOverride.caption}</span>
+                <DisplayNumeral tone="soft">{numeral.value}</DisplayNumeral>
+                <span className="ds-recpage__numeral-caption">{numeral.caption}</span>
               </div>
             ) : numeral ? (
               <DisplayNumeral className="ds-recpage__numeral" tone="soft" decorative>
-                {numeral}
+                {numeral.value}
               </DisplayNumeral>
             ) : null}
             <Link className="ds-recpage__crumb" href={crumb.href} prefetch={false}>

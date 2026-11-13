@@ -36,6 +36,7 @@ import {
   EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_HOVER_SHADOW_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  EXPLORE_COUNTY_HATCH_LAYER_ID,
   EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
   EXPLORE_POINT_SHADOW_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
@@ -49,6 +50,8 @@ import {
 import { syncSingleLayerPaint } from './map-plate-paint';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import type { StageConfig } from './stage-config';
+import { hatchedCountyKeys } from '../../lib/map-experience/county-hatch';
+import { loadedCountyPolygons } from './geo-source-loaders';
 
 export const SELECTED_FILL_ID = 'explore-state-selected-fill';
 export const SELECTED_LINE_ID = 'explore-state-selected-line';
@@ -58,6 +61,7 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
   SATELLITE_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  EXPLORE_COUNTY_HATCH_LAYER_ID,
   'plate-water',
   'plate-boundary-country',
   'plate-place-city',
@@ -282,5 +286,6 @@ export function buildStyleForScheme(
     clusteringEnabled: cfg.clusteringEnabled,
     satellite: cfg.satellite,
     colorScheme,
+    hatchedCountyKeys: hatchedCountyKeys(cfg.featureCollection, loadedCountyPolygons()),
   });
 }

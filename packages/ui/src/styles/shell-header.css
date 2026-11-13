@@ -2,14 +2,14 @@
  * Shell chrome shared by every surface: the header height and the clearance the fixed header
  * leaves, and the brand wordmark's light/dark lockup and symbol swap.
  *
- * The public header is `.ds-bar` in apps/web's command-bar.css: a flush 56px bar fixed to the top
+ * The public header is `.ds-bar` in apps/web's command-bar.css: a flush 52px bar fixed to the top
  * from 48rem up, and an in-flow 48px bar below that. `--ds-island-clearance` is what anything
  * fixed or sticky under the header clears. Below 48rem the header scrolls with the page, so the
  * clearance is 0 there, except on the Door (`/`, `/explore`), where the map sits fixed under it.
  */
 
 :root {
-  --ds-header-h: 56px;
+  --ds-header-h: 52px;
   --ds-island-clearance: calc(var(--ds-header-h) + env(safe-area-inset-top, 0px));
 }
 

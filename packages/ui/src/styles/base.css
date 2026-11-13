@@ -55,7 +55,7 @@ body {
      The serif is now what it was always described as, a register you opt into: `.ds-room-prose`,
      the lede and the editorial titles ask for it by name. */
   font-family: var(--ds-font-sans);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   line-height: 1.6;
 }
 
@@ -120,7 +120,7 @@ svg {
 
 .ds-mono {
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   letter-spacing: 0;
 }
 

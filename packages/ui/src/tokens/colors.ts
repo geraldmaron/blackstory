@@ -249,7 +249,15 @@ export type GroundPalette = {
   readonly borderControl: string;
   readonly primaryBg: string;
   readonly primaryInk: string;
+  /** The primary button's hover plate (`--ds-primary-hover`). */
+  readonly primaryHover: string;
 };
+
+/** `--ds-primary-hover` on the paper and ink grounds, where the primary plate is copper. */
+export const primaryHoverPalettes = {
+  light: { primaryBg: '#B86B2A', primaryHover: '#C98A55', primaryInk: brandPalette.blackInk },
+  dark: { primaryBg: '#D07A32', primaryHover: '#DD955D', primaryInk: brandPalette.blackInk },
+} as const;
 
 export const groundPalettes = {
   copper: {
@@ -258,6 +266,7 @@ export const groundPalettes = {
     borderControl: brandPalette.blackInk,
     primaryBg: brandPalette.blackInk,
     primaryInk: brandPalette.archivePaper,
+    primaryHover: '#2A2622',
   },
   sand: {
     ground: brandPalette.pageSand,
@@ -265,6 +274,7 @@ export const groundPalettes = {
     borderControl: brandPalette.blackInk,
     primaryBg: brandPalette.blackInk,
     primaryInk: brandPalette.archivePaper,
+    primaryHover: '#2A2622',
   },
 } as const satisfies Record<'copper' | 'sand', GroundPalette>;
 

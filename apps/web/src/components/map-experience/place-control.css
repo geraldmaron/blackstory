@@ -44,7 +44,7 @@
   background: transparent;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   caret-color: var(--ds-accent);
 }
 
@@ -121,7 +121,7 @@
   background: transparent;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   text-align: left;
   cursor: pointer;
 }
@@ -142,14 +142,14 @@
 .ds-place__option-kind {
   flex: none;
   color: var(--ds-ink-muted);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-place__status {
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.4;
 }
 
@@ -164,7 +164,7 @@
 .ds-place__privacy {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.5;
 }
 

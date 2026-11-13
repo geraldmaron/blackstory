@@ -12,7 +12,7 @@ import {
   listBooksStaticParams,
 } from '../books-view-model';
 import { coverIsbnForBook } from '../books-cover';
-import { isbnsWithCovers } from '../books-cover-availability';
+import { isbnsKnownWithoutCovers } from '../books-cover-availability';
 import { BookRecordView, type BookArchiveRecord } from './BookRecordView';
 
 type BooksDetailPageProps = {
@@ -59,7 +59,7 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
     ? await resolveArchiveRecord(view.book.canonicalEntityId)
     : undefined;
   const isbn = coverIsbnForBook(view.book);
-  const hasCover = isbn ? (await isbnsWithCovers([isbn], 'L')).has(isbn) : false;
+  const hasCover = isbn ? !isbnsKnownWithoutCovers([isbn], 'L').has(isbn) : false;
   return (
     <BookRecordView
       view={view}

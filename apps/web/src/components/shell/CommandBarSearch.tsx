@@ -84,6 +84,14 @@ export function CommandBarSearch({ placeholder, query }: CommandBarSearchProps) 
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      // Escape on an empty field puts the search back to rest; with a query it only closes the list.
+      if (event.key === 'Escape') {
+        const field = event.target;
+        if (field instanceof HTMLInputElement && field.id === BAR_SEARCH_INPUT_ID && !field.value) {
+          field.blur();
+        }
+        return;
+      }
       if (!matchesPaletteOpen(event)) return;
       // `/` is a character before it is a shortcut. Yielding to whatever the reader is already
       // typing into is what keeps this from firing inside the correction form's own fields.

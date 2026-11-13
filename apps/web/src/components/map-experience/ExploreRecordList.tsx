@@ -26,6 +26,7 @@ import { placeDetail, placeLabelFor } from '../../lib/map-experience/place-label
 import { rowDecadeLabel } from '../../lib/map-experience/explore-rows';
 import type { CollectionPeriod } from '../../lib/discovery/collection-period';
 import { kindLabelForMark } from '../entity/record-mark';
+import { usePhotos } from '../../lib/map-experience/use-photo-index';
 import './explore-record-list.css';
 
 void React;
@@ -67,8 +68,11 @@ export type ExploreRecordListProps = {
   readonly emptyState?: React.ReactNode;
   /** The brushed decade range: each row then shows its first decade inside it. */
   readonly period?: CollectionPeriod | undefined;
-  /** Record id to its thumbnail URL; a row without one shows a sand tile with its kind glyph. */
-  readonly photos?: Readonly<Record<string, { readonly url: string }>> | null;
+  /**
+   * The photo route (`/atlas/photos`): only the rows in view are asked for (`usePhotos`). A row
+   * without a photo shows a sand tile with its kind glyph. Omitted until the map has painted.
+   */
+  readonly photosUrl?: string | undefined;
   readonly className?: string;
 };
 
@@ -80,7 +84,7 @@ export function ExploreRecordList({
   emptyState,
   period,
   className,
-  photos,
+  photosUrl,
 }: ExploreRecordListProps) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
@@ -111,6 +115,11 @@ export function ExploreRecordList({
     () => resultsWindow(features.length, scrollTop, viewportHeight),
     [features.length, scrollTop, viewportHeight],
   );
+
+  const visibleIds = features
+    .slice(range.first, range.last)
+    .map((feature) => feature.properties.entityId);
+  const photos = usePhotos(photosUrl ?? '', photosUrl ? visibleIds : []);
 
   /** Keep the selected row in view when the selection comes from the map rather than a click. */
   useEffect(() => {
@@ -185,7 +194,7 @@ export function ExploreRecordList({
               }}
             >
               <span className="ds-xlist__thumb" aria-hidden="true">
-                {photos?.[id]?.url ? (
+                {photos[id]?.url ? (
                   // eslint-disable-next-line @next/next/no-img-element -- remote Commons thumbnail
                   <img src={photos[id]!.url} alt="" loading="lazy" decoding="async" />
                 ) : (

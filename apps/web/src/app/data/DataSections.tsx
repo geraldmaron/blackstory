@@ -68,8 +68,13 @@ export type DataSectionsProps = {
 
 /* —— findings: the sentence each figure leads with ———————————————————————————— */
 
+/** 41,341,383 → "41.3". The one rounding for the population in millions, here and in the mast. */
+export function millionsFigure(value: number): string {
+  return (value / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 });
+}
+
 function formatMillions(value: number): string {
-  return `${(value / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })} million`;
+  return `${millionsFigure(value)} million`;
 }
 
 function populationReading(rows: readonly NationalPopulationTimelineRow[]): ReactNode {

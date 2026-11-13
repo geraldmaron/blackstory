@@ -50,6 +50,27 @@ export function pinThumbnailUrl(url: string, width: number): string {
   return commonsUploadThumbnailUrl(url, width);
 }
 
+/** The most ids one `?ids=` request may name; more is a caller bug, not a bigger answer. */
+export const MAX_PHOTO_IDS = 100;
+
+/**
+ * The part of a photo index a `?ids=a,b,c` request names (`usePhotos`). With no `ids` parameter
+ * the whole index is the answer.
+ */
+export function pickPhotoIds(
+  index: Readonly<Record<string, PinPhotoView>>,
+  url: string,
+): Readonly<Record<string, PinPhotoView>> {
+  const raw = new URL(url).searchParams.get('ids');
+  if (raw === null) return index;
+  const picked: Record<string, PinPhotoView> = {};
+  for (const id of raw.split(',').slice(0, MAX_PHOTO_IDS)) {
+    const view = Object.hasOwn(index, id) ? index[id] : undefined;
+    if (view) picked[id] = view;
+  }
+  return picked;
+}
+
 export function buildEntityPhotoIndex(
   entities: readonly PublicEntityView[],
 ): Readonly<Record<string, PinPhotoView>> {

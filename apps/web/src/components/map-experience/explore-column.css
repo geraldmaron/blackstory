@@ -78,7 +78,7 @@
   background: transparent;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -120,7 +120,7 @@
 
 .ds-xcol__clear {
   min-height: 32px;
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-xcol__body {
@@ -154,7 +154,7 @@
   border-top: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.45;
 }
 
@@ -191,7 +191,7 @@
   gap: var(--ds-space-3);
   padding: var(--ds-space-6) var(--ds-space-4);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.5;
 }
 

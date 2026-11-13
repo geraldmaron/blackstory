@@ -32,16 +32,32 @@ export type DoorChaptersProps = {
   readonly grades: readonly RecordsFacet[];
 };
 
-/** Decade facets in time order, keeping only real decades ("1770s"). */
-export function decadeBars(facets: readonly RecordsFacet[]) {
-  return facets
-    .map((facet) => ({ ...facet, year: Number.parseInt(facet.id, 10) }))
-    .filter((facet) => Number.isFinite(facet.year))
-    .sort((a, b) => a.year - b.year);
+export type DecadeBar = { readonly year: number; readonly label: string; readonly count: number };
+
+/**
+ * The decade axis on a true time scale: every decade from the first documented to the last, in
+ * order, so a century with no records takes a century's width. Empty decades count 0. Only real
+ * decades ("1770s") are read from the facets.
+ */
+export function decadeBars(facets: readonly RecordsFacet[]): readonly DecadeBar[] {
+  const counts = new Map<number, number>();
+  for (const facet of facets) {
+    const year = Number.parseInt(facet.id, 10);
+    if (Number.isFinite(year)) counts.set(year, (counts.get(year) ?? 0) + facet.count);
+  }
+  if (counts.size === 0) return [];
+  const first = Math.min(...counts.keys());
+  const last = Math.max(...counts.keys());
+  const bars: DecadeBar[] = [];
+  for (let year = first; year <= last; year += 10) {
+    bars.push({ year, label: `${year}s`, count: counts.get(year) ?? 0 });
+  }
+  return bars;
 }
 
 export function DoorChapters({ total, records, lead, decades, grades }: DoorChaptersProps) {
   const bars = decadeBars(decades);
+  const documented = bars.filter((bar) => bar.count > 0);
   const peak = Math.max(1, ...bars.map((bar) => bar.count));
   const busiest = bars.find((bar) => bar.count === peak);
   return (
@@ -73,9 +89,8 @@ export function DoorChapters({ total, records, lead, decades, grades }: DoorChap
                       <KindGlyph kind={row.kind} size={40} />
                     )}
                   </span>
-                  <DisplayNumeral className="ds-door-ch__sheet-decade" decorative>
-                    {row.era}
-                  </DisplayNumeral>
+                  {/* The decade is stated nowhere else on the card, so it is read, not decorative. */}
+                  <DisplayNumeral className="ds-door-ch__sheet-decade">{row.era}</DisplayNumeral>
                   <h3 className="ds-door-ch__sheet-name">
                     <Link href={row.href}>{row.name}</Link>
                   </h3>
@@ -94,9 +109,9 @@ export function DoorChapters({ total, records, lead, decades, grades }: DoorChap
           aria-labelledby="door-ch-story"
         >
           <div className="ds-door-ch__cover" aria-hidden="true">
-            {/* Eager: the block sits a screen and a half down, and a lazy cover there painted as an
-                empty ink band until the reader stopped on it. */}
-            <CoverImage item={lead} width={1600} eager />
+            {/* Lazy, at normal priority: the browser starts it well before it scrolls into view,
+                and it never competes with the map and the headline for the first viewport. */}
+            <CoverImage item={lead} width={1600} />
           </div>
           <div className="ds-wrap ds-door-ch__inner">
             <p className="ds-door-ch__years">{lead.eraLabel}</p>
@@ -116,41 +131,47 @@ export function DoorChapters({ total, records, lead, decades, grades }: DoorChap
         </Block>
       ) : null}
 
-      {bars.length > 0 ? (
+      {documented.length > 0 ? (
         <Block tone="sand" className="ds-door-ch ds-door-ch--time" aria-labelledby="door-ch-time">
           <div className="ds-wrap ds-door-ch__inner">
             <h2 className="ds-door-ch__title ds-door-ch__title--plain" id="door-ch-time">
-              {bars.length} decades on record
+              {documented.length} decades on record
             </h2>
             <p className="ds-door-ch__line">
-              Each bar is a decade the archive documents, as tall as the records in it.
+              Each bar is a decade on a true time scale, as tall as the records in it; a gap is
+              decades with none.
               {busiest
                 ? ` The ${busiest.label} hold the most, ${busiest.count.toLocaleString('en-US')}.`
                 : ''}
             </p>
             <figure className="ds-door-ch__axis">
-              <ol className="ds-door-ch__bars">
+              {/* A picture of the counts, not a set of controls: the list below it carries them. */}
+              <ol className="ds-door-ch__bars" aria-hidden="true">
                 {bars.map((bar) => (
                   <li
-                    key={bar.id}
+                    key={bar.year}
                     className="ds-door-ch__bar"
+                    data-empty={bar.count === 0 ? 'true' : undefined}
                     style={{ '--bar': bar.count / peak } as React.CSSProperties}
                   >
-                    <a
-                      href={bar.href}
-                      aria-label={`${bar.label}, ${bar.count.toLocaleString('en-US')} records`}
-                    >
-                      <span className="ds-door-ch__bar-fill" />
-                      {bar.year % 50 === 0 ? (
-                        <span className="ds-door-ch__bar-year" aria-hidden="true">
-                          {bar.year}
-                        </span>
-                      ) : null}
-                    </a>
+                    <span className="ds-door-ch__bar-fill" />
+                    {bar.year % 50 === 0 ? (
+                      <span className="ds-door-ch__bar-year">{bar.year}</span>
+                    ) : null}
                   </li>
                 ))}
               </ol>
+              <figcaption className="ds-visually-hidden">
+                Records per documented decade:{' '}
+                {documented
+                  .map((bar) => `${bar.label}, ${bar.count.toLocaleString('en-US')}`)
+                  .join('; ')}
+                .
+              </figcaption>
             </figure>
+            <Link className={buttonClassName('primary')} href="/records?layout=chronology">
+              Open the timeline
+            </Link>
           </div>
         </Block>
       ) : null}

@@ -97,7 +97,7 @@
   border: var(--ds-border-width) solid transparent;
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   line-height: 1.4;
 }
@@ -166,7 +166,7 @@
 
 .ds-timeline__title {
   margin: 0 0 var(--ds-space-1);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 600;
 }
 
@@ -174,7 +174,7 @@
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-map {
@@ -195,7 +195,7 @@
   position: absolute;
   width: 0.5rem;
   height: 0.5rem;
-  margin: -0.25rem 0 0 -0.25rem;
+  margin: calc(var(--ds-space-1) * -1) 0 0 calc(var(--ds-space-1) * -1);
   border-radius: 50%;
   background: var(--ds-accent-muted);
   outline: 2px solid var(--ds-surface-raised);
@@ -206,7 +206,7 @@
   margin: 0;
   color: var(--ds-ink-subtle);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 /**
@@ -254,7 +254,7 @@
 .ds-map-explorer__legend-title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
 }
 
 .ds-map-explorer__legend-subtitle {
@@ -268,7 +268,7 @@
   margin: 0;
   color: var(--ds-ink-subtle);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-map-explorer__feature-list,
@@ -281,7 +281,7 @@
   max-height: 16rem;
   overflow-y: auto;
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-map-explorer__feature-name {
@@ -320,7 +320,7 @@
 .ds-result-list__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.35;
@@ -390,7 +390,7 @@
 
 .ds-filters__label {
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-weight: 600;
   color: var(--ds-ink);
 }
@@ -406,7 +406,7 @@
   font: inherit;
   font-family: var(--ds-font-sans);
   /* >=16px avoids iOS zoom-on-focus. */
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
 }
 
 .ds-filters__actions {
@@ -469,11 +469,11 @@
   color: var(--ds-primary-ink);
 }
 
-/* Pressing into the table: the plate drops a step toward ink, and a 2px ink rule under it marks
-   hover without relying on the color change. */
+/* Hover: the plate steps away from its label's value (`--ds-primary-hover`, contrast-tested on
+   every ground), and a 2px rule under it in the label's color marks hover without the color. */
 .ds-button--primary:hover:not(:disabled) {
-  border-color: var(--ds-primary-bg);
-  background: color-mix(in srgb, var(--ds-primary-bg) 86%, var(--ds-primary-ink));
+  border-color: var(--ds-primary-hover);
+  background: var(--ds-primary-hover);
   box-shadow: inset 0 -2px 0 var(--ds-primary-ink);
 }
 
@@ -515,7 +515,7 @@
   background: transparent;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   line-height: 1;
   text-decoration: none;
@@ -576,7 +576,7 @@
   background: var(--ds-ink);
   color: var(--ds-canvas);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
 }
 
@@ -615,19 +615,35 @@
   color: var(--ds-ink);
 }
 
+.ds-tabs__tab:not([aria-current='page']):hover {
+  text-decoration: underline;
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 0.45em;
+}
+
+/* The page you are on: ink at a heavier weight, and the site's pin, a small solid copper dot,
+   under the label. Weight and shape carry it, not the hue; no fill, no box. */
 .ds-tabs__tab[aria-current='page'] {
-  background: var(--ds-primary-bg);
-  color: var(--ds-primary-ink);
+  color: var(--ds-ink);
   font-weight: 650;
+}
+
+.ds-tabs__tab[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  bottom: var(--ds-space-1);
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  transform: translateX(-50%);
 }
 
 /* The page you are on, with nowhere to go: not a control. */
 span.ds-tabs__tab {
   cursor: default;
 }
-
-/* The current tab is a copper block tab (ink type on copper; ink with paper type on a copper or
-   sand ground). The block's shape and the heavier weight carry it without the color. */
 
 /* —— Segmented: options on the same data —————————————————————————————————————— */
 .ds-segmented {
@@ -717,10 +733,10 @@ span.ds-tabs__tab {
   align-items: center;
   justify-self: start;
   min-height: 2.75rem;
-  margin-block: -0.75rem;
+  margin-block: calc(var(--ds-space-3) * -1);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.25rem;
   text-decoration: none;
 }
@@ -752,10 +768,12 @@ span.ds-tabs__tab {
 .ds-page-title,
 .ds-page-header--display .ds-page-header__title {
   margin: 0;
+  /* Schibsted's ascenders rise above a 0.9 line box; this keeps them off a block's top edge. */
+  padding-top: 0.04em;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-title);
   font-weight: 600;
-  line-height: 0.9;
+  line-height: 0.92;
   letter-spacing: -0.035em;
   text-wrap: balance;
   font-kerning: normal;
@@ -928,7 +946,7 @@ span.ds-tabs__tab {
   list-style: none;
   padding: 0;
   color: var(--ds-ink-muted);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.4;
 }
 
@@ -950,7 +968,7 @@ span.ds-tabs__tab {
   padding: var(--ds-space-3) 0 0;
   border-top: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink-muted);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.45;
 }
 

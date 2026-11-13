@@ -384,11 +384,10 @@
   background: var(--ds-surface-sunken);
 }
 
-/* The map is an ink inset on the paper: an ink frame around the paper chart and its copper pin. */
-.ds-recpage__media .ds-record-map {
-  padding: var(--ds-space-2);
+/* The map is a paper chart laid on the sheet: one hard ink edge, the sheet's radius, no mat. */
+.ds-recpage__media .ds-record-map__frame {
+  border-color: var(--ds-border-strong);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-material-ink);
 }
 
 .ds-recpage__photo .ds-entity-photo__credit {

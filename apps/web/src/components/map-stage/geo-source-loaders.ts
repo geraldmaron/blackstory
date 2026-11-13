@@ -15,7 +15,10 @@ import { DEFAULT_POPULATION_GEO } from '../../lib/map-experience/explore-populat
 import {
   EXPLORE_STATE_DENSITY_SOURCE_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
+  EXPLORE_COUNTY_HATCH_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
+import { buildExploreMapStyle } from '../../app/map/explore-style';
+import { hatchedCountyKeys } from '../../lib/map-experience/county-hatch';
 import { readDocumentColorScheme } from './color-scheme';
 import type { StageConfig } from './stage-config';
 
@@ -91,6 +94,12 @@ export type CountyPolygonCollection = {
 };
 
 let countyLinesPromise: Promise<CountyPolygonCollection> | undefined;
+let countyPolygons: CountyPolygonCollection | undefined;
+
+/** The county geometry once any map has loaded it; the county hatch reads it (`county-hatch.ts`). */
+export function loadedCountyPolygons(): CountyPolygonCollection | undefined {
+  return countyPolygons;
+}
 
 export function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
   if (!countyLinesPromise) {
@@ -99,7 +108,8 @@ export function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
         if (!response.ok) {
           throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
         }
-        return (await response.json()) as CountyPolygonCollection;
+        countyPolygons = (await response.json()) as CountyPolygonCollection;
+        return countyPolygons;
       })
       .catch((error) => {
         // Clear the cached promise so a later blackShare/zoom retry can recover.
@@ -159,7 +169,25 @@ export function requestCountyPolygonLoad(map: MapLibreMap, cfg: StageConfig): vo
     map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
     ((cfg.layerMode === 'blackShare' || cfg.layerMode === 'blackChange') && popGeo === 'county');
   if (!needsCountyGeometry) return;
-  void loadCountyPolygons(map, cfg.countyChoroplethLevels).catch((error) => {
-    console.error('[MapStage] county polygon load failed', error);
+  void loadCountyPolygons(map, cfg.countyChoroplethLevels)
+    .then(() => syncCountyHatch(map, cfg))
+    .catch((error) => {
+      console.error('[MapStage] county polygon load failed', error);
+    });
+}
+
+/** Turns the county hatch on for the counties holding county records, once the geometry is in. */
+function syncCountyHatch(map: MapLibreMap, cfg: StageConfig): void {
+  if (!map.getLayer(EXPLORE_COUNTY_HATCH_LAYER_ID)) return;
+  const style = buildExploreMapStyle({
+    featureCollection: cfg.featureCollection,
+    jurisdictionAreaFeatures: [],
+    layerMode: cfg.layerMode,
+    hatchedCountyKeys: hatchedCountyKeys(cfg.featureCollection, countyPolygons),
   });
+  const layer = style.layers.find((entry) => entry.id === EXPLORE_COUNTY_HATCH_LAYER_ID);
+  const opacity = (layer?.paint as Record<string, unknown> | undefined)?.['fill-opacity'];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- paint value from our own style
+  if (opacity !== undefined)
+    map.setPaintProperty(EXPLORE_COUNTY_HATCH_LAYER_ID, 'fill-opacity', opacity as any);
 }

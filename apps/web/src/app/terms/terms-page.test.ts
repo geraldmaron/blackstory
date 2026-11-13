@@ -90,8 +90,8 @@ test('the license section states the facts/expression line and carves out third 
 });
 
 test('the copyright window is the modeled one, and no agent is implied', () => {
-  assert.match(sectionsSource, /ACKNOWLEDGEMENT_HOURS = 72/);
-  assert.match(sectionsSource, /RESOLUTION_DAYS = 30/);
+  assert.match(sectionsSource, /ACKNOWLEDGEMENT_HOURS = TAKEDOWN_ACKNOWLEDGEMENT_SLA_HOURS/);
+  assert.match(sectionsSource, /RESOLUTION_DAYS = TAKEDOWN_RESOLUTION_SLA_DAYS/);
   assert.match(flat, /I acknowledge a copyright complaint within \{ACKNOWLEDGEMENT_HOURS\} hours/);
   assert.match(flat, /reach a decision within \{RESOLUTION_DAYS\} days/);
   assert.match(flat, /Material found to be infringing is removed\./);

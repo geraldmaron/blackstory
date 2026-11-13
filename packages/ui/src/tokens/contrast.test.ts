@@ -6,6 +6,7 @@ import { test } from 'node:test';
 import {
   contrastRatio,
   groundPalettes,
+  primaryHoverPalettes,
   mapPalettes,
   criticalTextPairs,
   criticalUiPairs,
@@ -97,9 +98,22 @@ test('copper and sand grounds carry ink text at 4.5:1 and controls at 3:1', () =
       ['ink', g.ink, g.ground, 4.5],
       ['control edge', g.borderControl, g.ground, 3],
       ['primary label', g.primaryInk, g.primaryBg, 4.5],
+      ['primary label on hover', g.primaryInk, g.primaryHover, 4.5],
     ] as const) {
       const ratio = contrastRatio(fg, bg);
       assert.ok(ratio >= min, `${name} ${pair}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1`);
+    }
+  }
+});
+
+test('the copper primary button keeps its ink label at 4.5:1 at rest and on hover', () => {
+  for (const [theme, p] of Object.entries(primaryHoverPalettes)) {
+    for (const [state, bg] of [
+      ['rest', p.primaryBg],
+      ['hover', p.primaryHover],
+    ] as const) {
+      const ratio = contrastRatio(p.primaryInk, bg);
+      assert.ok(ratio >= 4.5, `${theme} ${state}: ink on ${bg} is ${ratio.toFixed(2)}:1`);
     }
   }
 });

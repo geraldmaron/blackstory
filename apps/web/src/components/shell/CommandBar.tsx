@@ -1,9 +1,11 @@
 /**
- * The header, on every route: lockup, the one search, the four tabs, the theme control.
+ * The header, on every route: lockup, the four tabs as plain text links, the one search, the
+ * theme control.
  *
- * From 48rem up it is a flush 56px bar fixed to the top, its content aligned to the wide
- * container. Below 48rem it is an in-flow 48px bar with the lockup, a search button and the theme
- * control; the search button opens the same combobox full screen, and the tabs move to the bottom
+ * From 48rem up it is a flush 52px ink bar fixed to the top, its content aligned to the wide
+ * container. The search rests as a compact "Search" control at the right and opens in place to the
+ * full field on focus, `/` or Cmd-K (command-bar.css). Below 48rem it is an in-flow 48px bar with
+ * the lockup, a search button and the theme control; the search button opens the same combobox full screen, and the tabs move to the bottom
  * tab bar (`PhoneTabBar`). There is one search field in the DOM at every width, so there is never
  * a second box to type into.
  *
@@ -198,19 +200,19 @@ export function CommandBar({
             <ShellWordmark lockup={BRAND_ASSETS.lockup} />
           </Link>
 
+          <Tabs className="ds-bar__tabs" label="Main" items={tabs} linkAs={Link} />
+
           <div
             className="ds-bar__search-region"
             role={searchOpen ? 'dialog' : undefined}
             aria-modal={searchOpen ? 'true' : undefined}
             aria-label={searchOpen ? 'Search' : undefined}
           >
-            <CommandBarSearch placeholder="Search records, places, eras" query={query} />
+            <CommandBarSearch placeholder="Search" query={query} />
             <button type="button" className="ds-bar__search-cancel" onClick={closeSearch}>
               Cancel
             </button>
           </div>
-
-          <Tabs className="ds-bar__tabs" label="Main" items={tabs} linkAs={Link} />
 
           <div className="ds-bar__tools">
             {onOpenSaved ? (
