@@ -14,7 +14,8 @@ import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room, RoomJump, RoomSection } from '../../components/room';
-import { FAQ_LEDE, FAQ_SECTIONS, faqEntryId, type FaqLink } from './faq-copy';
+import { TrustMast, TrustSheet } from '../../components/trust';
+import { FAQ_ENTRIES, FAQ_LEDE, FAQ_SECTIONS, faqEntryId, type FaqLink } from './faq-copy';
 import { FaqHashOpener } from './FaqHashOpener';
 import '../reading-room.css';
 import '../../components/trust/trust.css';
@@ -44,64 +45,79 @@ function FaqLinkRow({ link }: { readonly link: FaqLink }) {
 
 export default function FaqPage() {
   return (
-    <Room width="read">
-      <PageHeader
-        crumb={parentCrumb('/faq')}
-        linkAs={Link}
-        title="The questions people actually ask"
-        dek={FAQ_LEDE}
-      />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="copper"
+          numeral={{
+            value: String(FAQ_ENTRIES.length),
+            label: 'questions, each with its own address',
+          }}
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/faq')}
+            linkAs={Link}
+            title="The questions people actually ask"
+            dek={FAQ_LEDE}
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <RoomJump
+          sections={FAQ_SECTIONS.map((section) => ({ id: section.id, label: section.heading }))}
+        />
+        <FaqHashOpener />
 
-      <RoomJump
-        sections={FAQ_SECTIONS.map((section) => ({ id: section.id, label: section.heading }))}
-      />
-      <FaqHashOpener />
+        {FAQ_SECTIONS.map((section) => (
+          <RoomSection key={section.id} id={section.id} title={section.heading}>
+            <div className="ds-faq">
+              {section.entries.map((entry) => {
+                const [first, ...rest] = entry.answer;
+                return (
+                  <details key={entry.question} id={faqEntryId(entry)} className="ds-faq__item">
+                    <summary className="ds-faq__question">
+                      <h3>{entry.question}</h3>
+                      <svg className="ds-faq__chevron" viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                          d="m4 6 4 4 4-4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </summary>
+                    <div className="ds-faq__answer">
+                      <p className="ds-faq__lead">{first}</p>
+                      {rest.map((paragraph) => (
+                        <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+                      ))}
+                      {entry.links === undefined ? null : (
+                        <ul className="ds-faq__links" aria-label="Read more">
+                          {entry.links.map((link) => (
+                            <li key={link.href}>
+                              <FaqLinkRow link={link} />
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </details>
+                );
+              })}
+            </div>
+          </RoomSection>
+        ))}
 
-      {FAQ_SECTIONS.map((section) => (
-        <RoomSection key={section.id} id={section.id} title={section.heading}>
-          <div className="ds-faq">
-            {section.entries.map((entry) => {
-              const [first, ...rest] = entry.answer;
-              return (
-                <details key={entry.question} id={faqEntryId(entry)} className="ds-faq__item">
-                  <summary className="ds-faq__question">
-                    <h3>{entry.question}</h3>
-                    <svg className="ds-faq__chevron" viewBox="0 0 16 16" aria-hidden="true">
-                      <path
-                        d="m4 6 4 4 4-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </summary>
-                  <div className="ds-faq__answer">
-                    <p className="ds-faq__lead">{first}</p>
-                    {rest.map((paragraph) => (
-                      <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-                    ))}
-                    {entry.links === undefined ? null : (
-                      <ul className="ds-faq__links" aria-label="Read more">
-                        {entry.links.map((link) => (
-                          <li key={link.href}>
-                            <FaqLinkRow link={link} />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </details>
-              );
-            })}
-          </div>
-        </RoomSection>
-      ))}
-
-      <p className="ds-trust-foot">
-        A question that is not here? <Link href="/support">Ask it directly</Link>.
-      </p>
+        <p className="ds-trust-foot">
+          A question that is not here? <Link href="/support">Ask it directly</Link>.
+        </p>
+      </TrustSheet>
     </Room>
   );
 }

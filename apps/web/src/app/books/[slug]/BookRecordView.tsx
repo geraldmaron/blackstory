@@ -84,20 +84,57 @@ export function challengeWhen(challenges: readonly DatedChallenge[]): RecordFact
   };
 }
 
+/** "2022-2023" as "2022–23": a school year set as one numeral, so it cannot read as a date. */
+function shortSchoolYear(schoolYear: string): string {
+  const match = /^(\d{4})\D+(\d{2,4})$/.exec(schoolYear.trim());
+  return match ? `${match[1]}–${match[2]!.slice(-2)}` : schoolYear.trim();
+}
+
+/**
+ * The display numeral beside the title, captioned: next to the publication year in the meta
+ * line, a bare challenge year would read as a date about the book.
+ */
+export function challengeNumeral(
+  challenges: readonly DatedChallenge[],
+): { value: string; caption: string } | undefined {
+  const schoolYears = [
+    ...new Set(challenges.map((c) => c.schoolYear?.trim()).filter((y): y is string => !!y)),
+  ].sort();
+  if (schoolYears.length > 0) {
+    return {
+      value: shortSchoolYear(schoolYears[0]!),
+      caption: schoolYears.length === 1 ? 'Challenge school year' : 'First challenge on file',
+    };
+  }
+  const years = challenges
+    .map((c) => c.challengeYear)
+    .filter((y): y is number => y !== undefined)
+    .sort((a, b) => a - b);
+  if (years.length === 0) return undefined;
+  return {
+    value: String(years[0]),
+    caption: new Set(years).size === 1 ? 'Challenge year' : 'First challenge on file',
+  };
+}
+
 export function BookRecordView({
   view,
   related,
   archiveRecord,
+  hasCover = true,
 }: {
   readonly view: Extract<BooksDetailViewModel, { readonly kind: 'ok' }>;
   readonly related: readonly BooksBrowseItem[];
   readonly archiveRecord?: BookArchiveRecord;
+  /** False when the server found no cover upstream, so the page does not request one. */
+  readonly hasCover?: boolean;
 }) {
   const { book, states } = view;
   const challenges = activeBookChallenges(book);
   const authors = book.authors.map((author) => author.name);
   const published = /^\d{4}/.exec(book.publishedDate)?.[0];
   const coverIsbn = coverIsbnForBook(book);
+  const numeral = challengeNumeral(challenges);
   const bookshop = book.purchaseLinks.find((link) => link.retailer === 'bookshop');
   const lookups = book.purchaseLinks.filter((link) => link.retailer !== 'bookshop');
   const isbn = book.identifiers.find((id) => id.system === 'isbn-13' || id.system === 'isbn-10');
@@ -207,12 +244,14 @@ export function BookRecordView({
           detail: `${plural(challenges.length, 'challenge report')}`,
         },
       ]}
+      {...(numeral ? { numeral } : {})}
       {...(coverIsbn
         ? {
             media: (
               <BooksCoverArt
                 title={book.title}
-                isbn={coverIsbn}
+                {...(hasCover ? { isbn: coverIsbn } : {})}
+                author={authors.join(', ')}
                 size="L"
                 decorative={false}
                 className="ds-recpage__cover"

@@ -5,7 +5,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
-import { PageHeader } from '@repo/ui';
+import { DisplayNumeral, PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { parentCrumb, Room } from '../../components/room';
@@ -16,6 +16,7 @@ import {
   type RawBooksBrowseParams,
 } from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
+import { isbnsWithCovers } from './books-cover-availability';
 import { BOOKS_PAGE_DESCRIPTION } from './books-copy';
 import '../reading-room.css';
 import './books.css';
@@ -48,7 +49,13 @@ function dek(view: ReturnType<typeof buildBooksBrowseViewModel>): string {
 export default async function BooksPage({ searchParams }: BooksPageProps) {
   const params = await searchParams;
   const snapshot = await loadBannedBooksListing();
-  const header = { crumb: parentCrumb('/books'), linkAs: Link, title: 'Banned books' } as const;
+  const header = {
+    crumb: parentCrumb('/books'),
+    linkAs: Link,
+    title: 'Banned books',
+    display: true,
+    className: 'ds-books-head',
+  } as const;
 
   if (snapshot.books.length === 0) {
     return (
@@ -61,11 +68,32 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
     );
   }
 
-  const view = buildBooksBrowseViewModel(snapshot, params);
+  const built = buildBooksBrowseViewModel(snapshot, params);
+  // A title with no cover upstream gets no ISBN, so it renders typeset without a failing request.
+  const covered = await isbnsWithCovers(built.items.map((item) => item.coverIsbn));
+  const view = {
+    ...built,
+    items: built.items.map((item) =>
+      item.coverIsbn && !covered.has(item.coverIsbn) ? { ...item, coverIsbn: undefined } : item,
+    ),
+  };
 
   return (
     <Room width="wide" className="ds-books">
-      <PageHeader {...header} dek={dek(view)} />
+      {/* The title count as a giant numeral; the dek states it in words, so it is not read twice. */}
+      <PageHeader
+        {...header}
+        dek={dek(view)}
+        {...(view.totalMatched > 0
+          ? {
+              actions: (
+                <DisplayNumeral decorative className="ds-books-head__count">
+                  {view.totalMatched.toLocaleString('en-US')}
+                </DisplayNumeral>
+              ),
+            }
+          : {})}
+      />
       <BooksBrowseSections view={view} />
     </Room>
   );

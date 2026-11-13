@@ -32,7 +32,7 @@ const LICENSE_DEED = 'https://creativecommons.org/licenses/by/4.0/';
  * The takedown windows published here are the ones the routing model already holds
  * (`packages/domain/src/rights/takedown.ts`), not a softer pair invented for a policy page.
  */
-const ACKNOWLEDGEMENT_HOURS = 72;
+export const ACKNOWLEDGEMENT_HOURS = 72;
 const RESOLUTION_DAYS = 30;
 
 const PAGE_SECTIONS: readonly {

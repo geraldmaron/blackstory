@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { coverDek, splitLede, splitSectionHeading } from './story-text';
+import { coverDek, firstYear, splitLede, splitSectionHeading } from './story-text';
 
 test('a section heading that leads with a year splits into year and title', () => {
   assert.deepEqual(splitSectionHeading('1790 · A ledger open on his knee'), {
@@ -56,4 +56,13 @@ test('a cover dek is the first whole sentence, never a cut phrase', () => {
     coverDek('The U.S. Census counted every household twice. Then it stopped.'),
     'The U.S. Census counted every household twice.',
   );
+});
+
+test('a span gives the year it opens on, and nothing when it names no year', () => {
+  assert.equal(firstYear('1787-present'), '1787');
+  assert.equal(firstYear('1797–1801'), '1797');
+  assert.equal(firstYear('1841 (31 days)'), '1841');
+  assert.equal(firstYear('1950s'), '1950s');
+  assert.equal(firstYear('Undated'), undefined);
+  assert.equal(firstYear(undefined), undefined);
 });

@@ -1,14 +1,15 @@
 /**
  * The `/books` index body: the register's toolbar (State, Author, Sort, and a Covers | States
- * switch), the active narrowing as removable chips, then either the cover wall or the states by
- * challenge count.
+ * switch), the active narrowing as removable chips, then either the cover wall (large covers on
+ * a full-bleed ink block, each with a copper tab naming its states) or the states by challenge
+ * count (a sand block: the tile map in copper steps beside a paper sheet of ranked states).
  *
  * Server-rendered and JavaScript-free apart from the cover's image fallback: menus are the
  * register's native popovers of GET links, and every cover and state is an anchor.
  */
 import React from 'react';
 import Link from 'next/link';
-import { Chip, buttonClassName } from '@repo/ui';
+import { Block, Chip, DisplayNumeral, Sheet, buttonClassName } from '@repo/ui';
 import { RecordsToolbar, type ToolbarMenu } from '../records/RecordsToolbar';
 import { Outcome } from '../records/RecordsIndex';
 import {
@@ -132,29 +133,106 @@ function activeFilters(view: BooksBrowseViewModel): ActiveFilter[] {
   return active;
 }
 
-function CoverWall({ items }: { readonly items: readonly BooksBrowseItem[] }) {
+/** The closing note, set as a caption inside the last block so the page meets the footer on it. */
+function BooksNote() {
   return (
-    <ul className="ds-books-wall" aria-label="Challenged titles">
-      {items.map((item) => (
-        <li key={item.id}>
-          <Link className="ds-books-wall__link" href={`/books/${item.slug}`}>
-            <BooksCoverArt
-              className="ds-books-wall__cover"
-              title={item.title}
-              author={item.authorNames}
-              {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
-            />
-            <span className="ds-books-wall__title">{item.title}</span>
-            <span className="ds-books-wall__states">{statesPhrase(item.states.length)}</span>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <p className="ds-books-note">
+      {BOOKS_INDEX_NOTE} <Link href="/methodology">How this list is built</Link>
+    </p>
   );
 }
 
-/** Shade steps for the tile grid; the two darkest carry paper-colored codes (books.css). */
+/**
+ * The sand lead over the cover wall: the state with the most challenged titles as a display
+ * numeral, then the next four in mono. Every entry opens the states view; the numbers are the
+ * same `stateCounts` the states view ranks.
+ */
+function StatesLead({ view }: { readonly view: BooksBrowseViewModel }) {
+  const [top, ...rest] = view.stateCounts;
+  if (!top) return null;
+  const href = buildBooksBrowseHref({ ...currentParams(view), view: 'states' });
+  return (
+    <Block tone="sand" className="ds-books-lead">
+      <div className="ds-wrap ds-books-lead__inner">
+        <a className="ds-books-lead__top" href={href}>
+          <DisplayNumeral size="title" className="ds-books-lead__numeral">
+            {top.count.toLocaleString('en-US')}
+          </DisplayNumeral>
+          <span className="ds-books-lead__label">
+            <span className="ds-books-lead__state">{top.name}</span>
+            <span className="ds-books-lead__unit">
+              {top.count === 1 ? 'title' : 'titles'} challenged, the most of any state
+            </span>
+          </span>
+        </a>
+        <ol className="ds-books-lead__rest" aria-label="Next states by challenged titles">
+          {rest.slice(0, 4).map((entry) => (
+            <li key={entry.code}>
+              <a className="ds-books-lead__row" href={href}>
+                <span>{entry.name}</span>
+                <span className="ds-books-lead__count">{titlesPhrase(entry.count)}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </Block>
+  );
+}
+
+function CoverWall({ items }: { readonly items: readonly BooksBrowseItem[] }) {
+  return (
+    <Block tone="ink" className="ds-books-band">
+      <div className="ds-wrap">
+        <ul className="ds-books-wall" aria-label="Challenged titles">
+          {items.map((item) => (
+            <li key={item.id}>
+              <Link className="ds-books-wall__link" href={`/books/${item.slug}`}>
+                <span className="ds-books-wall__frame">
+                  <BooksCoverArt
+                    className="ds-books-wall__cover"
+                    title={item.title}
+                    author={item.authorNames}
+                    {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
+                  />
+                  {/* A copper tab pinned to the cover's foot; sand when no report names a state. */}
+                  <span
+                    className="ds-books-wall__states"
+                    data-ground={item.states.length > 0 ? 'copper' : 'sand'}
+                  >
+                    {statesPhrase(item.states.length)}
+                  </span>
+                </span>
+                <span className="ds-books-wall__title">{item.title}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <BooksNote />
+      </div>
+    </Block>
+  );
+}
+
+/** Steps for the tile grid: paper, copper, copper text, ink; none is an outline (books.css). */
 const TILE_STEPS = 4;
+
+/** Square root, so the states behind one outlier still read apart from each other. */
+export function tileStep(count: number, max: number): number {
+  return count <= 0 || max <= 0 ? 0 : Math.ceil(Math.sqrt(count / max) * TILE_STEPS);
+}
+
+/** The legend's ranges, read off `tileStep` itself so the key cannot drift from the tiles. */
+export function tileLegend(max: number): { step: number; from: number; to: number }[] {
+  const ranges: { step: number; from: number; to: number }[] = [];
+  for (let count = 1; count <= max; count += 1) {
+    const step = tileStep(count, max);
+    const range = ranges.at(-1);
+    if (range?.step === step) range.to = count;
+    else ranges.push({ step, from: count, to: count });
+  }
+  return ranges;
+}
 
 /**
  * The states by how many titles carry a cited challenge there. The tile grid is the picture: a
@@ -166,44 +244,58 @@ function StateView({ view }: { readonly view: BooksBrowseViewModel }) {
   const counts = new Map(view.stateCounts.map((entry) => [entry.code, entry.count]));
   const max = Math.max(...view.stateCounts.map((entry) => entry.count));
   return (
-    <div className="ds-books-states">
-      <div className="ds-books-tiles" aria-hidden="true">
-        {Object.entries(STATE_TILES).map(([code, [row, column]]) => {
-          const count = counts.get(code) ?? 0;
-          // Square root, so the states behind one outlier still read apart from each other.
-          const step = count === 0 ? 0 : Math.ceil(Math.sqrt(count / max) * TILE_STEPS);
-          return (
-            <span
-              key={code}
-              className="ds-books-tiles__tile"
-              data-step={step}
-              data-current={code === view.state ? 'true' : undefined}
-              style={{ gridRow: row + 1, gridColumn: column + 1 }}
-            >
-              {code}
-            </span>
-          );
-        })}
-      </div>
+    <Block tone="sand" className="ds-books-band ds-books-band--states">
+      <div className="ds-wrap ds-books-states">
+        <div className="ds-books-map" aria-hidden="true">
+          <div className="ds-books-tiles">
+            {Object.entries(STATE_TILES).map(([code, [row, column]]) => {
+              const step = tileStep(counts.get(code) ?? 0, max);
+              return (
+                <span
+                  key={code}
+                  className="ds-books-tiles__tile"
+                  data-step={step}
+                  data-current={code === view.state ? 'true' : undefined}
+                  style={{ gridRow: row + 1, gridColumn: column + 1 }}
+                >
+                  {code}
+                </span>
+              );
+            })}
+          </div>
+          <ul className="ds-books-legend">
+            {tileLegend(max).map((range) => (
+              <li key={range.step}>
+                <span className="ds-books-tiles__tile" data-step={range.step} />
+                {range.from === range.to ? range.from : `${range.from} to ${range.to}`}{' '}
+                {range.to === 1 ? 'title' : 'titles'}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <ol className="ds-books-ranks" aria-label="States by challenged titles">
-        {view.stateCounts.map((entry) => (
-          <li key={entry.code}>
-            <a
-              className="ds-books-ranks__row"
-              href={buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' })}
-              aria-current={entry.code === view.state ? 'true' : undefined}
-            >
-              <span className="ds-books-ranks__name">{entry.name}</span>
-              <span className="ds-books-ranks__bar" aria-hidden="true">
-                <span style={{ width: `${(entry.count / max) * 100}%` }} />
-              </span>
-              <span className="ds-books-ranks__count">{titlesPhrase(entry.count)}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
-    </div>
+        <Sheet className="ds-books-ranks-sheet">
+          <ol className="ds-books-ranks" aria-label="States by challenged titles">
+            {view.stateCounts.map((entry) => (
+              <li key={entry.code}>
+                <a
+                  className="ds-books-ranks__row"
+                  href={buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' })}
+                  aria-current={entry.code === view.state ? 'true' : undefined}
+                >
+                  <span className="ds-books-ranks__name">{entry.name}</span>
+                  <span className="ds-books-ranks__bar" aria-hidden="true">
+                    <span style={{ width: `${(entry.count / max) * 100}%` }} />
+                  </span>
+                  <span className="ds-books-ranks__count">{titlesPhrase(entry.count)}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </Sheet>
+        <BooksNote />
+      </div>
+    </Block>
   );
 }
 
@@ -240,7 +332,10 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
           Nothing in the catalog matches {active.map((filter) => filter.label).join(', ')}.
         </Outcome>
       ) : (
-        <CoverWall items={view.items} />
+        <>
+          <StatesLead view={view} />
+          <CoverWall items={view.items} />
+        </>
       );
   }
 
@@ -288,9 +383,8 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
 
       {body}
 
-      <p className="ds-books-note">
-        {BOOKS_INDEX_NOTE} <Link href="/methodology">How this list is built</Link>
-      </p>
+      {/* With a band on the page the note rides its foot; an outcome keeps it here. */}
+      {empty ? <BooksNote /> : null}
     </>
   );
 }

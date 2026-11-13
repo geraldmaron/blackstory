@@ -108,7 +108,7 @@ export function LivesEraScrubber({
 
   return (
     <section className="lives-eras" aria-label="Across the years">
-      <div className="lives-scrub">
+      <div className="lives-scrub" data-ground="sand">
         {measure ? (
           <p className="lives-scrub__measure">
             <span className="lives-scrub__name">{measure}</span>
@@ -139,6 +139,8 @@ export function LivesEraScrubber({
                 tabIndex={isSelected ? 0 : -1}
                 className="lives-scrub__era"
                 data-empty={era.marks ? undefined : 'true'}
+                // The chosen era turns into an ink block (shape and weight, not color alone).
+                data-ground={isSelected ? 'ink' : undefined}
                 onClick={() => choose(index, false)}
                 onKeyDown={onKeyDown}
               >

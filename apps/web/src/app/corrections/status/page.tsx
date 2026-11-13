@@ -10,6 +10,7 @@ import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../../components/room';
+import { TrustMast, TrustSheet } from '../../../components/trust';
 import '../../utility.css';
 import '../../../components/trust/trust.css';
 import '../../../components/forms/form-kit.css';
@@ -23,17 +24,27 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function CorrectionStatusLandingPage() {
   return (
-    <Room width="read">
-      <PageHeader
-        crumb={parentCrumb('/corrections/status')}
-        linkAs={Link}
-        title="Check a correction receipt"
-        dek="Enter the code you were given when you sent a correction. There is no way to browse other people’s submissions."
-      />
-      <ReceiptLookupForm />
-      <p className="ds-trust-foot">
-        No code? <Link href="/corrections">Send a correction</Link> to get one.
-      </p>
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast tone="sand">
+          <PageHeader
+            display
+            crumb={parentCrumb('/corrections/status')}
+            linkAs={Link}
+            title="Check a correction receipt"
+            dek="Enter the code you were given when you sent a correction. There is no way to browse other people’s submissions."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <ReceiptLookupForm />
+        <p className="ds-trust-foot">
+          No code? <Link href="/corrections">Send a correction</Link> to get one.
+        </p>
+      </TrustSheet>
     </Room>
   );
 }

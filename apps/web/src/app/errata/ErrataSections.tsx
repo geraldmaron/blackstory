@@ -9,6 +9,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
+import { DisplayNumeral } from '@repo/ui';
 import { ERRATA_CHANGE_TYPE_LABELS } from '../../lib/trust/domain-trust';
 import type { ErrataEntry } from '../../lib/trust/errata-seed';
 import { errataDate, splitErrataHeadline } from './errata-headline';
@@ -70,7 +71,13 @@ function ErrataRow({
         ) : (
           <span className="ds-errata__name">{name}</span>
         )}
-        <span className="ds-errata__type">{ERRATA_CHANGE_TYPE_LABELS[entry.changeType]}</span>
+        {/* A correction changed a fact, so it reads heaviest: an ink tag. The rest are sand. */}
+        <span
+          className="ds-errata__type"
+          data-ground={entry.changeType === 'correction' ? 'ink' : 'sand'}
+        >
+          {ERRATA_CHANGE_TYPE_LABELS[entry.changeType]}
+        </span>
       </p>
       {subject ? <p className="ds-errata__change">{change}</p> : null}
       <div className="ds-errata__more" {...(clamp ? { 'data-clamp': '' } : {})}>
@@ -104,10 +111,9 @@ function ErrataRow({
   );
 }
 
-const DAY = new Intl.DateTimeFormat('en-US', {
+const MONTH_DAY = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
-  year: 'numeric',
   timeZone: 'UTC',
 });
 
@@ -138,7 +144,12 @@ export function ErrataSections({ entries, recordHrefs }: ErrataSectionsProps) {
       {byDay(entries).map(({ day, entries: dayEntries }) => (
         <li key={day} className="ds-errata__day">
           <h2 className="ds-errata__date">
-            <time dateTime={day}>{DAY.format(new Date(`${day}T00:00:00Z`))}</time>
+            <time dateTime={day}>
+              <DisplayNumeral size="title" className="ds-errata__day-numeral">
+                {MONTH_DAY.format(new Date(`${day}T00:00:00Z`))}
+              </DisplayNumeral>{' '}
+              <span className="ds-errata__year">{day.slice(0, 4)}</span>
+            </time>
           </h2>
           <ol className="ds-errata__entries">
             {dayEntries.map((entry) => (

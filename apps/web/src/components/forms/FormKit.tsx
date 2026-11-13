@@ -49,7 +49,11 @@ export function FormLayout({
   return (
     <div className={cx('ds-form-layout', className)}>
       <div className="ds-form-layout__main">{children}</div>
-      <aside className="ds-form-layout__aside" aria-labelledby="form-next-heading">
+      <aside
+        className="ds-form-layout__aside"
+        aria-labelledby="form-next-heading"
+        data-ground="copper"
+      >
         {aside}
       </aside>
     </div>

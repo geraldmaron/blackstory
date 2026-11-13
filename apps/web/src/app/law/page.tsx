@@ -4,7 +4,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
-import { PageHeader } from '@repo/ui';
+import { DisplayNumeral, PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { parentCrumb, Room } from '../../components/room';
@@ -53,7 +53,25 @@ export default async function LawPage({ searchParams }: LawPageProps) {
 
   return (
     <Room width="wide" className="ds-law">
-      <PageHeader crumb={parentCrumb('/law')} linkAs={Link} title="Law" dek={dek(view)} />
+      {/* The count beside the title as a giant numeral; the dek states it in words, so the
+          numeral is not read twice. */}
+      <PageHeader
+        display
+        className="ds-law-head"
+        crumb={parentCrumb('/law')}
+        linkAs={Link}
+        title="Law"
+        dek={dek(view)}
+        {...(view.totalMatched > 0
+          ? {
+              actions: (
+                <DisplayNumeral decorative className="ds-law-head__count">
+                  {view.totalMatched.toLocaleString('en-US')}
+                </DisplayNumeral>
+              ),
+            }
+          : {})}
+      />
       <LawBrowseSections view={view} catalog={source.snapshots} />
     </Room>
   );

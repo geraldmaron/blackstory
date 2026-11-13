@@ -57,3 +57,12 @@ export function coverDek(summary: string): string {
   const end = firstSentenceEnd(text);
   return end === undefined ? text : text.slice(0, end);
 }
+
+/**
+ * The year a span opens on, for a display numeral: "1787" from "1787-present", "1797" from
+ * "1797–1801", "1841" from "1841 (31 days)". A decade keeps its "s" ("1950s"), so it is never
+ * sharpened into an exact year. A label with no year ("Undated") gives undefined.
+ */
+export function firstYear(label: string | undefined): string | undefined {
+  return /\b(\d{3,4}s?)\b/.exec(label ?? '')?.[1];
+}

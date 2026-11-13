@@ -19,12 +19,13 @@
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
+/* The grade letter is the mark a record carries, set large in copper; its meaning sits beside. */
 .ds-grade-key__grade {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-display-3);
-  font-weight: 500;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
   line-height: 1;
-  color: var(--ds-ink);
+  color: var(--ds-numeral-accent);
   font-variant-numeric: tabular-nums;
 }
 
@@ -98,17 +99,23 @@
   vertical-align: middle;
 }
 
-/* A neutral value step per letter, so the eye reads the table as strength without color. */
+/* A sand step per letter, deepest for A, so the eye reads the table as strength; the letter is
+   printed in every cell, so the step is never read alone. Stone fails on sand, so the note in a
+   filled cell is ink. */
 .ds-grade-matrix__table td[data-grade='A'] {
-  background: color-mix(in srgb, var(--ds-ink) 14%, var(--ds-canvas));
+  background: var(--ds-material-sand);
 }
 
 .ds-grade-matrix__table td[data-grade='B'] {
-  background: color-mix(in srgb, var(--ds-ink) 8%, var(--ds-canvas));
+  background: color-mix(in srgb, var(--ds-material-sand) 55%, var(--ds-canvas));
 }
 
 .ds-grade-matrix__table td[data-grade='C'] {
-  background: color-mix(in srgb, var(--ds-ink) 3%, var(--ds-canvas));
+  background: color-mix(in srgb, var(--ds-material-sand) 22%, var(--ds-canvas));
+}
+
+.ds-grade-matrix__table td[data-grade] .ds-grade-matrix__moved {
+  color: var(--ds-ink);
 }
 
 .ds-grade-matrix__letter {
@@ -168,17 +175,37 @@
 
 /* The bar narrows a step at a time: the coarsest area is the widest. */
 .ds-precision-ladder__bar {
+  display: grid;
+  place-items: center;
   justify-self: center;
-  width: calc(100% - var(--step, 0) * 20%);
+  width: calc(100% - var(--step, 0) * 18%);
   height: 1.75rem;
-  border: var(--ds-border-width) solid var(--ds-ink-muted);
+  border: var(--ds-border-width) solid var(--ds-ink);
   border-radius: var(--ds-radius-sm);
-  background: color-mix(in srgb, var(--ds-ink) calc(14% - var(--step, 0) * 2.5%), var(--ds-canvas));
+  background: var(--ds-material-sand);
 }
 
 .ds-precision-ladder__step[data-stop] .ds-precision-ladder__bar {
   border-style: dashed;
   background: transparent;
+}
+
+/* The map's own marks: a hollow copper ring for an area, a solid copper pin for a site. Copper
+   is under 3:1 on the sand bar, so each mark carries a hairline ink edge. */
+.ds-precision-ladder__mark {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 4px solid var(--ds-accent-graphic);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow:
+    0 0 0 1px var(--ds-ink),
+    inset 0 0 0 1px var(--ds-ink);
+}
+
+.ds-precision-ladder__mark[data-mark='dot'] {
+  background: var(--ds-accent-graphic);
+  box-shadow: 0 0 0 1px var(--ds-ink);
 }
 
 .ds-precision-ladder__level {

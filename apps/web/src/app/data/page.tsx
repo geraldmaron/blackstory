@@ -12,6 +12,7 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
 import {
   buildLivesHref,
   parseLivesAreaSlug,
@@ -50,15 +51,39 @@ export default async function DataPage({
 
   const dataModel = await loadDataPageModel();
 
+  const latest = dataModel.sections.timelineRows.at(-1);
+
   return (
-    <Room width="wide">
-      <PageHeader
-        crumb={parentCrumb('/data')}
-        linkAs={Link}
-        title="What the numbers show, and what they leave out"
-        dek={DATA_INTRO.lede}
-      />
-      <DataSections {...dataModel.sections} />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="copper"
+          numeral={
+            latest === undefined
+              ? undefined
+              : {
+                  value: `${(latest.blackPopulation / 1_000_000).toLocaleString('en-US', {
+                    maximumFractionDigits: 1,
+                  })}M`,
+                  label: `Black Americans counted in ${latest.decade}`,
+                }
+          }
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/data')}
+            linkAs={Link}
+            title="What the numbers show, and what they leave out"
+            dek={DATA_INTRO.lede}
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <DataSections {...dataModel.sections} />
+      </TrustSheet>
     </Room>
   );
 }

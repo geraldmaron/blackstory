@@ -1,5 +1,6 @@
 /**
- * `/books`: the cover wall, the states view and the closing note. The toolbar, menus, active
+ * `/books`: the display header, the cover wall on ink, the states view on sand and the closing
+ * note. The toolbar, menus, active
  * chips and outcome states are the register's (records-index.css); the cover is
  * book-cover.css. Spacing uses the shared scale only (4, 8, 12, 16, 24, 32, 48, 72).
  */
@@ -22,20 +23,127 @@ body:has(.ds-books) .ds-reading-progress {
   position-anchor: --records-author;
 }
 
+/* —— header: display title, the count as a giant copper numeral ————————————————— */
+.ds-books-head {
+  align-items: flex-end;
+  flex-wrap: nowrap;
+}
+
+.ds-books-head .ds-page-header__dek {
+  max-width: 40rem;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.ds-books-head__count {
+  margin-bottom: -0.06em;
+}
+
+/* —— full-bleed bands: ink under the wall, sand under the states ———————————————— */
+.ds-books-band {
+  margin-inline: calc(50% - 50vw);
+  padding-block: var(--ds-space-12) var(--ds-space-16);
+}
+
+/* —— the sand lead: the top state as a numeral, the next four in mono ———————————— */
+.ds-books-lead {
+  margin-inline: calc(50% - 50vw);
+  margin-top: var(--ds-space-6);
+  padding-block: var(--ds-space-8);
+}
+
+.ds-books-lead__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-space-6) var(--ds-space-12);
+}
+
+.ds-books-lead__top {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ds-space-6);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-books-lead__numeral {
+  margin-bottom: -0.1em;
+}
+
+.ds-books-lead__label {
+  display: grid;
+  gap: var(--ds-space-1);
+  padding-bottom: var(--ds-space-2);
+}
+
+.ds-books-lead__state {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: var(--ds-tracking-display);
+}
+
+.ds-books-lead__unit {
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body);
+  font-style: italic;
+}
+
+.ds-books-lead__top:hover .ds-books-lead__state,
+.ds-books-lead__row:hover > span:first-child {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-books-lead__top:focus-visible,
+.ds-books-lead__row:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-space-1);
+}
+
+.ds-books-lead__rest {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(12rem, auto));
+  gap: 0 var(--ds-space-8);
+  margin: 0;
+  padding: 0 0 var(--ds-space-2);
+  list-style: none;
+}
+
+.ds-books-lead__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  padding-block: var(--ds-space-2);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
 /* —— cover wall ——————————————————————————————————————————————————————————————— */
 .ds-books-wall {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: var(--ds-space-8) var(--ds-space-6);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--ds-space-12) var(--ds-space-8);
   margin: 0;
-  padding: var(--ds-space-8) 0 0;
+  padding: 0;
   list-style: none;
 }
 
 .ds-books-wall__link {
   display: grid;
   align-content: start;
-  gap: var(--ds-space-1);
+  gap: var(--ds-space-3);
   color: var(--ds-ink);
   text-decoration: none;
   border-radius: var(--ds-radius-sm);
@@ -46,56 +154,83 @@ body:has(.ds-books) .ds-reading-progress {
   outline-offset: var(--ds-space-1);
 }
 
-.ds-books-wall__cover {
-  margin-bottom: var(--ds-space-2);
+/* The cover and its tab move together. */
+.ds-books-wall__frame {
+  position: relative;
+  display: block;
+  padding-bottom: var(--ds-space-4);
   transition: transform var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-books-wall__link:hover .ds-books-wall__cover {
-  transform: translateY(calc(var(--ds-space-1) * -1));
+.ds-books-wall__link:hover .ds-books-wall__frame {
+  transform: translateY(calc(var(--ds-space-2) * -1));
+}
+
+/* The copper tab, stuck over the cover's foot like an index tab on a file. */
+.ds-books-wall__states {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--ds-space-2) * -1);
+  max-width: calc(100% + var(--ds-space-2));
+  padding: var(--ds-space-1) var(--ds-space-3);
+  border-radius: 0 var(--ds-radius-sm) var(--ds-radius-sm) 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 700;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ds-books-wall__title {
   display: -webkit-box;
   overflow: hidden;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-body);
-  font-weight: 600;
-  line-height: 1.25rem;
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.2;
   letter-spacing: var(--ds-tracking-title);
   overflow-wrap: break-word;
+  text-wrap: balance;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
 }
 
 .ds-books-wall__link:hover .ds-books-wall__title {
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
 }
 
-.ds-books-wall__states {
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-caption);
-  line-height: 1rem;
-}
-
-/* —— states view —————————————————————————————————————————————————————————————— */
+/* —— states view: the tile map on sand beside a paper sheet of ranks —————————————— */
 .ds-books-states {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   align-items: start;
   gap: var(--ds-space-12);
-  padding-top: var(--ds-space-8);
+}
+
+.ds-books-map {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--records-bar-h) + var(--ds-space-6));
+  display: grid;
+  gap: var(--ds-space-6);
 }
 
 .ds-books-tiles {
-  position: sticky;
-  top: calc(var(--ds-island-clearance) + var(--records-bar-h) + var(--ds-space-6));
   display: grid;
   grid-template-columns: repeat(11, minmax(0, 1fr));
   grid-template-rows: repeat(8, auto);
   gap: var(--ds-space-1);
+}
+
+/* Four steps by the square root of each state's share of the busiest, each a material of the
+   palette: paper, copper, copper text, ink. A state with none is an outline. Codes are ink, paper
+   on the two darkest; the ranked list prints the numbers. Fixed values, the same in both themes. */
+.ds-books-map {
+  --books-paper: #f4efe5;
+  --books-copper-text: #8e4f2a;
 }
 
 .ds-books-tiles__tile {
@@ -104,52 +239,78 @@ body:has(.ds-books) .ds-reading-progress {
   aspect-ratio: 1;
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-ink-subtle);
+  color: var(--ds-ink);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
+  font-weight: 600;
   line-height: 1;
 }
 
-/* Four steps from the paper toward ink by the square root of each state's share of the busiest.
-   The code flips to paper on the two darkest steps, so every step keeps 4.5:1. */
 .ds-books-tiles__tile:not([data-step='0']) {
   border-color: transparent;
-  color: var(--ds-ink);
 }
 
 .ds-books-tiles__tile[data-step='1'] {
-  background: color-mix(in oklab, var(--ds-ink) 14%, var(--ds-surface-raised));
+  background: var(--books-paper);
 }
 
 .ds-books-tiles__tile[data-step='2'] {
-  background: color-mix(in oklab, var(--ds-ink) 32%, var(--ds-surface-raised));
+  background: var(--ds-material-copper);
 }
 
 .ds-books-tiles__tile[data-step='3'] {
-  background: color-mix(in oklab, var(--ds-ink) 64%, var(--ds-surface-raised));
-  color: var(--ds-canvas);
+  background: var(--books-copper-text);
+  color: var(--books-paper);
 }
 
 .ds-books-tiles__tile[data-step='4'] {
-  background: var(--ds-ink);
-  color: var(--ds-canvas);
+  background: var(--ds-material-ink);
+  color: var(--books-paper);
+}
+
+/* The key under the grid: one swatch per step and the range of titles it stands for. */
+.ds-books-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3) var(--ds-space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-books-legend > li {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-books-legend .ds-books-tiles__tile {
+  width: var(--ds-space-6);
 }
 
 /* The state the wall is filtered to: an outline, not a color. */
 .ds-books-tiles__tile[data-current='true'] {
-  outline: 2px solid var(--ds-ink);
+  outline: 3px solid var(--ds-material-ink);
   outline-offset: 2px;
+}
+
+.ds-books-ranks-sheet {
+  padding-block: var(--ds-space-4);
 }
 
 .ds-books-ranks {
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-books-ranks > li {
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+.ds-books-ranks > li + li {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-books-ranks__row {
@@ -180,59 +341,76 @@ body:has(.ds-books) .ds-reading-progress {
 
 .ds-books-ranks__name {
   overflow: hidden;
-  font-weight: 600;
+  font-family: var(--ds-font-display);
+  font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ds-books-ranks__row:hover .ds-books-ranks__name {
+.ds-books-ranks__row:hover .ds-books-ranks__name,
+.ds-books-ranks__row[aria-current='true'] .ds-books-ranks__name {
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
 }
 
 .ds-books-ranks__bar {
-  height: var(--ds-space-2);
+  height: var(--ds-space-3);
 }
 
 .ds-books-ranks__bar > span {
   display: block;
   height: 100%;
-  min-width: 2px;
-  background: var(--ds-ink-muted);
+  min-width: 3px;
+  background: var(--ds-material-copper);
 }
 
 .ds-books-ranks__row:hover .ds-books-ranks__bar > span,
 .ds-books-ranks__row[aria-current='true'] .ds-books-ranks__bar > span {
-  background: var(--ds-ink);
+  background: var(--ds-material-ink);
 }
 
 .ds-books-ranks__count {
-  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
+/* The closing note: a Newsreader caption at the foot of the last band, in its own ink. */
 .ds-books-note {
+  grid-column: 1 / -1;
   max-width: var(--ds-width-read);
-  margin: var(--ds-space-12) 0;
-  color: var(--ds-ink-muted);
+  margin: var(--ds-space-12) 0 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-body-sm);
+  font-style: italic;
   line-height: var(--ds-leading-body);
+}
+
+/* In the states view the note hangs under the ranked sheet, not across the band. */
+.ds-books-states > .ds-books-note {
+  grid-column: 2;
+  margin-top: 0;
+}
+
+/* The last band meets the footer directly, with no strip of table between them. */
+.ds-books .ds-room__doc:has(.ds-books-band .ds-books-note) {
+  padding-bottom: 0;
 }
 
 /* —— narrower ————————————————————————————————————————————————————————————————— */
 @media (max-width: 79.9375rem) {
   .ds-books-wall {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 63.9375rem) {
   .ds-books-wall {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .ds-books-states {
@@ -240,8 +418,12 @@ body:has(.ds-books) .ds-reading-progress {
     gap: var(--ds-space-8);
   }
 
-  .ds-books-tiles {
+  .ds-books-map {
     position: static;
+  }
+
+  .ds-books-states > .ds-books-note {
+    grid-column: auto;
   }
 }
 
@@ -250,24 +432,53 @@ body:has(.ds-books) .ds-reading-progress {
     padding-block: var(--ds-space-8) var(--ds-space-4);
   }
 
+  .ds-books-head {
+    flex-wrap: wrap;
+  }
+
+  .ds-books-band {
+    padding-block: var(--ds-space-8) var(--ds-space-12);
+  }
+
   .ds-books-wall {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--ds-space-6) var(--ds-space-4);
-    padding-top: var(--ds-space-6);
+    gap: var(--ds-space-8) var(--ds-space-4);
+  }
+
+  .ds-books-wall__title {
+    font-size: var(--ds-text-subtitle);
+  }
+
+  /* The ranked sheet runs full-bleed on a phone. */
+  .ds-books-ranks-sheet {
+    margin-inline: calc(var(--ds-gutter) * -1);
   }
 
   /* Eleven columns of tiles shrink past reading at phone width; the ranked list says it all. */
-  .ds-books-tiles {
+  .ds-books-map {
     display: none;
   }
 
-  /* With no figure beside it, the toolbar's rule already tops the list. */
-  .ds-books-ranks {
-    border-top: 0;
+  /* The lead keeps its numeral and the next two states. */
+  .ds-books-lead {
+    padding-block: var(--ds-space-6);
   }
 
-  .ds-books-states {
-    padding-top: var(--ds-space-2);
+  .ds-books-lead__inner {
+    gap: var(--ds-space-4);
+  }
+
+  .ds-books-lead__top {
+    gap: var(--ds-space-4);
+  }
+
+  .ds-books-lead__rest {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .ds-books-lead__rest > li:nth-child(n + 3) {
+    display: none;
   }
 
   .ds-books-ranks__row {
@@ -277,11 +488,11 @@ body:has(.ds-books) .ds-reading-progress {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-books-wall__cover {
+  .ds-books-wall__frame {
     transition: none;
   }
 
-  .ds-books-wall__link:hover .ds-books-wall__cover {
+  .ds-books-wall__link:hover .ds-books-wall__frame {
     transform: none;
   }
 }

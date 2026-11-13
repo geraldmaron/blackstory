@@ -6,3 +6,4 @@ export * from './TrustSiteJsonLdScript';
 export * from './PublishingPrinciplesJsonLdScript';
 export { TrustLinks, type TrustLink, type TrustLinksProps } from './TrustLinks';
 export { TrustFlow, type TrustFlowStep, type TrustFlowProps } from './TrustFlow';
+export { TrustMast, TrustSheet, type TrustMastNumeral, type TrustMastProps } from './TrustFrame';

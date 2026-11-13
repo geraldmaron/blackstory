@@ -3,6 +3,10 @@
  * rather than boxed, one primary button with a loading state, and a "what happens next" aside
  * beside the form on desktop and after it on phone. Selected radio cards read by a filled mark
  * and an ink border, never by color alone, and never by a copper wash.
+ *
+ * On the archive table the form sits on a paper sheet; its numbered groups open on copper
+ * numerals, the aside is a copper block with its steps set as large ink numerals, and success
+ * replaces the form with a full copper block.
  */
 
 /* —— layout ————————————————————————————————————————————————————————————————— */
@@ -18,13 +22,13 @@
 }
 
 .ds-form-layout__aside {
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-ink-muted);
+  padding: var(--ds-space-6);
+  border-radius: var(--ds-radius-md);
 }
 
 @media (min-width: 64rem) {
   .ds-form-layout {
-    grid-template-columns: minmax(0, 40rem) minmax(0, 18rem);
+    grid-template-columns: minmax(0, 40rem) minmax(0, 22rem);
     justify-content: space-between;
     column-gap: var(--ds-space-12);
   }
@@ -313,19 +317,32 @@
 
 /* —— success: replaces the form, same column ——————————————————————————————————— */
 .ds-form-done {
-  padding-top: var(--ds-space-2);
+  padding: var(--ds-space-8) var(--ds-space-6);
+  border-radius: var(--ds-radius-md);
+  animation: ds-form-done-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
-.ds-form-done:focus {
+@keyframes ds-form-done-in {
+  from {
+    transform: translateY(16px);
+  }
+}
+
+.ds-form-done:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 3px;
+}
+
+.ds-form-done:focus:not(:focus-visible) {
   outline: none;
 }
 
 .ds-form-done__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 650;
-  line-height: 1.1;
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: 1;
   letter-spacing: var(--ds-tracking-display);
   color: var(--ds-ink);
 }
@@ -353,7 +370,8 @@
   display: block;
   margin-top: var(--ds-space-1);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-body);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
@@ -369,7 +387,7 @@
 .ds-form-next__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
+  font-size: var(--ds-text-title);
   font-weight: 600;
   letter-spacing: var(--ds-tracking-title);
   color: var(--ds-ink);
@@ -384,7 +402,9 @@
 
 .ds-form-next__steps > li {
   position: relative;
-  padding: var(--ds-space-2) 0 var(--ds-space-2) var(--ds-space-6);
+  min-height: 3.5rem;
+  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-12);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   line-height: 1.5;
@@ -392,15 +412,18 @@
   counter-increment: next;
 }
 
+/* The step number is drawn, not read: the list is already ordered. */
 .ds-form-next__steps > li::before {
-  content: counter(next);
+  content: counter(next) / '';
   position: absolute;
   left: 0;
   top: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  line-height: 1.7;
-  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  color: var(--ds-numeral-accent);
 }
 
 .ds-form-next__more {
@@ -423,4 +446,36 @@
 
 .ds-form-next__more a {
   color: var(--ds-ink);
+}
+
+/* —— on a sheet: numbered groups and a receipt field set as data —————————————————— */
+.ds-trust-sheet .ds-form {
+  counter-reset: form-group;
+}
+
+.ds-trust-sheet .ds-form-group {
+  counter-increment: form-group;
+}
+
+.ds-trust-sheet .ds-form-group > legend::before {
+  content: counter(form-group, decimal-leading-zero) / '';
+  display: block;
+  margin-bottom: var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  color: var(--ds-numeral-accent);
+}
+
+.ds-trust-sheet > .ds-form {
+  max-width: 40rem;
+}
+
+.ds-form input[name='receiptCode'] {
+  min-height: 3.5rem;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-title);
+  letter-spacing: 0.04em;
 }

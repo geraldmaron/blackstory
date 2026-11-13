@@ -160,6 +160,7 @@ export function StorySpine({ headings, sourcesHref }: StorySpineProps) {
         </button>
         <div
           className="ds-story-sheet"
+          data-ground="paper"
           id={SHEET_ID}
           popover="auto"
           role="dialog"

@@ -127,7 +127,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
 
   if (state.status === 'success') {
     return (
-      <div className="ds-form-done" ref={doneRef} tabIndex={-1}>
+      <div className="ds-form-done" ref={doneRef} tabIndex={-1} data-ground="copper">
         <h2 className="ds-form-done__title">Lead received.</h2>
         <p className="ds-form-done__body">
           It is in the review queue, not on the site. If it is worth pursuing it becomes a private

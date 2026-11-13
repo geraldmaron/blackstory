@@ -50,31 +50,35 @@
   color: var(--ds-ink-muted);
 }
 
+/* One warm ramp, light to dark: sand tint, sand, copper, deep copper, ink. Lightness falls at
+   every step, and every tile prints its count, so the shade is never read alone. */
 .ds-about-states__tile[data-step='1'],
 .ds-about-states__swatch[data-step='1'] {
-  --tile-ink: 10%;
+  background: color-mix(in srgb, var(--ds-material-sand) 45%, var(--ds-canvas));
 }
 
 .ds-about-states__tile[data-step='2'],
 .ds-about-states__swatch[data-step='2'] {
-  --tile-ink: 22%;
+  background: var(--ds-material-sand);
+  --tile-text: #0a0a0a;
 }
 
 .ds-about-states__tile[data-step='3'],
 .ds-about-states__swatch[data-step='3'] {
-  --tile-ink: 40%;
+  background: var(--ds-material-copper);
+  --tile-text: #0a0a0a;
 }
 
 .ds-about-states__tile[data-step='4'],
 .ds-about-states__swatch[data-step='4'] {
-  --tile-ink: 62%;
-  --tile-text: var(--ds-canvas);
+  background: var(--ds-accent);
+  --tile-text: #f4efe5;
 }
 
 .ds-about-states__tile[data-step='5'],
 .ds-about-states__swatch[data-step='5'] {
-  --tile-ink: 88%;
-  --tile-text: var(--ds-canvas);
+  background: var(--ds-material-ink);
+  --tile-text: #f4efe5;
 }
 
 .ds-about-states__postal {

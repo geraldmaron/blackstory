@@ -6,6 +6,8 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { PageHeader } from '@repo/ui';
 import Link from 'next/link';
 import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
+import { livesDecadeNumeral } from '../../components/lives/lives-mast';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../lib/lives/lives-source';
 import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
 import { parseLivesMilestone } from '../../lib/lives/lives-milestones';
@@ -48,19 +50,29 @@ export default async function LivesIndexPage({
   const narratives = renumberLivesNarrativeReferences(mapping.byEraId);
 
   return (
-    <Room width="wide">
-      <PageHeader
-        crumb={parentCrumb('/lives')}
-        linkAs={Link}
-        title="Lives across the decades"
-        dek="One ordinary question, followed through the census, the rules in force and the words of the people who lived it."
-      />
-      <LivesSourceNotice
-        source={loaded?.source ?? 'unreadable'}
-        areaName={bundle.areaName}
-        retryHref="/lives"
-      />
-      <LivesMilestoneExperience bundle={bundle} milestone={milestone} narratives={narratives} />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast tone="sand" numeral={livesDecadeNumeral(bundle)}>
+          <PageHeader
+            display
+            crumb={parentCrumb('/lives')}
+            linkAs={Link}
+            title="Lives across the decades"
+            dek="One ordinary question, followed through the census, the rules in force and the words of the people who lived it."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <LivesSourceNotice
+          source={loaded?.source ?? 'unreadable'}
+          areaName={bundle.areaName}
+          retryHref="/lives"
+        />
+        <LivesMilestoneExperience bundle={bundle} milestone={milestone} narratives={narratives} />
+      </TrustSheet>
     </Room>
   );
 }

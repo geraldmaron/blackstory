@@ -11,6 +11,8 @@ import {
   buildBooksRelatedItems,
   listBooksStaticParams,
 } from '../books-view-model';
+import { coverIsbnForBook } from '../books-cover';
+import { isbnsWithCovers } from '../books-cover-availability';
 import { BookRecordView, type BookArchiveRecord } from './BookRecordView';
 
 type BooksDetailPageProps = {
@@ -56,10 +58,13 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
   const archiveRecord = view.book.canonicalEntityId
     ? await resolveArchiveRecord(view.book.canonicalEntityId)
     : undefined;
+  const isbn = coverIsbnForBook(view.book);
+  const hasCover = isbn ? (await isbnsWithCovers([isbn], 'L')).has(isbn) : false;
   return (
     <BookRecordView
       view={view}
       related={buildBooksRelatedItems(snapshot, view.book)}
+      hasCover={hasCover}
       {...(archiveRecord ? { archiveRecord } : {})}
     />
   );

@@ -8,6 +8,9 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
+// The frame's own sheet travels with it, so a cover outside /stories (the home page's chapter
+// block) gets its ground and sizing too.
+import './story-image.css';
 
 void React;
 

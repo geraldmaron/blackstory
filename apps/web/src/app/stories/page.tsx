@@ -3,8 +3,9 @@
  * and `format` says under which editorial contract: `chapter` for the era-immersion long-forms,
  * `entry` for short cited entries published in ordered collections.
  *
- * Bare `/stories` is an editorial front: the newest chapter as a full-width cover, the other
- * chapters as a row of covers, then everything else as a ruled list under one toolbar. Any choice
+ * Bare `/stories` is an editorial front: the newest chapter edge to edge with its title on an ink
+ * panel, the other chapters as tiles with sand and copper captions, then everything else as one
+ * paper sheet under a display head and one toolbar. Any choice
  * in the toolbar (format, sort) or a narrowing that arrives by link (collection, era, tag, place,
  * an old `q`) turns the page into the flat list of what matches. Every control is a link, so a
  * view is bookmarkable and works with JavaScript off.
@@ -12,7 +13,7 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { listPublicStoryListItems } from '../../lib/stories/source';
-import { Chip, Notice, buttonClassName } from '@repo/ui';
+import { Chip, DisplayNumeral, Notice, Sheet, buttonClassName } from '@repo/ui';
 import {
   buildKindChips,
   buildStoriesFront,
@@ -29,7 +30,6 @@ import {
 } from './stories-index';
 import { Room } from '../../components/room';
 import { ChapterCover, LeadCover, StoriesToolbar, StoryRow } from './StoriesIndexParts';
-import '../../components/story/story-image.css';
 import './stories.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -85,17 +85,25 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
       <StoriesToolbar formats={formats} format={query.format} sort={sort} />
     ) : null;
 
+  // The list's own head: what the sheet below holds, with its count as a copper numeral.
+  const listed = front ? front.rest.length : filtered.length;
+  const listTitle = front ? 'More stories' : 'Stories';
+  const countLine = `${listed.toLocaleString('en-US')} ${listed === 1 ? 'story' : 'stories'}`;
+
   return (
-    <Room width="wide" className="ds-stories">
-      {/* The covers (or the toolbar) lead in every state; the title is for the outline only, so
+    <Room
+      width="wide"
+      className="ds-stories"
+      {...(front?.lead ? { masthead: <LeadCover item={front.lead} /> } : {})}
+    >
+      {/* The covers (or the list head) lead in every state; the h1 is for the outline only, so
           the toolbar never moves when the reader narrows the list. */}
       <h1 className="ds-visually-hidden">Stories</h1>
 
-      {front?.lead ? <LeadCover item={front.lead} /> : null}
       {front && front.covers.length > 0 ? (
         <section className="ds-stories-covers" aria-label="More chapters">
-          {front.covers.map((item) => (
-            <ChapterCover key={item.slug} item={item} />
+          {front.covers.map((item, index) => (
+            <ChapterCover key={item.slug} item={item} tone={index % 2 === 0 ? 'sand' : 'copper'} />
           ))}
         </section>
       ) : null}
@@ -104,8 +112,21 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
         <section
           className="ds-stories-browse"
           data-first={front ? undefined : 'true'}
-          aria-label="All stories"
+          aria-labelledby="stories-list-title"
         >
+          <header className="ds-stories-head">
+            <h2 className="ds-stories-head__title" id="stories-list-title">
+              {listTitle}
+            </h2>
+            {source === 'unavailable' ? null : (
+              <>
+                <DisplayNumeral className="ds-stories-head__count" decorative>
+                  {listed.toLocaleString('en-US')}
+                </DisplayNumeral>
+                <p className="ds-stories-head__dek">{countLine}</p>
+              </>
+            )}
+          </header>
           {toolbar}
           {echoes.length > 0 ? (
             <div className="ds-stories-echoes">
@@ -122,31 +143,33 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
             </div>
           ) : null}
 
-          {notice.body.length > 0 ? (
-            <div className="ds-stories-notice">
-              <Notice tone={source === 'unavailable' ? 'warning' : 'note'} title={notice.title}>
-                {notice.body}
-              </Notice>
-              {source === 'live' && items.length > 0 ? (
-                <a className={buttonClassName('secondary')} href="/stories">
-                  Show all stories
-                </a>
-              ) : null}
-            </div>
-          ) : (
-            <ul className="ds-stories-list">
-              {pager.rows.map((item) => (
-                <StoryRow key={item.slug} item={item} />
-              ))}
-            </ul>
-          )}
+          <Sheet className="ds-stories-paper">
+            {notice.body.length > 0 ? (
+              <div className="ds-stories-notice">
+                <Notice tone={source === 'unavailable' ? 'warning' : 'note'} title={notice.title}>
+                  {notice.body}
+                </Notice>
+                {source === 'live' && items.length > 0 ? (
+                  <a className={buttonClassName('primary')} href="/stories">
+                    Show all stories
+                  </a>
+                ) : null}
+              </div>
+            ) : (
+              <ul className="ds-stories-list">
+                {pager.rows.map((item) => (
+                  <StoryRow key={item.slug} item={item} />
+                ))}
+              </ul>
+            )}
+          </Sheet>
 
           {pager.pageCount > 1 ? (
             <nav className="ds-stories-pager" aria-label="Stories pages">
               {pager.previousHref === undefined ? (
                 <span />
               ) : (
-                <a className={buttonClassName('quiet')} href={pager.previousHref} rel="prev">
+                <a className={buttonClassName('secondary')} href={pager.previousHref} rel="prev">
                   Previous
                 </a>
               )}
@@ -154,7 +177,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
               {pager.nextHref === undefined ? (
                 <span />
               ) : (
-                <a className={buttonClassName('quiet')} href={pager.nextHref} rel="next">
+                <a className={buttonClassName('secondary')} href={pager.nextHref} rel="next">
                   Next
                 </a>
               )}

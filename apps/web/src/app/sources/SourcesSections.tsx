@@ -4,8 +4,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { PageHeader } from '@repo/ui';
-import { parentCrumb, RoomJump, RoomSection } from '../../components/room';
+import { RoomJump, RoomSection } from '../../components/room';
 import { TrustFlow } from '../../components/trust';
 import { SOURCE_LINEAGE_STAGES, SOURCE_PUBLISHER_KINDS } from '../methodology/methodology-copy';
 import type { SourceLibrary } from './source-library';
@@ -21,7 +20,7 @@ const SOURCES_JUMP = [
 
 const count = (value: number) => value.toLocaleString('en-US');
 
-function dekFor(library: SourceLibrary | undefined): string {
+export function sourcesDek(library: SourceLibrary | undefined): string {
   if (library === undefined) {
     return 'Every public claim on BlackStory traces to a publisher someone can open.';
   }
@@ -35,13 +34,6 @@ function dekFor(library: SourceLibrary | undefined): string {
 export function SourcesSections({ library }: { readonly library: SourceLibrary | undefined }) {
   return (
     <>
-      <PageHeader
-        crumb={parentCrumb('/sources')}
-        linkAs={Link}
-        title="Where the evidence comes from"
-        dek={dekFor(library)}
-      />
-
       <RoomJump sections={SOURCES_JUMP} />
 
       <RoomSection id="publishers" title="Publishers">

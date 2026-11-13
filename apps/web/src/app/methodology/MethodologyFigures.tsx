@@ -11,6 +11,7 @@ import {
   gradeForConfidence,
   type ConfidenceTier,
 } from '@repo/public-contracts/evidence';
+import { recordMarkFor } from '../../lib/map-experience/geo-precision';
 import { PRECISION_LEVELS, RECORD_GRADE_DEFINITIONS } from './methodology-copy';
 
 void React;
@@ -127,7 +128,14 @@ export function PrecisionLadder() {
             data-stop={index === PRECISION_LEVELS.length - 1 || undefined}
             style={{ '--step': index } as React.CSSProperties}
           >
-            <span className="ds-precision-ladder__bar" aria-hidden="true" />
+            <span className="ds-precision-ladder__bar" aria-hidden="true">
+              {step.precision && recordMarkFor(step.precision) !== 'none' ? (
+                <span
+                  className="ds-precision-ladder__mark"
+                  data-mark={recordMarkFor(step.precision)}
+                />
+              ) : null}
+            </span>
             <span className="ds-precision-ladder__level">{step.level}</span>
             <span className="ds-precision-ladder__drawn">{step.drawn}</span>
           </li>

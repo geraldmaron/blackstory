@@ -6,6 +6,8 @@ import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../../components/room';
+import { TrustMast, TrustSheet } from '../../../components/trust';
+import { livesDecadeNumeral } from '../../../components/lives/lives-mast';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../../lib/lives/lives-source';
 import { parseLivesAreaSlug, type RawLivesSearchParams } from '../../../lib/lives/lives-url-state';
 import { LivesSourceNotice } from '../../../components/lives/LivesSourceNotice';
@@ -37,22 +39,32 @@ export default async function LivesExplorerPage({
   const bundle = loaded?.bundle ?? emptyLivesAreaBundle(area);
 
   return (
-    <Room width="wide">
-      <PageHeader
-        crumb={parentCrumb('/lives/explorer')}
-        linkAs={Link}
-        title="Evidence appendix"
-        dek="Every decade, region, definition and coverage note behind Lives, with the cited tables."
-      />
-      <LivesSourceNotice
-        source={loaded?.source ?? 'unreadable'}
-        areaName={bundle.areaName}
-        retryHref={`/lives/explorer?area=${encodeURIComponent(area.slug)}`}
-      />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast tone="copper" numeral={livesDecadeNumeral(bundle)}>
+          <PageHeader
+            display
+            crumb={parentCrumb('/lives/explorer')}
+            linkAs={Link}
+            title="Evidence appendix"
+            dek="Every decade, region, definition and coverage note behind Lives, with the cited tables."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <LivesSourceNotice
+          source={loaded?.source ?? 'unreadable'}
+          areaName={bundle.areaName}
+          retryHref={`/lives/explorer?area=${encodeURIComponent(area.slug)}`}
+        />
 
-      <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={area.slug} />}>
-        <LivesTimeline bundle={bundle} areaSlug={area.slug} />
-      </Suspense>
+        <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={area.slug} />}>
+          <LivesTimeline bundle={bundle} areaSlug={area.slug} />
+        </Suspense>
+      </TrustSheet>
     </Room>
   );
 }

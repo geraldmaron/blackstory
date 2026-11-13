@@ -8,6 +8,7 @@ import { CorrectionsSections } from './CorrectionsSections';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
 import { resolvePublicEntityView } from '../../lib/public-data/source';
 import { isCorrectionTargetType } from './categories';
 import '../utility.css';
@@ -43,19 +44,29 @@ export default async function CorrectionsPage({ searchParams }: CorrectionsPageP
       ? await resolvePublicEntityView(initialTarget).catch(() => undefined)
       : undefined;
   return (
-    <Room width="record">
-      <PageHeader
-        crumb={parentCrumb('/corrections')}
-        linkAs={Link}
-        title="Tell the archive it's wrong"
-        dek="A person reads every correction, and you get a receipt code to track the outcome."
-      />
-      <CorrectionsSections
-        key={`${initialTargetType}:${initialTarget}`}
-        initialTarget={initialTarget}
-        initialTargetType={initialTargetType}
-        {...(record?.data ? { targetName: record.data.displayName } : {})}
-      />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast tone="copper">
+          <PageHeader
+            display
+            crumb={parentCrumb('/corrections')}
+            linkAs={Link}
+            title="Tell the archive it's wrong"
+            dek="A person reads every correction, and you get a receipt code to track the outcome."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <CorrectionsSections
+          key={`${initialTargetType}:${initialTarget}`}
+          initialTarget={initialTarget}
+          initialTargetType={initialTargetType}
+          {...(record?.data ? { targetName: record.data.displayName } : {})}
+        />
+      </TrustSheet>
     </Room>
   );
 }

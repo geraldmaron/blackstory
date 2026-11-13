@@ -94,7 +94,9 @@ export function DoorChapters({ total, records, lead, decades, grades }: DoorChap
           aria-labelledby="door-ch-story"
         >
           <div className="ds-door-ch__cover" aria-hidden="true">
-            <CoverImage item={lead} width={1600} />
+            {/* Eager: the block sits a screen and a half down, and a lazy cover there painted as an
+                empty ink band until the reader stopped on it. */}
+            <CoverImage item={lead} width={1600} eager />
           </div>
           <div className="ds-wrap ds-door-ch__inner">
             <p className="ds-door-ch__years">{lead.eraLabel}</p>

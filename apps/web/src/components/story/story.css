@@ -46,8 +46,8 @@
   margin-top: var(--ds-space-8);
 }
 
-/* The three tracks, shared by the masthead and the body so their left edges agree. */
-.ds-story-mast,
+/* The body's tracks: prose on the reading measure, artifacts on the wide track (the sheet's
+   whole inner width). */
 .ds-story-body {
   display: grid;
   grid-template-columns:
@@ -57,27 +57,54 @@
     [wide-end];
 }
 
-.ds-story-mast > *,
 .ds-story-body > * {
   grid-column: body;
   min-width: 0;
 }
 
-.ds-story-body > .ds-story-wide,
+.ds-story-body > .ds-story-wide {
+  grid-column: wide;
+}
+
+/* —— Masthead: on the ink table, the title large, the opening year as a numeral, a copper band
+      of facts, then (chapters) the hero image whole on the wide track ——————————————————— */
+.ds-story-mast {
+  display: grid;
+  grid-template-columns: [wide-start] minmax(0, 1fr) [aside-start] auto [wide-end];
+  align-items: end;
+  column-gap: var(--ds-space-8);
+}
+
+.ds-story-mast__text {
+  grid-column: wide-start / aside-start;
+  min-width: 0;
+}
+
+.ds-story-mast__numeral {
+  grid-column: aside-start / wide-end;
+  grid-row: 1;
+  margin-bottom: -0.04em;
+}
+
+.ds-story-mast__text .ds-story-mast__numeral {
+  margin: var(--ds-space-2) 0 var(--ds-space-1);
+}
+
+.ds-story-mast__band,
 .ds-story-mast > .ds-story-mast__hero {
   grid-column: wide;
 }
 
-/* —— Masthead ———————————————————————————————————————————————————————————————— */
 .ds-story-mast__facts {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--ds-space-1) 0;
-  margin: 0;
+  margin: 0 0 var(--ds-space-4);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
 }
 
 .ds-story-mast__facts > :not(:last-child)::after {
@@ -85,7 +112,6 @@
   display: inline-block; /* keeps a link's underline off the separator */
   padding-inline: var(--ds-space-2);
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
 }
 
 /* A 44px hit area; the negative margin keeps the facts line at its visual height. */
@@ -96,27 +122,18 @@
   margin-block: calc((2.75rem - 1lh) / -2);
   color: var(--ds-ink);
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
+  text-decoration-color: var(--ds-accent-graphic);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
 }
 
-.ds-story-mast__years {
-  font-family: var(--ds-font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-.ds-story-mast__title {
-  margin: var(--ds-space-3) 0 var(--ds-space-6);
+.ds-story-mast__title.ds-story-mast__title {
+  margin: 0 0 var(--ds-space-6);
   color: var(--ds-ink);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
-  font-weight: 650;
-  line-height: var(--ds-leading-display);
-  letter-spacing: var(--ds-tracking-display);
-  text-wrap: balance;
 }
 
 .ds-story-mast__dek {
+  max-width: var(--ds-width-read);
   margin: 0;
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
@@ -126,6 +143,7 @@
 }
 
 .ds-story-mast__rest {
+  max-width: var(--ds-width-read);
   margin: var(--ds-space-3) 0 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
@@ -134,64 +152,101 @@
   text-wrap: pretty;
 }
 
-.ds-story-mast__byline {
+/* The facts band: the record page's Where/When/Evidence line, for a story. Ink on copper in
+   both themes, cells divided by ink rules. */
+.ds-story-mast__band {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-1) 0;
-  margin: var(--ds-space-6) 0 0;
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  color: var(--ds-ink-muted);
+  align-items: start;
+  gap: var(--ds-space-4) 0;
+  margin: var(--ds-space-10) 0 0;
+  padding: var(--ds-space-6) var(--ds-space-8);
+  border-radius: var(--ds-radius-md);
   font-family: var(--ds-font-sans);
+  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
+}
+
+.ds-story-mast__band > div {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-1);
+  padding-inline: var(--ds-space-6);
+  border-left: 2px solid var(--ds-ink);
+}
+
+.ds-story-mast__band > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.ds-story-mast__band dt {
   font-size: var(--ds-text-caption);
-  line-height: 1.5;
+  font-weight: 700;
 }
 
-.ds-story-mast__byline > :not(:last-child)::after {
-  content: '·';
-  display: inline-block;
-  padding-inline: var(--ds-space-2);
+.ds-story-mast__band dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--ds-space-2);
+  margin: 0;
+  font-size: var(--ds-text-body);
+  font-weight: 600;
 }
 
-.ds-story-mast__byline a {
-  color: var(--ds-ink);
+.ds-story-mast__band a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-block: calc((2.75rem - 1lh) / -2);
+  color: inherit;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
 }
 
+.ds-story-mast__years {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-story-mast__byline dd > :not(:last-child)::after {
+  content: '·';
+  padding-left: var(--ds-space-2);
+}
+
+.ds-story-mast__band > .ds-story-mast__report {
+  align-self: center;
+  margin-left: auto;
+  border-left: 0;
+}
+
 .ds-story-mast__hero {
-  margin-top: var(--ds-space-12);
+  margin-top: var(--ds-space-10);
 }
 
-/* An entry's short masthead: the portrait beside the title block, hanging into the margin. */
+/* An entry's masthead: the portrait large beside the title block. */
 .ds-story--entry .ds-story-mast[data-media='photo'] {
-  /* The left track resolves to the body's own left gutter (964 - 590 - 32 - 200 = 142). */
-  grid-template-columns:
-    [wide-start] minmax(0, 1fr)
-    [body-start] minmax(0, calc(var(--ds-width-read) - 5.625rem))
-    [body-end] var(--ds-space-8)
-    [portrait-start] 12.5rem
-    [wide-end];
-}
-
-.ds-story--entry .ds-story-mast__title {
-  font-size: var(--ds-text-display-2);
+  grid-template-columns: [wide-start] minmax(0, 1fr) [aside-start] 17rem [wide-end];
+  column-gap: var(--ds-space-12);
 }
 
 .ds-story-mast__portrait {
-  grid-column: portrait-start / wide-end;
+  grid-column: aside-start / wide-end;
   grid-row: 1;
-  align-self: start;
+  align-self: end;
   margin: 0;
 }
 
 .ds-story-mast__portrait .ds-story-img {
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+  background: var(--ds-material-paper);
 }
 
+/* The credit hangs under the portrait as a sand plate, the frame's lower edge in color. */
 .ds-story-mast__portrait .ds-story-caption {
-  margin-top: var(--ds-space-2);
+  margin-top: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-radius: 0 0 var(--ds-radius-md) var(--ds-radius-md);
 }
 
 /* —— Section spine (wide screens) and Contents bar (everything narrower) ————————————— */
@@ -260,9 +315,10 @@
 }
 
 .ds-story-sections__year {
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-variant-numeric: tabular-nums;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .ds-story-sections__item--sources {
@@ -351,7 +407,6 @@
   border: var(--ds-border-width) solid var(--ds-border);
   border-bottom: 0;
   border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
-  background: var(--ds-surface-raised);
   color: var(--ds-ink);
 }
 
@@ -396,7 +451,7 @@
   }
 
   .ds-story__main {
-    margin-top: var(--ds-space-18);
+    margin-top: var(--ds-space-12);
   }
 
   .ds-story-spine {
@@ -407,7 +462,7 @@
     top: calc(var(--ds-island-clearance) + var(--ds-space-8));
     display: block;
     max-height: calc(100vh - var(--ds-island-clearance) - var(--ds-space-12));
-    margin-top: var(--ds-space-18);
+    margin-top: var(--ds-space-12);
     overflow-y: auto;
     scrollbar-width: none;
   }
@@ -473,6 +528,37 @@
   margin-top: var(--ds-space-12);
 }
 
+/* On the story page every section heading is set large; the shared heading stays 24px elsewhere. */
+.ds-story .ds-story-body > .ds-story-h2 {
+  font-size: var(--ds-text-display-3);
+  line-height: 1.1;
+  letter-spacing: var(--ds-tracking-display);
+}
+
+/* A dated section opens on its year as a copper numeral across the wide track, cropped by the
+   heading: the heading's sheet-colored box sits over the numeral's foot, its rule on the
+   baseline band, and starts where the numeral starts with its text indented to the body track. */
+.ds-story-body > .ds-story-year {
+  grid-column: wide;
+  margin-top: var(--ds-space-18);
+  margin-bottom: -0.18em;
+}
+
+.ds-story-body > .ds-story-year:first-child {
+  margin-top: 0;
+}
+
+.ds-story-body > .ds-story-h2.ds-story-h2--dated {
+  position: relative;
+  z-index: 1; /* local: the heading crops the year numeral above it */
+  grid-column: wide;
+  margin-top: 0;
+  padding-top: var(--ds-space-3);
+  padding-inline: max(0px, (100% - var(--ds-width-read)) / 2);
+  border-top: 4px solid var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
 .ds-story-body > .ds-story-h2 + *,
 .ds-story-body > .ds-story-h3 + * {
   margin-top: var(--ds-space-4);
@@ -512,28 +598,26 @@
   font-variant-numeric: tabular-nums;
 }
 
-.ds-story-quote {
-  position: relative;
-  padding-top: var(--ds-space-6);
+/* A pull line: large Newsreader italic on the wide track, hung from a copper bar. */
+.ds-story-body > .ds-story-quote {
+  grid-column: wide;
 }
 
-.ds-story-quote::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--ds-space-12);
-  height: 2px;
-  background: var(--ds-ink);
+.ds-story-quote {
+  position: relative;
+  margin-inline: 0;
+  padding: var(--ds-space-2) 0 var(--ds-space-2) var(--ds-space-8);
+  border-left: 8px solid var(--ds-accent-graphic);
 }
 
 .ds-story-quote p {
   margin: 0;
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-display-3);
+  font-size: var(--ds-text-display-2);
   font-style: italic;
-  line-height: 1.3;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
   text-wrap: balance;
 }
 
@@ -606,24 +690,27 @@
 /* —— Artifacts on the wide track ————————————————————————————————————————————————— */
 
 /* Figure callouts: the chapter's own numbers, set as numbers. */
+/* A copper block: the numbers in ink, large. */
 .ds-story-figures {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   gap: var(--ds-space-8);
+  padding: var(--ds-space-8);
+  border-radius: var(--ds-radius-md);
 }
 
 .ds-story-figures__item {
   margin: 0;
   padding-top: var(--ds-space-4);
-  border-top: 2px solid var(--ds-ink);
+  border-top: 4px solid var(--ds-ink);
 }
 
 .ds-story-figures__number {
   display: block;
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
-  font-weight: 650;
+  font-size: var(--ds-text-display-1);
+  font-weight: 600;
   font-variant-numeric: lining-nums proportional-nums;
   line-height: 1;
   letter-spacing: var(--ds-tracking-display);
@@ -631,22 +718,20 @@
 
 .ds-story-figures__label {
   margin-top: var(--ds-space-3);
-  color: var(--ds-ink-muted);
+  color: var(--ds-ink);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   line-height: 1.45;
 }
 
-/* A primary document: the one bordered plate in the body, date and title beside its words. */
+/* A primary document: a sand block, date and title beside its words. */
 .ds-story-doc {
   display: grid;
   grid-template-columns: 13rem minmax(0, 1fr);
   gap: var(--ds-space-8);
   margin: 0;
   padding: var(--ds-space-8);
-  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
 }
 
 .ds-story-doc__date {
@@ -732,12 +817,18 @@
 }
 
 /* —— End of the piece ——————————————————————————————————————————————————————————— */
+/* The end block is a copper band across the sheet's foot, from the page bands to the right edge
+   (the sheet's own padding, given back). */
 .ds-story-body > .ds-story-end {
   display: grid;
   gap: var(--ds-space-12);
-  margin-top: var(--ds-space-18);
-  padding-top: var(--ds-space-12);
-  border-top: var(--ds-border-width) solid var(--ds-border-strong);
+  margin: var(--ds-space-18) calc(var(--ds-sheet-pad) * -1) calc(var(--ds-sheet-pad) * -1);
+  padding: var(--ds-space-12) var(--ds-sheet-pad) var(--ds-space-12);
+  border-radius: 0 0 var(--ds-radius-md) 0;
+}
+
+.ds-story-end .ds-section-heading {
+  font-size: var(--ds-text-display-3);
 }
 
 /* The end block's h2s are SectionHeadings too; inside the block the gap above is the block's. */
@@ -760,16 +851,16 @@
   white-space: nowrap;
 }
 
+/* Next and previous: ink blocks on the copper band, names large. */
 .ds-story-next__card {
   display: grid;
-  grid-template-columns: 6rem minmax(0, 1fr);
+  grid-template-columns: 7.5rem minmax(0, 1fr);
   gap: var(--ds-space-6);
   padding: var(--ds-space-6);
-  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   color: var(--ds-ink);
   text-decoration: none;
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+  transition: transform var(--ds-duration-fast) var(--ds-ease-standard);
 }
 
 .ds-story-next__card:not(:has(.ds-story-next__thumb)) {
@@ -777,7 +868,7 @@
 }
 
 .ds-story-next__card:hover {
-  border-color: var(--ds-border-strong);
+  transform: translateY(-2px);
 }
 
 .ds-story-next__card:focus-visible,
@@ -845,13 +936,12 @@
   align-content: center;
 }
 
-/* The next card's title sits at section-heading size, never above the page's own headings. */
 .ds-story-next__title {
   font-family: var(--ds-font-display);
-  font-size: 1.5rem;
-  font-weight: 650;
-  line-height: 1.75rem;
-  letter-spacing: var(--ds-tracking-title);
+  font-size: var(--ds-text-display-3);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: var(--ds-tracking-display);
 }
 
 .ds-story-next__card:hover .ds-story-next__title,
@@ -894,14 +984,15 @@
   margin-bottom: var(--ds-space-3);
   overflow: hidden;
   border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-sunken);
+  background: var(--ds-material-ink);
 }
 
 .ds-story-chapters__title {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: 650;
-  line-height: 1.2;
+  font-size: var(--ds-text-display-3);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: var(--ds-tracking-display);
 }
 
 .ds-story-chapters__years {
@@ -972,6 +1063,8 @@
 /* —— Sources ————————————————————————————————————————————————————————————————————— */
 .ds-story-body > .ds-story-sources-block {
   margin-top: var(--ds-space-18);
+  padding-top: var(--ds-space-8);
+  border-top: 4px solid var(--ds-ink);
   scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-18));
 }
 
@@ -983,7 +1076,7 @@
 
 .ds-story-sources__item {
   display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
+  grid-template-columns: 3.5rem minmax(0, 1fr);
   padding: var(--ds-space-2) var(--ds-space-2) var(--ds-space-2) 0;
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-sans);
@@ -996,13 +1089,16 @@
   background: var(--ds-surface-sunken);
 }
 
+/* Each source's number large and copper, as on a record page. */
 .ds-story-sources__num {
-  padding-right: var(--ds-space-3);
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.75;
+  padding-right: var(--ds-space-4);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 0.9;
+  letter-spacing: var(--ds-tracking-display);
   text-align: right;
 }
 
@@ -1046,16 +1142,99 @@
     border-top: 0;
   }
 
+  /* One column: the numeral (or the portrait) first, then the title, the band, the hero. */
+  .ds-story-mast,
   .ds-story--entry .ds-story-mast[data-media='photo'] {
-    grid-template-columns: [wide-start body-start] minmax(0, 1fr) [body-end wide-end];
+    grid-template-columns: [wide-start aside-start] minmax(0, 1fr) [wide-end];
   }
 
-  .ds-story-mast__portrait {
-    grid-column: body;
+  .ds-story-mast__text {
+    grid-column: wide;
+  }
+
+  .ds-story-mast > .ds-story-mast__numeral {
     grid-row: auto;
     order: -1;
-    width: 8rem;
-    margin-bottom: var(--ds-space-6);
+    margin: 0 0 var(--ds-space-2);
+  }
+
+  /* An entry's year steps up to the full numeral scale (72px at phone width). */
+  .ds-story-mast__text .ds-story-mast__numeral {
+    font-size: var(--ds-text-display-numeral);
+  }
+
+  /* The portrait runs edge to edge at size, the caption under it at full width. */
+  .ds-story-mast__portrait {
+    grid-row: auto;
+    order: -1;
+    width: auto;
+    margin: 0 calc(var(--ds-gutter) * -1) var(--ds-space-4);
+  }
+
+  /* !important: StoryImage reserves the stored aspect inline; here the frame crops to 4:3. */
+  .ds-story-mast__portrait .ds-story-img {
+    aspect-ratio: 4 / 3 !important;
+    border-radius: 0;
+  }
+
+  .ds-story-mast__portrait .ds-story-img > img {
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .ds-story-mast__portrait .ds-story-caption {
+    padding-inline: var(--ds-gutter);
+    border-radius: 0;
+  }
+
+  /* The byline parts stack, so no separator dot is left hanging at a line end. */
+  .ds-story-mast__byline dd {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ds-story-mast__byline dd > :not(:last-child)::after {
+    content: none;
+  }
+
+  .ds-story-mast__band {
+    margin-inline: calc(var(--ds-gutter) * -1);
+    padding: var(--ds-space-4) var(--ds-gutter);
+    border-radius: 0;
+  }
+
+  .ds-story-mast__band > div {
+    flex: 1 1 40%;
+    padding-inline: 0 var(--ds-space-4);
+    border-left: 0;
+  }
+
+  .ds-story-mast__band > .ds-story-mast__report {
+    margin-left: 0;
+  }
+
+  /* The sheet runs full-bleed (the kit drops its side edges); the copper end band follows it. */
+  .ds-story__main {
+    width: auto;
+    margin-inline: calc(var(--ds-gutter) * -1);
+  }
+
+  .ds-story-body > .ds-story-end {
+    border-radius: 0;
+  }
+
+  .ds-story-body > .ds-story-year {
+    margin-top: var(--ds-space-12);
+  }
+
+  .ds-story-quote {
+    padding-left: var(--ds-space-4);
+    border-left-width: 6px;
+  }
+
+  .ds-story-figures {
+    padding: var(--ds-space-6) var(--ds-space-4);
   }
 
   .ds-story-doc {
@@ -1067,6 +1246,10 @@
   .ds-story-figures {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--ds-space-6) var(--ds-space-4);
+  }
+
+  .ds-story-figures__number {
+    font-size: var(--ds-text-display-2);
   }
 
   .ds-story-next__card {
@@ -1232,11 +1415,11 @@
   text-underline-offset: 0.18em;
 }
 
-/* —— Loading: the masthead's shape on the reading measure ————————————————————————— */
+/* —— Loading: the masthead, the copper band and the sheet, held still ———————————————— */
 .ds-story-wait {
   display: grid;
   gap: var(--ds-space-4);
-  max-width: var(--ds-width-read);
+  max-width: var(--ds-width-record);
   margin-inline: auto;
 }
 
@@ -1247,17 +1430,25 @@
   background: var(--ds-surface-sunken);
 }
 
-.ds-story-wait__line--facts {
-  width: 12rem;
-  height: 0.875rem;
-}
-
 .ds-story-wait__line--title {
-  width: 70%;
-  height: 4rem;
+  width: 60%;
+  height: 6rem;
   margin-bottom: var(--ds-space-4);
 }
 
 .ds-story-wait__line--short {
   width: 55%;
+}
+
+.ds-story-wait__band {
+  display: block;
+  height: 6rem;
+  margin-block: var(--ds-space-6);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-material-copper);
+}
+
+.ds-story-wait__sheet {
+  display: grid;
+  gap: var(--ds-space-4);
 }

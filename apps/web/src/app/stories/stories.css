@@ -1,41 +1,27 @@
 /*
- * /stories: an editorial front, then one ruled list under one toolbar.
+ * /stories: the lead chapter edge to edge with its title on an ink panel, the other chapters as
+ * tiles with sand and copper caption blocks, then one paper sheet of stories under a display head.
  * Type sizes come from the --ds-text-* scale (room-kit.test guards this file).
  */
 
 .ds-stories .ds-room__doc {
-  padding-block: var(--ds-space-8) var(--ds-space-18);
+  padding-block: var(--ds-space-12) var(--ds-space-18);
 }
 
-/* —— Lead cover ——————————————————————————————————————————————————————————— */
-/* A cover keeps its own ground in both themes: the type sits on the picture, so its colors are
-   fixed to the picture, not to the page. */
+/* —— Lead: the cover edge to edge, the title on an ink panel over its foot ————————————— */
 .ds-stories-lead {
-  --cover-ink: #f4efe5;
-  --cover-ink-muted: rgba(244, 239, 229, 0.78);
   position: relative;
-  display: grid;
-  overflow: hidden;
-  border-radius: var(--ds-radius-md);
-  background: #131110;
-  color: var(--cover-ink);
-  isolation: isolate;
 }
 
 .ds-stories-lead__media {
-  grid-area: 1 / 1;
-  aspect-ratio: 21 / 9;
-  min-height: 30rem;
-}
-
-/* The chapter images are archive scans with paper borders; the cover crops inside the document,
-   never on its edge. --crop is the inset zoom, and hover adds to it rather than replacing it. */
-.ds-stories-lead__media,
-.ds-stories-cover__media {
-  --crop: 1.08;
+  height: clamp(20rem, 52vh, 36rem);
   overflow: hidden;
+  background: var(--ds-material-ink);
 }
 
+/* The chapter images are archive scans with paper borders; a cover crops inside the document, at
+   its head, never on its edge. --crop is the inset zoom, and hover adds to it. */
+.ds-stories-lead__media,
 .ds-stories-cover__media {
   --crop: 1.06;
 }
@@ -43,13 +29,14 @@
 .ds-stories-lead__media .ds-story-img,
 .ds-stories-cover__media .ds-story-img {
   height: 100%;
+  background: var(--ds-material-paper);
 }
 
 .ds-stories-lead__media img,
 .ds-stories-cover__media img {
   height: 100%;
   object-fit: cover;
-  object-position: 50% 6%;
+  object-position: 50% 8%;
   transform: scale(var(--crop));
   transition: transform var(--ds-duration-slow) var(--ds-ease-entrance);
 }
@@ -59,50 +46,57 @@
   transform: scale(calc(var(--crop) + 0.02));
 }
 
-.ds-stories-lead__copy {
-  grid-area: 1 / 1;
-  align-self: end;
+.ds-stories-lead__wrap {
   position: relative;
-  z-index: 1; /* local: the cover copy above its picture, inside this cover only */
+  margin-top: calc(var(--ds-space-24) * -1);
+}
+
+/* Ink in both themes: on the light table it is the page's contrast block. The numeral sits at the
+   panel's far edge and is cropped by its foot. */
+.ds-stories-lead__panel {
+  position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'years numeral'
+    'title numeral'
+    'dek numeral'
+    'cta numeral';
   justify-items: start;
-  gap: var(--ds-space-3);
-  max-width: calc(var(--ds-width-read) + var(--ds-space-12) * 2);
-  padding: var(--ds-space-12);
+  column-gap: var(--ds-space-12);
+  row-gap: var(--ds-space-4);
+  overflow: hidden;
+  padding: var(--ds-space-10) var(--ds-space-12);
+  border-radius: var(--ds-radius-md);
+  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
-/* The scrim covers the whole picture: an even veil so no bright paper reads as a hole, deepening
-   toward the copy at the lower left. */
-.ds-stories-lead[data-media='photo'] .ds-stories-lead__media {
-  position: relative;
-}
-
-.ds-stories-lead[data-media='photo'] .ds-stories-lead__media::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to top, rgba(13, 11, 10, 0.88) 0%, rgba(13, 11, 10, 0) 70%),
-    linear-gradient(to right, rgba(13, 11, 10, 0.78) 0%, rgba(13, 11, 10, 0.2) 75%),
-    rgba(13, 11, 10, 0.28);
-  pointer-events: none;
+.ds-stories-lead__numeral {
+  grid-area: numeral;
+  align-self: end;
+  margin-bottom: calc(var(--ds-space-10) * -1 - 0.14em);
 }
 
 .ds-stories-lead__years {
+  grid-area: years;
   margin: 0;
-  color: var(--cover-ink-muted);
+  padding: var(--ds-space-1) var(--ds-space-3);
+  background: var(--ds-material-copper);
+  color: var(--ds-material-ink);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .ds-stories-lead__title {
-  margin: 0;
+  grid-area: title;
+  margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
-  font-weight: 650;
-  line-height: var(--ds-leading-display);
-  letter-spacing: var(--ds-tracking-display);
+  font-size: var(--ds-text-display-title);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 
@@ -116,10 +110,16 @@
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 0; /* local: the stretched link over the picture, under the button */
+  z-index: 0; /* local: the stretched link over the panel, under the button */
 }
 
-.ds-stories-lead:has(.ds-stories-lead__link:focus-visible) {
+.ds-stories-lead__link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 4px;
+  text-underline-offset: 0.08em;
+}
+
+.ds-stories-lead__panel:has(.ds-stories-lead__link:focus-visible) {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
 }
@@ -129,66 +129,93 @@
 }
 
 .ds-stories-lead__dek {
+  grid-area: dek;
+  max-width: 38rem;
   margin: 0;
-  color: var(--cover-ink-muted);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial-lede);
-  line-height: 1.45;
+  font-style: italic;
+  line-height: 1.4;
   text-wrap: pretty;
 }
 
 .ds-stories-lead__cta {
+  grid-area: cta;
   position: relative;
-  z-index: 1; /* local: the button above the stretched link, inside this cover only */
+  z-index: 1; /* local: the button above the stretched link, inside this panel only */
   margin-top: var(--ds-space-2);
 }
 
+/* No picture: the panel opens the page on its own. */
 .ds-stories-lead[data-media='none'] .ds-stories-lead__media {
   display: none;
 }
 
-.ds-stories-lead[data-media='none'] .ds-stories-lead__copy {
-  padding-top: var(--ds-space-18);
+.ds-stories-lead[data-media='none'] .ds-stories-lead__wrap {
+  margin-top: var(--ds-space-8);
 }
 
-/* —— Chapter covers ———————————————————————————————————————————————————————— */
+/* —— Chapter tiles: picture over a sand or copper caption block ———————————————————— */
 .ds-stories-covers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: var(--ds-space-8);
-  margin-top: var(--ds-space-8);
 }
 
 .ds-stories-cover {
   position: relative;
   display: grid;
-  align-content: start;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border-radius: var(--ds-radius-md);
+  transition: transform var(--ds-duration-fast) var(--ds-ease-standard);
+}
+
+.ds-stories-cover:hover {
+  transform: translateY(-4px);
 }
 
 .ds-stories-cover__media {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-sunken);
+  background: var(--ds-material-paper);
 }
 
 .ds-stories-cover__blank {
   display: block;
   height: 100%;
+  background: var(--ds-material-ink);
+}
+
+.ds-stories-cover__caption {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-6) var(--ds-space-8) var(--ds-space-8);
+}
+
+.ds-stories-cover__years {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .ds-stories-cover__title {
-  margin: var(--ds-space-4) 0 0;
+  margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 650;
-  line-height: var(--ds-leading-title);
-  letter-spacing: var(--ds-tracking-title);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .ds-stories-cover__link {
-  color: var(--ds-ink);
+  color: inherit;
   text-decoration: none;
 }
 
@@ -198,56 +225,80 @@
   inset: 0;
 }
 
-.ds-stories-cover__link:hover,
 .ds-stories-cover:hover .ds-stories-cover__link {
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.1em;
 }
 
 .ds-stories-cover:has(.ds-stories-cover__link:focus-visible) {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-space-2);
-  border-radius: var(--ds-radius-md);
+  outline-offset: var(--ds-focus-offset);
 }
 
 .ds-stories-cover__link:focus-visible {
   outline: none;
 }
 
-.ds-stories-cover__years,
-.ds-stories-row__years {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  font-variant-numeric: tabular-nums;
-}
-
-.ds-stories-cover__years {
-  margin: var(--ds-space-1) 0 0;
-}
-
 .ds-stories-cover__dek {
-  margin: var(--ds-space-2) 0 0;
-  color: var(--ds-ink-muted);
+  margin: 0;
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial);
   line-height: 1.5;
   text-wrap: pretty;
 }
 
-/* —— Toolbar ——————————————————————————————————————————————————————————————— */
-/* The browse block runs at the record width: the list is one ruled column, read in order. */
+/* —— The list head: a display title and the count as a copper numeral ——————————————— */
 .ds-stories-browse {
-  max-width: var(--ds-width-record);
   margin-top: var(--ds-space-18);
 }
 
-/* With no covers above it (a narrowed list), the toolbar is the first thing on the page. */
 .ds-stories-browse[data-first] {
   margin-top: 0;
 }
 
+.ds-stories-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title count'
+    'dek count';
+  align-items: end;
+  column-gap: var(--ds-space-8);
+  padding-bottom: var(--ds-space-8);
+}
+
+.ds-stories-head__title {
+  grid-area: title;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-1);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ds-stories-browse[data-first] .ds-stories-head__title {
+  font-size: var(--ds-text-display-title);
+}
+
+.ds-stories-head__count {
+  grid-area: count;
+  margin-bottom: -0.06em;
+}
+
+.ds-stories-head__dek {
+  grid-area: dek;
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* —— Toolbar ——————————————————————————————————————————————————————————————— */
 .ds-stories-toolbar {
   padding-bottom: var(--ds-space-4);
 }
@@ -273,18 +324,17 @@
 .ds-stories-toolbar__glyph {
   width: 1rem;
   height: 1rem;
-  color: var(--ds-ink-muted);
 }
 
+/* The sort menu is a small paper sheet. */
 .ds-stories-sort {
   width: min(100% - var(--ds-space-8), 18rem);
   margin: auto;
   padding: var(--ds-space-2);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-material-ink);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
   color: var(--ds-ink);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+  box-shadow: 4px 4px 0 var(--ds-material-copper);
 }
 
 .ds-stories-sort::backdrop {
@@ -333,14 +383,16 @@
   background: var(--ds-surface-sunken);
 }
 
+/* The current sort: a check and weight, never color alone. */
 .ds-stories-sort__option[aria-current='true'] {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .ds-stories-sort__check {
   flex: none;
   width: 1rem;
   height: 1rem;
+  color: var(--ds-accent);
 }
 
 /* —— Narrowing echoes, notice, pager ——————————————————————————————————————— */
@@ -367,7 +419,7 @@
   display: grid;
   justify-items: start;
   gap: var(--ds-space-4);
-  padding-top: var(--ds-space-4);
+  padding-block: var(--ds-space-4);
 }
 
 .ds-stories-pager {
@@ -385,7 +437,11 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* —— The ruled list ————————————————————————————————————————————————————————— */
+/* —— The list: one paper sheet ———————————————————————————————————————————————— */
+.ds-stories-paper {
+  padding-block: var(--ds-space-2);
+}
+
 .ds-stories-list {
   margin: 0;
   padding: 0;
@@ -393,35 +449,53 @@
 }
 
 .ds-stories-row {
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-stories-row:last-child {
+  border-bottom: 0;
 }
 
 .ds-stories-row__link {
   display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
-  grid-template-rows: auto 1fr;
-  column-gap: var(--ds-space-4);
-  row-gap: var(--ds-space-1);
-  padding: var(--ds-space-4) 0;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'thumb title years'
+    'thumb kind years'
+    'thumb summary summary';
+  align-items: start;
+  gap: var(--ds-space-1) var(--ds-space-6);
+  margin-inline: calc(var(--ds-space-2) * -1);
+  padding: var(--ds-space-4) var(--ds-space-2);
   color: var(--ds-ink);
   text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-standard);
+}
+
+.ds-stories-row__link:hover {
+  background: var(--ds-surface-sunken);
 }
 
 .ds-stories-row__link:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-space-1);
-  border-radius: var(--ds-radius-sm);
+  outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
+/* A 72px portrait, or a sand tile with the initial in ink. */
 .ds-stories-row__thumb {
-  grid-row: 1 / span 2;
-  width: 3.5rem;
+  grid-area: thumb;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: var(--ds-radius-sm);
+  background: var(--ds-material-sand);
+  color: var(--ds-material-ink);
 }
 
 .ds-stories-row__thumb .ds-story-img {
+  width: 100%;
   height: 100%;
   min-height: 0;
 }
@@ -432,88 +506,136 @@
   object-position: center top;
 }
 
-.ds-stories-row__title {
+.ds-stories-row__initial {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
-  line-height: 1.3;
+}
+
+.ds-stories-row__title {
+  grid-area: title;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: var(--ds-tracking-title);
   text-wrap: balance;
 }
 
 .ds-stories-row__link:hover .ds-stories-row__title {
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 2px;
   text-underline-offset: 0.15em;
 }
 
 .ds-stories-row__years {
+  grid-area: years;
   justify-self: end;
-  padding-top: 2px;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.ds-stories-row__meta {
-  grid-column: 2 / -1;
+.ds-stories-row__kind {
+  grid-area: kind;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+}
+
+.ds-stories-row__summary {
+  grid-area: summary;
   display: -webkit-box;
   overflow: hidden;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
   line-height: 1.45;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-.ds-stories-row__kind {
-  color: var(--ds-ink);
-}
-
-.ds-stories-row__kind::after {
-  content: ' · ';
-  color: var(--ds-ink-muted);
-}
-
 /* —— Phone ————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
   .ds-stories .ds-room__doc {
-    padding-top: var(--ds-space-4);
-  }
-
-  /* The cover goes edge to edge, the copy sits under the picture rather than on it. */
-  .ds-stories-lead {
-    margin-inline: calc(var(--ds-gutter) * -1);
-    border-radius: 0;
+    padding-top: var(--ds-space-8);
   }
 
   .ds-stories-lead__media {
-    grid-area: auto;
+    height: auto;
     aspect-ratio: 4 / 3;
-    min-height: 0;
   }
 
-  .ds-stories-lead__copy {
-    grid-area: auto;
+  /* The panel runs edge to edge and rises over the picture's foot by a band. */
+  .ds-stories-lead__wrap {
+    width: 100%;
+    margin-top: calc(var(--ds-space-12) * -1);
+  }
+
+  .ds-stories-lead__panel {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'numeral'
+      'years'
+      'title'
+      'dek'
+      'cta';
     padding: var(--ds-space-6) var(--ds-gutter) var(--ds-space-8);
+    border-radius: 0;
   }
 
-  .ds-stories-lead[data-media='photo'] .ds-stories-lead__media::after {
-    display: none;
+  .ds-stories-lead__numeral {
+    align-self: start;
+    margin: 0 0 var(--ds-space-2);
   }
 
-  .ds-stories-lead[data-media='none'] .ds-stories-lead__copy {
-    padding-top: var(--ds-space-12);
-  }
-
-  .ds-stories-lead__title {
-    font-size: var(--ds-text-display-2);
+  .ds-stories-cover__caption {
+    padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-6);
   }
 
   .ds-stories-browse {
     margin-top: var(--ds-space-12);
   }
-}
 
-@media (max-width: 47.9375rem) {
+  .ds-stories-head {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'count'
+      'title'
+      'dek';
+  }
+
+  .ds-stories-head__count {
+    margin: 0 0 var(--ds-space-2);
+  }
+
+  /* The sheet runs full-bleed on a phone (the kit drops its side edges). */
+  .ds-stories-paper {
+    margin-inline: calc(var(--ds-gutter) * -1);
+  }
+
+  .ds-stories-row__link {
+    grid-template-columns: 4rem minmax(0, 1fr);
+    grid-template-areas:
+      'thumb title'
+      'thumb years'
+      'thumb kind'
+      'summary summary';
+    column-gap: var(--ds-space-4);
+  }
+
+  .ds-stories-row__thumb {
+    width: 4rem;
+  }
+
+  .ds-stories-row__years {
+    justify-self: start;
+    font-size: var(--ds-text-body);
+  }
+
   /* Sort opens as a bottom sheet within thumb reach. */
   .ds-stories-sort.ds-stories-sort {
     inset: auto 0 0 0;
@@ -522,6 +644,7 @@
     padding: var(--ds-space-2) var(--ds-space-2)
       calc(var(--ds-space-4) + env(safe-area-inset-bottom, 0px));
     border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+    box-shadow: none;
   }
 
   .ds-stories-sort::backdrop {
@@ -531,13 +654,18 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ds-stories-lead__media img,
-  .ds-stories-cover__media img {
+  .ds-stories-cover__media img,
+  .ds-stories-cover {
     transition: none;
   }
 
   .ds-stories-lead:hover .ds-stories-lead__media img,
   .ds-stories-cover:hover .ds-stories-cover__media img {
     transform: scale(var(--crop));
+  }
+
+  .ds-stories-cover:hover {
+    transform: none;
   }
 }
 
@@ -555,37 +683,37 @@
   gap: var(--ds-space-8);
 }
 
-.ds-stories-wait span {
-  display: block;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-sunken);
-}
-
 .ds-stories-wait__lead {
-  aspect-ratio: 21 / 9;
-  min-height: 20rem;
-}
-
-.ds-stories-wait__covers.ds-stories-wait__covers,
-.ds-stories-wait__rows.ds-stories-wait__rows {
-  display: grid;
-  gap: var(--ds-space-8);
-  background: none;
+  display: block;
+  height: clamp(20rem, 52vh, 36rem);
+  background: var(--ds-material-ink);
 }
 
 .ds-stories-wait__covers {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--ds-space-8);
 }
 
 .ds-stories-wait__covers > span {
-  aspect-ratio: 3 / 2;
+  display: block;
+  aspect-ratio: 16 / 13;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-material-sand);
+}
+
+.ds-stories-wait__covers > span + span {
+  background: var(--ds-material-copper);
 }
 
 .ds-stories-wait__rows {
+  display: grid;
   gap: var(--ds-space-4);
 }
 
 .ds-stories-wait__rows > span {
-  height: 4.5rem;
+  display: block;
+  height: 5.5rem;
   border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
 }

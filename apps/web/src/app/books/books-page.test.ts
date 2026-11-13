@@ -104,3 +104,20 @@ test('the When cell is never sharper than the challenge reports', async () => {
   });
   assert.deepEqual(challengeWhen([]), { label: 'When', value: 'Not dated yet' });
 });
+
+test('the numeral beside a book title says what its year is, so it cannot pass for a date', async () => {
+  const { challengeNumeral } = await import('./[slug]/BookRecordView');
+  assert.deepEqual(challengeNumeral([{ schoolYear: '2022-2023' }]), {
+    value: '2022–23',
+    caption: 'Challenge school year',
+  });
+  assert.deepEqual(challengeNumeral([{ schoolYear: '2023-2024' }, { schoolYear: '2021-2022' }]), {
+    value: '2021–22',
+    caption: 'First challenge on file',
+  });
+  assert.deepEqual(challengeNumeral([{ challengeYear: 2023 }]), {
+    value: '2023',
+    caption: 'Challenge year',
+  });
+  assert.equal(challengeNumeral([]), undefined);
+});

@@ -1,19 +1,21 @@
 /**
  * Story page at `/stories/[slug]`, chapters and entries alike, on one frame:
  *
- *   masthead (on the reading measure) → hero image (chapters, wide track)
- *   section spine (sticky, left of the column on wide screens; a Contents bar and sheet below)
- *   body: prose on the 680px measure, every artifact open on the 964px track
- *   end block: where to read next, then the records the story links to
- *   sources: a plain numbered list
+ *   masthead on the ink table: display title, the opening year as a numeral, the dek, then a
+ *     copper band of facts (years, place or office, sources, byline); chapters then show their
+ *     hero image whole on the wide track
+ *   section spine (sticky, left of the sheet on wide screens; a Contents bar and sheet below)
+ *   the paper sheet: prose on the 680px measure, every artifact open on the wide track, section
+ *     years as copper numerals, then the numbered sources, then the copper end block (where to
+ *     read next, the records the story links to) across the sheet's foot
  *
- * Entries use the same frame with a short masthead: the portrait beside the title, no hero band.
+ * Entries use the same frame with a short masthead: the portrait large beside the title.
  * Emits schema.org Article JSON-LD only.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
-import { Notice } from '@repo/ui';
+import { DisplayNumeral, Notice, PageTitle, Sheet } from '@repo/ui';
 import { Room } from '../../../components/room';
 import { StoryBody } from '../../../components/story/StoryBody';
 import { StoryEnd } from '../../../components/story/StoryEnd';
@@ -23,7 +25,7 @@ import { StoryReferences } from '../../../components/story/StoryReferences';
 import { StoryRecords } from '../../../components/story/story-records';
 import { StorySpine } from '../../../components/story/StorySpine';
 import { storyImageSrc } from '../../../components/story/story-image';
-import { splitLede } from '../../../components/story/story-text';
+import { firstYear, splitLede } from '../../../components/story/story-text';
 import type { HydratedStory } from '../../../lib/stories/hydrate';
 import { extractChapterHeadings } from '../../../lib/stories/heading-anchors';
 import {
@@ -99,10 +101,12 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   if (result.source === 'unavailable') {
     return (
       <Room width="read" className="ds-story">
-        <Notice tone="warning" title="This story is unavailable">
-          The live record could not be reached, so this story cannot be shown right now. Reload to
-          try again, or <Link href="/stories">go back to all stories</Link>.
-        </Notice>
+        <Sheet className="ds-story-unavailable">
+          <Notice tone="warning" title="This story is unavailable">
+            The live record could not be reached, so this story cannot be shown right now. Reload to
+            try again, or <Link href="/stories">go back to all stories</Link>.
+          </Notice>
+        </Sheet>
       </Room>
     );
   }
@@ -159,6 +163,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const hero = doc.heroImage;
   const hasSources = story.references.length > 0;
 
+  const year = firstYear(doc.eraLabel);
   const facts = [
     collection ? (
       <Link
@@ -170,10 +175,6 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
       </Link>
     ) : null,
     collection?.positionLabel ? <span key="position">{collection.positionLabel}</span> : null,
-    <span key="era" className="ds-story-mast__years">
-      {doc.eraLabel}
-    </span>,
-    isEntry ? null : <span key="place">{doc.placeLabel}</span>,
   ].filter(Boolean);
 
   return (
@@ -185,49 +186,85 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
       <article className="ds-story__frame">
         <header className="ds-story-mast" data-media={hero ? 'photo' : 'none'}>
           <div className="ds-story-mast__text">
-            <p className="ds-story-mast__facts">{facts}</p>
-            <h1 className="ds-story-mast__title">{doc.title}</h1>
+            {facts.length > 0 ? <p className="ds-story-mast__facts">{facts}</p> : null}
+            {year && isEntry ? (
+              <DisplayNumeral
+                className="ds-story-mast__numeral"
+                tone="soft"
+                size="title"
+                decorative
+              >
+                {year}
+              </DisplayNumeral>
+            ) : null}
+            <PageTitle className="ds-story-mast__title">{doc.title}</PageTitle>
             <p className="ds-story-mast__dek">{lede.dek}</p>
             {lede.rest ? <p className="ds-story-mast__rest">{lede.rest}</p> : null}
-            <p className="ds-story-mast__byline">
-              {storyBylineLines(doc.contributors).map((line) => (
-                <span key={line}>{line}</span>
-              ))}
-              <span>
-                <time dateTime={doc.publishedAt}>{formatDate(doc.publishedAt)}</time>
-              </span>
-              {doc.updatedAt ? (
-                <span>
-                  Updated <time dateTime={doc.updatedAt}>{formatDate(doc.updatedAt)}</time>
-                </span>
-              ) : null}
-              {hasSources ? (
-                <span>
-                  <a href="#sources">
-                    {story.references.length} {story.references.length === 1 ? 'source' : 'sources'}
-                  </a>
-                </span>
-              ) : null}
-              <span>
-                <Link href="/corrections">Report an error</Link>
-              </span>
-            </p>
           </div>
+          {year && !isEntry ? (
+            <DisplayNumeral className="ds-story-mast__numeral" tone="soft" decorative>
+              {year}
+            </DisplayNumeral>
+          ) : null}
           {hero && isEntry ? (
-            <figure className="ds-story-mast__portrait">
+            <figure className="ds-story-mast__portrait" data-ground="paper">
               <StoryImage
-                src={storyImageSrc(hero.url, 200, hero.width)}
+                src={storyImageSrc(hero.url, 320, hero.width)}
                 fallbackSrc={hero.url}
                 alt={hero.alt}
                 {...(hero.width ? { width: hero.width } : {})}
                 {...(hero.height ? { height: hero.height } : {})}
                 eager
               />
-              <figcaption className="ds-story-caption">
+              <figcaption className="ds-story-caption" data-ground="sand">
                 <span className="ds-story-caption__credit">{hero.credit}</span>
               </figcaption>
             </figure>
           ) : null}
+          <dl className="ds-story-mast__band" data-ground="copper" aria-label={`This ${noun}`}>
+            <div>
+              <dt>{isEntry ? 'Term' : 'Years'}</dt>
+              <dd className="ds-story-mast__years">{doc.eraLabel}</dd>
+            </div>
+            {isEntry ? null : (
+              <div>
+                <dt>Place</dt>
+                <dd>{doc.placeLabel}</dd>
+              </div>
+            )}
+            {hasSources ? (
+              <div>
+                <dt>Sources</dt>
+                <dd>
+                  <a href="#sources">
+                    {story.references.length} {story.references.length === 1 ? 'source' : 'sources'}
+                  </a>
+                </dd>
+              </div>
+            ) : null}
+            <div className="ds-story-mast__byline">
+              <dt>Written</dt>
+              <dd>
+                {storyBylineLines(doc.contributors).map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+                <span>
+                  <time dateTime={doc.publishedAt}>{formatDate(doc.publishedAt)}</time>
+                </span>
+                {doc.updatedAt ? (
+                  <span>
+                    Updated <time dateTime={doc.updatedAt}>{formatDate(doc.updatedAt)}</time>
+                  </span>
+                ) : null}
+              </dd>
+            </div>
+            <div className="ds-story-mast__report">
+              <dt className="ds-visually-hidden">Corrections</dt>
+              <dd>
+                <Link href="/corrections">Report an error</Link>
+              </dd>
+            </div>
+          </dl>
           {hero && !isEntry ? (
             <StoryFigure className="ds-story-mast__hero" image={hero} eager />
           ) : null}
@@ -235,10 +272,19 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
 
         <StorySpine headings={headings} {...(hasSources ? { sourcesHref: '#sources' } : {})} />
 
-        <div className="ds-story__main">
-          <StoryBody story={story} />
+        <Sheet as="div" className="ds-story__main">
+          <StoryBody story={story} numerals />
 
           <div className="ds-story-body">
+            {hasSources ? (
+              <section className="ds-story-sources-block" id="sources">
+                <h2 className="ds-section-heading ds-story-end__heading" id="sources-heading">
+                  Sources
+                </h2>
+                <StoryReferences references={story.references} headingId="sources-heading" />
+              </section>
+            ) : null}
+
             <StoryEnd
               next={next}
               previous={previous}
@@ -255,17 +301,8 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
                 />
               }
             />
-
-            {hasSources ? (
-              <section className="ds-story-sources-block" id="sources">
-                <h2 className="ds-section-heading ds-story-end__heading" id="sources-heading">
-                  Sources
-                </h2>
-                <StoryReferences references={story.references} headingId="sources-heading" />
-              </section>
-            ) : null}
           </div>
-        </div>
+        </Sheet>
       </article>
     </Room>
   );

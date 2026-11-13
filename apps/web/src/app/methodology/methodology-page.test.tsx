@@ -23,7 +23,7 @@ import {
   SOURCE_LINEAGE_STAGES,
   SOURCE_PUBLISHER_KINDS,
 } from './methodology-copy';
-import { GradeMatrix, gradeFor } from './MethodologyFigures';
+import { GradeMatrix, PrecisionLadder, gradeFor } from './MethodologyFigures';
 
 void React;
 
@@ -37,7 +37,7 @@ test('methodology renders its own room, not a hub redirect', () => {
 });
 
 test('methodology opens on the shared PageHeader, with no kicker and no copper accent word', () => {
-  const header = sectionsSource.match(/<PageHeader\b[\s\S]*?\/>/)?.[0] ?? '';
+  const header = pageSource.match(/<PageHeader\b[\s\S]*?\/>/)?.[0] ?? '';
   assert.ok(header, 'methodology renders PageHeader');
   assert.doesNotMatch(header, /kicker=|<em>/);
 });
@@ -68,6 +68,16 @@ test('the grade matrix is computed from the published rule, so it cannot drift f
   assert.match(html, /<table/);
   assert.match(html, /scope="col"/);
   assert.match(html, /Not graded/);
+});
+
+test("the precision ladder draws the map's own mark for each row, never a dot for an area", () => {
+  const html = renderToStaticMarkup(<PrecisionLadder />);
+  assert.deepEqual(
+    [...html.matchAll(/data-mark="(\w+)"/g)].map((match) => match[1]),
+    ['ring', 'dot'],
+  );
+  assert.match(html, /City, neighborhood or campus/);
+  assert.match(html, /A hollow ring, never a dot/);
 });
 
 test('processes are figures, and the old sketch diagrams are gone', () => {

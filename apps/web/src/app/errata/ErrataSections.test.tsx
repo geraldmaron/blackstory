@@ -80,8 +80,9 @@ test('a row names the record, what changed, the note and the kind of change', ()
   );
   assert.match(html, /ds-errata__change">Founding date corrected</);
   assert.match(html, /ds-errata__note">The original entry cited the wrong year/);
-  assert.match(html, /ds-errata__type">Correction</);
-  assert.match(html, /ds-errata__type">Editor&#x27;s note</);
+  // A correction is the ink tag; the other kinds are sand.
+  assert.match(html, /ds-errata__type" data-ground="ink">Correction</);
+  assert.match(html, /ds-errata__type" data-ground="sand">Editor&#x27;s note</);
   // An unresolved record is named, not linked; an archive-level entry names its page.
   assert.match(html, /<span class="ds-errata__name">Bethel Church<\/span>/);
   assert.match(html, /<a class="ds-errata__name" href="\/methodology">Methodology<\/a>/);
@@ -91,7 +92,12 @@ test('a row names the record, what changed, the note and the kind of change', ()
 test('each day is one group under its date, with its changes in order', () => {
   const html = renderToStaticMarkup(<ErrataSections entries={SAMPLE_ENTRIES} />);
   assert.equal(html.match(/class="ds-errata__date"/g)?.length, 2);
-  assert.match(html, /<time dateTime="2026-08-01">Aug 1, 2026<\/time>/);
+  // The day is a display numeral the reader hears, with its year beside it.
+  assert.match(
+    html,
+    /<time dateTime="2026-08-01"><span class="ds-numeral ds-numeral--title ds-errata__day-numeral">Aug 1<\/span> <span class="ds-errata__year">2026<\/span><\/time>/,
+  );
+  assert.doesNotMatch(html, /aria-hidden/);
   assert.equal(html.match(/class="ds-errata__row"/g)?.length, 3);
 });
 

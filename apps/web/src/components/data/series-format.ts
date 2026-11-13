@@ -9,7 +9,7 @@ import type {
 import { compactNumber, type Tone } from './chart-kit';
 
 /**
- * The Black series is the highlighted one (ink); every other series is the neutral comparison. A
+ * The Black series is the highlighted one (copper); every other series is the ink comparison. A
  * series set with no Black series (a single ratio line) highlights its only series.
  */
 export function seriesTone(series: DataPageGroupedBarSeries, id: string): Tone {

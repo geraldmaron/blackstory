@@ -159,13 +159,16 @@ details[open] > summary > .lives-caret {
   }
 }
 
+/* The question is the page's pull line: large Newsreader italic. */
 .lives-milestone__question {
-  max-width: 42.5rem;
-  margin: 0 0 var(--ds-space-8);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: 600;
-  line-height: var(--ds-leading-title);
+  max-width: 24ch;
+  margin: 0 0 var(--ds-space-10);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-display-2);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
   color: var(--ds-ink);
   text-wrap: balance;
 }
@@ -362,11 +365,10 @@ details[open] > summary > .lives-caret {
   margin-top: var(--ds-space-18);
 }
 
-/* On the canvas, between two rules. No panel: the selected era is ink weight plus a copper bar. */
+/* A sand band across the sheet. The selected era becomes an ink block with heavier type. */
 .lives-scrub {
-  padding: var(--ds-space-4) 0 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  padding: var(--ds-space-6) var(--ds-space-4) var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
   container-type: inline-size;
   scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-4));
 }
@@ -383,7 +385,8 @@ details[open] > summary > .lives-caret {
 }
 
 .lives-scrub__name {
-  font-size: var(--ds-text-body-sm);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
   font-weight: 600;
   color: var(--ds-ink);
 }
@@ -402,6 +405,7 @@ details[open] > summary > .lives-caret {
   min-height: 2.75rem;
   padding: var(--ds-space-2) var(--ds-space-2) 0;
   border: 0;
+  border-radius: var(--ds-radius-sm);
   background: none;
   color: var(--ds-ink-muted);
   font: inherit;
@@ -416,6 +420,14 @@ details[open] > summary > .lives-caret {
 .lives-scrub__era:hover,
 .lives-scrub__era[aria-selected='true'] {
   color: var(--ds-ink);
+}
+
+.lives-scrub__era[aria-selected='true'] {
+  background: var(--ds-canvas);
+}
+
+.lives-scrub__era:not([aria-selected='true']):hover {
+  background: var(--ds-surface-raised);
 }
 
 .lives-scrub__era:focus-visible {
@@ -566,7 +578,7 @@ details[open] > summary > .lives-caret {
   right: 0;
   bottom: 0;
   left: 0;
-  border-bottom: 2px solid var(--ds-accent-graphic);
+  border-bottom: 3px solid var(--ds-accent-graphic);
 }
 
 /* Narrow: each era is a row on a horizontal scale, its values on one line under it. */
@@ -706,17 +718,25 @@ details[open] > summary > .lives-caret {
   color: var(--ds-ink-muted);
 }
 
+/* The era's decades set as a display numeral in copper, the stretch's own masthead. */
 .lives-era__years {
   margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-1);
+  font-weight: 600;
+  font-variant-numeric: lining-nums;
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  color: var(--ds-numeral-accent);
   white-space: nowrap;
 }
 
 .lives-era__header .lives-era__years--heading {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
+  font-size: var(--ds-text-display-title);
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  color: var(--ds-numeral-accent);
 }
 
 /* The era's two flow columns. Nothing inside is pinned to a row. */
@@ -1298,13 +1318,17 @@ details[open] > summary > .lives-caret {
   max-width: 42.5rem;
 }
 
+/* The decade at display-numeral scale in copper, cropped by nothing: the panel's masthead. */
 .lives-panel__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
+  font-size: var(--ds-text-display-title);
   font-weight: 600;
-  letter-spacing: var(--ds-tracking-display);
-  color: var(--ds-ink);
+  font-variant-numeric: lining-nums;
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  color: var(--ds-numeral-accent);
+  white-space: nowrap;
 }
 
 /* The decade's dek: what class means here, and any limit on comparing it with the decade before. */
@@ -1467,7 +1491,7 @@ details[open] > summary > .lives-caret {
   padding: 0 var(--ds-space-2);
   overflow: hidden;
   border-radius: 0;
-  background: var(--ds-ink);
+  background: var(--fig-hi);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
@@ -1475,16 +1499,19 @@ details[open] > summary > .lives-caret {
   white-space: nowrap;
 }
 
+/* The same three series tones as every figure (data-charts.css), so the key above matches.
+   Ink type on copper (4.9:1); paper type on stone and ink. */
+.lives-stack__part[data-tone='hi'] {
+  color: var(--ds-material-ink);
+}
+
 .lives-stack__part[data-tone='mid'] {
-  background: color-mix(in srgb, var(--ds-ink) 68%, var(--ds-canvas));
+  background: var(--fig-mid);
+  color: var(--ds-canvas);
 }
 
 .lives-stack__part[data-tone='lo'] {
-  background: color-mix(in srgb, var(--ds-ink) 44%, var(--ds-canvas));
-  color: var(--ds-ink);
-}
-
-[data-theme='dark'] .lives-stack__part[data-tone='lo'] {
+  background: var(--fig-lo);
   color: var(--ds-canvas);
 }
 

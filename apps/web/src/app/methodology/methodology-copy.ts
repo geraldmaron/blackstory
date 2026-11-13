@@ -161,13 +161,20 @@ export const PRECISION_LEAD =
 export const PRECISION_CONTEXT =
   'Place is how this archive is organized. It is also the field most likely to put a living person on a map at their own front door, so it carries the strictest rules on the site.';
 
-/** The precision steps a public point can take, coarsest first. */
+/**
+ * The precision steps a public point can take, coarsest first. `precision` is the stored value the
+ * figure passes to `recordMarkFor`, so the glyph each row draws is the map's own mark.
+ */
 export const PRECISION_LEVELS = [
-  { level: 'State', drawn: 'Counted in a statewide tag, no point' },
-  { level: 'County', drawn: 'Counted in a county tag, no point' },
-  { level: 'City or neighborhood', drawn: 'A hollow ring, never a dot' },
-  { level: 'Campus or institution', drawn: 'A solid dot at the site' },
-  { level: 'Private residence', drawn: 'Never drawn for a living person' },
+  { level: 'State', precision: 'state', drawn: 'Counted in a statewide tag, no point' },
+  { level: 'County', precision: 'county', drawn: 'Counted in a county tag, no point' },
+  {
+    level: 'City, neighborhood or campus',
+    precision: 'campus',
+    drawn: 'A hollow ring, never a dot',
+  },
+  { level: 'Institution or site', precision: 'institution', drawn: 'A solid dot at the site' },
+  { level: 'Private residence', precision: null, drawn: 'Never drawn for a living person' },
 ] as const;
 
 export const DIGNITY_RULES = [

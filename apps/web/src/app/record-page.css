@@ -78,6 +78,29 @@
   font-size: clamp(4.5rem, 1rem + 9vw, 10rem);
 }
 
+/* A numeral that needs naming: the caption under it, in mono, on the meta line's floor. */
+.ds-recpage__numeral--captioned {
+  display: grid;
+  justify-items: end;
+  gap: var(--ds-space-1);
+  margin-bottom: 0;
+  font-size: var(--ds-text-display-title);
+  line-height: 1;
+}
+
+.ds-recpage__numeral--captioned > .ds-numeral {
+  font-size: inherit;
+  line-height: 0.9;
+}
+
+.ds-recpage__numeral-caption {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
 .ds-recpage__crumb {
   justify-self: start;
   display: inline-flex;
@@ -1003,6 +1026,10 @@ a.ds-evidence__title:hover,
 
   .ds-recpage__numeral {
     margin: 0;
+  }
+
+  .ds-recpage__numeral--captioned {
+    justify-items: start;
   }
 
   .ds-recpage__pager {

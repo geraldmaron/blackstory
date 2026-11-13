@@ -7,6 +7,7 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
 import '../utility.css';
 import '../../components/trust/trust.css';
 import { PrivacySections } from './PrivacySections';
@@ -20,14 +21,27 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function PrivacyPage() {
   return (
-    <Room width="read">
-      <PageHeader
-        crumb={parentCrumb('/privacy')}
-        linkAs={Link}
-        title="What this site collects, and what it won't"
-        dek="No accounts, no advertising, and your location only when you press a control that says so."
-      />
-      <PrivacySections />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="sand"
+          numeral={{ value: '0', label: 'user accounts, ad identifiers or tracking prompts' }}
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/privacy')}
+            linkAs={Link}
+            title="What this site collects, and what it won't"
+            dek="No accounts, no advertising, and your location only when you press a control that says so."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <PrivacySections />
+      </TrustSheet>
     </Room>
   );
 }

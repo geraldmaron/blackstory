@@ -45,9 +45,14 @@ for (const page of ROOM_KIT_PAGES) {
     assert.match(source, /from '(?:\.\.\/)+components\/room(?:'|\/(?:Room)')/);
     assert.match(source, /<Room/);
     assert.match(source, /<PageHeader/);
-    // Forms sit beside their "what happens next" aside, so they take the record width.
-    const width = page.route === 'submit' || page.route === 'corrections' ? 'record' : 'read';
-    assert.match(source, new RegExp(`<Room width="${width}"`));
+    // Trust pages and forms open on a color mast with a paper sheet risen over it, so they take
+    // the wide container and the sheet sets the reading measure; the error pages stay read.
+    const width = page.route === 'not-found' || page.route === 'error' ? 'read' : 'wide';
+    assert.match(source, new RegExp(`<Room\\s+width="${width}"`));
+    if (width === 'wide') {
+      assert.match(source, /<TrustMast/);
+      assert.match(source, /<TrustSheet>/);
+    }
     // The v6 shell must be gone rather than merely unused: two chromes on one page is the drift
     // the kit exists to remove, and an unused import is how the second one comes back.
     assert.doesNotMatch(source, /UtilityEditionShell/);

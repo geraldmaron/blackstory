@@ -9,7 +9,8 @@
   margin: 0;
   overflow: hidden;
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface-sunken);
+  /* A paper mat in both themes: an off-ratio cover sits on it with a visible edge, not in a hole. */
+  background: #f4efe5;
   /* An inner hairline, so a pale cover still has an edge on the paper theme. */
   box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-rule);
 }
@@ -18,12 +19,15 @@
   display: block;
   width: 100%;
   height: 100%;
-  /* Letterbox an off-ratio cover on the sunken frame rather than crop its own title off. */
+  /* Mat an off-ratio cover, centered, rather than crop its own title off. */
   object-fit: contain;
-  object-position: center bottom;
+  object-position: center;
 }
 
 .ds-book-cover--typeset {
+  /* Sand with ink type (data-ground="sand" points the text tokens at ink). */
+  background: var(--ds-material-sand);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -54,4 +58,16 @@
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* On a book's record page the cover is the record's image: shown at the rail's full width (the
+   shared rule holds media covers to 180px) and pinned to the sheet with a flat copper offset. */
+.ds-recpage .ds-recpage__cover.ds-book-cover {
+  justify-self: stretch;
+  width: min(100%, 20rem);
+  margin-bottom: var(--ds-space-4);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-rule),
+    var(--ds-space-2) var(--ds-space-2) 0 var(--ds-material-copper);
+  overflow: visible;
 }

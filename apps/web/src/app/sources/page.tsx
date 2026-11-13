@@ -5,9 +5,12 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room } from '../../components/room';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
 import { loadSourceLibrary } from './load-source-library';
-import { SourcesSections } from './SourcesSections';
+import { SourcesSections, sourcesDek } from './SourcesSections';
 import '../reading-room.css';
 import '../../components/trust/trust.css';
 import './sources.css';
@@ -26,8 +29,35 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default async function SourcesPage() {
   const library = await loadSourceLibrary();
   return (
-    <Room width="read">
-      <SourcesSections library={library} />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="sand"
+          numeral={
+            library === undefined
+              ? undefined
+              : {
+                  value: library.rows.length.toLocaleString('en-US'),
+                  label: 'publishers the archive cites',
+                  decorative: true,
+                }
+          }
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/sources')}
+            linkAs={Link}
+            title="Where the evidence comes from"
+            dek={sourcesDek(library)}
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <SourcesSections library={library} />
+      </TrustSheet>
     </Room>
   );
 }

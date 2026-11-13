@@ -5,18 +5,21 @@
  * direct load. (/lives once rendered its class chart as solid black bars because only /data
  * imported it.)
  *
- * Series are neutral. `hi` is ink, the one highlighted series; `lo` is a lighter neutral step for
- * the comparison; `mid` sits between for a part of a whole. Copper is not a series color: it is
- * kept for the current thing on the page (the decade a reader picked). Identity is never color
- * alone: every series is named by a direct label, in the tooltip and in the table.
+ * Series wear the brand's materials, read from the ground the figure sits on (a paper sheet on
+ * /data and /lives): `hi`, the Black series a figure is about, is copper; `lo`, the comparison, is
+ * ink; `mid`, a part of a whole, is stone. Copper-to-ink and stone-to-ink separate well for every
+ * color vision type (checked with the dataviz validator against #f4efe5); copper beside stone is
+ * the close pair (normal-vision delta 14), so the two only meet with a 2px gap between them and a
+ * direct label on each. Identity is never color alone: every series is named by a direct label,
+ * in the tooltip and in the table.
  */
 
 .ds-datafig,
 .ds-plot,
 .ds-hbars {
-  --fig-hi: var(--ds-ink);
-  --fig-mid: color-mix(in srgb, var(--ds-ink) 68%, var(--ds-canvas));
-  --fig-lo: color-mix(in srgb, var(--ds-ink) 44%, var(--ds-canvas));
+  --fig-hi: var(--ds-accent-graphic);
+  --fig-mid: var(--ds-ink-muted);
+  --fig-lo: var(--ds-ink);
   --fig-grid: var(--ds-viz-grid);
   --fig-hatch: repeating-linear-gradient(
     135deg,
@@ -494,6 +497,10 @@ button.ds-mark {
 /* Labels on the plot */
 .ds-point-label {
   position: absolute;
+  z-index: 2; /* local: like annotation labels, sits on a canvas halo over any rule it meets */
+  padding: 0 2px;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;

@@ -1323,7 +1323,13 @@ body:has(.ds-door) .ds-door-journey {
   object-fit: cover;
 }
 
+/* Chapter covers are archive scans: hold the head of the document, where its title is. */
+.ds-door-ch__cover img {
+  object-position: 50% 8%;
+}
+
 .ds-door-ch--story .ds-door-ch__inner {
+  position: relative; /* paints the years tag over the cover's foot, which is positioned */
   margin-top: calc(var(--ds-space-18) * -1);
 }
 

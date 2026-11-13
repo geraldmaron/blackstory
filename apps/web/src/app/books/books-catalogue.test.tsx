@@ -9,7 +9,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { getBannedBooksListingSnapshot } from '../../data/banned-books-seed';
 import { BooksCoverArt } from './BooksCoverArt';
-import { BooksBrowseSections } from './BooksBrowseSections';
+import { BooksBrowseSections, tileLegend, tileStep } from './BooksBrowseSections';
 import { buildBooksBrowseViewModel } from './books-view-model';
 
 void React;
@@ -55,7 +55,8 @@ test('the toolbar carries State, Author, Sort and Covers | States, all as links'
 
 test('the states view: a decorative tile grid and a ranked list that filters the wall', () => {
   const html = render({ view: 'states' });
-  assert.match(html, /<div class="ds-books-tiles" aria-hidden="true">/);
+  assert.match(html, /<div class="ds-books-map" aria-hidden="true"><div class="ds-books-tiles">/);
+  assert.match(html, /<ul class="ds-books-legend">/);
   assert.match(html, /<ol class="ds-books-ranks" aria-label="States by challenged titles">/);
   assert.match(html, /href="\/books\?state=FL"/);
   // Order means nothing on a figure, so the Sort control is not offered there.
@@ -63,6 +64,31 @@ test('the states view: a decorative tile grid and a ranked list that filters the
   // A tile is a code and a shade step; the counts are printed once, in the ranked list.
   assert.match(html, /class="ds-books-tiles__tile" data-step="4"[^>]*>FL<\/span>/);
   assert.doesNotMatch(html, /ds-books-tiles__count/);
+});
+
+test('the tile legend reads its ranges off the step formula, with no gaps or overlaps', () => {
+  assert.deepEqual(tileLegend(62), [
+    { step: 1, from: 1, to: 3 },
+    { step: 2, from: 4, to: 15 },
+    { step: 3, from: 16, to: 34 },
+    { step: 4, from: 35, to: 62 },
+  ]);
+  assert.equal(tileStep(0, 62), 0);
+  assert.deepEqual(tileLegend(1), [{ step: 4, from: 1, to: 1 }]);
+});
+
+test('the covers view leads with the busiest state on sand, every entry opening the states view', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, {});
+  const html = render({});
+  const [top] = view.stateCounts;
+  assert.ok(top);
+  assert.match(html, /class="ds-books-lead/);
+  assert.match(html, new RegExp(`>${top.count}</span>`));
+  assert.match(html, new RegExp(`class="ds-books-lead__state">${top.name}<`));
+  assert.equal(
+    (html.match(/class="ds-books-lead__row" href="\/books\?view=states"/g) ?? []).length,
+    Math.min(4, view.stateCounts.length - 1),
+  );
 });
 
 test('a state or author no title carries is dropped, not echoed back', () => {

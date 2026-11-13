@@ -6,11 +6,10 @@
  * This is the one page that defines the evidence grades. Every other page links here.
  */
 import React from 'react';
-import Link from 'next/link';
-import { Citation, PageHeader } from '@repo/ui';
+import { Citation } from '@repo/ui';
 import { getDisclaimer } from '@repo/domain/disclaimers';
 import { formatCitation } from '../../lib/citation/format';
-import { parentCrumb, Prose, RoomFactList, RoomJump, RoomSection } from '../../components/room';
+import { Prose, RoomFactList, RoomJump, RoomSection } from '../../components/room';
 import { TrustFlow, TrustLinks } from '../../components/trust';
 import { GradeKey, GradeMatrix, PrecisionLadder } from './MethodologyFigures';
 import {
@@ -30,7 +29,6 @@ import {
   LIVES_METHOD_RULES,
   LIVING_LEAD,
   METHODOLOGY_DIGNITY_LINE,
-  METHODOLOGY_INTRO_LEDE,
   METHODOLOGY_PAGE_SECTIONS,
   METHODOLOGY_PUBLISH_RULES,
   METHODOLOGY_SOURCE_LIBRARY_HREF,
@@ -80,13 +78,6 @@ export function MethodologySections() {
 
   return (
     <>
-      <PageHeader
-        crumb={parentCrumb('/methodology')}
-        linkAs={Link}
-        title="How the archive works"
-        dek={METHODOLOGY_INTRO_LEDE}
-      />
-
       <RoomJump sections={METHODOLOGY_PAGE_SECTIONS} />
 
       <RoomSection id="how-a-record-gets-in" title="How a record gets in">

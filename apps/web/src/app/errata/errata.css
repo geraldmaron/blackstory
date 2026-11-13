@@ -1,6 +1,7 @@
 /**
- * `/errata`: the dated log. Each day is a group under its date, and each change in it is the
- * record, its kind, what changed in one line and a two-line note. Ruled rows, no boxes.
+ * `/errata`: the dated log. Each day opens on its date set as a copper display numeral, and each
+ * change under it is the record in display type, its kind as an ink or sand block tag, what
+ * changed as a Newsreader line, and a two-line note.
  */
 .ds-errata__kinds {
   display: flex;
@@ -13,23 +14,38 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: var(--ds-border-width) solid var(--ds-ink-muted);
 }
 
 /* —— a day: its date, then that day's changes ————————————————————————————————— */
 .ds-errata__day {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  padding-bottom: var(--ds-space-10);
+  border-top: 2px solid var(--ds-ink);
 }
 
 .ds-errata__date {
   margin: 0;
-  padding-top: var(--ds-space-6);
-  font-family: var(--ds-font-sans);
+  padding-top: var(--ds-space-5);
+}
+
+.ds-errata__date time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--ds-space-3);
+}
+
+/* Never under the 72px display floor, however narrow the screen. */
+.ds-errata__day-numeral.ds-numeral--title {
+  font-size: max(4.5rem, var(--ds-text-display-title));
+}
+
+.ds-errata__year {
+  font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   font-weight: 600;
-  line-height: 1.4;
+  letter-spacing: var(--ds-tracking-mono);
   font-variant-numeric: tabular-nums;
   color: var(--ds-ink);
 }
@@ -42,7 +58,7 @@
 
 /* —— one change ———————————————————————————————————————————————————————————— */
 .ds-errata__row {
-  padding-block: var(--ds-space-4);
+  padding-block: var(--ds-space-5);
 }
 
 .ds-errata__row + .ds-errata__row {
@@ -60,10 +76,10 @@
 
 .ds-errata__name {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: var(--ds-tracking-title);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
   color: var(--ds-ink);
   text-wrap: balance;
 }
@@ -79,21 +95,28 @@ a.ds-errata__name:hover {
   text-decoration-color: currentColor;
 }
 
+/* A block tag on its own ground: ink for a correction, sand for the rest (data-ground). */
 .ds-errata__type {
-  font-family: var(--ds-font-sans);
+  align-self: start;
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
+  font-weight: 600;
   line-height: 1.3;
-  color: var(--ds-ink-muted);
+  letter-spacing: var(--ds-tracking-mono);
   white-space: nowrap;
 }
 
 .ds-errata__change {
-  margin: var(--ds-space-1) 0 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body);
-  font-weight: 500;
-  line-height: 1.45;
+  max-width: 52ch;
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.35;
   color: var(--ds-ink);
+  text-wrap: pretty;
 }
 
 .ds-errata__more {
@@ -217,17 +240,40 @@ a.ds-errata__name:hover {
   color: var(--ds-ink);
 }
 
-/* Desktop: the date gets its own column and stays in view while its day scrolls past. */
-@media (min-width: 48rem) {
+/* Desktop: the date gets its own column, month over day, and stays in view while its day
+   scrolls past. */
+@media (min-width: 64rem) {
   .ds-errata__day {
-    grid-template-columns: 7.5rem minmax(0, 1fr);
-    column-gap: var(--ds-space-6);
+    grid-template-columns: 15rem minmax(0, 1fr);
+    column-gap: var(--ds-space-8);
   }
 
   .ds-errata__date {
     position: sticky;
     top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-4));
     align-self: start;
-    padding-top: calc(var(--ds-space-4) + 3px);
+  }
+
+  .ds-errata__date time {
+    display: grid;
+    row-gap: var(--ds-space-3);
+  }
+
+  .ds-errata__day-numeral {
+    width: min-content;
+    white-space: normal;
+  }
+}
+
+/* Phone: the tag rides above the name so the name keeps the full measure. */
+@media (max-width: 47.9375rem) {
+  .ds-errata__head {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--ds-space-2);
+  }
+
+  .ds-errata__type {
+    order: -1;
+    justify-self: start;
   }
 }

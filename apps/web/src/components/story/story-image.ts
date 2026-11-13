@@ -17,11 +17,12 @@ const UNKNOWN_WIDTH_CEILING = 500;
 /**
  * The URL to render an image at `width` CSS pixels (doubled for dense screens). Commons will not
  * upscale, so a resized URL is asked for only when the stored width says the original is wider.
- * StoryImage falls back to the original URL if the resized one fails anyway.
+ * A request past the largest step takes the largest step: an edge-to-edge cover asked for the
+ * original used to ship a 7,000px scan that never finished painting. StoryImage falls back to the
+ * original URL if the resized one fails anyway.
  */
 export function storyImageSrc(url: string, width: number, storedWidth?: number): string {
-  const step = COMMONS_STEPS.find((candidate) => candidate >= width * 2);
-  if (step === undefined) return url;
+  const step = COMMONS_STEPS.find((candidate) => candidate >= width * 2) ?? COMMONS_STEPS.at(-1)!;
   if (storedWidth !== undefined ? step >= storedWidth : step > UNKNOWN_WIDTH_CEILING) return url;
   return pinThumbnailUrl(url, step);
 }

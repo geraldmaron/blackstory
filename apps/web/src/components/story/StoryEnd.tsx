@@ -1,6 +1,6 @@
 /**
- * The one block at the end of a story, before its sources: where to read next, then the records
- * the story links to. An entry in a collection offers the next entry with the previous one beside
+ * The one block at the end of a story, after its sources: a copper band across the sheet's foot
+ * with where to read next (ink blocks with large names), then the records the story links to. An entry in a collection offers the next entry with the previous one beside
  * it on one row; a chapter, or an entry at the end of its collection, offers the other chapters.
  */
 import React from 'react';
@@ -16,7 +16,11 @@ const href = (item: PublicStoryListItemDoc) => `/stories/${item.slug}`;
 /** The previous entry: the same card at a quieter weight, no picture or summary. */
 function PreviousCard({ previous }: { readonly previous: PublicStoryListItemDoc }) {
   return (
-    <a className="ds-story-next__card ds-story-next__card--previous" href={href(previous)}>
+    <a
+      className="ds-story-next__card ds-story-next__card--previous"
+      href={href(previous)}
+      data-ground="ink"
+    >
       <span className="ds-story-next__text">
         <span className="ds-story-next__meta">
           <span aria-hidden="true">← </span>
@@ -49,7 +53,7 @@ function NextInCollection({
       </div>
       <div className="ds-story-next__row">
         {previous ? <PreviousCard previous={previous} /> : null}
-        <a className="ds-story-next__card" href={href(next)}>
+        <a className="ds-story-next__card" href={href(next)} data-ground="ink">
           {image ? (
             <span className="ds-story-next__thumb">
               <StoryImage
@@ -133,7 +137,11 @@ export function StoryEnd({
       <ChapterCards chapters={chapters} />
     ) : null;
   return (
-    <section className="ds-story-wide ds-story-end" aria-label="After this story">
+    <section
+      className="ds-story-wide ds-story-end"
+      aria-label="After this story"
+      data-ground="copper"
+    >
       {onward}
       {/* The last entry of a collection has no next card; its previous entry still gets a way back. */}
       {previous && !(next && collectionLabel && nextPosition) ? (

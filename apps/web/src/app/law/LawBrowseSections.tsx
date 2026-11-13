@@ -1,15 +1,15 @@
 /**
- * The `/law` index body: the register's toolbar, the active narrowing as removable chips, a
- * compact time axis that shows where the laws cluster, then the chronology
- * as ruled rows grouped by era (year in mono at the left, the law's name, one line on what it
- * did, its jurisdiction as a word).
+ * The `/law` index body: the register's toolbar, the active narrowing as removable chips, the
+ * time axis drawn large on a sand band, then the chronology: each era a full-bleed color block
+ * with its span as a display numeral beside a paper sheet of rows (the year, the law's name,
+ * one line on what it did, its jurisdiction as a word).
  *
  * Server-rendered and JavaScript-free: menus are the register's native popovers of GET links,
  * and rows are anchors.
  */
 import React from 'react';
 import Link from 'next/link';
-import { Chip, buttonClassName } from '@repo/ui';
+import { Block, Chip, DisplayNumeral, Sheet, buttonClassName } from '@repo/ui';
 import { US_STATES } from '@repo/domain';
 import {
   humanizeLegalKind,
@@ -144,13 +144,21 @@ function lawsPhrase(count: number): string {
 
 const eraAnchor = (era: LawEra) => `era-${era.id}`;
 
-function eraSpan(era: LawEra, items: readonly LegalBrowseItem[]): string | null {
+/** The era's first and last year, or null when it has no closed span to print. */
+function eraSpan(era: LawEra, items: readonly LegalBrowseItem[]): readonly [number, number] | null {
   if (era.id === LAW_UNDATED.id) return null;
-  if (era.from !== undefined && era.to !== undefined) return `${era.from}–${era.to}`;
+  if (era.from !== undefined && era.to !== undefined) return [era.from, era.to];
   if (era.from === undefined) return null;
   const years = items.flatMap((item) => (item.effectiveYear ? [item.effectiveYear] : []));
-  return `${era.from}–${Math.max(...years)}`;
+  return [era.from, Math.max(...years)];
 }
+
+/**
+ * Era blocks alternate ink and copper down the page, counted from the last, which is always ink:
+ * the copper footer follows it, and two copper blocks in a row would read as one.
+ */
+const eraTone = (index: number, count: number) =>
+  (count - 1 - index) % 2 === 0 ? 'ink' : 'copper';
 
 /**
  * The time axis: one mark per dated entry at its year, decade ticks under a hairline, and a band
@@ -178,48 +186,93 @@ function TimeAxis({
   const ticks: number[] = [];
   for (let year = Math.ceil(from / 20) * 20; year <= to; year += 20) ticks.push(year);
   const stack = new Map<number, number>();
+  // Each era's bar takes the tone of its block below, with a 2px gap between neighbors.
+  const eras = view.groups.flatMap(({ era, items }, index) => {
+    if (era.id === LAW_UNDATED.id) return [];
+    // An open-ended era's band stops at its last entry, not at the edge of the axis.
+    const last = Math.max(...items.map((item) => item.effectiveYear ?? from));
+    const start = Math.max(era.from ?? from, from);
+    const end = Math.min((era.to ?? last) + 1, to);
+    return [{ era, tone: eraTone(index, view.groups.length), start, end }];
+  });
 
   return (
-    <div className="ds-law-axis" aria-hidden="true">
-      <div className="ds-law-axis__track">
-        {view.groups.map(({ era, items }) => {
-          if (era.id === LAW_UNDATED.id) return null;
-          // An open-ended era's band stops at its last entry, not at the edge of the axis.
-          const last = Math.max(...items.map((item) => item.effectiveYear ?? from));
-          const start = Math.max(era.from ?? from, from);
-          const end = Math.min((era.to ?? last) + 1, to);
-          return (
-            <span
-              key={era.id}
-              className="ds-law-axis__band"
-              style={{ left: at(start), width: at(from + end - start) }}
-            />
-          );
-        })}
-        {dated.map((item) => {
-          const level = stack.get(item.effectiveYear) ?? 0;
-          stack.set(item.effectiveYear, level + 1);
-          return (
-            <span
-              key={item.id}
-              className="ds-law-axis__mark"
-              style={{ left: at(item.effectiveYear), '--law-stack': level } as React.CSSProperties}
-            />
-          );
-        })}
-        {ticks.map((year) => (
-          <span
-            key={year}
-            className={
-              year % 40 === 0 ? 'ds-law-axis__tick' : 'ds-law-axis__tick ds-law-axis__tick--minor'
-            }
-            style={{ left: at(year) }}
-          >
-            {year}
-          </span>
-        ))}
+    <Block tone="sand" className="ds-law-axis-band">
+      <div className="ds-wrap">
+        <div className="ds-law-axis" aria-hidden="true">
+          <div className="ds-law-axis__track">
+            {eras.map(({ era, tone, start, end }) => (
+              <span
+                key={era.id}
+                className="ds-law-axis__band"
+                data-tone={tone}
+                style={{ left: at(start), width: `calc(${at(from + end - start)} - 2px)` }}
+              />
+            ))}
+            {eras.map(({ era, start }, index) => (
+              <span
+                key={era.id}
+                className="ds-law-axis__era"
+                // The name may wrap inside the room up to the next era, never over it.
+                style={{
+                  left: at(start),
+                  maxWidth: at(from + (eras[index + 1]?.start ?? to) - start),
+                }}
+              >
+                {era.name}
+              </span>
+            ))}
+            {dated.map((item, index) => {
+              const level = stack.get(item.effectiveYear) ?? 0;
+              stack.set(item.effectiveYear, level + 1);
+              return (
+                <span
+                  key={item.id}
+                  className="ds-law-axis__mark"
+                  style={
+                    {
+                      left: at(item.effectiveYear),
+                      '--law-stack': level,
+                      '--law-i': index,
+                    } as React.CSSProperties
+                  }
+                />
+              );
+            })}
+            {ticks.map((year) => (
+              <span
+                key={year}
+                className={
+                  year % 40 === 0
+                    ? 'ds-law-axis__tick'
+                    : 'ds-law-axis__tick ds-law-axis__tick--minor'
+                }
+                style={{ left: at(year) }}
+              >
+                {year}
+              </span>
+            ))}
+          </div>
+          {/* At phone width the names cannot sit under their bars; they read as a key instead. */}
+          <ul className="ds-law-axis__legend">
+            {eras.map(({ era, tone }) => (
+              <li key={era.id} data-tone={tone}>
+                {era.name}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
+    </Block>
+  );
+}
+
+function LawNote({ className }: { readonly className: string }) {
+  return (
+    <p className={className}>
+      Plain-language summaries, not legal advice. A jurisdiction is the reach of the authority that
+      passed a law, not a place on the map. <Link href="/methodology">How entries are checked</Link>
+    </p>
   );
 }
 
@@ -233,7 +286,7 @@ function LawRow({
   return (
     <li className="ds-law-row">
       <Link className="ds-law-row__link" href={`/law/${item.slug}`}>
-        <span className="ds-law-row__year">
+        <span className="ds-law-row__year" data-unknown={item.effectiveYear ? undefined : 'true'}>
           {item.effectiveYear ? String(item.effectiveYear) : 'Year unknown'}
         </span>
         <span className="ds-law-row__name">{item.title}</span>
@@ -255,6 +308,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
   const active = activeFilters(view);
   const facets = active.filter((filter) => filter.key !== 'q').length;
 
+  const endsOnEra = view.items.length > 0 && view.groups.length > 0;
   let body: React.ReactNode;
   if (view.totalAvailable === 0) {
     body = (
@@ -270,27 +324,56 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
     );
   } else if (view.groups.length === 0) {
     body = (
-      <ol className="ds-law-list">
-        {view.items.map((item) => (
-          <LawRow key={item.id} item={item} jurisdiction={jurisdictionOf(item)} />
-        ))}
-      </ol>
+      <Sheet className="ds-law-sheet ds-law-sheet--flat">
+        <ol className="ds-law-list">
+          {view.items.map((item) => (
+            <LawRow key={item.id} item={item} jurisdiction={jurisdictionOf(item)} />
+          ))}
+        </ol>
+      </Sheet>
     );
   } else {
-    body = view.groups.map((group) => {
+    body = view.groups.map((group, index) => {
       const span = eraSpan(group.era, group.items);
+      const tone = eraTone(index, view.groups.length);
+      const last = index === view.groups.length - 1;
       return (
-        <section key={group.era.id} className="ds-law-era" aria-labelledby={eraAnchor(group.era)}>
-          <h2 className="ds-law-era__title" id={eraAnchor(group.era)}>
-            {group.era.name}
-            {span === null ? null : <span className="ds-law-era__span">{span}</span>}
-          </h2>
-          <ol className="ds-law-list">
-            {group.items.map((item) => (
-              <LawRow key={item.id} item={item} jurisdiction={jurisdictionOf(item)} />
-            ))}
-          </ol>
-        </section>
+        <Block
+          key={group.era.id}
+          tone={tone}
+          className="ds-law-era"
+          aria-labelledby={eraAnchor(group.era)}
+        >
+          <div className="ds-wrap ds-law-era__inner">
+            <header className="ds-law-era__mark">
+              <h2 className="ds-law-era__title" id={eraAnchor(group.era)}>
+                {group.era.name}
+              </h2>
+              {span === null ? null : (
+                <DisplayNumeral
+                  as="p"
+                  size="title"
+                  tone={tone === 'ink' ? 'soft' : 'accent'}
+                  className="ds-law-era__span"
+                >
+                  <span>{span[0]}</span>
+                  <span className="ds-law-era__to"> to </span>
+                  <span>{span[1]}</span>
+                </DisplayNumeral>
+              )}
+              <p className="ds-law-era__count">{lawsPhrase(group.items.length)}</p>
+            </header>
+            <Sheet className="ds-law-sheet">
+              <ol className="ds-law-list">
+                {group.items.map((item) => (
+                  <LawRow key={item.id} item={item} jurisdiction={jurisdictionOf(item)} />
+                ))}
+              </ol>
+            </Sheet>
+            {/* The closing note rides the last era, so the page meets the footer on a block. */}
+            {last ? <LawNote className="ds-law-note ds-law-note--in-era" /> : null}
+          </div>
+        </Block>
       );
     });
   }
@@ -329,13 +412,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
 
       {body}
 
-      {view.totalAvailable > 0 ? (
-        <p className="ds-law-note">
-          Plain-language summaries, not legal advice. A jurisdiction is the reach of the authority
-          that passed a law, not a place on the map.{' '}
-          <Link href="/methodology">How entries are checked</Link>
-        </p>
-      ) : null}
+      {view.totalAvailable > 0 && !endsOnEra ? <LawNote className="ds-law-note" /> : null}
     </>
   );
 }

@@ -152,7 +152,7 @@ export function CorrectionForm({
 
   if (state.status === 'success') {
     return (
-      <div className="ds-form-done" ref={receiptRef} tabIndex={-1}>
+      <div className="ds-form-done" ref={receiptRef} tabIndex={-1} data-ground="copper">
         <h2 className="ds-form-done__title">It arrived. Here is your receipt.</h2>
         <p className="ds-form-done__body">
           Nothing you sent is public. A person reads it against the published sources, and if it is

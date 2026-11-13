@@ -1,6 +1,29 @@
 /**
  * `/support`: the one action and the address. Everything else is the trust kit.
+ *
+ * On a desktop the two ways in (a correction, an email) sit side by side, each under its own
+ * copper numeral; the links to existing answers run the full sheet under them.
  */
+.ds-support__pair {
+  display: grid;
+}
+
+@media (min-width: 64rem) {
+  .ds-support__pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--ds-space-12);
+  }
+
+  .ds-trust-sheet .ds-support__pair .ds-room-section > .ds-section-heading {
+    margin-top: 0;
+  }
+}
+
+/* The pair wrapper makes the next section first-of-type again; give it back its section space. */
+.ds-trust-sheet .ds-support__pair + .ds-room-section.ds-room-section > .ds-section-heading {
+  margin-top: var(--ds-space-16);
+}
+
 .ds-support__action {
   margin-top: var(--ds-space-4);
 }
@@ -8,7 +31,8 @@
 .ds-support__email {
   margin: var(--ds-space-4) 0 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
+  font-size: var(--ds-text-display-3);
+  line-height: 1.1;
   font-weight: 600;
   letter-spacing: var(--ds-tracking-title);
   overflow-wrap: anywhere;

@@ -1,13 +1,16 @@
 /**
  * The pieces of the `/stories` front: the lead cover, the chapter covers, a list row and the one
  * toolbar. Server components; the only client code is StoryImage's load and error state.
+ *
+ * Material: the lead runs edge to edge with an ink panel, the chapter tiles carry sand and copper
+ * caption blocks, and the list is one paper sheet on the ink table.
  */
 import React from 'react';
 import type { PublicStoryListItemDoc } from '@repo/schemas';
-import { FilterButton, Segmented, buttonClassName } from '@repo/ui';
+import { DisplayNumeral, FilterButton, Segmented, buttonClassName } from '@repo/ui';
 import { StoryImage } from '../../components/story/StoryImage';
 import { storyImageSrc } from '../../components/story/story-image';
-import { coverDek } from '../../components/story/story-text';
+import { coverDek, firstYear } from '../../components/story/story-text';
 
 void React;
 
@@ -40,48 +43,72 @@ export function CoverImage({
   );
 }
 
-/** The newest chapter at full width: its own image, title, dek and year range. */
+/**
+ * The newest chapter, edge to edge under the header: the cover unfiltered, and the title at display
+ * scale on a solid ink panel that overlaps the picture's foot. The panel is ink in both themes, so
+ * the type never sits on the picture and needs no scrim.
+ */
 export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
+  const year = firstYear(item.eraLabel);
   return (
     <article className="ds-stories-lead" data-media={item.heroImage ? 'photo' : 'none'}>
       <div className="ds-stories-lead__media">
-        <CoverImage item={item} width={960} eager />
+        <CoverImage item={item} width={1440} eager />
       </div>
-      <div className="ds-stories-lead__copy">
-        <p className="ds-stories-lead__years">{item.eraLabel}</p>
-        <h2 className="ds-stories-lead__title">
-          <a className="ds-stories-lead__link" href={href(item)}>
-            {item.title}
+      <div className="ds-wrap ds-stories-lead__wrap">
+        <div className="ds-stories-lead__panel" data-ground="ink">
+          {year ? (
+            <DisplayNumeral className="ds-stories-lead__numeral" tone="soft" decorative>
+              {year}
+            </DisplayNumeral>
+          ) : null}
+          <p className="ds-stories-lead__years">{item.eraLabel}</p>
+          <h2 className="ds-stories-lead__title">
+            <a className="ds-stories-lead__link" href={href(item)}>
+              {item.title}
+            </a>
+          </h2>
+          <p className="ds-stories-lead__dek">{coverDek(item.summary)}</p>
+          <a className={buttonClassName('primary', 'ds-stories-lead__cta')} href={href(item)}>
+            {readLabel(item)}
           </a>
-        </h2>
-        <p className="ds-stories-lead__dek">{coverDek(item.summary)}</p>
-        <a className={buttonClassName('primary', 'ds-stories-lead__cta')} href={href(item)}>
-          {readLabel(item)}
-        </a>
+        </div>
       </div>
     </article>
   );
 }
 
-/** One of the other chapters, image first. The whole card is the link. */
-export function ChapterCover({ item }: { readonly item: PublicStoryListItemDoc }) {
+/**
+ * One of the other chapters: the picture, then a color-blocked caption (sand and copper in turn)
+ * with the title large in ink. The whole tile is the link.
+ */
+export function ChapterCover({
+  item,
+  tone,
+}: {
+  readonly item: PublicStoryListItemDoc;
+  readonly tone: 'sand' | 'copper';
+}) {
   return (
     <article className="ds-stories-cover">
       <div className="ds-stories-cover__media">
-        <CoverImage item={item} width={560} />
+        <CoverImage item={item} width={720} />
       </div>
-      <h2 className="ds-stories-cover__title">
-        <a className="ds-stories-cover__link" href={href(item)}>
-          {item.title}
-        </a>
-      </h2>
-      <p className="ds-stories-cover__years">{item.eraLabel}</p>
-      <p className="ds-stories-cover__dek">{coverDek(item.summary)}</p>
+      <div className="ds-stories-cover__caption" data-ground={tone}>
+        <p className="ds-stories-cover__years">{item.eraLabel}</p>
+        <h2 className="ds-stories-cover__title">
+          <a className="ds-stories-cover__link" href={href(item)}>
+            {item.title}
+          </a>
+        </h2>
+        <p className="ds-stories-cover__dek">{coverDek(item.summary)}</p>
+      </div>
     </article>
   );
 }
 
-/** A ruled list row: portrait thumbnail where the data has one, title, years, one line of summary. */
+/** A list row on the paper sheet: a 72px portrait where the data has one, the name large, the
+ *  years bold in mono, one line of summary. */
 export function StoryRow({ item }: { readonly item: PublicStoryListItemDoc }) {
   const image = item.heroImage;
   // An entry names its place in its collection ("2nd president"); a chapter says it is one.
@@ -89,22 +116,24 @@ export function StoryRow({ item }: { readonly item: PublicStoryListItemDoc }) {
   return (
     <li className="ds-stories-row">
       <a className="ds-stories-row__link" href={href(item)}>
-        <span className="ds-stories-row__thumb">
+        <span className="ds-stories-row__thumb" data-media={image ? 'photo' : 'none'}>
           {image ? (
             <StoryImage
-              src={storyImageSrc(image.url, 64, image.width)}
+              src={storyImageSrc(image.url, 72, image.width)}
               fallbackSrc={image.url}
               alt=""
               inLink
             />
-          ) : null}
+          ) : (
+            <span className="ds-stories-row__initial" aria-hidden="true">
+              {item.title.slice(0, 1)}
+            </span>
+          )}
         </span>
         <span className="ds-stories-row__title">{item.title}</span>
         <span className="ds-stories-row__years">{item.eraLabel}</span>
-        <span className="ds-stories-row__meta">
-          <span className="ds-stories-row__kind">{kind}</span>
-          <span className="ds-stories-row__summary">{item.summary}</span>
-        </span>
+        <span className="ds-stories-row__kind">{kind}</span>
+        <span className="ds-stories-row__summary">{item.summary}</span>
       </a>
     </li>
   );
@@ -188,6 +217,7 @@ export function StoriesToolbar({
         <div
           className="ds-stories-sort"
           id={SORT_MENU_ID}
+          data-ground="paper"
           popover="auto"
           role="dialog"
           aria-labelledby={`${SORT_MENU_ID}-title`}

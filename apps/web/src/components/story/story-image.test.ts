@@ -14,7 +14,12 @@ test('snaps to a width Commons actually renders, doubled for dense screens', () 
 
 test('never asks Commons to upscale: the original when the stored file is not wider', () => {
   assert.equal(storyImageSrc(ORIGINAL, 600, 1000), ORIGINAL);
-  assert.equal(storyImageSrc(ORIGINAL, 1152, 5000), ORIGINAL);
+  assert.equal(storyImageSrc(ORIGINAL, 1600, 1800), ORIGINAL);
+});
+
+test('a width past the largest step takes the largest step, never the full original', () => {
+  assert.match(storyImageSrc(ORIGINAL, 1152, 5000), /\/1920px-/);
+  assert.match(storyImageSrc(ORIGINAL, 1600, 7258), /\/1920px-/);
 });
 
 test('with no stored width, resizes only at small steps', () => {

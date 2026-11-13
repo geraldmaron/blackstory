@@ -1,7 +1,7 @@
 /**
  * A book cover at its true 2:3 proportion. The real art loads from Open Library over a paper
- * ground; with no ISBN, or when the request fails, the cover is typeset instead (the title in
- * the display face, the author under it), never a monogram or an empty box.
+ * ground; with no ISBN, or when the request fails, the cover is typeset instead on sand (the title
+ * in the display face, the author under it), never a monogram or an empty box.
  *
  * Decorative by default, because the link around it already carries the title; the detail page
  * labels it.
@@ -39,6 +39,7 @@ export function BooksCoverArt({
     return (
       <figure
         className={`${rootClass} ds-book-cover--typeset`}
+        data-ground="sand"
         aria-hidden={decorative ? true : undefined}
         {...(decorative ? {} : { 'aria-label': `Cover unavailable for ${title}` })}
       >

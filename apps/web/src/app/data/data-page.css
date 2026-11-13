@@ -118,23 +118,52 @@
   scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
 }
 
+/* The section opener is a block of color on the sheet: sand for the census, copper for the door
+   into Lives, ink for the measured gaps. Its ground sets the type colors. */
+.ds-data-section + .ds-data-section {
+  margin-top: var(--ds-space-18);
+}
+
 .ds-data-section__head {
   display: grid;
-  gap: var(--ds-space-2);
-  max-width: 44rem;
-  margin-bottom: var(--ds-space-8);
+  gap: var(--ds-space-3);
+  margin-bottom: var(--ds-space-10);
+  padding: var(--ds-space-8) var(--ds-space-6) var(--ds-space-6);
+  border-radius: var(--ds-radius-md);
 }
 
 .ds-data-section__head > .ds-section-heading {
-  margin-bottom: 0;
+  max-width: 18ch;
+  margin: 0;
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
 }
 
 .ds-data-section__lede {
+  max-width: 52ch;
   margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body);
-  line-height: var(--ds-leading-body);
-  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--ds-ink);
+}
+
+/* The Lives section is only its door, so the whole section is the copper block. */
+.ds-data-section[data-ground] {
+  padding: var(--ds-space-8) var(--ds-space-6);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-data-section[data-ground] > .ds-data-section__head {
+  margin-bottom: var(--ds-space-6);
+  padding: 0;
+}
+
+.ds-data-section[data-ground] .ds-data-door {
+  margin: 0;
 }
 
 .ds-data-section__meta {
@@ -253,4 +282,16 @@
   font-size: var(--ds-text-body-sm);
   line-height: var(--ds-leading-body);
   color: var(--ds-ink-muted);
+}
+
+/* —— a figure's key number ————————————————————————————————————————————————————
+   One number per figure, set at the title step in copper above the finding that states it. */
+.ds-datafig__key {
+  display: block;
+  margin-bottom: var(--ds-space-3);
+  font-size: var(--ds-text-display-1);
+}
+
+.ds-datafig--half .ds-datafig__key {
+  font-size: var(--ds-text-display-2);
 }

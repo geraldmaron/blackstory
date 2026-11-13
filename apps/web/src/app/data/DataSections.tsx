@@ -18,7 +18,7 @@ import type {
   DataPageIndicatorBundle,
   DataPageRacePairSeries,
 } from '@repo/domain/statistics/data-page-series';
-import { SectionHeading, buttonClassName, cx } from '@repo/ui';
+import { DisplayNumeral, SectionHeading, buttonClassName, cx } from '@repo/ui';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
 import { DataContents, type ContentsGroup } from '../../components/data/DataContents';
@@ -239,9 +239,63 @@ function groupedReading(series: DataPageGroupedBarSeries): ReactNode {
   );
 }
 
+/**
+ * A figure's one key number, set as a display numeral above its finding. The finding states the
+ * same number in words, so the numeral is drawn, not read twice.
+ */
+function keyed(value: string | undefined, reading: ReactNode): ReactNode {
+  if (value === undefined || reading === null || reading === undefined) return reading;
+  return (
+    <>
+      <DisplayNumeral as="span" size="title" decorative className="ds-datafig__key">
+        {value}
+      </DisplayNumeral>
+      {reading}
+    </>
+  );
+}
+
+function populationKey(rows: readonly NationalPopulationTimelineRow[]): string | undefined {
+  const last = rows.at(-1);
+  return last
+    ? `${(last.blackPopulation / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })}M`
+    : undefined;
+}
+
+function shareKey(rows: readonly NationalPopulationTimelineRow[]): string | undefined {
+  if (rows.length === 0) return undefined;
+  const { peak } = shareExtremes(rows);
+  return formatSharePct(peak.blackPopulation, peak.totalPopulation);
+}
+
+function stateGainKey(changes: readonly StatePopulationChange[]): string | undefined {
+  const gain = rankStateMovers(changes, 1).gains[0];
+  return gain ? `+${gain.blackAbsoluteChange.toLocaleString('en-US')}` : undefined;
+}
+
+function pairKey(series: DataPageRacePairSeries): string {
+  return formatDataPageValue(series.primary.value, series.primary.unit);
+}
+
+/** The latest value of the first series, as the grouped reading prints it. */
+function groupedKey(series: DataPageGroupedBarSeries): string | undefined {
+  const last = series.points.at(-1);
+  const first = series.series[0];
+  const value = last && first ? last.values[first.id] : undefined;
+  return value === undefined ? undefined : formatDataPageValue(value, series.unit);
+}
+
 /* —— layout ——————————————————————————————————————————————————————————————— */
 
 type FigureEntry = { readonly id: string; readonly node: ReactNode };
+
+/** Each section opens on a block of its own color: the chapters of the page. */
+const SECTION_TONE: Readonly<Record<DataPageSectionId, 'sand' | 'copper' | 'ink'>> = {
+  counted: 'sand',
+  lives: 'copper',
+  gaps: 'ink',
+  reading: 'sand',
+};
 
 function Section({
   id,
@@ -254,8 +308,16 @@ function Section({
 }) {
   const copy = DATA_SECTION_COPY[id];
   return (
-    <section className="ds-data-section" id={id} aria-labelledby={`${id}-heading`}>
-      <header className="ds-data-section__head">
+    <section
+      className="ds-data-section"
+      id={id}
+      aria-labelledby={`${id}-heading`}
+      {...(id === 'lives' ? { 'data-ground': SECTION_TONE[id] } : {})}
+    >
+      <header
+        className="ds-data-section__head"
+        {...(id === 'lives' ? {} : { 'data-ground': SECTION_TONE[id] })}
+      >
         <SectionHeading id={`${id}-heading`}>{copy.title}</SectionHeading>
         <p className="ds-data-section__lede">{copy.lede}</p>
         {meta ? <p className="ds-data-section__meta">{meta}</p> : null}
@@ -354,7 +416,7 @@ export function DataSections({
               id="population-spine"
               rows={timelineRows}
               sources={chartSources}
-              reading={shareReading(timelineRows)}
+              reading={keyed(shareKey(timelineRows), shareReading(timelineRows))}
             />
           ),
         },
@@ -387,7 +449,7 @@ export function DataSections({
               id="population-count"
               rows={timelineRows}
               sources={chartSources}
-              reading={populationReading(timelineRows)}
+              reading={keyed(populationKey(timelineRows), populationReading(timelineRows))}
             />
           ),
         },
@@ -404,7 +466,10 @@ export function DataSections({
                     changes={stateChanges}
                     stateNameByFips={stateNameByFips}
                     sources={chartSources}
-                    reading={stateShiftReading(stateChanges, stateNameByFips)}
+                    reading={keyed(
+                      stateGainKey(stateChanges),
+                      stateShiftReading(stateChanges, stateNameByFips),
+                    )}
                   />
                 ),
               },
@@ -441,7 +506,10 @@ export function DataSections({
           span="half"
           series={indicators.wealthComparison}
           showGap={!hasRatio(indicators.wealthComparison)}
-          reading={pairReading(indicators.wealthComparison, 'held a median')}
+          reading={keyed(
+            pairKey(indicators.wealthComparison),
+            pairReading(indicators.wealthComparison, 'held a median'),
+          )}
         />
       ),
     },
@@ -473,7 +541,10 @@ export function DataSections({
                 key="wealth-arc"
                 id="wealth-ratio-long-arc"
                 series={indicators.wealthRatioLongArc}
-                reading={groupedReading(indicators.wealthRatioLongArc)}
+                reading={keyed(
+                  groupedKey(indicators.wealthRatioLongArc),
+                  groupedReading(indicators.wealthRatioLongArc),
+                )}
               />
             ),
           },
@@ -492,7 +563,10 @@ export function DataSections({
                 id="housing-ownership"
                 span="half"
                 series={indicators.cookHomeownership}
-                reading={groupedReading(indicators.cookHomeownership)}
+                reading={keyed(
+                  groupedKey(indicators.cookHomeownership),
+                  groupedReading(indicators.cookHomeownership),
+                )}
               />
             ),
           },
@@ -508,7 +582,10 @@ export function DataSections({
                 id="housing-denials"
                 span="half"
                 series={indicators.hmdaDenialRates}
-                reading={groupedReading(indicators.hmdaDenialRates)}
+                reading={keyed(
+                  groupedKey(indicators.hmdaDenialRates),
+                  groupedReading(indicators.hmdaDenialRates),
+                )}
               />
             ),
           },
@@ -523,7 +600,10 @@ export function DataSections({
                 key="housing-arc"
                 id="housing-ownership-long-arc"
                 series={indicators.nationalHomeownershipLongArc}
-                reading={groupedReading(indicators.nationalHomeownershipLongArc)}
+                reading={keyed(
+                  groupedKey(indicators.nationalHomeownershipLongArc),
+                  groupedReading(indicators.nationalHomeownershipLongArc),
+                )}
               />
             ),
           },
@@ -536,7 +616,10 @@ export function DataSections({
           key="cost-burden"
           id="housing-cost-burden"
           series={indicators.costBurdenComparison}
-          reading={pairReading(indicators.costBurdenComparison, 'cost-burdened at')}
+          reading={keyed(
+            pairKey(indicators.costBurdenComparison),
+            pairReading(indicators.costBurdenComparison, 'cost-burdened at'),
+          )}
         />
       ),
     },
@@ -570,7 +653,10 @@ export function DataSections({
           span="half"
           series={indicators.imprisonmentComparison}
           showGap={!hasRatio(indicators.imprisonmentComparison)}
-          reading={pairReading(indicators.imprisonmentComparison, 'imprisoned at')}
+          reading={keyed(
+            pairKey(indicators.imprisonmentComparison),
+            pairReading(indicators.imprisonmentComparison, 'imprisoned at'),
+          )}
         />
       ),
     },
@@ -583,7 +669,10 @@ export function DataSections({
                 key="justice-sentences"
                 id="justice-sentences"
                 series={indicators.federalDrugSentences}
-                reading={groupedReading(indicators.federalDrugSentences)}
+                reading={keyed(
+                  groupedKey(indicators.federalDrugSentences),
+                  groupedReading(indicators.federalDrugSentences),
+                )}
               />
             ),
           },

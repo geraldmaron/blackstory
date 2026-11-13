@@ -23,16 +23,19 @@ import { storyVideoSource, storyVideoWatchUrl } from '@repo/schemas';
 import { StoryCitationMarks, StoryInline, StoryProse } from './StoryProse';
 import { StoryVideo } from './StoryVideo';
 import { StoryFigure } from './StoryFigure';
+import { splitSectionHeading } from './story-text';
+import { DisplayNumeral } from '@repo/ui';
 // The artifacts' own sheets travel with the body, so every surface that renders one (the story
 // page, /lives, the admin preview) gets them without remembering to import them.
 import '../theme-spine/theme-spine.css';
 import '../theme-impact/theme-impact.css';
-import './story-image.css';
 
 void React;
 
 export type StoryBodyProps = {
   readonly story: HydratedStory;
+  /** Set each dated section's year as a copper numeral over its heading (the story page). */
+  readonly numerals?: boolean;
 };
 
 /**
@@ -78,7 +81,7 @@ function timelineSpan(events: readonly { readonly date: string }[]): string | un
 /** A run of consecutive stat blocks: figure callouts in one row on the wide track. */
 function FigureCallouts({ stats }: { readonly stats: readonly HydratedStoryStat[] }) {
   return (
-    <div className="ds-story-wide ds-story-figures" data-count={stats.length}>
+    <div className="ds-story-wide ds-story-figures" data-count={stats.length} data-ground="copper">
       {stats.map((stat, index) => (
         <figure className="ds-story-figures__item" key={index}>
           <span className="ds-story-figures__number">{stat.figure.replace(/_/g, ' ')}</span>
@@ -97,15 +100,33 @@ function Block({
   index,
   refNumberById,
   headingId,
+  numerals = false,
 }: {
   readonly block: HydratedStoryBlock;
   readonly index: number;
   readonly refNumberById: ReadonlyMap<string, number>;
   /** DOM anchor id for an h2 section heading, so the section spine can jump to it. */
   readonly headingId?: string;
+  readonly numerals?: boolean;
 }) {
   switch (block.type) {
-    case 'heading':
+    case 'heading': {
+      const { year, title } = splitSectionHeading(block.text);
+      // The year is drawn once as a numeral; the heading keeps it for assistive technology, so
+      // its text (and the spine's) is unchanged.
+      if (block.level === 2 && numerals && year) {
+        return (
+          <>
+            <DisplayNumeral as="p" className="ds-story-year" decorative>
+              {year}
+            </DisplayNumeral>
+            <h2 id={headingId} className="ds-section-heading ds-story-h2 ds-story-h2--dated">
+              <span className="ds-visually-hidden">{year} · </span>
+              {title}
+            </h2>
+          </>
+        );
+      }
       return block.level === 2 ? (
         <h2 id={headingId} className="ds-section-heading ds-story-h2">
           {block.text}
@@ -115,6 +136,7 @@ function Block({
           {block.text}
         </h3>
       );
+    }
     case 'paragraph':
       return <StoryProse className="ds-story-p" text={block.text} refNumberById={refNumberById} />;
     case 'list': {
@@ -153,7 +175,7 @@ function Block({
       return null;
     case 'primaryDocument':
       return (
-        <figure className="ds-story-wide ds-story-doc">
+        <figure className="ds-story-wide ds-story-doc" data-ground="sand">
           <div className="ds-story-doc__head">
             {block.dateLabel ? <p className="ds-story-doc__date">{block.dateLabel}</p> : null}
             <p className="ds-story-doc__title">{block.title}</p>
@@ -282,7 +304,7 @@ function Block({
   }
 }
 
-export function StoryBody({ story }: StoryBodyProps) {
+export function StoryBody({ story, numerals = false }: StoryBodyProps) {
   const rendered: React.ReactNode[] = [];
   const blocks = story.blocks;
   const headingIdByBlockIndex = new Map(
@@ -308,6 +330,7 @@ export function StoryBody({ story }: StoryBodyProps) {
         block={block}
         index={i}
         refNumberById={story.refNumberById}
+        numerals={numerals}
         {...(headingId === undefined ? {} : { headingId })}
       />,
     );

@@ -93,6 +93,12 @@ export type RecordPageProps = {
   /** A one-line content note under the lede (sensitivity, legal disclaimer). */
   readonly note?: ReactNode;
   readonly facts: readonly RecordFact[];
+  /**
+   * The display numeral, when the When fact's first year would read as the wrong kind of date
+   * (a book's challenge school year beside its publication year): the value and a caption that
+   * names what it is. Defaults to `recordNumeral(facts)` with no caption.
+   */
+  readonly numeral?: { readonly value: string; readonly caption: string };
   /** A real image, a RecordMap, or both. The phone shows the image when there is one. */
   readonly media?: ReactNode;
   readonly actions: RecordActions;
@@ -282,6 +288,7 @@ export function RecordPage({
   lede,
   note,
   facts,
+  numeral: numeralOverride,
   media,
   actions,
   sourcesAnchor,
@@ -289,13 +296,21 @@ export function RecordPage({
   file,
   pager,
 }: RecordPageProps) {
-  const numeral = recordNumeral(facts);
+  const numeral = numeralOverride?.value ?? recordNumeral(facts);
   return (
     <main className="ds-room ds-recpage" id="main">
       <div className="ds-recpage__desk ds-wrap">
         <Sheet as="article" className="ds-recpage__grid" aria-labelledby="record-title">
           <header className="ds-recpage__head">
-            {numeral ? (
+            {numeral && numeralOverride ? (
+              <div
+                className="ds-recpage__numeral ds-recpage__numeral--captioned"
+                aria-hidden="true"
+              >
+                <DisplayNumeral tone="soft">{numeral}</DisplayNumeral>
+                <span className="ds-recpage__numeral-caption">{numeralOverride.caption}</span>
+              </div>
+            ) : numeral ? (
               <DisplayNumeral className="ds-recpage__numeral" tone="soft" decorative>
                 {numeral}
               </DisplayNumeral>

@@ -8,9 +8,10 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
 import '../utility.css';
 import '../../components/trust/trust.css';
-import { TermsSections } from './TermsSections';
+import { ACKNOWLEDGEMENT_HOURS, TermsSections } from './TermsSections';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/terms',
@@ -21,14 +22,30 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function TermsPage() {
   return (
-    <Room width="read">
-      <PageHeader
-        crumb={parentCrumb('/terms')}
-        linkAs={Link}
-        title="A notice, not a contract"
-        dek="Reading BlackStory asks nothing of you, so nothing here is written as a bargain. It states what the archive publishes, what you may do with it, and what happens when it gets something wrong."
-      />
-      <TermsSections />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="sand"
+          numeral={{
+            value: String(ACKNOWLEDGEMENT_HOURS),
+            label: 'hours to acknowledge a copyright complaint',
+          }}
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/terms')}
+            linkAs={Link}
+            title="A notice, not a contract"
+            dek="Reading BlackStory asks nothing of you, so nothing here is written as a bargain. It states what the archive publishes, what you may do with it, and what happens when it gets something wrong."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <TermsSections />
+      </TrustSheet>
     </Room>
   );
 }

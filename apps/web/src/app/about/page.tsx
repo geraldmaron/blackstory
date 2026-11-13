@@ -8,6 +8,7 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
 import { loadRecordsIndex, recordsQueryCacheKey } from '../records/load-records-index';
 import { ABOUT_LEDE } from './about-copy';
 import { AboutSections, type AboutSectionsProps } from './AboutSections';
@@ -46,14 +47,34 @@ async function loadStates(): Promise<AboutSectionsProps['states']> {
 export default async function AboutPage() {
   const states = await loadStates();
   return (
-    <Room width="read">
-      <PageHeader
-        crumb={parentCrumb('/about')}
-        linkAs={Link}
-        title="Doing my part, and making room for yours."
-        dek={ABOUT_LEDE}
-      />
-      <AboutSections {...(states === undefined ? {} : { states })} />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="copper"
+          numeral={
+            states === undefined
+              ? undefined
+              : {
+                  value: states.total.toLocaleString('en-US'),
+                  label: 'published records, each pinned where its sources put it',
+                }
+          }
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/about')}
+            linkAs={Link}
+            title="Doing my part, and making room for yours."
+            dek={ABOUT_LEDE}
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <AboutSections {...(states === undefined ? {} : { states })} />
+      </TrustSheet>
     </Room>
   );
 }
