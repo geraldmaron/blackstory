@@ -293,6 +293,10 @@ details[open] > summary > .lives-caret {
 }
 
 .lives-archive__citation {
+  display: inline-block;
+  /* Two lines of caption type come to 42px; a little padding, paid back in margin, makes 44. */
+  margin-block: calc(var(--ds-space-1) * -1);
+  padding-block: var(--ds-space-1);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
 }
@@ -581,8 +585,9 @@ details[open] > summary > .lives-caret {
   border-bottom: 3px solid var(--ds-accent-graphic);
 }
 
-/* Narrow: each era is a row on a horizontal scale, its values on one line under it. */
-@container (max-width: 34rem) {
+/* Narrow: each era is a row on a horizontal scale, its values on one line under it. Five eras
+   as columns need about 9rem each to hold a labelled mark ("Hispanic 43%"), so rows start there. */
+@container (max-width: 46rem) {
   .lives-scrub__row {
     grid-auto-flow: row;
   }
@@ -592,7 +597,8 @@ details[open] > summary > .lives-caret {
     grid-template-rows: 2rem auto auto;
     column-gap: var(--ds-space-3);
     row-gap: var(--ds-space-1);
-    padding: var(--ds-space-3) 0;
+    /* Side padding keeps the label off the edge of the selected era's ink block. */
+    padding: var(--ds-space-3) var(--ds-space-2);
   }
 
   .lives-scrub__era + .lives-scrub__era {

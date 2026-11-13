@@ -37,8 +37,9 @@ export type DataChartFrameProps = {
   /** Anchor for the figure, so a reader can cite one figure and not the page. */
   readonly id?: string;
   readonly chapterHref?: string;
-  /** Heading level of the finding: 3 under a page section, 4 inside a nested panel. */
-  readonly headingLevel?: 3 | 4;
+  /** Heading level of the finding: 2 straight under the page title, 3 under a page section, 4
+   *  inside a nested panel. */
+  readonly headingLevel?: 2 | 3 | 4;
   readonly className?: string;
 };
 
@@ -63,7 +64,7 @@ export function DataChartFrame({
     (sourceLabel !== undefined && sourceUrl !== undefined
       ? [{ label: sourceLabel, url: sourceUrl }]
       : []);
-  const Heading = headingLevel === 4 ? 'h4' : 'h3';
+  const Heading = `h${headingLevel}` as const;
 
   return (
     <figure

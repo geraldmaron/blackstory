@@ -65,6 +65,46 @@ svg {
   max-width: 100%;
 }
 
+/* A link takes the ink of the text it sits in, never the browser's blue or purple. A component
+   that wants copper, or no underline, says so itself. */
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+/* The parts the browser draws carry the palette too: the caret, form accents, scrollbars and
+   selected text. Selection is copper under ink on the table and on paper; a copper or sand block
+   inverts it, since copper on copper would not show. The fixed constants are used because some
+   engines resolve a highlight's variables at the root, not at the ground the text sits on. */
+:root {
+  accent-color: var(--ds-accent-graphic);
+  caret-color: var(--ds-accent);
+  scrollbar-color: var(--ds-border-control) var(--ds-canvas);
+}
+
+::selection {
+  background: var(--ds-fixed-accent);
+  color: var(--ds-fixed-ink);
+}
+
+[data-ground='copper'] ::selection,
+[data-ground='sand'] ::selection {
+  background: var(--ds-fixed-ink);
+  color: var(--ds-fixed-paper);
+}
+
+/* The clear control inside a search field is drawn in the field's own ink. */
+input[type='search']::-webkit-search-cancel-button {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  background: currentColor;
+  cursor: pointer;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round'%3E%3Cpath d='m4 4 8 8m0-8-8 8'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
 :focus {
   outline: none;
 }

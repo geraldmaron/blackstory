@@ -634,6 +634,19 @@ button.ds-mark {
   transform: translate(0, -100%);
 }
 
+/* A gap too narrow for its label stands the label on end, so two neighboring gaps never write
+   over each other. The band measures itself, whatever width the plot is drawn at. */
+.ds-fig-band[data-kind='gap'][data-wide='true'] {
+  container-type: inline-size;
+}
+
+@container (max-width: 6rem) {
+  .ds-fig-band[data-kind='gap'][data-wide='true'] .ds-fig-band__label {
+    writing-mode: vertical-rl;
+    transform: translate(-50%, -50%) rotate(180deg);
+  }
+}
+
 .ds-rule {
   position: absolute;
   top: 0;
@@ -1078,6 +1091,13 @@ button.ds-mark {
   .ds-diverge {
     --bar-max: 48%;
   }
+
+  /* A long name ("District of Columbia") takes a second line here instead of an ellipsis. */
+  .ds-diverge__name {
+    overflow: visible;
+    line-height: 1.2;
+    white-space: normal;
+  }
 }
 
 .ds-diverge__row:hover .ds-tip,
@@ -1135,6 +1155,7 @@ button.ds-mark {
 }
 
 .ds-datafig__more {
+  position: relative;
   min-height: 1.5rem;
   padding: 0;
   border: 0;
@@ -1145,6 +1166,13 @@ button.ds-mark {
   text-decoration-color: var(--ds-border-control);
   text-underline-offset: 0.2em;
   cursor: pointer;
+}
+
+/* A 44px hit area around the inline text, without moving the source line. */
+.ds-datafig__more::before {
+  content: '';
+  position: absolute;
+  inset: -0.625rem 0;
 }
 
 .ds-datafig__more:focus-visible {

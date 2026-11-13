@@ -84,7 +84,7 @@
   .ds-map-controls {
     right: var(--ds-space-3);
     bottom: calc(var(--ds-tabbar-h) + var(--ds-space-3));
-    transform: translateY(calc(-1 * var(--ds-xcol-detent-h, 160px)));
+    transform: translateY(calc(-1 * var(--ds-xcol-detent-h, 176px)));
   }
 }
 

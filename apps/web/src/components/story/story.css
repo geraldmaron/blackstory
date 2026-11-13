@@ -789,31 +789,28 @@
   margin: 0;
 }
 
-/* An archival image keeps its whole frame; the caption runs to the image's own width. */
+/* An archival image keeps its whole frame. The figure is as wide as the image may be shown:
+   never past the track it sits on, the height cap, or the file's own pixels. The frame and the
+   caption take that width, so nothing waits on the file and nothing leaves the sheet. */
 .ds-story-figure {
-  display: table;
+  --story-cap: min(75vh, 44rem);
+  width: min(100%, var(--story-cap) * var(--story-ratio), var(--story-natural));
   margin-inline: auto;
 }
 
-.ds-story-figure .ds-story-caption {
-  display: table-caption;
-  caption-side: bottom;
+/* No stored size: hold the reading measure and letterbox a tall scan inside the height cap. */
+.ds-story-figure:not([style]) {
+  width: min(100%, var(--ds-width-read));
+}
+
+.ds-story-figure:not([style]) img {
+  max-height: var(--story-cap);
+  object-fit: contain;
 }
 
 .ds-story-figure__frame {
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
-}
-
-.ds-story-figure__frame > img {
-  width: auto;
-  max-width: min(calc(100vw - var(--ds-gutter) * 2), var(--ds-width-record));
-  max-height: min(75vh, 44rem);
-}
-
-.ds-story-figure__frame[data-state='loading']:not([style]),
-.ds-story-figure__frame[data-state='failed'] {
-  width: min(calc(100vw - var(--ds-gutter) * 2), var(--ds-width-read));
 }
 
 /* —— End of the piece ——————————————————————————————————————————————————————————— */

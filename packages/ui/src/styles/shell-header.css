@@ -32,6 +32,8 @@ html {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  /* The cropped artwork is about 27px tall; the link around it is still a 44px target. */
+  min-height: 2.75rem;
   overflow: hidden;
   text-decoration: none;
   line-height: 1;

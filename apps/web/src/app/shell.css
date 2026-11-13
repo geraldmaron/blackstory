@@ -279,6 +279,8 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 .ds-shell-footer .ds-maker-credit__link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
   min-height: 2.75rem;
   color: var(--ds-ink);
   text-decoration: none;
@@ -1575,6 +1577,13 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
   .maplibregl-ctrl-attrib.maplibregl-compact
   .maplibregl-ctrl-attrib-button {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7.25' fill='none' stroke='%23A39B8F' stroke-width='1.5'/%3E%3Cpath d='M10 9v5' stroke='%23A39B8F' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='6.5' r='1' fill='%23A39B8F'/%3E%3C/svg%3E");
+}
+
+/* The 28px info mark takes a 44px hit area (the embeds do the same in record-map.css). */
+.ds-map-stage .maplibregl-ctrl-attrib-button::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--ds-space-2) * -1);
 }
 
 /* MapLibre's attribution toggle is a <summary> that ships with no focus style; every map (the

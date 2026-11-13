@@ -56,9 +56,9 @@
   outline: none;
 }
 
+/* This field has its own controls beside it; the built-in clear control stays out. */
 .ds-place__input::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-  appearance: none;
+  display: none;
 }
 
 .ds-place__locate {

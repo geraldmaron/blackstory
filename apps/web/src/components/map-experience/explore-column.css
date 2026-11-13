@@ -51,11 +51,10 @@
   min-width: 0;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.75rem;
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.015em;
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -176,7 +175,7 @@
 
 .ds-xcol__loading span {
   display: block;
-  height: 68px;
+  height: 84px;
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
   background:
     linear-gradient(var(--ds-surface), var(--ds-surface)) var(--ds-space-6) 20px / 58% 12px
@@ -230,7 +229,7 @@ body:has(.ds-atlas .ds-xcol) {
     right: 0;
     bottom: var(--ds-tabbar-h);
     width: auto;
-    height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 160px));
+    height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 176px));
     padding-right: 0;
     border-top: var(--ds-border-width) solid var(--ds-material-ink);
     border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
@@ -298,7 +297,7 @@ body:has(.ds-atlas .ds-xcol) {
   body:has(.ds-atlas .ds-xcol) {
     --ds-map-attrib-left: var(--ds-space-3);
     /* Above the sheet at its peek; a raised sheet covers it, as it covers the map. */
-    --ds-map-attrib-bottom: calc(var(--ds-tabbar-h) + 160px + var(--ds-space-3));
+    --ds-map-attrib-bottom: calc(var(--ds-tabbar-h) + 176px + var(--ds-space-3));
   }
 }
 
@@ -319,7 +318,7 @@ body:has(.ds-atlas .ds-xcol) {
     right: 0;
     bottom: var(--ds-tabbar-h);
     width: auto;
-    height: 160px;
+    height: 176px;
     overflow: hidden;
     border-top: var(--ds-border-width) solid var(--ds-rule);
     border-right: 0;

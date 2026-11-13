@@ -24,7 +24,7 @@
   display: grid;
   grid-template-columns: repeat(11, minmax(0, 1fr));
   grid-template-rows: repeat(8, auto);
-  gap: 3px;
+  gap: 2px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -60,25 +60,25 @@
 .ds-about-states__tile[data-step='2'],
 .ds-about-states__swatch[data-step='2'] {
   background: var(--ds-material-sand);
-  --tile-text: #0a0a0a;
+  --tile-text: var(--ds-fixed-ink);
 }
 
 .ds-about-states__tile[data-step='3'],
 .ds-about-states__swatch[data-step='3'] {
   background: var(--ds-material-copper);
-  --tile-text: #0a0a0a;
+  --tile-text: var(--ds-fixed-ink);
 }
 
 .ds-about-states__tile[data-step='4'],
 .ds-about-states__swatch[data-step='4'] {
-  background: var(--ds-accent);
-  --tile-text: #f4efe5;
+  background: var(--ds-material-copper-deep);
+  --tile-text: var(--ds-fixed-paper);
 }
 
 .ds-about-states__tile[data-step='5'],
 .ds-about-states__swatch[data-step='5'] {
   background: var(--ds-material-ink);
-  --tile-text: #f4efe5;
+  --tile-text: var(--ds-fixed-paper);
 }
 
 .ds-about-states__postal {
@@ -87,15 +87,15 @@
   letter-spacing: 0.02em;
 }
 
+/* Full-strength tile text: dimming it dropped the count under 4.5:1 on the copper step. */
 .ds-about-states__count {
   display: none;
   font-size: var(--ds-text-micro);
-  opacity: 0.85;
 }
 
 @media (min-width: 40rem) {
   .ds-about-states__grid {
-    gap: 4px;
+    gap: var(--ds-space-1);
   }
 
   .ds-about-states__postal {
@@ -119,7 +119,7 @@
 .ds-about-states__legend {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--ds-space-1);
   margin: 0;
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);

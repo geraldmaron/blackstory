@@ -32,7 +32,8 @@ import './explore-record-list.css';
 void React;
 
 /** Fixed row height (explore-record-list.css). Windowing needs a known row box. */
-export const RESULTS_ROW_HEIGHT = 68;
+/** Tall enough for a two-line name over its place line; a cut-off name tells a reader nothing. */
+export const RESULTS_ROW_HEIGHT = 84;
 /** Rows rendered above and below the viewport so a fast scroll does not show blank space. */
 const OVERSCAN = 6;
 
@@ -184,7 +185,10 @@ export function ExploreRecordList({
               aria-setsize={features.length}
               tabIndex={index === focusIndex ? 0 : -1}
               className={cx('ds-xlist__row', selected && 'ds-xlist__row--selected')}
-              style={{ transform: `translateY(${index * RESULTS_ROW_HEIGHT}px)` }}
+              style={{
+                height: RESULTS_ROW_HEIGHT,
+                transform: `translateY(${index * RESULTS_ROW_HEIGHT}px)`,
+              }}
               onClick={() => onSelect(feature)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {

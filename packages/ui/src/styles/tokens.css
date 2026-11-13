@@ -245,6 +245,8 @@
   --ds-material-paper: #fffdf8;
   --ds-material-ink: #0a0a0a;
   --ds-material-copper: #b86b2a;
+  /* The step between copper and ink on a density ramp (state tile maps). Paper text reads on it. */
+  --ds-material-copper-deep: #8e4f2a;
   --ds-material-sand: #d8a178;
   /* The three page bands at a sheet's edge, outermost first. A pattern, never the logo. */
   --ds-band-w: 4px;

@@ -2009,12 +2009,17 @@ a.ds-room-chip {
    the active-filter chip row, the designed outcome block and the waiting placeholder. Moved here
    from records-index.css so every index that renders them loads them. */
 /* —— toolbar ———————————————————————————————————————————————————————————————— */
+/* The bar's ground and its rule run the full width of the window, whatever the column's width:
+   two outward shadows (ground, then the rule one pixel lower), clipped to the bar's own height. */
 .ds-records-toolbar {
   position: sticky;
   top: var(--ds-island-clearance);
   z-index: var(--ds-z-content, 1);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   background: var(--ds-canvas);
+  box-shadow:
+    0 0 0 100vmax var(--ds-canvas),
+    0 var(--ds-border-width) 0 100vmax var(--ds-rule);
+  clip-path: inset(0 -100vmax calc(var(--ds-border-width) * -1));
 }
 
 .ds-records-toolbar__inner {

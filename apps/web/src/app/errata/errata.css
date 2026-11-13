@@ -3,10 +3,11 @@
  * change under it is the record in display type, its kind as an ink or sand block tag, what
  * changed as a Newsreader line, and a two-line note.
  */
+/* 12px between rows: each 32px chip keeps its own 44px hit area when the group wraps. */
 .ds-errata__kinds {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-3) var(--ds-space-2);
   margin-bottom: var(--ds-space-6);
 }
 
@@ -84,7 +85,11 @@
   text-wrap: balance;
 }
 
+/* One line of display type as a 44px target: padding paid back in margin. */
 a.ds-errata__name {
+  display: inline-block;
+  margin-block: calc(var(--ds-space-3) * -1);
+  padding-block: var(--ds-space-3);
   text-decoration: underline;
   text-decoration-color: var(--ds-rule);
   text-decoration-thickness: var(--ds-border-width);

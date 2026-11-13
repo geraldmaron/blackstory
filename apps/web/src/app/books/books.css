@@ -24,8 +24,9 @@ body:has(.ds-books) .ds-reading-progress {
 }
 
 /* —— header: display title, the count as a giant copper numeral ————————————————— */
+/* The count stands on the same baseline as the dek's last line. */
 .ds-books-head {
-  align-items: flex-end;
+  align-items: last baseline;
   flex-wrap: nowrap;
 }
 
@@ -35,10 +36,6 @@ body:has(.ds-books) .ds-reading-progress {
   font-size: var(--ds-text-editorial-lede);
   font-style: italic;
   line-height: 1.3;
-}
-
-.ds-books-head__count {
-  margin-bottom: -0.06em;
 }
 
 /* —— full-bleed bands: ink under the wall, sand under the states ———————————————— */
@@ -64,14 +61,10 @@ body:has(.ds-books) .ds-reading-progress {
 
 .ds-books-lead__top {
   display: flex;
-  align-items: flex-end;
+  align-items: last baseline;
   gap: var(--ds-space-6);
   color: var(--ds-ink);
   text-decoration: none;
-}
-
-.ds-books-lead__numeral {
-  margin-bottom: -0.1em;
 }
 
 .ds-books-lead__label {
@@ -231,8 +224,8 @@ body:has(.ds-books) .ds-reading-progress {
    palette: paper, copper, copper text, ink. A state with none is an outline. Codes are ink, paper
    on the two darkest; the ranked list prints the numbers. Fixed values, the same in both themes. */
 .ds-books-map {
-  --books-paper: #f4efe5;
-  --books-copper-text: #8e4f2a;
+  --books-paper: var(--ds-fixed-paper);
+  --books-copper-text: var(--ds-material-copper-deep);
 }
 
 .ds-books-tiles__tile {

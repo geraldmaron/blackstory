@@ -21,9 +21,10 @@ export type SheetDetent = 'peek' | 'half' | 'full';
 /** The phone header above the sheet, and the tab bar under it (tab-bar.css). */
 const PHONE_HEADER = 48;
 const PHONE_TAB_BAR = 56;
-/** Grab strip (44, a full touch target) + header (48) + one 68px register row: the count and
- * the top record. */
-export const SHEET_PEEK_HEIGHT = 160;
+/** Grab strip (44, a full touch target) + header (48) + one register row (84, see
+ * RESULTS_ROW_HEIGHT): the count and the top record. explore-column.css and map-controls.css
+ * carry the same 176px. */
+export const SHEET_PEEK_HEIGHT = 176;
 
 /** The sheet's own height at a detent, tab bar excluded. Pure, so layout and camera agree. */
 export function sheetHeightFor(detent: SheetDetent, viewportHeight: number): number {

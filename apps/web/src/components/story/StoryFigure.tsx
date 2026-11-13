@@ -3,7 +3,7 @@
  * frame with a ground, then one caption line with the credit after it in muted ink.
  */
 import React from 'react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { StoryImageDoc } from '@repo/schemas';
 import { cx } from '@repo/ui';
 import { StoryImage } from './StoryImage';
@@ -23,8 +23,17 @@ export function StoryFigure({
   readonly eager?: boolean;
   readonly className?: string;
 }) {
+  // The stored size sets the figure's width in CSS, so the frame is reserved before the file
+  // arrives and can never be wider than the track it sits on.
+  const sized =
+    image.width && image.height
+      ? ({
+          '--story-ratio': image.width / image.height,
+          '--story-natural': `${image.width}px`,
+        } as CSSProperties)
+      : undefined;
   return (
-    <figure className={cx('ds-story-figure', className)}>
+    <figure className={cx('ds-story-figure', className)} style={sized}>
       <StoryImage
         className="ds-story-figure__frame"
         // 640 CSS px asks Commons for its 1280 step: sharp on the 964 track at 1.3x, and a thumbnail,

@@ -156,7 +156,7 @@
   }
 
   .ds-rooms__heading {
-    font-size: 1.75rem;
+    font-size: var(--ds-text-display-3);
   }
 
   .ds-rooms__row {

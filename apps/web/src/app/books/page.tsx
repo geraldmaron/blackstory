@@ -71,7 +71,10 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const built = buildBooksBrowseViewModel(snapshot, params);
   // A title known to have no cover upstream gets no ISBN, so it renders typeset without a failing
   // request. Unchecked titles render as usual and are checked in the background.
-  const uncovered = isbnsKnownWithoutCovers(built.items.map((item) => item.coverIsbn));
+  const uncovered = isbnsKnownWithoutCovers(
+    built.items.map((item) => item.coverIsbn),
+    'L',
+  );
   const view = {
     ...built,
     items: built.items.map((item) =>

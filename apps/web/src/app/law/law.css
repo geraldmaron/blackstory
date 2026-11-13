@@ -16,8 +16,9 @@ body:has(.ds-law) .ds-reading-progress {
 }
 
 /* —— header: display title, the count as a giant copper numeral ————————————————— */
+/* The count stands on the same baseline as the dek's last line. */
 .ds-law-head {
-  align-items: flex-end;
+  align-items: last baseline;
   flex-wrap: nowrap;
 }
 
@@ -26,11 +27,6 @@ body:has(.ds-law) .ds-reading-progress {
   font-size: var(--ds-text-editorial-lede);
   font-style: italic;
   line-height: 1.3;
-}
-
-.ds-law-head__count {
-  /* Crop the numeral's descender space so it sits on the dek's floor. */
-  margin-bottom: -0.06em;
 }
 
 /* —— the time axis, drawn large on a full-bleed sand band ——————————————————————— */
@@ -189,7 +185,7 @@ body:has(.ds-law) .ds-reading-progress {
 .ds-law-era__span > .ds-law-era__to {
   margin-block: var(--ds-space-2);
   font-family: var(--ds-font-editorial);
-  font-size: 0.3em;
+  font-size: var(--ds-text-title);
   font-style: italic;
   font-weight: 400;
   line-height: 1;
@@ -256,7 +252,7 @@ body:has(.ds-law) .ds-reading-progress {
   grid-area: year;
   color: var(--ds-accent);
   font-family: var(--ds-font-display);
-  font-size: 2rem;
+  font-size: var(--ds-text-display-3);
   font-weight: 650;
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;
@@ -366,6 +362,11 @@ body:has(.ds-law) .ds-reading-progress {
     grid-row: span 2;
     grid-column: 2;
   }
+
+  /* One column from here down: the note must not open a second one beside the mark. */
+  .ds-law-note--in-era {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 47.9375rem) {
@@ -435,17 +436,12 @@ body:has(.ds-law) .ds-reading-progress {
   }
 
   .ds-law-note--in-era {
-    grid-column: auto;
     margin-top: var(--ds-space-4);
     padding: 0 var(--ds-gutter) var(--ds-space-8);
   }
 
   .ds-law-era {
     padding-block: var(--ds-space-8) 0;
-  }
-
-  .ds-law-era__title {
-    font-size: 1.75rem;
   }
 
   /* The sheet runs full-bleed on a phone, so the block's wrap lets go of it. */
@@ -468,9 +464,5 @@ body:has(.ds-law) .ds-reading-progress {
       'name name'
       'gloss gloss';
     padding-block: var(--ds-space-4);
-  }
-
-  .ds-law-row__year {
-    font-size: 1.5rem;
   }
 }

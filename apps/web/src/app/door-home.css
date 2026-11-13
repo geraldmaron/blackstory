@@ -246,7 +246,7 @@
   flex: 0 0 auto;
   margin: 0;
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
   color: var(--ds-ink-muted);
 }
@@ -259,7 +259,7 @@
   background: none;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   text-decoration: underline;
   text-decoration-color: var(--ds-border-control);
@@ -282,7 +282,7 @@
 }
 
 .ds-door-walk__body[data-more='true'] {
-  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--ds-space-8)), transparent);
+  mask-image: linear-gradient(to bottom, black calc(100% - var(--ds-space-8)), transparent);
 }
 
 .ds-door-walk__heading {
@@ -309,7 +309,7 @@
 .ds-door-walk__prose {
   margin: 0;
   font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   line-height: 1.5;
   color: var(--ds-ink);
   text-wrap: pretty;
@@ -317,7 +317,7 @@
 
 .ds-door-walk__mono {
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
 }
 
@@ -343,7 +343,7 @@
 .ds-door-walk__record-line {
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.45;
 }
 
@@ -373,7 +373,7 @@
   align-items: center;
   min-height: 44px;
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   font-weight: 600;
   color: var(--ds-accent-text);
   text-decoration: underline;
@@ -443,7 +443,7 @@
 .ds-door-walk__figure-label {
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.3;
   color: var(--ds-ink-muted);
 }
@@ -471,14 +471,14 @@
 
 .ds-door-walk__dest-name {
   font-family: var(--ds-font-display);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
   line-height: 1.25;
 }
 
 .ds-door-walk__dest-line {
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.4;
   color: var(--ds-ink-muted);
 }
@@ -497,7 +497,7 @@
 .ds-door-walk__cite {
   margin: var(--ds-space-4) 0 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.45;
   color: var(--ds-ink-muted);
 }
@@ -607,7 +607,7 @@ body:has(.ds-door-callout[data-shown='true']) .ds-pin-flag {
 
 .ds-door-callout__name {
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 600;
   line-height: 1.25;
   overflow-wrap: anywhere;
@@ -615,7 +615,7 @@ body:has(.ds-door-callout[data-shown='true']) .ds-pin-flag {
 
 .ds-door-callout__place {
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.35;
   color: var(--ds-ink-muted);
 }
@@ -626,14 +626,14 @@ body:has(.ds-door-callout[data-shown='true']) .ds-pin-flag {
   -webkit-line-clamp: 2;
   overflow: hidden;
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.4;
 }
 
 .ds-door-callout__open {
   margin-top: var(--ds-space-1);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-weight: 600;
   color: var(--ds-accent-text);
   text-decoration: underline;
@@ -694,7 +694,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   place-items: center;
   height: 100%;
   font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   font-style: italic;
   font-weight: 600;
   line-height: 1;
@@ -768,7 +768,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   }
 
   .ds-door-open__line {
-    font-size: 1rem;
+    font-size: var(--ds-text-body);
   }
 
   .ds-door-walk {
@@ -785,7 +785,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   }
 
   .ds-door-walk__prose {
-    font-size: 0.9375rem;
+    font-size: var(--ds-text-body-sm);
   }
 
   .ds-door-walk__record,
@@ -819,7 +819,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   .ds-door-callout__name {
     min-width: 0;
     overflow: hidden;
-    font-size: 0.9375rem;
+    font-size: var(--ds-text-body-sm);
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow-wrap: normal;
@@ -1090,7 +1090,7 @@ body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.4;
   color: var(--ds-ink);
   pointer-events: auto;

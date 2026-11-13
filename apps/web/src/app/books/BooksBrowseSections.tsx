@@ -193,6 +193,8 @@ function CoverWall({ items }: { readonly items: readonly BooksBrowseItem[] }) {
                     className="ds-books-wall__cover"
                     title={item.title}
                     author={item.authorNames}
+                    // The wall draws a cover about 220px wide; the medium file is 145px and blurred.
+                    size="L"
                     {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
                   />
                   {/* A copper tab pinned to the cover's foot; sand when no report names a state. */}

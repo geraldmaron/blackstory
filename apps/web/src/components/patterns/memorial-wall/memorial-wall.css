@@ -89,9 +89,9 @@
 }
 
 .ds-memorial-wall__presence-meta {
-  margin: 0.75rem 0 0;
+  margin: var(--ds-space-3) 0 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.4;
   letter-spacing: 0.01em;
   color: var(--ds-ink-muted);
@@ -99,9 +99,9 @@
 
 .ds-memorial-wall__presence-link {
   display: inline-block;
-  margin-top: 0.75rem;
+  margin-top: var(--ds-space-3);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   color: var(--ds-ink);
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -163,7 +163,7 @@
 }
 
 .ds-memorial-wall__inscription-line + .ds-memorial-wall__inscription-line {
-  margin-top: 0.15rem;
+  margin-top: 2px;
   color: var(--ds-ink-muted);
 }
 
@@ -180,7 +180,7 @@
 
   .ds-memorial-wall__inscription-text {
     max-width: 22rem;
-    font-size: 0.875rem;
+    font-size: var(--ds-text-body-sm);
     line-height: 1.5;
   }
 }

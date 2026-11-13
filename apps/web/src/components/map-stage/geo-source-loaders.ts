@@ -187,7 +187,6 @@ function syncCountyHatch(map: MapLibreMap, cfg: StageConfig): void {
   });
   const layer = style.layers.find((entry) => entry.id === EXPLORE_COUNTY_HATCH_LAYER_ID);
   const opacity = (layer?.paint as Record<string, unknown> | undefined)?.['fill-opacity'];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- paint value from our own style
   if (opacity !== undefined)
-    map.setPaintProperty(EXPLORE_COUNTY_HATCH_LAYER_ID, 'fill-opacity', opacity as any);
+    map.setPaintProperty(EXPLORE_COUNTY_HATCH_LAYER_ID, 'fill-opacity', opacity);
 }

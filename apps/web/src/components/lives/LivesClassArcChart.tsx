@@ -115,6 +115,8 @@ export function LivesClassArcChart({
     <DataChartFrame
       title={`Middle-band class share by group · ${bundle.areaName}, ${decades[0]!.label} to ${decades.at(-1)!.label}`}
       {...(id !== undefined ? { id } : {})}
+      // The explorer's first finding sits straight under the page title.
+      headingLevel={2}
       reading={
         emphasisValue === null ? (
           <>

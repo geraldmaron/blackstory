@@ -233,7 +233,18 @@ export function TypeaheadCombobox({
             : `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'} available`;
 
   return (
-    <div className={className ?? 'ds-typeahead'} ref={rootRef}>
+    <div
+      className={className ?? 'ds-typeahead'}
+      ref={rootRef}
+      // Tabbing on closes the list; left open it sat over the page's own controls. A press on an
+      // option never moves focus (see its onMouseDown), so this only fires on a real departure.
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setOpen(false);
+          setActiveIndex(-1);
+        }
+      }}
+    >
       <label
         className={hideLabel ? 'ds-visually-hidden' : (labelClassName ?? undefined)}
         htmlFor={id}
@@ -300,6 +311,10 @@ export function TypeaheadCombobox({
                   }
                   role="option"
                   aria-selected={selected}
+                  // The arrow keys walk the options (aria-activedescendant); Tab leaves the field.
+                  tabIndex={-1}
+                  // Keep focus in the field, so a press on an option is not also a blur.
+                  onMouseDown={(event) => event.preventDefault()}
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => pick(suggestion)}
                 >

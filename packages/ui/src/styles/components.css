@@ -531,11 +531,11 @@
   text-overflow: ellipsis;
 }
 
-/* 44px hit area around the 32px chip. */
+/* 44px hit area around the 32px chip (the inset is measured from inside its 1px border). */
 .ds-chip::before {
   content: '';
   position: absolute;
-  inset: -6px 0;
+  inset: -7px 0;
 }
 
 .ds-chip:hover {
@@ -646,9 +646,12 @@ span.ds-tabs__tab {
 }
 
 /* —— Segmented: options on the same data —————————————————————————————————————— */
+/* More options than one row holds wrap inside the control; they are never cut off. */
 .ds-segmented {
   display: inline-flex;
+  flex-wrap: wrap;
   gap: 2px;
+  max-width: 100%;
   padding: 2px;
   border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
