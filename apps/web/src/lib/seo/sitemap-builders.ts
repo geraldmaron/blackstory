@@ -16,10 +16,18 @@ export type SitemapEntityEntry = {
   readonly updatedAt?: string;
 };
 
+/** A published story, addressed at `/stories/{slug}`. */
+export type SitemapStoryEntry = {
+  readonly slug: string;
+  readonly publishedAt?: string;
+  readonly updatedAt?: string;
+};
+
 export type BuildSitemapOptions = {
   readonly siteUrl?: string;
   readonly releaseGeneratedAt?: string;
   readonly entities?: readonly SitemapEntityEntry[];
+  readonly stories?: readonly SitemapStoryEntry[];
 };
 
 /**
@@ -72,7 +80,9 @@ function recordPath(entity: SitemapEntityEntry, collisions: ReadonlyMap<string, 
 }
 
 /**
- * Builds sitemap entries for static routes plus record pages from the active release catalog.
+ * Builds sitemap entries for static routes, published stories, and record pages from the active
+ * release catalog. Stories are the archive's long-form reading pages; without them here a crawler
+ * only reaches a story by walking in from `/stories`, and the collection pages are paginated.
  * Standable records emit their family address — `/place/{slug}`, or `/invention/{slug}` for an
  * invention; the rest keep `/entity/{id}`. The sitemap never advertises a URL that redirects, so
  * an invention must be listed in its own family, not at the place address that now 308s away.
@@ -103,7 +113,25 @@ export function buildPublicSitemapEntries(
     priority: 0.8,
   }));
 
-  return [...staticEntries, ...entityEntries];
+  // A story slug can collide with a static route under `/stories` (`/stories/mosaic-credits`);
+  // the static entry already lists that URL, and the sitemap never lists one URL twice.
+  const seenStories = new Set<string>(staticEntries.map((entry) => entry.url));
+  const storyEntries: MetadataRoute.Sitemap = [];
+  for (const story of options.stories ?? []) {
+    const slug = story.slug.trim();
+    if (slug.length === 0) continue;
+    const url = toAbsolute(siteUrl, `/stories/${encodeURIComponent(slug)}`);
+    if (seenStories.has(url)) continue;
+    seenStories.add(url);
+    storyEntries.push({
+      url,
+      lastModified: story.updatedAt ?? story.publishedAt ?? releaseStamp,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    });
+  }
+
+  return [...staticEntries, ...storyEntries, ...entityEntries];
 }
 
 /**

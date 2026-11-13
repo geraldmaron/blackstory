@@ -34,6 +34,8 @@ import {
   storyCollectionSlug,
 } from '../lib/discovery/story-collection';
 import { loadRecordsCatalog } from '../lib/records/records-catalog';
+import { absolutePublicUrl } from '../lib/seo/metadata-builders';
+import { buildRecordJsonLd, recordCanonicalPath, serializeJsonLd } from '../lib/seo/record-json-ld';
 
 /** The public families a released record can address. */
 export type RecordFamily = 'place' | 'invention';
@@ -65,9 +67,15 @@ export async function recordFirstPaintMetadata(
   if (!model.lead) {
     return { title: NOT_FOUND_TITLE[family] };
   }
+  // The canonical is the record's own family address with no arrival query. A record page is
+  // reachable under many DiscoveryState query variants (map and list returns, prev/next), and
+  // without a canonical each one reads to a crawler as a separate thin page.
   return {
     title: model.lead.displayName,
     description: model.lead.summary,
+    alternates: {
+      canonical: absolutePublicUrl(recordCanonicalPath(familyForKind(model.lead.kind), slug)),
+    },
   };
 }
 
@@ -150,5 +158,22 @@ export async function RecordFirstPaint({ family, slug, searchParams }: RecordFir
     ? { lng: feature.geometry.coordinates[0], lat: feature.geometry.coordinates[1] }
     : undefined;
   const discovery = await recordDiscoveryReturn(model.lead.id, arrival, geo, feature !== undefined);
-  return <HomeFirstPaint model={model} discovery={discovery} />;
+  const jsonLd = buildRecordJsonLd({
+    family,
+    slug,
+    displayName: model.lead.displayName,
+    summary: model.lead.summary,
+    jurisdictionLabel: model.lead.jurisdictionLabel,
+  });
+  // No nonce: a JSON-LD block is data, never executed, so script-src does not govern it, and a
+  // server-only nonce would hydrate as a mismatch (same reasoning as the story page).
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+      <HomeFirstPaint model={model} discovery={discovery} />
+    </>
+  );
 }
