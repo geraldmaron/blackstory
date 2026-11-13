@@ -8,12 +8,6 @@
       "port": 3048
     },
     {
-      "name": "web-op",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["run", "dev:web:op"],
-      "port": 3048
-    },
-    {
       "name": "web-maintenance",
       "runtimeExecutable": "env",
       "runtimeArgs": [
