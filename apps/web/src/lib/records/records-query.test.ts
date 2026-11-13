@@ -50,3 +50,10 @@ test('combination shapes are search results or two-plus constraints', () => {
   assert.equal(isRecordsCombinationQuery(parseRecordsQuery({ kind: 'school', page: '2' })), true);
   assert.equal(isRecordsCombinationQuery(parseRecordsQuery({ kind: 'school', state: 'GA' })), true);
 });
+
+test('the timeline layout accepts its hand-typed spellings and canonicalizes to layout=chronology', () => {
+  for (const raw of [{ view: 'chronology' }, { view: 'timeline' }, { layout: 'timeline' }]) {
+    assert.equal(recordsHref(parseRecordsQuery(raw)), '/records?layout=chronology');
+  }
+  assert.equal(parseRecordsQuery({ view: 'map' }).layout, 'index');
+});

@@ -5,6 +5,9 @@
  */
 const TOPIC_IDS = new Set(require('./topic-ids.json'));
 
+/** The page calls the layout "Timeline"; hand-typed `view=` and `layout=` spellings land on it. */
+const TIMELINE_SPELLINGS = new Set(['chronology', 'timeline']);
+
 const EMPTY_RECORDS_QUERY = Object.freeze({
   q: '',
   kind: '',
@@ -32,6 +35,8 @@ const RECORDS_PAGE_PARAM_ALLOWLIST = Object.freeze([
   'includeUndated',
   'sort',
   'layout',
+  // Read only as a spelling of `layout` (`?view=timeline`); the canonical URL never emits it.
+  'view',
   'page',
 ]);
 
@@ -102,7 +107,11 @@ function parseRecordsQuery(raw) {
     periodStart: period.start,
     periodEnd: period.end,
     includeUndated: period.includeUndated,
-    layout: one('layout').toLowerCase() === 'chronology' ? 'chronology' : 'index',
+    layout:
+      TIMELINE_SPELLINGS.has(one('layout').toLowerCase()) ||
+      TIMELINE_SPELLINGS.has(one('view').toLowerCase())
+        ? 'chronology'
+        : 'index',
     q: one('q').replace(/\s+/g, ' ').slice(0, MAX_QUERY_LENGTH).trim(),
     kind: slugOrEmpty(one('kind').toLowerCase()),
     era: slugOrEmpty(one('era').toLowerCase()),

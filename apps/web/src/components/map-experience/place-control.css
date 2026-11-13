@@ -1,0 +1,186 @@
+/* Where: one field with the locate action at its trailing edge (PlaceControl.tsx). */
+.ds-place {
+  position: relative;
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-place__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  margin: 0;
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-place__field:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-place__field:focus-within {
+  border-color: var(--ds-ink);
+}
+
+.ds-place__icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-left: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+}
+
+.ds-place__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--ds-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  caret-color: var(--ds-accent);
+}
+
+.ds-place__input::placeholder {
+  color: var(--ds-ink-muted);
+}
+
+.ds-place__input:focus {
+  outline: none;
+}
+
+.ds-place__input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ds-place__locate {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 42px;
+  border: 0;
+  border-left: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 0 var(--ds-radius-sm) var(--ds-radius-sm) 0;
+  background: transparent;
+  color: var(--ds-ink);
+  cursor: pointer;
+}
+
+.ds-place__locate svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ds-place__locate:hover:not(:disabled) {
+  background: var(--ds-surface);
+}
+
+.ds-place__locate:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.ds-place__locate:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-place__list {
+  position: absolute;
+  top: calc(44px + var(--ds-space-1));
+  right: 0;
+  left: 0;
+  z-index: 2; /* local: suggestions over the groups below the field */
+  margin: 0;
+  padding: var(--ds-space-1) 0;
+  list-style: none;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-contact-plate);
+}
+
+.ds-place__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--ds-space-3);
+  border: 0;
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-place__option:hover,
+.ds-place__option:focus-visible {
+  background: var(--ds-surface);
+  outline: none;
+}
+
+.ds-place__option-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-place__option-kind {
+  flex: none;
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+}
+
+.ds-place__status {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.ds-place__status:empty {
+  display: none;
+}
+
+.ds-place__radius {
+  justify-self: start;
+}
+
+.ds-place__privacy {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.ds-place__privacy summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.25em;
+}
+
+.ds-place__privacy summary:hover {
+  color: var(--ds-ink);
+}
+
+.ds-place__privacy p {
+  max-width: 34rem;
+  margin: var(--ds-space-1) 0 0;
+}

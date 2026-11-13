@@ -5,9 +5,10 @@
  * sentences in the same order is reading a brochure, not an archive, so a second read has to be
  * able to teach something the first did not.
  *
- * What varies is *which* points are made and how many: the context stage runs one or two chapters,
- * each carrying a different cited fact from the twenty in `story-facts.ts`, and the record chapter
- * already draws its own pin from the release.
+ * What varies is *which* points are made: the context stage runs one of its chapters, carrying a
+ * cited fact drawn from the twenty in `story-facts.ts`, and the record chapter already draws its
+ * own pin from the release. The length does not vary: the walk is always the same number of steps,
+ * so its progress reads the same on every visit.
  *
  * What does not vary is the shape of the argument. Every chapter declares a `StoryStage`, selection
  * happens strictly within a stage, and the stages always run in `STORY_STAGE_ORDER`: the archive is
@@ -38,9 +39,9 @@ export type StoryRunOrder = {
  */
 const REQUIRED_STAGES: readonly StoryStage[] = ['opening', 'shape', 'evidence', 'time', 'closing'];
 
-/** How many chapters the context stage runs. Two on roughly half of visits. */
+/** How many chapters the context stage runs: one, on every visit, so the walk's length is fixed. */
 const MIN_CONTEXT_CHAPTERS = 1;
-const MAX_CONTEXT_CHAPTERS = 2;
+const MAX_CONTEXT_CHAPTERS = 1;
 
 function bounded(roll: number): number {
   return Number.isFinite(roll) ? Math.min(Math.max(roll, 0), 0.999999) : 0;

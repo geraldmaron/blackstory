@@ -51,9 +51,9 @@ export const EMPTY_RECORDS_QUERY: RecordsQuery = Object.freeze({
 });
 
 /**
- * Orderings `/records` understands. `discovery` is the long-standing default — best evidence
- * first, then earliest era — and stays the one the bare URL means. The index had no sort
- * control at all, so 4,210 records could only ever be read in that one order.
+ * Orderings `/records` understands. `discovery` is the default, the one the bare URL means and
+ * never written into it. Explore reads it as best evidence first; the Records register resolves
+ * it to relevance when the reader searched and to earliest otherwise (`recordsComparator`).
  */
 export const RECORDS_SORTS = Object.freeze(['discovery', 'era', 'name', 'evidence'] as const);
 export type RecordsSort = (typeof RECORDS_SORTS)[number];
@@ -80,6 +80,8 @@ export const RECORDS_PAGE_PARAM_ALLOWLIST: readonly string[] = Object.freeze([
   'includeUndated',
   'sort',
   'layout',
+  // Read only as a spelling of `layout` (`?view=timeline`); the canonical URL never emits it.
+  'view',
   'page',
 ]);
 
@@ -88,6 +90,8 @@ const FACET_SLUG = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 const STATE_POSTAL = /^[A-Z]{2}$/;
 const EVIDENCE_GRADES = new Set(['A', 'B', 'C']);
 const MAX_QUERY_LENGTH = 120;
+/** The page calls the layout "Timeline"; hand-typed `view=` and `layout=` spellings land on it. */
+const TIMELINE_SPELLINGS = new Set(['chronology', 'timeline']);
 /** Far above any real page count (the catalog is a few thousand rows); bounds `?page=<huge>`. */
 const MAX_PAGE = 1000;
 
@@ -123,7 +127,11 @@ export function parseRecordsQuery(
     periodStart: period.start,
     periodEnd: period.end,
     includeUndated: period.includeUndated,
-    layout: one('layout').toLowerCase() === 'chronology' ? 'chronology' : 'index',
+    layout:
+      TIMELINE_SPELLINGS.has(one('layout').toLowerCase()) ||
+      TIMELINE_SPELLINGS.has(one('view').toLowerCase())
+        ? 'chronology'
+        : 'index',
     q: one('q').replace(/\s+/g, ' ').slice(0, MAX_QUERY_LENGTH).trim(),
     kind: slugOrEmpty(one('kind').toLowerCase()),
     era: slugOrEmpty(one('era').toLowerCase()),

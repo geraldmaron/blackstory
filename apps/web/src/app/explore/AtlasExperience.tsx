@@ -1,48 +1,40 @@
 /**
- * Explore — the composition that makes everything P0 to P4 built reachable, mounted over the
- * persistent `MapStage` canvas in place of the v6 chrome it replaced (WP-27).
+ * Explore: the map page, mounted over the persistent `MapStage` canvas.
+ *
+ * Layout (explore-column.css): a full-canvas map, one flush 380px column on the left that holds
+ * filters and list, the list, or the record inspector in place, the decade histogram docked on
+ * the map's bottom edge, and the zoom and locate stack bottom-right. Below 768px the column is a
+ * bottom sheet (peek, half, full) over a full-screen map. The column header carries the only
+ * record count on the page.
  *
  * Deliberately does not: own record data (the view model is built on the server and hydrated here
- * unchanged), change status derivation or evidence grading, or consolidate routes (`/` staying a
- * separate surface is WP-25, irreversible, its own approval).
+ * unchanged), change status derivation or evidence grading, or move the camera itself. Every
+ * selection (pin, list row, previous/next, deep link, home hand-off, palette) goes through
+ * `useRecordSelection` and so through the one `frameRecord` contract.
  *
- * The camera reaches the plate through `MapStage.getMap()`, narrow on purpose: preset framing
- * still goes through `flyPreset`, and this handle is only what `camera-moves.ts` needs. Every
- * move on either path carries an authored duration and easing, never library defaults
- * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar).
- *
- * This file is the orchestrator (WP-23): render plus wiring. Every piece of state and behavior
- * lives in a hook under `explore/hooks/` — the lens, the camera, the selection, the saved
- * collection, the palette index, the command context.
+ * This file is the orchestrator: render plus wiring. State and behavior live in the hooks under
+ * `explore/hooks/`.
  */
 'use client';
 
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Chip, FilterButton, Notice } from '@repo/ui';
 import { recordsHref } from '../../lib/records/records-query';
 import {
   drawableCollection,
   matchExploreCollection,
-  periodDecadesFor,
   recordsQueryFromExplore,
 } from '../../lib/discovery/explore-collection';
-import { mapListContinuityLabel } from '../../lib/discovery/continuity-label';
-import { buildExploreHref, buildExploreSearchParams } from '../../lib/map-experience/url-state';
-import { CollectionContext } from '../../components/discovery/collection-context';
-import { CollectionPeriodControls } from '../../components/discovery/collection-period-controls';
 import {
   normalizePeriod,
   periodIsActive,
   periodIsInvalid,
-  periodLabel,
 } from '../../lib/discovery/collection-period';
 import {
   collectionIsUnresolved,
   collectionMemberIds,
   collectionStateMessage,
 } from '../../lib/discovery/story-collection';
-
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Notice } from '@repo/ui';
-import { focusLandmark } from '../../lib/keyboard/use-focus-trap';
 import { CommandBar } from '../../components/shell/CommandBar';
 import { CommandPalette } from '../../components/patterns/command-palette/CommandPalette';
 import { ShortcutSheet } from '../../components/patterns/ShortcutSheet';
@@ -50,35 +42,42 @@ import { CollectionsDrawer } from '../../components/patterns/CollectionsDrawer';
 import { EmptyState } from '../../components/patterns/EmptyState';
 import { ToastStack, useToasts } from '../../components/patterns/Toast';
 import { AnnotationOverlay } from '../../components/map-experience/AnnotationOverlay';
-import { LensPanel, type LensLayerKey } from '../../components/map-experience/LensPanel';
-import { SheetPresence } from '../../components/map-experience/SheetPresence';
-import { MapExperienceLegend } from '../../components/map-experience/MapExperienceLegend';
-import { ResultsRail, type ResultsConstraint } from '../../components/map-experience/ResultsRail';
+import {
+  ExploreColumn,
+  sheetHeightFor,
+  sheetReachFor,
+  type SheetDetent,
+} from '../../components/map-experience/ExploreColumn';
+import { ExploreFilters } from '../../components/map-experience/ExploreFilters';
+import { ExploreRecordList } from '../../components/map-experience/ExploreRecordList';
+import { RecordInspector } from '../../components/map-experience/RecordInspector';
+import { DecadeBrush } from '../../components/map-experience/DecadeBrush';
+import { PlaceControl, type PlaceResolved } from '../../components/map-experience/PlaceControl';
 import { MapControls } from '../../components/map-experience/MapControls';
-import type { PlaceFinderResolvedPayload } from '../../components/map-experience/PlaceFinder';
 import {
   distanceLabel,
   nearbyFrame,
   nearbySummary,
   type NearbyArea,
 } from '../../lib/map-experience/nearby';
-import { RecordSheet } from '../../components/map-experience/RecordSheet';
+import {
+  DEFAULT_EXPLORE_RADIUS_ID,
+  exploreRadiusPresetById,
+  type ExploreRadiusPresetId,
+} from '../../lib/map-experience/explore-place-radius';
 import { usePhotoIndex } from '../../lib/map-experience/use-photo-index';
 import {
   PinPhotoLayer,
   type PinPhotoHoverTarget,
 } from '../../components/map-experience/PinPhotoLayer';
-import { TimePanel } from '../../components/map-experience/TimePanel';
 import { MIGRATION_CORRIDORS } from '../../lib/map-experience/migration-corridors';
-import { nationalFieldPatch } from '../../lib/map-experience/national-field';
 import { clearCollection, unsaveRecord } from '../../lib/collections/store';
 import { useMapStage } from '../../components/map-stage/MapStage';
 import {
   hydrateExploreViewModel,
   type SerializableExploreViewModel,
 } from './explore-view-model-wire';
-import { eraBucketFor } from './hooks/atlas-feature-helpers';
-import { usePanelVisibility, type PanelVisibility } from './hooks/use-panel-visibility';
+import { usePanelVisibility } from './hooks/use-panel-visibility';
 import { useSavedCollection } from './hooks/use-saved-collection';
 import { useLensFilters } from './hooks/use-lens-filters';
 import { useMapSync } from './hooks/use-map-sync';
@@ -94,7 +93,6 @@ import {
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useLocateMe } from './hooks/use-locate-me';
-import { useCompactSheetDrag } from './hooks/use-compact-sheet-drag';
 import { useCommandContext } from './hooks/use-command-context';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
@@ -108,36 +106,13 @@ void React;
 const ZOOM_STEP_MS = 250;
 
 /**
- * Basemap symbol layers the "Place labels" Lens chip governs (state/city and street names —
- * `app/map/explore-style.ts`'s `plate-place-city` and `explore-street-label`). That module is
- * outside this package's file lock, so the toggle reaches these layers through the live map
- * instance rather than a new patch field on `MapStageDataPatch`.
+ * Basemap symbol layers the "Hide place names" layer chip governs (state/city and street names:
+ * `app/map/explore-style.ts`'s `plate-place-city` and `explore-street-label`). Reached through the
+ * live map instance rather than a patch field on `MapStageDataPatch`.
  */
 const PLACE_LABEL_LAYER_IDS = ['plate-place-city', 'explore-street-label'] as const;
 
-/**
- * The dock's chips, in the order the narrow switcher shows them.
- *
- * Every chip that renders is a toggle: `aria-pressed` says whether its instrument is on screen and
- * pressing it flips that. Filters is the one chip that renders at every width whatever its state,
- * because it is the control readers look for first and it used to disappear the moment the panel it
- * governs was open — the only way to close Filters was a hide control inside the panel, and the only
- * way to reopen it was a chip that only existed while it was shut. The other three still appear on
- * the wide layout when their own panel is hidden, and always on the narrow one, where the dock is
- * the switcher that says which single instrument the reader is holding.
- */
-const NARROW_INSTRUMENTS = [
-  { key: 'lens', label: 'Filters' },
-  { key: 'results', label: 'Records' },
-  { key: 'decade', label: 'When' },
-] as const satisfies readonly { key: keyof PanelVisibility; label: string }[];
-
-/** Renders at every width in both states, so opening and closing Filters is one control. */
-const ALWAYS_DOCKED: keyof PanelVisibility = 'lens';
-
-/** The narrow slice of the MapLibre instance the label toggle needs. `stage.getMap()` types as
- * `AtlasCameraTarget` (camera-only, by design — MapStage.tsx §doc comment), so this file casts
- * to this structural type the same way it already casts for `AnnotationOverlay`. */
+/** The narrow slice of the MapLibre instance the label toggle needs. */
 type LabelLayerMap = {
   getLayer(id: string): unknown;
   setLayoutProperty(id: string, name: string, value: unknown): void;
@@ -145,11 +120,25 @@ type LabelLayerMap = {
   off(event: string, handler: () => void): void;
 };
 
+function BackIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path
+        d="M10 3.5 5.5 8l4.5 4.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export type AtlasExperienceProps = {
   readonly initial: SerializableExploreViewModel;
   /**
-   * Door browse posture (morph-from-home or cold `/explore`). Keeps the room CommandBar;
-   * exit back to the journey is owned by DoorImmersive (outside this pointer-events:none stack).
+   * Door browse posture (morph-from-home or cold `/explore`): the site header is already on the
+   * page, so the room CommandBar is not rendered.
    */
   readonly embedded?: boolean;
 };
@@ -158,6 +147,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const stage = useMapStage();
   const view = useMemo(() => hydrateExploreViewModel(initial), [initial]);
   const toasts = useToasts();
+  const ready = Boolean(view.collectionFacts);
 
   const {
     mode,
@@ -168,105 +158,65 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setShortcutsOpen,
     savedOpen,
     setSavedOpen,
-    panels,
-    setPanels,
-    narrow,
     chromeHidden,
     setChromeHidden,
-    showPanel,
+    phone,
+    viewportHeight,
   } = usePanelVisibility();
 
-  /**
-   * The focus contract for the two panel transitions (design-direction-v9-atlas.md §7).
-   *
-   * Hiding a panel destroys the button the reader just pressed. Without this, focus falls to
-   * `<body>` and their next Tab starts from the top of the document — a keyboard reader loses the
-   * instrument *and* their place, for the crime of tidying the screen. So hide moves focus to the
-   * dock chip that brings the panel back, and restoring moves it to that panel's header.
-   *
-   * Run after paint via a queued state flag rather than inside the click handler, because the
-   * element being focused does not exist until React has committed the new panel state.
-   */
-  const [focusAfterPanels, setFocusAfterPanels] = useState<string | null>(null);
-
-  const hidePanel = useCallback(
-    (panel: keyof PanelVisibility) => {
-      setPanels((current) => ({ ...current, [panel]: false }));
-      setFocusAfterPanels(`.ds-atlas__dock [data-dock="${panel}"]`);
-    },
-    [setPanels],
+  /* —— The column's state: filters open or not, and on a phone the sheet's height. —— */
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [detent, setDetent] = useState<SheetDetent>('peek');
+  /** `?find=place` (the old /locate) arrives with the place field ready to type in. */
+  const [findPlace] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('find') === 'place',
   );
-
-  const restorePanel = useCallback(
-    (panel: keyof PanelVisibility) => {
-      showPanel(panel);
-      setFocusAfterPanels(panel === 'lens' ? '.ds-lens__head' : '.ds-results__head');
-    },
-    [showPanel],
-  );
-
-  const hidePanelRef = useRef(hidePanel);
-  hidePanelRef.current = hidePanel;
-
   useEffect(() => {
-    if (focusAfterPanels === null) return;
-    focusLandmark(document.querySelector(focusAfterPanels));
-    setFocusAfterPanels(null);
-  }, [focusAfterPanels]);
+    if (findPlace) setFiltersOpen(true);
+  }, [findPlace]);
 
   /**
-   * Hands-on map, out-of-the-way chrome (the pattern every maps app shares). On a phone or a
-   * phone on its side, the moment the reader drags, pinches or twists the map, the open
-   * instrument sheet folds back into the dock; a tap on empty map does the same and also
-   * closes the record sheet. Wide screens keep their side panels — they do not cover the map
-   * being moved. Text fields are blurred by MapStage itself on every surface.
+   * The selection. Owned here, not inside the selection hook: the camera's padding needs to know
+   * where the sheet will be without depending on the camera it drives.
    */
-  const narrowRef = useRef(narrow);
-  narrowRef.current = narrow;
-  const atlasRootRef = useRef<HTMLDivElement>(null);
-  useCompactSheetDrag(atlasRootRef, (key) => {
-    if (key === 'record') {
-      setSelectedIdRef.current(undefined);
-      return;
-    }
-    hidePanelRef.current(key);
-  });
+  const [selectedId, setSelectedId] = useState<string | undefined>(
+    () => initial.viewState.selected,
+  );
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
+  const [overlapIds, setOverlapIds] = useState<readonly string[] | null>(null);
+
+  /** On a phone a selection raises the sheet far enough to read the inspector. */
+  const shownDetent: SheetDetent = selectedId !== undefined && detent === 'peek' ? 'half' : detent;
   useEffect(() => {
-    const foldSheets = () => {
-      if (!narrowRef.current) return;
-      setPanels((current) =>
-        current.lens || current.results || current.decade
-          ? { lens: false, results: false, decade: false }
-          : current,
-      );
+    if (selectedId !== undefined) setDetent((current) => (current === 'peek' ? 'half' : current));
+  }, [selectedId]);
+
+  /**
+   * Hands-on map, out-of-the-way chrome. On a phone, a drag, pinch or twist on the map lowers the
+   * sheet to its peek; a tap on empty map also closes the inspector.
+   */
+  const phoneRef = useRef(phone);
+  phoneRef.current = phone;
+  useEffect(() => {
+    const lower = () => {
+      if (phoneRef.current) setDetent('peek');
     };
-    const offInteract = stage.subscribe('interact', foldSheets);
+    const offInteract = stage.subscribe('interact', lower);
     const offActivate = stage.subscribe('activate', () => {
-      if (!narrowRef.current) return;
-      foldSheets();
-      setSelectedIdRef.current(undefined);
+      if (!phoneRef.current) return;
+      lower();
+      setSelectedId(undefined);
     });
     return () => {
       offInteract();
       offActivate();
     };
-  }, [setPanels, stage]);
+  }, [stage]);
 
-  /**
-   * The selection.
-   *
-   * Owned here, not inside the selection hook: the camera's padding needs to know whether the
-   * sheet is open without depending on the camera it drives, so the id has to sit above both.
-   */
-  const [selectedId, setSelectedId] = useState<string | undefined>(
-    () => initial.viewState.selected,
-  );
-  const setSelectedIdRef = useRef(setSelectedId);
-  const selectedIdRef = useRef(selectedId);
-  selectedIdRef.current = selectedId;
-  const [overlapIds, setOverlapIds] = useState<readonly string[] | null>(null);
-
-  const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
+  const { collection, persist, toggleSave } = useSavedCollection(toasts);
   const {
     query,
     era,
@@ -279,9 +229,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setKindFamily,
     evidenceFloor,
     setEvidenceFloor,
-    decade,
-    setDecade,
-    sweepDecade,
+    period,
+    setPeriod,
     topicId,
     setTopicId,
     status,
@@ -300,7 +249,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     sorted,
     kindCounts,
     topicCounts,
-    presence,
     stateOptions,
     decadeBars,
     constraints,
@@ -314,14 +262,18 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         : null,
     [overlapIds, sorted],
   );
+  const listed = overlapFeatures ?? sorted;
+
+  /** Overlapping records always open a chooser: the list, narrowed to them. */
   useEffect(
     () =>
       stage.subscribe('overlap', (ids) => {
         setSelectedId(undefined);
         setOverlapIds(ids);
-        restorePanel('results');
+        setFiltersOpen(false);
+        if (phoneRef.current) setDetent('half');
       }),
-    [stage, restorePanel],
+    [stage],
   );
   useEffect(() => {
     const clear = () => setOverlapIds(null);
@@ -334,48 +286,49 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       offInteract();
     };
   }, [stage]);
-
   useEffect(() => setOverlapIds(null), [filtered]);
 
-  const holdingPlaceArrival = useMemo(() => {
-    return placeArrivalQuery(
-      {
-        ...(query ? { query } : {}),
-        sort: collectionState.sort,
-        ...((exactKind ?? kindFamily) ? { kind: exactKind ?? kindFamily! } : {}),
-        ...(era !== 'all' ? { era } : {}),
-        ...(stateCode ? { state: stateCode } : {}),
-        ...(topicId ? { topic: topicId } : {}),
-        ...(status ? { status } : {}),
-        ...(evidenceFloor === 'A' || evidenceFloor === 'B' || evidenceFloor === 'C'
-          ? { evidence: evidenceFloor }
-          : {}),
-        // The named collection, range and Records layout ride into the record so Return and
-        // previous/next restore exactly what the reader left.
-        ...(collectionState.collection ? { collection: collectionState.collection } : {}),
-        ...(collectionState.periodStart ? { periodStart: collectionState.periodStart } : {}),
-        ...(collectionState.periodEnd ? { periodEnd: collectionState.periodEnd } : {}),
-        ...(collectionState.includeUndated ? { includeUndated: true } : {}),
-        ...(collectionState.layout ? { layout: collectionState.layout } : {}),
-      },
-      'map',
-    );
-  }, [
-    query,
-    era,
-    exactKind,
-    collectionState.collection,
-    collectionState.periodStart,
-    collectionState.periodEnd,
-    collectionState.includeUndated,
-    collectionState.layout,
-    collectionState.sort,
-    evidenceFloor,
-    kindFamily,
-    stateCode,
-    status,
-    topicId,
-  ]);
+  const holdingPlaceArrival = useMemo(
+    () =>
+      placeArrivalQuery(
+        {
+          ...(query ? { query } : {}),
+          sort: collectionState.sort,
+          ...((exactKind ?? kindFamily) ? { kind: exactKind ?? kindFamily! } : {}),
+          ...(era !== 'all' ? { era } : {}),
+          ...(stateCode ? { state: stateCode } : {}),
+          ...(topicId ? { topic: topicId } : {}),
+          ...(status ? { status } : {}),
+          ...(evidenceFloor === 'A' || evidenceFloor === 'B' || evidenceFloor === 'C'
+            ? { evidence: evidenceFloor }
+            : {}),
+          // The named collection, range and Records layout ride into the record so Return and
+          // previous/next restore exactly what the reader left.
+          ...(collectionState.collection ? { collection: collectionState.collection } : {}),
+          ...(collectionState.periodStart ? { periodStart: collectionState.periodStart } : {}),
+          ...(collectionState.periodEnd ? { periodEnd: collectionState.periodEnd } : {}),
+          ...(collectionState.includeUndated ? { includeUndated: true } : {}),
+          ...(collectionState.layout ? { layout: collectionState.layout } : {}),
+        },
+        'map',
+      ),
+    [
+      query,
+      era,
+      exactKind,
+      collectionState.collection,
+      collectionState.periodStart,
+      collectionState.periodEnd,
+      collectionState.includeUndated,
+      collectionState.layout,
+      collectionState.sort,
+      evidenceFloor,
+      kindFamily,
+      stateCode,
+      status,
+      topicId,
+    ],
+  );
 
   useExploreUrlSync(view.viewState, {
     collectionState,
@@ -389,66 +342,13 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     lines: layers.routes,
     selectedId,
   });
-  /**
-   * The one frame of the story's decade sweep where the plate is deliberately empty: the cursor
-   * sits before the archive's first decade, so nothing matches. That frame crossdissolves rather
-   * than snapping, because chapter 4 opens by clearing the country and a hard cut there reads as
-   * the map having broken. Every later frame of the sweep only *adds* pins, and adding is what
-   * the per-decade crossfade already handles.
-   */
-  const sweepClearingPlate =
-    sweepDecade !== null && (decadeBars[0] === undefined || sweepDecade < decadeBars[0].decade);
 
-  // Black-population choropleth tiers for the Lens's own `layerMode` (not the URL-seeded
-  // `view.viewState.layerMode` — see the effect below). Empty (and no fetch) whenever the layer
-  // model is `off` / `presence`; loads the compact state or county index lazily on first ask.
   const populationLevels = usePopulationChoropleth(layerMode, view.viewState);
 
-  useMapSync(
-    stage,
-    view,
-    filtered,
-    layers.pins,
-    layers.satellite,
-    selectedId,
-    stateCode,
-    sweepClearingPlate,
-    populationLevels,
-  );
+  useMapSync(stage, view, filtered, layers, layerMode, selectedId, stateCode, populationLevels);
 
-  // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
-  // once the reader touches it. `useMapSync` (outside this package's file lock) still runs its
-  // own patch on the same data; this effect is declared after it so it always applies last and
-  // wins — see this file's props doc for why the layer id list above lives here instead.
-  useEffect(() => {
-    stage.patchData(
-      nationalFieldPatch(
-        { type: 'FeatureCollection', features: layers.pins ? filtered : [] },
-        {
-          layerMode,
-          densityLevels: view.densityLevels,
-          satellite: layers.satellite,
-          historyEdgeCollection: view.edgeLineCollection,
-          stateChoroplethLevels: populationLevels.stateChoroplethLevels,
-          countyChoroplethLevels: populationLevels.countyChoroplethLevels,
-          ...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {}),
-        },
-      ),
-    );
-  }, [
-    filtered,
-    layers.pins,
-    layers.satellite,
-    layerMode,
-    stage,
-    view.densityLevels,
-    view.edgeLineCollection,
-    populationLevels,
-  ]);
-
-  // "Place labels" (§5.2): the map plate's own basemap label layers. Reapplied on every
-  // `styledata` event because `patchData` rebuilds the style, which resets layout properties set
-  // through the live instance back to their style defaults.
+  // Reapplied on every `styledata`: `patchData` rebuilds the style, which resets layout
+  // properties set through the live instance.
   useEffect(() => {
     const map = stage.getMap() as unknown as LabelLayerMap | null;
     if (!map) return;
@@ -465,13 +365,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     };
   }, [layers.labels, stage]);
 
-  /**
-   * Pin photo card: hover wins over selection (hover is the more specific, momentary intent).
-   * `stage.subscribe('pinHover', …)` is MapStage's own delayed-intent/leave signal off the live
-   * entity markers (`entity-marker-sync.ts`'s `data-pin-name`). Selection has no marker-rect event
-   * of its own, so it looks the marker element up directly by the same `data-entity-id` MapStage
-   * already stamps on it — same DOM, no second source of truth.
-   */
+  /** Pin photo card, on hover. */
   const [atlasHoverTarget, setAtlasHoverTarget] = useState<PinPhotoHoverTarget | null>(null);
   useEffect(
     () =>
@@ -489,32 +383,31 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, []);
-  const atlasPinPhotoTarget = useMemo<PinPhotoHoverTarget | null>(() => {
-    if (atlasHoverTarget) return atlasHoverTarget;
-    if (!selectedId) return null;
-    const target = stage.entityHoverTarget(selectedId);
-    if (!target) return null;
-    return { key: selectedId, name: target.name, rect: target.rect };
-  }, [atlasHoverTarget, selectedId, stage]);
 
-  const [legendOpen, setLegendOpen] = useState(false);
   const reducedMotion = useReducedMotion();
+  const sheetReach = useMemo(
+    () =>
+      phone
+        ? {
+            now: sheetReachFor(shownDetent, viewportHeight),
+            selected: sheetReachFor(shownDetent === 'peek' ? 'half' : shownDetent, viewportHeight),
+          }
+        : { now: 0, selected: 0 },
+    [phone, shownDetent, viewportHeight],
+  );
   const { camera, readout, spotlight, bearing, selectionPadding } = useAtlasCamera(
     stage,
-    panels,
-    chromeHidden,
-    // The padding is for the panel: the camera reserves room whenever something is selected.
-    selectedId !== undefined,
+    sheetReach,
     setLayers,
     // A selection, or one about to be restored from the home hand-off, holds the camera.
     () => selectedIdRef.current !== undefined || readPinContinuity() !== null,
   );
-  const { selectedFeature, selectedIndex, select, selectById, stepRecord, sheetRecord } =
+  const { selectedFeature, selectedIndex, select, selectById, stepRecord, inspectorRecord } =
     useRecordSelection(
       stage,
       camera,
       selectionPadding,
-      overlapFeatures ?? sorted,
+      listed,
       selectedId,
       setSelectedId,
       view.allFeatures,
@@ -537,10 +430,9 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   }, [plateReady, selectById, view.allFeatures]);
 
   /**
-   * The home hand-off: a pin (or an overlapping group of pins) the reader chose on the Door.
-   * The Door's pins carry first-paint `pin-N` ids, so a single pin goes through the pin select
-   * path, which remembers its coordinates and re-resolves to the real entity once the catalog
-   * replaces those ids. Overlaps open the chooser, never the first record.
+   * The home hand-off: a pin (or an overlapping group of pins) the reader chose on the Door. A
+   * single pin goes through the pin select path, which re-resolves its first-paint id to the real
+   * record; overlaps open the chooser, never the first record.
    */
   const continuityRestoredRef = useRef(false);
   useEffect(() => {
@@ -556,55 +448,47 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         .filter((id): id is string => id !== undefined);
       if (ids.length > 0) {
         setOverlapIds(ids);
-        restorePanel('results');
+        if (phoneRef.current) setDetent('half');
       }
       return;
     }
     emitExplorePinSelect({ pinId: saved.entityId, lng: saved.lng, lat: saved.lat });
-  }, [initial.viewState.selected, restorePanel, view.allFeatures]);
+  }, [initial.viewState.selected, view.allFeatures]);
+
   const { copy, citationFor } = useReaderActions(toasts);
-  /**
-   * The radius chip the reader last picked, kept even before anything is located: pick "5 mi",
-   * then locate, and the 5 miles applies — the chip and the filter can never disagree.
-   */
-  const radiusRef = useRef<{ meters: number | null; label: string }>({ meters: null, label: '' });
-  const setNearbyWithRadius = useCallback(
+
+  /* —— Where: a typed place or the device, with an optional radius. —— */
+  const [radiusId, setRadiusId] = useState<ExploreRadiusPresetId>(DEFAULT_EXPLORE_RADIUS_ID);
+  const radiusRef = useRef(radiusId);
+  radiusRef.current = radiusId;
+  const placeWithRadius = useCallback(
     (area: NearbyArea | null) => {
       if (!area) {
         setNearby(null);
         return;
       }
-      const { meters, label } = radiusRef.current;
+      const preset = exploreRadiusPresetById(radiusRef.current);
       setNearby({
         ...area,
-        radiusMeters: meters,
-        ...(meters !== null ? { radiusLabel: label } : {}),
+        radiusMeters: preset.meters,
+        ...(preset.meters !== null ? { radiusLabel: preset.statusLabel } : {}),
       });
     },
     [setNearby],
   );
-  const { locate: nearMe, status: locateStatus } = useLocateMe(toasts, setNearbyWithRadius);
+  const { locate: nearMe, status: locateStatus } = useLocateMe(toasts, placeWithRadius);
 
-  /**
-   * A located place on the plate: the marker (a "you are here" dot for the device, a pin for a
-   * searched place), the radius/accuracy circle, the camera frame, and one sentence saying what
-   * the reader is now looking at. Runs when the located place changes — not when other filters
-   * do, so a kind chip does not yank the camera back.
-   */
+  // Held in refs so the camera and summary run when the located place changes, and only then.
   const filteredRef = useRef(filtered);
   filteredRef.current = filtered;
   const sortedRef = useRef(sorted);
   sortedRef.current = sorted;
   const nearestMetersRef = useRef(nearestMeters);
   nearestMetersRef.current = nearestMeters;
-  // Held in refs so the camera/summary effect below runs when the located place changes and only
-  // then — not when the camera handle re-memoizes or the toast API identity changes.
   const cameraRef = useRef(camera);
   cameraRef.current = camera;
   const toastsRef = useRef(toasts);
   toastsRef.current = toasts;
-  // The marker and circles belong to the stage they are drawn on: redraw them whenever the
-  // located place or the stage handle changes, and clear them from the old one.
   useEffect(() => {
     if (!nearby) return;
     const { lat, lng } = nearby.center;
@@ -625,15 +509,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       stage.setSearchArea(null);
     };
   }, [nearby, stage]);
-  // The camera move and the summary happen once per located place.
   useEffect(() => {
     if (!nearby) return;
     cameraRef.current.frameArea(nearbyFrame(nearby, filteredRef.current), { trigger: 'reader' });
     toastsRef.current.show({
       id: 'nearby-summary',
-      // `sorted`: the same count the Records rail shows (it drops internal placeholder records).
-      // Nearest among the records the lens shows (radius aside), so a radius that matches nothing
-      // can still name the closest one outside it.
       message: nearbySummary(nearby, sortedRef.current.length, nearestMetersRef.current),
     });
   }, [nearby]);
@@ -648,14 +528,13 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     return labels;
   }, [distances, nearby]);
 
-  /** The place finder resolved an address, a ZIP, or a record from its typeahead. */
   const onPlaceResolved = useCallback(
-    (payload: PlaceFinderResolvedPayload) => {
-      if (payload.entityId) {
-        selectById(payload.entityId);
+    (resolved: PlaceResolved) => {
+      if (resolved.kind === 'record') {
+        selectById(resolved.entityId);
         return;
       }
-      const { target } = payload;
+      const { target } = resolved;
       const { lat, lng, zoom } = target.viewport;
       if (target.preset === 'state' && target.statePostalCode) {
         setStateCode(target.statePostalCode);
@@ -665,34 +544,33 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         );
         return;
       }
-      radiusRef.current = { meters: payload.radiusMeters, label: payload.radiusLabel };
-      setNearby({
+      placeWithRadius({
         center: { lat, lng },
         label: target.label,
         source: 'search',
-        radiusMeters: payload.radiusMeters,
-        ...(payload.radiusMeters !== null ? { radiusLabel: payload.radiusLabel } : {}),
+        radiusMeters: null,
       });
     },
-    [camera, selectById, setNearby, setStateCode],
+    [camera, placeWithRadius, selectById, setStateCode],
   );
 
   const onRadiusChange = useCallback(
-    (radiusMeters: number | null, radiusLabel: string) => {
-      radiusRef.current = { meters: radiusMeters, label: radiusLabel };
+    (id: ExploreRadiusPresetId) => {
+      setRadiusId(id);
       if (!nearby) return;
-      const next: NearbyArea = {
+      const preset = exploreRadiusPresetById(id);
+      setNearby({
         center: nearby.center,
         label: nearby.label,
         source: nearby.source,
         ...(nearby.accuracyMeters !== undefined ? { accuracyMeters: nearby.accuracyMeters } : {}),
-        radiusMeters,
-        ...(radiusMeters !== null ? { radiusLabel } : {}),
-      };
-      setNearby(next);
+        radiusMeters: preset.meters,
+        ...(preset.meters !== null ? { radiusLabel: preset.statusLabel } : {}),
+      });
     },
     [nearby, setNearby],
   );
+
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
     view,
     stateOptions,
@@ -701,7 +579,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     camera,
     citationFor,
     copy,
-    decade,
+    era,
     evidenceFloor,
     kindFamily,
     nearMe,
@@ -723,36 +601,21 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setSavedOpen,
   });
 
-  const sheetOpen = sheetRecord !== null;
-  /*
-   * The rail's thumbnails ride on the pin hover card's photo index, and never on load: the fetch
-   * starts on the first sign a reader is looking at records (a pin hovered, or the pointer or
-   * focus entering the rail), and every row that has a photo fills in from then on.
-   */
-  const [railTouched, setRailTouched] = useState(false);
-  const railPhotos = usePhotoIndex('/atlas/photos', railTouched || atlasPinPhotoTarget !== null);
-  /* The record the inspector last showed, so a closing inspector can animate away still showing
-     it (`SheetPresence`). Derived state, updated during render only when a new record opens. */
-  const [leavingSheet, setLeavingSheet] = useState<typeof sheetRecord>(null);
-  if (sheetRecord !== null && sheetRecord !== leavingSheet) setLeavingSheet(sheetRecord);
+  /* The inspector's photo rides on the pin hover card's photo index, fetched only once a record
+     is selected or a pin hovered, never on load. */
+  const photos = usePhotoIndex(
+    '/atlas/photos',
+    selectedId !== undefined || atlasHoverTarget !== null,
+  );
+  const inspector = inspectorRecord
+    ? {
+        ...inspectorRecord,
+        ...(photos?.[inspectorRecord.id]?.url ? { photoUrl: photos[inspectorRecord.id]!.url } : {}),
+      }
+    : null;
 
-  const showLens = panels.lens && !chromeHidden && mode === 'atlas';
-  /* The inspector takes the list's slot: one column, list or record, never both side by side. */
-  const showResults =
-    panels.results && !chromeHidden && mode === 'atlas' && selectedId === undefined;
-
-  /**
-   * The collection strip rides with the instruments: gone when chrome is hidden, and gone while a
-   * record sheet is open (the sheet takes the column the strip's right edge would cross). While it
-   * is not visible the rail keeps its own "Open record list" return link, so the list is never
-   * unreachable.
-   */
+  /* —— Collection honesty: an unresolved collection or range is stated, never counted. —— */
   const namedCollection = collectionState.collection ?? '';
-  /**
-   * A named collection that cannot be shown (unknown story, unreadable address, failed story
-   * read) is stated, not counted. It is never "Counting", never zero matches and never the whole
-   * archive. This holds before the catalog arrives, so the strip does not wait for the facts.
-   */
   const unresolvedCollection =
     namedCollection !== '' && (!view.collection || collectionIsUnresolved(view.collection))
       ? (collectionStateMessage(view.collection ?? { state: 'unavailable', slug: '' }) ??
@@ -765,27 +628,15 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       includeUndated: collectionState.includeUndated,
     }),
   )
-    ? 'This documented-decade range is not readable. Fix or clear it before counting records.'
+    ? 'This decade range cannot be read. Clear it to see records.'
     : undefined;
   const unresolvedScope = unresolvedCollection ?? unresolvedRange;
-  const showCollection =
-    mode === 'atlas' &&
-    !chromeHidden &&
-    !sheetOpen &&
-    (Boolean(view.collectionFacts) || unresolvedCollection !== undefined);
-  const exploreQuery = recordsQueryFromExplore(collectionState);
-  const collectionHrefs = {
-    map: buildExploreHref(collectionState),
-    // Both Records representations carry the same collection and every narrowing.
-    records: recordsHref({ ...exploreQuery, layout: 'index' }),
-    chronology: recordsHref({ ...exploreQuery, layout: 'chronology' }),
-  };
   const collectionMembers = useMemo(
     () => (view.collection ? collectionMemberIds(view.collection) : undefined),
     [view.collection],
   );
-  /** Collection members with a public map anchor, before any temporary map constraint. */
-  const collectionDrawable = useMemo(
+  /** Matching records with a public map point, before any temporary map limit (a radius). */
+  const drawable = useMemo(
     () =>
       view.collectionFacts
         ? drawableCollection(
@@ -795,80 +646,140 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         : null,
     [view.collectionFacts, view.allFeatures, collectionState, collectionMembers],
   );
-  /** Decade-range controls: native GET to `/explore`, every other param carried as hidden fields. */
-  const period = normalizePeriod({
-    start: collectionState.periodStart,
-    end: collectionState.periodEnd,
-    includeUndated: collectionState.includeUndated,
-  });
-  const periodDecades = useMemo(
-    () =>
-      view.collectionFacts
-        ? periodDecadesFor(view.collectionFacts, collectionState, collectionMembers)
-        : [],
-    [view.collectionFacts, collectionState, collectionMembers],
-  );
-  const {
-    periodStart: _periodStart,
-    periodEnd: _periodEnd,
-    includeUndated: _includeUndated,
-    ...periodBase
-  } = collectionState;
-  const periodPreserved = Object.fromEntries(
-    new URLSearchParams(buildExploreSearchParams(periodBase)).entries(),
-  );
+  const unmapped = drawable !== null ? Math.max(0, collectionMatched - drawable) : 0;
+  const matchingRecordsHref = recordsHref(recordsQueryFromExplore(collectionState));
+
+  /* —— What the column shows. —— */
+  const columnView = inspector ? 'inspector' : filtersOpen ? 'filters' : 'list';
+  const count = listed.length;
+  const countHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const closeInspector = useCallback(() => {
+    setSelectedId(undefined);
+    requestAnimationFrame(() => countHeadingRef.current?.focus({ preventScroll: true }));
+  }, []);
+  const toggleFilters = useCallback(() => {
+    setFiltersOpen((open) => {
+      if (phoneRef.current) setDetent(open ? 'half' : 'full');
+      return !open;
+    });
+  }, []);
+
   /**
-   * Current collection and documented-range status for the instruments that otherwise speak for
-   * the whole archive (the time slider, the Filters chip). Undefined when nothing is narrowed or
-   * the scope cannot be counted, so the archive-wide wording stays true.
+   * The brushed range on a wide screen is echoed by the dock's own label and clear, so the column
+   * does not repeat it. On a phone the brush lives inside Filters, and the echo is its only trace
+   * on the list.
    */
-  const scopeStatus =
-    view.collectionFacts &&
-    unresolvedScope === undefined &&
-    (namedCollection !== '' || periodIsActive(period))
+  const columnConstraints = phone
+    ? constraints
+    : constraints.filter((constraint) => constraint.key !== 'period');
+  /** The Filters badge counts what the Filters state itself sets: never the header search. */
+  const filterCount = columnConstraints.filter(
+    (constraint) => constraint.key !== 'q' && constraint.key !== 'decade',
+  ).length;
+
+  const echoes = [
+    ...(overlapIds
       ? [
-          namedCollection !== ''
-            ? `Collection narrowed: ${collectionMatched.toLocaleString('en-US')} ${collectionMatched === 1 ? 'record' : 'records'}`
-            : `Documented range: ${collectionMatched.toLocaleString('en-US')} ${collectionMatched === 1 ? 'record' : 'records'}`,
-          ...(periodIsActive(period) ? [periodLabel(period)] : []),
-        ].join(', ')
-      : undefined;
-  /** Temporary map constraints. They limit what is drawn, never what is in the collection. */
-  const mapLimits = [
-    ...(nearby ? ['nearby'] : []),
-    ...(sweepDecade !== null ? ['the time sweep'] : []),
-    ...(overlapIds ? ['overlapping pins'] : []),
+          {
+            key: 'overlap',
+            label: `${(overlapFeatures?.length ?? 0).toLocaleString('en-US')} records at this spot`,
+            onClear: () => setOverlapIds(null),
+          },
+        ]
+      : []),
+    ...columnConstraints,
   ];
 
-  /** Compact: is any sheet up? The on-map controls ride above it (map-controls.css). */
-  const compactSheetOpen =
-    narrow &&
-    (showLens || showResults || sheetOpen || (mode === 'atlas' && !chromeHidden && panels.decade));
-  /** Wide: the controls sit in the top-right corner of the *free* map, left of any right column. */
-  const controlsRight = (() => {
-    if (narrow) return null;
-    const edge = 16;
-    const gap = 12;
-    if (sheetOpen) return edge + 430 + gap;
-    if (showResults) return edge + 344 + gap;
-    return edge;
-  })();
+  const header = !ready ? (
+    <h2 className="ds-xcol__count">Loading records</h2>
+  ) : inspector ? (
+    <button type="button" className="ds-xcol__back" onClick={closeInspector}>
+      <BackIcon />
+      All records
+    </button>
+  ) : (
+    <>
+      <h2 className="ds-xcol__count" tabIndex={-1} ref={countHeadingRef} aria-live="polite">
+        {count.toLocaleString('en-US')}{' '}
+        <span className="ds-xcol__count-unit">{count === 1 ? 'record' : 'records'}</span>
+      </h2>
+      <FilterButton
+        count={filterCount}
+        aria-expanded={filtersOpen}
+        aria-controls="explore-filters"
+        onClick={toggleFilters}
+      >
+        Filters
+      </FilterButton>
+    </>
+  );
+
+  const brush = (
+    <DecadeBrush
+      bars={decadeBars}
+      range={
+        period.start !== '' && period.end !== '' && !periodIsInvalid(period)
+          ? { start: Number(period.start), end: Number(period.end) }
+          : null
+      }
+      onChange={(range) => setPeriod(range?.start ?? null, range?.end ?? null)}
+    />
+  );
+
+  const list = (
+    <>
+      {unresolvedScope !== undefined ? (
+        <p className="ds-xcol__note" role="status">
+          {unresolvedScope}
+        </p>
+      ) : null}
+      <ExploreRecordList
+        features={listed}
+        period={periodIsActive(period) ? period : undefined}
+        selectedId={selectedId}
+        onSelect={select}
+        distanceLabels={distanceLabels}
+        emptyState={
+          <EmptyState
+            constraints={{
+              ...(evidenceFloor !== 'any' ? { evidenceFloor } : {}),
+              ...(era !== 'all' ? { decade: era } : {}),
+              ...(stateCode ? { state: stateCode } : {}),
+              ...(kindFamily ? { kind: kindFamily } : {}),
+              ...(query ? { query } : {}),
+            }}
+            onReset={resetLens}
+          />
+        }
+      />
+      {unmapped > 0 && !overlapIds ? (
+        <p className="ds-xcol__note">
+          {unmapped.toLocaleString('en-US')} matching{' '}
+          {unmapped === 1 ? 'record has' : 'records have'} no place on the map.{' '}
+          <a href={matchingRecordsHref}>See them in Records</a>
+        </p>
+      ) : null}
+    </>
+  );
 
   return (
     /* `data-key-scope` is what makes the bare camera, time and record keys legal here and nowhere
-       else. `handleKeyStroke` walks up from the keystroke's target looking for it, so Explore
-       marking its own root is the entire scope contract — no route check, no second list. */
+       else. `handleKeyStroke` walks up from the keystroke's target looking for it. */
     <div
-      ref={atlasRootRef}
-      inert={!view.collectionFacts}
-      aria-busy={!view.collectionFacts}
       className={embedded ? 'ds-atlas ds-atlas--embedded' : 'ds-atlas'}
+      inert={!ready}
+      aria-busy={!ready}
       data-key-scope="instrument"
       data-chrome={chromeHidden ? 'hidden' : 'shown'}
       data-mode={mode}
-      data-embedded={embedded ? 'true' : undefined}
-      data-sheet-open={compactSheetOpen ? 'true' : undefined}
-      data-collection={showCollection ? 'shown' : undefined}
+      data-detent={phone ? shownDetent : undefined}
+      style={
+        phone
+          ? ({
+              '--ds-xcol-detent-h': `${sheetHeightFor(shownDetent, viewportHeight)}px`,
+            } as React.CSSProperties)
+          : undefined
+      }
     >
       {embedded ? null : (
         <CommandBar
@@ -885,8 +796,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       {!stage.mapAvailable ? (
         <div className="ds-atlas__notice">
           <Notice tone="warning" title="Map unavailable">
-            The map canvas could not start on this device. Every record is still listed and
-            searchable in the rail and the palette.
+            The map could not start on this device. Every record is still listed beside it and in
+            Records.
           </Notice>
         </div>
       ) : null}
@@ -914,198 +825,101 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         />
       ) : null}
 
-      <SheetPresence show={showLens}>
-        <LensPanel
-          // The same count the Records dock and rail show — they list `sorted`, which drops
-          // internal placeholder records, and the two numbers used to disagree by that much.
-          matched={sorted.length}
-          total={view.allFeatures.length}
-          stateOptions={stateOptions}
-          state={stateCode}
-          onStateChange={setStateCode}
-          onNearMe={nearMe}
-          locating={locateStatus === 'locating'}
-          onRadiusChange={onRadiusChange}
-          catalogFeatures={view.allFeatures}
-          onPlaceResolved={onPlaceResolved}
-          kindCounts={kindCounts}
-          kindFamily={kindFamily}
-          onKindFamilyChange={setKindFamily}
-          evidenceFloor={evidenceFloor}
-          onEvidenceFloorChange={setEvidenceFloor}
-          topicOptions={topicCounts}
-          topicId={topicId}
-          onTopicChange={setTopicId}
-          layers={layers}
-          onLayerToggle={(layer: LensLayerKey) =>
-            setLayers((current) => ({ ...current, [layer]: !current[layer] }))
+      {chromeHidden || mode !== 'atlas' ? null : (
+        <ExploreColumn
+          sheet={phone}
+          detent={shownDetent}
+          onDetentChange={setDetent}
+          viewportHeight={viewportHeight}
+          view={columnView}
+          busy={!ready}
+          header={header}
+          echoes={
+            ready && columnView !== 'inspector' && echoes.length > 0 ? (
+              <div className="ds-xcol__echoes" role="group" aria-label="Active filters">
+                {echoes.map((echo) => (
+                  <Chip
+                    key={echo.key}
+                    className="ds-xcol__echo"
+                    removable
+                    label={echo.label}
+                    onClick={echo.onClear}
+                  >
+                    {echo.label}
+                  </Chip>
+                ))}
+                {columnConstraints.length > 1 ? (
+                  <Button variant="quiet" className="ds-xcol__clear" onClick={resetLens}>
+                    Clear all
+                  </Button>
+                ) : null}
+              </div>
+            ) : null
           }
-          layerMode={layerMode}
-          onLayerModeChange={setLayerMode}
-          areaFillPermitted={areaFillPermitted}
-          presence={presence}
-          onShowLegend={() => setLegendOpen(true)}
-          onReset={resetLens}
-          onHide={() => hidePanel('lens')}
-          escapeDismiss={narrow}
-        />
-      </SheetPresence>
-
-      {showCollection ? (
-        <CollectionContext
-          className="ds-collection--atlas"
-          activeView="map"
-          mapHref={collectionHrefs.map}
-          recordsHref={collectionHrefs.records}
-          chronologyHref={collectionHrefs.chronology}
-          {...(view.collection?.state === 'live'
-            ? {
-                source: {
-                  label: view.collection.title,
-                  href: view.collection.href,
-                  unresolvedCount: view.collection.unresolvedCount,
-                },
-              }
-            : {})}
-          {...(unresolvedScope !== undefined ? { unresolved: unresolvedScope } : {})}
-          {...(view.collectionFacts && unresolvedCollection === undefined
-            ? {
-                period: (
-                  <CollectionPeriodControls
-                    action="/explore"
-                    preserved={periodPreserved}
-                    decades={periodDecades}
-                    start={period.start}
-                    end={period.end}
-                    includeUndated={period.includeUndated}
-                    clearHref={buildExploreHref(periodBase)}
-                  />
-                ),
-                periodSummary: periodIsActive(period)
-                  ? periodLabel(period)
-                  : 'Documented decade range',
-              }
-            : {})}
-          ready={Boolean(view.collectionFacts)}
-          matched={view.collectionFacts ? collectionMatched : null}
-          drawable={collectionDrawable}
-          onMap={overlapFeatures?.length ?? filtered.length}
-          mapLimits={mapLimits}
-          announce
-        />
-      ) : null}
-
-      <SheetPresence show={showResults}>
-        <ResultsRail
-          photos={railPhotos}
-          onIntent={() => setRailTouched(true)}
-          features={overlapFeatures ?? sorted}
-          total={view.allFeatures.length}
-          /* The strip above owns the collection count and the list link while it is visible; the
-             rail keeps both only as the return path when the strip is hidden. */
-          {...(showCollection
-            ? {}
-            : {
-                collectionLabel:
-                  nearby || sweepDecade !== null
-                    ? `${collectionMatched.toLocaleString('en-US')} records in collection. ${filtered.length.toLocaleString('en-US')} shown with map constraints.`
-                    : mapListContinuityLabel(collectionMatched, filtered.length),
-                collectionHref: collectionHrefs.records,
-              })}
-          selectedId={selectedId}
-          onSelect={select}
-          sort={sort}
-          onSortChange={setSort}
-          distanceLabels={distanceLabels}
-          savedIds={savedSet}
-          onToggleSave={toggleSave}
-          onHide={() => hidePanel('results')}
-          constraints={[
-            ...(overlapIds
-              ? [
-                  {
-                    key: 'overlap',
-                    label: `${overlapFeatures?.length ?? 0} overlapping pins`,
-                    onClear: () => setOverlapIds(null),
-                  },
-                ]
-              : []),
-            ...constraints.map((constraint): ResultsConstraint => ({
-              key: constraint.key,
-              label: constraint.label,
-              onClear: constraint.onClear,
-            })),
-          ]}
-          emptyState={
-            <EmptyState
-              constraints={{
-                ...(evidenceFloor !== 'any' ? { evidenceFloor } : {}),
-                ...(decade !== null ? { decade: eraBucketFor(decade) } : {}),
-                ...(stateCode ? { state: stateCode } : {}),
-                ...(kindFamily ? { kind: kindFamily } : {}),
-              }}
-              onReset={resetLens}
-            />
-          }
-        />
-      </SheetPresence>
-
-      <SheetPresence show={mode === 'atlas' && !chromeHidden && panels.decade}>
-        <TimePanel
-          bars={decadeBars}
-          decade={decade}
-          onDecadeChange={setDecade}
-          totalRecords={view.allFeatures.length}
-          scope={scopeStatus}
-        />
-      </SheetPresence>
-      {/*
-       * The dock. Two different objects sharing one row of chips.
-       *
-       * Wide: the Filters toggle, plus a chip for anything else the reader has hidden. `data-dock`
-       * is the focus contract's handle — hiding a panel moves focus to the chip that brings it back.
-       *
-       * Narrow: the four-way instrument switcher. Four panels do not fit on a phone, so the
-       * surface shows one at a time and the dock is how the reader changes which — the mechanism
-       * the dock already existed for, rather than a second one invented for small screens.
-       */}
-      {!chromeHidden ? (
-        <div
-          className="ds-atlas__dock"
-          data-switcher={narrow ? 'true' : undefined}
-          data-browse-chrome="true"
         >
-          {NARROW_INSTRUMENTS.map(({ key, label }) => {
-            if (!(narrow || key === ALWAYS_DOCKED || !panels[key])) return null;
-            // A hidden Lens/Results is a peek, not a blank chip: the reader closed the panel, not
-            // its state, so the dock keeps reporting what that state is — the literal "closed but
-            // still visible" instrument the chip was always meant to be, just without a live
-            // count to prove it before now.
-            const detail =
-              key === 'lens'
-                ? constraints.length === 0
-                  ? scopeStatus !== undefined
-                    ? 'no map filters'
-                    : 'no filters'
-                  : `${constraints.length} filter${constraints.length === 1 ? '' : 's'}`
-                : key === 'results'
-                  ? `${sorted.length} of ${view.allFeatures.length}`
-                  : null;
-            return (
-              <button
-                key={key}
-                type="button"
-                data-dock={key}
-                aria-pressed={panels[key]}
-                onClick={() => (panels[key] ? hidePanel(key) : restorePanel(key))}
-              >
-                <span className="ds-atlas__dock-label">{label}</span>
-                {detail ? <span className="ds-atlas__dock-detail">{detail}</span> : null}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+          {!ready ? (
+            <div className="ds-xcol__loading" aria-hidden="true">
+              {Array.from({ length: 8 }, (_, index) => (
+                <span key={index} />
+              ))}
+            </div>
+          ) : inspector ? (
+            <RecordInspector
+              record={inspector}
+              {...(selectedIndex >= 0
+                ? { position: { index: selectedIndex + 1, total: listed.length } }
+                : {})}
+              onStep={stepRecord}
+            />
+          ) : (
+            <>
+              {filtersOpen ? (
+                <div className="ds-xcol__refine" id="explore-filters">
+                  <ExploreFilters
+                    place={
+                      <PlaceControl
+                        catalogFeatures={view.allFeatures}
+                        onResolved={onPlaceResolved}
+                        // The map's locate button is the one locate control; a phone sheet at
+                        // full height covers it, so there the field carries the action instead.
+                        {...(phone && shownDetent === 'full'
+                          ? { onLocate: nearMe, locating: locateStatus === 'locating' }
+                          : {})}
+                        placed={nearby !== null}
+                        radiusId={radiusId}
+                        onRadiusChange={onRadiusChange}
+                        autoFocus={findPlace}
+                      />
+                    }
+                    {...(phone ? { when: brush } : {})}
+                    kindCounts={kindCounts}
+                    kindFamily={kindFamily}
+                    onKindFamilyChange={setKindFamily}
+                    evidenceFloor={evidenceFloor}
+                    onEvidenceFloorChange={setEvidenceFloor}
+                    topics={topicCounts}
+                    topicId={topicId}
+                    onTopicChange={setTopicId}
+                    sort={sort}
+                    onSortChange={setSort}
+                    canSortByDistance={nearby !== null}
+                    layerMode={layerMode}
+                    onLayerModeChange={setLayerMode}
+                    areaFillPermitted={areaFillPermitted}
+                    layers={layers}
+                    onLayerToggle={(layer) =>
+                      setLayers((current) => ({ ...current, [layer]: !current[layer] }))
+                    }
+                  />
+                </div>
+              ) : null}
+              {list}
+            </>
+          )}
+        </ExploreColumn>
+      )}
+
+      {!phone && !chromeHidden && mode === 'atlas' ? <div className="ds-xdock">{brush}</div> : null}
 
       {mode === 'atlas' && !chromeHidden && stage.mapAvailable ? (
         <MapControls
@@ -1123,42 +937,16 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           located={nearby?.source === 'device'}
           bearing={bearing}
           onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
-          {...(controlsRight !== null
-            ? {
-                style: {
-                  '--ds-map-controls-right': `${controlsRight}px`,
-                } as React.CSSProperties,
-              }
-            : {})}
         />
       ) : null}
 
-      {legendOpen ? (
-        <div className="ds-atlas__legend-overlay" role="dialog" aria-label="Legend">
-          <MapExperienceLegend
-            layerMode={layerMode}
-            {...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {})}
-            onHide={() => setLegendOpen(false)}
-          />
-        </div>
-      ) : null}
-
-      <p className="ds-atlas__readout" role="status" aria-live="polite">
+      <p className="ds-atlas__readout ds-visually-hidden" role="status" aria-live="polite">
         {readout}
       </p>
 
-      <PinPhotoLayer target={atlasPinPhotoTarget} photosUrl="/atlas/photos" />
-
-      <SheetPresence show={sheetOpen}>
-        <RecordSheet
-          record={sheetRecord ?? leavingSheet}
-          onClose={() => setSelectedId(undefined)}
-          {...(selectedIndex >= 0
-            ? { position: { index: selectedIndex + 1, total: (overlapFeatures ?? sorted).length } }
-            : {})}
-          onStep={stepRecord}
-        />
-      </SheetPresence>
+      {/* Hover only: a selected record's photo is in the inspector, and a card over the pin would
+          hide the copper mark that says which record is selected. */}
+      <PinPhotoLayer target={atlasHoverTarget} photosUrl="/atlas/photos" />
 
       <CommandPalette
         open={paletteOpen}
@@ -1174,10 +962,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             setPaletteOpen(false);
             return;
           }
-          // The palette searches the whole index, but only records with a feature in the current
-          // projection can be selected on the map. Every record still has a page, so records with
-          // no pin fall through to their page. `kind` selects the correct route for entities that
-          // are not mappable, including laws, cases, and national organizations.
+          // Only records with a point in this projection can be selected on the map; the rest
+          // still have a page. `kind` picks the route for records that are not mappable.
           setPaletteOpen(false);
           const walk = atlasWalkHref({
             displayName: record.name,
@@ -1211,9 +997,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             select(feature);
             return;
           }
-          // Same as the palette: a saved record whose pin is not in this projection still opens.
-          // `SavedRecord` does not persist a summary, so this fallback still relies on the
-          // `PLACE_PAGE_STAND_IDS` shortcut for a place-kind save with no other signal.
           const walk = atlasWalkHref({
             displayName: record.name,
             kind: record.kind,

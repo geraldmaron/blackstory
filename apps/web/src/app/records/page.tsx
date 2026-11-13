@@ -9,7 +9,8 @@
  * all resolve here in one hop — so it must never 404 and must render something honest for any
  * param combination a stale bookmark carries.
  *
- * Plate posture: Parked. This room never shows the map; the off-ramp hands the narrowing to it.
+ * Plate posture: Parked. This room never shows the map; "Show these on the map" hands the
+ * narrowing to it.
  */
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -86,7 +87,7 @@ export default async function RecordsPage({ searchParams }: RecordsPageProps) {
       {model.nextHref === undefined ? null : (
         <link rel="next" href={new URL(model.nextHref, SITE_URL).toString()} />
       )}
-      <RecordsIndexRoom model={model} releaseLabel="Active release" />
+      <RecordsIndexRoom model={model} />
     </>
   );
 }

@@ -57,8 +57,6 @@ export type StoryChapter = {
   /** Which beat of the argument this chapter fills. */
   readonly stage: StoryStage;
   readonly camera: ChapterCamera;
-  /** Centerd card, no index badge. The cold open and the outro. */
-  readonly centered: boolean;
   /** Radial spotlight over the chapter's own center, as a percentage radius. */
   readonly spotlightRadiusPercent?: number;
   /** Draw the migration corridors. */
@@ -81,13 +79,6 @@ export type StoryChapter = {
 };
 
 /**
- * `threshold: 0.42` against the story scroll container. Low enough that a chapter fires before it
- * is fully centered (the camera needs a head start), high enough that a chapter clipping the
- * viewport edge does not steal the camera from the one the reader is reading.
- */
-export const CHAPTER_INTERSECTION_THRESHOLD = 0.42;
-
-/**
  * The authored pool. This is not the running order: `pickStoryChapters` draws from it per visit and
  * assigns the real `index`. The `index` values here are the pool's own default ordering, kept so a
  * caller that wants the canonical full sequence still gets a sensible one.
@@ -98,14 +89,12 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
     id: 'cold-open',
     stage: 'opening',
     camera: { center: [-96.5, 38.6], zoom: 3.35, pitch: 0, bearing: 0 },
-    centered: true,
   },
   {
     index: 1,
     id: 'thickest',
     stage: 'shape',
     camera: { center: [-90.05, 32.3], zoom: 5.1, pitch: 34, bearing: -14 },
-    centered: false,
     spotlightRadiusPercent: 20,
   },
   {
@@ -115,7 +104,6 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
     // The fallback framing, used only when the release yields no eligible record. The chapter
     // normally flies to whatever `pickStoryRecord` returned, at whatever zoom the dignity gate allows.
     camera: { center: [-86.81, 33.52], zoom: 13.4, pitch: 56, bearing: 24 },
-    centered: false,
     focusRandomRecord: true,
   },
   {
@@ -123,7 +111,6 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
     id: 'migration',
     stage: 'context',
     camera: { center: [-88.2, 37.6], zoom: 4.05, pitch: 42, bearing: 0 },
-    centered: false,
     routes: true,
     rotatingFact: true,
   },
@@ -139,7 +126,6 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
     id: 'second-context',
     stage: 'context',
     camera: { center: [-89.4, 36.2], zoom: 4.2, pitch: 30, bearing: 0 },
-    centered: false,
     rotatingFact: true,
   },
   {
@@ -147,7 +133,6 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
     id: 'four-centuries',
     stage: 'time',
     camera: { center: [-95.2, 39.2], zoom: 3.5, pitch: 0, bearing: 0 },
-    centered: false,
     sweep: true,
   },
   {
@@ -155,7 +140,6 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
     id: 'your-turn',
     stage: 'closing',
     camera: { center: [-96.5, 38.6], zoom: 3.4, pitch: 0, bearing: 0 },
-    centered: true,
   },
 ];
 

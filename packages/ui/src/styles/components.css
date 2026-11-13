@@ -518,6 +518,14 @@
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
+  /* A long value (a story title echo) truncates instead of pushing past its row. */
+  max-width: 100%;
+}
+
+.ds-chip__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 44px hit area around the 32px chip. */
@@ -605,6 +613,11 @@
 .ds-tabs__tab[aria-current='page'] {
   color: var(--ds-ink);
   font-weight: 600;
+}
+
+/* The page you are on, with nowhere to go: not a control. */
+span.ds-tabs__tab {
+  cursor: default;
 }
 
 /* The current mark is a bar under the label, not a box around it, and never color alone. */

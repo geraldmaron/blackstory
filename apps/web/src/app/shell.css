@@ -2018,15 +2018,35 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
  * library's default regardless of load order.
  */
 .ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact {
+  box-sizing: border-box;
+  min-width: 1.75rem;
   min-height: 1.75rem;
-  padding: 0;
+  /* Room for the info button, which MapLibre pins to the right edge. Collapsed, the control is
+     exactly that button. */
+  padding: 0 1.75rem 0 0;
   background-color: color-mix(in srgb, var(--ds-surface) 92%, transparent);
   color: var(--ds-ink);
 }
 
 .ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
-  background: transparent;
+  /* `background-color`, not the `background` shorthand: the shorthand also cleared the button's
+     icon, which left the collapsed attribution as an empty box with nothing to press. The glyph is
+     drawn in the muted ink of each theme (a data URI cannot read a custom property). */
+  background-color: transparent;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7.25' fill='none' stroke='%236D675F' stroke-width='1.5'/%3E%3Cpath d='M10 9v5' stroke='%236D675F' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='6.5' r='1' fill='%236D675F'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 18px;
   color: var(--ds-ink-muted);
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+[data-theme='dark']
+  .ds-map-stage
+  .maplibregl-ctrl-attrib.maplibregl-compact
+  .maplibregl-ctrl-attrib-button {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7.25' fill='none' stroke='%23A39B8F' stroke-width='1.5'/%3E%3Cpath d='M10 9v5' stroke='%23A39B8F' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='6.5' r='1' fill='%23A39B8F'/%3E%3C/svg%3E");
 }
 
 .ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner,
@@ -2175,15 +2195,6 @@ body:has(.ds-explore-stage[data-results='open']) {
       min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
     );
   }
-}
-
-/*
- * State abbreviations are MapLibre markers whose opacity follows the zoom continuously
- * (MapStage's `updateStateLabelOpacity`). MapLibre gives every marker a 0.2s opacity transition;
- * here it only restarted on every zoom frame and made the fade trail the camera.
- */
-.ds-state-label.maplibregl-marker {
-  transition: none;
 }
 
 /* Place-search orientation pin — copper head + stem; not an entity hit target. */

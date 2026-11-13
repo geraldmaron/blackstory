@@ -1,245 +1,787 @@
 /**
- * `/records` — the only styles this room adds on top of the shared kit.
+ * `/records` — the register: toolbar, filter menus and sheet, active-filter row, research rows,
+ * outcome states and pager. The page frame, buttons, chips and Segmented come from @repo/ui; the
+ * timeline bands are records-chronology.css.
  *
- * Everything structural (the column, the chip, the hairline row) comes
- * from `components/room/room-kit.css`. What is left here is what the index has that no other
- * room does: the control line, the facet disclosures, the grade dot and the pager. The GET find
- * field and the active-constraint row used to live here too; /law renders both, so they moved
- * into the kit. Anything a second room renders moves there the same way rather than being copied.
+ * Spacing uses the shared scale only (4, 8, 12, 16, 24, 32, 48, 72).
  */
 
-/* —— the workbench ————————————————————————————————————————————————————————————
-   Collection heading and view choice, then find and facets, as one unit under the header. The
-   collection strip drops its own box here (`ds-collection--flat`) so there is one panel edge, not
-   a card inside a card. */
-.ds-records-workbench {
-  display: grid;
-  gap: var(--ds-space-3);
-  margin-block: var(--ds-space-4) var(--ds-space-5);
-  padding-bottom: var(--ds-space-4);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-records-workbench > .ds-find {
-  margin: 0;
-}
-
-/* —— the control line: find field and facets, side by side ————————————————————
-   The room used to open on a panel of six labeled chip rows, which cost most of a screen before
-   the first record. One line instead: a GET search field that takes the spare width, then one
-   disclosure per facet. Both halves work with JavaScript off. */
-/* The tray below is positioned against this row, so it needs to be the containing block. */
-.ds-records-controls {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
-  /* Sits inside the kit's FindBar, which owns the spacing around the whole bar. */
-  margin: 0;
-}
-
-/* —— facets: one pill each, opening onto its own vocabulary ————————————————————
-   A native `<details>`, so the menu is markup rather than a script: the pill states the group and
-   the value currently narrowing it, and opening it lists the chips that change that value. */
-/*
- * Deliberately not `position: relative`. The tray below spans the whole control row, so its
- * containing block has to be `.ds-records-controls`; making the disclosure a containing block
- * is what pinned each tray to its own 80px pill in the first place.
- */
-.ds-records-facet {
-  flex: none;
-}
-
-.ds-records-facet__pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-full);
-  color: var(--ds-ink);
-  font-size: var(--ds-text-caption);
-  list-style: none;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-/* Safari draws its own disclosure triangle from a pseudo-element `list-style: none` misses. */
-.ds-records-facet__pill::-webkit-details-marker {
+/* The shell draws a copper reading-progress bar on reading surfaces. A register is not read
+   front to back, and copper is for the current thing, so the bar stays off here. */
+body:has(.ds-records) .ds-reading-progress {
   display: none;
 }
 
-.ds-records-facet__pill:hover {
-  border-color: var(--ds-border-strong);
+.ds-records {
+  /* The sticky toolbar's height, which the timeline's sticky decade labels and every jump
+     target clear. 44px controls plus 12px above and below. */
+  --records-bar-h: 68px;
 }
 
-.ds-records-facet__pill[data-active] {
-  background: var(--room-copper-wash);
-  border-color: var(--ds-accent-graphic);
-  color: var(--ds-accent);
+/* —— toolbar ———————————————————————————————————————————————————————————————— */
+.ds-records-toolbar {
+  position: sticky;
+  top: var(--ds-island-clearance);
+  z-index: var(--ds-z-content, 1);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-canvas);
 }
 
-.ds-records-facet__value::before {
-  content: '· ';
-  opacity: 0.6;
+.ds-records-toolbar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: var(--records-bar-h);
 }
 
-/*
- * One tray, the width of the control row, under all of the pills.
- *
- * It used to be six trays, each anchored to its own pill with `width: max-content` and a
- * 28rem cap. A pill is about 80px wide and a vocabulary is not, so every tray ran far past its
- * pill and straight across its neighbors. With the disclosures independent, all six could be
- * open at once, and the row became a stack of half-legible panels with their labels cut off.
- *
- * Spanning the row fixes both halves. Nothing overlaps, because only one facet opens at a time
- * now; nothing is clipped at the right edge, because the tray starts and ends where the controls
- * do rather than where one pill happens to sit.
- *
- * Still over the list rather than shoving it down: an open facet is one click, and reflowing the
- * index underneath would move the rows the reader came to read.
- */
-.ds-records-facet__menu {
-  position: absolute;
-  z-index: var(--ds-z-atlas-pill);
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
+.ds-records-toolbar__facets {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  padding: var(--ds-space-3);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
+  gap: var(--ds-space-2);
 }
 
-/*
- * The fallback for a browser without exclusive `<details>` (name=). There, more than one can be
- * open, and without this the last one in the DOM would win on paint order alone. Raising the
- * one the reader just opened is not possible in CSS, so they simply stack in a readable order
- * instead of overlapping at the same depth.
- */
-.ds-records-facet[open] .ds-records-facet__menu {
-  z-index: calc(var(--ds-z-atlas-pill) + 1);
-}
-
-/* One step tighter than a chip standing on its own: inside the panel there are six rows of them
-   and the height of a single chip is multiplied by every row. */
-.ds-records-facet__menu .ds-room-chip {
-  height: 26px;
-  padding: 0 8px;
-  gap: 5px;
-  font-size: var(--ds-text-caption);
-}
-
-/* —— the grade dot ——————————————————————————————————————————————————————————
-   Grade is never color alone: the tier word sits beside the dot in mono, which is what makes
-   the row readable to a screen reader and to a reader who cannot separate the hues. */
-/*
- * The evidence mark: the shared three-segment meter plus the letter, the same pairing the Explore
- * results rail, the record sheet and the record page draw. This index used to own a third grade
- * treatment whose A was copper — the accent color, not the confidence scale — so the same record
- * carried a different grade language on every surface a reader could meet it.
- */
-.ds-records-grade {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  color: var(--room-ink-4, var(--ds-ink-subtle));
-}
-
-.ds-records-grade__meter .ds-rec-meter__seg {
-  width: 7px;
-  height: 3px;
-  border-radius: 1px;
-}
-
-.ds-records-grade__letter {
-  min-width: 0.5rem;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.ds-records-grade__letter[data-grade='high'] {
-  color: var(--ds-confidence-high-fg);
-}
-
-.ds-records-grade__letter[data-grade='medium'] {
-  color: var(--ds-confidence-medium-fg);
-}
-
-.ds-records-grade__letter[data-grade='low'] {
-  color: var(--ds-confidence-low-fg);
-}
-
-/* —— the pager: real anchors, never a client-side page counter ————————————————— */
-.ds-records-pager {
+.ds-records-toolbar__end {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--ds-space-3);
-  margin-top: var(--ds-space-6);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  margin-left: auto;
 }
 
-.ds-records-pager__link {
-  font-size: var(--ds-text-caption);
-  font-weight: 550;
+.ds-records-toolbar__glyph {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-records-toolbar__sheet-button {
+  display: none;
+}
+
+/* The glyph and label sit on one line inside the kit button's label span. */
+.ds-records-toolbar__sort > span:first-child,
+.ds-records-toolbar__sheet-button > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+/* Each menu drops from its own button. Anchor names pair a button with its menu by key. */
+.ds-records-toolbar__facet[data-key='kind'] {
+  anchor-name: --records-kind;
+}
+.ds-records-toolbar__facet[data-key='era'] {
+  anchor-name: --records-era;
+}
+.ds-records-toolbar__facet[data-key='state'] {
+  anchor-name: --records-state;
+}
+.ds-records-toolbar__facet[data-key='topic'] {
+  anchor-name: --records-topic;
+}
+.ds-records-toolbar__facet[data-key='status'] {
+  anchor-name: --records-status;
+}
+.ds-records-toolbar__facet[data-key='evidence'] {
+  anchor-name: --records-evidence;
+}
+.ds-records-toolbar__facet[data-key='sort'] {
+  anchor-name: --records-sort;
+}
+.ds-records-menu[data-key='kind'] {
+  position-anchor: --records-kind;
+}
+.ds-records-menu[data-key='era'] {
+  position-anchor: --records-era;
+}
+.ds-records-menu[data-key='state'] {
+  position-anchor: --records-state;
+}
+.ds-records-menu[data-key='topic'] {
+  position-anchor: --records-topic;
+}
+.ds-records-menu[data-key='status'] {
+  position-anchor: --records-status;
+}
+.ds-records-menu[data-key='evidence'] {
+  position-anchor: --records-evidence;
+}
+.ds-records-menu[data-key='sort'] {
+  position-anchor: --records-sort;
+}
+
+/* —— menus: native popovers of GET links ——————————————————————————————————————— */
+.ds-records-menu,
+.ds-records-sheet {
+  box-sizing: border-box;
+  margin: auto;
+  padding: 0;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-contact-plate);
   color: var(--ds-ink);
+}
+
+.ds-records-menu {
+  width: min(20rem, 100vw - var(--ds-space-8));
+  max-height: min(26rem, 100dvh - var(--ds-space-12));
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.ds-records-menu:popover-open {
+  display: flex;
+}
+
+.ds-records-menu::backdrop,
+.ds-records-sheet::backdrop {
+  background: transparent;
+}
+
+@supports (position-area: bottom) {
+  .ds-records-menu {
+    position-area: bottom span-right;
+    position-try-fallbacks:
+      bottom span-left,
+      top span-right;
+    margin: var(--ds-space-2) 0 0;
+    max-height: min(26rem, 100dvh - var(--ds-island-clearance) - 140px);
+  }
+
+  /* Sort sits at the right edge, so its menu opens leftward and stays inside the column. */
+  .ds-records-menu[data-key='sort'] {
+    position-area: bottom span-left;
+  }
+}
+
+.ds-records-menu__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* On wide screens the button names the menu, so its title is for assistive tech only and the
+   head shows only when there is a Clear. The phone sheet restores both. */
+.ds-records-menu:not(:has(.ds-records-menu__clear)) .ds-records-menu__head {
+  display: none;
+}
+
+.ds-records-menu .ds-records-menu__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ds-records-menu__clear {
+  margin-left: auto;
+}
+
+.ds-records-menu__title {
+  margin: 0 auto 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.ds-records-menu__clear {
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.25em;
+}
+
+.ds-records-menu__clear:hover {
+  color: var(--ds-ink);
+  text-decoration-color: currentColor;
+}
+
+/* The menu closes on Escape and outside click; Close is for touch, where neither is obvious. */
+.ds-records-menu__close {
+  display: none;
+}
+
+.ds-records-menu__list {
+  margin: 0;
+  padding: var(--ds-space-1) 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+}
+
+.ds-records-menu__option {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-4);
+  color: var(--ds-ink);
+  font-size: var(--ds-text-body-sm);
   text-decoration: none;
 }
 
-.ds-records-pager__link:hover {
-  color: var(--ds-accent);
+.ds-records-menu__option:hover {
+  background: var(--ds-surface-sunken);
 }
 
-.ds-records-pager__at {
+.ds-records-menu__option:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-records-menu__option[aria-current='true'] {
+  font-weight: 600;
+}
+
+.ds-records-menu__check {
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink);
+}
+
+.ds-records-menu__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-records-menu__count {
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
 }
 
-.ds-records-pager__spacer {
-  flex: 0 0 1px;
-}
-
-/* A long facet's tray holds one native select across the tray: every value, one picker. */
-.ds-records-facet__form {
-  display: flex;
-  flex: 1 1 100%;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
+.ds-records-menu__empty {
   margin: 0;
+  padding: var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
 }
 
-.ds-records-facet__form .ds-pill-select {
-  flex: 1 1 16rem;
+/* —— the phone and tablet sheet ———————————————————————————————————————————————— */
+.ds-records-sheet__list {
+  margin: 0;
+  padding: 0 0 var(--ds-space-2);
+  list-style: none;
 }
 
-.ds-records-facet__form .ds-pill-select__control {
-  flex: 1 1 auto;
+.ds-records-sheet__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 1rem;
+  align-items: center;
+  gap: var(--ds-space-3);
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0 var(--ds-space-4);
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  font-size: var(--ds-text-body-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-records-sheet__list li:last-child .ds-records-sheet__row {
+  border-bottom: 0;
+}
+
+.ds-records-sheet__name {
+  font-weight: 600;
+}
+
+.ds-records-sheet__value {
+  overflow: hidden;
+  color: var(--ds-ink-muted);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-records-sheet__chevron {
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-records-sheet__foot {
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-records-sheet__show {
   width: 100%;
 }
 
-/* Facet pills and the chips inside their trays are touch targets on a phone or a tablet. */
-@media (max-width: 64rem), (pointer: coarse) {
-  .ds-records-facet__pill {
-    height: 44px;
+/* Below 64rem the six buttons and Sort fold into one Filters button and its bottom sheet; each
+   menu then opens as its own sheet over it. */
+@media (max-width: 63.9375rem) {
+  .ds-records-toolbar__facets,
+  .ds-records-toolbar__sort {
+    display: none;
   }
 
-  .ds-records-facet__menu .ds-room-chip {
+  .ds-records-toolbar__sheet-button {
+    display: inline-flex;
+  }
+
+  .ds-records-menu,
+  .ds-records-sheet {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    max-width: 40rem;
+    max-height: 85dvh;
+    margin: 0 auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-width: var(--ds-border-width) 0 0;
+    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+    position-area: none;
+  }
+
+  .ds-records-sheet:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ds-records-sheet__list {
+    overflow-y: auto;
+  }
+
+  .ds-records-menu::backdrop,
+  .ds-records-sheet::backdrop {
+    background: var(--ds-overlay);
+  }
+
+  .ds-records-menu__close {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--ds-space-1);
+    border: 0;
+    background: none;
+    color: var(--ds-ink);
+    font: inherit;
+    font-size: var(--ds-text-body-sm);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--ds-border-control);
+    text-underline-offset: 0.25em;
+    cursor: pointer;
+  }
+
+  .ds-records-menu__head {
+    padding-block: var(--ds-space-1);
+  }
+
+  .ds-records-menu:not(:has(.ds-records-menu__clear)) .ds-records-menu__head {
+    display: flex;
+  }
+
+  .ds-records-menu .ds-records-menu__title {
+    position: static;
+    width: auto;
     height: auto;
-    min-height: 44px;
-    padding-inline: 14px;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 63.9375rem) {
+  .ds-records-menu,
+  .ds-records-sheet {
+    transition:
+      transform var(--ds-duration-base) cubic-bezier(0.16, 1, 0.3, 1),
+      overlay var(--ds-duration-base) allow-discrete,
+      display var(--ds-duration-base) allow-discrete;
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .ds-records-menu:popover-open,
+    .ds-records-sheet:popover-open {
+      transform: translateY(100%);
+    }
+  }
+}
+
+/* —— active filters ————————————————————————————————————————————————————————— */
+.ds-records-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  /* One height whatever the row holds, so the list never shifts between states. */
+  box-sizing: border-box;
+  min-height: 3.5rem;
+  padding-block: var(--ds-space-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Text actions in the row sit on the gutter, not inset by a button's padding. */
+.ds-records-active > a {
+  padding-inline: 0;
+}
+
+.ds-records-active__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A long echo (a story title) truncates inside its chip rather than widening the row. */
+.ds-records-active__chips > li {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ds-records-active__map {
+  margin-left: auto;
+}
+
+/* —— research rows —————————————————————————————————————————————————————————— */
+.ds-records-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-record {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  scroll-margin-top: calc(var(--records-bar-h) + var(--ds-space-4));
+}
+
+.ds-record__link {
+  display: grid;
+  /* A fixed kind and place track, so every summary starts on one edge. */
+  grid-template-columns: 17.5rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name name data'
+    'meta summary summary';
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-6);
+  padding: var(--ds-space-4) var(--ds-space-2);
+  margin-inline: calc(var(--ds-space-2) * -1);
+  color: var(--ds-ink);
+  text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-record__link:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-record__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-record__name {
+  grid-area: name;
+  min-width: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.5rem;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: pretty;
+}
+
+.ds-record__link:hover .ds-record__name {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-record__name b,
+.ds-record__summary b {
+  font-weight: 700;
+  color: var(--ds-ink);
+}
+
+.ds-record__meta {
+  grid-area: meta;
+  overflow: hidden;
+  color: var(--ds-ink);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.25rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-record__sep {
+  color: var(--ds-ink-subtle);
+}
+
+.ds-record__place {
+  color: var(--ds-ink-muted);
+}
+
+.ds-record__summary {
+  grid-area: summary;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.25rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-record__data {
+  grid-area: data;
+  display: grid;
+  /* "Undated" is the widest decade value; decades sit flush right against the grade. */
+  grid-template-columns: 7ch auto;
+  align-items: baseline;
+  column-gap: 2ch;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Fixed sub-columns: the letters stack in one column whatever the source count reads. */
+.ds-record__evidence {
+  display: grid;
+  grid-template-columns: 1ch 12ch;
+  align-items: baseline;
+  column-gap: 1ch;
+}
+
+.ds-record__decade {
+  text-align: right;
+}
+
+.ds-record__ungraded {
+  grid-column: 1 / -1;
+}
+
+.ds-record__letter {
+  color: var(--ds-ink);
+  font-weight: 700;
+}
+
+/* The timeline's row: one line, the band states the decade. Kind and place follow the name. */
+.ds-record__link--compact {
+  grid-template-columns: fit-content(60%) minmax(0, 1fr) auto;
+  grid-template-areas: 'name meta data';
+  gap: var(--ds-space-1) var(--ds-space-4);
+  padding-block: var(--ds-space-3);
+}
+
+.ds-record__link--compact .ds-record__name {
+  font-size: var(--ds-text-body);
+}
+
+.ds-record__link--compact .ds-record__data {
+  grid-template-columns: auto;
+}
+
+/* —— outcomes: empty, no match, unreadable ————————————————————————————————————— */
+.ds-records-outcome {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-3);
+  max-width: var(--ds-width-read);
+  padding-block: var(--ds-space-12) var(--ds-space-8);
+}
+
+.ds-records-outcome__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
+}
+
+.ds-records-outcome__body {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+  overflow-wrap: anywhere;
+}
+
+/* —— pager ———————————————————————————————————————————————————————————————— */
+.ds-records-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-8);
+}
+
+.ds-records-pager__arrow {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-records-pager__at {
+  margin: 0 var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-records-pager__num {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-records-jump {
+  display: flex;
+  gap: var(--ds-space-2);
+  margin: 0 0 0 auto;
+}
+
+.ds-records-jump__field {
+  position: relative;
+  display: inline-flex;
+}
+
+.ds-records-jump__select {
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-8) 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+}
+
+.ds-records-jump__select:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-records-jump__select option {
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+}
+
+.ds-records-jump__caret {
+  position: absolute;
+  top: 50%;
+  right: var(--ds-space-3);
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--ds-ink-muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* —— phone ————————————————————————————————————————————————————————————————— */
+@media (max-width: 47.9375rem) {
+  .ds-records .ds-page-header {
+    padding-block: var(--ds-space-8) var(--ds-space-4);
+  }
+
+  /* The decade the list is sorted by stays on line one, the evidence on line two. */
+  .ds-record__link {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name decade'
+      'meta evidence'
+      'summary summary';
+    gap: var(--ds-space-1) var(--ds-space-3);
+    padding-block: var(--ds-space-3);
+  }
+
+  .ds-record__data {
+    display: contents;
+  }
+
+  .ds-record__decade {
+    grid-area: decade;
+    justify-self: end;
+  }
+
+  .ds-record__evidence {
+    grid-area: evidence;
+    justify-self: end;
+  }
+
+  .ds-record__summary {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .ds-record__link--compact {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name name'
+      'meta evidence';
+  }
+
+  /* Under the chips, flush to the gutter. */
+  .ds-records-active__map {
+    margin-left: 0;
+  }
+
+  .ds-records-pager__at {
+    order: -1;
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .ds-records-jump {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .ds-records-jump__field,
+  .ds-records-jump__select {
+    width: 100%;
+  }
+}
+
+/* —— the wait: hairline placeholders at the real row's geometry ———————————————————— */
+.ds-records-wait {
+  display: inline-block;
+  height: 0.75rem;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+  vertical-align: middle;
+}
+
+.ds-records-wait--line {
+  width: 72%;
+  height: 0.5rem;
+}
+
+.ds-records-list--waiting .ds-record__link:hover {
+  background: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ds-records-wait {
+    animation: ds-records-wait 1.6s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes ds-records-wait {
+  to {
+    opacity: 0.45;
   }
 }

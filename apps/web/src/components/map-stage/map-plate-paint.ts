@@ -35,15 +35,15 @@ export const PERSISTENT_PLATE_LAYER_IDS = [
   // Imagery carries per-scheme raster paint (opacity, saturation, brightness bounds) — a theme
   // toggle has to re-push it, or the dark plate's scrim stays over the light one.
   'plate-satellite',
-  // Base cartography: land, water, country border and city names all carry theme-dependent
-  // paint, so a light/dark toggle has to push their colors the same way it pushes the streets'.
-  'plate-landcover',
+  // Base cartography: water, country border and city names all carry theme-dependent paint, so
+  // a light/dark toggle has to push their colors the same way it pushes the streets'.
   'plate-water',
   'plate-boundary-country',
   'plate-place-city',
-  'explore-street-casing',
   'explore-street-fill',
   'explore-street-label',
+  'explore-state-label',
+  'explore-state-label-selected',
 ] as const;
 
 export type LayerPaintUpdate = {

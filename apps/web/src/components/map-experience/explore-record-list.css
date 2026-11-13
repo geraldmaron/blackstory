@@ -1,0 +1,113 @@
+/*
+ * The Explore record list: register rows, windowed. Row height is RESULTS_ROW_HEIGHT (68px) in
+ * ExploreRecordList.tsx and must stay in step with it.
+ */
+.ds-xlist {
+  position: relative;
+  /* Basis 0: the list takes what the column has left, never the height of its own rows. */
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-border-control) transparent;
+}
+
+.ds-xlist--empty {
+  overflow: visible;
+  padding: var(--ds-space-6) var(--ds-space-4);
+}
+
+.ds-xlist__rows {
+  position: relative;
+}
+
+.ds-xlist__row {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--ds-space-1);
+  height: 68px;
+  padding: 0 var(--ds-space-4) 0 var(--ds-space-6);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink);
+  cursor: pointer;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-xlist__row:hover {
+  background: var(--ds-surface);
+}
+
+.ds-xlist__row:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+/* The selected row carries the map's own selected mark: a copper dot with a paper halo. Never
+   the fill alone. */
+.ds-xlist__row--selected {
+  background: var(--ds-surface-raised);
+}
+
+.ds-xlist__row--selected::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: var(--ds-space-2);
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  box-shadow: 0 0 0 2px var(--ds-canvas);
+}
+
+.ds-xlist__line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  min-width: 0;
+}
+
+.ds-xlist__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-xlist__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-xlist__decade,
+.ds-xlist__grade {
+  flex: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ds-xlist__decade {
+  color: var(--ds-ink);
+}

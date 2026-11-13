@@ -30,11 +30,16 @@ import {
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
+  EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  JURISDICTION_TAG_MIN_ZOOM,
   PLATE_BACKGROUND_OPACITY,
   PLATE_STATE_FILL_OPACITY,
   selectedPointFilterExpression,
   selectedTagFilterExpression,
+  stateLabelFilters,
 } from './explore-style';
 
 type LayerLike = {
@@ -315,18 +320,19 @@ test('the state-selected fill and density fallback tints are relocated DIGNITY_P
   assert.equal(densityLayerOff.paint?.['fill-color'], plateForScheme('dark').land);
 });
 
-test('OpenFreeMap street layers are present for casing, fill, and labels', () => {
+test('the land stays one flat value: no landcover fill, and streets are one quiet line', () => {
   const style = buildStyleFixture('presence');
   assert.ok(style.sources['openfreemap'], 'expected openfreemap vector source');
-  assert.ok(style.layers.some((layer) => layer.id === 'explore-street-casing'));
+  assert.ok(!style.layers.some((layer) => layer.id === 'plate-landcover'));
+  assert.ok(!style.layers.some((layer) => layer.id === 'explore-street-casing'));
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-fill'));
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-label'));
 });
 
 test('plate-road paints the design-law `road` role and hands off to the local street layers at z8', () => {
   // `plate.road` (design-direction-v9-atlas.md's "Motorway/trunk/primary, minzoom: 6")
-  // had zero consumers: the local street layers use their own, separately-tuned `streetCasing`/
-  // `street` literals, not this token.
+  // had zero consumers: the local street layer uses its own, separately-tuned `street` literal,
+  // not this token.
   const source = buildExploreMapSource(listPublicEntities());
   for (const colorScheme of ['light', 'dark'] as const) {
     const style = buildExploreMapStyle({
@@ -348,7 +354,7 @@ test('plate-road paints the design-law `road` role and hands off to the local st
     assert.equal(roadLayer.source, 'openfreemap');
     assert.equal(roadLayer['source-layer'], 'transportation');
     assert.equal(roadLayer.minzoom, 6);
-    // Must not overlap explore-street-casing/-fill's own minzoom: 8, or the same roads paint twice.
+    // Must not overlap explore-street-fill's own minzoom: 8, or the same roads paint twice.
     assert.equal(roadLayer.maxzoom, 8);
     assert.deepEqual(roadLayer.filter, [
       'match',
@@ -380,56 +386,32 @@ function widthForClass(matchExpr: unknown[], roadClass: string): number {
   return matchExpr[index + 1] as number;
 }
 
-test('street casing and fill use muted zoom stops with motorway→minor class hierarchy', () => {
+test('streets keep a motorway-to-minor width hierarchy at a third of the ink at most', () => {
   const style = buildStyleFixture('presence');
-  const casing = layerById(style, 'explore-street-casing');
   const fill = layerById(style, 'explore-street-fill');
-  const casingZ14 = streetWidthMatchAtZoom(casing.paint?.['line-width'], 14);
   const fillZ14 = streetWidthMatchAtZoom(fill.paint?.['line-width'], 14);
-  const casingZ12 = streetWidthMatchAtZoom(casing.paint?.['line-width'], 12);
   const fillZ12 = streetWidthMatchAtZoom(fill.paint?.['line-width'], 12);
-
-  assert.equal(widthForClass(casingZ14, 'motorway'), 4);
-  assert.equal(widthForClass(casingZ14, 'trunk'), 3.5);
-  assert.equal(widthForClass(casingZ14, 'primary'), 3);
-  assert.equal(widthForClass(casingZ14, 'secondary'), 2.2);
-  assert.equal(widthForClass(casingZ14, 'tertiary'), 1.6);
-  assert.equal(widthForClass(casingZ14, 'minor'), 1.2);
-  assert.equal(casingZ14[casingZ14.length - 1], 0.8);
-
-  assert.equal(widthForClass(casingZ12, 'trunk'), 1.8);
   assert.equal(widthForClass(fillZ12, 'trunk'), 1.0);
   assert.equal(widthForClass(fillZ14, 'trunk'), 2.0);
-
-  // Fill stays thinner than casing at every named class (and the fallback).
-  for (const roadClass of [
-    'motorway',
-    'trunk',
-    'primary',
-    'secondary',
-    'tertiary',
-    'minor',
-  ] as const) {
+  const order = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'] as const;
+  for (let i = 0; i < order.length - 1; i++) {
     assert.ok(
-      widthForClass(fillZ14, roadClass) < widthForClass(casingZ14, roadClass),
-      `${roadClass} fill must be thinner than casing at z14`,
-    );
-    assert.ok(
-      widthForClass(fillZ12, roadClass) < widthForClass(casingZ12, roadClass),
-      `${roadClass} fill must be thinner than casing at z12`,
+      widthForClass(fillZ14, order[i]!) > widthForClass(fillZ14, order[i + 1]!),
+      `z14 ${order[i]} must exceed ${order[i + 1]}`,
     );
   }
-  assert.ok((fillZ14[fillZ14.length - 1] as number) < (casingZ14[casingZ14.length - 1] as number));
-
-  // Hierarchy: motorway > trunk > primary > secondary > tertiary > minor > fallback
-  const casingOrder = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'] as const;
-  for (let i = 0; i < casingOrder.length - 1; i++) {
-    assert.ok(
-      widthForClass(casingZ14, casingOrder[i]!) > widthForClass(casingZ14, casingOrder[i + 1]!),
-      `casing z14 ${casingOrder[i]} must exceed ${casingOrder[i + 1]}`,
-    );
+  // Major roads are one step stronger than the rest, nothing more.
+  assert.deepEqual(fill.paint?.['line-opacity'], [
+    'match',
+    ['get', 'class'],
+    ['motorway', 'trunk', 'primary'],
+    1,
+    0.72,
+  ]);
+  for (const scheme of ['light', 'dark'] as const) {
+    const alpha = Number(/,\s*([\d.]+)\)$/.exec(plateForScheme(scheme).street)?.[1]);
+    assert.ok(alpha <= 0.35, `${scheme} street ink is ${alpha}`);
   }
-  assert.ok(widthForClass(casingZ14, 'minor') > (casingZ14[casingZ14.length - 1] as number));
 });
 
 test('the plate reads as a map: land, water and boundaries come from the tokens', () => {
@@ -458,15 +440,17 @@ test('the plate reads as a map: land, water and boundaries come from the tokens'
 
   // The water fill is the coastline. Without this layer the plate has no sea.
   assert.equal(layerById(dark, 'plate-water').paint?.['fill-color'], mapPalettes.dark.water);
-  assert.equal(layerById(light, 'plate-water').paint?.['fill-color'], mapPalettes.light.water);
+  assert.equal(
+    layerById(light, 'plate-water').paint?.['fill-color'],
+    plateForScheme('light').water,
+  );
   assert.equal(
     layerById(light, 'plate-boundary-country').paint?.['line-color'],
     mapPalettes.light.line2,
   );
-  assert.equal(layerById(light, 'plate-landcover').paint?.['fill-color'], mapPalettes.light.green);
-
   const lightPlate = plateForScheme('light');
-  assert.equal(lightPlate.water, mapPalettes.light.water);
+  // Light water is a neutral gray, not the token's tan: no fill near the copper hue.
+  assert.notEqual(lightPlate.water, mapPalettes.light.water);
   assert.equal(lightPlate.land, mapPalettes.light.land);
   assert.equal(lightPlate.stateBounds, mapPalettes.light.line);
   // County lines are deliberately not a token: §3's `line-2` is the country border, and it is
@@ -777,4 +761,54 @@ test('record density is off by default: no copper state choropleth at rest', () 
   const style = buildStyleFixture('off');
   const density = layerById(style, EXPLORE_STATE_DENSITY_LAYER_ID);
   assert.equal(density.paint?.['fill-opacity'], 0);
+});
+
+test('jurisdiction tags stay off the national view and give way to group counts', () => {
+  const style = buildStyleFixture('off');
+  const ids = style.layers.map((layer) => layer.id);
+  const tag = layerById(style, EXPLORE_JURISDICTION_TAG_LAYER_ID) as LayerLike & {
+    minzoom?: number;
+  };
+  // National scale is about z3.5 to z4.5; tags begin at regional zoom, one per state.
+  assert.ok((tag.minzoom ?? 0) >= 5, 'tags must not draw at national scale');
+  assert.equal(JURISDICTION_TAG_MIN_ZOOM, 5.5);
+  // MapLibre places symbols top layer first. The counts sit above the tags, so they claim their
+  // place first and a tag that would touch a group is dropped instead of drawn over it.
+  assert.ok(
+    ids.indexOf(EXPLORE_JURISDICTION_TAG_LAYER_ID) < ids.indexOf(EXPLORE_CLUSTER_COUNT_LAYER_ID),
+  );
+  assert.ok(
+    ids.indexOf(EXPLORE_JURISDICTION_TAG_LAYER_ID) <
+      ids.indexOf(EXPLORE_UNCLUSTERED_POINT_LAYER_ID),
+  );
+  const count = layerById(style, EXPLORE_CLUSTER_COUNT_LAYER_ID);
+  // Counts always draw (legible), and reserve the group circle in the collision index.
+  assert.equal(count.layout?.['text-allow-overlap'], true);
+  assert.ok(Number(count.layout?.['text-padding']) >= 15);
+  assert.notEqual(count.layout?.['text-ignore-placement'], true);
+  assert.notEqual(tag.layout?.['text-allow-overlap'], true);
+});
+
+test('state labels are a symbol layer under the groups, so a label yields to a count', () => {
+  const style = buildStyleFixture('off');
+  const ids = style.layers.map((layer) => layer.id);
+  for (const id of [EXPLORE_STATE_LABEL_LAYER_ID, EXPLORE_STATE_LABEL_SELECTED_LAYER_ID]) {
+    const label = layerById(style, id) as LayerLike & { type?: string; maxzoom?: number };
+    assert.equal(label.type, 'symbol');
+    // Below every record mark, group circle and count: MapLibre places top layers first.
+    assert.ok(ids.indexOf(id) < ids.indexOf(EXPLORE_UNCLUSTERED_POINT_LAYER_ID));
+    assert.ok(ids.indexOf(id) < ids.indexOf(EXPLORE_CLUSTER_LAYER_ID));
+    assert.ok(ids.indexOf(id) < ids.indexOf(EXPLORE_CLUSTER_COUNT_LAYER_ID));
+    assert.notEqual(label.layout?.['text-allow-overlap'], true);
+    assert.equal(label.maxzoom, STATE_LABEL_FADE_END_ZOOM);
+  }
+  // Selection swaps two filters; nothing else about the labels changes.
+  assert.deepEqual(stateLabelFilters('NY'), {
+    rest: ['!=', ['get', 'postalCode'], 'NY'],
+    selected: ['==', ['get', 'postalCode'], 'NY'],
+  });
+  const source = style.sources[EXPLORE_STATE_LABELS_SOURCE_ID] as {
+    data: { features: readonly unknown[] };
+  };
+  assert.equal(source.data.features.length, 51);
 });

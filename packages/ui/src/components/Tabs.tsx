@@ -5,7 +5,8 @@
  *
  * `linkAs` lets a framework link (Next's `Link`) render the anchors. A tab with `onClick` and no
  * `href` renders a button, for a destination that is reached by restoring state rather than by
- * navigating.
+ * navigating. A current tab with neither is the page itself and renders as inert text: never a
+ * button that does nothing.
  */
 
 import React, { type ElementType, type ReactNode } from 'react';
@@ -35,6 +36,13 @@ export function Tabs({ label, items, linkAs: LinkAs = 'a', className }: TabsProp
     <nav className={cx('ds-tabs', className)} aria-label={label}>
       {items.map((item, index) => {
         const current = item.current ? 'page' : undefined;
+        if (item.href === undefined && item.onClick === undefined) {
+          return (
+            <span key={index} className="ds-tabs__tab" aria-current={current}>
+              {item.label}
+            </span>
+          );
+        }
         if (item.href === undefined) {
           return (
             <button

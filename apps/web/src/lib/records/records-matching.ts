@@ -5,7 +5,7 @@ import type { ConfidenceTier } from '../map-experience/build-explore-map-source'
 import { kindMatchesPublicFilter } from '../map-experience/filters';
 import { meetsEvidenceFloor, type EvidenceFloor } from '../map-experience/evidence-grade';
 import { isInternalRecordLabel } from '../place/public-place-path';
-import { matchesPeriod } from '../discovery/collection-period';
+import { documentedDecades, matchesPeriod } from '../discovery/collection-period';
 import { COLLECTION_INVALID, COLLECTION_MISSING } from '../discovery/story-collection';
 
 export type RecordFacts = {
@@ -137,4 +137,44 @@ function compareDiscoveryOrder(a: CollectionFacts, b: CollectionFacts): number {
   const eraB = earliestEraYear(b);
   if (eraA !== eraB) return eraA - eraB;
   return a.row.name.localeCompare(b.row.name);
+}
+
+/**
+ * The ordering the Records register reads, which resolves the URL's default (`discovery`) by
+ * context: relevance when the reader searched, earliest documented decade otherwise. An explicit
+ * sort is the sort. Explore keeps `comparatorFor`, where the default means best evidence.
+ */
+export function recordsComparator(
+  query: Pick<RecordsQuery, 'sort' | 'q'>,
+): (a: CollectionFacts, b: CollectionFacts) => number {
+  if (query.sort !== 'discovery') return comparatorFor(query.sort);
+  const needle = query.q.trim().toLowerCase();
+  if (needle.length === 0) return comparatorFor('era');
+  const byEvidence = comparatorFor('evidence');
+  const byEra = comparatorFor('era');
+  return (a, b) =>
+    internalLast(a, b) ||
+    relevanceRank(a, needle) - relevanceRank(b, needle) ||
+    byEvidence(a, b) ||
+    byEra(a, b);
+}
+
+/** True when the register is read in time order, so a decade can be jumped to. */
+export function recordsOrderIsChronological(query: Pick<RecordsQuery, 'sort' | 'q'>): boolean {
+  return query.sort === 'era' || (query.sort === 'discovery' && query.q.trim().length === 0);
+}
+
+/** Name hits outrank summary and place hits; a whole-name or leading match outranks the rest. */
+function relevanceRank(facts: CollectionFacts, needle: string): number {
+  const name = facts.row.name.toLowerCase();
+  if (name === needle) return 0;
+  if (name.startsWith(needle)) return 1;
+  if (` ${name}`.includes(` ${needle}`)) return 2;
+  if (name.includes(needle)) return 3;
+  return 4;
+}
+
+/** Earliest documented decade of a record, or `null` when the archive knows none. */
+export function earliestDecade(facts: Pick<CollectionFacts, 'eraBuckets'>): number | null {
+  return documentedDecades(facts.eraBuckets)[0] ?? null;
 }

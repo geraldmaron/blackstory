@@ -61,6 +61,14 @@ test('Tabs mark the current place with aria-current; a tab without href is a but
   assert.match(html, /<a class="ds-tabs__tab" href="\/records">Records/);
 });
 
+test('a current tab with no destination and no action is inert text, never a dead button', () => {
+  const html = renderToStaticMarkup(
+    createElement(Tabs, { label: 'Main', items: [{ label: 'Map', current: true }] }),
+  );
+  assert.match(html, /<span class="ds-tabs__tab" aria-current="page">Map<\/span>/);
+  assert.doesNotMatch(html, /<button/);
+});
+
 test('Segmented is a radio group, or links when every option has an href', () => {
   const radios = renderToStaticMarkup(
     createElement(Segmented, {

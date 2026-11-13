@@ -1,0 +1,175 @@
+/*
+ * The decade histogram strip. 56px tall. Where it sits is the caller's (explore-column.css docks
+ * it on the map's bottom edge on a wide screen, and sets it inside the filter state on a phone).
+ * Bars are neutral; the brushed range is ink; copper is only the two handles of a set range.
+ */
+.ds-xbrush {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--ds-space-4);
+  height: 56px;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  color: var(--ds-ink);
+}
+
+.ds-xbrush__label {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+
+.ds-xbrush__range {
+  overflow: hidden;
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-xbrush__range--all {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+}
+
+.ds-xbrush__clear {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: calc(var(--ds-space-2) * -1);
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-xbrush__clear:hover {
+  color: var(--ds-ink);
+}
+
+.ds-xbrush__clear:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-xbrush__plot {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-xbrush__track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  min-height: 0;
+  isolation: isolate;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.ds-xbrush__bar {
+  position: relative;
+  z-index: 1; /* local: bars above the brushed wash */
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 1px 1px 0 0;
+  background: color-mix(in srgb, var(--ds-ink) 34%, transparent);
+  pointer-events: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-xbrush--active .ds-xbrush__bar {
+  background: color-mix(in srgb, var(--ds-ink) 18%, transparent);
+}
+
+.ds-xbrush--active .ds-xbrush__bar--in {
+  background: var(--ds-ink);
+}
+
+/* The brushed span: a faint wash behind the in-range bars so a sparse range still reads. */
+.ds-xbrush__span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 0; /* local: the wash sits under the bars */
+  background: color-mix(in srgb, var(--ds-ink) 7%, transparent);
+  pointer-events: none;
+}
+
+/* Handles: a 2px rule with a grip. The visible mark is narrow; the hit area is 44px wide and the
+   strip's own height. Neutral at rest, copper once a range is set. */
+.ds-xbrush__handle {
+  position: absolute;
+  z-index: 2; /* local: handles above the bars */
+  top: calc(var(--ds-space-1) * -1);
+  bottom: 0;
+  width: 44px;
+  margin-left: -22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.ds-xbrush__handle::before,
+.ds-xbrush__handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  background: var(--ds-border-control);
+  transform: translateX(-50%);
+}
+
+.ds-xbrush__handle::before {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+}
+
+.ds-xbrush__handle::after {
+  top: 50%;
+  width: 8px;
+  height: 16px;
+  border-radius: var(--ds-radius-sm);
+  transform: translate(-50%, -50%);
+}
+
+.ds-xbrush:not(.ds-xbrush--active) .ds-xbrush__handle {
+  opacity: 0;
+}
+
+.ds-xbrush:not(.ds-xbrush--active):hover .ds-xbrush__handle,
+.ds-xbrush__handle:focus-visible {
+  opacity: 1;
+}
+
+.ds-xbrush--active .ds-xbrush__handle::before,
+.ds-xbrush--active .ds-xbrush__handle::after {
+  background: var(--ds-accent-graphic);
+}
+
+.ds-xbrush__handle:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 0;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-xbrush__axis {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ds-ink-subtle);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}

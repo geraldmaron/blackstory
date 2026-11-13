@@ -11,7 +11,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { DestinationIcon } from '../patterns/DestinationIcon';
-import { exitMapBrowse } from '../../lib/nav/map-browse';
 import { SHELL_TABS, currentTabFor, pathIsMapSurface } from './shell-tabs';
 import './tab-bar.css';
 
@@ -36,20 +35,13 @@ export function PhoneTabBar({ pathname, browsing }: PhoneTabBarProps) {
             <span className="ds-tabbar__label">{tab.label}</span>
           </>
         );
-        // Pressing the current Map tab while browsing returns to the journey (the platform
-        // convention: the current tab goes back to its start).
+        // On the map, the current Map tab is inert: it never navigates (a link would drop the
+        // map's filters) and never doubles as a way out. The header lockup is the way home.
         if (tab.id === '/explore' && pathIsMapSurface(pathname) && browsing) {
           return (
-            <button
-              key={tab.id}
-              type="button"
-              className="ds-tabbar__tab"
-              aria-current="page"
-              aria-label={`${tab.label}, back to the journey`}
-              onClick={() => exitMapBrowse()}
-            >
+            <span key={tab.id} className="ds-tabbar__tab" aria-current="page">
               {mark}
-            </button>
+            </span>
           );
         }
         return (

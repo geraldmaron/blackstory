@@ -4,8 +4,10 @@
  * The map's own controls: zoom, locate, and north. Every maps app puts these on the map itself,
  * so that is where readers look for them.
  *
- * One vertical group, 44px targets (WCAG 2.5.5). Grouping nearby records is not a control: it is
+ * One vertical stack, 44px targets (WCAG 2.5.5). Grouping nearby records is not a control: it is
  * always on. The compass only appears once the plate is rotated, and pressing it straightens it.
+ * The stack never changes shape while the column changes state, so nothing under a reader's
+ * pointer moves: locate is always here, and it is the page's one locate control.
  */
 import React from 'react';
 import { cx } from '@repo/ui';
@@ -23,7 +25,6 @@ export type MapControlsProps = {
   readonly bearing: number;
   readonly onResetBearing: () => void;
   readonly className?: string;
-  readonly style?: React.CSSProperties;
 };
 
 /** The compass shows only when the plate is turned more than this many degrees off north. */
@@ -37,19 +38,13 @@ export function MapControls({
   bearing,
   onResetBearing,
   className,
-  style,
 }: MapControlsProps) {
   const rotated =
     Math.abs(((bearing % 360) + 360) % 360) > COMPASS_THRESHOLD_DEGREES &&
     Math.abs(((bearing % 360) + 360) % 360) < 360 - COMPASS_THRESHOLD_DEGREES;
 
   return (
-    <div
-      className={cx('ds-map-controls', className)}
-      style={style}
-      role="group"
-      aria-label="Map controls"
-    >
+    <div className={cx('ds-map-controls', className)} role="group" aria-label="Map controls">
       <div className="ds-map-controls__stack">
         <button
           type="button"

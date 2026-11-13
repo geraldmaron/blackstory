@@ -6,7 +6,6 @@ export { StatusMark } from './StatusMark';
 export { LayerModelControl } from './LayerModelControl';
 export { DensityLayerToggle } from './DensityLayerToggle';
 export { KindBadge } from './KindBadge';
-export { MapExperienceLegend } from './MapExperienceLegend';
 export { NarrativeCard } from './NarrativeCard';
 export { EntitySessionNav } from './EntitySessionNav';
 export type { EntitySessionNavProps } from './EntitySessionNav';

@@ -198,8 +198,21 @@ export function isDesignationClaim(claim: EraEvidenceClaim): boolean {
   return DESIGNATION_TEXT.test(claim.object ?? '');
 }
 
+/**
+ * A number followed by a street name is a house number, not a year: Green Book claims read "as a
+ * restaurant at 1510 South St.", which once dated a 1956 listing to the 1510s.
+ */
+const STREET_AFTER =
+  /^\s+(?:Broadway|(?:[A-Z0-9][\w'’.-]*\s+){1,3}(?:St|Street|Ave|Avenue|Blvd|Boulevard|Rd|Road|Dr|Drive|Pl|Ln|Lane|Ct|Ter|Terrace|Pkwy|Parkway|Hwy|Highway|Pike|Sq))\b\.?(?=[,;)]|\s*$|\s+[A-Z(])/;
+
 function yearsInClaim(claim: EraEvidenceClaim): readonly string[] {
-  return (claim.object ?? '').match(CLAIM_YEAR) ?? [];
+  const text = claim.object ?? '';
+  const years: string[] = [];
+  for (const match of text.matchAll(CLAIM_YEAR)) {
+    const after = text.slice((match.index ?? 0) + match[0].length);
+    if (!STREET_AFTER.test(after)) years.push(match[0]);
+  }
+  return years;
 }
 
 /**

@@ -1,5 +1,6 @@
 /**
- * The door is an immersive Journey: scroll snaps chapters and flies the shared map plate.
+ * The Door: the map uncovered, a headline column, the spotlight as a callout on its pin, and a
+ * guided walk whose chapters are one docked card that flies the shared map plate.
  * It is not the Explore instrument (no lens, no rail, no sheet) and it has one map, not two:
  * the plate it drives is the one `MapStage`, handed the same national-field patch Explore rests on.
  */
@@ -19,6 +20,7 @@ const immersive = readFileSync(
   'utf8',
 );
 const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
+const walk = readFileSync(fileURLToPath(new URL('./door-walk.tsx', import.meta.url)), 'utf8');
 
 test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument', () => {
   assert.match(page, /DoorHome/);
@@ -35,20 +37,20 @@ test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
 });
 
-test('DoorImmersive scrolls chapters and drives the shared plate', () => {
+test('the opening is the map, one headline column, one primary action and one quiet link', () => {
   assert.match(immersive, /'use client'/);
-  assert.match(immersive, /IntersectionObserver/);
-  assert.match(immersive, /resolveDoorFocus/);
-  assert.match(immersive, /scrollIntoView/);
-  assert.match(immersive, />\s*Begin\s*</);
-  assert.match(immersive, /Browse the map/);
-  assert.doesNotMatch(immersive, /Filter the map|Enter the map/);
-  assert.match(immersive, /How this archive works/);
-  assert.match(immersive, /enterBrowse|MAP_BROWSE_ENTER_EVENT/);
-  assert.match(immersive, /ds-door__filters/);
-  assert.match(immersive, /AtlasLoader/);
-  assert.match(immersive, /browseShell/);
-  assert.doesNotMatch(immersive, /Stay with the map/);
+  assert.match(immersive, /HeroHeadlineMorph/);
+  assert.match(immersive, />\s*Start the walk\s*</);
+  assert.match(immersive, /buttonClassName\('primary', 'ds-door-open__start'\)/);
+  assert.match(immersive, /buttonClassName\('quiet'\)\}\s*href="\/records"/);
+  assert.match(immersive, />\s*Browse all records\s*</);
+  // The header carries the one search; the hero form, its button and the extra browse doors go.
+  assert.doesNotMatch(immersive, /<form|Search records|Search names/);
+  assert.doesNotMatch(immersive, /Browse the map|Browse the list|ds-door__filters/);
+  assert.doesNotMatch(immersive, /openLedger|ds-door-open__ledger|records on the map/);
+  assert.doesNotMatch(door, /buildOpenLedger|KIND_FAMILY_ENTRIES|placeCount/);
+  // The UI does not explain itself: no gesture hints, no invite that describes the buttons.
+  assert.doesNotMatch(immersive, /click a pin|shift \+ drag|Begin takes|DOOR_OPEN_INVITE/);
   // The one persistent plate, never a second MapLibre instance and never the map's story runner.
   assert.match(immersive, /useMapStage\(\)/);
   assert.match(
@@ -57,6 +59,55 @@ test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   );
   assert.match(immersive, /focus\.camera/);
   assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
+  assert.match(immersive, /AtlasLoader/);
+  assert.match(immersive, /browseShell/);
+});
+
+test('the walk is one docked card with progress, Back, Next and a way to the map', () => {
+  // A stepper, not a scroll story: no observer, no viewport-height chapters, no snap.
+  assert.doesNotMatch(immersive, /IntersectionObserver|useChapterObserver|scrollIntoView/);
+  assert.match(immersive, /const goToStep = useCallback/);
+  assert.match(immersive, /showChapter\(chapters\[clamped\]!\)/);
+  assert.match(immersive, /<DoorWalkCard/);
+  assert.match(immersive, /onSkip=\{enterBrowse\}/);
+  assert.match(walk, /Skip to the map/);
+  assert.match(walk, />\s*Next\s*</);
+  assert.match(walk, />\s*Back\s*</);
+  // Step 1 has nothing to go back to: Next stands alone and "Skip to the map" is the one exit.
+  assert.match(walk, /\{position > 1 \? \(\s*<Button variant="secondary"/);
+  // The cite slot carries real citations only, never a note about the interface.
+  assert.doesNotMatch(walk, /Drawn from the active release|precision its sources support/);
+  assert.match(walk, /\{position\} of \{total\}/);
+  assert.match(walk, /aria-current|data-state=\{state\}/);
+  // Keyboard: arrows step, Escape returns to the opening.
+  assert.match(walk, /ArrowRight[\s\S]*ArrowLeft[\s\S]*Escape/);
+  // The closing block links Records, Stories and Data, and hands over the map once.
+  assert.match(walk, /href: '\/records'[\s\S]*href: '\/stories'[\s\S]*href: '\/data'/);
+  assert.match(walk, /Explore the map/);
+  // No kickers, no 01-04 numerals, no copper accent word in the heading.
+  assert.doesNotMatch(walk, /kicker|padStart|<em>/);
+  // The record chapter shows the record, not a 200-word summary in the prose.
+  assert.doesNotMatch(walk, /recordSpotlight\.summary\} It is one pin/);
+  assert.match(walk, /ds-door-walk__record-line/);
+  assert.match(css, /\.ds-door-walk__record-line\s*\{[^}]*-webkit-line-clamp:\s*3/);
+  // The UI never tells the reader to scrub a control the card does not have.
+  assert.doesNotMatch(walk, /Scrub/);
+  // Focus follows the step the reader chose.
+  assert.match(immersive, /walkHeadingRef\.current\)\?\.focus/);
+});
+
+test('the spotlight is a callout on its pin, kept inside the uncovered map window', () => {
+  assert.match(immersive, /<DoorSpotlightCallout/);
+  assert.match(immersive, /frameRef=\{windowRef\}/);
+  assert.match(immersive, /active=\{step === 0 && plateState === 'live' && !browseMode\}/);
+  // The mark follows the record's stored precision, never sharper (P-03).
+  assert.match(immersive, /mark=\{recordMarkFor\(spotlight\.precision\)\}/);
+  // The window excludes the dock on every layout, so the callout cannot cover the headline.
+  assert.match(
+    css,
+    /\.ds-door__window\s*\{[^}]*inset:\s*0 0 0 calc\(var\(--ds-door-edge\) \+ var\(--ds-door-dock-w\)/,
+  );
+  assert.match(css, /\.ds-door__window\s*\{\s*inset:\s*0 0 calc\(var\(--ds-door-dock-h/);
 });
 
 test('Door browse morphs in place rather than hard-linking Filter CTAs to /explore', () => {
@@ -68,12 +119,11 @@ test('Door browse morphs in place rather than hard-linking Filter CTAs to /explo
   assert.match(door, /buildAtlasShell/);
   assert.match(door, /browseShell/);
   assert.match(door, /initialBrowse/);
-  // Exit lives on the Door, outside the atlas pointer-events:none stack.
-  assert.match(immersive, /ds-door__browse-exit/);
-  assert.match(immersive, /Back to journey/);
-  assert.match(immersive, /data-browse-chrome/);
-  assert.match(css, /\.ds-door__browse-exit/);
-  assert.match(css, /z-index:\s*calc\(var\(--ds-z-atlas-instruments\) - 1\)/);
+  // No "Back to the walk" pill over the map: the header's Map tab and the browser's Back return.
+  assert.doesNotMatch(immersive, /ds-door__browse-exit|Back to home|Back to the walk|canReturn/);
+  assert.doesNotMatch(css, /ds-door__browse-exit/);
+  // Entering browse moves focus to the map's heading once the instruments mount.
+  assert.match(immersive, /browseHeadingRef\.current\?\.focus/);
 });
 
 test('clicking a map entity during the journey exits smoothly into browse, not a navigation', () => {
@@ -115,7 +165,7 @@ test('the Door has one map: no static board, no layout zoom, no pin plate', () =
 
 test('the plate is framed against the Door window and re-framed on resize', () => {
   assert.match(immersive, /ds-door__window/);
-  assert.match(immersive, /doorFramePadding\(windowBox, plateBox, chromeBox\)/);
+  assert.match(immersive, /doorFramePadding\(windowBox, plateBox\)/);
   assert.match(immersive, /doorFrameOffset\(windowBox, plateBox\)/);
   // The introduction overlays the map, rather than shrinking it into a strip above the copy.
   assert.doesNotMatch(immersive, /bottomChrome|openSheetRef/);
@@ -145,17 +195,8 @@ test('the plate is framed against the Door window and re-framed on resize', () =
     /stage\.resize\(\);(?:\s*\/\/[^\n]*\n)*\s*applyCamera\(!map\.isMoving\(\)\)/,
   );
   assert.match(immersive, /sameDoorFrameBox/);
-  // The observer re-firing for the chapter already in view must not restart its flight.
+  // Re-showing the chapter already on the plate must not restart its flight.
   assert.match(immersive, /if \(chapter\.id === lastChapterIdRef\.current\) return;/);
-  // A reload scrolled to a later chapter frames that chapter first, as a cut, not a flight.
-  assert.match(
-    immersive,
-    /useLayoutEffect\(\(\) => \{[\s\S]*chapterInViewFromRects\(rects, window\.innerHeight\)/,
-  );
-  assert.match(
-    immersive,
-    /if \(!chapter \|\| chapter\.sweep \|\| chapter\.id === lastChapterIdRef\.current\) return;/,
-  );
 });
 
 test('the reveal waits for both the plate and this mount, and never gates on a stale attribute', () => {
@@ -206,26 +247,39 @@ test('the Door and Explore rest on one national-field patch', () => {
   assert.match(atlas, /nationalFieldPatch\(/);
 });
 
-test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
-  assert.match(css, /html:has\(\.ds-door\)[\s\S]*scroll-snap-type:\s*y\s+proximity/);
+test('door CSS keeps one fixed full-bleed plate under a fixed dock, with no page scroll', () => {
+  assert.doesNotMatch(css, /scroll-snap/);
   assert.match(css, /\.ds-door__field[\s\S]*position:\s*fixed/);
+  assert.match(css, /\.ds-door__dock\s*\{[^}]*position:\s*fixed/);
   assert.match(css, /\.ds-door__window\s*\{[^}]*position:\s*absolute/);
   assert.match(css, /\.ds-door__window\s*\{[^}]*pointer-events:\s*none/);
-  // Page Sand / copper wash behind the map was the distracting orange field.
+  // No viewport-height chapters: the dead space between cards is gone.
+  assert.doesNotMatch(css, /ds-door-journey__chapter|ds-door-journey__card/);
   assert.doesNotMatch(css, /mix-blend-mode:\s*multiply/);
-  // Archive material law permits `--ds-contact-*` where a layer overlaps; ban decorative stacks.
+  // Flat material: the contact shadow on floating layers only, no glass or glow. The only
+  // gradients are the scrim under the headline column and the fade on a walk body with more below.
+  const scrimFree = css
+    .replace(/\.ds-door-journey::before\s*\{[^}]*\}/g, '')
+    .replace(/\.ds-door-walk__body\[data-more='true'\]\s*\{[^}]*\}/g, '');
   assert.doesNotMatch(
-    css.replace(/box-shadow:\s*var\(--ds-contact-[a-z]+\);/g, ''),
-    /radial-gradient|linear-gradient|box-shadow|backdrop-filter/,
+    scrimFree.replace(/box-shadow:\s*var\(--ds-contact-[a-z]+\);/g, ''),
+    /radial-gradient|linear-gradient|box-shadow:\s*0 0 [1-9]|backdrop-filter/,
   );
-  // Nested overflow scrollport was the bug: wheel only hit cards. Document scrolls instead.
-  assert.doesNotMatch(css, /\.ds-door-journey\s*\{[^}]*overflow-y:\s*auto/);
-  // Opening masthead is edge-anchored (ds-door-open), not a centered dialog card.
-  assert.match(css, /\.ds-door-open\s*\{/);
-  assert.match(css, /ds-door-journey__chapter--rest/);
-  // The measured morph slot stays clipped, but display-font ink may paint outside its fractional
-  // layout bounds. Cross-browser padding preserves that ink while its negative margin keeps the
-  // animated slot's footprint unchanged.
+  assert.match(
+    css,
+    /\.ds-door-journey::before\s*\{[^}]*color-mix\(in srgb, var\(--ds-canvas\) 85%, transparent\)/,
+  );
+  // Radii are 8 / 14 only here: no pills, and uppercase mono stays on data.
+  assert.doesNotMatch(css, /--ds-radius-full|999px|text-transform:\s*uppercase(?![^}]*ds-hero)/);
+  // The column shares the header's left edge (the wide container) and sits 48px off the bottom.
+  assert.match(
+    css,
+    /--ds-door-edge:\s*max\(var\(--ds-gutter\), calc\(\(100vw - var\(--ds-width-wide\)\) \/ 2\)\)/,
+  );
+  assert.match(css, /--ds-door-bottom:\s*var\(--ds-space-12\)/);
+  // A long chapter scrolls inside the card's body; progress and controls stay pinned.
+  assert.match(css, /\.ds-door-walk__body\s*\{[^}]*min-height:\s*0;[^}]*overflow-y:\s*auto/);
+  assert.match(walk, /className="ds-door-walk__body"/);
   assert.match(
     css,
     /\.ds-hero-headline-morph__prefix\s*\{[^}]*overflow:\s*clip;[^}]*padding-inline:\s*var\(--ds-hero-glyph-bleed\);[^}]*margin-inline:\s*calc\(var\(--ds-hero-glyph-bleed\) \* -1\)/s,
@@ -234,74 +288,32 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
     css,
     /\.ds-hero-headline-morph__prefix-out\s*\{[^}]*left:\s*var\(--ds-hero-glyph-bleed\)/s,
   );
-  assert.match(css, /\.ds-door-journey__card[\s\S]*max-height/);
-  assert.match(css, /@media \(max-height: 52rem\)/);
-  assert.match(css, /\.ds-door__field-chrome[\s\S]*top:\s*var\(--ds-space-4\)/);
-  assert.match(css, /\.ds-door__filters[\s\S]*min-height:\s*44px/);
-  assert.match(css, /@media \(max-width: 899px\)[\s\S]*\.ds-door__filters[\s\S]*margin-left:\s*0/);
+  assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
   assert.match(
     css,
     /body:has\(\.ds-door\)\s+\.ds-shell\s*>\s*\.ds-bar[\s\S]*pointer-events:\s*auto/,
   );
-  // Mobile chapters are in document flow; nested card scroll would steal the page wheel.
-  assert.match(css, /@media \(max-width: 899px\)[\s\S]*max-height:\s*none/);
-  // On a phone the window is a band under the bar, sized to the country, that the chapters
-  // scroll over; the plate stays fixed full-bleed rather than a sticky strip cards cover.
+  // Stacked (phone or portrait): the dock sits above the tab bar and the window above the dock.
   assert.match(
     css,
-    /@media \(max-width: 899px\)[\s\S]*\.ds-door__window\s*\{[^}]*height:\s*var\(--ds-door-band\)/,
+    /@media \(max-width: 47\.9375rem\), \(max-aspect-ratio: 1\/1\)[\s\S]*\.ds-door__dock\s*\{[^}]*bottom:\s*calc\(var\(--ds-tabbar-h\)/,
   );
-  assert.doesNotMatch(css, /position:\s*sticky/);
-  // Every later chapter opens with a band-high gap, so the flown map is seen before its card.
-  assert.match(css, /\.ds-door-journey__chapter\s*\{[^}]*padding:\s*var\(--ds-door-band\)/);
-  // Below 900px every card is one centered column at a reading width: full width on a phone,
-  // centered under the country on a tablet rather than a 480px card against the left edge.
-  assert.match(
-    css,
-    /@media \(max-width: 899px\)[\s\S]*\.ds-door-journey__chapter--center\s*\{\s*justify-items:\s*center/,
-  );
-  assert.match(css, /\.ds-door-journey__card[\s\S]*width:\s*min\(36rem/);
-  // The morph slot stays shrinkable so its animated width directly positions Story.
-  assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
-  // Opening masthead is edge-anchored low so the map reads as the stage.
-  assert.match(css, /\.ds-door-journey__chapter--rest\s*\{[^}]*align-content:\s*end/);
+  // The attribution, a license obligation, is one collapsed 44px "i" in the window's
+  // bottom-right corner, not a box of links on the map.
+  assert.doesNotMatch(css, /--ds-map-attrib-left:|--ds-map-attrib-bottom:/);
+  assert.match(css, /\.maplibregl-ctrl-bottom-left\s*\{[^}]*right:\s*var\(--ds-space-4\)/);
+  assert.match(css, /\.maplibregl-ctrl-attrib-button\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px/);
+  // The plate's DOM state codes stand down while the Door draws its own in one collision pass.
+  assert.match(css, /\.ds-map-stage \.ds-state-label\s*\{\s*visibility:\s*hidden/);
+  assert.match(immersive, /mountDoorPlateLabels\(map, sweptPinsRef\.current\)/);
 });
 
-test('door-home CSS switches mobile typography and gutters', () => {
+test('door-home CSS steps the headline down on a phone', () => {
   assert.match(css, /ds-door-open__headline[\s\S]*clamp\(/);
-  assert.match(css, /var\(--ds-gutter\)/);
-});
-
-test('the phone opening card never scrolls inside itself', () => {
-  // A capped height with an inner scroller clipped the headline on a 320x568 screen.
-  const start = css.indexOf('@media (max-width: 559px) {');
-  assert.ok(start >= 0, 'the phone block exists');
-  const next = css.indexOf('@media', start + 1);
-  const phone = css.slice(start, next === -1 ? undefined : next);
-  assert.doesNotMatch(phone, /overflow-y:\s*auto/);
-  assert.doesNotMatch(phone, /max-height:\s*calc\(100dvh/);
-});
-
-test('the opening masthead names a place through the public pin href', () => {
-  assert.match(immersive, /ds-door-open/);
-  assert.match(immersive, /ds-door-open__place/);
-  // The same pin table a marker click opens, so the link is the canonical place URL.
-  assert.match(immersive, /hrefByPinId\.get\(spotlightPinId\)/);
-});
-
-test('the opening masthead densifies with invite, kind ledger, and morphing headline', () => {
-  assert.match(immersive, /HeroHeadlineMorph/);
-  assert.match(immersive, /DOOR_OPEN_INVITE/);
-  assert.match(immersive, /ds-door-open__invite/);
-  assert.match(immersive, /ds-door-open__ledger/);
-  assert.match(immersive, /ds-door-open__ledger-row/);
-  assert.match(immersive, /openLedger/);
-  assert.match(door, /openLedger=\{openLedger\}/);
-  assert.match(door, /KIND_FAMILY_ENTRIES/);
-  assert.match(door, /buildOpenLedger/);
-  assert.match(css, /\.ds-door-open__invite\s*\{/);
-  assert.match(css, /\.ds-door-open__ledger\s*\{/);
-  assert.match(css, /\.ds-door-open__ledger-count\s*\{/);
+  assert.match(
+    css,
+    /@media \(max-width: 47\.9375rem\)[\s\S]*\.ds-door-open__headline\s*\{\s*font-size:\s*clamp\(/,
+  );
 });
 
 test('DoorImmersive hands every record to the plate', () => {
@@ -336,6 +348,7 @@ test('a reader without a plate is told so, where the map would be, and sent to t
     immersive,
     /plateUnavailable \? \([\s\S]*ds-door__field-note[\s\S]*href="\/records"/,
   );
+  assert.doesNotMatch(immersive, /ds-door__field-fallback/);
   // The server-rendered fallback remains useful when JavaScript is unavailable.
   assert.match(door, /<DoorNoscript view=\{noscriptView\}/);
   const noscript = readFileSync(
@@ -347,5 +360,4 @@ test('a reader without a plate is told so, where the map would be, and sent to t
     /<noscript>[\s\S]*ds-door__noscript[\s\S]*href="\/records"[\s\S]*<\/noscript>/,
   );
   assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);
-  assert.doesNotMatch(css, /\.ds-door__field-chrome\s*\{\s*display:\s*none/);
 });

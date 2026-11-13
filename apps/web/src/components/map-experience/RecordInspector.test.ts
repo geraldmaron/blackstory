@@ -5,9 +5,13 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { RecordSheet, type RecordSheetProps, type SheetRecord } from './RecordSheet';
+import {
+  RecordInspector,
+  type InspectorRecord,
+  type RecordInspectorProps,
+} from './RecordInspector';
 
-const RECORD: SheetRecord = {
+const RECORD: InspectorRecord = {
   id: 'ent_gaston_motel',
   name: 'A.G. Gaston Motel',
   kind: 'place',
@@ -19,20 +23,15 @@ const RECORD: SheetRecord = {
   href: '/entity/ent_gaston_motel',
 };
 
-function render(overrides: Partial<RecordSheetProps> = {}): string {
-  const props: RecordSheetProps = { record: RECORD, onClose: () => {}, ...overrides };
-  return renderToStaticMarkup(createElement(RecordSheet, props));
+function render(overrides: Partial<RecordInspectorProps> = {}): string {
+  const props: RecordInspectorProps = { record: RECORD, ...overrides };
+  return renderToStaticMarkup(createElement(RecordInspector, props));
 }
 
-test('no record means no inspector', () => {
-  assert.equal(render({ record: null }), '');
-});
-
-test('the inspector is a dialog that does not trap the reader on the map', () => {
+test('the inspector is a labelled region, not a modal: the map stays operable beside it', () => {
   const html = render();
-  assert.match(html, /role="dialog"/);
-  assert.match(html, /aria-modal="false"/, 'the map must stay operable behind it');
-  assert.match(html, /aria-labelledby="ds-sheet-name"/);
+  assert.doesNotMatch(html, /aria-modal="true"/);
+  assert.match(html, /<article[^>]*aria-labelledby="ds-inspector-name"/);
 });
 
 test('reads in order: kind and place, name, summary, precision, evidence, Open record', () => {
@@ -41,7 +40,7 @@ test('reads in order: kind and place, name, summary, precision, evidence, Open r
     'Place · Birmingham, Alabama',
     'A.G. Gaston Motel',
     'Built in 1954',
-    'Placed to the city',
+    'City-level location',
     'Grade A',
     '6 sources',
     'Open record',
@@ -54,15 +53,15 @@ test('reads in order: kind and place, name, summary, precision, evidence, Open r
 });
 
 test('the precision statement renders for every record, in words', () => {
-  assert.match(render({ record: { ...RECORD, precision: 'site' } }), /Placed at the site/);
-  assert.match(render({ record: { ...RECORD, precision: 'state' } }), /Placed to the state/);
+  assert.match(render({ record: { ...RECORD, precision: 'site' } }), /Exact site/);
+  assert.match(render({ record: { ...RECORD, precision: 'state' } }), /State-level location/);
 });
 
 test('one primary action opens the record page; no camera button, no miniature record page', () => {
   const html = render();
   assert.match(
     html,
-    /<a class="ds-sheet__open" href="\/entity\/ent_gaston_motel">Open record<\/a>/,
+    /<a class="ds-button ds-button--primary" href="\/entity\/ent_gaston_motel">Open record<\/a>/,
   );
   assert.doesNotMatch(html, /Fly to place/);
   assert.doesNotMatch(html, /Sources|Documented connections|Cited in|Visit/);
@@ -82,4 +81,10 @@ test('the evidence signal is a meter plus words, never color alone', () => {
   const html = render();
   assert.match(html, /class="ds-rec-meter[^"]*"[^>]*role="img"[^>]*aria-label="[^"]+"/);
   assert.match(html, /Grade A/);
+});
+
+test('a photo shows only when the archive holds one; never a placeholder box', () => {
+  assert.doesNotMatch(render(), /ds-inspector__photo/);
+  const html = render({ record: { ...RECORD, photoUrl: 'https://cdn.example/gaston.jpg' } });
+  assert.match(html, /<img src="https:\/\/cdn.example\/gaston.jpg" alt=""/);
 });

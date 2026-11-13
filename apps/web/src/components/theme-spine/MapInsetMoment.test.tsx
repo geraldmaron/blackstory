@@ -26,7 +26,7 @@ describe('MapInsetMoment', () => {
     const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
     assert.match(html, /<figure class="ds-record-map">/);
     assert.match(html, /Fifteenth Street Presbyterian Church/);
-    assert.match(html, /Placed to the neighborhood/);
+    assert.match(html, /Neighborhood-level location/);
   });
 
   it('links into /explore with the entity pre-selected via the shared selected= convention', () => {

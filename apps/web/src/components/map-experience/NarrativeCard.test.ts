@@ -87,7 +87,7 @@ test('Where links to maps when the record is not visitable', () => {
 test('states the location precision in words beside the map, never as a bare number', () => {
   const feature = requireFeature('ent_dunbar_school_001');
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
-  assert.match(html, /class="ds-record-map__precision">Placed (at|to) the [a-z]+</);
+  assert.match(html, /class="ds-record-map__precision">(Exact site|[A-Z][a-z]+-level location)</);
 });
 
 test('renders edition fact strip and browse controls when browseControls props are provided', () => {

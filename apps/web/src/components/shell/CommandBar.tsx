@@ -165,15 +165,11 @@ export function CommandBar({
   const browsing = pathIsBrowsing(pathname, doorBrowse);
   const current = currentTabFor(pathname);
   const tabs: TabItem[] = SHELL_TABS.map((tab) => {
-    // While browsing the map full screen, pressing Map returns to the journey: pushState left
-    // Next on `/`, so a link to `/` would do nothing.
+    // On the map, Map is the page you are on: marked current and inert. It never navigates (a
+    // link would drop the map's filters from the URL) and never doubles as a way out. The lockup
+    // is the way home.
     if (tab.id === '/explore' && pathIsMapSurface(pathname) && browsing) {
-      return {
-        label: tab.label,
-        current: true,
-        ariaLabel: `${tab.label}, back to the journey`,
-        onClick: () => exitMapBrowse(),
-      };
+      return { label: tab.label, current: true };
     }
     return { label: tab.label, href: tab.href, current: current === tab.id };
   });
@@ -186,7 +182,18 @@ export function CommandBar({
         data-search-open={searchOpen ? 'true' : undefined}
       >
         <div className="ds-bar__inner">
-          <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory, home">
+          <Link
+            className="ds-bar__brand ds-shell-wordmark"
+            href="/"
+            aria-label="BlackStory, home"
+            onClick={(event) => {
+              // Browsing the map on the Door, pushState left Next on `/`, so the link alone would
+              // do nothing: home is the journey, so leave browse back into it.
+              if (!doorBrowse) return;
+              event.preventDefault();
+              exitMapBrowse();
+            }}
+          >
             <ShellWordmark lockup={BRAND_ASSETS.lockup} />
           </Link>
 

@@ -343,7 +343,6 @@ describe('/records · place hrefs and map continuity', () => {
     assert.equal(byId.get('ent_school_b')?.href, '/place/union-school--ent_school_b?from=list');
     assert.equal(byId.get('ent_person_a')?.href, '/entity/ent_person_a?from=list');
     assert.equal(typeof model.mappableMatched, 'number');
-    assert.match(model.atlasReason, /records match/i);
   });
 
   it('findRecordsNeighbors steps within the same narrowing and keeps arrival query', () => {
@@ -495,5 +494,108 @@ describe('/records · crawl-trap guard', () => {
       era: other.id,
     });
     assert.equal(both.indexable, false);
+  });
+});
+
+describe('/records · order and decade jumps', () => {
+  const entities = [
+    entity({ id: 'late', displayName: 'Union Church', era: '1950s', summary: 'A school.' }),
+    entity({ id: 'early', displayName: 'Old Meeting House', era: '1790s', summary: 'A church.' }),
+    entity({ id: 'name', displayName: 'Church Street', era: '1880s', summary: 'A street.' }),
+  ];
+
+  it('reads earliest first with no search, and best match first with one', () => {
+    const plain = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      plain.rows.map((row) => row.id),
+      ['early', 'name', 'late'],
+    );
+    const searched = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, q: 'church' });
+    // A leading name match, then a later word in the name, then a summary-only match.
+    assert.deepEqual(
+      searched.rows.map((row) => row.id),
+      ['name', 'late', 'early'],
+    );
+  });
+
+  it('offers a jump to every decade while the order is by time, and none otherwise', () => {
+    const plain = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      plain.decadeJumps.map((jump) => [jump.label, jump.page, jump.href]),
+      [
+        ['1790s', 1, '/records#decade-1790'],
+        ['1880s', 1, '/records#decade-1880'],
+        ['1950s', 1, '/records#decade-1950'],
+      ],
+    );
+    const byName = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, sort: 'name' });
+    assert.deepEqual(byName.decadeJumps, []);
+  });
+
+  it('a decade jump lands on the page where that decade starts', () => {
+    const many = [
+      ...Array.from({ length: 150 }, (_, index) => entity({ id: `a${index}`, era: '1880s' })),
+      entity({ id: 'z', era: '1950s' }),
+    ];
+    const model = buildRecordsIndex(many, EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      model.decadeJumps.map((jump) => [jump.label, jump.page]),
+      [
+        ['1880s', 1],
+        ['1950s', 2],
+      ],
+    );
+    assert.equal(model.decadeJumps[1]?.href, '/records?page=2#decade-1950');
+  });
+
+  it('sort=era without a search is the default order under another spelling', () => {
+    const model = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, sort: 'era' });
+    assert.equal(model.canonicalPath, '/records');
+  });
+});
+
+describe('/records · rows state only what the record supports', () => {
+  it('a Green Book 1956 listing never sorts earlier than the 1930s', () => {
+    const listing = entity({
+      id: 'greenbook-1956-0683',
+      displayName: 'Collins Restaurant',
+      summary: '',
+      // What releases built before the street-number fix stored: the house number as a decade.
+      eraBuckets: ['1510s', '1950s'],
+    });
+    const colonial = entity({ id: 'fort', displayName: 'Fort Mose', eraBuckets: ['1730s'] });
+    const model = buildRecordsIndex([listing, colonial], EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      model.rows.map((row) => [row.name, row.era]),
+      [
+        ['Fort Mose', '1730s'],
+        ['Collins Restaurant', '1950s'],
+      ],
+    );
+  });
+
+  it('takes the address the map plate resolved, and /entity off the plate, so no row is dead', () => {
+    const doc = {
+      id: 'greenbook-1956-0001',
+      displayName: 'Liberty Hotel',
+      kind: 'place',
+      summary: 'A hotel listed in the Green Book.',
+      jurisdictionLabel: 'New Jersey',
+      locationLabel: '',
+      topicTags: [],
+      eraBuckets: ['1950s'],
+      confidenceTier: 'low',
+      mappable: true,
+    } as const;
+    const bare = { ...doc, id: 'bare', displayName: 'Bare Record', summary: '' };
+    const offPlate = { ...doc, id: 'off', displayName: 'Off Plate' };
+    const drawn = new Map([['greenbook-1956-0001', '/entity/greenbook-1956-0001']]);
+    const hrefs = buildRecordsIndex([doc, bare, offPlate], EMPTY_RECORDS_QUERY, drawn).rows.map(
+      (row) => row.href.split('?')[0],
+    );
+    assert.deepEqual(hrefs.sort(), ['/entity/bare', '/entity/greenbook-1956-0001', '/entity/off']);
+    // Without a plate (record-page neighbors) the summary rule still holds: no summary, no /place.
+    const guessed = buildRecordsIndex([bare], EMPTY_RECORDS_QUERY).rows[0]?.href.split('?')[0];
+    assert.equal(guessed, '/entity/bare');
   });
 });

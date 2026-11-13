@@ -3,17 +3,24 @@ import {
   drawableCollection,
 } from '../../../lib/discovery/explore-collection';
 import { collectionMemberIds } from '../../../lib/discovery/story-collection';
+import {
+  documentedDecades,
+  normalizePeriod,
+  periodIsActive,
+  periodIsInvalid,
+  periodLabel,
+  type CollectionPeriod,
+} from '../../../lib/discovery/collection-period';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { UseToasts } from '../../../components/patterns/Toast';
-import type { LensLayers } from '../../../components/map-experience/LensPanel';
-import type { ResultsSort } from '../../../components/map-experience/ResultsRail';
+import { decadeRangeLabel } from '../../../components/map-experience/DecadeBrush';
 import { floorLabel, type EvidenceFloor } from '../../../lib/map-experience/evidence-grade';
 import { decadeDensityBars } from '../../../lib/map-experience/decade-density';
-import { earliestDecadeFor } from '../../../lib/map-experience/decade-transition';
 import { buildTopicCounts, type TopicCount } from '../../../lib/map-experience/filters';
 import { lensPermitsAreaFill } from '../../../lib/map-experience/lens-composition';
 import {
+  MAP_KIND_FAMILY_ENCODING,
   isKnownMapKind,
   isKnownMapKindFamily,
   kindFamilyEncodingFor,
@@ -22,33 +29,40 @@ import {
 } from '../../../lib/map-experience/kind-encoding';
 import type { ExploreLayerMode } from '../../../lib/map-experience/url-state';
 import type { ExploreViewModel } from '../explore-view-model';
-import { decadeStartYear, eraBucketFor, eraFor } from './atlas-feature-helpers';
-import { isInternalRecordLabel } from '../../../lib/place/public-place-path';
+import { decadeStartYear } from './atlas-feature-helpers';
+import { sortExploreRows, type ExploreRowSort } from '../../../lib/map-experience/explore-rows';
 import {
   applyNearbyRadius,
   nearestDistance,
   nearbyConstraintLabel,
   nearbyDistances,
-  sortByDistance,
   type NearbyArea,
 } from '../../../lib/map-experience/nearby';
 
-/** Presence rows shown in the lens. Ten is what fits without the panel becoming a table. */
-const PRESENCE_ROWS = 10;
+/** Layers a reader can toggle from the filter state of the column. */
+export type LensLayers = {
+  readonly pins: boolean;
+  readonly routes: boolean;
+  readonly labels: boolean;
+  readonly satellite: boolean;
+};
+
+export type LensLayerKey = keyof LensLayers;
 
 /** One active, clearable narrowing constraint, rendered as a chip in the Results header
  * (docs/ui/patterns-lens-handoff.md §3). `selected`, `collection` and `find` are named
  * exclusions there — they address rather than narrow — and none of them is built here. */
 export type LensConstraint = {
-  readonly key: 'q' | 'near' | 'state' | 'kind' | 'topic' | 'status' | 'evidenceFloor' | 'decade';
+  readonly key:
+    'q' | 'near' | 'state' | 'kind' | 'topic' | 'status' | 'evidenceFloor' | 'decade' | 'period';
   readonly label: string;
   readonly onClear: () => void;
 };
 
 /**
- * The lens: every filter a reader can apply to the archive (state, kind, decade, evidence floor,
- * layer toggles, sort), and everything derived from them — the filtered/sorted feature lists, the
- * kind and state presence counts, and the decade histogram bars.
+ * The lens: every filter a reader can apply to the archive (state, kind, documented decades,
+ * evidence floor, layer toggles, sort), and everything derived from them: the filtered and sorted
+ * feature lists, the kind counts, and the decade histogram bars.
  */
 export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   const [stateCode, setStateCode] = useState(view.viewState.state ?? '');
@@ -68,21 +82,25 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setKindFamilyState(next);
   }, []);
   const [evidenceFloor, setEvidenceFloor] = useState<EvidenceFloor>(view.viewState.floor ?? 'any');
-  const [decade, setDecadeState] = useState<number | null>(null);
-  const setDecade = useCallback((next: number | null) => {
-    setDecadeState(next);
-    setEra(next === null ? 'all' : eraBucketFor(next));
-  }, []);
   /**
-   * The story sweep's cursor: show every record whose era had begun by this decade, cumulatively.
-   *
-   * Deliberately not the `decade` filter above. That one is the reader's own instrument and it is
-   * a *window* — click the 1920s bar and you get the 1920s. The sweep is an argument about the
-   * record accumulating, so it needs the opposite semantics, and folding the two together would
-   * mean the histogram chip lied about what the map was showing. A value below the archive's
-   * first decade empties the plate, which is how chapter 4 opens.
+   * The brushed decade range: documented decades, never event years (`collection-period.ts`).
+   * Seeded from `?periodStart=&periodEnd=` and written back through the URL sync like any filter.
    */
-  const [sweepDecade, setSweepDecade] = useState<number | null>(null);
+  const [period, setPeriodState] = useState<CollectionPeriod>(() =>
+    normalizePeriod({
+      start: view.viewState.periodStart,
+      end: view.viewState.periodEnd,
+      includeUndated: view.viewState.includeUndated,
+    }),
+  );
+  const setPeriod = useCallback((start: number | null, end: number | null) => {
+    setPeriodState(
+      normalizePeriod({
+        start: start === null ? '' : String(start),
+        end: end === null ? '' : String(end),
+      }),
+    );
+  }, []);
   const [topicId, setTopicId] = useState<string | null>(
     view.viewState.filters.theme !== 'all' ? view.viewState.filters.theme : null,
   );
@@ -97,13 +115,16 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     // Seeded from `?sat=1` so a shared satellite view opens as satellite.
     satellite: view.viewState.sat,
   });
-  const [sort, setDisplaySort] = useState<ResultsSort>(view.viewState.sort ?? 'discovery');
+  const [sort, setDisplaySort] = useState<ExploreRowSort>(view.viewState.sort ?? 'discovery');
   const [bibliographySort, setBibliographySort] = useState(view.viewState.sort ?? 'discovery');
-  const setSort = useCallback((next: ResultsSort | ((current: ResultsSort) => ResultsSort)) => {
-    setDisplaySort(next);
-    if (next === 'discovery' || next === 'era' || next === 'name' || next === 'evidence')
-      setBibliographySort(next);
-  }, []);
+  const setSort = useCallback(
+    (next: ExploreRowSort | ((current: ExploreRowSort) => ExploreRowSort)) => {
+      setDisplaySort(next);
+      if (next === 'discovery' || next === 'era' || next === 'name' || next === 'evidence')
+        setBibliographySort(next);
+    },
+    [],
+  );
   /**
    * A located point (the reader's device or a searched place). Narrows like any other lens
    * constraint: a chosen radius filters, and the rail sorts nearest-first while it is set.
@@ -129,9 +150,19 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   );
 
   const collectionState = useMemo(() => {
-    const { state: _state, floor: _floor, ...base } = view.viewState;
+    const {
+      state: _state,
+      floor: _floor,
+      periodStart: _periodStart,
+      periodEnd: _periodEnd,
+      includeUndated: _includeUndated,
+      ...base
+    } = view.viewState;
     return {
       ...base,
+      ...(period.start !== '' ? { periodStart: period.start } : {}),
+      ...(period.end !== '' ? { periodEnd: period.end } : {}),
+      ...(period.includeUndated ? { includeUndated: true } : {}),
       query,
       sort: bibliographySort,
       ...(stateCode ? { state: stateCode } : {}),
@@ -146,6 +177,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     } as const;
   }, [
     view.viewState,
+    period,
     query,
     bibliographySort,
     stateCode,
@@ -170,44 +202,23 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     [view.collectionFacts, collectionState, collectionMembers],
   );
   /** Unlocated matches remain in collectionMatches; only drawable records enter the plate. */
-  const lensFiltered = useMemo(() => {
-    let features = collectionMatches
-      ? drawableCollection(view.allFeatures, collectionMatches)
-      : view.filteredFeatures;
-    if (sweepDecade !== null)
-      features = features.filter((feature) => {
-        const earliest = earliestDecadeFor(feature);
-        return earliest !== null && earliest <= sweepDecade;
-      });
-    return features;
-  }, [
-    collectionMatches,
-    collectionState,
-    view.allFeatures,
-    view.filteredFeatures,
-    stateCode,
-    evidenceFloor,
-    sweepDecade,
-  ]);
+  const lensFiltered = useMemo(
+    () =>
+      collectionMatches
+        ? drawableCollection(view.allFeatures, collectionMatches)
+        : view.filteredFeatures,
+    [collectionMatches, view.allFeatures, view.filteredFeatures],
+  );
 
   const filtered = useMemo(
     () => (nearby && distances ? applyNearbyRadius(lensFiltered, nearby, distances) : lensFiltered),
     [distances, lensFiltered, nearby],
   );
 
-  /** Distance to the closest record the lens shows, inside the radius or not — so "nothing within
+  /** Distance to the closest record the lens shows, inside the radius or not, so "nothing within
    * 5 miles" can still say where the nearest one is. */
   const nearestMeters = useMemo(
-    () =>
-      distances
-        ? nearestDistance(
-            // The rail's own rows: internal placeholder records never show, so never count.
-            lensFiltered.filter(
-              (feature) => !isInternalRecordLabel(feature.properties.displayName),
-            ),
-            distances,
-          )
-        : undefined,
+    () => (distances ? nearestDistance(lensFiltered, distances) : undefined),
     [distances, lensFiltered],
   );
 
@@ -279,10 +290,17 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       });
     }
     if (era !== 'all') {
+      rows.push({ key: 'decade', label: era, onClear: () => setEra('all') });
+    }
+    if (periodIsActive(period)) {
       rows.push({
-        key: 'decade',
-        label: era,
-        onClear: () => setDecade(null),
+        key: 'period',
+        // Worded as the decade dock words it, so the two never read as different filters.
+        label:
+          period.start !== '' && period.end !== '' && !periodIsInvalid(period)
+            ? `${decadeRangeLabel({ start: Number(period.start), end: Number(period.end) })}${period.includeUndated ? ', plus undated' : ''}`
+            : periodLabel(period),
+        onClear: () => setPeriod(null, null),
       });
     }
     return rows;
@@ -290,7 +308,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     query,
     era,
     exactKind,
-    decade,
+    period,
+    setPeriod,
     evidenceFloor,
     kindFamily,
     nearby,
@@ -301,48 +320,42 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     topicId,
   ]);
 
-  const sorted = useMemo(() => {
-    const rows = filtered.filter(
-      (feature) => !isInternalRecordLabel(feature.properties.displayName),
-    );
-    if (sort === 'nearest' && distances) return sortByDistance(rows, distances);
-    if (sort === 'discovery' || sort === 'era' || sort === 'name' || sort === 'evidence')
-      return rows;
-    rows.sort((a, b) => {
-      const left = decadeStartYear(eraFor(a));
-      const right = decadeStartYear(eraFor(b));
-      if (left !== right) return sort === 'oldest' ? left - right : right - left;
-      return a.properties.displayName.localeCompare(b.properties.displayName);
-    });
-    return rows;
-  }, [distances, filtered, sort]);
+  const sorted = useMemo(
+    () => sortExploreRows(filtered, sort, distances, periodIsActive(period) ? period : undefined),
+    [distances, filtered, sort, period],
+  );
 
+  /**
+   * Kind facet counts: what the column would count with that kind chosen and every other filter
+   * applied. Run through the same match, drawable and radius steps as the list itself, so a
+   * selected chip's number always equals the column's count.
+   */
   const kindCounts = useMemo(() => {
     const counts: Partial<Record<MapKindFamily, number>> = {};
-    for (const feature of view.allFeatures) {
-      const family = feature.properties.kindFamily as MapKindFamily;
-      counts[family] = (counts[family] ?? 0) + 1;
+    for (const family of Object.keys(MAP_KIND_FAMILY_ENCODING) as MapKindFamily[]) {
+      const rows = view.collectionFacts
+        ? drawableCollection(
+            view.allFeatures,
+            matchExploreCollection(
+              view.collectionFacts,
+              { ...collectionState, filters: { ...collectionState.filters, kind: family } },
+              collectionMembers,
+            ),
+          )
+        : view.allFeatures.filter((feature) => feature.properties.kindFamily === family);
+      counts[family] = (
+        nearby && distances ? applyNearbyRadius(rows, nearby, distances) : rows
+      ).length;
     }
     return counts;
-  }, [view.allFeatures]);
-
-  const presence = useMemo(() => {
-    const counts = new Map<string, { name: string; count: number }>();
-    for (const feature of view.allFeatures) {
-      const code = feature.properties.statePostalCode;
-      if (!code) continue;
-      const entry = counts.get(code) ?? {
-        name: feature.properties.stateName ?? findUsStateByPostalCode(code)?.name ?? code,
-        count: 0,
-      };
-      entry.count += 1;
-      counts.set(code, entry);
-    }
-    return [...counts.entries()]
-      .map(([postalCode, entry]) => ({ postalCode, name: entry.name, count: entry.count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, PRESENCE_ROWS);
-  }, [view.allFeatures]);
+  }, [
+    collectionMembers,
+    collectionState,
+    distances,
+    nearby,
+    view.allFeatures,
+    view.collectionFacts,
+  ]);
 
   const stateOptions = useMemo(
     () =>
@@ -352,16 +365,35 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     [view.facetOptions.state],
   );
 
-  const decadeBars = useMemo(
-    () =>
-      decadeDensityBars(
+  /**
+   * The histogram: how the records every other filter leaves are spread across documented
+   * decades. The brushed range itself is lifted, or brushing would erase the bars outside it and
+   * the reader could never widen the range again. Before the catalog arrives, the release-wide
+   * counts the shell already carries.
+   */
+  const decadeBars = useMemo(() => {
+    if (!view.collectionFacts) {
+      return decadeDensityBars(
         view.entityDecades.map((entry) => ({
           decade: decadeStartYear(entry.decade),
           count: entry.count,
         })),
-      ),
-    [view.entityDecades],
-  );
+      );
+    }
+    const {
+      periodStart: _periodStart,
+      periodEnd: _periodEnd,
+      includeUndated: _includeUndated,
+      ...unbrushed
+    } = collectionState;
+    const counts = new Map<number, number>();
+    for (const fact of matchExploreCollection(view.collectionFacts, unbrushed, collectionMembers)) {
+      for (const decade of documentedDecades(fact.eraBuckets)) {
+        counts.set(decade, (counts.get(decade) ?? 0) + 1);
+      }
+    }
+    return decadeDensityBars([...counts].map(([decade, count]) => ({ decade, count })));
+  }, [collectionMembers, collectionState, view.collectionFacts, view.entityDecades]);
 
   const resetLens = useCallback(() => {
     const previous = {
@@ -371,7 +403,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       era,
       query,
       evidenceFloor,
-      decade,
+      period,
       topicId,
       status,
       nearby,
@@ -381,7 +413,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setStateCode('');
     setKindFamily(null);
     setEvidenceFloor('any');
-    setDecade(null);
+    setPeriodState(normalizePeriod({}));
     setTopicId(null);
     setStatus(null);
     toasts.show({
@@ -394,7 +426,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
           setStateCode(previous.stateCode);
           setKindFamily(previous.kindFamily);
           setEvidenceFloor(previous.evidenceFloor);
-          setDecade(previous.decade);
+          setPeriodState(previous.period);
           setTopicId(previous.topicId);
           setStatus(previous.status);
           setExactKind(previous.exactKind);
@@ -407,13 +439,12 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     query,
     era,
     exactKind,
-    decade,
+    period,
     evidenceFloor,
     kindFamily,
     nearby,
     setNearby,
     setKindFamily,
-    setDecade,
     stateCode,
     status,
     toasts,
@@ -432,10 +463,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setKindFamily,
     evidenceFloor,
     setEvidenceFloor,
-    decade,
-    setDecade,
-    sweepDecade,
-    setSweepDecade,
+    period,
+    setPeriod,
     topicId,
     setTopicId,
     status,
@@ -455,7 +484,6 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     sorted,
     kindCounts,
     topicCounts,
-    presence,
     stateOptions,
     decadeBars,
     constraints,

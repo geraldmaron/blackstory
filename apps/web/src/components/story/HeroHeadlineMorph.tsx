@@ -5,7 +5,7 @@
  * uppercase S), then the prefix crossfades through Her / Their / Your / Black
  * Story before holding. The prefix slot width interpolates so Story slides
  * instead of jumping. Trailer stays "happened *here*." Letter spans are
- * aria-hidden; the heading exposes the full accessible label.
+ * aria-hidden; the heading's accessible name is the settled line throughout.
  *
  * Paced by one timer per phase boundary, not a per-frame loop, and only while the heading is on
  * screen: Explore mounts the Door with its journey hidden, and a morph nobody can see was still
@@ -226,7 +226,9 @@ export function HeroHeadlineMorph({
   const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 
   return (
-    <h1 ref={headingRef} className={className} id={id} aria-label={phase.accessibleLabel}>
+    // The name is the settled line, not the frame on screen: a heading that renames itself every
+    // few hundred milliseconds reads to a screen reader (and in a shared screenshot) as a typo.
+    <h1 ref={headingRef} className={className} id={id} aria-label={FINAL_PHASE.accessibleLabel}>
       <span
         className="ds-hero-headline-morph"
         aria-hidden="true"

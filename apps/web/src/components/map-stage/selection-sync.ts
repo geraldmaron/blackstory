@@ -31,11 +31,9 @@ export function setSelectedEntityFilter(map: MapLibreMap, entityId: string | und
     map.setFilter(EXPLORE_SELECTED_TAG_LAYER_ID, selectedTagFilterExpression(entityId) as any);
   }
   if (map.getLayer(EXPLORE_JURISDICTION_TAG_LAYER_ID)) {
+    const unselected = unselectedTagFilterExpression(entityId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
-    map.setFilter(
-      EXPLORE_JURISDICTION_TAG_LAYER_ID,
-      unselectedTagFilterExpression(entityId) as any,
-    );
+    map.setFilter(EXPLORE_JURISDICTION_TAG_LAYER_ID, unselected as any);
   }
 }
 export function setHistoryEdgeData(map: MapLibreMap, collection: HistoryEdgeLineCollection): void {

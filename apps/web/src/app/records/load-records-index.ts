@@ -62,7 +62,9 @@ export const loadRecordsIndex = cache(async function loadRecordsIndex(
     // Only a well-formed `story:<slug>` reads the story cache; sentinels need no read.
     slug === undefined ? Promise.resolve(undefined) : resolveStoryCollectionSource(slug),
   ]);
-  const drawableIds = new Set(features.map((feature) => feature.properties.entityId));
+  const drawableIds = new Map(
+    features.map((feature) => [feature.properties.entityId, feature.properties.href] as const),
+  );
   // Membership resolves over the released bibliography only: linked ids that are not in this
   // catalog are counted by the descriptor, never listed.
   const collection: CollectionDescriptor =

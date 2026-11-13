@@ -8,11 +8,6 @@ import { describe, it } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import {
-  EMPTY_RECORDS_QUERY,
-  type RecordsIndex as RecordsIndexModel,
-} from '../../lib/records/build-records-index';
-import { RecordsIndexRoom } from '../../app/records/RecordsIndex';
 import { CollectionPeriodControls } from './collection-period-controls';
 import {
   CollectionContext,
@@ -113,62 +108,6 @@ describe('CollectionContext counts', () => {
 });
 
 describe('CollectionContext integrations', () => {
-  it('renders in the Records room with its own model hrefs and counts', () => {
-    const model = {
-      query: { ...EMPTY_RECORDS_QUERY, q: 'school', sort: 'era', page: 2 },
-      rows: [
-        {
-          id: 'unmapped-school',
-          href: '/entity/unmapped-school',
-          name: 'Unmapped School',
-          place: 'Place not recorded',
-          era: '1920s',
-          kind: 'school',
-          kindFamily: 'place',
-          mapTone: undefined,
-          grade: null,
-          gradeDescription: 'Unrated',
-          confidenceTier: 'unrated',
-          mappable: false,
-        },
-      ],
-      totalAll: 4000,
-      totalMatched: 30,
-      mappableMatched: 25,
-      page: 2,
-      pageCount: 2,
-      countLabel: '30 records',
-      previousHref: undefined,
-      nextHref: undefined,
-      facets: { kind: [], era: [], state: [], topic: [], status: [], evidence: [] },
-      eraGroups: [],
-      stateGroups: [],
-      constraints: [],
-      clearAllHref: '/records',
-      atlasHref: '/explore?q=school&sort=era',
-      atlasReason: '30 records match. 25 appear on the map.',
-      collection: { state: 'none' },
-      indexHref: '/records?q=school&sort=era&page=2',
-      chronologyHref: '/records?q=school&sort=era&layout=chronology',
-      periodClearHref: '/records?q=school&sort=era',
-      periodDecades: [],
-      undatedExcluded: 0,
-    } as unknown as RecordsIndexModel;
-    const markup = renderToStaticMarkup(
-      <RecordsIndexRoom model={model} releaseLabel="Active release" />,
-    );
-    assert.match(markup, /class="ds-collection ds-collection--flat"/);
-    assert.match(markup, /30 records in this collection/);
-    assert.match(markup, /Not on the map/);
-    assert.match(markup, /25 can be placed on the map; 5 have no mapped location/);
-    // The active Records link keeps the current page of the same collection.
-    assert.match(
-      markup,
-      /href="\/records\?q=school&amp;sort=era&amp;page=2"[^>]*aria-current="page"/,
-    );
-    assert.match(markup, /href="\/explore\?q=school&amp;sort=era"[^>]*>Map<\/a>/);
-  });
-
   it('is wired into the embedded Explore surface and replaces the rail fragment', () => {
     const source = readFileSync(
       new URL('../../app/explore/AtlasExperience.tsx', import.meta.url),

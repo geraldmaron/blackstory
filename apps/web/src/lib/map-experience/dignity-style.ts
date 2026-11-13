@@ -96,11 +96,10 @@ export const DIGNITY_PALETTE = {
   confidenceLow: '#D07A32',
   confidenceUnrated: brandPalette.stone,
 
-  streetCasingDark: 'rgba(244, 239, 229, 0.22)',
-  streetDark: 'rgba(244, 239, 229, 0.38)',
+  /** Streets are one quiet line (no casing), about a third of the ink at most. */
+  streetDark: 'rgba(244, 239, 229, 0.26)',
   streetLabelDark: 'rgba(244, 239, 229, 0.55)',
-  streetCasingLight: 'rgba(10, 10, 10, 0.18)',
-  streetLight: 'rgba(10, 10, 10, 0.22)',
+  streetLight: 'rgba(10, 10, 10, 0.26)',
   streetLabelLight: 'rgba(10, 10, 10, 0.55)',
 } as const;
 
@@ -169,6 +168,9 @@ export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
   unrated: DIGNITY_PALETTE.confidenceUnrated,
 };
 
+/** Light plate water: near-neutral gray, never a hue near copper. */
+const LIGHT_PLATE_WATER = '#BFBDB8';
+
 /** Light plate ocean — pure white per cartography direction (pre-flash matches in map-surfaces.css). */
 export const LIGHT_PLATE_OCEAN = '#FFFFFF';
 
@@ -195,8 +197,9 @@ export function plateForScheme(scheme: MapColorScheme) {
        */
       ocean: mapPalettes.light.land,
       land: mapPalettes.light.land,
-      water: mapPalettes.light.water,
-      green: mapPalettes.light.green,
+      /** A neutral gray step below the paper land (the same ΔL* as the token): the token's tan
+       *  read as a copper wash once zoomed in over reservoirs and rivers. */
+      water: LIGHT_PLATE_WATER,
       /** Country boundary. Solid and heavier than `stateBounds`. */
       countryBounds: mapPalettes.light.line2,
       road: mapPalettes.light.road,
@@ -204,17 +207,19 @@ export function plateForScheme(scheme: MapColorScheme) {
       placeLabel: mapPalettes.light.label,
       placeLabelHi: mapPalettes.light.labelHi,
       placeLabelHalo: mapPalettes.light.halo,
+      /** The selected state's abbreviation, beside its copper outline. */
+      selectedStateLabel: brandPalette.copperTextLight,
       selected: DIGNITY_PALETTE.selectedDark,
       densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
       densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
-      streetCasing: DIGNITY_PALETTE.streetCasingLight,
       street: DIGNITY_PALETTE.streetLight,
       streetLabel: DIGNITY_PALETTE.streetLabelLight,
       /** Single records: ink on the paper land. */
       markInk: '#2A2622',
       /** Groups: paper circles with an ink hairline and an ink count. Never copper. */
       groupFill: brandPalette.archivePaper,
-      groupStroke: '#8C857A',
+      // Ink-strong enough that a paper circle still stands off the paper land.
+      groupStroke: '#6D675F',
       groupText: brandPalette.blackInk,
       /** Jurisdiction tags: quiet, the same register as the state labels. */
       tagText: '#6D675F',
@@ -245,16 +250,15 @@ export function plateForScheme(scheme: MapColorScheme) {
     ocean: mapPalettes.dark.land,
     land: mapPalettes.dark.land,
     water: mapPalettes.dark.water,
-    green: mapPalettes.dark.green,
     countryBounds: mapPalettes.dark.line2,
     road: mapPalettes.dark.road,
     placeLabel: mapPalettes.dark.label,
     placeLabelHi: mapPalettes.dark.labelHi,
     placeLabelHalo: mapPalettes.dark.halo,
+    selectedStateLabel: brandPalette.copperDark,
     selected: DIGNITY_PALETTE.selected,
     densityUnknown: DIGNITY_PALETTE.densityUnknownFill,
     densityDisabled: DIGNITY_PALETTE.densityDisabledFill,
-    streetCasing: DIGNITY_PALETTE.streetCasingDark,
     street: DIGNITY_PALETTE.streetDark,
     streetLabel: DIGNITY_PALETTE.streetLabelDark,
     /** Single records: paper on the ink land. */

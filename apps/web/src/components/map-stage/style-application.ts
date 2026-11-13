@@ -28,10 +28,12 @@ import {
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
-import { buildExploreMapStyle } from '../../app/map/explore-style';
+import { buildExploreMapStyle, stateLabelFilters } from '../../app/map/explore-style';
 import {
   DECADE_CROSSFADE_IN_TARGETS,
   DECADE_CROSSFADE_OUT_TARGETS,
@@ -47,11 +49,9 @@ export const SELECTED_LINE_ID = 'explore-state-selected-line';
 export const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
   SATELLITE_LAYER_ID,
-  'plate-landcover',
   'plate-water',
   'plate-boundary-country',
   'plate-place-city',
-  'explore-street-casing',
   'explore-street-fill',
   'explore-street-label',
   'explore-state-density-fill',
@@ -62,6 +62,8 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
   'explore-state-bounds-line',
   'explore-state-selected-fill',
   'explore-state-selected-line',
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
   'explore-jurisdiction-area-fill',
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
@@ -235,6 +237,13 @@ export function setSelectedStateFilter(map: MapLibreMap, postalCode: string | un
   if (map.getLayer(SELECTED_LINE_ID)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
     map.setFilter(SELECTED_LINE_ID, filter as any);
+  }
+  const labels = stateLabelFilters(postalCode);
+  if (map.getLayer(EXPLORE_STATE_LABEL_LAYER_ID)) {
+    map.setFilter(EXPLORE_STATE_LABEL_LAYER_ID, labels.rest as never);
+  }
+  if (map.getLayer(EXPLORE_STATE_LABEL_SELECTED_LAYER_ID)) {
+    map.setFilter(EXPLORE_STATE_LABEL_SELECTED_LAYER_ID, labels.selected as never);
   }
 }
 /**

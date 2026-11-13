@@ -3,8 +3,9 @@
  *
  * Voice rules, binding (design-direction-v9-atlas.md §6, brand.md):
  *   - no em dashes anywhere
- *   - sentence case in body copy; mono uppercase for slugs only
- *   - exactly one italic accent word per heading, carried in `accent`
+ *   - sentence case everywhere; no kickers above headings
+ *   - one emphasis word per heading, carried in `accent` (set plain, never in copper)
+ *   - two sentences of prose at most: the map carries the chapter, the card names it
  *   - people are named with their role and their place
  *   - presence is framed as presence, never as deficit
  *
@@ -18,20 +19,18 @@ import { CORRIDOR_HONESTY_LINE } from '../../lib/story/chapters';
 
 export type ChapterCopy = {
   readonly id: string;
-  /** Mono uppercase slug above the heading. Absent on the cold open. */
-  readonly kicker?: string;
   /** Heading with `{accent}` marking where the italic serif word goes. */
   readonly heading: string;
   /** The single italic accent word. Exactly one per heading. */
   readonly accent: string;
   readonly prose: string;
   readonly facts?: readonly { readonly value: string; readonly label: string }[];
-  /** The line under the card. Sourcing, honesty, or precision. Never decoration. */
-  readonly cite: string;
+  /**
+   * The citation under the card, only when the chapter makes a claim from outside the archive.
+   * A real source line, never a note about the interface.
+   */
+  readonly cite?: string;
 };
-
-/** The cold open headline, split into words for the kinetic stagger. */
-export const COLD_OPEN_WORDS = ['History', 'happened', 'here.'] as const;
 
 export const STORY_COPY: readonly ChapterCopy[] = [
   {
@@ -40,20 +39,16 @@ export const STORY_COPY: readonly ChapterCopy[] = [
     accent: 'here',
     prose:
       'This archive connects records to places where the evidence supports a location. This is a short pass over what is in it. The map moves with the story.',
-    cite: 'Counts on this page are counts of the active release, not claims about everything that happened.',
   },
   {
     id: 'thickest',
-    kicker: 'Reading the gaps',
     heading: 'The archive is not {accent} spread.',
     accent: 'evenly',
     prose:
-      'The map reflects surviving sources, what has been digitized, and what has been researched and reviewed here. A cluster can reflect concentrated cataloging as well as history. A blank area does not establish that nothing happened.',
-    cite: 'Release counts measure published records. They do not measure all surviving evidence or the full history of a place.',
+      'The map shows what survived, what was digitized and what has been researched so far. A cluster can mean concentrated cataloging, and a blank area does not mean nothing happened there.',
   },
   {
     id: 'one-record',
-    kicker: 'One record, up close',
     heading: 'Every pin opens into {accent}.',
     accent: 'evidence',
     prose:
@@ -63,59 +58,44 @@ export const STORY_COPY: readonly ChapterCopy[] = [
       { value: '1954', label: 'built' },
       { value: '1963', label: 'campaign headquarters' },
     ],
-    cite: 'A.G. Gaston Motel, National Historic Landmark, National Park Service. Shown at the precision its sources support.',
+    cite: 'A.G. Gaston Motel, National Historic Landmark, National Park Service.',
   },
   {
     id: 'migration',
-    kicker: 'The Great Migration',
-    heading: 'Six million people, {accent} as they moved.',
-    accent: 'drawn',
+    // Above any drawn fact about the migration and the record it left, so it names neither.
+    heading: 'The record {accent} the people.',
+    accent: 'follows',
     prose:
       'Between 1910 and 1970 about six million people left the South. The corridors were not random: rail lines and kin networks decided who landed in Chicago and who landed in Los Angeles. Records cluster at both ends of every line, which is why a Mississippi surname turns up in a Milwaukee school register.',
-    facts: [
-      { value: '1910 to 1970', label: 'the period' },
-      { value: '7', label: 'corridors drawn' },
-    ],
+    facts: [{ value: '1910 to 1970', label: 'the period' }],
     cite: `Six million is the standard figure for the Great Migration, 1910 to 1970 (Isabel Wilkerson, The Warmth of Other Suns, 2010). ${CORRIDOR_HONESTY_LINE}`,
   },
   {
     /*
      * The second context chapter. Its body is always a drawn fact carrying its own citation, so
-     * the heading and kicker stay deliberately general: they have to sit correctly above any of
-     * the twenty entries, which rules out naming a place or a figure here. The prose and cite
-     * below are the fallback for a draw that failed to resolve, and they claim nothing the rest
+     * the heading stays deliberately general: they have to sit correctly above any of
+     * the twenty entries, which rules out naming a place or a figure here. The prose below
+     * is the fallback for a draw that failed to resolve, and it claims nothing the rest
      * of the page does not already establish.
      */
     id: 'second-context',
-    kicker: 'And one more thing',
     heading: 'The record keeps {accent}.',
     accent: 'talking',
     prose:
       'The same archive answers more than one question. Where people went, what they built when they arrived, and which of it somebody thought to write down.',
-    cite: 'Every figure on this card carries its own source, named on the card itself.',
   },
   {
     id: 'four-centuries',
-    kicker: 'Four centuries in ten seconds',
     heading: 'Watch the record {accent}.',
     accent: 'fill',
     prose:
-      'Scrub from the 1630s to the 2020s and the map fills unevenly. Thin colonial entries in the tidewater. A thickening through Reconstruction. A hard cluster around the twentieth century civil rights record, where documenting and organizing ran together.',
-    facts: [
-      { value: '1630s', label: 'earliest in this release' },
-      { value: '2020s', label: 'latest in this release' },
-      { value: '40', label: 'decades' },
-    ],
-    cite: 'Status is shown as-of each decade from published status history. Never present-day status backfilled.',
+      'The map clears, then takes the archive back one decade at a time. It fills unevenly, thin in the colonial years and thickest around the civil rights record, where documenting and organizing ran together.',
   },
   {
     id: 'your-turn',
-    kicker: 'Your turn',
     heading: 'Start where you {accent}.',
     accent: 'stand',
-    prose:
-      'Everything you just watched is a control you can hold. Open Explore, drop into your own state, and follow the evidence.',
-    cite: 'Every record links to its sources. Where the archive is thin, it says so.',
+    prose: 'Every record links to its sources, and where the archive is thin, it says so.',
   },
 ];
 

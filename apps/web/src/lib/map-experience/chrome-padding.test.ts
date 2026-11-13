@@ -1,190 +1,51 @@
-/**
- * Guards the camera padding clamp. The contract these tests defend is narrow but load-bearing:
- * MapLibre throws and kills map init when padding does not fit the canvas, so no combination of
- * viewport and open panels may ever produce an inset that fills an axis.
- */
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
-
-import { CHROME_NARROW_MAX_WIDTH, chromePadding, type ChromeState } from './chrome-padding';
+import test from 'node:test';
+import {
+  EXPLORE_COLUMN_WIDTH,
+  EXPLORE_HISTOGRAM_HEIGHT,
+  EXPLORE_PHONE_MAX_WIDTH,
+  chromePadding,
+} from './chrome-padding';
 
 const VIEWPORTS = [
-  { viewportWidth: 320, viewportHeight: 568 },
-  { viewportWidth: 375, viewportHeight: 812 },
-  { viewportWidth: 768, viewportHeight: 1024 },
-  { viewportWidth: 1024, viewportHeight: 768 },
   { viewportWidth: 1440, viewportHeight: 900 },
-  { viewportWidth: 1920, viewportHeight: 1080 },
+  { viewportWidth: 1024, viewportHeight: 768 },
+  { viewportWidth: 768, viewportHeight: 1024 },
+  { viewportWidth: 844, viewportHeight: 390 },
+  { viewportWidth: 390, viewportHeight: 844 },
+  { viewportWidth: 320, viewportHeight: 480 },
 ] as const;
 
-const BOOLEANS = [false, true] as const;
-
-function everyPanelCombination(): ReadonlyArray<
-  Pick<ChromeState, 'lensOpen' | 'resultsOpen' | 'sheetOpen'>
-> {
-  const combos: Array<Pick<ChromeState, 'lensOpen' | 'resultsOpen' | 'sheetOpen'>> = [];
-  for (const lensOpen of BOOLEANS) {
-    for (const resultsOpen of BOOLEANS) {
-      for (const sheetOpen of BOOLEANS) {
-        combos.push({ lensOpen, resultsOpen, sheetOpen });
-      }
-    }
-  }
-  return combos;
-}
-
-test('padding always fits the canvas across every viewport and panel combination', () => {
+test('padding always leaves part of both axes free, so MapLibre never throws', () => {
   for (const viewport of VIEWPORTS) {
-    for (const panels of everyPanelCombination()) {
-      const state: ChromeState = { ...viewport, ...panels };
-      const inset = chromePadding(state);
-      const label = `${viewport.viewportWidth}x${viewport.viewportHeight} ${JSON.stringify(panels)}`;
-
-      assert.ok(
-        inset.left + inset.right < viewport.viewportWidth,
-        `horizontal padding must leave canvas at ${label}`,
-      );
-      assert.ok(
-        inset.top + inset.bottom < viewport.viewportHeight,
-        `vertical padding must leave canvas at ${label}`,
-      );
-      for (const [side, value] of Object.entries(inset)) {
-        assert.ok(
-          Number.isFinite(value) && value >= 0,
-          `${side} must be a positive number at ${label}`,
-        );
-      }
+    for (const sheetHeight of [0, 160, 422, 844, 5000]) {
+      const inset = chromePadding({ ...viewport, sheetHeight });
+      assert.ok(inset.left + inset.right < viewport.viewportWidth, JSON.stringify(viewport));
+      assert.ok(inset.top + inset.bottom < viewport.viewportHeight, JSON.stringify(viewport));
+      for (const side of Object.values(inset)) assert.ok(side >= 0);
     }
   }
 });
 
-test('padding never consumes more than half of either axis', () => {
-  for (const viewport of VIEWPORTS) {
-    for (const panels of everyPanelCombination()) {
-      const inset = chromePadding({ ...viewport, ...panels });
-      assert.ok(inset.left + inset.right <= viewport.viewportWidth * 0.5);
-      assert.ok(inset.top + inset.bottom <= viewport.viewportHeight * 0.5);
-    }
-  }
+test('wide layout clears the left column and the histogram on the bottom edge', () => {
+  const inset = chromePadding({ viewportWidth: 1440, viewportHeight: 900 });
+  assert.ok(inset.left >= EXPLORE_COLUMN_WIDTH);
+  assert.ok(inset.bottom >= EXPLORE_HISTOGRAM_HEIGHT);
+  // The column is one fixed object: the inspector replacing the list moves nothing.
+  assert.deepEqual(
+    inset,
+    chromePadding({ viewportWidth: 1440, viewportHeight: 900, sheetHeight: 600 }),
+  );
 });
 
-test('clamp engages at 1024 with every panel open', () => {
-  const unclamped = chromePadding({
-    viewportWidth: 1024,
-    viewportHeight: 768,
-    lensOpen: true,
-    resultsOpen: true,
-    sheetOpen: true,
-  });
-
-  // Lens 330 + sheet 468 = 798, well past the 512 budget at this width.
-  assert.ok(unclamped.left < 330, 'left must be scaled down by the clamp');
-  assert.ok(unclamped.right < 468, 'right must be scaled down by the clamp');
-  assert.ok(unclamped.left + unclamped.right <= 512);
-
-  // Both sides scale by the same factor, so their ratio survives the clamp.
-  const ratio = unclamped.left / unclamped.right;
-  assert.ok(Math.abs(ratio - 330 / 468) < 0.02, 'clamp must scale both sides proportionally');
-});
-
-test('wide layout reserves room for whichever panels are open', () => {
-  const base = { viewportWidth: 1920, viewportHeight: 1080 } as const;
-
-  const none = chromePadding({ ...base, lensOpen: false, resultsOpen: false, sheetOpen: false });
-  assert.equal(none.left, 40);
-  assert.equal(none.right, 40);
-
-  const lens = chromePadding({ ...base, lensOpen: true, resultsOpen: false, sheetOpen: false });
-  assert.equal(lens.left, 330);
-
-  const results = chromePadding({ ...base, lensOpen: false, resultsOpen: true, sheetOpen: false });
-  assert.equal(results.right, 376);
-
-  // The sheet replaces the results rail rather than stacking with it, so it wins the right edge.
-  const sheet = chromePadding({ ...base, lensOpen: false, resultsOpen: true, sheetOpen: true });
-  assert.equal(sheet.right, 468);
-});
-
-test('narrow layout reserves the bottom sheet only while one is open', () => {
-  const narrow = { viewportWidth: 375, viewportHeight: 812 } as const;
-  const closed = chromePadding({
-    ...narrow,
-    lensOpen: false,
-    resultsOpen: false,
-    sheetOpen: false,
-  });
-  const open = chromePadding({ ...narrow, lensOpen: true, resultsOpen: false, sheetOpen: false });
-
-  assert.ok(open.bottom > closed.bottom, 'an open sheet pushes the framing up');
-  assert.equal(closed.left, open.left, 'sides do not depend on panels on a phone');
-  assert.equal(closed.left, 16);
-  assert.equal(closed.right, 68, 'right edge clears the on-map controls');
-  assert.equal(closed.top, 120, 'top clears the two-row compact command bar');
-});
-
-test('a phone on its side frames the map beside the left-hand panel', () => {
-  const sideways = chromePadding({
-    viewportWidth: 844,
-    viewportHeight: 390,
-    lensOpen: true,
-    resultsOpen: false,
-    sheetOpen: false,
-  });
-  assert.ok(sideways.left > 300, 'the open instrument is a left column');
-  assert.ok(sideways.top + sideways.bottom < 390 / 2);
-  const smallPhone = chromePadding({
-    viewportWidth: 667,
-    viewportHeight: 375,
-    lensOpen: true,
-    resultsOpen: false,
-    sheetOpen: false,
-  });
-  assert.ok(smallPhone.left > 250, 'a 667×375 phone on its side also uses the left column');
-});
-
-test('narrow breakpoint switches exactly at the documented width', () => {
-  const panels = { lensOpen: true, resultsOpen: false, sheetOpen: false } as const;
-  const justNarrow = chromePadding({
-    viewportWidth: CHROME_NARROW_MAX_WIDTH - 1,
-    viewportHeight: 900,
-    ...panels,
-  });
-  const justWide = chromePadding({
-    viewportWidth: CHROME_NARROW_MAX_WIDTH,
-    viewportHeight: 900,
-    ...panels,
-  });
-
-  assert.equal(justNarrow.left, 16);
-  assert.equal(justWide.left, 330);
-});
-
-test('short viewports fall back to symmetric vertical padding', () => {
-  // 88 + min(280, 152) = 240, past the 200 budget on a 400px-tall canvas.
-  const short = chromePadding({
-    viewportWidth: 320,
-    viewportHeight: 400,
-    lensOpen: false,
-    resultsOpen: false,
-    sheetOpen: false,
-  });
-  assert.equal(short.top, 40);
-  assert.equal(short.bottom, 40);
-  assert.ok(short.top + short.bottom < 400);
-});
-
-test('degenerate viewports still produce a fitting inset', () => {
-  for (const viewportHeight of [0, 1, 60, 120]) {
-    for (const viewportWidth of [0, 1, 200, 900]) {
-      const inset = chromePadding({
-        viewportWidth,
-        viewportHeight,
-        lensOpen: true,
-        resultsOpen: true,
-        sheetOpen: true,
-      });
-      assert.ok(inset.top + inset.bottom <= viewportHeight * 0.5);
-      assert.ok(inset.left + inset.right <= viewportWidth * 0.5);
-    }
-  }
+test('phone padding follows the bottom sheet', () => {
+  const peek = chromePadding({ viewportWidth: 390, viewportHeight: 844, sheetHeight: 180 });
+  const half = chromePadding({ viewportWidth: 390, viewportHeight: 844, sheetHeight: 422 });
+  assert.ok(peek.bottom > 180);
+  assert.ok(half.bottom > peek.bottom);
+  assert.ok(peek.left < EXPLORE_COLUMN_WIDTH);
+  // The lower 48 fill the phone's width: a slim, even gutter on both sides.
+  assert.equal(peek.left, peek.right);
+  assert.ok(peek.left <= 16);
+  assert.equal(EXPLORE_PHONE_MAX_WIDTH, 767);
 });

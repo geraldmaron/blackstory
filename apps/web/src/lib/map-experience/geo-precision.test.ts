@@ -47,11 +47,11 @@ test('recordMarkFor: dot for exact or site, ring for neighborhood or city, none 
 });
 
 test('precisionInWords names where the archive can place a record', () => {
-  assert.equal(precisionInWords('site'), 'Placed at the site');
-  assert.equal(precisionInWords('city'), 'Placed to the city');
-  assert.equal(precisionInWords('neighborhood'), 'Placed to the neighborhood');
-  assert.equal(precisionInWords('county'), 'Placed to the county');
-  assert.equal(precisionInWords('state'), 'Placed to the state');
+  assert.equal(precisionInWords('site'), 'Exact site');
+  assert.equal(precisionInWords('city'), 'City-level location');
+  assert.equal(precisionInWords('neighborhood'), 'Neighborhood-level location');
+  assert.equal(precisionInWords('county'), 'County-level location');
+  assert.equal(precisionInWords('state'), 'State-level location');
 });
 
 test('city/neighborhood precisions map to locality; state/country map to state', () => {

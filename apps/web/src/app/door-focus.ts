@@ -5,6 +5,7 @@
  * spec, the record the plate rings, and the place name the live region announces. A frame is a
  * camera and nothing else.
  */
+import { zoomForLocationPrecision } from '../lib/map-experience/geo-precision';
 import type { StoryChapter } from '../lib/story/chapters';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
@@ -25,9 +26,6 @@ export type DoorFocusFrame = {
   readonly camera: DoorFocusCamera;
 };
 
-/** The spotlight chapter pushes in at least this close, whatever the chapter's own zoom says. */
-const SPOTLIGHT_MIN_ZOOM = 8.5;
-
 export function resolveDoorFocus(input: {
   readonly chapter: StoryChapter;
   readonly spotlight: StoryRecordSpotlight | null;
@@ -45,7 +43,9 @@ export function resolveDoorFocus(input: {
   if (chapter.focusRandomRecord && spotlight && spotlightLngLat) {
     lng = spotlightLngLat[0];
     lat = spotlightLngLat[1];
-    zoom = Math.max(chapter.camera.zoom, SPOTLIGHT_MIN_ZOOM);
+    // Never closer than the record's stored precision supports (P-03): a city record lands at
+    // city scale, a site at street scale.
+    zoom = zoomForLocationPrecision(spotlight.precision);
     focusEntityId = spotlight.entityId;
     placeLabel = `${spotlight.name}, ${spotlight.place}`;
   } else if (chapter.rotatingFact && fact) {

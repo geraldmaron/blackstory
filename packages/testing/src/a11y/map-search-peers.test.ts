@@ -44,13 +44,24 @@ test('the record index search destination needs no JavaScript to filter, page or
   // rows, filter chips and page steps are all anchors rendered on the server. If any of these
   // becomes a button with an onClick, a reader without JS loses the archive's only flat index.
   const room = readFileSync(join(repoRoot, 'apps/web/src/app/records/RecordsIndex.tsx'), 'utf8');
-  assert.match(room, /method="get"/, 'the find field is a plain GET form');
   assert.match(room, /rel="prev"/);
   assert.match(room, /rel="next"/);
-
-  const kit = readFileSync(
-    join(repoRoot, 'apps/web/src/components/room/HairlineIndex.tsx'),
+  // Filter menus are native popovers of links, opened by `popoverTarget` with no script.
+  const toolbar = readFileSync(
+    join(repoRoot, 'apps/web/src/app/records/RecordsToolbar.tsx'),
     'utf8',
   );
-  assert.match(kit, /className="ds-room-idx__row" href=/, 'index rows are anchors, not buttons');
+  assert.match(toolbar, /popover="auto"/);
+  assert.match(toolbar, /popoverTarget=/);
+  assert.doesNotMatch(toolbar, /onClick/);
+  // The decade jump is a plain GET form that names a page.
+  const jump = readFileSync(join(repoRoot, 'apps/web/src/app/records/DecadeJump.tsx'), 'utf8');
+  assert.match(jump, /method="get"/, 'the decade jump is a plain GET form');
+
+  const row = readFileSync(join(repoRoot, 'apps/web/src/app/records/RecordRow.tsx'), 'utf8');
+  assert.match(
+    row,
+    /className=\{[\s\S]*?ds-record__link[\s\S]*?\}\s*href=\{row\.href\}/,
+    'index rows are anchors, not buttons',
+  );
 });

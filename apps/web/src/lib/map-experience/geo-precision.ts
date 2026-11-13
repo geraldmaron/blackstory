@@ -76,11 +76,11 @@ export function precisionsWithMark(mark: RecordMark): string[] {
 /** The precision as a reader reads it: where the archive can place this record. */
 export function precisionInWords(precision: string): string {
   const mark = recordMarkFor(precision);
-  if (mark === 'dot') return 'Placed at the site';
-  if (precision === 'neighborhood') return 'Placed to the neighborhood';
-  if (precision === 'county') return 'Placed to the county';
-  if (precision === 'state' || precision === 'country') return 'Placed to the state';
-  return 'Placed to the city';
+  if (mark === 'dot') return 'Exact site';
+  if (precision === 'neighborhood') return 'Neighborhood-level location';
+  if (precision === 'county') return 'County-level location';
+  if (precision === 'state' || precision === 'country') return 'State-level location';
+  return 'City-level location';
 }
 
 /**

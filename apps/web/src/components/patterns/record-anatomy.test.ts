@@ -74,7 +74,7 @@ test('renders inline fact rows without legacy column strip classes', () => {
   assert.match(html, /ds-edition-fact-icon--kind-muted/);
   assert.match(html, /ds-edition-fact-icon--evidence-high/);
   assert.match(html, /Record at a glance/);
-  assert.match(html, /Placed at the site/);
+  assert.match(html, /Exact site/);
   assert.match(
     html,
     /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=Washington%2C%20D.C.%20%40%2038\.9098%2C-77\.0143"/,

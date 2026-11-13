@@ -29,13 +29,6 @@ const SAMPLE_STYLE: StyleSpecification = {
       paint: { 'raster-opacity': 0.76 },
     },
     {
-      id: 'plate-landcover',
-      type: 'fill',
-      source: 'openfreemap',
-      'source-layer': 'landcover',
-      paint: { 'fill-color': '#ebe5d1' },
-    },
-    {
       id: 'plate-water',
       type: 'fill',
       source: 'openfreemap',
@@ -57,13 +50,6 @@ const SAMPLE_STYLE: StyleSpecification = {
       paint: { 'text-color': '#2e2a24', 'text-halo-color': '#f8f5ee', 'text-halo-width': 1.4 },
     },
     {
-      id: 'explore-street-casing',
-      type: 'line',
-      source: 'openfreemap',
-      'source-layer': 'transportation',
-      paint: { 'line-color': 'rgba(10, 10, 10, 0.18)', 'line-width': 1 },
-    },
-    {
       id: 'explore-street-fill',
       type: 'line',
       source: 'openfreemap',
@@ -80,6 +66,18 @@ const SAMPLE_STYLE: StyleSpecification = {
         'text-halo-color': '#E8E0D2',
         'text-halo-width': 1,
       },
+    },
+    {
+      id: 'explore-state-label',
+      type: 'symbol',
+      source: 'explore-state-labels',
+      paint: { 'text-color': '#6d675f' },
+    },
+    {
+      id: 'explore-state-label-selected',
+      type: 'symbol',
+      source: 'explore-state-labels',
+      paint: { 'text-color': '#8E4F2A' },
     },
     {
       id: 'explore-unclustered-point',

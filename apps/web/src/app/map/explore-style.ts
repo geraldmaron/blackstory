@@ -68,6 +68,9 @@ import {
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
+  EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
@@ -76,6 +79,13 @@ import {
   COUNTY_LINES_MIN_ZOOM,
 } from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
+import {
+  STATE_LABEL_APPEAR_END_ZOOM,
+  STATE_LABEL_APPEAR_START_ZOOM,
+  STATE_LABEL_FADE_END_ZOOM,
+  STATE_LABEL_FADE_START_ZOOM,
+  stateLabelPoints,
+} from '../../lib/map-experience/state-labels';
 import {
   DEFAULT_POPULATION_GEO,
   type ExplorePopulationGeo,
@@ -108,6 +118,9 @@ export {
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
+  EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
@@ -146,46 +159,7 @@ function roadClassWidthMatch(widths: RoadClassWidths): ExpressionSpecification {
   ] as unknown as ExpressionSpecification;
 }
 
-/** Street casing: muted hierarchy; z12≈1.8 / z14≈3.5 at trunk, thinner elsewhere. */
-function streetCasingWidthExpression(): ExpressionSpecification {
-  return [
-    'interpolate',
-    ['linear'],
-    ['zoom'],
-    8,
-    roadClassWidthMatch({
-      motorway: 0.48,
-      trunk: 0.42,
-      primary: 0.36,
-      secondary: 0.26,
-      tertiary: 0.19,
-      minor: 0.14,
-      fallback: 0.1,
-    }),
-    12,
-    roadClassWidthMatch({
-      motorway: 2.06,
-      trunk: 1.8,
-      primary: 1.54,
-      secondary: 1.13,
-      tertiary: 0.82,
-      minor: 0.62,
-      fallback: 0.41,
-    }),
-    14,
-    roadClassWidthMatch({
-      motorway: 4,
-      trunk: 3.5,
-      primary: 3,
-      secondary: 2.2,
-      tertiary: 1.6,
-      minor: 1.2,
-      fallback: 0.8,
-    }),
-  ] as unknown as ExpressionSpecification;
-}
-
-/** Street fill: always thinner than casing at the same class; z12≈1.0 / z14≈2.0 at trunk. */
+/** Street lines: a quiet class hierarchy; z12≈1.0 / z14≈2.0 at trunk. */
 function streetFillWidthExpression(): ExpressionSpecification {
   return [
     'interpolate',
@@ -270,6 +244,44 @@ export function unselectedTagFilterExpression(
   return ['!', selectedTagFilterExpression(entityId)] as unknown as ExpressionSpecification;
 }
 
+/** The 51 label points, built once: the data never changes, only which one is selected. */
+const STATE_LABEL_FEATURES = {
+  type: 'FeatureCollection',
+  features: stateLabelPoints().map((point) => ({
+    type: 'Feature',
+    id: point.postalCode,
+    geometry: { type: 'Point', coordinates: [point.lng, point.lat] },
+    properties: { postalCode: point.postalCode },
+  })),
+} as const;
+
+/** State abbreviations fade in above the continental floor and out as cities take over. */
+const STATE_LABEL_OPACITY = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  STATE_LABEL_APPEAR_START_ZOOM,
+  0,
+  STATE_LABEL_APPEAR_END_ZOOM,
+  1,
+  STATE_LABEL_FADE_START_ZOOM,
+  1,
+  STATE_LABEL_FADE_END_ZOOM,
+  0,
+] as unknown as ExpressionSpecification;
+
+/** Filters for the two state-label layers. Selection only swaps these (`setSelectedStateFilter`). */
+export function stateLabelFilters(postalCode: string | undefined): {
+  readonly rest: ExpressionSpecification;
+  readonly selected: ExpressionSpecification;
+} {
+  const code = postalCode ?? '';
+  return {
+    rest: ['!=', ['get', 'postalCode'], code] as unknown as ExpressionSpecification,
+    selected: ['==', ['get', 'postalCode'], code] as unknown as ExpressionSpecification,
+  };
+}
+
 /** A dot at the site, a hollow ring at the neighborhood or city (`recordMarkFor`). */
 const DOT_RADIUS_PX = 4;
 const RING_RADIUS_PX = 7;
@@ -288,6 +300,16 @@ function markIs(mark: RecordMark): ExpressionSpecification {
 function byMark(dot: unknown, ring: unknown): ExpressionSpecification {
   return ['case', markIs('dot'), dot, ring] as unknown as ExpressionSpecification;
 }
+
+/** Jurisdiction tags draw from regional zoom up, never at national scale. */
+export const JURISDICTION_TAG_MIN_ZOOM = 5.5;
+
+/**
+ * Collision padding around a group's count, in pixels: enough to cover the largest group circle
+ * (`CLUSTER_RADIUS_BY_COUNT`) around an 11px count. `text-padding` cannot vary by feature, so
+ * every group reserves the largest circle's box.
+ */
+const GROUP_COLLISION_PADDING_PX = (CLUSTER_RADIUS_BY_COUNT.at(-1)?.[1] ?? 20) - 4;
 
 /** Group sizes: three steps, never implying precision (`CLUSTER_RADIUS_BY_COUNT`). */
 function groupRadiusExpression(): ExpressionSpecification {
@@ -506,6 +528,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: tags as any,
       },
+      [EXPLORE_STATE_LABELS_SOURCE_ID]: {
+        type: 'geojson',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        data: STATE_LABEL_FEATURES as any,
+      },
       [EXPLORE_ENTITIES_INCOMING_SOURCE_ID]: {
         type: 'geojson',
         // Same promotion as the primary buffer: the hold marks are written to both.
@@ -553,7 +580,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: { ...SATELLITE_RASTER_PAINT[colorScheme] },
       },
       /* —— Base cartography ————————————————————————————————————————————————————————
-         The plate is a map before it is a chart. These four layers come from the
+         The plate is a map before it is a chart. These layers come from the
          OpenFreeMap vector source and read at the continental resting frame, which is where a
          reader spends most of their time; the archive overlays below them are the data.
 
@@ -562,18 +589,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
          as state polygons floating on a flat field: no coastline, no Great Lakes, no Canada or
          Mexico, and no place names between the state abbreviations and street labels at z11.
          `docs/ui/patterns-map-canvas.md`; reference build `.design-mocks/blackstory-atlas-v9.html`. */
-      {
-        // Parks and wood. Deliberately close to land — texture, not a category.
-        id: 'plate-landcover',
-        type: 'fill',
-        source: OPENFREEMAP_SOURCE_ID,
-        'source-layer': 'landcover',
-        filter: ['match', ['get', 'class'], ['wood', 'grass', 'park'], true, false],
-        // Off over imagery: a flat green polygon where the aerial already shows the actual tree
-        // canopy is strictly less information, and it hides the thing the reader turned on.
-        layout: { visibility: satellite ? 'none' : 'visible' },
-        paint: { 'fill-color': plate.green },
-      },
       {
         // Oceans, lakes and wide rivers. This is what gives the plate a coastline: without it
         // the only edge on the map is the outer boundary of the state polygon set.
@@ -594,7 +609,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'line',
         source: OPENFREEMAP_SOURCE_ID,
         'source-layer': 'boundary',
-        filter: ['all', ['<=', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
+        // Some boundary features carry no admin_level; a bare `get` compared as a number logs a
+        // MapLibre type warning for each one, so a missing level reads as "not a country border".
+        filter: [
+          'all',
+          ['<=', ['to-number', ['coalesce', ['get', 'admin_level'], 99]], 2],
+          ['!=', ['get', 'maritime'], 1],
+        ],
         paint: {
           'line-color': plate.countryBounds,
           'line-width': [
@@ -671,19 +692,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        id: 'explore-street-casing',
-        type: 'line',
-        source: OPENFREEMAP_SOURCE_ID,
-        'source-layer': 'transportation',
-        minzoom: 8,
-        filter: ['all', ['!=', ['get', 'class'], 'ferry'], ['!=', ['get', 'brunnel'], 'tunnel']],
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: {
-          'line-color': plate.streetCasing,
-          'line-width': streetCasingWidthExpression(),
-        },
-      },
-      {
+        /* One quiet line per street, no casing: roads orient, they never out-read a record mark.
+           Major roads are one step stronger than the rest, nothing more. */
         id: 'explore-street-fill',
         type: 'line',
         source: OPENFREEMAP_SOURCE_ID,
@@ -694,6 +704,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           'line-color': plate.street,
           'line-width': streetFillWidthExpression(),
+          'line-opacity': [
+            'match',
+            ['get', 'class'],
+            ['motorway', 'trunk', 'primary'],
+            1,
+            0.72,
+          ] as unknown as ExpressionSpecification,
         },
       },
       {
@@ -794,9 +811,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
             COUNTY_LINES_MIN_ZOOM,
             0,
             COUNTY_LINES_MIN_ZOOM + 1,
-            0.28,
+            0.2,
             9,
-            0.45,
+            0.3,
           ] as unknown as ExpressionSpecification,
         },
       },
@@ -874,6 +891,53 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        /* State abbreviations: small, low contrast, under every record mark and group in the
+           style, so in MapLibre's one top-down collision pass a group count claims its space
+           first and a label that would touch it gives way (`text-optional` is implied for a
+           text-only symbol). Never drawn across a count. */
+        id: EXPLORE_STATE_LABEL_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_STATE_LABELS_SOURCE_ID,
+        minzoom: STATE_LABEL_APPEAR_START_ZOOM,
+        maxzoom: STATE_LABEL_FADE_END_ZOOM,
+        filter: stateLabelFilters(undefined).rest,
+        layout: {
+          'text-field': ['get', 'postalCode'] as unknown as ExpressionSpecification,
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 10,
+          'text-letter-spacing': 0.12,
+          'text-padding': 2,
+        },
+        paint: {
+          'text-color': plate.placeLabel,
+          'text-halo-color': plate.placeLabelHalo,
+          'text-halo-width': haloWidth(1),
+          'text-opacity': STATE_LABEL_OPACITY,
+        },
+      },
+      {
+        // The selected state's abbreviation: copper and bold, beside its copper outline.
+        id: EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_STATE_LABELS_SOURCE_ID,
+        minzoom: STATE_LABEL_APPEAR_START_ZOOM,
+        maxzoom: STATE_LABEL_FADE_END_ZOOM,
+        filter: stateLabelFilters(undefined).selected,
+        layout: {
+          'text-field': ['get', 'postalCode'] as unknown as ExpressionSpecification,
+          'text-font': ['Noto Sans Bold'],
+          'text-size': 11,
+          'text-letter-spacing': 0.12,
+          'text-padding': 2,
+        },
+        paint: {
+          'text-color': plate.selectedStateLabel,
+          'text-halo-color': plate.placeLabelHalo,
+          'text-halo-width': haloWidth(1),
+          'text-opacity': STATE_LABEL_OPACITY,
+        },
+      },
+      {
         id: EXPLORE_JURISDICTION_AREA_LAYER_ID,
         type: 'fill',
         source: EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
@@ -927,6 +991,35 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        // County- and state-precision records, counted at the state's label point. Never a
+        // point: a pin would claim a place the archive does not hold. Not drawn at national
+        // scale, where fifty of them read as clutter; one per state from regional zoom.
+        //
+        // Stacked BELOW the record marks on purpose: MapLibre places symbols top layer first, so
+        // the group counts above claim their space before a tag is placed, and a tag that would
+        // touch a group gives way instead of printing over it.
+        id: EXPLORE_JURISDICTION_TAG_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_JURISDICTION_TAGS_SOURCE_ID,
+        minzoom: JURISDICTION_TAG_MIN_ZOOM,
+        filter: unselectedTagFilterExpression(undefined),
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-size': 10,
+          'text-font': ['Noto Sans Regular'],
+          'text-offset': [0, 1.4],
+          'text-max-width': 24,
+          'text-letter-spacing': 0.04,
+          // A tag that would collide gives way at this zoom and returns as the reader zooms in.
+          'text-padding': 4,
+        },
+        paint: {
+          'text-color': plate.tagText,
+          'text-halo-color': plate.ocean,
+          'text-halo-width': haloWidth(1.2),
+        },
+      },
+      {
         // One layer, two shapes: a solid dot where the archive holds the site, a hollow ring
         // where it holds the neighborhood or city. Kind is never encoded here.
         id: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
@@ -968,7 +1061,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-field': ['get', 'point_count_abbreviated'],
           'text-size': 11,
           'text-font': ['Noto Sans Bold'],
+          // A count always draws, and claims the whole group circle in the collision index (the
+          // padding reaches the largest circle's edge), so no tag or label prints across a group.
           'text-allow-overlap': true,
+          'text-padding': GROUP_COLLISION_PADDING_PX,
         },
         paint: { 'text-color': plate.groupText },
       },
@@ -1011,29 +1107,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-allow-overlap': true,
         },
         paint: { 'text-color': plate.groupText, 'text-opacity': 0 },
-      },
-      {
-        // County- and state-precision records, counted at the state's label point. Never a
-        // point: a pin would claim a place the archive does not hold.
-        id: EXPLORE_JURISDICTION_TAG_LAYER_ID,
-        type: 'symbol',
-        source: EXPLORE_JURISDICTION_TAGS_SOURCE_ID,
-        filter: unselectedTagFilterExpression(undefined),
-        layout: {
-          'text-field': ['get', 'label'],
-          'text-size': 10,
-          'text-font': ['Noto Sans Regular'],
-          'text-offset': [0, 1.4],
-          'text-max-width': 24,
-          'text-letter-spacing': 0.04,
-          // A tag that would collide gives way at this zoom and returns as the reader zooms in.
-          'text-padding': 4,
-        },
-        paint: {
-          'text-color': plate.tagText,
-          'text-halo-color': plate.ocean,
-          'text-halo-width': haloWidth(1.2),
-        },
       },
       {
         id: EXPLORE_SELECTED_TAG_LAYER_ID,

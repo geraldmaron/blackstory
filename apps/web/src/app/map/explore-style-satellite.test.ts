@@ -127,8 +127,8 @@ test('both schemes declare the same raster channels, so a theme toggle leaves no
   );
 });
 
-test('the flat land and water fills come off, so imagery is not painted over', () => {
-  for (const id of ['plate-landcover', 'plate-water']) {
+test('the flat water fill comes off, so imagery is not painted over', () => {
+  for (const id of ['plate-water']) {
     assert.equal(visibility(layerById(build(false), id)), 'visible', `${id} belongs on flat plate`);
     assert.equal(visibility(layerById(build(true), id)), 'none', `${id} would hide the imagery`);
   }

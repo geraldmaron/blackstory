@@ -1,43 +1,43 @@
 /**
- * Door Immersive Journey: scroll chapters drive the camera of the shared map plate.
+ * The Door: the national map uncovered across the viewport, a headline column docked bottom-left
+ * (beneath the map on a phone), the visit's spotlight record as a callout on its pin, and a guided
+ * walk whose chapters fly the same plate.
  *
  * One visit rolls chapters / facts / spotlight on the server so SSR and hydrate match.
- * Document scroll so the wheel works over the map; IntersectionObserver picks the chapter.
  *
  * THE MAP IS EXPLORE'S MAP, AND IT IS THE ONLY MAP HERE. The Door hands the persistent `MapStage`
- * the same national-field patch Explore rests on (`nationalFieldPatch`: grouped at national zoom,
- * the same style, the same entity markers) and flies its camera per chapter. A static Albers pin
- * board would not align with the Web Mercator plate during the handoff, so the field is the page's
- * ground until the shared plate has painted.
+ * the same national-field patch Explore rests on (`nationalFieldPatch`) and flies its camera per
+ * chapter.
  *
- * The opening is not one of the chapter cards. It renders on its own path as the masthead sheet
- * clamped into the frame's left edge: block type that morphs, a short invite into the field, the
- * visit's spotlight place, a kind-family ledger of what is on the plate, the release count, and
- * two actions. Redundant wordmark / tagline / eyebrow / "HERE" chrome stays gone so the sheet
- * answers "what is here" once, with weight, instead of restating the brand four times.
+ * The walk is a stepper, not a scroll story: every chapter is the same compact card docked where
+ * the headline column sits, with progress, Back / Next and "Skip to the map". The page itself does
+ * not scroll, so there is no viewport-height dead space between chapters and the wheel is never
+ * hijacked. Arrow keys step inside the card and Escape returns to the opening.
  *
- * Browse is a posture of this surface, not a second product: journey copy morphs away and the
- * Explore instruments mount over the same plate. `/explore` stays the deep-link URL. The control
- * language is one pair: Browse arms the field, Filters toggles the panel (AtlasExperience's dock).
+ * The camera is framed against the Door's map window (`.ds-door__window`): the part of the plate
+ * the dock does not cover (right of the column on a desktop, above the dock on a phone), re-framed
+ * whenever that window changes (door-field-frame.ts). The callout lives inside the same window, so
+ * it can never sit on the headline.
  *
- * The camera is framed against the Door's map window (`.ds-door__window`: below the bar on a
- * desktop, a band under the bar on a phone), not against the whole canvas, and re-framed whenever that
- * window changes — a resize moves the map the way it moves the layout (door-field-frame.ts).
+ * Browse is a posture of this surface, not a second product: the walk morphs away and the
+ * Explore instruments mount over the same plate. `/explore` stays the deep-link URL.
  *
- * Pins with public hrefs stay clickable: a marker or cluster on the live plate goes through the
- * stage's own `select` and cluster-expand paths.
+ * Pins with public hrefs stay clickable: a marker on the live plate goes through the stage's own
+ * `select` and cluster-expand paths and hands off to browse.
  */
 'use client';
 
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { buttonClassName } from '@repo/ui';
 import { savePinContinuity } from '../lib/discovery/pin-continuity';
 import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';
 import type { StateDensityLevel } from '../lib/map-experience/density';
 import { CAMERA_EASING_SLOW_OUT } from '../lib/map-experience/camera-presets';
 import { CAMERA_FLY_CURVE } from '../lib/map-experience/camera-moves';
+import { recordMarkFor } from '../lib/map-experience/geo-precision';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { nationalFieldPatch } from '../lib/map-experience/national-field';
 import {
@@ -47,11 +47,10 @@ import {
   type SweepHandle,
 } from '../lib/map-experience/decade-transition';
 import { DECADE_LAYER_FADE_MS } from './map/decade-layer-transition';
+import { sweepRange } from './door-sweep';
 import type { StoryChapter } from '../lib/story/chapters';
-import { chapterInViewFromRects, useChapterObserver } from '../lib/story/use-chapter-observer';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
-import { copyFor, headingParts } from '../components/story/story-copy';
 import { hereLocality } from './door-here';
 import { HeroHeadlineMorph } from '../components/story/HeroHeadlineMorph';
 import {
@@ -74,6 +73,9 @@ import {
   sameDoorFrameBox,
   type DoorFrameBox,
 } from './door-field-frame';
+import { DoorSpotlightCallout } from './door-spotlight-callout';
+import { chapterBody, DoorWalkCard } from './door-walk';
+import { mountDoorPlateLabels, type DoorPlateLabels, type DoorPlate } from './door-plate-labels';
 
 void React;
 
@@ -86,29 +88,12 @@ const AtlasLoader = dynamic(() => import('./explore/AtlasLoader').then((mod) => 
 /** Morph duration before instruments mount; matches `--ds-door-browse-ms` in door-home.css. */
 const DOOR_BROWSE_MORPH_MS = 320;
 
-const RECORD_CHAPTER_ID = 'one-record';
-
-/** Same flight the Explore story mode gives a chapter (`use-story-runner.ts`). */
+/** Same flight the Explore story mode gives a chapter. */
 const CHAPTER_FLIGHT_MS = 1600;
 
-/**
- * The decade range the sweep runs over, taken from the pins actually on the plate rather than
- * from the release's own first and last decade. The chapter's claim is about *this* field
- * filling up, so a decade with nothing on this plate is a frame with nothing to show.
- */
-function sweepRange(
-  pins: ExploreMapFeatureCollection,
-): { readonly from: number; readonly to: number } | null {
-  let from: number | null = null;
-  let to: number | null = null;
-  for (const feature of pins.features) {
-    const decade = earliestDecadeFor(feature);
-    if (decade === null) continue;
-    if (from === null || decade < from) from = decade;
-    if (to === null || decade > to) to = decade;
-  }
-  return from === null || to === null ? null : { from, to };
-}
+/** The opening's one sentence: what is here, not how to use the page. */
+const DOOR_OPEN_LINE =
+  'People, places and events in Black American history, each pinned where its sources put it.';
 
 /** The national chapters: flat, unrotated, and no closer than the story's opening zoom. */
 const NATIONAL_CAMERA_MAX_ZOOM = 3.6;
@@ -127,93 +112,15 @@ function boxOf(element: HTMLElement | null): DoorFrameBox | null {
 type DoorFrameBoxes = {
   readonly window: DoorFrameBox | null;
   readonly plate: DoorFrameBox | null;
-  readonly chrome: DoorFrameBox | null;
 };
 
 function sameDoorFrameBoxes(a: DoorFrameBoxes, b: DoorFrameBoxes): boolean {
-  return (
-    sameDoorFrameBox(a.window, b.window) &&
-    sameDoorFrameBox(a.plate, b.plate) &&
-    sameDoorFrameBox(a.chrome, b.chrome)
-  );
-}
-
-const DOOR_COLD_OPEN_PROSE =
-  'Every record in this archive is tied to a place you can stand in. Scroll to move the field. Grouped pins split as you get closer; any pin you can reach opens a record.';
-
-const DOOR_OPEN_INVITE =
-  'People, places, events, and sources on one field. Search the records, open the map, or read the list. Begin takes a short guided walk.';
-
-export type DoorOpenLedgerRow = {
-  readonly family: string;
-  readonly label: string;
-  readonly count: number;
-};
-
-type ChapterBody = {
-  readonly prose: string;
-  readonly figures: readonly { readonly value: string; readonly label: string }[] | undefined;
-  readonly cite: string;
-};
-
-function chapterBody(
-  chapter: StoryChapter,
-  recordSpotlight: StoryRecordSpotlight | null,
-  fact: StoryFact | undefined,
-): ChapterBody | null {
-  const copy = copyFor(chapter.id);
-  if (!copy) return null;
-
-  if (chapter.id === 'cold-open') {
-    return { prose: DOOR_COLD_OPEN_PROSE, figures: copy.facts, cite: copy.cite };
-  }
-
-  if (chapter.id === RECORD_CHAPTER_ID && recordSpotlight) {
-    const sources =
-      recordSpotlight.evidenceCount === 1 ? '1 source' : `${recordSpotlight.evidenceCount} sources`;
-    return {
-      prose: `${recordSpotlight.name}, in ${recordSpotlight.place}. ${recordSpotlight.summary} It is one pin, and you can read its citations before you decide to trust it.`,
-      figures: [
-        { value: recordSpotlight.place, label: 'where' },
-        { value: recordSpotlight.era, label: 'when' },
-        { value: sources, label: 'evidence on the record' },
-      ],
-      cite: 'Drawn from the active release. Shown at the precision its sources support, and every citation opens on the record itself.',
-    };
-  }
-
-  if (chapter.rotatingFact && fact) {
-    return { prose: fact.prose, figures: fact.figures, cite: fact.source };
-  }
-
-  return { prose: copy.prose, figures: copy.facts, cite: copy.cite };
+  return sameDoorFrameBox(a.window, b.window) && sameDoorFrameBox(a.plate, b.plate);
 }
 
 function prefersReducedMotion(): boolean {
   return (
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  );
-}
-
-/** A link to a Door pin's record: the opaque `/door/pin/pin-N` redirect needs a real `<a>` (it's
- * a server answer, not a client route), public `/place/` and `/law` paths take a Next `Link`. */
-function DoorRecordLink({
-  href,
-  className,
-  children,
-}: {
-  readonly href: string;
-  readonly className?: string;
-  readonly children: React.ReactNode;
-}) {
-  return href.startsWith('/door/pin/') ? (
-    <a className={className} href={href}>
-      {children}
-    </a>
-  ) : (
-    <Link className={className} href={href}>
-      {children}
-    </Link>
   );
 }
 
@@ -232,12 +139,9 @@ export type DoorImmersiveProps = {
   readonly spotlightLngLat: readonly [number, number] | null;
   /** Opaque `pin-N` for the spotlight, resolved on the server so the catalog stays off `/`. */
   readonly spotlightPinId: string | null;
-  readonly placeCount: string;
-  /** Kind-family census for the opening masthead ledger. */
-  readonly openLedger: readonly DoorOpenLedgerRow[];
   /**
-   * Cold `/explore` (and deep links): land already in browse posture — same embedded atlas and
-   * Journey exit as a morph from `/`, without the cinematic delay.
+   * Cold `/explore` (and deep links): land already in browse posture, the same embedded atlas as
+   * a morph from `/`, without the cinematic delay.
    */
   readonly initialBrowse?: boolean;
 };
@@ -251,18 +155,17 @@ export function DoorImmersive({
   spotlight,
   spotlightLngLat,
   spotlightPinId,
-  placeCount,
-  openLedger,
   initialBrowse = false,
 }: DoorImmersiveProps) {
   const journeyRef = useRef<HTMLDivElement | null>(null);
-  const browseExitRef = useRef<HTMLButtonElement | null>(null);
+  const dockRef = useRef<HTMLDivElement | null>(null);
+  const startRef = useRef<HTMLButtonElement | null>(null);
+  const walkHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const browseHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const browseReturnFocusRef = useRef<HTMLElement | null>(null);
   const browseFocusPendingRef = useRef(false);
-  /** The map window: the part of the plate the reader sees on this surface (door-home.css). */
+  /** The map window: the part of the plate the dock leaves uncovered (door-home.css). */
   const windowRef = useRef<HTMLDivElement | null>(null);
-  /** The field chrome along the window's top edge; the country is framed below it. */
-  const chromeRef = useRef<HTMLDivElement | null>(null);
 
   const stage = useMapStage();
   const stageRef = useRef(stage);
@@ -277,20 +180,34 @@ export function DoorImmersive({
   const browseMorphTimerRef = useRef<number | null>(null);
   const initialBrowseArmedRef = useRef(false);
 
-  // The hidden journey is inert. Move focus only for an actual mode transition,
-  // never steal it on a cold page load, and preserve the original entry control.
+  /** 0 is the opening; 1..n are the walk's chapters, in the order this visit drew them. */
+  const [step, setStep] = useState(0);
+  const stepFocusPendingRef = useRef(false);
+
+  // The hidden walk is inert. Move focus only for an actual mode transition, never steal it on a
+  // cold page load, and preserve the original entry control. Entering browse lands on the map's
+  // heading once the instruments have mounted; the way back is the header's Map tab or Back.
   useEffect(() => {
     if (!browseFocusPendingRef.current) return;
-    browseFocusPendingRef.current = false;
     if (browseMode) {
-      browseExitRef.current?.focus({ preventScroll: true });
+      if (!browseMounted) return;
+      browseFocusPendingRef.current = false;
+      browseHeadingRef.current?.focus({ preventScroll: true });
     } else {
+      browseFocusPendingRef.current = false;
       const origin = browseReturnFocusRef.current;
       const target =
         origin?.isConnected && !origin.closest('[inert]') ? origin : journeyRef.current;
       target?.focus({ preventScroll: true });
     }
-  }, [browseMode]);
+  }, [browseMode, browseMounted]);
+
+  // A step the reader chose moves focus to what replaced the control they pressed.
+  useEffect(() => {
+    if (!stepFocusPendingRef.current) return;
+    stepFocusPendingRef.current = false;
+    (step === 0 ? startRef.current : walkHeadingRef.current)?.focus({ preventScroll: true });
+  }, [step]);
 
   const initialFocus = useMemo(
     () =>
@@ -311,9 +228,10 @@ export function DoorImmersive({
   /**
    * The decade the sweep chapter has filled the plate up to, or null when no sweep is running.
    *
-   * Chapter 5 says "watch the record fill", so it has to be watchable: the plate crossdissolves
-   * to an empty country, holds there, and then takes the archive back one decade at a time,
-   * cumulatively. A cursor before the first decade matches nothing, which is the cleared frame.
+   * The sweep chapter says "watch the record fill", so it has to be watchable: the plate
+   * crossdissolves to an empty country, holds there, and then takes the archive back one decade at
+   * a time, cumulatively. A cursor before the first decade matches nothing, which is the cleared
+   * frame.
    */
   const [sweepDecade, setSweepDecade] = useState<number | null>(null);
   const sweepRef = useRef<SweepHandle | null>(null);
@@ -322,14 +240,18 @@ export function DoorImmersive({
     sweepRef.current = null;
     setSweepDecade(null);
   }, []);
-  // Scrolling away mid-sweep, or leaving the Door entirely, must not strand a half-filled plate.
+  // Stepping away mid-sweep, or leaving the Door entirely, must not strand a half-filled plate.
   useEffect(() => stopSweep, [stopSweep]);
 
   const decadeRange = useMemo(() => sweepRange(pins), [pins]);
 
-  /** What the plate shows this frame: the whole field, or the archive as of the swept decade. */
+  /**
+   * What the plate shows this frame: the whole field, the cleared country, or the archive as of
+   * the swept decade (which includes any outlier older than the sweep's first decade).
+   */
   const sweptPins = useMemo<ExploreMapFeatureCollection>(() => {
     if (sweepDecade === null) return pins;
+    if (decadeRange !== null && sweepDecade < decadeRange.from) return { ...pins, features: [] };
     return {
       ...pins,
       features: pins.features.filter((feature) => {
@@ -337,13 +259,12 @@ export function DoorImmersive({
         return decade !== null && decade <= sweepDecade;
       }),
     };
-  }, [pins, sweepDecade]);
+  }, [decadeRange, pins, sweepDecade]);
 
   /**
    * The one frame the plate crossdissolves rather than snapping: the cleared one. Removing
    * features from a GeoJSON source is otherwise instant, and a country's worth of pins vanishing
-   * between frames reads as a fault rather than as the record being rewound. Every later frame
-   * only adds pins, which the per-decade pin crossfade already covers.
+   * between frames reads as a fault rather than as the record being rewound.
    */
   const clearingPlate =
     sweepDecade !== null && (decadeRange === null || sweepDecade < decadeRange.from);
@@ -370,16 +291,12 @@ export function DoorImmersive({
     }
   }, [initialBrowse, stage]);
 
-  /** Where the journey was scrolled when the reader went into browse, and whether we pushed. */
-  const journeyScrollRef = useRef(0);
+  /** Whether entering browse pushed the `/explore` entry over this page's own `/`. */
   const enteredByPushRef = useRef(false);
-  /** Bumped on every enter/leave, so a scroll restore still waiting from an earlier exit stands
-   * down instead of scrolling a page the reader has since moved on from. */
-  const browseGenerationRef = useRef(0);
 
   /**
    * Leaves browse. `traversed`: the browser already stepped back over the pushed `/explore` entry
-   * (its own Back or a swipe), so the URL is right and only the scroll is left to restore.
+   * (its own Back or a swipe), so the URL is already right.
    */
   const leaveBrowse = useCallback(
     (traversed: boolean) => {
@@ -403,58 +320,26 @@ export function DoorImmersive({
       /*
        * Morph enter uses history.pushState so the Door tree stays mounted; Next's pathname can
        * still be `/` while the address bar reads `/explore`. Cold `/explore` is a real route.
-       * Exit must restore the journey URL and, when Next owns the explore page, leave that route.
+       * Exit must restore the opening URL and, when Next owns the explore page, leave that route.
        */
       const pushedState =
         (window.history.state as { doorBrowse?: number } | null)?.doorBrowse === 1;
       const steppingBack = !traversed && enteredByPushRef.current && pushedState;
       if (traversed) {
-        // Nothing to do to the URL: the traversal already put the journey's `/` back.
+        // Nothing to do to the URL: the traversal already put `/` back.
       } else if (steppingBack) {
-        // Entering pushed `/explore` over the journey's own `/` entry; leaving steps back over it
-        // rather than stacking a second `/` on top (which made the browser's Back a no-op).
+        // Leaving steps back over the pushed entry rather than stacking a second `/` on top
+        // (which made the browser's Back a no-op).
         window.history.back();
       } else if (
         pathname.startsWith('/explore') ||
         window.location.pathname.startsWith('/explore')
       ) {
-        // Cold `/explore` is a real route Next owns.
         router.replace('/', { scroll: false });
       } else if (pushedState) {
         window.history.replaceState(null, '', '/');
       }
       enteredByPushRef.current = false;
-      // Back to the chapter the reader left from, not the top of the journey. The journey is
-      // still collapsed under browse for a few frames (and a history traversal can reset scroll),
-      // so wait until the page is tall enough to hold the old position before scrolling to it.
-      const target = journeyScrollRef.current;
-      const generation = ++browseGenerationRef.current;
-      const startedAt = performance.now();
-      const restore = () => {
-        if (generation !== browseGenerationRef.current) return;
-        const tallEnough = document.documentElement.scrollHeight - window.innerHeight >= target - 1;
-        if (tallEnough || performance.now() - startedAt > 1500) {
-          window.scrollTo({ top: target, behavior: 'auto' });
-          return;
-        }
-        window.requestAnimationFrame(restore);
-      };
-      const scheduleRestore = () =>
-        window.setTimeout(() => window.requestAnimationFrame(restore), 60);
-      if (steppingBack) {
-        // The traversal applies the browser's own scroll restoration when it lands, after this
-        // handler; restore once it has, or the journey snaps to the top.
-        window.addEventListener('popstate', () => window.setTimeout(scheduleRestore, 120), {
-          once: true,
-        });
-      } else if (traversed) {
-        // Called from that same popstate: the browser's restoration lands just after it. Only
-        // when Back landed on the journey: from a cold `/explore`, Back leaves for whatever page
-        // came before, and that page's scroll is the browser's to restore, not ours.
-        if (window.location.pathname === '/') window.setTimeout(scheduleRestore, 120);
-      } else {
-        scheduleRestore();
-      }
     },
     [pathname, router, stage],
   );
@@ -467,11 +352,6 @@ export function DoorImmersive({
   const startBrowse = useCallback(
     (push: boolean) => {
       if (browseModeRef.current) return;
-      browseGenerationRef.current += 1;
-      // Captured first: entering browse announces itself, and listeners of that announcement put
-      // the document back at the top synchronously. On a browser Forward the journey may still
-      // be collapsed (scrollY 0) from the traversal; keep the chapter we already know then.
-      if (push || window.scrollY > 0) journeyScrollRef.current = window.scrollY;
       browseReturnFocusRef.current =
         document.activeElement instanceof HTMLElement ? document.activeElement : null;
       browseFocusPendingRef.current = true;
@@ -480,7 +360,7 @@ export function DoorImmersive({
       stopSweep();
       stage.setDoorBrowseLive(true);
       announceMapBrowseEntered();
-      // Either way the journey's `/` entry sits directly behind this one, so leaving steps back.
+      // Either way the page's `/` entry sits directly behind this one, so leaving steps back.
       enteredByPushRef.current = true;
       if (push) window.history.pushState({ doorBrowse: 1 }, '', '/explore');
       const delay = prefersReducedMotion() ? 0 : DOOR_BROWSE_MORPH_MS;
@@ -506,47 +386,10 @@ export function DoorImmersive({
   startBrowseRef.current = startBrowse;
 
   /*
-   * Tap the map to explore it. The journey's chapters sit over the map, so on a phone the map you
-   * can see in the band above the opening sheet never receives a touch: it is a backdrop that a
-   * scroll drives (the scrollytelling convention — interaction off while the story owns the
-   * camera). The way in has to be obvious, so a tap that lands on the map band — on a chapter's
-   * empty area, not its words or buttons, and inside the measured map window — opens the
-   * full-screen map right there. A scroll is not a click, so reading is untouched.
-   */
-  useEffect(() => {
-    const journey = journeyRef.current;
-    if (!journey) return;
-    const onClick = (event: MouseEvent) => {
-      if (browseModeRef.current) return;
-      const target = event.target as HTMLElement | null;
-      if (!target) return;
-      const onEmptyChapter =
-        target === journey || target.classList.contains('ds-door-journey__chapter');
-      if (!onEmptyChapter) return;
-      const frame = windowRef.current?.getBoundingClientRect();
-      if (!frame || frame.width < 1 || frame.height < 1) return;
-      const inside =
-        event.clientX >= frame.left &&
-        event.clientX <= frame.right &&
-        event.clientY >= frame.top &&
-        event.clientY <= frame.bottom;
-      if (!inside) return;
-      enterBrowseRef.current();
-    };
-    journey.addEventListener('click', onClick);
-    return () => journey.removeEventListener('click', onClick);
-  }, []);
-
-  /*
-   * Listeners must not rebind when enter/exit identities change. The previous effect listed those
-   * callbacks as deps, so every toggle rebuilt the effect and the cleanup called
-   * setDoorBrowseLive(false) + announceMapBrowseExited mid-session — journey hidden, atlas
-   * disarmed, morph timer cancelled. Toggle once and the map was unusable.
-   *
-   * The stage handle is read through a ref for the same reason: its identity changes when the map
-   * finishes loading (`mapAvailable` is in the provider's memo), and a cold `/explore` that re-ran
-   * this cleanup then sat in the Door's ambient posture with every gesture off. A remount (Strict
-   * Mode's in development) puts browse back, because the cold-start arm above runs only once.
+   * Listeners must not rebind when enter/exit identities change: a cleanup that ran mid-session
+   * called setDoorBrowseLive(false) + announceMapBrowseExited and left the map unusable. The stage
+   * handle is read through a ref for the same reason (its identity changes when the map finishes
+   * loading). A remount (Strict Mode's in development) puts browse back.
    */
   useEffect(() => {
     if (browseModeRef.current) {
@@ -560,8 +403,7 @@ export function DoorImmersive({
         (event.state as { doorBrowse?: number } | null)?.doorBrowse === 1 &&
         window.location.pathname.startsWith('/explore');
       if (browseModeRef.current && !onBrowseEntry) {
-        // Back (or swipe-back) already stepped over our `/explore` entry; do not step again, but
-        // still wait for the browser's scroll restoration before returning to the chapter.
+        // Back (or swipe-back) already stepped over our `/explore` entry; do not step again.
         leaveBrowseRef.current(true);
       } else if (!browseModeRef.current && onBrowseEntry) {
         // Forward onto the `/explore` entry: show the map the address bar now names.
@@ -575,8 +417,6 @@ export function DoorImmersive({
       window.removeEventListener(MAP_BROWSE_ENTER_EVENT, onEnter);
       window.removeEventListener(MAP_BROWSE_EXIT_EVENT, onExit);
       window.removeEventListener('popstate', onPop);
-      // A journey scroll restore still waiting must not land on whatever page replaced the Door.
-      browseGenerationRef.current += 1;
       if (browseMorphTimerRef.current !== null) {
         window.clearTimeout(browseMorphTimerRef.current);
         browseMorphTimerRef.current = null;
@@ -589,82 +429,52 @@ export function DoorImmersive({
     };
   }, []);
 
-  /**
-   * The chapter the plate is currently framing. The observer fires for the chapter already in
-   * view too — on mount, and again when a fast scroll settles on the chapter it started from —
-   * and re-resolving the same chapter would restart its flight (and, on the sweep chapter, the
-   * sweep) for nothing. The opening chapter is framed on mount, so it starts as the last one.
-   */
+  /** The chapter the plate is currently framing; re-showing it must not restart its flight. */
   const lastChapterIdRef = useRef<string>(chapters[0]!.id);
 
-  /**
-   * A page that mounts already scrolled — a reload, a restored history entry — frames the chapter
-   * the reader is on before the plate's first frame, instead of framing the opening chapter and
-   * then flying. A layout effect, so it runs before the passive effects that land
-   * the first frame, and after the sections have their boxes. The sweep chapter is left to the
-   * observer: its camera is the national frame either way, and the sweep has to start from the
-   * observer's own batch the way it does from a scroll.
-   */
-  useLayoutEffect(() => {
-    const scope = journeyRef.current;
-    if (!scope) return;
-    const rects = [...scope.querySelectorAll<HTMLElement>('[data-chapter]')].map((section) => {
-      const rect = section.getBoundingClientRect();
-      return { chapterIndex: Number(section.dataset.chapter), top: rect.top, bottom: rect.bottom };
-    });
-    const index = chapterInViewFromRects(rects, window.innerHeight);
-    const chapter = index === null ? undefined : chapters[index];
-    if (!chapter || chapter.sweep || chapter.id === lastChapterIdRef.current) return;
-    lastChapterIdRef.current = chapter.id;
-    setFocus(
-      resolveDoorFocus({
-        chapter,
-        spotlight,
-        fact: factByChapterId[chapter.id],
-        spotlightLngLat,
-      }),
-    );
-  }, [chapters, factByChapterId, spotlight, spotlightLngLat]);
+  /** Frames a chapter on the plate and, for the sweep chapter, runs the decade sweep. */
+  const showChapter = useCallback(
+    (chapter: StoryChapter) => {
+      if (browseModeRef.current) return;
+      if (chapter.id === lastChapterIdRef.current) return;
+      lastChapterIdRef.current = chapter.id;
+      setFocus(
+        resolveDoorFocus({
+          chapter,
+          spotlight,
+          fact: factByChapterId[chapter.id],
+          spotlightLngLat,
+        }),
+      );
 
-  useChapterObserver(
-    journeyRef,
-    chapters,
-    useCallback(
-      (chapter: StoryChapter) => {
-        if (browseModeRef.current) return;
-        if (chapter.id === lastChapterIdRef.current) return;
-        lastChapterIdRef.current = chapter.id;
-        setFocus(
-          resolveDoorFocus({
-            chapter,
-            spotlight,
-            fact: factByChapterId[chapter.id],
-            spotlightLngLat,
-          }),
-        );
+      stopSweep();
+      if (!chapter.sweep || decadeRange === null) return;
+      const calm = prefersReducedMotion();
+      sweepRef.current = sweep({
+        from: decadeRange.from,
+        to: decadeRange.to,
+        onClear: () => setSweepDecade(decadeRange.from - 10),
+        // Long enough for the clearing crossdissolve to land before the first decade arrives,
+        // so the reader actually sees the empty country the chapter is about.
+        clearHoldMs: calm ? SWEEP_CLEAR_HOLD_MS : DECADE_LAYER_FADE_MS + SWEEP_CLEAR_HOLD_MS,
+        onDecade: setSweepDecade,
+        // The last decade is not the end of the argument: the whole archive comes back, which
+        // also returns every undated record the sweep had to leave out.
+        onDone: () => setSweepDecade(null),
+        reducedMotion: calm,
+      });
+    },
+    [decadeRange, factByChapterId, spotlight, spotlightLngLat, stopSweep],
+  );
 
-        stopSweep();
-        if (!chapter.sweep || decadeRange === null) return;
-        const calm = prefersReducedMotion();
-        sweepRef.current = sweep({
-          from: decadeRange.from,
-          to: decadeRange.to,
-          onClear: () => setSweepDecade(decadeRange.from - 10),
-          // Long enough for the clearing crossdissolve to land before the first decade arrives,
-          // so the reader actually sees the empty country the chapter is about. Under reduced
-          // motion the plate clears in a cut and only the short beat is needed.
-          clearHoldMs: calm ? SWEEP_CLEAR_HOLD_MS : DECADE_LAYER_FADE_MS + SWEEP_CLEAR_HOLD_MS,
-          onDecade: setSweepDecade,
-          // The last decade is not the end of the argument: the whole archive comes back, which
-          // also returns every undated record the sweep had to leave out.
-          onDone: () => setSweepDecade(null),
-          reducedMotion: calm,
-        });
-      },
-      [decadeRange, factByChapterId, spotlight, spotlightLngLat, stopSweep],
-    ),
-    // Document scroll: observe against the viewport, not a nested scrollport.
-    { scrollRoot: 'document' },
+  const goToStep = useCallback(
+    (next: number) => {
+      const clamped = Math.min(Math.max(next, 0), chapters.length - 1);
+      stepFocusPendingRef.current = true;
+      setStep(clamped);
+      showChapter(chapters[clamped]!);
+    },
+    [chapters, showChapter],
   );
 
   const focusPinId =
@@ -674,8 +484,7 @@ export function DoorImmersive({
 
   /* —— The live plate ————————————————————————————————————————————————————————————————
      The same field Explore paints. `patchData` is also what wakes the shared plate on this
-     surface (MapStage builds MapLibre on first contact), so the Door pays for the map exactly
-     once, at the moment it asks for it, and shares the instance with `/explore` afterwards. */
+     surface (MapStage builds MapLibre on first contact). */
   useEffect(() => {
     if (browseModeRef.current) return;
     stage.patchData(
@@ -707,11 +516,8 @@ export function DoorImmersive({
 
   /**
    * True once THIS mount has landed its own frame on the shared plate. `plateLive` alone is
-   * stale on arrival: the plate is a persistent singleton (MapStage.tsx), and `subscribe`
-   * replays the last viewport it ever reported — from whatever page was live before this one —
-   * the instant this effect subscribes. Revealing the plate on that (door-home.css) would show
-   * the previous page's camera for a frame. `framed` starts false on every mount and only flips
-   * once the first frame below has actually been applied for this page's own chapter.
+   * stale on arrival: the plate is a persistent singleton and `subscribe` replays the last
+   * viewport it ever reported, from whatever page was live before this one.
    */
   const [framed, setFramed] = useState(false);
   /** The first frame after mount is a cut, so a warm plate is never seen arriving from elsewhere. */
@@ -719,34 +525,26 @@ export function DoorImmersive({
   const cameraRef = useRef<DoorFocusCamera>(focus.camera);
   cameraRef.current = focus.camera;
   /** The boxes the last frame was computed against, so a resize only refits when they moved. */
-  const lastFrameBoxesRef = useRef<DoorFrameBoxes>({
-    window: null,
-    plate: null,
-    chrome: null,
-  });
+  const lastFrameBoxesRef = useRef<DoorFrameBoxes>({ window: null, plate: null });
   const measureFrameBoxes = useCallback((map: { getContainer(): HTMLElement }): DoorFrameBoxes => {
     return {
       window: boxOf(windowRef.current),
       // MapLibre's own container: on the Door the whole viewport (posture `ambient`, shell.css).
       plate: boxOf(map.getContainer()),
-      chrome: boxOf(chromeRef.current),
     };
   }, []);
 
   /**
    * Point the plate at the current frame, framed against the map window.
    *
-   * A national chapter fits CONUS inside the window through the Atlas's own national preset,
-   * with the window's insets as the fit's padding (`doorFramePadding`), so the country sits
-   * below the bar and the field chrome on a desktop and inside the top band on a phone rather than
-   * centered on a canvas the reader only partly sees. The strip is shorter than the country at the Instrument's
-   * national zoom floor, so the fit may sink the floor to what it needs (`zoomFloor: 'fit'`,
-   * camera.ts). Pitch and bearing are passed even though a national chapter
-   * authors them as 0: scrolling back up from a tilted chapter has to be able to say "flat", or
-   * the tilt and the turn survive the move. A place chapter keeps the chapter's own
-   * spec and lands the place at the window's center through `offset`.
+   * A national chapter fits CONUS inside the window through the Atlas's own national preset, with
+   * the window's insets as the fit's padding (`doorFramePadding`), so the country sits right of the
+   * headline column on a desktop and above the dock on a phone. Pitch and bearing are passed even
+   * though a national chapter authors them as 0: stepping back from a tilted chapter has to be able
+   * to say "flat". A place chapter keeps its own spec and lands the place at the window's center
+   * through `offset`.
    *
-   * `cut` lands the frame in one step — the first frame after mount, and every refit after a
+   * `cut` lands the frame in one step: the first frame after mount, and every refit after a
    * resize, where the plate has to keep step with a layout that does not animate its own reflow.
    */
   const applyCamera = useCallback(
@@ -757,11 +555,10 @@ export function DoorImmersive({
       const camera = cameraRef.current;
       const boxes = measureFrameBoxes(map);
       lastFrameBoxesRef.current = boxes;
-      const { window: windowBox, plate: plateBox, chrome: chromeBox } = boxes;
+      const { window: windowBox, plate: plateBox } = boxes;
       map.stop();
       if (isNationalCamera(camera)) {
-        const padding =
-          windowBox && plateBox ? doorFramePadding(windowBox, plateBox, chromeBox) : null;
+        const padding = windowBox && plateBox ? doorFramePadding(windowBox, plateBox) : null;
         stage.flyPreset(
           'national',
           { bounds: US_CONUS_BOUNDS },
@@ -792,7 +589,7 @@ export function DoorImmersive({
         duration: CHAPTER_FLIGHT_MS,
         curve: CAMERA_FLY_CURVE,
         easing: CAMERA_EASING_SLOW_OUT,
-        // Ambient: a scroll-driven move must stay suppressible under reduced motion.
+        // Ambient: a walk-driven move must stay suppressible under reduced motion.
         essential: false,
       } as never);
       return true;
@@ -805,10 +602,9 @@ export function DoorImmersive({
   useEffect(() => {
     if (!plateLive) return;
     /*
-     * Browse skips journey framing (`applyCamera` returns false while armed) because Atlas owns
-     * the camera. Cold `/explore` mounts already in browse, so without this path `framed` never
-     * flips, `data-plate` stays `pending`, and `.ds-door__field` keeps the opaque canvas cover
-     * over the live plate forever (map only peeks in the island-clearance band under the bar).
+     * Browse skips walk framing (`applyCamera` returns false while armed) because Atlas owns the
+     * camera. Cold `/explore` mounts already in browse, so without this path `framed` never
+     * flips and `.ds-door__field` keeps the opaque canvas cover over the live plate forever.
      */
     if (browseModeRef.current) {
       firstFrameRef.current = false;
@@ -821,11 +617,30 @@ export function DoorImmersive({
   }, [applyCamera, camera, plateLive]);
 
   /**
-   * Re-frame when the map window or the canvas changes: a window resize, the bar wrapping, a
-   * phone's toolbar collapsing, the strip/full-bleed breakpoint. A cut when the camera is at rest
-   * (a flight re-aimed when it is not), one per animation frame however many events a drag
-   * produces, and only when a box actually moved — a sub-pixel jitter is not a resize
-   * (`sameDoorFrameBox`).
+   * The dock's height is the stacked window's bottom edge (door-home.css reads
+   * `--ds-door-dock-h`), so each chapter's card, whatever its length, leaves the map above it
+   * framed rather than covered.
+   */
+  useEffect(() => {
+    const dock = dockRef.current;
+    if (!dock || typeof ResizeObserver === 'undefined') return;
+    // On the body, so the map attribution (a sibling of this tree) can clear the dock too.
+    const root = document.body;
+    const publish = () => root.style.setProperty('--ds-door-dock-h', `${dock.offsetHeight}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(dock);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--ds-door-dock-h');
+    };
+  }, []);
+
+  /**
+   * Re-frame when the map window or the canvas changes: a window resize, the dock growing with a
+   * longer chapter, a phone's toolbar collapsing. A cut when the camera is at rest (a flight
+   * re-aimed when it is not), one per animation frame however many events arrive, and only when a
+   * box actually moved (`sameDoorFrameBox`).
    */
   useEffect(() => {
     if (!plateLive) return;
@@ -842,10 +657,8 @@ export function DoorImmersive({
         // MapLibre re-measures its own container on its own observer; measure first so the fit
         // is computed against the canvas as it is now, not as it was a frame ago.
         stage.resize();
-        // Cut only a camera at rest. A phone fires `resize` as its toolbar collapses, which is
-        // the same swipe that starts a chapter's flight, and a cut there stopped the flight
-        // mid-air and jumped to its end (measured: zoom 6.98 to 13.4 in a single cut). A moving
-        // camera is re-aimed at the new frame from where it is instead.
+        // Cut only a camera at rest. A camera already moving is re-aimed at the new frame from
+        // where it is instead of being jumped to its end.
         applyCamera(!map.isMoving());
       });
     };
@@ -859,15 +672,16 @@ export function DoorImmersive({
     };
   }, [applyCamera, measureFrameBoxes, plateLive, stage]);
 
-  /** The spotlight record's copper ring on the plate. */
+  /** The current record on the plate: the spotlight on the opening and on its own chapter. */
+  const selectedPinId = step === 0 ? spotlightPinId : focusPinId;
   useEffect(() => {
     if (!plateLive) return;
     stage.applyViewState({
       selectedState: undefined,
       selectedEdge: undefined,
-      selectedEntity: focusPinId ?? undefined,
+      selectedEntity: selectedPinId ?? undefined,
     });
-  }, [focusPinId, plateLive, stage]);
+  }, [selectedPinId, plateLive, stage]);
 
   /** A marker click on the live plate opens the record the pin's href names. */
   const hrefByPinId = useMemo(() => {
@@ -879,10 +693,10 @@ export function DoorImmersive({
     return byId;
   }, [pins]);
   /*
-   * Clicking an entity while the journey is playing means "stop the tour, show me that one": the
-   * same selection every pin click on this map makes. The Door saves the pin, hands off to browse
-   * (`enterBrowse`, the same plate, no navigation), and Explore restores it through the one
-   * `frameRecord` contract. Overlapping pins hand off as a group and open the chooser.
+   * Clicking an entity during the walk means "stop the tour, show me that one": the same selection
+   * every pin click on this map makes. The Door saves the pin, hands off to browse (`enterBrowse`,
+   * the same plate, no navigation), and Explore restores it through the one `frameRecord`
+   * contract. Overlapping pins hand off as a group and open the chooser.
    */
   useEffect(() => {
     const pinFor = (entityId: string) => {
@@ -920,6 +734,30 @@ export function DoorImmersive({
     };
   }, [enterBrowse, hrefByPinId, pins.features, stage]);
 
+  /*
+   * The Door's own labels (state codes, one tag per state, low-zoom groups) in one collision pass
+   * with the record marks, and the attribution collapsed to its "i". Mounted only while the Door
+   * owns the plate: browse hands it to Explore, which brings its own.
+   */
+  const labelsRef = useRef<DoorPlateLabels | null>(null);
+  const sweptPinsRef = useRef(sweptPins);
+  sweptPinsRef.current = sweptPins;
+  useEffect(() => {
+    if (!plateLive || browseMode) return;
+    // The stage's camera handle is the MapLibre map itself (MapStage.tsx, `getMap`).
+    const map = stage.getMap() as unknown as DoorPlate | null;
+    if (!map) return;
+    const labels = mountDoorPlateLabels(map, sweptPinsRef.current);
+    labelsRef.current = labels;
+    return () => {
+      labelsRef.current = null;
+      labels.remove();
+    };
+  }, [browseMode, plateLive, stage]);
+  useEffect(() => {
+    labelsRef.current?.setPins(sweptPins);
+  }, [sweptPins]);
+
   /** Pin photos rise from live markers. */
   const [pinPhotoTarget, setPinPhotoTarget] = useState<PinPhotoHoverTarget | null>(null);
   useEffect(
@@ -932,101 +770,41 @@ export function DoorImmersive({
     [stage],
   );
 
-  const scrollToChapter = useCallback(
-    (index: number) => {
-      const target = journeyRef.current?.querySelector(`[data-chapter="${index}"]`);
-      target?.scrollIntoView({
-        behavior: reducedMotion ? 'auto' : 'smooth',
-        block: 'start',
-      });
-    },
-    [reducedMotion],
-  );
-
   const plateState: DoorPlateState = plateUnavailable ? 'unavailable' : framed ? 'live' : 'pending';
+
+  // The spotlight's public place URL, from the same pin table a marker click opens. The entity
+  // path is only the fallback for a spotlight the plate carries no pin for.
+  const spotlightHref = spotlight
+    ? ((spotlightPinId ? hrefByPinId.get(spotlightPinId) : undefined) ??
+      `/entity/${encodeURIComponent(spotlight.entityId)}`)
+    : null;
+  const spotlightLocality = spotlight ? hereLocality(spotlight.name, spotlight.place) : null;
+
+  const walkChapters = chapters.slice(1);
+  const currentChapter = chapters[step]!;
+  const currentBody =
+    step === 0
+      ? null
+      : chapterBody(currentChapter, spotlight, factByChapterId[currentChapter.id], decadeRange);
 
   return (
     <>
-      {browseMode ? (
-        <div className="ds-door__browse-exit" data-browse-chrome="true">
-          <button
-            ref={browseExitRef}
-            type="button"
-            className="ds-door__browse-exit-btn"
-            onClick={exitBrowse}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path
-                d="M10 3.5 5.5 8l4.5 4.5"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Back to journey
-          </button>
-        </div>
-      ) : null}
       <aside
         className="ds-door__field"
-        aria-label="National pin field"
+        aria-label="National map"
         data-plate={plateState}
         data-browse={browseMode ? 'on' : 'off'}
       >
-        {/* The map window. Measured for the camera frame (door-field-frame.ts); the plate shows
-            through it once this mount has framed it. Nothing is drawn in it. */}
+        {/* The map window: the uncovered part of the plate. Measured for the camera frame
+            (door-field-frame.ts) and the callout's bounds; nothing is drawn in it. */}
         <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
-        <div className="ds-door__field-chrome" ref={chromeRef}>
-          {plateUnavailable ? (
-            /* No WebGL: the journey chapters below still carry the visit. The field itself holds
-               a sequenced editorial card, not a black void with one link. */
-            <div className="ds-door__field-fallback" role="status">
-              <p className="ds-door__field-note">
-                The live map could not start in this browser. The journey below still walks the
-                archive.
-              </p>
-              {spotlight ? (
-                <div className="ds-door__field-fallback-card">
-                  <p className="ds-door__field-fallback-kicker">Start with a place</p>
-                  <p className="ds-door__field-fallback-name">{spotlight.name}</p>
-                  {spotlight.place ? (
-                    <p className="ds-door__field-fallback-place">{spotlight.place}</p>
-                  ) : null}
-                  <p className="ds-door__field-fallback-actions">
-                    <Link
-                      href={
-                        spotlightPinId && hrefByPinId.get(spotlightPinId)
-                          ? (hrefByPinId.get(spotlightPinId) as string)
-                          : `/entity/${encodeURIComponent(spotlight.entityId)}`
-                      }
-                    >
-                      Open this record
-                    </Link>
-                    <button type="button" onClick={enterBrowse}>
-                      Browse the map
-                    </button>
-                    <Link href="/records">Browse the sequenced list</Link>
-                  </p>
-                </div>
-              ) : (
-                <p className="ds-door__field-note">
-                  <Link href="/records">Browse the records</Link> as a sequenced list.
-                </p>
-              )}
-            </div>
-          ) : null}
-          {/*
-            Arms browse on this plate. Not duplicated in the Find bar — Map is the destination;
-            this CTA (and "Browse the map" on the sheets) is how you enter the filter posture.
-            Hidden once browse is armed; leave via Back to journey or Map in the bar.
-          */}
-          {browseMode ? null : (
-            <button type="button" className="ds-door__filters" onClick={enterBrowse}>
-              Browse the map
-            </button>
-          )}
-        </div>
+        {plateUnavailable ? (
+          /* No WebGL: say so where the map would be, and point at the index that needs none. */
+          <p className="ds-door__field-note" role="status">
+            The map could not start in this browser. <Link href="/records">Browse the records</Link>{' '}
+            instead.
+          </p>
+        ) : null}
         <p className="ds-door__live" aria-live="polite">
           {browseMode ? 'Browsing the map' : focus.placeLabel}
         </p>
@@ -1039,207 +817,57 @@ export function DoorImmersive({
         tabIndex={-1}
         inert={browseMode}
         aria-hidden={browseMode ? true : undefined}
+        data-step={step}
       >
-        {' '}
-        {chapters.map((chapter) => {
-          const copy = copyFor(chapter.id);
-          const body = chapterBody(chapter, spotlight, factByChapterId[chapter.id]);
-          if (!copy || !body) return null;
-          const { before, accent, after } = headingParts(copy);
-          const isOpen = chapter.index === 0;
-          const isClose = chapter.index === chapters.length - 1;
-          const side = chapter.centered ? 'center' : chapter.index % 2 === 0 ? 'end' : 'start';
-          // The spotlight's public place URL, from the same pin table a marker click opens. The
-          // entity path is only the fallback for a spotlight the plate carries no pin for.
-          const spotlightPublicHref =
-            spotlight && spotlightPinId ? (hrefByPinId.get(spotlightPinId) ?? null) : null;
-          const spotlightLocality = spotlight
-            ? hereLocality(spotlight.name, spotlight.place)
-            : null;
-          const spotlightHref =
-            chapter.id === RECORD_CHAPTER_ID && spotlight
-              ? (spotlightPublicHref ?? `/entity/${encodeURIComponent(spotlight.entityId)}`)
-              : null;
-
-          /*
-            Opening masthead (door-home.css): morphing headline, short invite, spotlight place,
-            kind-family ledger, release count, Begin + Browse. The map remains a continuous
-            backdrop behind the sheet; its national frame uses the full desktop window and the
-            phone's top band. Brand chrome already in the bar stays out of the sheet.
-          */
-          if (isOpen) {
-            return (
-              <section
-                key={chapter.id}
-                id="door-open"
-                className="ds-door-journey__chapter ds-door-journey__chapter--rest"
-                data-chapter={chapter.index}
-                aria-labelledby={`door-journey-heading-${chapter.id}`}
-              >
-                <div className="ds-door-open">
-                  {/* Action first: the headline, a real GET search into /records, and the three
-                      ways in. Orientation (spotlight, census) sits beside it, not above it. */}
-                  <div className="ds-door-open__primary">
-                    <HeroHeadlineMorph
-                      className="ds-door-open__headline"
-                      id={`door-journey-heading-${chapter.id}`}
-                    />
-                    <p className="ds-door-open__invite">{DOOR_OPEN_INVITE}</p>
-                    <form
-                      className="ds-door-open__search"
-                      method="get"
-                      action="/records"
-                      role="search"
-                      aria-label="Search the archive"
-                    >
-                      <label className="ds-visually-hidden" htmlFor="door-open-q">
-                        Search records by name or place
-                      </label>
-                      <input
-                        className="ds-door-open__search-input"
-                        id="door-open-q"
-                        name="q"
-                        type="search"
-                        placeholder="Search names, places"
-                        autoComplete="off"
-                        enterKeyHint="search"
-                      />
-                      <button type="submit" className="ds-cta ds-cta--ink ds-door-open__search-go">
-                        Search records
-                      </button>
-                    </form>
-                    <div className="ds-door-open__actions">
-                      <button
-                        type="button"
-                        className="ds-cta ds-cta--copper"
-                        onClick={() => scrollToChapter(1)}
-                      >
-                        Begin
-                      </button>
-                      <button type="button" className="ds-cta ds-cta--ink" onClick={enterBrowse}>
-                        Browse the map
-                      </button>
-                      <Link className="ds-cta ds-cta--quiet" href="/records">
-                        Browse the list
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="ds-door-open__orient">
-                    {spotlight ? (
-                      <div className="ds-door-open__feature">
-                        <p className="ds-door-open__eyebrow">A place to start</p>
-                        <p className="ds-door-open__strip">
-                          <span className="ds-door-open__where">
-                            <span className="ds-door-open__pin" aria-hidden="true" />
-                            {spotlightPublicHref ? (
-                              <DoorRecordLink
-                                className="ds-door-open__place"
-                                href={spotlightPublicHref}
-                              >
-                                {spotlight.name}
-                              </DoorRecordLink>
-                            ) : (
-                              <span className="ds-door-open__place">{spotlight.name}</span>
-                            )}
-                            {spotlightLocality ? (
-                              <span className="ds-door-open__locality">{spotlightLocality}</span>
-                            ) : null}
-                          </span>
-                        </p>
-                      </div>
-                    ) : null}
-                    <div className="ds-door-open__census">
-                      <p className="ds-door-open__count">{placeCount} records on the map</p>
-                      {openLedger.length > 0 ? (
-                        <dl className="ds-door-open__ledger" aria-label="Kinds on this field">
-                          {openLedger.map((row) => (
-                            <div key={row.family} className="ds-door-open__ledger-row">
-                              <dt className="ds-door-open__ledger-label">{row.label}</dt>
-                              <dd className="ds-door-open__ledger-count">
-                                {row.count.toLocaleString('en-US')}
-                              </dd>
-                            </div>
-                          ))}
-                        </dl>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              </section>
-            );
-          }
-
-          return (
-            <section
-              key={chapter.id}
-              id={`door-chapter-${chapter.index}`}
-              className={`ds-door-journey__chapter ds-door-journey__chapter--${side}`}
-              data-chapter={chapter.index}
-              aria-labelledby={`door-journey-heading-${chapter.id}`}
-            >
-              <div className="ds-door-journey__card">
-                <div className="ds-door-journey__copy">
-                  {chapter.centered ? null : (
-                    <span className="ds-door-journey__index" aria-hidden="true">
-                      {String(chapter.index).padStart(2, '0')}
-                    </span>
-                  )}
-                  {copy.kicker ? <p className="ds-door-journey__kicker">{copy.kicker}</p> : null}
-                  <h2
-                    className="ds-door-journey__heading"
-                    id={`door-journey-heading-${chapter.id}`}
-                  >
-                    {before}
-                    <em>{accent}</em>
-                    {after}
-                  </h2>
-
-                  <p className="ds-door-journey__prose">{body.prose}</p>
-
-                  {body.figures ? (
-                    <dl className="ds-door-journey__facts">
-                      {body.figures.map((figure) => (
-                        <div key={`${figure.label}-${figure.value}`}>
-                          <dt className="ds-door-journey__fact-value">{figure.value}</dt>
-                          <dd className="ds-door-journey__fact-label">{figure.label}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  ) : null}
-
-                  <p className="ds-door-journey__cite">{body.cite}</p>
-
-                  {spotlightHref ? (
-                    <p className="ds-door-journey__record">
-                      <DoorRecordLink href={spotlightHref}>Open this record</DoorRecordLink>
-                    </p>
-                  ) : null}
-                </div>
-
-                {isClose ? (
-                  <div className="ds-door-journey__actions">
-                    <button type="button" className="ds-cta ds-cta--copper" onClick={enterBrowse}>
-                      Browse the map
-                    </button>
-                    <Link className="ds-cta ds-cta--ink" href="/records">
-                      Record index
-                    </Link>
-                    <Link className="ds-cta ds-cta--quiet" href="/about">
-                      How this archive works
-                    </Link>
-                    <button
-                      type="button"
-                      className="ds-cta ds-cta--quiet"
-                      onClick={() => scrollToChapter(0)}
-                    >
-                      Back to the start
-                    </button>
-                  </div>
-                ) : null}
+        {spotlight && spotlightLngLat && spotlightHref ? (
+          <DoorSpotlightCallout
+            active={step === 0 && plateState === 'live' && !browseMode}
+            lngLat={spotlightLngLat}
+            mark={recordMarkFor(spotlight.precision)}
+            name={spotlight.name}
+            locality={spotlightLocality}
+            line={spotlight.summary}
+            href={spotlightHref}
+            frameRef={windowRef}
+          />
+        ) : null}
+        <div className="ds-door__dock" ref={dockRef} data-step={step === 0 ? 'open' : 'walk'}>
+          {step === 0 ? (
+            <section className="ds-door-open" aria-labelledby="door-open-heading">
+              <HeroHeadlineMorph className="ds-door-open__headline" id="door-open-heading" />
+              <p className="ds-door-open__line">{DOOR_OPEN_LINE}</p>
+              <div className="ds-door-open__actions">
+                <button
+                  ref={startRef}
+                  type="button"
+                  className={buttonClassName('primary', 'ds-door-open__start')}
+                  onClick={() => goToStep(1)}
+                >
+                  Start the walk
+                </button>
+                <Link className={buttonClassName('quiet')} href="/records">
+                  Browse all records
+                </Link>
               </div>
             </section>
-          );
-        })}
+          ) : currentBody ? (
+            <DoorWalkCard
+              key={currentChapter.id}
+              chapter={currentChapter}
+              body={currentBody}
+              position={step}
+              total={walkChapters.length}
+              spotlight={spotlight}
+              spotlightLocality={spotlightLocality}
+              spotlightHref={spotlightHref}
+              decadeRange={decadeRange}
+              sweepDecade={sweepDecade}
+              headingRef={walkHeadingRef}
+              onGo={goToStep}
+              onSkip={enterBrowse}
+            />
+          ) : null}
+        </div>
       </div>
 
       {browseMounted ? (
@@ -1250,8 +878,10 @@ export function DoorImmersive({
           aria-hidden={!browseMode ? true : undefined}
           data-cold={initialBrowse ? 'true' : undefined}
         >
-          {/* The journey's h1 is hidden while browse is armed; this keeps one h1 on the page. */}
-          <h1 className="ds-visually-hidden">Explore the map</h1>
+          {/* The opening's h1 is hidden while browse is armed; this keeps one h1 on the page. */}
+          <h1 className="ds-visually-hidden" ref={browseHeadingRef} tabIndex={-1}>
+            Explore the map
+          </h1>
           <AtlasLoader shell={browseShell} pins={pins} embedded />
         </div>
       ) : null}

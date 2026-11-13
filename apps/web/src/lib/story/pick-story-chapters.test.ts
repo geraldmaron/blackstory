@@ -99,6 +99,11 @@ test('every rotating-fact chapter gets a fact, and no two in one visit repeat on
   }
 });
 
+test('the walk is the same length on every visit', () => {
+  const lengths = new Set(ROLLS.map((roll) => pickStoryChapters(roll).chapters.length));
+  assert.deepEqual([...lengths], [6]);
+});
+
 test('the running order actually varies across rolls', () => {
   // The whole point of the draw. If every roll produced the same signature, a returning reader
   // would meet the same story and this module would be dead weight.

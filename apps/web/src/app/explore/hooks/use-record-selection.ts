@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAction } from 'react';
-import type { SheetRecord } from '../../../components/map-experience/RecordSheet';
+import type { InspectorRecord } from '../../../components/map-experience/RecordInspector';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';
 import type { ChromeInset } from '../../../lib/map-experience/chrome-padding';
@@ -141,19 +141,19 @@ export function useRecordSelection(
     if (entityId) selectById(entityId);
   }, [allFeatures, featuresById, selectById, selectedId]);
 
-  const sheetRecord = useMemo<SheetRecord | null>(() => {
+  const inspectorRecord = useMemo<InspectorRecord | null>(() => {
     if (!selectedFeature) return null;
     const { properties } = selectedFeature;
     return {
       id: properties.entityId,
       name: properties.displayName,
       kind: properties.kind,
-      ...(properties.mapTone ? { mapTone: properties.mapTone } : {}),
       place: placeLabelFor(selectedFeature),
       story: properties.oneLineStory,
       precision: properties.precision,
       confidenceTier: properties.confidenceTier,
       evidenceLabel: evidenceLabel(properties.confidenceTier, properties.evidenceCount),
+      ...(properties.eraBuckets[0] ? { decade: properties.eraBuckets[0] } : {}),
       ...(properties.href ? { href: withQuery(properties.href, placeArrivalQuery) } : {}),
     };
   }, [placeArrivalQuery, selectedFeature]);
@@ -164,6 +164,6 @@ export function useRecordSelection(
     select,
     selectById,
     stepRecord,
-    sheetRecord,
+    inspectorRecord,
   } as const;
 }

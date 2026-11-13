@@ -15,6 +15,7 @@ const SPOTLIGHT = {
   summary: 'A test summary.',
   evidenceCount: 2,
   kindLabel: 'place',
+  precision: 'city',
 };
 
 test('opening chapter frames the nation', () => {
@@ -48,7 +49,8 @@ test('evidence chapter prefers the spotlight coordinate', () => {
   assert.equal(frame.focusEntityId, 'ent_test_001');
   assert.match(frame.placeLabel, /Test Place/);
   assert.deepEqual(frame.camera.center, [-86.81, 33.52]);
-  assert.ok(frame.camera.zoom >= 8.5);
+  // City precision lands at city scale, never a street corner the record does not claim.
+  assert.equal(frame.camera.zoom, 10);
   assert.equal(frame.camera.pitch, evidence.camera.pitch);
   assert.equal(frame.camera.bearing, evidence.camera.bearing);
 });

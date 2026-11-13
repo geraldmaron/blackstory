@@ -17,7 +17,7 @@
 
 import { decodeCollectionCatalog } from '../../lib/discovery/collection-catalog-wire';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Notice } from '@repo/ui';
+import { Button } from '@repo/ui';
 import { hasMaintenanceBypassHint } from '../../lib/maintenance/maintenance-bypass-hint';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import { AtlasExperience } from './AtlasExperience';
@@ -110,43 +110,31 @@ export function AtlasLoader({
   const matchingRecordsHref = recordsHref(recordsQueryFromExplore(shell.viewState));
 
   if (error && !catalog?.collectionFacts) {
+    // The column, in its error state: the map stays visible beside it.
     return (
-      <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
-        <Notice
-          tone="error"
-          title="Map browse could not load its records"
-          className="ds-atlas__pending"
-        >
-          <p>The record catalog did not arrive. Check your connection and try again.</p>
-          <p>
-            <button
-              type="button"
-              className="ds-button ds-button--secondary ds-button--compact"
-              onClick={() => setAttempt((n) => n + 1)}
-            >
-              Try again
-            </button>{' '}
-            <a href={matchingRecordsHref}>Open matching records</a>
-          </p>
-        </Notice>
+      <div className="ds-atlas" data-atlas-catalog="error">
+        <aside className="ds-xcol" aria-label="Records on the map">
+          <div className="ds-xcol__head">
+            <h2 className="ds-xcol__count">Records did not load</h2>
+          </div>
+          <div className="ds-xcol__error" role="alert">
+            <p>
+              The list of records for the map did not arrive. Check your connection and try again.
+            </p>
+            <p>
+              <Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>
+                Try again
+              </Button>{' '}
+              <Button variant="quiet" href={matchingRecordsHref}>
+                Open the same records in Records
+              </Button>
+            </p>
+          </div>
+        </aside>
       </div>
     );
   }
 
-  return (
-    <>
-      {!catalog?.collectionFacts ? (
-        <div role="status" className="ds-atlas__notice ds-collection">
-          <span>Loading map records.</span>
-          <a
-            className="ds-button ds-button--secondary ds-button--compact"
-            href={matchingRecordsHref}
-          >
-            Open matching records
-          </a>
-        </div>
-      ) : null}
-      <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />
-    </>
-  );
+  // Until the catalog arrives the column shows its own loading rows (AtlasExperience).
+  return <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />;
 }

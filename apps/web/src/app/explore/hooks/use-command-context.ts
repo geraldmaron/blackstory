@@ -10,13 +10,13 @@ import type { MapKindFamily } from '../../../lib/map-experience/kind-encoding';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import { buildShareHref } from '../../../lib/share/deep-link';
 import { handleKeyStroke, isEscape, resolveEscape } from '../../../lib/keyboard/bindings';
-import { eraBucketFor } from './atlas-feature-helpers';
 
 type UseCommandContextArgs = {
   camera: CameraApi;
   citationFor: (feature: ExploreMapFeature) => string;
   copy: (text: string, message: string) => void;
-  decade: number | null;
+  /** The URL's era bucket ("1880s"), or "all". */
+  era: string;
   evidenceFloor: EvidenceFloor;
   kindFamily: MapKindFamily | null;
   nearMe: () => void;
@@ -47,7 +47,7 @@ export function useCommandContext({
   camera,
   citationFor,
   copy,
-  decade,
+  era,
   evidenceFloor,
   kindFamily,
   nearMe,
@@ -92,7 +92,7 @@ export function useCommandContext({
           {
             ...(selectedId ? { record: selectedId } : {}),
             ...(stateCode ? { state: stateCode } : {}),
-            ...(decade !== null ? { era: eraBucketFor(decade) } : {}),
+            ...(era !== 'all' ? { era } : {}),
             ...(evidenceFloor !== 'any' ? { grade: evidenceFloor } : {}),
             ...(kindFamily ? { kind: kindFamily } : {}),
           },
@@ -122,7 +122,7 @@ export function useCommandContext({
       camera,
       citationFor,
       copy,
-      decade,
+      era,
       evidenceFloor,
       kindFamily,
       nearMe,

@@ -6,7 +6,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  CHAPTER_INTERSECTION_THRESHOLD,
   CORRIDOR_CHAPTER_ID,
   CORRIDOR_HONESTY_LINE,
   STORY_CHAPTERS,
@@ -23,7 +22,7 @@ test('chapters are contiguous from the cold open, with no gap or repeat in the s
   });
   const ids = new Set(STORY_CHAPTERS.map((chapter) => chapter.id));
   assert.equal(ids.size, STORY_CHAPTERS.length, 'two chapters share an id');
-  assert.equal(STORY_CHAPTERS[0]?.centered, true, 'the cold open is a centered chapter');
+  assert.equal(STORY_CHAPTERS[0]?.stage, 'opening', 'the cold open opens the sequence');
 });
 
 test('every chapter camera is inside the envelope MapLibre will accept', () => {
@@ -42,7 +41,10 @@ test('every chapter has copy, so no chapter renders as an empty card', () => {
     const copy = copyFor(chapter.id);
     assert.ok(copy, `${chapter.id} has no copy`);
     assert.ok(copy.prose.length > 0, `${chapter.id} has no prose`);
-    assert.ok(copy.cite.length > 0, `${chapter.id} cites nothing`);
+    // A chapter that prints figures is making a claim, and a claim carries its source.
+    if (copy.facts && copy.facts.length > 0) {
+      assert.ok(copy.cite && copy.cite.length > 0, `${chapter.id} prints figures with no source`);
+    }
   }
 });
 
@@ -63,7 +65,7 @@ test('the corridor chapter carries the honesty line from the corridor data, not 
 
   const copy = copyFor(CORRIDOR_CHAPTER_ID);
   assert.ok(copy);
-  const text = `${copy.prose} ${copy.cite}`;
+  const text = `${copy.prose} ${copy.cite ?? ''}`;
   assert.ok(
     text.includes(CORRIDOR_HONESTY_LINE),
     'the corridor chapter must publish the corridor honesty line verbatim',
@@ -90,11 +92,6 @@ test('every chapter declares a stage the running order knows how to place', () =
   // Exactly one opening and one closing: they are the fixed framing every visit gets.
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.stage === 'opening').length, 1);
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.stage === 'closing').length, 1);
-});
-
-test('the intersection threshold fires a chapter before it is centered, but not at the edge', () => {
-  assert.ok(CHAPTER_INTERSECTION_THRESHOLD > 0.25);
-  assert.ok(CHAPTER_INTERSECTION_THRESHOLD < 0.5);
 });
 
 test('the record chapter keeps a valid fallback framing for a release with no eligible record', () => {

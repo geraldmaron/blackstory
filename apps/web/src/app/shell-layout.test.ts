@@ -128,59 +128,31 @@ describe('horizontal overflow guards', () => {
   });
 
   it('does not size explore chrome with 100vw (scrollbar gutter / hide-translate overflow)', () => {
-    assert.doesNotMatch(mapSurfacesCss, /calc\(\s*100vw/);
-    assert.doesNotMatch(mapSurfacesCss, /min\(\s*\d+vw/);
-    assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__instruments\s*\{[^}]*left:\s*var\(--ds-explore-edge\)/s,
+    const columnCss = readFileSync(
+      join(here, '../components/map-experience/explore-column.css'),
+      'utf8',
     );
-    assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__results\s*\{[^}]*right:\s*var\(--ds-explore-edge\)/s,
-    );
-    assert.match(
-      mapSurfacesCss,
-      /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-instruments-width:\s*auto/s,
-    );
-    assert.match(
-      mapSurfacesCss,
-      /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-results-width:\s*auto/s,
-    );
-  });
-
-  it('explore v6 panels use opaque Surface fills without backdrop blur or fixed-ink cockpit', () => {
-    assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__instruments\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
-    );
-    assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__results\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
-    );
-    assert.doesNotMatch(mapSurfacesCss, /backdrop-filter/);
-    assert.doesNotMatch(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s);
+    for (const source of [mapSurfacesCss, columnCss]) {
+      assert.doesNotMatch(source, /calc\(\s*100vw/);
+      assert.doesNotMatch(source, /min\(\s*\d+vw/);
+    }
+    // The column and the histogram dock are inset from the viewport edges, never sized to it.
+    assert.match(columnCss, /\.ds-xcol\s*\{[^}]*left:\s*0;[^}]*width:\s*var\(--ds-xcol-w\)/s);
+    assert.match(columnCss, /\.ds-xdock\s*\{[^}]*right:\s*0;[^}]*left:\s*var\(--ds-xcol-w\)/s);
   });
 
   it('Explore chrome is matte surface, not shop blur or elevation', () => {
     const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
-    const lensCss = readFileSync(join(here, '../components/map-experience/lens-panel.css'), 'utf8');
-    const resultsCss = readFileSync(
-      join(here, '../components/map-experience/results-rail.css'),
-      'utf8',
-    );
-    const sheetCss = readFileSync(
-      join(here, '../components/map-experience/record-sheet.css'),
-      'utf8',
-    );
+    const mapCss = (file: string) =>
+      readFileSync(join(here, '../components/map-experience', file), 'utf8');
     const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
-    const timeCss = readFileSync(join(here, '../components/map-experience/time-panel.css'), 'utf8');
     for (const [name, source] of [
       ['command-bar', commandBarCss],
-      ['lens', lensCss],
-      ['results', resultsCss],
-      ['sheet', sheetCss],
+      ['column', mapCss('explore-column.css')],
+      ['list', mapCss('explore-record-list.css')],
+      ['inspector', mapCss('record-inspector.css')],
+      ['histogram', mapCss('decade-brush.css')],
       ['atlas', atlasCss],
-      ['time', timeCss],
     ] as const) {
       assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
       assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);

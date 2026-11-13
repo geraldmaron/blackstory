@@ -73,7 +73,6 @@ import {
   type DecadeMorphAnimationHandle,
   type DensityColorMorphState,
 } from '../../app/map/decade-layer-transition';
-import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
 import {
   bindMapResizeLifecycle,
@@ -113,7 +112,6 @@ import {
   joinDensityOntoStatePolygons,
   indexDensityFillColors,
 } from '../../lib/map-experience/join-state-polygons';
-import * as stateLabels from '../../lib/map-experience/state-labels';
 import type { ExploreLayerMode, ExploreViewportFrame } from '../../lib/map-experience/url-state';
 import {
   DEFAULT_POPULATION_GEO,
@@ -128,7 +126,7 @@ import {
   buildExploreSearchCenterMarkerElement,
   type ExploreSearchCenterMarkerInput,
 } from '../../lib/map-experience/explore-search-marker';
-import { readDocumentColorScheme, stateLabelColorFor } from './color-scheme';
+import { readDocumentColorScheme } from './color-scheme';
 import { EMPTY_EDGE_COLLECTION, EMPTY_FEATURE_COLLECTION, type StageConfig } from './stage-config';
 import {
   applyGeographyStyle,
@@ -370,13 +368,6 @@ export type MapStageHandle = {
    * confirmed exception to that norm today. `flyPreset` remains the route for preset framing.
    */
   readonly getMap: () => AtlasCameraTarget | null;
-  /**
-   * Where a record's disc is on screen right now, with its name — the anchor for a photo card.
-   * Null below cluster max zoom (the record is inside a cluster there) or when it is off the map.
-   */
-  readonly entityHoverTarget: (
-    entityId: string,
-  ) => { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null;
 };
 
 /** What the camera library needs off the map. Structural, so `MapStage` owes it no import. */
@@ -577,13 +568,6 @@ export function MapStageProvider({
   }>({ source: null, byId: new Map() });
   const searchCenterMarkerRef = useRef<Marker | null>(null);
   const searchAreaRef = useRef<SearchAreaInput | null>(null);
-  /** Soft opacity pulse on the GL selected ring — canceled when selection clears. */
-  const stateLabelMarkersRef = useRef<
-    Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
-  >(new Map());
-  /** The opacity last written to the state labels (2dp), and whether they are on the map. */
-  const stateLabelOpacityRef = useRef<string | null>(null);
-  const stateLabelsAttachedRef = useRef(true);
   const listenersRef = useRef(makeListenerStore());
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
@@ -734,49 +718,6 @@ export function MapStageProvider({
     [entityPoint],
   );
 
-  const updateStateLabelSelection = useCallback((selectedPostalCode: string | undefined) => {
-    const scheme = readDocumentColorScheme();
-    for (const [postalCode, entry] of stateLabelMarkersRef.current) {
-      const selected = postalCode === selectedPostalCode;
-      entry.element.classList.toggle(stateLabels.STATE_LABEL_SELECTED_CLASS_NAME, selected);
-      entry.element.style.color = stateLabelColorFor(scheme, selected);
-    }
-  }, []);
-
-  const syncStateLabelTheme = useCallback((scheme: MapColorScheme) => {
-    for (const [postalCode, entry] of stateLabelMarkersRef.current) {
-      const selected = postalCode === configRef.current.selectedState;
-      entry.element.classList.toggle(stateLabels.STATE_LABEL_SELECTED_CLASS_NAME, selected);
-      entry.element.style.color = stateLabelColorFor(scheme, selected);
-    }
-  }, []);
-
-  /**
-   * State labels fade with zoom. Written only when the 2dp value changes, and the 51 markers come
-   * off the map entirely while they are invisible (below 2.4 and above 6.2, which is most of a
-   * city-level pinch), so an invisible label is not repositioned on every camera frame.
-   * The 0.2s opacity transition MapLibre gives every marker is off for these (shell.css): the zoom
-   * drives the value continuously, and restarting a transition on every frame only lagged it.
-   */
-  const updateStateLabelOpacity = useCallback((zoom: number) => {
-    const map = mapRef.current;
-    const value = stateLabels.stateLabelOpacityForZoom(zoom);
-    const opacity = value.toFixed(2);
-    if (opacity === stateLabelOpacityRef.current) return;
-    stateLabelOpacityRef.current = opacity;
-    const show = value > 0;
-    for (const [, entry] of stateLabelMarkersRef.current) {
-      // Through the marker, never `element.style.opacity`: a MapLibre marker owns its element's
-      // inline opacity and rewrites it on every map update (terrain occlusion), so a value written
-      // straight to the element would survive for one frame and prevent the fade at every zoom.
-      if (show) entry.marker.setOpacity(opacity);
-      if (!map) continue;
-      if (show && !stateLabelsAttachedRef.current) entry.marker.addTo(map);
-      else if (!show && stateLabelsAttachedRef.current) entry.marker.remove();
-    }
-    if (map) stateLabelsAttachedRef.current = show;
-  }, []);
-
   const applyStyleAndData = useCallback(
     (options?: {
       readonly recreateEntitiesSource?: boolean;
@@ -851,18 +792,14 @@ export function MapStageProvider({
   );
   applyStyleAndDataRef.current = applyStyleAndData;
 
-  const syncPlatePaintToTheme = useCallback(
-    (map: MapLibreMap, style: StyleSpecification, scheme: MapColorScheme) => {
-      syncLayerPaintFromStyle(map, style, PERSISTENT_PLATE_LAYER_IDS, (update, error) => {
-        console.error(
-          `[MapStage] setPaintProperty ${update.layerId}.${update.paintKey} failed`,
-          error,
-        );
-      });
-      syncStateLabelTheme(scheme);
-    },
-    [syncStateLabelTheme],
-  );
+  const syncPlatePaintToTheme = useCallback((map: MapLibreMap, style: StyleSpecification) => {
+    syncLayerPaintFromStyle(map, style, PERSISTENT_PLATE_LAYER_IDS, (update, error) => {
+      console.error(
+        `[MapStage] setPaintProperty ${update.layerId}.${update.paintKey} failed`,
+        error,
+      );
+    });
+  }, []);
 
   const commitDataPatch = useCallback(
     (
@@ -1155,7 +1092,7 @@ export function MapStageProvider({
       const style = buildStyleForScheme(cfg, scheme);
       configRef.current = { ...cfg, style };
       applyStyleAndData();
-      syncPlatePaintToTheme(map, style, scheme);
+      syncPlatePaintToTheme(map, style);
     };
     const observer = new MutationObserver((mutations) => {
       if (mutations.some((mutation) => mutation.attributeName === 'data-theme')) {
@@ -1169,23 +1106,28 @@ export function MapStageProvider({
     return () => observer.disconnect();
   }, [applyStyleAndData, syncPlatePaintToTheme]);
 
-  const applyViewState = useCallback(
-    (patch: MapStageViewPatch) => {
-      configRef.current = {
-        ...configRef.current,
-        selectedState: patch.selectedState,
-        selectedEdge: patch.selectedEdge,
-        selectedEntity: patch.selectedEntity,
-      };
-      updateStateLabelSelection(patch.selectedState);
-      const map = mapRef.current;
-      if (!map || !map.isStyleLoaded()) return;
-      setSelectedStateFilter(map, patch.selectedState);
-      setSelectedEdgeFilter(map, patch.selectedEdge);
-      setSelectedEntityFilter(map, patch.selectedEntity);
-    },
-    [updateStateLabelSelection],
-  );
+  const applyViewState = useCallback((patch: MapStageViewPatch) => {
+    configRef.current = {
+      ...configRef.current,
+      selectedState: patch.selectedState,
+      selectedEdge: patch.selectedEdge,
+      selectedEntity: patch.selectedEntity,
+    };
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      const { selectedState, selectedEdge, selectedEntity } = configRef.current;
+      setSelectedStateFilter(map, selectedState);
+      setSelectedEdgeFilter(map, selectedEdge);
+      setSelectedEntityFilter(map, selectedEntity);
+    };
+    // A selection made while sources are still loading (the home hand-off lands mid-flight,
+    // as the catalog replaces the first-paint pins) used to be dropped, leaving the record
+    // framed with no copper mark. Apply it as soon as the map settles instead, reading the
+    // latest selection then.
+    if (map.isStyleLoaded()) apply();
+    else map.once('idle', apply);
+  }, []);
 
   const runFlyPreset = useCallback(
     (name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) =>
@@ -1442,6 +1384,18 @@ export function MapStageProvider({
         // keeps one control vocabulary (design-direction-v9-atlas.md §5.5). Attribution stays:
         // it is a license obligation, not chrome we get to choose.
         map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+        // Compact attribution opens itself the first time its text arrives. It is a license
+        // obligation, so it stays one tap away, but as one collapsed "i", not a box on the map.
+        // The control turns compact only once its text arrives, on a style or a source event.
+        const collapseAttribution = () => {
+          const attribution = container.querySelector('.maplibregl-ctrl-attrib.maplibregl-compact');
+          if (!attribution) return;
+          attribution.classList.remove('maplibregl-compact-show');
+          map?.off('styledata', collapseAttribution);
+          map?.off('sourcedata', collapseAttribution);
+        };
+        map.on('styledata', collapseAttribution);
+        map.on('sourcedata', collapseAttribution);
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
         });
@@ -1457,22 +1411,6 @@ export function MapStageProvider({
       }
 
       const activeMap = map;
-
-      // State-label markers mount first so, by DOM insertion order, entity markers layer above
-      // them (state-labels.ts's documented belt-and-suspenders stacking guidance).
-      const descriptors = stateLabels.buildStateLabelMarkers(configRef.current.selectedState);
-      for (const descriptor of descriptors) {
-        const element = stateLabels.buildStateLabelElement(descriptor);
-        const marker = new (maplibreglRef.current as MaplibreModule['default']).Marker({
-          element,
-          anchor: 'center',
-        })
-          .setLngLat([descriptor.lngLat[0], descriptor.lngLat[1]])
-          .addTo(activeMap);
-        stateLabelMarkersRef.current.set(descriptor.postalCode, { marker, element });
-      }
-      syncStateLabelTheme(readDocumentColorScheme());
-      updateStateLabelOpacity(activeMap.getZoom());
 
       // MapLibre constructs with every gesture on. Only Live starts fully steered; a plate built
       // on the Door (ambient) hands back drag/zoom-adjust on a precise pointer only, and one built
@@ -1584,7 +1522,6 @@ export function MapStageProvider({
           lastViewportRef.current = viewport;
           notify(listenersRef.current, 'viewport', viewport);
         },
-        applyZoomOpacity: updateStateLabelOpacity,
         onZoomSettled: () => {
           requestCountyPolygonLoad(activeMap, configRef.current);
         },
@@ -1603,9 +1540,6 @@ export function MapStageProvider({
           }
           notify(listenersRef.current, 'interact');
         },
-      });
-      activeMap.on('zoom', () => {
-        updateStateLabelOpacity(activeMap.getZoom());
       });
 
       /*
@@ -1691,8 +1625,6 @@ export function MapStageProvider({
       resizeLifecycleRef.current?.disconnect();
       contextRecoveryRef.current?.disconnect();
       clearSearchCenterMarker();
-      for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
-      stateLabelMarkersRef.current.clear();
       rotateGesturesRef.current.shift?.detach();
       rotateGesturesRef.current.wheel?.detach();
       rotateGesturesRef.current.twist?.detach();
@@ -1938,7 +1870,6 @@ export function MapStageProvider({
         ensureMap();
         return getMap();
       },
-      entityHoverTarget,
     }),
     [
       ensureMap,
@@ -1953,7 +1884,6 @@ export function MapStageProvider({
       resize,
       setDoorBrowseLive,
       getMap,
-      entityHoverTarget,
     ],
   );
 

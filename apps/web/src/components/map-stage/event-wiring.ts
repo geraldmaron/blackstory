@@ -45,8 +45,6 @@ export type PlateClickWiring = {
 export type PlateCameraWiring = {
   /** The settled camera frame, after any move. */
   readonly publishViewport: (viewport: ExploreViewportFrame) => void;
-  /** State-label opacity tracks zoom, so a flight that ends re-syncs it against where it landed. */
-  readonly applyZoomOpacity: (zoom: number) => void;
   /** The camera has stopped zooming: remount DOM discs, fetch polygons for the new detail. */
   readonly onZoomSettled: () => void;
   /**
@@ -125,7 +123,6 @@ export function bindPlateClickListeners(map: MapLibreMap, wiring: PlateClickWiri
 export function bindPlateCameraListeners(map: MapLibreMap, wiring: PlateCameraWiring): void {
   map.on('moveend', () => {
     wiring.publishViewport(readViewport(map));
-    wiring.applyZoomOpacity(map.getZoom());
   });
   map.on('zoomend', () => {
     wiring.onZoomSettled();

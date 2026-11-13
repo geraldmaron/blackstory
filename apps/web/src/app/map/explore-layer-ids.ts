@@ -15,6 +15,11 @@ export const EXPLORE_HISTORY_EDGES_SOURCE_ID = 'explore-history-edges';
 /** Dual-buffer incoming relationship lines for decade crossdissolve. */
 export const EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID = 'explore-history-edges-incoming';
 
+/** The 51 state abbreviations, as a symbol layer in the same collision pass as the group counts. */
+export const EXPLORE_STATE_LABELS_SOURCE_ID = 'explore-state-labels';
+export const EXPLORE_STATE_LABEL_LAYER_ID = 'explore-state-label';
+export const EXPLORE_STATE_LABEL_SELECTED_LAYER_ID = 'explore-state-label-selected';
+
 export const EXPLORE_CLUSTER_LAYER_ID = 'explore-clusters';
 export const EXPLORE_CLUSTER_INCOMING_LAYER_ID = 'explore-clusters-incoming';
 
