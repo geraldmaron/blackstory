@@ -11,6 +11,7 @@ import {
   normalizeReleaseClaims,
   normalizeReleaseRelated,
   normalizePublicPrecision,
+  PUBLIC_PRECISION_TIERS,
   type CanonicalStatusSnapshot,
   type PublicVisit,
   type ReleaseBuildContext,
@@ -147,6 +148,8 @@ export type PublishArtifactsResult =
       readonly entityRow: ReleaseEntityUpsertRow;
       readonly searchRow: SearchIndexUpsertRow;
       readonly lintReport: PublishStatusLintReport;
+      /** Non-blocking findings (unearned precision on an already-live record). */
+      readonly warnings?: readonly string[];
     }
   | {
       readonly ok: false;
@@ -182,6 +185,7 @@ function buildContext(input: {
   readonly visitOverride?: PublicVisit;
   readonly locationOverride?: ReleaseLocationOverride;
   readonly catalogDecision?: PublishCatalogDecision;
+  readonly republishingLive?: boolean;
 }) {
   return {
     releaseId: input.releaseId,
@@ -190,6 +194,7 @@ function buildContext(input: {
     ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
     ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
     ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
+    ...(input.republishingLive === true ? { precisionCheck: 'warn' as const } : {}),
   };
 }
 
@@ -1104,6 +1109,24 @@ function inheritLiveLocation(input: {
   readonly locationOverride: ReleaseLocationOverride;
 } {
   const place = placeFieldsFromLandscape(input.row);
+  const livePrecision = input.live.precision;
+  const rowRaw = asRecord(input.row.payload.geocode).precision;
+  /*
+   * Coarsening always passes through: a row that states a coarser precision than the live record
+   * (a federal law re-staged at `country`) wins over the live tier. Sharpening still needs
+   * evidence, so a finer or absent row precision never overrides the live one.
+   */
+  const rowPrecision =
+    typeof rowRaw === 'string' && rowRaw.trim().length > 0
+      ? normalizePublicPrecision(rowRaw)
+      : undefined;
+  const live =
+    rowPrecision !== undefined &&
+    livePrecision !== undefined &&
+    PUBLIC_PRECISION_TIERS.indexOf(rowPrecision) <
+      PUBLIC_PRECISION_TIERS.indexOf(normalizePublicPrecision(livePrecision))
+      ? { ...input.live, precision: rowPrecision }
+      : input.live;
   /*
    * Decided per field, on what each derivation can actually produce from THIS row — not on one
    * "does the row have place data" flag, which would let a row naming only a state overwrite a
@@ -1121,22 +1144,22 @@ function inheritLiveLocation(input: {
    */
   const rowNamesJurisdiction = place.city.length > 0;
   const rowNamesLocation = input.entry.locationLabel !== input.row.display_name.trim();
-  const locationLabel = rowNamesLocation ? undefined : input.live.locationLabel;
-  const jurisdictionLabel = rowNamesJurisdiction ? undefined : input.live.jurisdictionLabel;
+  const locationLabel = rowNamesLocation ? undefined : live.locationLabel;
+  const jurisdictionLabel = rowNamesJurisdiction ? undefined : live.jurisdictionLabel;
   return {
     entry: {
       ...input.entry,
-      lat: input.live.lat,
-      lng: input.live.lng,
-      ...(input.live.precision !== undefined ? { locationPrecision: input.live.precision } : {}),
+      lat: live.lat,
+      lng: live.lng,
+      ...(live.precision !== undefined ? { locationPrecision: live.precision } : {}),
       ...(locationLabel !== undefined ? { locationLabel } : {}),
       ...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {}),
     },
     locationOverride: {
-      lat: input.live.lat,
-      lng: input.live.lng,
-      ...(input.live.precision !== undefined ? { precision: input.live.precision } : {}),
-      ...(input.live.matchMethod !== undefined ? { matchMethod: input.live.matchMethod } : {}),
+      lat: live.lat,
+      lng: live.lng,
+      ...(live.precision !== undefined ? { precision: live.precision } : {}),
+      ...(live.matchMethod !== undefined ? { matchMethod: live.matchMethod } : {}),
       ...(locationLabel !== undefined ? { locationLabel } : {}),
     },
   };
@@ -1407,6 +1430,7 @@ export function gateLandscapePublishCandidate(input: {
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
       ...(locationOverride !== undefined ? { locationOverride } : {}),
       ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
+      republishingLive: republishingLiveRow,
     }),
   );
   if (!build.ok) {
@@ -1530,6 +1554,8 @@ export function buildArtifactsForEntry(input: {
    * still not be able to write a withdrawn record back into the release.
    */
   readonly catalogDecision?: PublishCatalogDecision;
+  /** The record is already live: an unearned point precision warns instead of failing the build. */
+  readonly republishingLive?: boolean;
 }): PublishArtifactsResult {
   const build = buildReleaseEntityArtifacts(
     input.entry,
@@ -1540,6 +1566,7 @@ export function buildArtifactsForEntry(input: {
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
       ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
       ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
+      ...(input.republishingLive !== undefined ? { republishingLive: input.republishingLive } : {}),
     }),
   );
   if (!build.ok) {
@@ -1554,7 +1581,13 @@ export function buildArtifactsForEntry(input: {
   }
   const entityRow = toReleaseEntityRow(build.projection);
   const searchRow = toSearchIndexRow(build.searchIndex, build.projection.location?.geohash ?? null);
-  return { ok: true, entityRow, searchRow, lintReport };
+  return {
+    ok: true,
+    entityRow,
+    searchRow,
+    lintReport,
+    ...(build.warnings ? { warnings: build.warnings } : {}),
+  };
 }
 
 export type { PublishStatusLintReport };

@@ -369,3 +369,32 @@ test('the row carries the authored applicability and disputes for the binder dow
     'lives-us-example-act-1935',
   );
 });
+
+test('a federal record builds at country precision; a case with an origin takes the origin', () => {
+  const law = buildLawEntityRow(
+    authored({
+      place: {
+        state: 'DC',
+        lat: 38.9,
+        lng: -77,
+        precision: 'institution',
+        historicAddress: '1 First St',
+      },
+    }),
+    options,
+  );
+  assert.equal((law.payload.geocode as { precision: string }).precision, 'country');
+  assert.equal(law.provenance.historicAddress, undefined);
+  const origin = { state: 'AL', city: 'Montgomery', lat: 32.38, lng: -86.31, precision: 'city' };
+  const kase = buildLawEntityRow(authored({ kind: 'case', origin }), options);
+  assert.equal((kase.payload.geocode as { precision: string }).precision, 'city');
+  assert.equal(kase.lat, 32.38);
+  const stateLaw = buildLawEntityRow(
+    authored({
+      scope: { level: 'state', jurisdictionId: 'state:IL', jurisdictionName: 'Illinois' },
+      place: { state: 'IL', lat: 40, lng: -89, precision: 'state' },
+    }),
+    options,
+  );
+  assert.equal((stateLaw.payload.geocode as { precision: string }).precision, 'state');
+});

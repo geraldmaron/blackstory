@@ -26,6 +26,7 @@ import type { FactCitation } from '../facts/citation.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
 import { buildGeoPointFields } from '../geography/geohash.js';
 import { recordEvidenceInputs, type RecordEvidenceInputs } from '../evidence-inputs.js';
+import { evaluateEarnedPrecision } from '../geography/earned-precision.js';
 import { publicVisitForTier, type PublicVisit } from '../geography/visit.js';
 import {
   evaluateGeoIntegrityPublishGate,
@@ -182,6 +183,12 @@ export type ReleaseBuildContext = {
    * canonical values win over heuristic derivation from summary text.
    */
   readonly canonicalStatus?: CanonicalStatusSnapshot;
+  /**
+   * `warn` for a republish of an already-live record: an unearned point precision is reported on
+   * the result instead of failing the build, so the check cannot silently unpublish the catalog.
+   * Default `block`, for new records.
+   */
+  readonly precisionCheck?: 'block' | 'warn';
 };
 
 /** Where release projection status fields were resolved. */
@@ -307,13 +314,16 @@ export type ReleaseBuildFailureReason =
   | 'notability_basis_gate'
   | 'reference_resolution'
   | 'catalog_decision_retracted'
-  | 'geo_integrity_gate';
+  | 'geo_integrity_gate'
+  | 'precision_not_earned';
 
 export type ReleaseBuildResult =
   | {
       readonly ok: true;
       readonly projection: ReleaseEntityProjectionFields;
       readonly searchIndex: ReleaseSearchIndexFields;
+      /** Earned-precision findings that did not block because the record is already live. */
+      readonly warnings?: readonly string[];
     }
   | { readonly ok: false; readonly reason: ReleaseBuildFailureReason; readonly message: string };
 
@@ -1606,6 +1616,17 @@ export function buildReleaseEntityArtifacts(
   const locationPrecision = context.locationOverride?.precision ?? entry.locationPrecision;
   const locationLabel = context.locationOverride?.locationLabel ?? entry.locationLabel;
   const matchMethod = context.locationOverride?.matchMethod ?? 'manual_research';
+  const earned = hasPoint
+    ? evaluateEarnedPrecision({
+        kind: entry.kind,
+        precision: locationPrecision,
+        matchMethod,
+        claims,
+      })
+    : { ok: true as const };
+  if (!earned.ok && context.precisionCheck !== 'warn') {
+    return { ok: false, reason: 'precision_not_earned', message: earned.message };
+  }
   const geo = hasPoint ? buildGeoPointFields(lat, lng, geohashPrecision) : undefined;
   const notabilityLabels = [
     ...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion])),
@@ -1765,5 +1786,10 @@ export function buildReleaseEntityArtifacts(
     evidenceInputs: recordEvidenceInputs(claims),
   };
 
-  return { ok: true, projection, searchIndex };
+  return {
+    ok: true,
+    projection,
+    searchIndex,
+    ...(!earned.ok ? { warnings: [earned.message] } : {}),
+  };
 }

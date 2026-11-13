@@ -429,6 +429,8 @@ export async function publishManagementWork(
           {
             releaseId,
             generatedAt: now,
+            // An admin edit of a live record: report an unearned precision, never unpublish it.
+            precisionCheck: 'warn' as const,
             ...(record.location
               ? { locationOverride: { ...record.location, locationLabel: record.location.label } }
               : {}),

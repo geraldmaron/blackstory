@@ -1605,6 +1605,23 @@ test('republish keeps the location an already-live record publishes today', () =
   });
 });
 
+test('republish lets a coarser row precision win over the live tier, never a finer one', () => {
+  const gate = (precision: string) =>
+    gateWithReviewedClaims({
+      row: curatedRow({ payload: { ...curatedRow().payload, geocode: { precision } } }),
+      releaseId: 'rel_seed_001',
+      generatedAt: '2026-09-12T00:00:00.000Z',
+      allowRepublish: true,
+      liveLocation: curatedLiveLocation(),
+    });
+  const coarse = gate('country');
+  assert.equal(coarse.eligible, true);
+  if (coarse.eligible) assert.equal(coarse.locationOverride?.precision, 'country');
+  const fine = gate('address');
+  assert.equal(fine.eligible, true);
+  if (fine.eligible) assert.equal(fine.locationOverride?.precision, 'address');
+});
+
 test('an inherited point does not overwrite place prose the landscape row supplies', () => {
   const result = gateWithReviewedClaims({
     row: curatedRow({
@@ -1666,6 +1683,7 @@ test('an inherited location survives the real build, matchMethod included', () =
     releaseId: 'rel_seed_001',
     generatedAt: '2026-09-12T00:00:00.000Z',
     ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
+    republishingLive: true,
   });
   assert.equal(built.ok, true);
   if (!built.ok) return;

@@ -13,8 +13,10 @@ import { encodeGeohash, geohashPrefixes } from '@repo/domain/geography/geohash';
 import {
   classifyNrhpAddressOutcome,
   classifyVisitability,
+  decideCountyBackfill,
   NRHP_ADDRESS_TIER_TABLE,
   parseSrcAccuMeters,
+  polygonCenterAndExtent,
   proposeNrhpTier,
   type NrhpAddressOutcome,
   type NrhpArcgisAttributes,
@@ -34,6 +36,15 @@ const APPLY = process.env.NRHP_ADDRESS_BACKFILL_APPLY === '1';
 const LANE = 'nrhp-black-heritage';
 const ARCGIS_POINTS_LAYER =
   'https://mapservices.nps.gov/arcgis/rest/services/cultural_resources/nrhp_locations/MapServer/0/query';
+/** Layer 1 (NRHP Polygons) of the same MapServer: fallback for refnums with no point feature.
+ *  Joined by NRIS_Refnum only; layer names carry "(Boundary Increase)" style suffixes. */
+const ARCGIS_POLYGONS_LAYER = ARCGIS_POINTS_LAYER.replace('/MapServer/0/', '/MapServer/1/');
+/** Dry-run proposals go here when set (e.g. a scratch dir); never into the repo. */
+const REPORT_PATH = process.env.NRHP_ADDRESS_REPORT_PATH;
+/** Comma-separated entity ids never to sharpen (records tied to persons of unknown living status). */
+const EXCLUDE_ENTITY_IDS = new Set(
+  (process.env.NRHP_ADDRESS_EXCLUDE_IDS ?? '').split(',').filter(Boolean),
+);
 const ARCGIS_OUT_FIELDS =
   'NRIS_Refnum,RESNAME,Address,City,County,State,Vicinity,IS_EXTANT,EXTANT_OTH,CONSTRANT,SRC_ACCU,MAP_METHOD,BND_TYPE,ResType';
 const BROWSER_UA =
@@ -44,6 +55,7 @@ const GEOHASH_PRECISION = 9;
 
 /** How this script's writes are labeled in `match_method` / `location.matchMethod`. */
 const MATCH_METHOD = 'nps-nrhp-arcgis-address';
+const MATCH_METHOD_POLYGON = 'nps-nrhp-arcgis-polygon';
 /** NARA/NPGallery canonical URLs cited alongside the layer are per-entity (roster's own field);
  *  the layer URL itself is the one constant citation every plan row shares. */
 const CITATION_LAYER_URL = ARCGIS_POINTS_LAYER;
@@ -54,7 +66,11 @@ const CITATION_LAYER_URL = ARCGIS_POINTS_LAYER;
 
 type ArcGisFeature = {
   readonly attributes?: Readonly<Record<string, string | number | null>>;
-  readonly geometry?: { readonly x?: number; readonly y?: number };
+  readonly geometry?: {
+    readonly x?: number;
+    readonly y?: number;
+    readonly rings?: readonly (readonly (readonly number[])[])[];
+  };
 };
 type ArcGisResponse = { readonly features?: readonly ArcGisFeature[] };
 
@@ -68,9 +84,11 @@ function attributesFromFeature(feature: ArcGisFeature): NrhpArcgisAttributes | n
   const a = feature.attributes;
   const refnum = toStr(a?.NRIS_Refnum);
   if (!refnum) return null;
-  const x = feature.geometry?.x;
-  const y = feature.geometry?.y;
+  const poly = polygonCenterAndExtent(feature.geometry?.rings);
+  const x = poly?.lng ?? feature.geometry?.x;
+  const y = poly?.lat ?? feature.geometry?.y;
   return {
+    extentKm: poly?.extentKm ?? null,
     refnum,
     resname: toStr(a?.RESNAME),
     address: toStr(a?.Address),
@@ -114,9 +132,9 @@ async function fetchJsonWithRetry(url: string, init: RequestInit): Promise<unkno
  *  unchanged candidate set fetches nothing and a changed lane only misses the affected batches —
  *  not positional ("batch 3"), which would silently go stale if the candidate set's order or size
  *  ever shifts. */
-function batchCacheFilename(refnums: readonly string[]): string {
+function batchCacheFilename(layerUrl: string, refnums: readonly string[]): string {
   const hash = createHash('sha1')
-    .update([...refnums].sort().join(','))
+    .update(`${layerUrl === ARCGIS_POINTS_LAYER ? '' : layerUrl}|${[...refnums].sort().join(',')}`)
     .digest('hex')
     .slice(0, 20);
   return `batch-${hash}.json`;
@@ -124,6 +142,7 @@ function batchCacheFilename(refnums: readonly string[]): string {
 
 async function fetchArcgisAttributes(
   refnums: readonly string[],
+  layerUrl: string = ARCGIS_POINTS_LAYER,
 ): Promise<Map<string, NrhpArcgisAttributes>> {
   mkdirSync(ARCGIS_CACHE_DIR, { recursive: true });
   const byRefnum = new Map<string, NrhpArcgisAttributes>();
@@ -131,7 +150,7 @@ async function fetchArcgisAttributes(
 
   for (let i = 0; i < sorted.length; i += BATCH_SIZE) {
     const batch = sorted.slice(i, i + BATCH_SIZE);
-    const cachePath = join(ARCGIS_CACHE_DIR, batchCacheFilename(batch));
+    const cachePath = join(ARCGIS_CACHE_DIR, batchCacheFilename(layerUrl, batch));
 
     let data: ArcGisResponse | null;
     let usedCache = false;
@@ -147,7 +166,7 @@ async function fetchArcgisAttributes(
         outSR: '4326',
         f: 'json',
       });
-      data = (await fetchJsonWithRetry(ARCGIS_POINTS_LAYER, {
+      data = (await fetchJsonWithRetry(layerUrl, {
         method: 'POST',
         body,
       })) as ArcGisResponse | null;
@@ -194,6 +213,8 @@ type EntityLocationRow = {
   readonly id: string;
   readonly precision: string | null;
   readonly label: string | null;
+  readonly lat: number | null;
+  readonly lng: number | null;
 };
 
 export type NrhpAddressPlanEntry = {
@@ -215,6 +236,9 @@ export type NrhpAddressPlanEntry = {
   readonly currentTier: string | null;
   readonly flagged: boolean;
   readonly flagReason: string | null;
+  /** 'points' (layer 0) or 'polygons' (layer 1 fallback for county-precision rows). */
+  readonly sourceLayer: 'points' | 'polygons' | null;
+  readonly displayName: string | null;
   readonly canApply: boolean;
   readonly skipReason: string | null;
 };
@@ -240,10 +264,15 @@ async function main(): Promise<void> {
   );
   const arcgisByRefnum = await fetchArcgisAttributes(refnums);
   console.log(`ArcGIS layer matched: ${arcgisByRefnum.size}/${refnums.length} refnums.`);
+  const polygonsByRefnum = await fetchArcgisAttributes(
+    refnums.filter((r) => !arcgisByRefnum.has(r)),
+    ARCGIS_POLYGONS_LAYER,
+  );
+  console.log(`Polygons layer fallback matched: ${polygonsByRefnum.size} more refnums.`);
 
   const entityIds = landscapeRes.rows.map((row) => row.id);
   const entityLocationsRes = await pool.query<EntityLocationRow>(
-    `SELECT entity_id, id, precision, label FROM canonical.entity_locations WHERE entity_id = ANY($1)`,
+    `SELECT entity_id, id, precision, label, lat, lng FROM canonical.entity_locations WHERE entity_id = ANY($1)`,
     [entityIds],
   );
   const entityLocationByEntityId = new Map<string, EntityLocationRow>();
@@ -266,21 +295,57 @@ async function main(): Promise<void> {
     const refnum = row.payload.refnum;
     if (!refnum) continue;
     const restrictedAddress = row.payload.restrictedAddress === true;
-    const feature = arcgisByRefnum.get(refnum) ?? null;
-    const outcome = classifyNrhpAddressOutcome({ restrictedAddress, feature });
-    const accuracyMeters = feature ? parseSrcAccuMeters(feature.srcAccu) : null;
+    const pointFeature = arcgisByRefnum.get(refnum) ?? null;
     const existingLocation = entityLocationByEntityId.get(row.id);
     const currentTier = existingLocation?.precision ?? null;
-    const proposal = proposeNrhpTier(outcome, accuracyMeters, currentTier);
+    // Polygons fallback only sharpens county-centroid rows that have no point feature.
+    const polygonFeature = pointFeature ? null : (polygonsByRefnum.get(refnum) ?? null);
+    const decision =
+      polygonFeature && currentTier === 'county'
+        ? decideCountyBackfill({
+            displayName: row.payload.displayName ?? '',
+            restricted: restrictedAddress,
+            excluded: EXCLUDE_ENTITY_IDS.has(row.id),
+            feature: polygonFeature,
+            countyCentroid:
+              existingLocation?.lat != null && existingLocation.lng != null
+                ? { lat: existingLocation.lat, lng: existingLocation.lng }
+                : null,
+          })
+        : null;
+    const feature = decision ? polygonFeature : pointFeature;
+    const outcome: NrhpAddressOutcome = decision
+      ? decision.toPrecision === 'address'
+        ? 'address_found'
+        : decision.toPrecision === 'city'
+          ? 'vicinity'
+          : decision.toPrecision === 'neighborhood'
+            ? 'coordinates_only'
+            : restrictedAddress
+              ? 'restricted'
+              : 'no_match'
+      : classifyNrhpAddressOutcome({ restrictedAddress, feature });
+    const accuracyMeters = feature ? parseSrcAccuMeters(feature.srcAccu) : null;
+    const proposal = decision
+      ? {
+          tier: decision.toPrecision,
+          flagged: decision.flags.length > 0,
+          flagReason: decision.flags.join(',') || null,
+        }
+      : proposeNrhpTier(outcome, accuracyMeters, currentTier);
 
     const hasEntityLocationRow = existingLocation !== undefined;
     const hasReleaseRow = releaseEntityIds.has(row.id);
     const hasGeometry = feature?.lat !== null && feature?.lng !== null && feature !== null;
-    const writable = outcome !== 'restricted' && outcome !== 'no_match';
+    const writable = decision
+      ? decision.toPrecision !== null
+      : outcome !== 'restricted' && outcome !== 'no_match';
 
     let skipReason: string | null = null;
-    if (!writable) skipReason = outcome === 'restricted' ? 'restricted_never_written' : 'no_match';
-    else if (!hasGeometry) skipReason = 'no_geometry_on_layer_feature';
+    if (!writable) {
+      skipReason =
+        decision?.flags[0] ?? (outcome === 'restricted' ? 'restricted_never_written' : 'no_match');
+    } else if (!hasGeometry) skipReason = 'no_geometry_on_layer_feature';
     else if (!hasEntityLocationRow) skipReason = 'not_yet_published_no_entity_locations_row';
     else if (!hasReleaseRow) skipReason = 'not_in_active_release';
 
@@ -303,6 +368,8 @@ async function main(): Promise<void> {
       currentTier,
       flagged: proposal.flagged,
       flagReason: proposal.flagReason,
+      sourceLayer: feature ? (decision ? 'polygons' : 'points') : null,
+      displayName: row.payload.displayName ?? null,
       canApply: writable && skipReason === null,
       skipReason,
     });
@@ -370,11 +437,24 @@ async function main(): Promise<void> {
   }
 
   const generatedAt = new Date().toISOString();
-  const reportPath = join(
-    CACHE_DIR,
-    `nrhp-address-backfill-${generatedAt.replace(/[:.]/gu, '-')}.json`,
-  );
-  mkdirSync(CACHE_DIR, { recursive: true });
+  const reportPath =
+    REPORT_PATH ??
+    join(CACHE_DIR, `nrhp-address-backfill-${generatedAt.replace(/[:.]/gu, '-')}.json`);
+  mkdirSync(dirname(reportPath), { recursive: true });
+  const proposals = entries
+    .filter((e) => e.sourceLayer === 'polygons')
+    .map((e) => ({
+      entity_id: e.entityId,
+      refnum: e.refnum,
+      display_name: e.displayName,
+      from_precision: e.currentTier,
+      to_precision: e.proposedTier,
+      lat: e.lat,
+      lng: e.lng,
+      source: `${ARCGIS_POLYGONS_LAYER}?where=NRIS_Refnum='${e.refnum}'`,
+      source_address: e.address,
+      flags: e.flagReason ? e.flagReason.split(',') : [],
+    }));
   writeFileSync(
     reportPath,
     JSON.stringify(
@@ -385,6 +465,7 @@ async function main(): Promise<void> {
         matchMethod: MATCH_METHOD,
         tierTable: NRHP_ADDRESS_TIER_TABLE,
         counts,
+        proposals,
         entries,
       },
       null,
@@ -441,7 +522,7 @@ async function main(): Promise<void> {
           geohash,
           prefixes,
           entry.proposedTier,
-          MATCH_METHOD,
+          entry.sourceLayer === 'polygons' ? MATCH_METHOD_POLYGON : MATCH_METHOD,
           // The street column landed with the WS3 contract (entity_visit_contact migration);
           // only an address_found row carries a real street, a vicinity row is prose.
           entry.outcome === 'address_found' && entry.address ? entry.address : null,
@@ -468,7 +549,15 @@ async function main(): Promise<void> {
                 )
           WHERE entity_id = $1
             AND release_id = (SELECT release_id FROM published.v_active_release_id)`,
-        [entry.entityId, entry.lat, entry.lng, geohash, prefixes, entry.proposedTier, MATCH_METHOD],
+        [
+          entry.entityId,
+          entry.lat,
+          entry.lng,
+          geohash,
+          prefixes,
+          entry.proposedTier,
+          entry.sourceLayer === 'polygons' ? MATCH_METHOD_POLYGON : MATCH_METHOD,
+        ],
       );
       await client.query('COMMIT');
       applied += 1;

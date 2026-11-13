@@ -563,6 +563,7 @@ function preparePublish(input: {
       // Forwarded, not re-derived: the gate already decided this record's location and this build
       // must produce the row the gate approved (`matchMethod` lives only here).
       ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
+      republishingLive: input.livePublished !== undefined,
     });
     if (!built.ok) {
       return {
@@ -571,6 +572,8 @@ function preparePublish(input: {
         detail: built.reason === 'build_failed' ? built.detail : built.detail,
       };
     }
+    for (const warning of built.warnings ?? [])
+      console.warn(`[precision] ${input.entityId}: ${warning}`);
     return {
       id: input.entityId,
       reviewBasis: combined.reviewBasis,

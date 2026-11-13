@@ -158,6 +158,7 @@ try {
       ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
       ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
       ...(catalogDecision !== undefined ? { catalogDecision } : {}),
+      republishingLive: true,
     });
     if (!result.ok) {
       tally(gateRejects, `build:${result.reason}`);
