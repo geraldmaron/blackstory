@@ -31,6 +31,11 @@
   padding: 0;
 }
 
+/* The crumb's 44px target sits close over a display title; give the title its own air. */
+.ds-trust-mast .ds-page-header__text {
+  gap: var(--ds-space-4);
+}
+
 .ds-trust-mast .ds-page-header__title {
   max-width: 18ch;
 }
@@ -554,7 +559,7 @@
 .ds-trust-quote {
   max-width: 62ch;
   margin: var(--ds-space-4) 0 0;
-  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-4);
+  padding: var(--ds-space-4);
   border-left: var(--ds-border-width) solid var(--ds-ink-muted);
 }
 

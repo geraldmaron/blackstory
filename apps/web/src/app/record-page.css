@@ -1069,6 +1069,15 @@ a.ds-evidence__title:hover,
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
+  /* Two steps share one phone row: the 32px desktop padding left no room for a long name. */
+  .ds-recpage__step {
+    padding: var(--ds-space-4);
+  }
+
+  .ds-recpage__step-name {
+    overflow-wrap: anywhere;
+  }
+
   .ds-recpage__position {
     grid-column: 1 / -1;
     grid-row: 2;

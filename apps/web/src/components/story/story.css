@@ -87,7 +87,7 @@
 }
 
 .ds-story-mast__text .ds-story-mast__numeral {
-  margin: var(--ds-space-2) 0 var(--ds-space-1);
+  margin: var(--ds-space-2) 0 var(--ds-space-3);
 }
 
 .ds-story-mast__band,
@@ -535,13 +535,13 @@
   letter-spacing: var(--ds-tracking-display);
 }
 
-/* A dated section opens on its year as a copper numeral across the wide track, cropped by the
-   heading: the heading's sheet-colored box sits over the numeral's foot, its rule on the
-   baseline band, and starts where the numeral starts with its text indented to the body track. */
+/* A dated section opens on its year as a copper numeral across the wide track, then the heading
+   under a 4px rule with clear air on both sides: the rule never cuts the digits, and the heading
+   starts where the numeral starts with its text indented to the body track. */
 .ds-story-body > .ds-story-year {
   grid-column: wide;
   margin-top: var(--ds-space-18);
-  margin-bottom: -0.18em;
+  margin-bottom: var(--ds-space-4);
 }
 
 .ds-story-body > .ds-story-year:first-child {
@@ -553,7 +553,7 @@
   z-index: 1; /* local: the heading crops the year numeral above it */
   grid-column: wide;
   margin-top: 0;
-  padding-top: var(--ds-space-3);
+  padding-top: var(--ds-space-6);
   padding-inline: max(0px, (100% - var(--ds-width-read)) / 2);
   border-top: 4px solid var(--ds-ink);
   background: var(--ds-canvas);
@@ -1226,6 +1226,11 @@
 
   .ds-story-body > .ds-story-year {
     margin-top: var(--ds-space-12);
+  }
+
+  /* The sheet pads 16 right and its bands + pad on the left; the image stays inside both. */
+  .ds-story__main .ds-story-figure__frame > img {
+    max-width: calc(100vw - var(--ds-sheet-pad) * 2 - var(--ds-band-w) * 3);
   }
 
   .ds-story-quote {

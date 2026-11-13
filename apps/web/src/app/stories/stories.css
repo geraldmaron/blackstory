@@ -464,7 +464,7 @@
     'thumb kind years'
     'thumb summary summary';
   align-items: start;
-  gap: var(--ds-space-1) var(--ds-space-6);
+  gap: var(--ds-space-2) var(--ds-space-6);
   margin-inline: calc(var(--ds-space-2) * -1);
   padding: var(--ds-space-4) var(--ds-space-2);
   color: var(--ds-ink);

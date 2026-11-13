@@ -243,6 +243,12 @@ body:has(.ds-records) .ds-reading-progress {
   font-size: var(--ds-text-subtitle);
 }
 
+/* The place wraps under its kind rather than ending in an ellipsis on a long name. */
+.ds-record__link--compact .ds-record__meta {
+  overflow: visible;
+  white-space: normal;
+}
+
 /* —— pager ———————————————————————————————————————————————————————————————— */
 .ds-records-pager {
   display: flex;
@@ -350,6 +356,12 @@ body:has(.ds-records) .ds-reading-progress {
 
   .ds-record__data {
     display: contents;
+  }
+
+  /* Kind and place wrap beside the grade instead of running under it. */
+  .ds-record__meta {
+    overflow: visible;
+    white-space: normal;
   }
 
   .ds-record__decade {

@@ -119,7 +119,9 @@ body:has(.ds-books) .ds-reading-progress {
 .ds-books-lead__row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: var(--ds-space-4);
+  min-height: 2.75rem;
   padding-block: var(--ds-space-2);
   border-top: var(--ds-border-width-strong) solid var(--ds-ink);
   color: var(--ds-ink);

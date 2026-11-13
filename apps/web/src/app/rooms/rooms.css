@@ -42,7 +42,7 @@
 .ds-rooms__mark {
   display: grid;
   align-content: start;
-  gap: var(--ds-space-3);
+  gap: var(--ds-space-4);
 }
 
 /* The group's number, cropped toward the heading under it. */

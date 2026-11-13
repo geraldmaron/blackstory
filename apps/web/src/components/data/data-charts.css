@@ -86,7 +86,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0 var(--ds-space-4);
+  gap: var(--ds-space-1) var(--ds-space-4);
   min-height: 2.75rem;
 }
 

@@ -22,6 +22,9 @@ export const MEMORIAL_HELD_MESSAGE_LINES = [
   'This list will never be finished. That is not a flaw. It is the truth.',
 ] as const;
 
+export const MEMORIAL_LIST_LEDE =
+  'Alphabetical, each with the year and the place the archive holds for them.';
+
 export const MEMORIAL_LIST_NOTE =
   'This list is incomplete and always will be. If a name belongs here and is missing, send the evidence through Submit, or write to me@geralddagher.com.';
 

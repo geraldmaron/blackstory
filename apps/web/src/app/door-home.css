@@ -1219,27 +1219,16 @@ body:has(.ds-door) .ds-door-journey {
   line-height: 1.45;
 }
 
-/* Paper: three record sheets peek up from the block's foot, cropped by it. */
-.ds-door-ch--count {
-  padding-bottom: 0;
-}
+/* Paper: three whole record sheets in one even row, with the block's own foot under them. */
 
 .ds-door-ch__sheets {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--ds-space-6);
   width: 100%;
-  margin: var(--ds-space-8) 0 calc(var(--ds-space-18) * -1);
+  margin: var(--ds-space-8) 0 0;
   padding: 0;
   list-style: none;
-}
-
-.ds-door-ch__sheets > li:nth-child(2) {
-  transform: translateY(var(--ds-space-8));
-}
-
-.ds-door-ch__sheets > li:nth-child(3) {
-  transform: translateY(var(--ds-space-4));
 }
 
 /* The sheets sit on paper, so they take the raised paper step and an ink edge. */
@@ -1329,8 +1318,7 @@ body:has(.ds-door) .ds-door-journey {
 }
 
 .ds-door-ch--story .ds-door-ch__inner {
-  position: relative; /* paints the years tag over the cover's foot, which is positioned */
-  margin-top: calc(var(--ds-space-18) * -1);
+  padding-top: var(--ds-space-12);
 }
 
 .ds-door-ch__years {
@@ -1346,6 +1334,7 @@ body:has(.ds-door) .ds-door-journey {
 .ds-door-ch__story-title {
   max-width: 16ch;
   margin: 0;
+  overflow-wrap: anywhere;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-title);
   font-weight: 600;
@@ -1491,14 +1480,6 @@ body:has(.ds-door) .ds-door-journey {
   .ds-door-ch__sheets,
   .ds-door-ch__grades {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .ds-door-ch__sheets {
-    margin-bottom: var(--ds-space-8);
-  }
-
-  .ds-door-ch__sheets > li:nth-child(n) {
-    transform: none;
   }
 
   .ds-door-ch__sheet {

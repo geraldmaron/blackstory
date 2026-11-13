@@ -90,238 +90,322 @@
   margin-top: -40svh;
 }
 
-/* The list is the page here, not a card on it: no border, no raised ground, no inset. */
-.ds-memorial__list {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
+/* ---- the names index ------------------------------------------------------
+   A heading on the table, rising over the dimming wall, then one paper sheet with page bands
+   that holds every name: a finder column (Find a name, letter jump) beside the letter groups.
+   Each group is marked by its letter at display size and read down in columns, like a wall.
+   Ink on paper in both themes; no copper on this surface. */
+
+.ds-memorial-index__head {
+  max-width: 46rem;
+  padding-bottom: var(--ds-space-10);
 }
 
-/* Heading and count share one baseline over one rule: the count is a fact about the list, not a
-   second heading under the first. */
-.ds-memorial__header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--ds-space-4) var(--ds-space-8);
-  padding-bottom: var(--ds-space-4);
-  margin-bottom: var(--ds-space-5);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-memorial__title {
+.ds-memorial-index__title {
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(1.5rem, 1.15rem + 1.1vw, 2rem);
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   color: var(--ds-ink);
+  text-wrap: balance;
 }
 
-/* No copper accent on this surface — italic alone carries the emphasis this em would
-   otherwise take from the room kit's ReadingEntry convention. */
-.ds-memorial__title em {
+.ds-memorial-index__lede {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 38em;
   font-family: var(--ds-font-editorial);
-  font-style: italic;
-  font-weight: 400;
-  color: var(--ds-ink);
-}
-
-/* Sans, sentence case. Mono caps made a count of the dead read like a system readout. */
-.ds-memorial__count {
-  margin: 0;
-  flex: none;
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
-  letter-spacing: 0;
-  text-transform: none;
+  font-size: 1.125rem;
+  line-height: 1.6;
   color: var(--ds-ink-muted);
 }
 
-/* ---- alphabetical groups + jump rail ------------------------------------- */
-
-/*
- * The list runs past a thousand names. As one flat `<ul>` that is tens of
- * screens with nothing to scroll against: no way to tell how far in you are,
- * and no way to reach a name without dragging the scrollbar and guessing. The
- * rail and the letter headings give the same list a spine — the names all stay
- * on one page, which for a memorial is the point.
- */
-.ds-memorial__jump {
-  position: sticky;
-  /* Clears the shell's floating bar so the rail is reachable at any depth. */
-  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
-  z-index: var(--ds-z-memorial-jump);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-block: var(--ds-space-5);
-  padding-block: var(--ds-space-2) var(--ds-space-3);
-  /* One hairline under it instead of a box around it: a bordered island floating over a list of
-     names is a widget, and this rail is part of the page it sits in. Opaque because it sticks. */
-  border-bottom: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
-  background: var(--ds-canvas);
-}
-
-.ds-memorial__jump-link {
-  display: inline-grid;
-  place-items: center;
-  min-width: 2.75rem;
-  min-height: 2.75rem;
-  border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
-  color: var(--ds-ink-muted);
-  text-decoration: none;
-  transition:
-    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
-    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
-}
-
-.ds-memorial__jump-link:hover,
-.ds-memorial__jump-link[aria-current='location'] {
-  background: var(--ds-surface-raised);
-  color: var(--ds-ink);
-}
-
-.ds-memorial__jump-link:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
-  outline-offset: 2px;
-}
-
-/* On a phone the wrapped rail is four rows and roughly a fifth of the screen,
-   which is a lot of permanently-stuck chrome over a memorial. One row that
-   scrolls sideways instead keeps every letter reachable at ~44px tall. */
-@media (max-width: 640px) {
-  .ds-memorial__jump {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    scrollbar-width: none;
-  }
-
-  .ds-memorial__jump::-webkit-scrollbar {
-    display: none;
-  }
-
-  .ds-memorial__jump-link {
-    flex: none;
-  }
-}
-
-.ds-memorial__group + .ds-memorial__group {
-  margin-block-start: var(--ds-space-10);
-}
-
-/* The letter, in the display face at the size of a heading and in ink. As accent mono caps it
-   read as a label on the group; the memorial takes no accent. */
-.ds-memorial__group-letter {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-3);
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-display);
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--ds-ink);
-}
-
-.ds-memorial__group-count {
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: var(--ds-ink-muted);
-}
-
-/*
- * Scroll target, offset from the heading it sits in rather than the heading
- * carrying `scroll-margin-top` itself: the sticky rail above would otherwise
- * cover the letter the reader just jumped to.
- */
-.ds-memorial__group-anchor {
-  display: block;
-  scroll-margin-top: calc(var(--ds-island-clearance) + 5rem);
-}
-
-.ds-memorial__name-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.ds-memorial-index__sheet {
   display: grid;
-  /* Narrower track than the old 14rem: a name is short, and at 14rem a desktop
-     fitted four columns and the list ran to some 16,000px. */
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-  gap: var(--ds-space-2) var(--ds-space-4);
+  grid-template-columns: 12.75rem minmax(0, 1fr);
+  gap: var(--ds-space-12);
+  --ds-sheet-pad: var(--ds-space-12);
 }
 
-.ds-memorial__name-list li {
-  margin: 0;
+/* The finder holds still beside the names while the reader scrolls through them. */
+.ds-memorial-index__finder {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-8));
+  align-self: start;
+  display: grid;
+  gap: var(--ds-space-8);
+}
+
+.ds-memorial-index__find {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-memorial-index__find-label {
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__find-input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border-control, var(--ds-ink));
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
   font-family: var(--ds-font-editorial);
-  font-size: 1rem;
-  line-height: 1.45;
+  font-size: 1.0625rem;
   color: var(--ds-ink);
-  padding-block: 0.2rem;
-  border-bottom: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 70%, transparent);
 }
 
-/* Quiet "this one goes further" cue: exact-match names with a real entity page (~3% of the
-   list). No accent on this surface, so the signal is the underline alone — every name still
-   gets exactly the same ink color, which is the point of a memorial that plays no favorites. */
-.ds-memorial__name-link {
-  color: var(--ds-ink);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
-}
-
-.ds-memorial__name-link:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+.ds-memorial-index__find-input:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
   outline-offset: 2px;
 }
 
-.ds-memorial__name-year {
-  font-family: var(--ds-font-mono);
-  font-size: 0.8em;
-  color: var(--ds-ink-muted);
-}
-
-/*
- * Widened out of `.ds-room__doc`'s prose measure. That measure is right for the
- * room's paragraphs and wrong for this: an index of 1,672 names held to a 900px
- * column fits three narrow tracks and runs to some 28,000px, so the reader pays
- * for a line length the content never uses. Breaking the zone (and only the
- * zone) out to the room's full width fits roughly twice the columns and roughly
- * halves the scroll, with the surrounding prose untouched.
- *
- * `50% - 50vw` is the standard full-bleed escape (half the zone's own width less
- * half the viewport), plus a 2rem gutter so it never touches the window edge.
- * The clamp bounds it at both ends: -14rem stops it sprawling on an ultrawide,
- * and 0px makes it a no-op on narrow screens, where the doc has no side margin
- * left to give back and the value would otherwise go positive and indent the
- * list.
- *
- * No background of its own. It used to darken once reached, to lift the list off the wall's
- * leftover names; the wall now dims to nearly nothing and leaves before the names begin, so the
- * list sits on the page's own canvas at full contrast, and the darkened panel only drew a card
- * around the names (and lowered contrast in the light theme).
- */
-.ds-memorial__list-zone {
-  margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
-}
-
-.ds-memorial__note {
-  margin: var(--ds-space-4) 0 0;
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+/* Reserves its line so a result count appearing never pushes the letters down. */
+.ds-memorial-index__find-status {
+  min-height: 1.5em;
+  margin: 0;
+  font-family: var(--ds-font-sans);
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
 
+.ds-memorial-index__jump-list {
+  display: grid;
+  grid-template-columns: repeat(4, 2.75rem);
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-memorial-index__jump-link {
+  display: grid;
+  place-items: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+a.ds-memorial-index__jump-link:hover {
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ink);
+}
+
+/* The letter being read: a solid ink tile in heavier type, so it reads by shape and weight. */
+.ds-memorial-index__jump-link[aria-current='location'] {
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-weight: 700;
+}
+
+.ds-memorial-index__jump-link[aria-disabled='true'] {
+  color: var(--ds-ink-subtle, var(--ds-ink-muted));
+  opacity: 0.45;
+}
+
+.ds-memorial-index__jump-link:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
+  outline-offset: 2px;
+}
+
+.ds-memorial-index__group {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: var(--ds-space-8);
+  padding-bottom: var(--ds-space-10);
+}
+
+/* A rule between groups, counted from the first one still showing while the list is filtered. */
+.ds-memorial-index__group:not([hidden]) ~ .ds-memorial-index__group {
+  padding-top: var(--ds-space-10);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Outranks `.ds-memorial [id]` below, which would otherwise set the jump offset. */
+.ds-memorial section.ds-memorial-index__group {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+/* The letter stays in view while its names scroll past. */
+.ds-memorial-index__letter {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-8));
+  align-self: start;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(3.5rem, 2.5rem + 2.6vw, 5.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__names {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 3 15rem;
+  column-gap: var(--ds-space-10);
+}
+
+.ds-memorial-index__entry {
+  display: grid;
+  gap: 0.125rem;
+  padding-block: 0.625rem;
+  break-inside: avoid;
+}
+
+.ds-memorial-index__entry[hidden],
+.ds-memorial-index__group[hidden] {
+  display: none;
+}
+
+.ds-memorial-index__name {
+  font-family: var(--ds-font-editorial);
+  font-size: 1.125rem;
+  line-height: 1.35;
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+.ds-memorial-index__name a,
+.ds-memorial-index__empty a {
+  color: var(--ds-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-memorial-index__name a:focus-visible,
+.ds-memorial-index__empty a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
+  outline-offset: 2px;
+}
+
+.ds-memorial-index__meta {
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-muted);
+}
+
+.ds-memorial-index__empty {
+  max-width: 34em;
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--ds-ink);
+}
+
+/* Phone: the sheet runs full-bleed; the field sits at its top and only the letters stick, as one
+   row that scrolls sideways, so the stuck chrome stays one 44px line. */
+@media (max-width: 47.9375rem) {
+  .ds-memorial-index__sheet {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    margin-inline: calc(var(--ds-gutter) * -1);
+    --ds-sheet-pad: var(--ds-space-5);
+  }
+
+  .ds-memorial-index__finder {
+    display: contents;
+  }
+
+  .ds-memorial-index__find {
+    padding-bottom: var(--ds-space-2);
+  }
+
+  .ds-memorial-index__jump {
+    position: sticky;
+    top: var(--ds-island-clearance);
+    z-index: var(--ds-z-memorial-jump);
+    margin-inline: calc(var(--ds-sheet-pad) * -1) 0;
+    padding: var(--ds-space-2) var(--ds-sheet-pad);
+    border-bottom: var(--ds-border-width) solid var(--ds-rule);
+    background: var(--ds-canvas);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  .ds-memorial-index__jump::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-memorial-index__jump-list {
+    display: flex;
+    gap: var(--ds-space-1);
+  }
+
+  .ds-memorial-index__jump-link {
+    flex: none;
+  }
+
+  .ds-memorial-index__groups {
+    padding-top: var(--ds-space-6);
+  }
+
+  .ds-memorial-index__group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-3);
+    padding-bottom: var(--ds-space-8);
+  }
+
+  .ds-memorial-index__group:not([hidden]) ~ .ds-memorial-index__group {
+    padding-top: var(--ds-space-8);
+  }
+
+  /* Clears the stuck letter row. */
+  .ds-memorial section.ds-memorial-index__group {
+    scroll-margin-top: calc(var(--ds-island-clearance) + 3.75rem);
+  }
+
+  .ds-memorial-index__letter {
+    position: static;
+    font-size: 3.5rem;
+  }
+}
+
+/*
+ * Widened out of `.ds-room__doc`'s prose measure, which is right for the room's paragraphs and
+ * wrong for an index of 1,600 names. `50% - 50vw` is the standard full-bleed escape plus a 2rem
+ * gutter; the clamp stops it sprawling on an ultrawide and makes it a no-op on narrow screens.
+ */
+.ds-memorial__list-zone {
+  margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
+}
+
+/* The sheet's colophon: the list is incomplete, said once, after the last name. */
+.ds-memorial__note {
+  max-width: 44em;
+  margin: var(--ds-space-6) 0 0;
+  padding-top: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ds-ink-muted);
+}
+
 .ds-memorial__related {
-  margin-top: var(--ds-space-6);
+  margin-top: var(--ds-space-16);
+}
+
+/* The closing card lines up with the list's width and ends the page with room before the footer. */
+.ds-memorial .ds-room-offramp {
+  margin-block: var(--ds-space-16) var(--ds-space-24);
+  margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
 }
 
 /* Related rooms sit after the names. Ink plates, not copper: this surface takes no accent. */
