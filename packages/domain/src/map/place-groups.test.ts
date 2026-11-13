@@ -103,7 +103,11 @@ test('the state token carries the full precision mix in words', () => {
   const state = groups.tokens.find((t) => t.id === 'state:state-ga')!;
   assert.equal(
     breakdownInWords(state.breakdown),
-    '2 exact sites, 1 citywide or by neighborhood, 1 county-wide, 1 statewide',
+    '2 sit at exact sites, 1 is placed within a city, 1 is known only by county, and 1 is known only by state',
+  );
+  assert.equal(
+    breakdownInWords({ site: 1, area: 0, county: 3, state: 0 }),
+    '1 sits at an exact site and 3 are known only by county',
   );
 });
 

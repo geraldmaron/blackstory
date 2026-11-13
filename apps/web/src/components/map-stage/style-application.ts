@@ -42,6 +42,8 @@ import {
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_PLACE_LEADER_LAYER_ID,
   EXPLORE_PLACE_NAME_LAYER_ID,
+  EXPLORE_SITE_NAME_LAYER_ID,
+  PLATE_WATERLINE_LAYER_IDS,
 } from '../../app/map/explore-layer-ids';
 import { buildExploreMapStyle, stateLabelFilters } from '../../app/map/explore-style';
 import {
@@ -65,6 +67,7 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
   EXPLORE_COUNTY_HATCH_LAYER_ID,
   'plate-water',
+  ...PLATE_WATERLINE_LAYER_IDS,
   'plate-boundary-country',
   'plate-place-city',
   'explore-street-fill',
@@ -95,6 +98,7 @@ export const ENTITY_LAYER_IDS = new Set([
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_PLACE_NAME_LAYER_ID,
+  EXPLORE_SITE_NAME_LAYER_ID,
   EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_INCOMING_LAYER_ID,

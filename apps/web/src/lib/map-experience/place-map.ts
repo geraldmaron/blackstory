@@ -102,11 +102,31 @@ function abbreviate(count: number): string {
   return count >= 1000 ? `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k` : String(count);
 }
 
+/**
+ * The name the plate prints beside a token, atlas style: the state's postal code at national scale
+ * and its name past it (the style switches, `PLACE_STATE_NAME_MIN_ZOOM`), a county without its
+ * "County" and state suffix (the frame already says which state), a city without its state.
+ */
+export function placeMapName(level: PlaceToken['level'], name: string): string {
+  const bare = name.replace(/,\s*[A-Z]{2}$/, '');
+  return level === 'county' ? bare.replace(/\s+County$/, '') : bare;
+}
+
+/** Type size step by record count, the same three steps as `CLUSTER_RADIUS_BY_COUNT`. */
+export function placeTier(count: number): 0 | 1 | 2 {
+  return count >= 100 ? 2 : count >= 10 ? 1 : 0;
+}
+
 export type PlaceTokenProperties = {
   readonly placeKey: string;
   readonly level: PlaceToken['level'];
   /** Printed under the token; empty for state tokens, whose state label already names them. */
   readonly label: string;
+  /** The name the plate prints beside the count (`placeMapName`). */
+  readonly mapName: string;
+  /** A state token's postal code, printed at national scale; empty below the state level. */
+  readonly postal: string;
+  readonly tier: 0 | 1 | 2;
   readonly summary: string;
   readonly point_count: number;
   readonly point_count_abbreviated: string;
@@ -157,6 +177,9 @@ export function placeMapCollection(
         placeKey: token.placeKey,
         level: token.level,
         label: token.level === 'state' ? '' : token.name,
+        mapName: placeMapName(token.level, token.name),
+        postal: token.level === 'state' ? token.placeKey.replace(/^state-/, '').toUpperCase() : '',
+        tier: placeTier(count),
         summary: placeSummary(token.name, token.breakdown),
         point_count: count,
         point_count_abbreviated: abbreviate(count),

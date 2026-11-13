@@ -100,7 +100,7 @@
    * `pnpm --filter @repo/ui test` before assuming it is safe.
    */
   --ds-map-land: #fbf8f2;
-  --ds-map-water: #e2b89a;
+  --ds-map-water: #cbbfad;
   --ds-map-line: #a2957c;
   --ds-map-line-2: #6d675f;
   --ds-map-road: #ebe4d6;
@@ -188,14 +188,14 @@
    * at the floor, so land is the only side of the land/water pair with room to move, and without
    * that separation coastlines and state lines vanish at continental zoom. See map-contrast.test.ts.
    */
-  --ds-map-land: #ebe3d3;
+  --ds-map-land: #38332d;
   --ds-map-water: #0a0a0a;
-  --ds-map-line: #6d675f;
-  --ds-map-line-2: #2a2622;
-  --ds-map-road: #ddd4c3;
-  --ds-map-label: #6d675f;
-  --ds-map-label-hi: #2e2a24;
-  --ds-map-halo: #f4efe5;
+  --ds-map-line: #7d7468;
+  --ds-map-line-2: #a39885;
+  --ds-map-road: #4a443c;
+  --ds-map-label: #b8ad9b;
+  --ds-map-label-hi: #f4efe5;
+  --ds-map-halo: #38332d;
 }
 
 /*

@@ -790,9 +790,13 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         </p>
       ) : null}
       {placeScope && !overlapIds && listed.length > 0 ? (
-        <p className="ds-xcol__note">
-          {placeScope.name}. {scopedMixInWords(listed)}.
-        </p>
+        <div className="ds-xcol__place">
+          <p className="ds-xcol__place-name">
+            <span className="ds-xcol__place-level">{placeScope.key.split('-')[0]}</span>
+            {placeScope.name}
+          </p>
+          <p className="ds-xcol__place-mix">{scopedMixInWords(listed)}.</p>
+        </div>
       ) : null}
       <ExploreRecordList
         features={listed}

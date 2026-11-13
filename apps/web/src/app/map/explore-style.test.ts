@@ -19,6 +19,7 @@ import {
   buildExploreMapStyle,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
   EXPLORE_JURISDICTION_TAG_LAYER_ID,
   EXPLORE_SELECTED_TAG_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
@@ -555,9 +556,9 @@ test('history relationship edge lines use theme-aware copper and toggle visibili
   assert.equal(lightEdge.paint?.['line-opacity'], 0.9);
   assert.equal(lightIncoming.paint?.['line-opacity'], 0);
 
-  // Both themes draw on paper land, so both use the copper text step.
+  // The night atlas is charcoal, so dark draws edges in the dark-theme copper step.
   assert.equal(darkEdge.paint?.['line-color'], darkPlate.historyEdge);
-  assert.equal(darkEdge.paint?.['line-color'], brandPalette.copperTextLight);
+  assert.equal(darkEdge.paint?.['line-color'], brandPalette.copperDark);
   assert.notEqual(darkEdge.paint?.['line-color'], DIGNITY_PALETTE.pointHalo);
   assert.equal(darkSelected.paint?.['line-color'], darkPlate.historyEdgeSelected);
 });
@@ -578,7 +579,8 @@ test('county label symbol layer reads name from GeoJSON and sits above county li
   };
   assert.equal(labelLayer.type, 'symbol');
   assert.equal(labelLayer.source, 'explore-county-lines');
-  assert.deepEqual(labelLayer.layout?.['text-field'], ['get', 'name']);
+  // Atlas convention: county names in spaced capitals.
+  assert.deepEqual(labelLayer.layout?.['text-field'], ['upcase', ['get', 'name']]);
   assert.deepEqual(labelLayer.layout?.['text-font'], ['Noto Sans Regular']);
 
   const lineIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_COUNTY_LINES_LAYER_ID);
@@ -735,10 +737,11 @@ test('the mark is a dot for site precision and a hollow ring for neighborhood or
   assert.equal(radius[3], 7, '14px ring');
   const fill = point.paint?.['circle-color'] as unknown[];
   assert.equal(fill[3], 'rgba(0,0,0,0)', 'the ring is hollow');
-  // The pin is copper with an ink ring; the ring is a copper stroke.
+  // The pin is copper with a ring opposite the plate (paper on the night atlas); the ring is a
+  // copper stroke.
   assert.equal(fill[2], brandPalette.copperPin);
   const stroke = point.paint?.['circle-stroke-color'] as unknown[];
-  assert.deepEqual([stroke[2], stroke[3]], [brandPalette.blackInk, brandPalette.copperPin]);
+  assert.deepEqual([stroke[2], stroke[3]], [brandPalette.archivePaper, brandPalette.copperPin]);
   // Only a site pin casts the contact shadow: the shadow layer is filtered to the dot shape.
   const shadow = layerById(style, EXPLORE_POINT_SHADOW_LAYER_ID) as LayerLike & {
     filter?: unknown;
@@ -748,7 +751,7 @@ test('the mark is a dot for site precision and a hollow ring for neighborhood or
   assert.ok(!JSON.stringify(point.paint).includes('kind'), 'kind is never encoded on the mark');
 });
 
-test('groups are copper discs in three sizes with an ink count, never a precision shape', () => {
+test('a place token is an invisible hit and collision layer the DOM labels print, never a precision shape', () => {
   for (const scheme of ['light', 'dark'] as const) {
     const source = buildExploreMapSource(listPublicEntities());
     const style = buildExploreMapStyle({
@@ -757,17 +760,28 @@ test('groups are copper discs in three sizes with an ink count, never a precisio
       layerMode: 'off',
       colorScheme: scheme,
     });
+    // The circle is the hit target in three sizes; the copper chip and name are DOM
+    // (`place-labels.ts`), so nothing GL paints a token.
     const group = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
-    const plate = plateForScheme(scheme);
-    assert.equal(group.paint?.['circle-color'], plate.groupFill);
-    assert.equal(plate.groupFill, brandPalette.copperPin);
-    // Ink count on copper is 4.9:1.
-    assert.equal(plate.groupText, brandPalette.blackInk);
+    assert.equal(group.paint?.['circle-opacity'], 0);
     const steps = group.paint?.['circle-radius'] as unknown[];
     assert.equal(steps[0], 'step');
     assert.equal(steps.length, 7, 'three size steps');
-    const count = layerById(style, EXPLORE_CLUSTER_COUNT_LAYER_ID);
-    assert.equal(count.paint?.['text-color'], plate.groupText);
+    // A count always draws (overlap allowed), so every record stays counted at every zoom.
+    const count = layerById(style, EXPLORE_CLUSTER_COUNT_LAYER_ID) as LayerLike & {
+      layout?: Record<string, unknown>;
+    };
+    assert.equal(count.layout?.['text-allow-overlap'], true);
+    assert.equal(count.paint?.['text-opacity'], 0);
+    const name = layerById(style, EXPLORE_PLACE_NAME_LAYER_ID) as LayerLike & {
+      layout?: Record<string, unknown>;
+    };
+    assert.equal(name.paint?.['text-opacity'], 0);
+    assert.notEqual(
+      name.layout?.['text-allow-overlap'],
+      true,
+      'a name yields rather than overprints',
+    );
   }
 });
 
@@ -817,9 +831,9 @@ test('jurisdiction tags stay off the national view and give way to group counts'
       ids.indexOf(EXPLORE_UNCLUSTERED_POINT_LAYER_ID),
   );
   const count = layerById(style, EXPLORE_CLUSTER_COUNT_LAYER_ID);
-  // Counts always draw (legible), and reserve the group circle in the collision index.
+  // Counts always draw (legible), and reserve the DOM count chip in the collision index.
   assert.equal(count.layout?.['text-allow-overlap'], true);
-  assert.ok(Number(count.layout?.['text-padding']) >= 15);
+  assert.ok(Number(count.layout?.['text-padding']) >= 5);
   assert.notEqual(count.layout?.['text-ignore-placement'], true);
   assert.notEqual(tag.layout?.['text-allow-overlap'], true);
 });

@@ -1,7 +1,7 @@
 # Place map (Explore)
 
 **Status:** binding for how `/explore` groups records on the map, and for the home Door, which paints the same plate. Supersedes the pixel clustering the older `patterns-map-entity-encoding.md` described. That doc now covers point marks by precision only.
-**Code:** `packages/domain/src/map/place-groups.ts` (the rules, shared by web and mobile), `apps/web/src/lib/map-experience/place-map.ts` (the web adapter), `apps/web/src/app/map/explore-style.ts` (layers), `apps/web/src/components/map-stage/MapStage.tsx` (token tap), `apps/web/src/app/explore/hooks/use-place-scope.ts` (list scoping).
+**Code:** `packages/domain/src/map/place-groups.ts` (the rules, shared by web and mobile), `apps/web/src/lib/map-experience/place-map.ts` (the web adapter), `apps/web/src/app/map/explore-style.ts` (layers), `apps/web/src/components/map-stage/place-labels.ts` (the names in the house type), `apps/web/src/components/map-stage/MapStage.tsx` (token tap), `apps/web/src/app/explore/hooks/use-place-scope.ts` (list scoping).
 
 ---
 
@@ -67,12 +67,61 @@ Until the county geometry loads (it is fetched from zoom 4), the county level fa
 
 | Part | Encodes | Notes |
 |---|---|---|
-| Circle | A place holds records | Three radius steps by count (`CLUSTER_RADIUS_BY_COUNT`), no color by count, no zoom scaling |
-| Count | Record count | Abbreviated past 999 ("1.2k") |
-| Name | The county or city | Printed under the token. A state token prints none, because the state label already names it |
-| Summary | Count and precision mix in words | "Washington, DC. 352 records: 272 exact sites, 80 citywide or by neighborhood". Carried on the token, shown in the scoped list |
+| Count tab | Record count | A copper tab at the place's anchor, Geist Mono, ink on copper with a keyline in the plate's type color. Abbreviated past 999 ("1.2k"). Always drawn, so every record stays counted at every zoom |
+| Name | The place | Beside the tab, in Schibsted. States and counties in spaced capitals (a state prints its postal code below zoom 4.6, its name above), cities as written. Drawn when it fits; it yields to every count and to other names, and returns as the reader zooms in |
+| Size | Count step | Three type steps by count (12, 13.5 and 16px names; `placeTier`), the same steps as the hit circle (`CLUSTER_RADIUS_BY_COUNT`). Never color by count |
+| Hit circle | Where a tap opens the place | An invisible circle layer in three radii. The tab and name take no pointer events |
+| Summary | Count and precision mix in words | "Washington, DC, 352 records. Of these, 272 sit at exact sites and 80 are placed within a city." Carried on the token; the scoped list header reads the mix |
 
 The precision mix is always words, never color alone. Copper and ink only. No red or alarm hues.
+
+---
+
+## Visual
+
+**Status:** the visual world of the plate, binding for `/explore` and the home Door (both paint the one `MapStage` plate). Record embeds and story insets share the plate's colors and labels but have not had their own pass. Replaces the flat paper-on-ink plate with copper count discs, solid and hollow dots, the sand county hatch and grey county names.
+
+### Thesis
+
+The map is an atlas plate set in the app's own type. Named places are the marks, not anonymous counts: a reader sees "JEFFERSON 58" and "Washington 80" in the faces the record page uses, at sizes that rank places the way an atlas does. It refuses the category default of colored count bubbles on a generic basemap.
+
+### The plate
+
+| Role | Dark (night atlas) | Light (day atlas) |
+|---|---|---|
+| Lower 48 (`land`) | Charcoal `#38332d` | Surface paper `#fbf8f2` |
+| Land around it (`ocean` role, the background) | `#24201c` | `#efe8dc` |
+| Water | Ink `#0a0a0a` | Stone sand `#cbbfad` |
+| Waterlines | Paper hairlines at 24% | Ink hairlines at 30% |
+| State line, country line | `#7d7468`, `#a39885` | `#a2957c`, `#6d675f` |
+| Type | Paper `#f4efe5` on a charcoal halo | Ink `#2e2a24` on a paper halo |
+
+Values live in `mapPalettes` (`packages/ui/src/tokens/colors.ts`, mirrored as `--ds-map-*` in `tokens.css`) and `plateForScheme` (`dignity-style.ts`). The ΔL* contract in `map-contrast.test.ts` holds for both.
+
+- **Waterlines** are the plate's signature: two hairlines inside every sea coast, offset 2 and 5px, the outer one lighter, the engraved coast of a nineteenth-century atlas. They show in the national frame only, fading in from zoom 3.4 (where the whole continent and its arctic coast are in frame) and gone past zoom 5.5, where the vector coast becomes marsh and inlet detail and the lines clump. Lakes carry none, because the northern lake country would read as static. Offsets stay under the tiles' 8px render buffer so no line surfaces on a tile seam.
+- **County names** under the tokens are spaced capitals in the plate's quiet label color, the atlas convention, and yield to every token.
+- **Area precision** is a flat copper wash at 16% over a county (or state) that holds records known only by county (or state). It says "somewhere in here", never a point.
+- No gradients, glows, bevels, glass or 3D. The only shadow is the flat contact shadow under a site pin.
+
+### Marks
+
+- **Place token:** the copper count tab and the name (anatomy above). Hover inverts the tab (the plate's type color behind the land color) and underlines the name in copper; press settles the tab to 92%.
+- **Site pin:** a copper pin head with a ring opposite the plate (paper on charcoal, ink on paper), a flat contact shadow, and, from zoom 12, the record's name beside it in Schibsted: the record page's pin and name, on the street. A city-precision record stays an open copper ring and is never named as a spot.
+- **Selection:** the pin grows 1.6x in its own shape and the paper name flag (`selection-flag.ts`) names it; its plate name steps aside so the name prints once.
+
+### How the type gets onto a WebGL map
+
+Map glyphs cannot set Schibsted or Geist Mono, so the names are DOM (`components/map-stage/place-labels.ts`). MapLibre still does the cartography: the count, name and site-name symbol layers are invisible and only place their text. Every frame the DOM layer prints exactly the symbols MapLibre placed, at the same anchor. Collision, the always-drawn count, hit testing and the place tap all stay on the map layers, so the labels take no pointer event and the canvas behaves as before. Counts sit above names in the style, so in MapLibre's top-down placement every count claims its tab before any name is placed.
+
+### Motion
+
+- A token tap eases the camera into the place's frame (420ms, never short of the next level) and scopes the list. The column then names the place the way the plate does: the level in a copper tab, the place in the display face, the precision mix in one plain sentence.
+- Labels fade in on the duration tokens as places regroup by zoom; reduced motion collapses them to a cut.
+
+### Known limits
+
+- A name that would touch a neighbor's count tab is not printed at that zoom. Dense metros name their largest places first and the rest on zoom.
+- Over satellite imagery the DOM labels keep the flat plate's halo; they have not had the imagery pass the GL labels have (`plateOverImagery`).
 
 ---
 
@@ -97,7 +146,7 @@ City-scale records do not spread. They stay counted in their city token, because
 
 The scoped list is the accessible path. Every token on the map has an equivalent in the list: select the place and the list holds its records, each a focusable row with its own precision in words. The canvas itself still has no keyboard path to individual tokens; that is an open item below.
 
-Color is never the only signal. Token counts and names are text, the precision mix is text, and site dots keep their dot (site) versus ring (area) shapes.
+Color is never the only signal. Token counts and names are text, the precision mix is text, and site dots keep their dot (site) versus ring (area) shapes. The DOM labels are `aria-hidden`: they echo the canvas, and the scoped list stays the accessible path.
 
 ---
 

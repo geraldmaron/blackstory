@@ -7,7 +7,11 @@
  * `@repo/ui`'s brand palette). This file introduces no new hues, so the dignity rule
  * (no red violence markers, no crime-heat) holds at the render layer, not only in tokens.
  */
-import type { ExpressionSpecification, StyleSpecification } from 'maplibre-gl';
+import type {
+  ExpressionSpecification,
+  LineLayerSpecification,
+  StyleSpecification,
+} from 'maplibre-gl';
 import { brandPalette } from '@repo/ui';
 import {
   DENSITY_TIER_FILL,
@@ -94,7 +98,8 @@ import {
   EXPLORE_PLACE_LEADER_LAYER_ID,
   EXPLORE_PLACE_LEADERS_SOURCE_ID,
   EXPLORE_PLACE_NAME_LAYER_ID,
-  JURISDICTION_HATCH_IMAGE_ID,
+  EXPLORE_SITE_NAME_LAYER_ID,
+  PLATE_WATERLINE_LAYER_IDS,
 } from './explore-layer-ids';
 import {
   COUNTY_LABELS_MIN_ZOOM,
@@ -156,7 +161,8 @@ export {
   EXPLORE_PLACE_LEADER_LAYER_ID,
   EXPLORE_PLACE_LEADERS_SOURCE_ID,
   EXPLORE_PLACE_NAME_LAYER_ID,
-  JURISDICTION_HATCH_IMAGE_ID,
+  EXPLORE_SITE_NAME_LAYER_ID,
+  PLATE_WATERLINE_LAYER_IDS,
 } from './explore-layer-ids';
 /**
  * OpenMapTiles `transportation.class` width ladder — motorway heaviest down through residential
@@ -234,8 +240,8 @@ function streetFillWidthExpression(): ExpressionSpecification {
 
 /** Record mark opacity. Marks are opaque: precision is carried by shape, never by fading. */
 export const ENTITY_POINT_FILL_OPACITY = 1;
-/** Group circle opacity. Opaque paper, so a group reads as a single counted object. */
-export const ENTITY_CLUSTER_OPACITY = 1;
+/** Group circle opacity. Zero: the circle is the token's hit target; the DOM chip is what reads. */
+export const ENTITY_CLUSTER_OPACITY = 0;
 
 /**
  * Opaque plate fills — memorial names live as a MapLibre symbol layer in the
@@ -349,26 +355,87 @@ function byMark(dot: unknown, ring: unknown): ExpressionSpecification {
   return ['case', markIs('dot'), dot, ring] as unknown as ExpressionSpecification;
 }
 
-/** The sand ring around a group: decoration only, it encodes nothing. */
-const GROUP_RING_PX = 3;
-
 /** The resting mark radius by shape, for the selection ease (`setSelectedEntityFilter`). */
 export function markRadiusExpression(scale = 1): ExpressionSpecification {
   return byMark(PIN_RADIUS_PX * scale, RING_RADIUS_PX * scale);
 }
 
-/** The state hatch stops at county scale. */
+/** The area tint stops at county scale. */
 const HATCH_MAX_ZOOM = 9;
+/** A held area is a flat copper wash, light enough that the waterlines and type stay on top. */
+const AREA_TINT_OPACITY = 0.16;
+
+/**
+ * Atlas waterlines: two hairlines inside every sea coast, offset in pixels, the outer one lighter. Offsets stay
+ * under the vector tiles' 8px render buffer so a line never surfaces along a tile seam.
+ */
+const WATERLINES = [
+  { offset: 2, opacity: 1 },
+  { offset: 5, opacity: 0.7 },
+] as const;
+
+/** Below this zoom the whole continent is in frame and the arctic coast would read as static. */
+const WATERLINE_MIN_ZOOM = 3.4;
+
+/** Waterlines belong to the generalized coast of the national frame. Past this zoom
+ * the coast is marsh and inlet detail, where offset lines clump into bright static. */
+const WATERLINE_MAX_ZOOM = 5.5;
+
+/** Past this zoom a state token prints its name; below it, its postal code (national frame). */
+export const PLACE_STATE_NAME_MIN_ZOOM = 4.6;
+
+/**
+ * The text a place token prints, atlas convention: states and counties in capitals, cities as
+ * written. The DOM label (`place-labels.ts`) prints the same string in the house face; this one only
+ * sizes the collision box.
+ */
+const PLACE_NAME_TEXT = [
+  'step',
+  ['zoom'],
+  [
+    'case',
+    ['==', ['get', 'level'], 'state'],
+    ['get', 'postal'],
+    ['==', ['get', 'level'], 'county'],
+    ['upcase', ['get', 'mapName']],
+    ['get', 'mapName'],
+  ],
+  PLACE_STATE_NAME_MIN_ZOOM,
+  ['case', ['==', ['get', 'level'], 'city'], ['get', 'mapName'], ['upcase', ['get', 'mapName']]],
+] as unknown as ExpressionSpecification;
+
+/** Name size by count step, in px: bigger places, bigger letters. Mirrors `place-labels.css`. */
+const PLACE_NAME_SIZE = [
+  'match',
+  ['get', 'tier'],
+  2,
+  16,
+  1,
+  13.5,
+  12,
+] as unknown as ExpressionSpecification;
+
+/** The name starts past the count chip: half the chip (6px pad + 7px per digit) plus a 6px gap. */
+const PLACE_NAME_OFFSET = [
+  'match',
+  ['length', ['get', 'point_count_abbreviated']],
+  1,
+  ['literal', [1.1, 0]],
+  2,
+  ['literal', [1.35, 0]],
+  3,
+  ['literal', [1.6, 0]],
+  ['literal', [1.85, 0]],
+] as unknown as ExpressionSpecification;
 
 /** Jurisdiction tags draw from regional zoom up, never at national scale. */
 export const JURISDICTION_TAG_MIN_ZOOM = 5.5;
 
 /**
- * Collision padding around a group's count, in pixels: enough to cover the largest group circle
- * (`CLUSTER_RADIUS_BY_COUNT`) around an 11px count. `text-padding` cannot vary by feature, so
- * every group reserves the largest circle's box.
+ * Collision padding around a token's count, in pixels: enough to cover its DOM count chip
+ * (`place-labels.css`, 22px tall) around a 12px count, so no name prints across a chip.
  */
-const GROUP_COLLISION_PADDING_PX = (CLUSTER_RADIUS_BY_COUNT.at(-1)?.[1] ?? 20) - 4;
+const GROUP_COLLISION_PADDING_PX = 6;
 
 /**
  * Draws a feature only inside its `[minZoom, maxZoom)` band: place tokens per level, site records
@@ -491,7 +558,7 @@ function countyHatchOpacityExpression(keys: readonly string[]): ExpressionSpecif
     'match',
     ['concat', ['get', 'stateFips'], ['get', 'countyFips']],
     [...keys],
-    0.7,
+    AREA_TINT_OPACITY,
     0,
   ] as unknown as ExpressionSpecification;
 }
@@ -503,7 +570,7 @@ function hatchOpacityExpression(postalCodes: readonly string[]): ExpressionSpeci
     'match',
     ['get', 'postalCode'],
     [...postalCodes],
-    0.7,
+    AREA_TINT_OPACITY,
     0,
   ] as unknown as ExpressionSpecification;
 }
@@ -754,7 +821,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         minzoom: JURISDICTION_TAG_MIN_ZOOM,
         maxzoom: HATCH_MAX_ZOOM,
         paint: {
-          'fill-pattern': JURISDICTION_HATCH_IMAGE_ID,
+          'fill-color': plate.areaTint,
           'fill-opacity': hatchOpacityExpression(hatchedStates),
           'fill-opacity-transition': { duration: 0 },
         },
@@ -768,7 +835,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         minzoom: JURISDICTION_TAG_MIN_ZOOM,
         maxzoom: HATCH_MAX_ZOOM,
         paint: {
-          'fill-pattern': JURISDICTION_HATCH_IMAGE_ID,
+          'fill-color': plate.areaTint,
           'fill-opacity': countyHatchOpacityExpression(input.hatchedCountyKeys ?? []),
           'fill-opacity-transition': { duration: 0 },
         },
@@ -786,6 +853,32 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         layout: { visibility: satellite ? 'none' : 'visible' },
         paint: { 'fill-color': plate.water },
       },
+      /* Waterlines, the engraved atlas signature: hairlines inside every shore, offset into the
+         water (a polygon ring's right-hand side is its inside) and stepping lighter outward. */
+      ...WATERLINES.map(({ offset, opacity }, index): LineLayerSpecification => ({
+        id: PLATE_WATERLINE_LAYER_IDS[index]!,
+        type: 'line',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'water',
+        // Sea coasts only: the thousands of small northern lakes would read as static.
+        filter: ['==', ['get', 'class'], 'ocean'],
+        maxzoom: WATERLINE_MAX_ZOOM,
+        layout: { visibility: satellite ? 'none' : 'visible', 'line-join': 'round' },
+        paint: {
+          'line-color': plate.waterline,
+          'line-width': 0.6,
+          'line-offset': offset,
+          'line-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            WATERLINE_MIN_ZOOM,
+            0,
+            WATERLINE_MIN_ZOOM + 0.6,
+            opacity,
+          ] as unknown as ExpressionSpecification,
+        },
+      })),
       {
         // Country borders. Solid and heavier than the state hairline, so the continent reads
         // as a continent rather than as a ragged edge where the state data stops.
@@ -861,16 +954,18 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
             ['linear'],
             ['zoom'],
             5,
-            10,
+            9.5,
             11,
-            14,
+            12.5,
           ] as unknown as ExpressionSpecification,
           'text-max-width': 8,
           'text-anchor': 'top',
           'text-offset': [0, 0.35],
         },
         paint: {
-          'text-color': plate.placeLabelHi,
+          // The quiet label step: towns the archive holds nothing in orient the reader; the
+          // archive's own places (`place-labels.ts`) lead in the house face.
+          'text-color': plate.placeLabel,
           'text-halo-color': plate.placeLabelHalo,
           'text-halo-width': haloWidth(1.4),
         },
@@ -1013,11 +1108,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
         minzoom: COUNTY_LABELS_MIN_ZOOM,
         layout: {
-          'text-field': ['get', 'name'],
+          'text-field': ['upcase', ['get', 'name']] as unknown as ExpressionSpecification,
           'text-font': ['Noto Sans Regular'],
-          'text-size': 10,
+          'text-size': 9,
           'text-max-width': 8,
-          'text-letter-spacing': 0.02,
+          'text-letter-spacing': 0.24,
         },
         paint: {
           'text-color': plate.countyLabel,
@@ -1248,6 +1343,52 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        // The place a token counts, named beside its count chip. Under the counts, so in MapLibre's
+        // top-down placement every count claims its chip first. Yields to counts and other names
+        // rather than overprinting. Invisible: it only places the name; the DOM label
+        // (`place-labels.ts`) sets the placed ones in the house face.
+        id: EXPLORE_PLACE_NAME_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        filter: ['all', ['has', 'point_count'], ['has', 'mapName'], IN_ZOOM_BAND],
+        layout: {
+          'text-field': PLACE_NAME_TEXT,
+          'text-size': PLACE_NAME_SIZE,
+          'text-font': ['Noto Sans Bold'],
+          'text-anchor': 'left',
+          'text-offset': PLACE_NAME_OFFSET,
+          'text-letter-spacing': [
+            'match',
+            ['get', 'level'],
+            'city',
+            0,
+            0.08,
+          ] as unknown as ExpressionSpecification,
+          'text-max-width': 40,
+          'text-padding': 3,
+        },
+        paint: { 'text-color': plate.placeLabelHi, 'text-opacity': 0 },
+      },
+      {
+        // A site record's name beside its pin, from street scale: the record page's own pin and
+        // name, on the plate. Invisible, like the place names: the DOM label sets it.
+        id: EXPLORE_SITE_NAME_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        minzoom: SITE_MIN_ZOOM + 1,
+        filter: ['all', ['!', ['has', 'point_count']], markIs('dot'), IN_ZOOM_BAND],
+        layout: {
+          'text-field': ['get', 'displayName'],
+          'text-size': 12.5,
+          'text-font': ['Noto Sans Bold'],
+          'text-anchor': 'left',
+          'text-offset': [0.9, 0],
+          'text-max-width': 14,
+          'text-padding': 2,
+        },
+        paint: { 'text-color': plate.placeLabelHi, 'text-opacity': 0 },
+      },
+      {
         id: EXPLORE_CLUSTER_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
@@ -1255,11 +1396,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
+          // The hit target only: the token itself is the DOM count chip and name.
           'circle-radius': groupRadiusExpression(),
-          'circle-color': plate.groupFill,
+          'circle-color': plate.markInk,
           'circle-opacity': ENTITY_CLUSTER_OPACITY,
-          'circle-stroke-width': GROUP_RING_PX,
-          'circle-stroke-color': plate.groupStroke,
+          'circle-stroke-width': 0,
         },
       },
       {
@@ -1271,34 +1412,12 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-field': ['get', 'point_count_abbreviated'],
           'text-size': 12,
           'text-font': ['Noto Sans Bold'],
-          // A count always draws, and claims the whole group circle in the collision index (the
-          // padding reaches the largest circle's edge), so no tag or label prints across a group.
+          // A count always draws, and claims its chip in the collision index, so no tag or name
+          // prints across a token. Invisible: the DOM chip (`place-labels.ts`) is what reads.
           'text-allow-overlap': true,
           'text-padding': GROUP_COLLISION_PADDING_PX,
         },
-        paint: { 'text-color': plate.groupText },
-      },
-      {
-        // The county or city a token counts, under it. A state token prints nothing: the state
-        // label already names it. Yields to counts and other names rather than overprinting.
-        id: EXPLORE_PLACE_NAME_LAYER_ID,
-        type: 'symbol',
-        source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['all', ['has', 'point_count'], ['!=', ['get', 'label'], ''], IN_ZOOM_BAND],
-        layout: {
-          'text-field': ['get', 'label'],
-          'text-size': 11,
-          'text-font': ['Noto Sans Bold'],
-          'text-anchor': 'top',
-          'text-offset': [0, 1.6],
-          'text-max-width': 12,
-          'text-padding': 2,
-        },
-        paint: {
-          'text-color': plate.tagText,
-          'text-halo-color': plate.placeLabelHalo,
-          'text-halo-width': haloWidth(2),
-        },
+        paint: { 'text-color': plate.markInk, 'text-opacity': 0 },
       },
       {
         id: EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
@@ -1321,10 +1440,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: ['all', ['has', 'point_count'], IN_ZOOM_BAND],
         paint: {
           'circle-radius': groupRadiusExpression(),
-          'circle-color': plate.groupFill,
+          'circle-color': plate.markInk,
           'circle-opacity': 0,
-          'circle-stroke-width': GROUP_RING_PX,
-          'circle-stroke-color': plate.groupStroke,
+          'circle-stroke-width': 0,
         },
       },
       {
@@ -1338,7 +1456,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-font': ['Noto Sans Bold'],
           'text-allow-overlap': true,
         },
-        paint: { 'text-color': plate.groupText, 'text-opacity': 0 },
+        paint: { 'text-color': plate.markInk, 'text-opacity': 0 },
       },
       {
         id: EXPLORE_SELECTED_TAG_LAYER_ID,

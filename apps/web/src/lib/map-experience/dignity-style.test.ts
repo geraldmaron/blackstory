@@ -96,9 +96,9 @@ function contrastRatio(fg: string, bg: string): number {
 test('history relationship edge plate colors meet WCAG 1.4.11 (≥3:1) on both themes', () => {
   const light = plateForScheme('light');
   const dark = plateForScheme('dark');
-  // The chart is paper in both themes, so both draw edges in the copper text step.
+  // Each theme draws edges in its own copper text step: paper by day, charcoal by night.
   assert.equal(light.historyEdge, brandPalette.copperTextLight);
-  assert.equal(dark.historyEdge, brandPalette.copperTextLight);
+  assert.equal(dark.historyEdge, brandPalette.copperDark);
   assert.notEqual(light.historyEdge, DIGNITY_PALETTE.pointHalo);
   assert.notEqual(dark.historyEdge, DIGNITY_PALETTE.pointHalo);
   assert.ok(

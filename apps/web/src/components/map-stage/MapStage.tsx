@@ -117,8 +117,8 @@ import {
   type ExploreSearchCenterMarkerInput,
 } from '../../lib/map-experience/explore-search-marker';
 import { readDocumentColorScheme } from './color-scheme';
-import { bindHatchImage } from './hatch-image';
 import { buildSelectionFlagElement } from './selection-flag';
+import { bindPlaceLabels, type PlaceLabelsHandle } from './place-labels';
 import { dropInIncomingPins } from './selection-sync';
 import { EXPLORE_GHOSTS_SOURCE_ID } from '../../app/map/explore-layer-ids';
 import { recordMarkFor } from '../../lib/map-experience/geo-precision';
@@ -665,9 +665,12 @@ export function MapStageProvider({
 
   /** The paper name flag on the selected pin (`selection-flag.ts`). */
   const selectionFlagRef = useRef<{ readonly id: string; readonly marker: Marker } | null>(null);
+  /** Place tokens and site names in the house type (`place-labels.ts`). */
+  const placeLabelsRef = useRef<PlaceLabelsHandle | null>(null);
   const syncSelectionFlag = useCallback(
     (map: MapLibreMap, entityId: string | undefined) => {
       const maplibregl = maplibreglRef.current;
+      placeLabelsRef.current?.setSelected(entityId);
       if (selectionFlagRef.current?.id === entityId) return;
       selectionFlagRef.current?.marker.remove();
       selectionFlagRef.current = null;
@@ -1393,7 +1396,7 @@ export function MapStageProvider({
         });
 
         mapRef.current = map;
-        bindHatchImage(map);
+        placeLabelsRef.current = bindPlaceLabels(map);
         if (process.env.NODE_ENV !== 'production') {
           // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
@@ -1603,6 +1606,7 @@ export function MapStageProvider({
       activeMap.on('mousemove', (event: MapMouseEvent) => {
         const hit = pointerHitAt(event.point);
         activeMap.getCanvas().style.cursor = hit ? 'pointer' : '';
+        placeLabelsRef.current?.setHovered(hit?.kind === 'place' ? hit.placeKey : undefined);
         const lifted = hit?.kind === 'entity' ? hit.entityId : undefined;
         if (lifted !== liftedPin) {
           liftedPin = lifted;
@@ -1614,6 +1618,7 @@ export function MapStageProvider({
       });
       activeMap.getCanvas().addEventListener('mouseleave', () => {
         hoverTo(null);
+        placeLabelsRef.current?.setHovered(undefined);
         liftedPin = undefined;
         setHoveredEntityFilter(activeMap, undefined);
       });
@@ -1662,6 +1667,8 @@ export function MapStageProvider({
       rotateGesturesRef.current.twist?.detach();
       rotateGesturesRef.current.pageZoom?.detach();
       rotateGesturesRef.current = { shift: null, wheel: null, twist: null, pageZoom: null };
+      placeLabelsRef.current?.dispose();
+      placeLabelsRef.current = null;
       mapRef.current?.remove();
       mapRef.current = null;
       maplibreglRef.current = null;

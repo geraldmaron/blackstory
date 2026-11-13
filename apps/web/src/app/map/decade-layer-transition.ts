@@ -21,12 +21,8 @@
  * never snap. Reduced motion collapses to a cut.
  */
 import type { Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
-import { ENTITY_CLUSTER_OPACITY, ENTITY_POINT_FILL_OPACITY } from './explore-style';
+import { ENTITY_POINT_FILL_OPACITY } from './explore-style';
 import {
-  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
@@ -71,17 +67,6 @@ export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[]
     restOpacity: 0.9,
   },
   { layerId: EXPLORE_POINT_SHADOW_LAYER_ID, paintKey: 'circle-opacity', restOpacity: 1 },
-  {
-    layerId: EXPLORE_CLUSTER_LAYER_ID,
-    paintKey: 'circle-opacity',
-    restOpacity: ENTITY_CLUSTER_OPACITY,
-  },
-  {
-    layerId: EXPLORE_CLUSTER_LAYER_ID,
-    paintKey: 'circle-stroke-opacity',
-    restOpacity: ENTITY_CLUSTER_OPACITY,
-  },
-  { layerId: EXPLORE_CLUSTER_COUNT_LAYER_ID, paintKey: 'text-opacity', restOpacity: 1 },
 ];
 
 /** Incoming-buffer channels — fade from 0 toward rest; stay at 0 when idle. */
@@ -98,17 +83,6 @@ export const DECADE_CROSSFADE_IN_TARGETS: readonly DecadeCrossfadePaintTarget[] 
     restOpacity: 0.9,
   },
   { layerId: EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID, paintKey: 'circle-opacity', restOpacity: 1 },
-  {
-    layerId: EXPLORE_CLUSTER_INCOMING_LAYER_ID,
-    paintKey: 'circle-opacity',
-    restOpacity: ENTITY_CLUSTER_OPACITY,
-  },
-  {
-    layerId: EXPLORE_CLUSTER_INCOMING_LAYER_ID,
-    paintKey: 'circle-stroke-opacity',
-    restOpacity: ENTITY_CLUSTER_OPACITY,
-  },
-  { layerId: EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID, paintKey: 'text-opacity', restOpacity: 1 },
 ];
 
 const ALL_DECADE_MORPH_TARGETS = [

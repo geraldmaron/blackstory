@@ -160,64 +160,59 @@ export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
 export const LIGHT_PLATE_OCEAN = '#FFFFFF';
 
 /**
- * Plate color for a scheme: a PAPER chart laid on the ink table, in both themes (art direction v2).
+ * Plate color for a scheme: an atlas plate in the app's own materials (`docs/ui/patterns-place-map.md`,
+ * "Visual").
  *
- * Dark theme: the lower 48 (`land`) is one deeper paper step than its neighbors (`ocean`, the
- * background, Surface paper), so the country reads; water and the surround are ink; state lines
- * are ink hairlines. Light theme: the table is paper already, so the lower 48 lifts to Surface
- * white on an Archive Paper surround and the water is a sand tint. Alaska, Hawaii and Puerto Rico
- * take the neighbors' step (the `EXPLORE_US_LAND_LAYER_ID` filter).
+ * Dark theme is the night atlas: the lower 48 (`land`) is a charcoal plate, the land around it
+ * (`ocean`, the background: Canada, Mexico, the islands) one step darker, the water ink black with
+ * paper waterlines along every coast, and the type paper. Light theme is the same atlas by day:
+ * Surface paper land on an Archive Paper surround, stone-sand water, ink waterlines and ink type.
  *
- * `land`, `water`, `stateBounds`, labels and halo come from `mapPalettes` in `@repo/ui` (the
- * source of truth, ΔL* contract in `map-contrast.test.ts`). The marks are copper in both themes:
- * a copper pin holds 3:1 on every land step (`contrast.test.ts`), and every pin also carries an
- * ink ring, so its edge never depends on the copper alone.
+ * `land`, `water`, boundaries, labels and halo come from `mapPalettes` in `@repo/ui` (the source of
+ * truth, ΔL* contract in `map-contrast.test.ts`). Copper is kept for the archive's own marks: place
+ * counts, site pins and the selection. A copper pin holds 3:1 on both land steps, and every pin also
+ * carries a ring in the opposite value, so its edge never depends on the copper alone.
  */
 export function plateForScheme(scheme: MapColorScheme) {
   const palette = mapPalettes[scheme];
   const light = scheme === 'light';
   return {
-    /**
-     * The background layer: the land around the lower 48 (Canada, Mexico, Alaska, the islands).
-     * The tiles supply the water over it. Archive Paper on light, Surface paper on dark.
-     */
-    ocean: light ? brandPalette.archivePaper : brandPalette.surface,
-    /** The lower 48 (the token's land): Surface white on light, one deeper paper step on dark. */
+    /** The background layer: the land around the lower 48. The tiles supply the water over it. */
+    ocean: light ? '#efe8dc' : '#24201c',
     land: palette.land,
     water: palette.water,
+    /** Waterlines: offset hairlines inside every coast, the engraved atlas signature. */
+    waterline: light ? 'rgba(10, 10, 10, 0.3)' : 'rgba(244, 239, 229, 0.24)',
     countryBounds: palette.line2,
     road: palette.road,
     placeLabel: palette.label,
     placeLabelHi: palette.labelHi,
     placeLabelHalo: palette.halo,
-    /** The selected state's abbreviation, beside its copper outline: copper text on paper. */
-    selectedStateLabel: brandPalette.copperTextLight,
-    selected: DIGNITY_PALETTE.selectedDark,
+    /** The selected state's abbreviation, beside its copper outline. */
+    selectedStateLabel: light ? brandPalette.copperTextLight : brandPalette.copperDark,
+    selected: light ? DIGNITY_PALETTE.selectedDark : DIGNITY_PALETTE.selected,
     densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
     densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
-    street: DIGNITY_PALETTE.streetLight,
-    streetLabel: DIGNITY_PALETTE.streetLabelLight,
-    /** Single records: a copper pin head (site) or an open copper ring (city), ink-ringed. */
+    street: light ? DIGNITY_PALETTE.streetLight : DIGNITY_PALETTE.streetDark,
+    streetLabel: light ? DIGNITY_PALETTE.streetLabelLight : DIGNITY_PALETTE.streetLabelDark,
+    /** Single records: a copper pin head (site) or an open copper ring (city). */
     markInk: brandPalette.copperPin,
-    markRing: brandPalette.blackInk,
+    /** The pin's ring sits opposite the plate: ink on paper, paper on charcoal. */
+    markRing: light ? brandPalette.blackInk : brandPalette.archivePaper,
     /** The flat contact shadow under a pin: ink, offset, no blur. */
-    markShadow: 'rgba(10, 10, 10, 0.28)',
-    /** Groups: a copper disc with an ink count and a sand outer ring (decoration only). */
-    groupFill: brandPalette.copperPin,
-    groupStroke: brandPalette.pageSand,
-    groupText: brandPalette.blackInk,
-    /** Jurisdiction tags: ink on paper, at the state's label point. */
-    tagText: brandPalette.blackInk,
-    /** Area precision is shown as an area: a sand hatch over the jurisdiction. */
-    hatch: brandPalette.pageSand,
+    markShadow: light ? 'rgba(10, 10, 10, 0.28)' : 'rgba(0, 0, 0, 0.55)',
+    /** Jurisdiction tags (the ungrouped embed): the plate's own type color. */
+    tagText: palette.labelHi,
+    /** Area precision is shown as an area: a flat copper tint over the jurisdiction. */
+    areaTint: brandPalette.copperPin,
     /** Pins outside the brushed decades: a sand ghost. */
     ghost: brandPalette.pageSand,
-    selectedHalo: brandPalette.archivePaper,
+    selectedHalo: light ? brandPalette.archivePaper : brandPalette.blackInk,
     stateBounds: palette.line,
-    countyLine: brandPalette.stone,
-    countyLabel: brandPalette.stone,
+    countyLine: light ? brandPalette.stone : '#8a8172',
+    countyLabel: palette.label,
     countyLabelHalo: palette.halo,
-    historyEdge: brandPalette.copperTextLight,
+    historyEdge: light ? brandPalette.copperTextLight : brandPalette.copperDark,
     historyEdgeSelected: brandPalette.copperPin,
   } as const;
 }

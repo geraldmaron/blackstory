@@ -123,7 +123,7 @@ export type MapPalette = {
 
 export const lightMap: MapPalette = {
   land: '#fbf8f2',
-  water: '#e2b89a',
+  water: '#cbbfad',
   line: '#a2957c',
   line2: '#6d675f',
   road: '#ebe4d6',
@@ -132,15 +132,16 @@ export const lightMap: MapPalette = {
   halo: '#fbf8f2',
 };
 
+/** Night atlas: a charcoal plate on ink water, paper type. `docs/ui/patterns-place-map.md`. */
 export const darkMap: MapPalette = {
-  land: '#ebe3d3',
+  land: '#38332d',
   water: '#0a0a0a',
-  line: '#6d675f',
-  line2: '#2a2622',
-  road: '#ddd4c3',
-  label: '#6d675f',
-  labelHi: '#2e2a24',
-  halo: '#f4efe5',
+  line: '#7d7468',
+  line2: '#a39885',
+  road: '#4a443c',
+  label: '#b8ad9b',
+  labelHi: '#f4efe5',
+  halo: '#38332d',
 };
 
 export const mapPalettes = {

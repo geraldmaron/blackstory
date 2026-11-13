@@ -167,6 +167,55 @@
   white-space: nowrap;
 }
 
+/* The place the map scoped the list to, named the way the plate names it: the level in a copper
+   tab, the place in the display face, the precision mix in a plain sentence under it. */
+.ds-xcol[data-view='filters'] .ds-xcol__place {
+  display: none;
+}
+
+.ds-xcol__place {
+  flex: none;
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-xcol__place-name {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.ds-xcol__place-level {
+  flex: none;
+  padding: 0.2em 0.55em;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-accent-graphic);
+  color: var(--ds-fixed-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.ds-xcol__place-mix {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
 /* Loading: rule-separated placeholder rows in the list's own geometry. */
 .ds-xcol__loading {
   display: grid;

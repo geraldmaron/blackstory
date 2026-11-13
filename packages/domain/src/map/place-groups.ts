@@ -386,24 +386,36 @@ function plural(count: number, one: string, many: string): string {
   return `${count.toLocaleString('en-US')} ${count === 1 ? one : many}`;
 }
 
-/** The precision mix in words, finest first: "180 exact sites, 110 citywide, 22 county-wide". */
+/**
+ * The precision mix as one plain sentence fragment, finest first: "180 sit at exact sites, 110 are
+ * placed within a city, and 22 are known only by county".
+ */
 export function breakdownInWords(breakdown: PlaceBreakdown): string {
-  return [
-    breakdown.site > 0 ? plural(breakdown.site, 'exact site', 'exact sites') : '',
-    breakdown.area > 0
-      ? `${breakdown.area.toLocaleString('en-US')} citywide or by neighborhood`
+  const n = (count: number) => count.toLocaleString('en-US');
+  const parts = [
+    breakdown.site > 0
+      ? breakdown.site === 1
+        ? '1 sits at an exact site'
+        : `${n(breakdown.site)} sit at exact sites`
       : '',
-    breakdown.county > 0 ? `${breakdown.county.toLocaleString('en-US')} county-wide` : '',
-    breakdown.state > 0 ? `${breakdown.state.toLocaleString('en-US')} statewide` : '',
-  ]
-    .filter(Boolean)
-    .join(', ');
+    breakdown.area > 0
+      ? `${n(breakdown.area)} ${breakdown.area === 1 ? 'is' : 'are'} placed within a city`
+      : '',
+    breakdown.county > 0
+      ? `${n(breakdown.county)} ${breakdown.county === 1 ? 'is' : 'are'} known only by county`
+      : '',
+    breakdown.state > 0
+      ? `${n(breakdown.state)} ${breakdown.state === 1 ? 'is' : 'are'} known only by state`
+      : '',
+  ].filter(Boolean);
+  if (parts.length < 3) return parts.join(' and ');
+  return `${parts.slice(0, -1).join(', ')}, and ${parts.at(-1)}`;
 }
 
 /** The full token sentence a screen reader and the list header read. */
 export function placeSummary(name: string, breakdown: PlaceBreakdown): string {
   const total = breakdown.site + breakdown.area + breakdown.county + breakdown.state;
-  return `${name}. ${plural(total, 'record', 'records')}: ${breakdownInWords(breakdown)}`;
+  return `${name}, ${plural(total, 'record', 'records')}. Of these, ${breakdownInWords(breakdown)}.`;
 }
 
 /** The `?place=` value shape: a level prefix and a slug. */

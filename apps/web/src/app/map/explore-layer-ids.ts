@@ -46,12 +46,14 @@ export const EXPLORE_GHOSTS_SOURCE_ID = 'explore-ghosts';
 export const EXPLORE_GHOST_POINT_LAYER_ID = 'explore-ghost-point';
 /** The lower-48 one paper step off its neighbors, so the country reads on the chart. */
 export const EXPLORE_US_LAND_LAYER_ID = 'plate-us-land';
-/** Area precision shown as an area: a sand hatch over states holding state-precision records. */
+/** Area precision shown as an area: a flat copper tint over states holding state-precision records. */
 export const EXPLORE_JURISDICTION_HATCH_LAYER_ID = 'explore-jurisdiction-hatch';
-/** The same hatch over a county holding county-precision records (`county-hatch.ts`). */
+/** The same tint over a county holding county-precision records (`county-hatch.ts`). */
 export const EXPLORE_COUNTY_HATCH_LAYER_ID = 'explore-jurisdiction-county-hatch';
-/** The hatch pattern image, added to the map at runtime (`hatch-image.ts`). */
-export const JURISDICTION_HATCH_IMAGE_ID = 'bs-sand-hatch';
+/** Atlas waterlines: offset hairlines inside every coast and lake shore, innermost first. */
+export const PLATE_WATERLINE_LAYER_IDS = ['plate-waterline-1', 'plate-waterline-2'] as const;
+/** Record names beside site pins: an invisible collision layer the DOM labels read (`place-labels.ts`). */
+export const EXPLORE_SITE_NAME_LAYER_ID = 'explore-site-name';
 /** The selected record: the same shape, 1.6x, copper with an ink ring. */
 export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
 /** County- and state-precision records, counted at the state's label point ("3 statewide"). */

@@ -115,16 +115,14 @@ test('shouldMorphDecadeDataPatch refuses morph when layerMode changes', () => {
   );
 });
 
-test('crossfade out targets cover pins, edges, and clusters — not density (color lerp)', () => {
+test('crossfade out targets cover pins and edges, not place tokens or density', () => {
   const keys = DECADE_CROSSFADE_OUT_TARGETS.map((target) => `${target.layerId}:${target.paintKey}`);
   assert.ok(!keys.some((key) => key.includes('state-density')));
   assert.ok(keys.some((key) => key.includes('history-edges') && key.endsWith('line-opacity')));
   assert.ok(keys.some((key) => key.includes('explore-point') && key.includes('circle-opacity')));
-  assert.ok(
-    keys.some(
-      (key) => key.includes(EXPLORE_CLUSTER_COUNT_LAYER_ID) && key.endsWith('text-opacity'),
-    ),
-  );
+  // Tokens are invisible GL layers the DOM labels print (`place-labels.ts`); fading them would
+  // paint the hit layers.
+  assert.ok(!keys.some((key) => key.includes(EXPLORE_CLUSTER_COUNT_LAYER_ID)));
   for (const target of DECADE_CROSSFADE_OUT_TARGETS) {
     assert.match(target.paintKey, /opacity/);
     assert.ok(target.restOpacity > 0);
@@ -135,7 +133,7 @@ test('crossfade in targets mirror the pin stack only (density uses feature-state
   const layerIds = new Set(DECADE_CROSSFADE_IN_TARGETS.map((target) => target.layerId));
   assert.ok(!layerIds.has('explore-state-density-fill-incoming'));
   assert.ok(layerIds.has(EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID));
-  assert.ok(layerIds.has(EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID));
+  assert.ok(!layerIds.has(EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID));
   for (const target of DECADE_CROSSFADE_IN_TARGETS) {
     assert.match(target.layerId, /incoming/);
     assert.match(target.paintKey, /opacity/);
@@ -144,8 +142,11 @@ test('crossfade in targets mirror the pin stack only (density uses feature-state
 
 test('isDecadeFadePaintChannel matches pin/edge dissolve channels only', () => {
   assert.equal(isDecadeFadePaintChannel(EXPLORE_STATE_DENSITY_LAYER_ID, 'fill-opacity'), false);
-  assert.equal(isDecadeFadePaintChannel(EXPLORE_CLUSTER_COUNT_LAYER_ID, 'text-opacity'), true);
-  assert.equal(isDecadeFadePaintChannel(EXPLORE_CLUSTER_COUNT_LAYER_ID, 'text-color'), false);
+  assert.equal(
+    isDecadeFadePaintChannel(EXPLORE_UNCLUSTERED_POINT_LAYER_ID, 'circle-opacity'),
+    true,
+  );
+  assert.equal(isDecadeFadePaintChannel(EXPLORE_CLUSTER_COUNT_LAYER_ID, 'text-opacity'), false);
 });
 
 test('decadeCrossfadeOpacities never empties the plate (out+in ≈ rest across the dissolve)', () => {

@@ -67,7 +67,7 @@ export function usePlaceScope(
   return { placeKey, setPlaceKey, scope };
 }
 
-/** "180 exact sites, 110 citywide or by neighborhood, 22 county-wide" for the scoped list. */
+/** "180 sit at exact sites, 110 are placed within a city, and 22 are known only by county". */
 export function scopedMixInWords(features: readonly ExploreMapFeature[]): string {
   const breakdown = { site: 0, area: 0, county: 0, state: 0 };
   for (const feature of features) breakdown[precisionBandFor(feature.properties.precision)] += 1;
