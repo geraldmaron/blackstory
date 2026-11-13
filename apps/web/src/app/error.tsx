@@ -6,9 +6,9 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Notice } from '@repo/ui';
+import { Notice, PageHeader } from '@repo/ui';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
-import { Room, ReadingEntry } from '../components/room';
+import { Room } from '../components/room';
 import './utility.css';
 
 void React;
@@ -27,11 +27,10 @@ export default function Error({
   const display = sanitizeClientErrorDisplay(error);
 
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/error"
+    <Room width="read">
+      <PageHeader
         title="Something went wrong"
-        lede="The public shell hit an unexpected error. You can retry or return home."
+        dek="The public shell hit an unexpected error. You can retry or return home."
       />
 
       <Notice tone="error" title={display.title}>

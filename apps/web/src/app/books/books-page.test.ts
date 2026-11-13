@@ -17,25 +17,25 @@ const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
 
 test('books index is the catalog room; /books/browse is a config redirect only', () => {
   assert.match(indexSource, /BooksBrowseSections/);
-  assert.match(indexSource, /<ReadingEntry/);
+  assert.match(indexSource, /<PageHeader/);
   assert.match(indexSource, /BooksCatalogPulse/);
+  assert.doesNotMatch(indexSource, /RoomStats/);
   assert.doesNotMatch(indexSource, /OrientationInstrument/);
   assert.doesNotMatch(indexSource, /how-it-works|BooksHubSections/);
   assert.doesNotMatch(indexSource, /EditionAtmosphereMosaic|BOOKS_EDITION_MOSAIC_SEED/);
 });
 
-test('books browse holds the door without shipping a finished Banned books walk room', () => {
-  assert.match(indexSource, /WalkOffRamp/);
-  // The crumb was hidden while it repeated a two-word title. The room now opens on a sentence,
-  // so `Rooms / Banned books` is the only place the noun appears above the fold.
-  assert.doesNotMatch(indexSource, /showCrumb=\{false\}/);
-  assert.match(indexSource, /The books someone asked to <em>remove<\/em>\./);
+test('books browse ends on the catalog, without the BlackStory off-ramp card', () => {
+  assert.doesNotMatch(indexSource, /WalkOffRamp/);
+  // The room opens on a sentence, so the crumb (Rooms) is where the room's parent appears.
+  assert.match(indexSource, /crumb=\{parentCrumb\('\/books'\)\}/);
+  assert.match(indexSource, /title="The books someone asked to remove"/);
   assert.doesNotMatch(indexSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
   assert.doesNotMatch(indexSource, /['"`]\/banned-books/);
   assert.doesNotMatch(indexSource, /Archive texture|Mosaic credits|ATMOSPHERE_ATTRIBUTION/);
   assert.doesNotMatch(indexSource, /Straight to the records|The Atlas answers where and when/);
   assert.doesNotMatch(indexSource, /\/explore/);
-  assert.match(detailSource, /WalkOffRamp/);
+  assert.doesNotMatch(detailSource, /WalkOffRamp/);
   assert.doesNotMatch(detailSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
 });
 
@@ -54,8 +54,8 @@ test('books detail page renders through the room kit, with no edition chrome lef
   assert.doesNotMatch(detailSource, /books-edition\.css/);
   assert.doesNotMatch(detailSource, /data-books-edition="v6"/);
   assert.match(detailSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
-  assert.match(detailSource, /<Room>/);
-  assert.match(detailSource, /<ReadingEntry/);
+  assert.match(detailSource, /<Room width="record">/);
+  assert.match(detailSource, /<PageHeader/);
   assert.doesNotMatch(detailSectionsSource, /books-panel-chrome/);
   // The route-owned box wrapper (`ds-books-edition__panel--<variant>`) is gone; the element
   // labels it left behind (`__panel-title`, `__panel-heading`) are content, not chrome, and stay.
@@ -111,7 +111,7 @@ test('the catalog room states the census limit and does not speak as an institut
   assert.doesNotMatch(indexSource, /\bWe could not\b/);
   assert.doesNotMatch(indexSource, /\bour side\b/);
   assert.match(browseSectionsSource, /BOOKS_ABOUT/);
-  assert.match(browseSectionsSource, /RoomJump/);
+  assert.doesNotMatch(browseSectionsSource, /RoomJump/);
   assert.match(browseSectionsSource, /id="read"/);
   assert.match(browseSectionsSource, /id="browse"/);
   assert.match(browseSectionsSource, /name="state"/);

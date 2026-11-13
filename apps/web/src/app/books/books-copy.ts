@@ -15,12 +15,6 @@ export const BOOKS_INTRO = {
   lede: 'Challenged and restricted titles tied to Black history and related reading. Each entry carries cited challenge reports and a path to buy or look up the book. Not a complete national census; status can change.',
 } as const;
 
-export const BOOKS_JUMP = [
-  { id: 'read', label: 'How to read this', icon: 'books' as const },
-  { id: 'browse', label: 'The catalog', icon: 'publication' as const },
-  { id: 'related', label: 'Keep going', icon: 'rooms' as const },
-] as const;
-
 export const BOOKS_CATALOG = {
   kicker: 'Catalog',
   title: 'Challenged titles',
@@ -40,24 +34,16 @@ export const BOOKS_READ_FACTS = [
   {
     title: 'Not a census',
     body: 'This is not every challenged title in the country, and status can change after the report an entry cites.',
-    icon: 'errata' as const,
   },
   {
     title: 'Cited reports',
     body: 'Each entry names the public reports it rests on. The report is the authority; this page is the finding aid.',
-    icon: 'evidence' as const,
   },
   {
     title: 'Bookshop links',
     body: 'Some titles link to Bookshop.org through an affiliate program. A purchase through one of those links pays BlackStory a commission. That relationship never decides which titles appear.',
-    icon: 'books' as const,
   },
 ] as const;
-
-export const BOOKS_RELATED = {
-  kicker: 'Next',
-  title: 'Keep going',
-} as const;
 
 export const BOOKS_DETAIL = {
   introKicker: 'Challenged book',

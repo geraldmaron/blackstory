@@ -6,22 +6,20 @@
  * stamps) use Geist Mono per the data register.
  */
 
-.ds-card {
+/* Surface: the one panel recipe. One bordered level per surface; inside it, rules. */
+.ds-surface {
   background: var(--ds-surface-raised);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  padding: var(--ds-space-5);
+  padding: var(--ds-space-6);
 }
 
-.ds-card--interactive {
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+/* Floating layers over the map get the one soft shadow. Nothing else casts one. */
+.ds-surface--floating {
+  box-shadow: var(--ds-contact-plate);
 }
 
-.ds-card--interactive:hover {
-  border-color: var(--ds-border-strong);
-}
-
-.ds-card__title {
+.ds-surface__title {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-size: 1.25rem;
@@ -30,9 +28,9 @@
   letter-spacing: -0.01em;
 }
 
-.ds-card__meta {
+.ds-surface__meta {
   margin: 0 0 var(--ds-space-3);
-  color: var(--ds-ink-subtle);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.02em;
@@ -66,11 +64,9 @@
 }
 
 .ds-citation__label {
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-subtle);
 }
 
@@ -372,11 +368,9 @@
 .ds-filters__legend {
   padding: 0;
   margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 
@@ -421,76 +415,335 @@
   flex-wrap: wrap;
 }
 
-/* Action vocabulary (design-direction-v5 §5): `.ds-button` (form buttons)
-   and shell.css's `.ds-cta` (links) share ONE recipe — sans 13px, no caps,
-   PILL radius. Weights: --primary = copper (THE orientation action, max one
-   per view), --secondary = quiet hairline. Height is the one exception:
-   `.ds-button` is 44px, the WCAG 2.5.5 target size, while apps/web's
-   `.ds-cta` still holds the comps' 40px.
-
-   Both comments here and in shell.css have claimed "ONE recipe" for several
-   cycles while the two rules actually diverged: `.ds-cta` dropped the caps
-   and moved to 14px under the Ink direction, `.ds-button` was left at 12px
-   uppercase with 0.08em tracking. A form's submit button and a room's link
-   action sat side by side looking like two different components. They are
-   now genuinely the same recipe, at the size the comps draw. */
+/*
+ * Button: the one action recipe (`Button`, `buttonClassName`). 44px, radius 8, Geist 14/600.
+ * primary = copper fill, one per screen; secondary = 1px control border; quiet = text only.
+ * A bare `.ds-button` with no variant (admin forms) renders as secondary.
+ */
 .ds-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--ds-space-2);
   min-height: 2.75rem;
-  padding: 0 var(--ds-space-5);
-  border: var(--ds-border-width) solid transparent;
-  border-radius: var(--ds-radius-full);
+  padding: 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 13px;
+  font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: normal;
   text-transform: none;
+  text-decoration: none;
   line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     background-color var(--ds-duration-fast) var(--ds-easing),
     color var(--ds-duration-fast) var(--ds-easing),
     border-color var(--ds-duration-fast) var(--ds-easing),
-    opacity var(--ds-duration-fast) var(--ds-easing);
+    text-decoration-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-button:disabled {
+.ds-button:hover:not(:disabled) {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-button:disabled,
+.ds-button[aria-disabled='true'] {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-/* Copper plate carries dark ink text in BOTH themes (accessible-pairs
-   table: #0A0A0A on #B86B2A — raw copper never carries light body text). */
+.ds-button[aria-busy='true'] {
+  cursor: progress;
+}
+
+/* Copper plate carries dark ink text in BOTH themes (accessible-pairs table: #0A0A0A on
+   #B86B2A; raw copper never carries light body text). */
 .ds-button--primary {
+  border-color: var(--ds-accent-graphic);
   background: var(--ds-accent-graphic);
   color: var(--ds-fixed-ink);
 }
 
 .ds-button--primary:hover:not(:disabled) {
-  opacity: 0.88;
-}
-
-.ds-button--secondary {
-  background: transparent;
-  color: var(--ds-ink);
-  border-color: var(--ds-border-strong);
+  border-color: var(--ds-accent);
+  background: color-mix(in srgb, var(--ds-accent-graphic) 86%, var(--ds-ink));
 }
 
 .ds-button--secondary:hover:not(:disabled) {
   background: var(--ds-surface-raised);
 }
 
-/* Compact instrument controls — map chrome, dense toolbars. Still ≥44px
-   touch target; radius-sm (not capsule) for explore-side panels. */
+/* Text only. The underline is the affordance; the 44px box is still the hit area. */
+.ds-button--quiet {
+  padding-inline: var(--ds-space-1);
+  border-color: transparent;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.25em;
+}
+
+.ds-button--quiet:hover:not(:disabled) {
+  border-color: transparent;
+  text-decoration-color: currentColor;
+}
+
+/* Map chrome's dense control (instrument panels). Still 44px; owned by the map surfaces. */
 .ds-button--compact {
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-4);
+  padding: 0 var(--ds-space-3);
+  font-size: 0.75rem;
+}
+
+/* —— Chip: filter values and active-filter echoes only ———————————————————————— */
+.ds-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  height: 2rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* 44px hit area around the 32px chip. */
+.ds-chip::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+
+.ds-chip:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-chip--selected {
+  border-color: var(--ds-ink);
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+}
+
+.ds-chip--removable {
+  padding-right: var(--ds-space-2);
+}
+
+.ds-chip__glyph {
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* —— FilterButton: secondary button + caret + optional count ————————————————— */
+.ds-filter-button__caret {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-filter-button__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 var(--ds-space-1);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
-  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-filter-button[aria-expanded='true'] {
+  border-color: var(--ds-border-strong);
+}
+
+/* —— Tabs: navigation between places ———————————————————————————————————————— */
+.ds-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: var(--ds-space-1);
+}
+
+.ds-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: 0;
+  background: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-tabs__tab:hover {
+  color: var(--ds-ink);
+}
+
+.ds-tabs__tab[aria-current='page'] {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+/* The current mark is a bar under the label, not a box around it, and never color alone. */
+.ds-tabs__tab[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  right: var(--ds-space-3);
+  bottom: 0;
+  left: var(--ds-space-3);
+  height: 2px;
+  background: var(--ds-accent-graphic);
+}
+
+/* —— Segmented: options on the same data —————————————————————————————————————— */
+.ds-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+}
+
+.ds-segmented__option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.5rem;
+  padding: 0 var(--ds-space-3);
+  border-radius: 6px;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ds-segmented__option:hover {
+  color: var(--ds-ink);
+}
+
+.ds-segmented__option[aria-current='page'],
+.ds-segmented__option:has(> .ds-segmented__input:checked) {
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-contact-hairline);
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-segmented__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ds-segmented__option:has(> .ds-segmented__input:focus-visible) {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* —— Containers: read 680, record 964, wide 1152 ———————————————————————————— */
+.ds-wrap {
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
+  margin-inline: auto;
+}
+
+.ds-wrap--read {
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-read));
+}
+
+.ds-wrap--record {
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-record));
+}
+
+/* —— PageHeader and SectionHeading ——————————————————————————————————————————— */
+.ds-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-space-4) var(--ds-space-6);
+  padding-block: var(--ds-space-12) var(--ds-space-8);
+}
+
+.ds-page-header__text {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  max-width: var(--ds-width-read);
+}
+
+.ds-page-header__crumb {
+  justify-self: start;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.ds-page-header__crumb:hover {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ds-page-header__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 650;
+  line-height: 1.06;
+  letter-spacing: var(--ds-tracking-display);
+  text-wrap: balance;
+}
+
+.ds-page-header__dek {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-subtitle);
+  line-height: var(--ds-leading-body);
+}
+
+.ds-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+}
+
+.ds-section-heading {
+  margin: var(--ds-space-12) 0 var(--ds-space-4);
+  font-family: var(--ds-font-display);
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
 }
 
 .ds-dialog::backdrop {
@@ -553,40 +806,35 @@
 }
 
 /*
- * The tone lives in the edge, the tint and the cue. The title and body stay in ink: a paragraph
- * set entirely in the status color reads as an alarm and is harder to read than the page around
- * it. The cue sits above the title, not in a column beside it, so the text keeps the full width.
+ * Notice: an inline note in the flow of the page, not a box. A 1px rule in the tone's edge color
+ * sits above it, the cue word names the tone (so it is never carried by color alone), and the
+ * title and body stay in ink: a paragraph set entirely in a status color reads as an alarm.
  */
 .ds-notice {
   --ds-notice-fg: var(--ds-ink-muted);
-  --ds-notice-bg: var(--ds-surface);
-  --ds-notice-edge: var(--ds-border);
+  --ds-notice-edge: var(--ds-rule);
 
   display: grid;
   gap: var(--ds-space-1);
-  padding: var(--ds-space-4) var(--ds-space-5);
-  border: var(--ds-border-width) solid var(--ds-notice-edge);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-notice-bg);
+  margin: 0;
+  padding: var(--ds-space-3) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-notice-edge);
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
 }
 
 .ds-notice--warning {
   --ds-notice-fg: var(--ds-warning-fg);
-  --ds-notice-bg: var(--ds-warning-bg);
   --ds-notice-edge: var(--ds-warning-border);
 }
 
 .ds-notice--dispute {
   --ds-notice-fg: var(--ds-dispute-fg);
-  --ds-notice-bg: var(--ds-dispute-bg);
   --ds-notice-edge: var(--ds-dispute-border);
 }
 
 .ds-notice--error {
   --ds-notice-fg: var(--ds-error-fg);
-  --ds-notice-bg: var(--ds-error-bg);
   --ds-notice-edge: var(--ds-error-border);
 }
 
@@ -594,21 +842,18 @@
    both themes, so a confirmation does not need a new colour pair invented for it. */
 .ds-notice--success {
   --ds-notice-fg: var(--ds-confidence-high-fg);
-  --ds-notice-bg: var(--ds-confidence-high-bg);
   --ds-notice-edge: var(--ds-confidence-high-border);
 }
 
 .ds-notice__cue {
   color: var(--ds-notice-fg);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .ds-notice__title {
-  margin: 0 0 var(--ds-space-1);
+  margin: 0;
   font-size: var(--ds-text-body);
   font-weight: 600;
   line-height: var(--ds-leading-title);
@@ -616,6 +861,7 @@
 
 .ds-notice__body {
   margin: 0;
+  color: var(--ds-ink-muted);
   font-size: var(--ds-text-body-sm);
   line-height: var(--ds-leading-body);
 }

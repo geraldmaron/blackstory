@@ -65,3 +65,15 @@ export function resolveTrail(pathname: string, hereLabel?: string): readonly Roo
 
   return steps;
 }
+
+/**
+ * The one step above a room, for `PageHeader`'s crumb: the parent's label and link, or nothing for
+ * a top-level room. `hereLabel` is not needed: the header's h1 already names where the reader is.
+ */
+export function parentCrumb(
+  pathname: string,
+): { readonly href: string; readonly label: string } | undefined {
+  const trail = resolveTrail(pathname);
+  const parent = trail.length >= 2 ? trail[trail.length - 2] : undefined;
+  return parent?.href ? { href: parent.href, label: parent.label } : undefined;
+}

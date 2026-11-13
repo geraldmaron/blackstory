@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { Notice, PageHeader } from '@repo/ui';
 import {
   Anatomy,
   Breadcrumb,
@@ -25,13 +26,10 @@ import {
   GroupHeading,
   HairlineIndex,
   MapMoment,
-  Note,
-  OffRamp,
   Precision,
   Prose,
   RecordNav,
   RoomCard,
-  ReadingEntry,
   DocumentColophon,
   SourceList,
   TrustBlock,
@@ -83,18 +81,12 @@ export function RoomKitGallery() {
       </Specimen>
 
       <Specimen
-        name="ReadingEntry"
-        tokens={['--ds-font-display', '--ds-font-editorial', '--ds-accent', '--ds-rule']}
+        name="PageHeader"
+        tokens={['--ds-font-display', '--ds-font-sans', '--ds-ink-muted']}
       >
-        <ReadingEntry
-          pathname="/books"
-          title={
-            <>
-              Banned <em>books</em>
-            </>
-          }
-          lede="Every title removed from a public shelf, with the order that removed it and the district that signed it."
-          showCrumb={false}
+        <PageHeader
+          title="Banned books"
+          dek="Every title removed from a public shelf, with the order that removed it and the district that signed it."
         />
         <DocumentColophon facts={['1,204 titles', '1963 to 2024']} />
       </Specimen>
@@ -180,11 +172,11 @@ export function RoomKitGallery() {
         </Prose>
       </Specimen>
 
-      <Specimen name="Note · Precision" tokens={['--ds-font-mono', '--ds-border-strong']}>
-        <Note kind="SERIES">
+      <Specimen name="Notice · Precision" tokens={['--ds-rule', '--ds-ink-muted']}>
+        <Notice tone="note" title="Series">
           1790 to 1990 from Gibson and Jung, Table 1. The two lanes do not overlap and are not the
           same instrument.
-        </Note>
+        </Notice>
         <Precision
           resolution="county centroid"
           caveat="This is not the address of the event, and the archive does not claim one."
@@ -321,24 +313,7 @@ export function RoomKitGallery() {
         </UtilityCard>
       </Specimen>
 
-      <Specimen
-        name="OffRamp · RecordNav"
-        tokens={['--ds-surface', '--ds-contact-overlap', '--ds-rule']}
-      >
-        <OffRamp
-          title="No reading room is a dead end"
-          actions={[
-            {
-              href: '/design-system#room-kit-heading',
-              label: 'Browse the records',
-              emphasis: 'copper',
-            },
-            { href: '/design-system#room-kit-heading', label: 'How this was built' },
-          ]}
-        >
-          Every room ends by naming somewhere else worth going. This block is mandatory at the foot
-          of a reading room.
-        </OffRamp>
+      <Specimen name="RecordNav" tokens={['--ds-rule']}>
         <RecordNav
           previous={{ href: '/design-system#room-kit-heading', label: 'Elias Clayton' }}
           next={{ href: '/design-system#room-kit-heading', label: 'Elmer Jackson' }}

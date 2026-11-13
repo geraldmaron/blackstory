@@ -5,18 +5,16 @@
  * Speaker: the archive states rules the software enforces. The one first-person sentence on the
  * page lives in `MethodologySections.tsx`, where a person is genuinely making a commitment.
  */
-import type { DestinationIconId } from '@repo/public-contracts/destinations';
-
 export const METHODOLOGY_INTRO_LEDE =
   'This page is the receipt for everything else on the site: how a record gets in, what an evidence grade means, why a map point is never drawn sharper than the source behind it, and what happens when a record touches someone still living. It is written out in full so a reader can hold any page here to it.';
 
 export const METHODOLOGY_MISSION_BEATS = [
   {
-    kicker: 'Corrections append',
+    title: 'Corrections append',
     body: 'A fix is added to a record rather than swapped in over it. The earlier reading stays readable, a disagreement stays on the page, and a withdrawn record still resolves so an old link does not quietly go dead.',
   },
   {
-    kicker: 'Nothing is asserted without a source',
+    title: 'Nothing is asserted without a source',
     body: 'Every public claim carries citations you can open.',
   },
 ] as const;
@@ -43,18 +41,16 @@ export const METHODOLOGY_DIGNITY_LINE =
 export const METHODOLOGY_PAGE_SECTIONS: readonly {
   readonly id: string;
   readonly label: string;
-  readonly icon: DestinationIconId;
 }[] = [
-  { id: 'how-a-record-gets-in', label: 'How a record gets in', icon: 'records' },
-  { id: 'evidence-grades', label: 'Evidence grades', icon: 'evidence' },
-  { id: 'editorial-standards', label: 'Editorial standards', icon: 'publication' },
-  { id: 'how-a-point-is-drawn', label: 'How a point is drawn', icon: 'precision' },
-  { id: 'how-it-holds-together', label: 'How it holds together', icon: 'collection' },
-  { id: 'lives-across-decades', label: 'Lives across the decades', icon: 'person' },
-  { id: 'where-the-evidence-comes-from', label: 'Where the evidence comes from', icon: 'source' },
-  { id: 'living-person-protection', label: 'Living person protection', icon: 'privacy' },
-  { id: 'internet-archive', label: 'Internet Archive', icon: 'collection' },
-  { id: 'see-it-applied', label: 'See it applied', icon: 'explore' },
+  { id: 'how-a-record-gets-in', label: 'How a record gets in' },
+  { id: 'evidence-grades', label: 'Evidence grades' },
+  { id: 'editorial-standards', label: 'Editorial standards' },
+  { id: 'how-a-point-is-drawn', label: 'How a point is drawn' },
+  { id: 'how-it-holds-together', label: 'How it holds together' },
+  { id: 'lives-across-decades', label: 'Lives across the decades' },
+  { id: 'where-the-evidence-comes-from', label: 'Where the evidence comes from' },
+  { id: 'living-person-protection', label: 'Living person protection' },
+  { id: 'internet-archive', label: 'Internet Archive' },
 ] as const;
 
 /** Canonical public source-library room. Methodology keeps a hash handoff for old links. */
@@ -99,25 +95,21 @@ export const SOURCE_LINEAGE_STAGES = [
     step: '01',
     title: 'Research run',
     body: 'A bounded discovery pass finds a candidate claim and the URL that carried it.',
-    icon: 'records' as const,
   },
   {
     step: '02',
     title: 'Capture',
     body: 'The cited URL is fetched or anchored in the Wayback Machine so link rot does not erase the reading.',
-    icon: 'source' as const,
   },
   {
     step: '03',
     title: 'Citation',
     body: 'The claim keeps the publisher, the URL, and the excerpt the drafter was handed.',
-    icon: 'evidence' as const,
   },
   {
     step: '04',
     title: 'Record',
     body: 'The citation reaches a public page with an evidence grade and a bibliography you can open.',
-    icon: 'publication' as const,
   },
 ] as const;
 

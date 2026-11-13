@@ -14,8 +14,9 @@ import {
 import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { ErrataSections } from './ErrataSections';
-import { Room, ReadingEntry, RoomHandoff, RoomSection, RoomStats } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room, RoomHandoff, RoomSection } from '../../components/room';
 import '../reading-room.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -27,36 +28,19 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function ErrataPage() {
   const entries = listErrataEntries();
-  const latest = entries
-    .map((entry) => entry.timestamp.slice(0, 10))
-    .sort()
-    .at(-1);
 
   return (
-    <Room ledger>
+    <Room width="read">
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.errata} pageTitle="Errata" />
-      <ReadingEntry
-        pathname="/errata"
-        title={
-          <>
-            Every mistake, <em>published</em>.
-          </>
-        }
-        lede="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
-      />
-      <RoomStats
-        label="The log at a glance"
-        stats={[
-          {
-            value: entries.length,
-            label: entries.length === 1 ? 'entry in the log' : 'entries in the log',
-          },
-          ...(latest === undefined ? [] : [{ value: latest, label: 'most recent entry' }]),
-        ]}
+      <PageHeader
+        crumb={parentCrumb('/errata')}
+        linkAs={Link}
+        title="Every mistake, published"
+        dek="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
       />
 
-      <RoomSection id="log" icon="errata" kicker="Log" title="Published corrections" tone="sunk">
+      <RoomSection id="log" title="Published corrections">
         <p className="ds-errata__feedbar" aria-label="Subscribe to the errata log">
           <a className="ds-room-chip" href="/errata/feed.json">
             JSON Feed
@@ -83,16 +67,6 @@ export default function ErrataPage() {
           />
         </div>
       </RoomSection>
-
-      <WalkOffRamp
-        title="Mistakes, published"
-        extra={[
-          { label: 'Request a correction', href: '/corrections' },
-          { label: 'How a correction is handled', href: '/methodology' },
-        ]}
-      >
-        Each entry keeps its date, the record it changed, and what changed about it.
-      </WalkOffRamp>
     </Room>
   );
 }

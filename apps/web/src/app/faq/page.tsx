@@ -3,7 +3,7 @@
  *
  * Rendered through the v9 room kit on the reading-room surface. Questions stay open on the page:
  * a FAQ built out of collapsed drawers would hide the two answers that matter most (who runs
- * this, and how AI is used). The jump nav is the table of contents.
+ * this, and how AI is used). RoomJump is the contents list.
  *
  * COPY LIVES IN `faq-copy.ts`, including the checkable-claim ledger in its header comment. Nothing
  * on this page asserts anything the repository does not already do.
@@ -13,16 +13,8 @@ import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { WalkOffRamp } from '../walk-off-ramp';
-import {
-  Prose,
-  Room,
-  ReadingEntry,
-  RoomJump,
-  RoomSection,
-  roomSectionTone,
-  KeepGoing,
-} from '../../components/room';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Prose, Room, RoomJump, RoomSection } from '../../components/room';
 import { FAQ_LEDE, FAQ_SECTIONS } from './faq-copy';
 import '../reading-room.css';
 
@@ -50,34 +42,20 @@ function FaqLinkRow({ href, label }: { readonly href: string; readonly label: st
 
 export default function FaqPage() {
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/faq"
-        title={
-          <>
-            The questions people actually <em>ask</em>.
-          </>
-        }
-        lede={FAQ_LEDE}
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/faq')}
+        linkAs={Link}
+        title="The questions people actually ask"
+        dek={FAQ_LEDE}
       />
 
       <RoomJump
-        sections={FAQ_SECTIONS.map((section) => ({
-          id: section.id,
-          label: section.heading,
-          icon: section.icon,
-        }))}
+        sections={FAQ_SECTIONS.map((section) => ({ id: section.id, label: section.heading }))}
       />
 
-      {FAQ_SECTIONS.map((section, index) => (
-        <RoomSection
-          key={section.id}
-          id={section.id}
-          icon={section.icon}
-          kicker={section.kicker}
-          title={section.heading}
-          tone={roomSectionTone(index)}
-        >
+      {FAQ_SECTIONS.map((section) => (
+        <RoomSection key={section.id} id={section.id} title={section.heading}>
           <Prose>
             {section.entries.map((entry) => (
               <React.Fragment key={entry.question}>
@@ -100,19 +78,6 @@ export default function FaqPage() {
           </Prose>
         </RoomSection>
       ))}
-
-      <KeepGoing paths={['/methodology', '/sources', '/about']} />
-
-      <WalkOffRamp
-        title="Still stuck"
-        extra={[
-          { label: 'Request a correction', href: '/corrections' },
-          { label: 'Submit a lead', href: '/submit' },
-        ]}
-      >
-        If your question is about one particular record, the corrections lane is the fastest way to
-        get a person reading it against the sources.
-      </WalkOffRamp>
     </Room>
   );
 }

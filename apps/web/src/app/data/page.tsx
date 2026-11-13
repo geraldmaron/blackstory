@@ -9,8 +9,9 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { permanentRedirect } from 'next/navigation';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { DocumentColophon, parentCrumb, Room } from '../../components/room';
 import {
   buildLivesHref,
   parseLivesAreaSlug,
@@ -51,23 +52,16 @@ export default async function DataPage({
   const dataModel = await loadDataPageModel();
 
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/data"
-        title={
-          <>
-            What the numbers <em>show</em>, and what they leave out.
-          </>
-        }
-        lede={DATA_INTRO.lede}
+    <Room width="wide">
+      <PageHeader
+        crumb={parentCrumb('/data')}
+        linkAs={Link}
+        title="What the numbers show, and what they leave out"
+        dek={DATA_INTRO.lede}
       />
       <DocumentColophon facts={dataModel.colophonFacts} />
 
       <DataSections {...dataModel.sections} />
-
-      <WalkOffRamp>
-        Every series here is published by the agency named beneath its figure.
-      </WalkOffRamp>
     </Room>
   );
 }

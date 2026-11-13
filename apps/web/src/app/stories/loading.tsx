@@ -5,10 +5,6 @@ void React;
 
 export default function Loading() {
   return (
-    <CatalogLoading
-      pathname="/stories"
-      label="Laying out the stories…"
-      note="Every chapter cites what it rests on."
-    />
+    <CatalogLoading label="Laying out the stories…" note="Every chapter cites what it rests on." />
   );
 }

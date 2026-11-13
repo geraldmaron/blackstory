@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
+import { buttonClassName } from '@repo/ui';
 import './record-archive.css';
 
 void React;
@@ -42,7 +43,7 @@ export function RecordArchiveContribution({
       </p>
       <p>
         <Link
-          className="ds-cta ds-cta--quiet"
+          className={buttonClassName('quiet')}
           href="/methodology#internet-archive"
           prefetch={false}
         >

@@ -1,12 +1,7 @@
 /**
  * Global not-found page for unknown public routes and missing entities.
  *
- * v9 Utility room (design-direction-v9-surfaces.md §"/_not-found"): a kicker, the title, one
- * serif line naming the two things that actually go wrong, then four exits.
- *
- * The kicker is a sentence, not the numeral. It was `404` while the register was mono caps and
- * the numeral carried; in the quiet sentence-case sans the kicker now takes, a bare `404` reads
- * as a stray fragment above the title rather than as the name of what happened.
+ * Utility room: the title, one line naming the two things that actually go wrong, then the exits.
  *
  * The exits are the whole point of the page. `/design-system` was one of them, which sent a lost
  * reader to a component gallery; it is gone. The first exit is the record they left. The archive exit
@@ -17,9 +12,9 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { EmptyState } from '@repo/ui';
+import { EmptyState, PageHeader } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
-import { Room, ReadingEntry } from '../components/room';
+import { Room } from '../components/room';
 import { loadWalkBackPlace } from './walk-back-place';
 import './utility.css';
 
@@ -39,17 +34,13 @@ export const metadata: Metadata = {
 export default async function NotFound() {
   const back = await loadWalkBackPlace();
   return (
-    <Room>
+    <Room width="read">
       <PaletteSeed />
-      <ReadingEntry
-        pathname="/not-found"
+      {/* No crumb: the reader is standing on an address that failed, and `/not-found` is not a
+          place in the archive they could go back up from. */}
+      <PageHeader
         title="That page is not here"
-        lede="Either the address has a typo in it, or it names a record the archive has not published."
-        /* Every other room prints its own route as a mono fact because readers cite URLs. This
-           room's route is not the reader's route — they are standing on the address that failed,
-           and `/not-found` is a path that does not resolve. Printing it twice, once as a crumb
-           and once as a fact, tells a lost reader where they are not. */
-        showCrumb={false}
+        dek="Either the address has a typo in it, or it names a record the archive has not published."
       />
 
       <EmptyState

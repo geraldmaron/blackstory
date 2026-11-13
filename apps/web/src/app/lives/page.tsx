@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import { PageHeader } from '@repo/ui';
+import { DocumentColophon, Room } from '../../components/room';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../lib/lives/lives-source';
 import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
 import {
@@ -51,12 +51,10 @@ export default async function LivesIndexPage({
   const narratives = renumberLivesNarrativeReferences(mapping.byEraId);
 
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/lives"
+    <Room width="wide">
+      <PageHeader
         title="Lives across the decades"
-        lede="Follow one ordinary question through changing counts, rules, and accounts of lived experience. Every visible figure is sourced."
-        showCrumb={false}
+        dek="Follow one ordinary question through changing counts, rules, and accounts of lived experience. Every visible figure is sourced."
       />
       <DocumentColophon
         facts={[
@@ -73,12 +71,6 @@ export default async function LivesIndexPage({
         retryHref="/lives"
       />
       <LivesMilestoneExperience bundle={bundle} milestone={milestone} narratives={narratives} />
-
-      <WalkOffRamp>
-        Every figure names its table. Rules sit beside the numbers, not as their cause. Method on{' '}
-        <a href="/methodology#lives-across-decades">Methodology</a>. Compact census spine on{' '}
-        <a href="/data#lives">Data</a>.
-      </WalkOffRamp>
     </Room>
   );
 }

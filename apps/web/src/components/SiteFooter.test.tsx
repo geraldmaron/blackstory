@@ -1,5 +1,5 @@
 /**
- * Site footer markup contracts: Surface card shell, typographic wordmark, nav columns.
+ * Site footer markup contracts: two rows, lockup artwork, sentence-case link columns.
  */
 
 import assert from 'node:assert/strict';
@@ -12,16 +12,14 @@ import { SiteFooter } from './SiteFooter';
 void React;
 
 describe('SiteFooter', () => {
-  it('renders a theme-aware Surface card with typographic wordmark and job columns', () => {
+  it('renders two rows: lockup, one sentence and link columns; then the fine print', () => {
     const html = renderToStaticMarkup(<SiteFooter />);
     assert.match(html, /class="ds-shell-footer"/);
-    assert.match(html, /class="ds-shell-footer__card"/);
-    assert.match(html, /class="ds-shell-footer__wordmark"/);
-    assert.match(html, /aria-label="BlackStory"/);
-    assert.match(html, /href="\/"/);
-    assert.match(html, new RegExp(`>${PRODUCT_NAME}<`));
-    assert.match(html, /People\. Places\. Evidence\. Context\./);
-    assert.match(html, /History, pinned to place\./);
+    // The lockup artwork, not the name typed as display text.
+    assert.match(html, /class="ds-shell-footer__brand ds-shell-wordmark"/);
+    assert.match(html, /ds-shell-wordmark__img--theme-light/);
+    assert.match(html, /ds-shell-wordmark__img--theme-dark/);
+    assert.match(html, new RegExp(`aria-label="${PRODUCT_NAME}, home"`));
     assert.match(html, /AI helps with the research and drafting here/);
     assert.match(html, /href="\/methodology#how-a-record-gets-in"/);
     assert.match(html, /aria-label="Footer"/);
@@ -33,11 +31,17 @@ describe('SiteFooter', () => {
     assert.match(html, /href="\/stories"/);
     assert.match(html, /href="\/records"/);
     assert.match(html, /href="\/rooms"/);
+    assert.match(html, new RegExp(`© \\d{4} ${PRODUCT_NAME}<`));
+    assert.match(html, /aria-label="Policies"/);
     // Banned books is a shipped reading room and belongs in the footer; `/banned-books` is a
     // path that has never existed and must never be linked.
     assert.match(html, />Banned books</);
     assert.doesNotMatch(html, /\/banned-books|\/journey/);
     assert.doesNotMatch(html, /href="\/chapters"|href="\/library"|href="\/history"/);
+    // No icons beside links, no tagline, no mono caps.
+    assert.doesNotMatch(html, /<svg/);
+    assert.doesNotMatch(html, /People\. Places\. Evidence\. Context\./);
+    assert.doesNotMatch(html, /ds-mono/);
   });
 
   it('offers a staff sign-in handoff to the in-app admin console', () => {

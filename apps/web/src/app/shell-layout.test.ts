@@ -199,22 +199,24 @@ describe('horizontal overflow guards', () => {
 });
 
 describe('shell footer theme tokens', () => {
-  // Ink direction: the Surface card frame comes off the footer — it sits directly on the page
-  // ground above a hairline, the same move RoomCard makes (see room-kit.css).
-  it('styles the footer as a theme-aware ground with a top hairline, not a Surface card', () => {
-    assert.doesNotMatch(shellCss, /\.ds-shell-footer__card\s*\{[^}]*background:/s);
-    assert.match(shellCss, /\.ds-shell-footer__card\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+  // The footer sits on the page ground above a hairline: no card, no fixed charcoal, and copper
+  // nowhere (copper is for the current thing and the one primary action).
+  it('styles the footer as a theme-aware ground with a top hairline, not a card', () => {
+    assert.doesNotMatch(shellCss, /\.ds-shell-footer__card/);
     assert.match(
       shellCss,
-      /\.ds-shell-footer__card\s*\{[^}]*border-top:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
+      /\.ds-shell-footer\s*\{[^}]*border-top:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
     );
-    assert.match(shellCss, /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-accent\)/s);
+    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+    assert.match(shellCss, /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer__links a:hover\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
+    assert.match(shellCss, /\.ds-shell-footer__links a:hover\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+    const footerRules = shellCss.slice(
+      shellCss.indexOf('/* —— Footer: two rows'),
+      shellCss.indexOf('/* Maker credit'),
     );
-    assert.match(shellCss, /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);
+    assert.doesNotMatch(footerRules, /--ds-accent/);
+    assert.doesNotMatch(footerRules, /text-transform:\s*uppercase/);
     assert.doesNotMatch(
       shellCss,
       /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-fixed-charcoal\)/s,

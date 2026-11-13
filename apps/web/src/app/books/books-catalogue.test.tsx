@@ -76,16 +76,12 @@ test('how-to-read is on the page, with the census limit and the affiliate bound'
     assert.ok(TEXT.includes(fact.title), `missing fact "${fact.title}"`);
   }
   assert.match(HTML, /id="read"/);
-  assert.match(HTML, /href="#read"/);
-  assert.match(HTML, /href="#browse"/);
+  assert.match(HTML, /id="browse"/);
 });
 
-test('the rail dump of three states is gone; related rooms leave as handoffs', () => {
+test('the rail dump of three states and the Keep going handoffs are gone', () => {
   assert.doesNotMatch(indexSource, /OrientationInstrument/);
-  assert.doesNotMatch(HTML, /icon="place"|id="place"/);
-  assert.match(HTML, /href="\/methodology"/);
-  assert.match(HTML, /href="\/law"/);
-  assert.match(HTML, /href="\/submit"/);
+  assert.doesNotMatch(HTML, /icon="place"|id="place"|id="related"/);
 });
 
 test('no link on the catalog page points at /history or another redirect endpoint', () => {

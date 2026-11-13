@@ -24,7 +24,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function MethodologyPage() {
   return (
-    <Room ledger>
+    <Room width="read">
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript
         pagePath={TRUST_PATHS.methodology}

@@ -17,9 +17,9 @@ const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
 
 test('law index is the catalog room; /law/browse is a config redirect only', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
-  assert.match(indexPageSource, /<ReadingEntry/);
-  assert.match(indexPageSource, /<Room ledger rail=\{rail\}>/);
-  assert.match(indexPageSource, /OrientationInstrument/);
+  assert.match(indexPageSource, /<PageHeader/);
+  assert.match(indexPageSource, /<Room width="wide">/);
+  assert.doesNotMatch(indexPageSource, /OrientationInstrument|RoomStats|WalkOffRamp|rail=/);
   assert.doesNotMatch(indexPageSource, /how-it-works|LawHubSections/);
   assert.doesNotMatch(indexPageSource, /EditionAtmosphereMosaic|LAW_EDITION_MOSAIC_SEED/);
 });
@@ -89,10 +89,10 @@ test('law detail page renders through the room kit, with no edition chrome left'
   assert.doesNotMatch(detailPageSource, /law-edition\.css/);
   assert.doesNotMatch(detailPageSource, /data-law-edition="v6"/);
   assert.match(detailPageSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
-  assert.match(detailPageSource, /<Room>/);
+  assert.match(detailPageSource, /<Room width="record">/);
   assert.doesNotMatch(detailSectionsSource, /law-panel-chrome/);
   assert.doesNotMatch(detailSectionsSource, /ds-law-edition__panel/);
-  assert.match(detailSectionsSource, /<ReadingEntry/);
+  assert.match(detailSectionsSource, /<PageHeader/);
 });
 
 test('law browse lede preserved without em dashes, and the room is not titled civil rights law', () => {
@@ -101,7 +101,7 @@ test('law browse lede preserved without em dashes, and the room is not titled ci
   assert.doesNotMatch(indexPageSource, /Civil rights/);
   // The room keeps the noun where a reader scans for it (tab, nav, crumb); the headline is a sentence.
   assert.match(indexPageSource, /title: 'Law'/);
-  assert.match(indexPageSource, /What the law actually <em>said<\/em>\./);
+  assert.match(indexPageSource, /title="What the law actually said"/);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /civil rights/i);
 });
 

@@ -46,10 +46,8 @@ test('section ids are unique, because the contents list links to them', () => {
   assert.equal(new Set(ids).size, ids.length, 'two sections share an anchor');
 });
 
-test('section headings carry orientation glyphs', () => {
-  for (const section of FAQ_SECTIONS) {
-    assert.ok(section.icon, `${section.heading} carries a section glyph`);
-  }
+test('sections render as plain headings with a contents list', () => {
+  assert.doesNotMatch(pageSource, /kicker|icon=/);
   assert.match(pageSource, /RoomJump/);
   assert.match(pageSource, /RoomSection/);
 });

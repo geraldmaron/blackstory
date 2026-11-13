@@ -10,18 +10,19 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import {
   Button,
-  Card,
   Citation,
   Confidence,
   EmptyState,
   FilterBar,
   MapFrame,
   Notice,
+  PageHeader,
   ResultList,
+  Surface,
   ThemeToggle,
   Timeline,
 } from '@repo/ui';
-import { Room, ReadingEntry } from '../../components/room';
+import { Room } from '../../components/room';
 import { DialogFixture } from './DialogFixture';
 import { RoomKitGallery } from './RoomKitGallery';
 // /design-system is a Utility surface, and Utility is one of the three room stylesheets.
@@ -39,11 +40,10 @@ export const dynamic = 'force-dynamic';
 export default async function DesignSystemPage() {
   if (!(await readVerifiedAdminIdentity())) redirect('/admin/login?next=%2Fdesign-system');
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/design-system"
+    <Room width="wide">
+      <PageHeader
         title="Design system"
-        lede="Archive Paper / Black Ink foundation, copper as the orientation signal, hairline separation, visible focus, reduced-motion support. This route is the component fixture gallery (Storybook equivalent)."
+        dek="Archive Paper / Black Ink foundation, copper as the orientation signal, hairline separation, visible focus, reduced-motion support. This route is the component fixture gallery (Storybook equivalent)."
       />
 
       <div className="ds-row" style={{ paddingTop: 'var(--ds-space-5)' }}>
@@ -160,15 +160,12 @@ export default async function DesignSystemPage() {
       </section>
 
       <section className="ds-gallery-section" aria-labelledby="card-heading">
-        <h2 id="card-heading">Cards & citations</h2>
+        <h2 id="card-heading">Surfaces & citations</h2>
         <p>
-          Cards group related research content; citations expose provenance without color-only cues.
+          Surfaces group related research content; citations expose provenance without color-only
+          cues.
         </p>
-        <Card
-          title="Rosenwald School site"
-          meta={<span className="ds-mono">entity:place</span>}
-          interactive
-        >
+        <Surface title="Rosenwald School site" meta={<span className="ds-mono">entity:place</span>}>
           <p className="ds-sans" style={{ marginTop: 0 }}>
             Documented community school associated with early twentieth-century Black education
             networks.
@@ -178,7 +175,7 @@ export default async function DesignSystemPage() {
             href="https://www.loc.gov/"
             label="Primary source"
           />
-        </Card>
+        </Surface>
       </section>
 
       <section className="ds-gallery-section" aria-labelledby="results-heading">

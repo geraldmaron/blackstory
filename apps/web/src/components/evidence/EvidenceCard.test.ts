@@ -216,7 +216,7 @@ test('prints the statement as the claim and never the pipeline predicate above i
       }),
     }),
   );
-  assert.doesNotMatch(html, /ds-card__title|>Organized</);
+  assert.doesNotMatch(html, /ds-surface__title|>Organized</);
   assert.match(html, /<article id="claim_seed_001"[^>]*aria-labelledby="claim_seed_001-statement"/);
   assert.match(
     html,

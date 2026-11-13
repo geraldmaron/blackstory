@@ -36,7 +36,7 @@ test('a state law hands off on its resolved state and decade, never a documented
   // The heading is the contract: it must read exactly this, verbatim.
   assert.match(
     html,
-    /<h2 class="ds-room-offramp__title">Records in this jurisdiction and era<\/h2>/,
+    /<h2 class="ds-section-heading" id="records-handoff-heading">Records in this jurisdiction and era<\/h2>/,
   );
 
   const seeRecordsLink =

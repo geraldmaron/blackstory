@@ -1,89 +1,16 @@
 /**
  * `/data` — the reference ledger's own layout, over the room kit.
  *
- * Three things live here that no other room has: the headline band (four figures a reader can
- * take away without opening a chart), the sticky section rail, and the section anatomy that
- * holds figures in a one- or two-column grid. The figures themselves are drawn by
+ * What lives here is the section anatomy that holds figures in a one- or two-column grid. The figures themselves are drawn by
  * `components/data/data-charts.css`; this sheet only places them.
  *
  * Named data-page.css, not data-edition.css: room-kit.test.tsx forbids new `*-edition.css`
  * files under `app/`.
  */
 
-/* The opening figures are the room kit's RoomStats (components/room/RoomStats.tsx). */
-
-/* —— the section rail ———————————————————————————————————————————————————————
-   Sticky under the command bar. A running head, not a menu: mono caps, hairline below, the
-   current section in ink with a copper underline. */
-.ds-data-nav {
-  position: sticky;
-  top: 64px;
-  z-index: var(--ds-z-content, 1);
-  /*
-   * Full bleed: pull out by exactly the column's own inline padding, whatever it currently is,
-   * and put it back as padding. `--ds-gutter` is not that below 560px, where the room column
-   * narrows to `--ds-space-3` — the nav used to run 4px past each viewport edge on a 320pt
-   * phone, hidden only by the body's clip.
-   */
-  margin: var(--ds-space-8) calc(var(--room-doc-pad, var(--ds-gutter)) * -1) 0;
-  padding: 0 var(--room-doc-pad, var(--ds-gutter));
-  background: color-mix(in srgb, var(--ds-canvas) 92%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-data-nav__list {
-  display: flex;
-  gap: var(--ds-space-5);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.ds-data-nav__list::-webkit-scrollbar {
-  display: none;
-}
-
-.ds-data-nav__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  padding: 12px 0 10px;
-  border-bottom: 2px solid transparent;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--ds-ink-muted);
-  text-decoration: none;
-  transition:
-    color var(--ds-duration-fast) var(--ds-easing),
-    border-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-data-nav__link:hover {
-  color: var(--ds-ink);
-}
-
-.ds-data-nav__link[aria-current='location'] {
-  color: var(--ds-ink);
-  border-bottom-color: var(--ds-accent-graphic);
-}
-
-.ds-data-nav__link:focus-visible {
-  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
-  outline-offset: 2px;
-  border-radius: var(--ds-radius-sm);
-}
-
 /* —— a section ————————————————————————————————————————————————————————————— */
 .ds-data-section {
-  margin-top: var(--ds-space-14, 72px);
-  scroll-margin-top: 120px;
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
 }
 
 .ds-data-section__head {
@@ -93,32 +20,8 @@
   margin-bottom: var(--ds-space-6);
 }
 
-.ds-data-section__kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45em;
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.ds-data-section__kicker .ds-kicker-glyph {
-  color: var(--ds-accent);
-}
-
-.ds-room .ds-data-section__title {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 600;
-  line-height: 1.12;
-  letter-spacing: -0.03em;
-  color: var(--ds-ink);
+.ds-data-section__head > .ds-section-heading {
+  margin-bottom: 0;
 }
 
 .ds-data-section__lede {
@@ -287,10 +190,4 @@
   outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
   outline-offset: 4px;
   border-radius: var(--ds-radius-sm);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-data-nav__link {
-    transition-duration: 0.01ms;
-  }
 }

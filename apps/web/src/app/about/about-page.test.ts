@@ -89,7 +89,7 @@ test('about links to the source library room', () => {
   assert.doesNotMatch(sectionsSource, /href="\/methodology#where-the-evidence-comes-from"/);
 });
 
-test('about sections are deep-linkable through a jump nav', () => {
+test('about sections are deep-linkable through a contents list', () => {
   assert.match(sectionsSource, /RoomJump/);
   assert.match(sectionsSource, /id: 'stance'/);
   assert.match(sectionsSource, /id: 'pillars'/);
@@ -99,13 +99,10 @@ test('about sections are deep-linkable through a jump nav', () => {
   assert.match(sectionsSource, /RoomSection/);
 });
 
-test('about pillars and jump nav carry orientation glyphs', () => {
-  for (const pillar of ABOUT_PILLARS) {
-    assert.ok(pillar.icon, `${pillar.kicker} carries a pillar glyph`);
-  }
+test('about sections carry no kicker or icon plate', () => {
   assert.match(sectionsSource, /RoomFactList/);
-  assert.match(sectionsSource, /RoomJump/);
-  assert.match(sectionsSource, /icon="source"/);
+  assert.doesNotMatch(sectionsSource, /kicker[=:]/);
+  assert.doesNotMatch(sectionsSource, /<RoomSection[^>]*icon=/);
 });
 
 test('about is a room on the walk, not the old board', () => {
@@ -114,7 +111,7 @@ test('about is a room on the walk, not the old board', () => {
   assert.doesNotMatch(sectionsSource, /Banned books/);
   assert.doesNotMatch(sectionsSource, /['"`]\/banned-books/);
   assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
-  assert.match(sectionsSource, /WalkOffRamp/);
+  assert.doesNotMatch(sectionsSource, /WalkOffRamp/);
   assert.match(sectionsSource, /ABOUT_ORIGIN/);
   assert.match(sectionsSource, /ABOUT_PILLARS/);
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
@@ -198,7 +195,7 @@ test('user-facing copy avoids em dashes', () => {
     ...ABOUT_STANCE.paragraphs,
     ABOUT_STANCE.maker.lead,
     ABOUT_STANCE.maker.label,
-    ...ABOUT_PILLARS.flatMap((pillar) => [pillar.kicker, pillar.title, pillar.body]),
+    ...ABOUT_PILLARS.flatMap((pillar) => [pillar.title, pillar.body]),
   ];
   for (const value of strings) {
     assert.doesNotMatch(value, /—/);

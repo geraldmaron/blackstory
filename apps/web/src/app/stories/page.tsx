@@ -15,24 +15,19 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { WalkOffRamp } from '../walk-off-ramp';
 import { listPublicStoryListItems } from '../../lib/stories/source';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
+import { Notice, PageHeader } from '@repo/ui';
 import {
   CardGrid,
   DocumentColophon,
   FindBar,
   GroupHeading,
-  Note,
-  OrientationInstrument,
-  ReadingEntry,
   Room,
   RoomCard,
 } from '../../components/room';
 import {
-  buildCollectionGroups,
   buildCollectionShelves,
-  buildEraGroups,
   buildKindChips,
   computeStoriesFacts,
   filterItems,
@@ -93,7 +88,6 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   )
     .filter(([, value]) => value.length > 0)
     .map(([key, , label]) => ({ key, label, href: storiesHref({ ...query, [key]: '', page: 1 }) }));
-  const collectionGroups = buildCollectionGroups(items);
 
   // The shelves layout only ever renders in the page's default, unnarrowed browse state (see
   // `showsShelves`); everything else — a search, a filter, a non-default sort — falls back to
@@ -115,60 +109,11 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
     placeLabel,
   ];
 
-  const leadCollection = collectionGroups[0];
-  const leadEra = buildEraGroups(items)[0];
-  const rail =
-    source === 'live' && items.length > 0 ? (
-      <OrientationInstrument
-        where="Writing built from the record"
-        {...(query.era.length > 0
-          ? { eraBand: query.era }
-          : leadEra
-            ? { eraBand: leadEra.label }
-            : {})}
-        moves={[
-          ...(leadCollection
-            ? [
-                {
-                  label: leadCollection.label,
-                  href: leadCollection.href,
-                  ...(leadCollection.count !== undefined
-                    ? { note: `${leadCollection.count.toLocaleString('en-US')} stories` }
-                    : {}),
-                },
-              ]
-            : []),
-          ...(leadEra
-            ? [
-                {
-                  label: `Period: ${leadEra.label}`,
-                  href: leadEra.href,
-                  ...(leadEra.count !== undefined
-                    ? { note: `${leadEra.count.toLocaleString('en-US')} stories` }
-                    : {}),
-                },
-              ]
-            : []),
-          {
-            label: 'Open the memorial',
-            href: '/memorial',
-            note: 'Names at full scale',
-          },
-        ].slice(0, 3)}
-      />
-    ) : undefined;
-
   return (
-    <Room ledger rail={rail}>
-      <ReadingEntry
-        pathname="/stories"
-        title={
-          <>
-            Start with a year and a <em>place</em>.
-          </>
-        }
-        lede="Long-form chapters that walk from a named year and place through the rules in force, and shorter entries that set out what a given administration actually did. Every story names the records it stands on."
-        showCrumb={false}
+    <Room width="wide">
+      <PageHeader
+        title="Start with a year and a place"
+        dek="Long-form chapters that walk from a named year and place through the rules in force, and shorter entries that set out what a given administration actually did. Every story names the records it stands on."
       />
       <DocumentColophon facts={meta} />
 
@@ -217,7 +162,9 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
       ) : null}
 
       {notice.body.length > 0 ? (
-        <Note kind={source === 'unavailable' ? 'Unavailable' : 'Empty'}>{notice.body}</Note>
+        <Notice tone={source === 'unavailable' ? 'warning' : 'note'} title={notice.title}>
+          {notice.body}
+        </Notice>
       ) : shelfMode ? (
         <>
           {lead ? (
@@ -362,11 +309,6 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           )}
         </nav>
       ) : null}
-
-      <WalkOffRamp>
-        This is the national archive of chapters. A record names Stories only when it already cites
-        one.
-      </WalkOffRamp>
     </Room>
   );
 }

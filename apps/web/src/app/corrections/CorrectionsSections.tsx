@@ -1,5 +1,5 @@
 /**
- * The correction room's body: what happens to a submission, the intake form, and the way out.
+ * The correction room's body: what happens to a submission, the intake form, and the receipt lookup.
  *
  * The explanation is stated as the three steps a correction actually goes through, above the form,
  * in one strip.
@@ -8,8 +8,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { CorrectionForm, type CorrectionFormProps } from './CorrectionForm';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
-import { Disclosure, RoomSection, UtilityStep, KeepGoing } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import { Disclosure, RoomSection, UtilityStep } from '../../components/room';
 import './corrections.css';
 
 /** The lifecycle, in the order it happens. Step one is done the moment the form is sent. */
@@ -22,13 +21,7 @@ const INTAKE_STEPS = [
 export function CorrectionsSections(props: CorrectionFormProps) {
   return (
     <div className="ds-corrections">
-      <RoomSection
-        id="file"
-        icon="correction"
-        kicker="File"
-        title="What happens to a correction"
-        tone="sunk"
-      >
+      <RoomSection id="file" title="What happens to a correction">
         <ol className="ds-corrections__lifecycle" aria-label="What happens to a correction">
           {INTAKE_STEPS.map((step, index) => (
             <li key={step.title}>
@@ -58,24 +51,11 @@ export function CorrectionsSections(props: CorrectionFormProps) {
             person, and coordinated volume never alters confidence or publication.
           </p>
         </Disclosure>
+
+        <p>
+          Already have a code? <Link href="/corrections/status">Check a receipt</Link>.
+        </p>
       </RoomSection>
-
-      <KeepGoing paths={['/errata', '/methodology', '/support']} />
-
-      <WalkOffRamp
-        title={
-          <>
-            Every accepted correction is <em>published</em>
-          </>
-        }
-        extra={[
-          { href: '/errata', label: 'Errata log' },
-          { href: '/methodology', label: 'How disputes are handled' },
-        ]}
-      >
-        A mistake is published beside the record it changed, never quietly overwritten.{' '}
-        <Link href="/corrections/status">Check a receipt</Link> if you already have a code.
-      </WalkOffRamp>
     </div>
   );
 }

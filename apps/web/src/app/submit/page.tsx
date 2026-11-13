@@ -4,10 +4,10 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { EmptyState, Notice } from '@repo/ui';
-import { KeepGoing, Room, ReadingEntry, RoomSection } from '../../components/room';
+import Link from 'next/link';
+import { EmptyState, Notice, PageHeader } from '@repo/ui';
+import { parentCrumb, Room, RoomSection } from '../../components/room';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
-import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
 import { SubmitLeadForm } from './SubmitLeadForm';
 
@@ -22,18 +22,15 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function SubmitLeadPage() {
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/submit"
-        title={
-          <>
-            Tell the archive what it&apos;s <em>missing</em>.
-          </>
-        }
-        lede="Some of the most important sources for this history sit where no compliant automated search can reach them: closed Facebook groups, Discord servers, private forums, family papers in a shoebox, an account nobody ever wrote down. If you know of one, this is where to say so."
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/submit')}
+        linkAs={Link}
+        title="Tell the archive what it's missing"
+        dek="Some of the most important sources for this history sit where no compliant automated search can reach them: closed Facebook groups, Discord servers, private forums, family papers in a shoebox, an account nobody ever wrote down. If you know of one, this is where to say so."
       />
 
-      <RoomSection id="lead" icon="submit" kicker="Lead" title="What you know" tone="sunk">
+      <RoomSection id="lead" title="What you know">
         <Notice tone="note" title="This is not a public post">
           Leads submitted here are never published as sent. I read every lead. A submission that is
           worth pursuing still has to clear the full research and fact-checking process before
@@ -52,10 +49,6 @@ export default function SubmitLeadPage() {
           have, write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> instead.
         </EmptyState>
       </RoomSection>
-
-      <KeepGoing paths={['/corrections', '/methodology', '/errata']} />
-
-      <WalkOffRamp>Nothing you send here is public on arrival.</WalkOffRamp>
     </Room>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * The evidence blocks: SourceList, Connections, TrustBlock, Anatomy, Precision and Note.
+ * The evidence blocks: SourceList, Connections, TrustBlock, Anatomy and Precision.
  *
  * These are the parts of a room that say how much it knows and how it knows it. Two rules
  * from the design law are enforced by the markup rather than left to a caller:
@@ -244,24 +244,6 @@ export function Precision({ resolution, caveat, className }: PrecisionProps) {
       <span>
         Located to {resolution}.{caveat ? ` ${caveat}` : ''}
       </span>
-    </p>
-  );
-}
-
-/* —— Note ——————————————————————————————————————————————————————————————————— */
-
-export type NoteProps = {
-  /** Mono caps prefix — "SERIES", "SCOPE", "CAUTION". */
-  readonly kind?: string;
-  readonly children: ReactNode;
-  readonly className?: string;
-};
-
-export function Note({ kind, children, className }: NoteProps) {
-  return (
-    <p className={cx('ds-room-note', className)}>
-      {kind ? <>{kind} · </> : null}
-      {children}
     </p>
   );
 }

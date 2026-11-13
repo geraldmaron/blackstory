@@ -14,7 +14,7 @@
  * provider reads as a single object and the two providers cannot blur into each other. The group
  * is a grid of `auto-fit` tracks, so it stacks rather than overflowing on a narrow card.
  *
- * Weight: segments use the shared quiet pill (`.ds-cta--quiet`, `.ds-cta--sm`), never copper.
+ * Weight: segments are secondary buttons joined into one outlined pair, never the primary.
  * An external handoff is not the primary action of any view it appears on — the record page's
  * "See it on the map" and the sheet's "Fly to place" are — and §8 allows one filled action per
  * composition. That constraint is what the previous text links were protecting; it survives here.
@@ -25,6 +25,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { buttonClassName } from '@repo/ui';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faDiamondTurnRight } from '@fortawesome/free-solid-svg-icons';
@@ -86,7 +87,10 @@ function ProviderControl({
       {provider.placeHref ? (
         <MapsExternalLink
           platformAware={false}
-          className="ds-cta ds-cta--quiet ds-cta--sm ds-maps-handoff__seg ds-maps-handoff__seg--place"
+          className={buttonClassName(
+            'secondary',
+            'ds-maps-handoff__seg ds-maps-handoff__seg--place',
+          )}
           href={provider.placeHref}
           placeLabel={placeLabel}
           ariaLabel={`Open ${placeLabel} in ${name} (opens in a new tab)`}
@@ -103,7 +107,10 @@ function ProviderControl({
       {provider.directionsHref ? (
         <MapsExternalLink
           platformAware={false}
-          className="ds-cta ds-cta--quiet ds-cta--sm ds-maps-handoff__seg ds-maps-handoff__seg--directions"
+          className={buttonClassName(
+            'secondary',
+            'ds-maps-handoff__seg ds-maps-handoff__seg--directions',
+          )}
           href={provider.directionsHref}
           placeLabel={placeLabel}
           ariaLabel={`Get directions to ${placeLabel} in ${name} (opens in a new tab)`}

@@ -40,8 +40,8 @@ describe('/rooms · the room renders without JavaScript', () => {
     }
   });
 
-  it('the way back is the map, not a palette button or the old board', () => {
-    assert.match(pageSource, /WalkOffRamp/);
+  it('ends on its last group, not a palette button, the old board or the off-ramp card', () => {
+    assert.doesNotMatch(pageSource, /WalkOffRamp/);
     assert.doesNotMatch(pageSource, /ATLAS_INSTRUMENT|Open the Atlas/);
     assert.doesNotMatch(pageSource, /onOpenPalette|setPaletteOpen/);
     assert.doesNotMatch(pageSource, /getSharedPublicEntities|buildRecordsIndex|releaseFacts/);

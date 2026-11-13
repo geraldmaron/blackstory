@@ -150,11 +150,6 @@
   text-underline-offset: 0.15em;
 }
 
-/* The one section a reader may arrive looking for. Flagged, not shouted. */
-.ds-terms__section--flagged .ds-room-section__title {
-  color: var(--ds-accent);
-}
-
 .ds-terms__follow {
   margin: var(--ds-space-5) 0 0;
   max-width: 46rem;

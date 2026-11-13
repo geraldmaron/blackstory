@@ -1,6 +1,5 @@
 /**
- * Rooms Hub layout. Destination glyphs on cards; chapter bands and jump nav come from the
- * shared room kit so this page does not invent a second table of contents.
+ * Rooms hub layout. Destination glyphs on cards; sections come from the shared room kit.
  */
 
 .ds-rooms-band__standfirst {

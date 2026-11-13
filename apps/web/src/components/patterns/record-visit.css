@@ -10,10 +10,8 @@
 
 .ds-record-visit__heading {
   margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -82,10 +80,8 @@
 
 .ds-record-visit__visitor-title {
   margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -105,10 +101,8 @@
   align-items: center;
   gap: var(--ds-space-2);
   margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 

@@ -99,10 +99,10 @@ describe('RecordVisitBlock', () => {
 
     assert.match(html, /ds-record-visit--compact/);
     assert.match(html, /ds-record-visit__address-text/);
-    // The maps exits may wear the quiet pill; copper is reserved for the one filled action of a
+    // The maps exits are secondary buttons; copper is reserved for the one primary action of a
     // composition, which on these surfaces is the record page's own map CTA, not a handoff.
-    assert.match(html, /ds-cta--quiet/);
-    assert.doesNotMatch(html, /ds-cta--copper/);
+    assert.match(html, /ds-button--secondary/);
+    assert.doesNotMatch(html, /ds-button--primary/);
   });
 
   it('renders phone and website with icons when visit contact claims resolve', () => {

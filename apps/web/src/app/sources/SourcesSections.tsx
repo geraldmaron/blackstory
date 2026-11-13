@@ -4,18 +4,16 @@
  * active release.
  */
 import React from 'react';
+import Link from 'next/link';
+import { Notice, PageHeader } from '@repo/ui';
 import {
-  DocumentPlate,
-  Note,
+  parentCrumb,
   Prose,
-  ReadingEntry,
   RoomFactList,
   RoomHandoff,
   RoomJump,
   RoomSection,
-  roomSectionTone,
 } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
 import { SourceLineageDiagram } from '../methodology/MethodologyDiagrams';
 import {
   SOURCE_LIBRARY_SURFACES,
@@ -29,66 +27,34 @@ const SOURCES_INTRO =
   'Every public claim on BlackStory traces to a publisher someone can open. This room names the kinds of publishers the archive cites, shows how a URL becomes a citation on a record, and points to where each surface already lists its sources.';
 
 const SOURCES_JUMP = [
-  { id: 'citation-chain', label: 'Citation chain', icon: 'source' as const },
-  { id: 'publisher-kinds', label: 'Publisher kinds', icon: 'publication' as const },
-  { id: 'where-sources-appear', label: 'Where they appear', icon: 'records' as const },
+  { id: 'citation-chain', label: 'Citation chain' },
+  { id: 'publisher-kinds', label: 'Publisher kinds' },
+  { id: 'where-sources-appear', label: 'Where they appear' },
 ] as const;
 
 export function SourcesSections() {
   return (
     <>
-      <ReadingEntry
-        pathname="/sources"
-        title={
-          <>
-            Where the evidence <em>comes from</em>.
-          </>
-        }
-        lede={SOURCES_INTRO}
-        plate={
-          <DocumentPlate
-            label="The citation chain"
-            citation="The four steps between a URL and a citation on a public record."
-            href="#citation-chain"
-            hrefLabel="Follow the chain"
-          >
-            {SOURCE_LINEAGE_STAGES.map((stage) => (
-              <div className="ds-room-plate__row" key={stage.step}>
-                <span className="ds-room-plate__step">{stage.step}</span>
-                {stage.title}
-              </div>
-            ))}
-          </DocumentPlate>
-        }
+      <PageHeader
+        crumb={parentCrumb('/sources')}
+        linkAs={Link}
+        title="Where the evidence comes from"
+        dek={SOURCES_INTRO}
       />
 
       <RoomJump sections={SOURCES_JUMP} />
 
-      <RoomSection
-        id="citation-chain"
-        icon="source"
-        kicker="Lineage"
-        title="How a URL becomes a citation"
-        tone={roomSectionTone(0)}
-      >
+      <RoomSection id="citation-chain" title="How a URL becomes a citation">
         <SourceLineageDiagram />
         <RoomFactList
           items={SOURCE_LINEAGE_STAGES.map((stage) => ({
             title: stage.title,
             body: stage.body,
-            icon: stage.icon,
-            kicker: stage.step,
           }))}
         />
       </RoomSection>
 
-      <RoomSection
-        id="publisher-kinds"
-        icon="publication"
-        kicker="Kinds"
-        title="Publisher kinds"
-        tone={roomSectionTone(1)}
-      >
+      <RoomSection id="publisher-kinds" title="Publisher kinds">
         <Prose>
           <p>
             BlackStory groups citation hosts under publisher kinds. A government archive is not the
@@ -105,18 +71,11 @@ export function SourcesSections() {
                 <p className="ds-mono">Examples: {entry.examples}</p>
               </>
             ),
-            icon: 'source' as const,
           }))}
         />
       </RoomSection>
 
-      <RoomSection
-        id="where-sources-appear"
-        icon="records"
-        kicker="Surfaces"
-        title="Where sources already appear"
-        tone={roomSectionTone(2)}
-      >
+      <RoomSection id="where-sources-appear" title="Where sources already appear">
         <Prose>
           <p>On the public site, sources already appear in three places:</p>
         </Prose>
@@ -131,21 +90,11 @@ export function SourcesSections() {
             />
           ))}
         </div>
-        <Note kind="LIMITATIONS">
+        <Notice tone="note" title="Limitations">
           Publisher profiles and live counts are computed from the active release at read time. This
           page names the kinds and the chain; it does not list every publisher or claim count.
-        </Note>
+        </Notice>
       </RoomSection>
-
-      <WalkOffRamp
-        extra={[
-          { label: 'Methodology', href: '/methodology' },
-          { label: 'Data', href: '/data' },
-        ]}
-      >
-        The same publishers sit under every public claim. Methodology is the receipt for how they
-        are used.
-      </WalkOffRamp>
     </>
   );
 }

@@ -102,25 +102,27 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
       ) : null}
 
       {card.dispute?.hasDispute ? (
-        <div className="ds-evidence-claim__notice">
-          <Notice tone="dispute" title="Preserved contradiction">
-            {card.dispute.note ? (
-              <p className="ds-evidence-claim__notice-lede">{card.dispute.note}</p>
-            ) : null}
-            {card.dispute.alternates.length > 0 ? (
-              <ul className="ds-evidence-claim__alternates">
-                {card.dispute.alternates.map((alternate) => (
-                  <li key={`${card.id}_${alternate.value}`}>
-                    <span className="ds-mono">{alternate.value}</span>
-                    {' — '}
-                    {humanizeToken(alternate.kind)}
-                    {alternate.credible ? '' : ' (not independently credible)'}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </Notice>
-        </div>
+        <Notice
+          className="ds-evidence-claim__notice"
+          tone="dispute"
+          title="Preserved contradiction"
+        >
+          {card.dispute.note ? (
+            <p className="ds-evidence-claim__notice-lede">{card.dispute.note}</p>
+          ) : null}
+          {card.dispute.alternates.length > 0 ? (
+            <ul className="ds-evidence-claim__alternates">
+              {card.dispute.alternates.map((alternate) => (
+                <li key={`${card.id}_${alternate.value}`}>
+                  <span className="ds-mono">{alternate.value}</span>
+                  {' — '}
+                  {humanizeToken(alternate.kind)}
+                  {alternate.credible ? '' : ' (not independently credible)'}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </Notice>
       ) : null}
 
       {hasCoverageMeta ? (
@@ -160,17 +162,18 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
       ) : null}
 
       {card.retraction ? (
-        <div className="ds-evidence-claim__notice">
-          <Notice tone="error" title={`Retracted ${formatIsoDate(card.retraction.retractedAt)}`}>
-            <p className="ds-evidence-claim__notice-lede">{card.retraction.reason}</p>
-            {card.retraction.supersededByClaimId ? (
-              <p className="ds-evidence-claim__notice-more">
-                Superseded by <span className="ds-mono">{card.retraction.supersededByClaimId}</span>
-                .
-              </p>
-            ) : null}
-          </Notice>
-        </div>
+        <Notice
+          className="ds-evidence-claim__notice"
+          tone="error"
+          title={`Retracted ${formatIsoDate(card.retraction.retractedAt)}`}
+        >
+          <p className="ds-evidence-claim__notice-lede">{card.retraction.reason}</p>
+          {card.retraction.supersededByClaimId ? (
+            <p className="ds-evidence-claim__notice-more">
+              Superseded by <span className="ds-mono">{card.retraction.supersededByClaimId}</span>.
+            </p>
+          ) : null}
+        </Notice>
       ) : null}
     </article>
   );

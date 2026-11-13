@@ -2,23 +2,20 @@
  * `/methodology` — how a record gets in, in English. Shop tokens stay off the page.
  */
 import React from 'react';
-import { Citation, Confidence, Notice } from '@repo/ui';
+import Link from 'next/link';
+import { Citation, Confidence, Notice, PageHeader } from '@repo/ui';
 import { FACT_CONFIDENCE_GRADES, type FactConfidenceGrade } from '@repo/domain/facts';
 import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/format';
 import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
 import { formatCitation } from '../../lib/citation/format';
 import {
-  DocumentPlate,
-  Note,
+  parentCrumb,
   Prose,
-  ReadingEntry,
   RoomFactList,
   RoomHandoff,
   RoomJump,
   RoomSection,
-  roomSectionTone,
 } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
 import {
   EvidenceConvergenceDiagram,
   MapPrecisionDiagram,
@@ -56,56 +53,25 @@ const EXAMPLE_CITATION = formatCitation({
   accessed: new Date('2026-01-01T00:00:00Z'),
 });
 
-const METHODOLOGY_JUMP = METHODOLOGY_PAGE_SECTIONS.filter(
-  (section) => section.id !== 'see-it-applied',
-);
-
-export function MethodologySections({ omitEntry = false }: { readonly omitEntry?: boolean }) {
+export function MethodologySections() {
   const grades = FACT_CONFIDENCE_GRADES as readonly FactConfidenceGrade[];
-  let chapter = 0;
-  const nextTone = () => roomSectionTone(chapter++);
 
   return (
     <>
-      {omitEntry ? null : (
-        <ReadingEntry
-          pathname="/methodology"
-          title={
-            <>
-              How the archive <em>works</em>.
-            </>
-          }
-          lede={METHODOLOGY_INTRO_LEDE}
-          plate={
-            <DocumentPlate
-              label="The grade key"
-              citation="The four grades a public statement can carry, as they appear on a record."
-              href="#evidence-grades"
-              hrefLabel="Read the definitions"
-            >
-              {grades.map((grade) => (
-                <div className="ds-room-plate__row" key={grade}>
-                  <Confidence level={mapConfidenceToUiLevel(grade)} label={humanizeToken(grade)} />
-                </div>
-              ))}
-            </DocumentPlate>
-          }
-        />
-      )}
+      <PageHeader
+        crumb={parentCrumb('/methodology')}
+        linkAs={Link}
+        title="How the archive works"
+        dek={METHODOLOGY_INTRO_LEDE}
+      />
 
-      <RoomJump sections={METHODOLOGY_JUMP} />
+      <RoomJump sections={METHODOLOGY_PAGE_SECTIONS} />
 
       <Prose>
         <TrustSiteDisclaimer />
       </Prose>
 
-      <RoomSection
-        id="how-a-record-gets-in"
-        icon="records"
-        kicker="Admission"
-        title="How a record gets in"
-        tone={nextTone()}
-      >
+      <RoomSection id="how-a-record-gets-in" title="How a record gets in">
         <Prose>
           <p>
             Candidates come in from research runs, and every one gets pinned to somewhere real
@@ -124,10 +90,8 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
         <RecordIntakeDiagram />
         <RoomFactList
           items={METHODOLOGY_MISSION_BEATS.map((beat) => ({
-            title: beat.kicker,
+            title: beat.title,
             body: beat.body,
-            icon: 'methodology' as const,
-            kicker: beat.kicker,
           }))}
         />
         <ol className="ds-stack">
@@ -141,16 +105,12 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             </li>
           ))}
         </ol>
-        <Note kind="VERIFICATION">{VERIFICATION_STEPS.join(' ')}</Note>
+        <Notice tone="note" title="Verification">
+          {VERIFICATION_STEPS.join(' ')}
+        </Notice>
       </RoomSection>
 
-      <RoomSection
-        id="evidence-grades"
-        icon="evidence"
-        kicker="Grades"
-        title="What the evidence grades mean"
-        tone={nextTone()}
-      >
+      <RoomSection id="evidence-grades" title="What the evidence grades mean">
         <Prose>
           <p>
             A grade is never a color on its own. Each one carries a mark, a label in words, and the
@@ -176,13 +136,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
         <Citation label="Example citation" source={EXAMPLE_CITATION} />
       </RoomSection>
 
-      <RoomSection
-        id="editorial-standards"
-        icon="publication"
-        kicker="Framing"
-        title="Editorial standards"
-        tone={nextTone()}
-      >
+      <RoomSection id="editorial-standards" title="Editorial standards">
         <Prose>
           <p>
             Accuracy is not enough on its own. These are the framing and corroboration rails a
@@ -194,17 +148,13 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
           items={EDITORIAL_STANDARDS.map((item) => ({
             title: item.title,
             body: item.body,
-            icon: 'publication' as const,
           }))}
         />
       </RoomSection>
 
       <RoomSection
         id="how-a-point-is-drawn"
-        icon="precision"
-        kicker="Map dignity"
         title="Why a point is never drawn sharper than its source"
-        tone={nextTone()}
       >
         <Prose>
           <p>
@@ -220,16 +170,12 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
             <li key={rule}>{rule}</li>
           ))}
         </ol>
-        <Note kind="LIMITATIONS">{LIMITATION_RULES.join(' ')}</Note>
+        <Notice tone="note" title="Limitations">
+          {LIMITATION_RULES.join(' ')}
+        </Notice>
       </RoomSection>
 
-      <RoomSection
-        id="how-it-holds-together"
-        icon="collection"
-        kicker="Structure"
-        title="How it holds together"
-        tone={nextTone()}
-      >
+      <RoomSection id="how-it-holds-together" title="How it holds together">
         <Prose>
           <p>{METHODOLOGY_STRUCTURE_LEDE}</p>
         </Prose>
@@ -237,13 +183,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
         <SiteStructureDiagram />
       </RoomSection>
 
-      <RoomSection
-        id="lives-across-decades"
-        icon="person"
-        kicker="Lives"
-        title="Lives across the decades"
-        tone={nextTone()}
-      >
+      <RoomSection id="lives-across-decades" title="Lives across the decades">
         <Prose>
           <p>{LIVES_METHOD_LEDE}</p>
         </Prose>
@@ -251,7 +191,6 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
           items={LIVES_METHOD_RULES.map((rule) => ({
             title: rule.title,
             body: rule.body,
-            icon: 'person' as const,
           }))}
         />
         <div className="ds-room-handoffs">
@@ -270,13 +209,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
         </div>
       </RoomSection>
 
-      <RoomSection
-        id="where-the-evidence-comes-from"
-        icon="source"
-        kicker="Sources"
-        title="Where the evidence comes from"
-        tone={nextTone()}
-      >
+      <RoomSection id="where-the-evidence-comes-from" title="Where the evidence comes from">
         <Prose>
           <p>{SOURCE_LIBRARY_LEDE}</p>
           <p>
@@ -292,13 +225,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
         />
       </RoomSection>
 
-      <RoomSection
-        id="living-person-protection"
-        icon="privacy"
-        kicker="Dignity"
-        title="Living person protection"
-        tone={nextTone()}
-      >
+      <RoomSection id="living-person-protection" title="Living person protection">
         <Prose>
           <p>{METHODOLOGY_DIGNITY_LINE}</p>
           <p>
@@ -315,13 +242,7 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
         />
       </RoomSection>
 
-      <RoomSection
-        id="internet-archive"
-        icon="collection"
-        kicker="Preservation"
-        title="Internet Archive handoff"
-        tone={nextTone()}
-      >
+      <RoomSection id="internet-archive" title="Internet Archive handoff">
         <Prose>
           <p>
             BlackStory links out to preserved copies rather than republishing full third-party
@@ -336,19 +257,6 @@ export function MethodologySections({ omitEntry = false }: { readonly omitEntry?
           </p>
         </Prose>
       </RoomSection>
-
-      <div id="see-it-applied">
-        <WalkOffRamp
-          title="See it applied"
-          extra={[
-            { label: 'Errata', href: '/errata' },
-            { label: 'Request a correction', href: '/corrections' },
-            { label: 'Source library', href: '/sources' },
-          ]}
-        >
-          Here&apos;s where those rules show up, and where to tell me when they fall short.
-        </WalkOffRamp>
-      </div>
     </>
   );
 }

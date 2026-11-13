@@ -31,14 +31,18 @@ test('methodology page renders its own room, not a hub redirect', () => {
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic|METHODOLOGY_EDITION_MOSAIC_SEED/);
 });
 
-test('methodology body uses ReadingEntry without a kicker when rendered alone', () => {
-  assert.match(sectionsSource, /<ReadingEntry/);
-  assert.doesNotMatch(sectionsSource, /<RoomHeader/);
-  assert.doesNotMatch(sectionsSource.match(/<ReadingEntry\b[\s\S]*?\/>/)?.[0] ?? '', /kicker=/);
+test('methodology opens on the shared PageHeader, with no kicker and no copper accent word', () => {
+  const header = sectionsSource.match(/<PageHeader\b[\s\S]*?\/>/)?.[0] ?? '';
+  assert.ok(header, 'methodology renders PageHeader');
+  assert.doesNotMatch(header, /kicker=|<em>/);
+  assert.doesNotMatch(sectionsSource, /<RoomHeader|<ReadingEntry/);
 });
 
 test('methodology renders grade marks and citation strings through the live record-page components', () => {
-  assert.match(sectionsSource, /import \{ Citation, Confidence, Notice \} from '@repo\/ui'/);
+  assert.match(
+    sectionsSource,
+    /import \{ Citation, Confidence, Notice, PageHeader \} from '@repo\/ui'/,
+  );
   assert.match(sectionsSource, /<Confidence/);
   assert.match(sectionsSource, /<Citation/);
   assert.doesNotMatch(sectionsSource, /ConfidenceMark/);
@@ -61,13 +65,16 @@ test('methodology copy still carries dignity and publish rules', () => {
   assert.match(copySource, /METHODOLOGY_DIGNITY_LINE/);
 });
 
-test('methodology table of contents and chapters carry orientation glyphs', () => {
+test('methodology contents list names every section the page renders', () => {
   for (const section of METHODOLOGY_PAGE_SECTIONS) {
-    assert.ok(section.icon, `${section.label} carries a section glyph`);
+    assert.match(
+      sectionsSource,
+      new RegExp(`id="${section.id}"`),
+      `${section.label} is on the page`,
+    );
   }
   assert.match(sectionsSource, /RoomJump/);
   assert.match(sectionsSource, /RoomSection/);
-  assert.match(sectionsSource, /icon="source"/);
   assert.match(sectionsSource, /Open the source library/);
 });
 

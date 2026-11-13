@@ -1,5 +1,5 @@
 /**
- * The bar's search, as a real search.
+ * The bar's search, as a real search: the one free-text search on the site, on every route.
  *
  * Off Explore this slot used to be an anchor to /records: it looked exactly like Explore's
  * search field, in the same place, at the same size, and typing into it was impossible because
@@ -11,10 +11,10 @@
  * reader sees here is the ranking they get on the results page, and the guardrails and rate
  * limits are the endpoint's rather than a second implementation's.
  *
- * Explore keeps its palette: there, a record selection also has to move the map, which is a
- * behavior this component deliberately does not know about.
+ * When the route carries `?q` the field is prefilled with it, so the field always shows what the
+ * page below it was searched for.
  *
- * It does own `⌘K` and `/` off Explore, and that is not a convenience. The palette's own opener
+ * It owns `⌘K` and `/`, and that is not a convenience. The palette's own opener
  * lives inside `CommandPalette`, which only Explore mounts, so on the other twelve rooms the
  * shortcut the bar advertises did nothing at all — including on the root error boundary, where a
  * thrown segment leaves search as the only way out of the page. The handler below is deliberately
@@ -37,7 +37,7 @@ import { instrumentRecordHref } from '../../lib/place/place-slug';
 void React;
 
 /** The input's id, and the handle the shortcut handler focuses it by. */
-const BAR_SEARCH_INPUT_ID = 'bar-search';
+export const BAR_SEARCH_INPUT_ID = 'bar-search';
 
 /**
  * Suggestions, not the results page: eight rows fit the list, and the facet counts the endpoint
@@ -48,6 +48,8 @@ const SUGGESTION_PAGE_SIZE = 8;
 export type CommandBarSearchProps = {
   /** Reads as a promise the surface can keep: the count is only shown where it is known. */
   readonly placeholder: string;
+  /** The route's `?q`, when it carries one. */
+  readonly query?: string | undefined;
 };
 
 type SearchApiResult = {
@@ -77,7 +79,7 @@ function recordHrefFrom(id: string, kind: string | undefined, displayName: strin
   });
 }
 
-export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
+export function CommandBarSearch({ placeholder, query }: CommandBarSearchProps) {
   const seed = useSyncExternalStore(subscribeToPaletteSeed, getPaletteSeed, getServerPaletteSeed);
 
   useEffect(() => {
@@ -156,25 +158,24 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
        `enterKeyHint="search"` and, unwrapped, a reader who typed a phrase and pressed Enter got
        nothing at all — on the twelve rooms where this is the only search, that was the whole
        search. Submitting lands on `/records`, which owns the full result list, its facets and
-       pagination, and reads `q` from the URL. `display: contents` keeps the form out of the bar's
-       three-column grid, so the pill stays exactly where it was.
+       pagination, and reads `q` from the URL.
 
        The combobox only calls `preventDefault` on Enter when a suggestion is highlighted, so
        arrow-then-Enter still opens that record and plain Enter falls through to this submit. */
     <form action="/records" method="get" role="search" className="ds-bar__search-form">
       <TypeaheadCombobox
         /* The seed arrives from a client effect on the 404, after this component has already
-           mounted holding an empty field, and `defaultValue` is read once. Keying on the seed
-           remounts the combobox so the new default takes — which is also what discards it again
-           when the reader navigates off the 404 and the seed clears. */
-        key={seed}
-        defaultValue={seed}
+           mounted holding an empty field, and `defaultValue` is read once. Keying on the seed and
+           the query remounts the combobox so the new default takes, which is also what clears it
+           when the reader navigates off the 404 or to a route without `?q`. */
+        key={`${seed}|${query ?? ''}`}
+        defaultValue={seed || query || ''}
         id={BAR_SEARCH_INPUT_ID}
         name="q"
         label="Search records, places and eras"
         hideLabel
         placeholder={placeholder}
-        className="ds-bar__search ds-bar__search--live"
+        className="ds-bar__search"
         inputClassName="ds-bar__search-input"
         listLabel="Matching records"
         listClassName="ds-bar__search-list"

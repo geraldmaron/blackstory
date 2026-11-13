@@ -1,6 +1,5 @@
 /**
- * The command bar: desktop carries the four axes as links; a phone carries one row (brand and
- * search) and navigates from the tab bar along the bottom edge.
+ * The header and the phone tab bar: one search, four tabs from the registry, one breakpoint.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -8,77 +7,82 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { primaryNavDestinations } from '../../lib/nav/destination-registry';
+import { SHELL_TABS, currentTabFor } from './shell-tabs';
 
 const here = dirname(fileURLToPath(import.meta.url));
+const read = (file: string) => readFileSync(join(here, file), 'utf8');
 
-test('the phone bar is one row — brand and search — with no nav crammed into it', () => {
-  const css = readFileSync(join(here, 'command-bar.css'), 'utf8');
-  const start = css.indexOf('@media (max-width: 819px)');
-  assert.ok(start >= 0, 'phone block must exist');
-  const next = css.indexOf('@media', start + 1);
-  const block = next === -1 ? css.slice(start) : css.slice(start, next);
-  assert.match(block, /height:\s*56px/);
-  assert.match(block, /grid-template-columns:\s*2rem minmax\(0, 1fr\)/);
-  assert.match(block, /\.ds-bar__tools\s*\{\s*display:\s*none/);
-  // The stacked two-row card and its scaled-down input are gone.
-  assert.doesNotMatch(css, /brand tools/);
-  assert.doesNotMatch(css, /scale\(0\.8125\)/);
-  assert.doesNotMatch(css, /@media \(max-width: 559px\)/);
+test('the tabs are Map, Records, Stories and More, in that order, from the registry', () => {
+  assert.deepEqual(
+    SHELL_TABS.map((tab) => tab.label),
+    ['Map', 'Records', 'Stories', 'More'],
+  );
+  assert.deepEqual(
+    SHELL_TABS.map((tab) => tab.href),
+    ['/', '/records', '/stories', '/rooms'],
+  );
+  assert.match(read('shell-tabs.ts'), /primaryNavDestinations\(\)/);
 });
 
-test('phones navigate from a bottom tab bar with the same four destinations everywhere', () => {
-  const source = readFileSync(join(here, 'PhoneTabBar.tsx'), 'utf8');
-  const bar = readFileSync(join(here, 'CommandBar.tsx'), 'utf8');
-  const css = readFileSync(join(here, 'tab-bar.css'), 'utf8');
-  assert.match(bar, /<PhoneTabBar /);
-  assert.match(source, /primaryNavDestinations\(\)/);
-  assert.doesNotMatch(source, /filter\(/, 'the tab set never changes per page');
-  assert.match(source, /aria-label="Main"/);
-  assert.match(css, /--ds-tabbar-h:\s*calc\(56px \+ env\(safe-area-inset-bottom/);
-  assert.match(css, /pointer-events:\s*auto/);
+test('a record page belongs to Records; a room belongs to More', () => {
+  assert.equal(currentTabFor('/'), '/explore');
+  assert.equal(currentTabFor('/explore'), '/explore');
+  assert.equal(currentTabFor('/records'), '/records');
+  assert.equal(currentTabFor('/entity/abc'), '/records');
+  assert.equal(currentTabFor('/place/abc'), '/records');
+  assert.equal(currentTabFor('/invention/abc'), '/records');
+  assert.equal(currentTabFor('/stories/the-count'), '/stories');
+  assert.equal(currentTabFor('/law'), '/rooms');
+  assert.equal(currentTabFor('/law/fair-housing-act-1968'), '/rooms');
+  assert.equal(currentTabFor('/rooms'), '/rooms');
 });
 
-test('the bar renders the product axes and never a hand-written list', () => {
-  const source = readFileSync(join(here, 'CommandBar.tsx'), 'utf8');
-  // Derived, not authored. This bar was the last hand-kept nav on the site, and what it left out
-  // was Stories — one of the four ways into the product — reachable only through Rooms.
-  assert.match(source, /primaryNavDestinations/);
-  assert.match(source, /aria-label="Find"/);
-  assert.match(source, /<RoomsMenu \/>/);
-  assert.match(source, /DestinationIcon/);
-  // Home is the brand lockup, not a nav item beside Explore.
-  assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
-  assert.doesNotMatch(source, /\n\s*Door\n/);
-  assert.doesNotMatch(source, />\s*Journey\s*</);
-  assert.doesNotMatch(source, /onModeChange!\('story'\)/);
-  // Browse is a Map posture entered from journey CTAs, not a fifth Find chip beside Map.
-  assert.doesNotMatch(source, />\s*Browse\s*</);
-  assert.doesNotMatch(source, /enterMapBrowse/);
-  assert.match(source, /exitMapBrowse/);
-  assert.match(source, /pathIsBrowsing/);
-  assert.doesNotMatch(source, />\s*Filters\s*</);
-  // No per-page folding of destinations on phones any more (the tab bar replaced it).
-  assert.doesNotMatch(source, /overflowFind|PHONE_OVERFLOW_AXIS_PATHS/);
-  // A literal axis href inside the nav is a second registry waiting to drift from the first.
-  // Scoped to the nav element: the no-JS search fallback legitimately links `/records` as the
-  // place a reader searches when the combobox cannot mount.
-  const navStart = source.indexOf('aria-label="Find"');
-  const nav = source.slice(navStart, source.indexOf('</nav>', navStart));
-  assert.doesNotMatch(nav, /href="\/explore"/);
-  assert.doesNotMatch(nav, />\s*Browse\s*</);
-  for (const axis of ['/stories', '/records']) {
-    assert.doesNotMatch(
-      nav,
-      new RegExp(`href="${axis}"`),
-      `${axis} must come from the registry, not a literal`,
-    );
+test('the header and the tab bar read the same tab set', () => {
+  for (const file of ['CommandBar.tsx', 'PhoneTabBar.tsx']) {
+    const source = read(file);
+    assert.match(source, /SHELL_TABS/);
+    assert.match(source, /currentTabFor/);
+    // A literal axis href is a second registry waiting to drift from the first.
+    assert.doesNotMatch(source, /href="\/(?:explore|records|stories|rooms)"/);
   }
 });
 
-test('the bar names exactly the four axes, in product order', () => {
-  assert.deepEqual(
-    primaryNavDestinations().map((axis) => axis.label),
-    ['Map', 'Stories', 'Records', 'Rooms'],
+test('the header has one search field and no floating island, pill track or Rooms menu', () => {
+  const source = read('CommandBar.tsx');
+  const css = read('command-bar.css');
+  assert.equal(source.match(/<CommandBarSearch\b/g)?.length, 1);
+  assert.doesNotMatch(source, /onOpenPalette \?/, 'the palette never replaces the search field');
+  assert.doesNotMatch(source, /RoomsMenu|RoomsList|ds-bar__modes/);
+  assert.match(source, /<Tabs\b/);
+  // Home is the lockup, never a tab.
+  assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
+  // Flush and full bleed: fixed to the top edge with a rule under it, no inset or radius.
+  assert.match(css, /\.ds-bar \{[^}]*top:\s*0;[^}]*left:\s*0;/s);
+  assert.match(css, /\.ds-bar \{[^}]*border-bottom:/s);
+  assert.doesNotMatch(css, /\.ds-bar \{[^}]*border-radius/s);
+});
+
+test('below 48rem the header is in flow and the tab bar takes the tabs; never at 48rem and up', () => {
+  const css = read('command-bar.css');
+  const tabCss = read('tab-bar.css');
+  const phone = css.slice(css.indexOf('@media (max-width: 47.9375rem)'));
+  assert.match(phone, /\.ds-bar \{\s*position:\s*relative/);
+  assert.match(phone, /\.ds-bar__tabs \{\s*display:\s*none/);
+  assert.match(
+    phone,
+    /\.ds-bar\[data-search-open\] \.ds-bar__search-region \{[^}]*position:\s*fixed/s,
   );
+  // The tab bar exists only below the brand's 48rem breakpoint.
+  assert.match(tabCss, /^\.ds-tabbar \{\s*display:\s*none;\s*\}/m);
+  assert.match(tabCss, /@media \(max-width: 47\.9375rem\)/);
+  assert.doesNotMatch(css + tabCss, /819px/);
+  assert.match(tabCss, /--ds-tabbar-h:\s*calc\(56px \+ env\(safe-area-inset-bottom/);
+  assert.match(tabCss, /pointer-events:\s*auto/);
+});
+
+test('the current tab is marked by more than color', () => {
+  const tabCss = read('tab-bar.css');
+  assert.match(tabCss, /\.ds-tabbar__tab\[aria-current='page'\] \{[^}]*font-weight:\s*600/s);
+  assert.match(tabCss, /\.ds-tabbar__tab\[aria-current='page'\]::before/);
+  assert.match(read('PhoneTabBar.tsx'), /aria-label="Main"/);
 });

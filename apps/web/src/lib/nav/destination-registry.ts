@@ -6,7 +6,7 @@
  * TWO LAYERS, ONE TABLE. The product semantics — stable id, canonical label, canonical path,
  * parent, family, icon, public, browsable — live once in `@repo/public-contracts/destinations`,
  * where native and admin read them too. This file adds only what the web surface itself decides:
- * card copy, the mono class modifier, the Rooms menu gloss, crawl facts, and noindex. A field
+ * card copy, the mono class modifier, crawl facts, and noindex. A field
  * that only the web app can act on belongs here; a field about what a destination IS belongs in
  * the catalog.
  *
@@ -33,7 +33,6 @@ import {
   primaryAxes,
   semanticDestinationsInFamily,
   type DestinationFamily,
-  type DestinationIconId,
   type SemanticDestination,
 } from '@repo/public-contracts/destinations';
 
@@ -58,7 +57,7 @@ const GROUP_FAMILY: Readonly<Record<DestinationGroup, DestinationFamily>> = Obje
   'take-part': 'participate',
 });
 
-/** The heading each group renders under in the footer and the Rooms menu. `find` has none. */
+/** The heading each group renders under in the footer. `find` has none. */
 export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> = Object.freeze({
   find: null,
   read: 'Read deeper',
@@ -67,7 +66,7 @@ export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> =
 });
 
 /**
- * Rooms hub page copy. Footer and the Rooms menu keep {@link GROUP_HEADINGS}; the hub page uses
+ * Rooms hub page copy. The footer keeps {@link GROUP_HEADINGS}; the hub page uses
  * these longer headings plus standfirsts so it reads as kinds of knowledge, not a settings menu.
  */
 export const ROOMS_GROUP_COPY: Readonly<
@@ -108,14 +107,6 @@ type WebPresentation = {
    */
   readonly kind?: string;
   /**
-   * Three or four words, for the bar's Rooms menu.
-   *
-   * Not the same string as the catalog's description: a menu row is 195px wide and a sentence
-   * wraps to four lines in it, which turned an eleven-room menu into a panel taller than the
-   * surface it opened over. This is the gloss, not the summary.
-   */
-  readonly menuLine?: string;
-  /**
    * Appended to the surface-class name in the card's mono footer: `READING ROOM · PLAIN LANGUAGE`.
    * The class itself is never written here — it is read from `surface-classes.ts`, so a room that
    * is reclassified cannot keep advertising the old class on its card.
@@ -144,17 +135,14 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   home: { kind: 'PLACE', crawl: { changeFrequency: 'daily', priority: 1 } },
   explore: {
     kind: 'MAP',
-    menuLine: 'The map',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
   stories: {
     kind: 'LONG FORM',
-    menuLine: 'Sourced narrative',
     crawl: { changeFrequency: 'weekly', priority: 0.8 },
   },
   records: {
     kind: 'INDEX',
-    menuLine: 'The archive as a list',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
   rooms: { kind: 'HUB', crawl: { changeFrequency: 'monthly', priority: 0.7 } },
@@ -162,58 +150,48 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   law: {
     kind: 'REFERENCE',
     modifier: 'PLAIN LANGUAGE',
-    menuLine: 'Statutes and rulings',
     crawl: { changeFrequency: 'weekly', priority: 0.7 },
   },
   data: {
     kind: 'INDICATORS',
     modifier: 'TABULAR',
-    menuLine: 'National series',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   lives: {
     kind: 'TIMELINE',
     modifier: 'IMMERSIVE',
-    menuLine: 'Class, decade by decade',
     crawl: { changeFrequency: 'monthly', priority: 0.6 },
   },
   books: {
     kind: 'CATALOG',
-    menuLine: 'Documented challenges',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   memorial: {
     kind: 'NAMES',
     modifier: 'STILL',
-    menuLine: 'Names, held quietly',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
 
   about: {
     kind: 'FRAMING',
-    menuLine: 'What this refuses to do',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   faq: {
     kind: 'ANSWERS',
-    menuLine: 'Plain answers',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   methodology: {
     kind: 'TRANSPARENCY',
     modifier: 'RECEIPT',
-    menuLine: 'How a record gets in',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   sources: {
     kind: 'PUBLISHERS',
-    menuLine: 'Where evidence comes from',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   errata: {
     kind: 'CORRECTIONS',
     modifier: 'FEED AVAILABLE',
-    menuLine: 'Mistakes, published',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
 
@@ -221,19 +199,16 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     cardTitle: 'Submit a lead',
     kind: 'CONTRIBUTE',
     modifier: 'FORM',
-    menuLine: 'Send us a lead',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   corrections: {
     cardTitle: 'Request a correction',
     kind: 'CORRECT',
     modifier: 'FORM · TRACKED',
-    menuLine: 'Tell us it is wrong',
     crawl: { changeFrequency: 'monthly', priority: 0.6 },
   },
   support: {
     kind: 'HELP',
-    menuLine: 'Keep this running',
     crawl: { changeFrequency: 'monthly', priority: 0.4 },
   },
 
@@ -407,7 +382,6 @@ export function parentPathFor(pathname: string): string | null {
 export type FooterNavItem = {
   readonly href: string;
   readonly label: string;
-  readonly icon: DestinationIconId;
 };
 
 export type FooterColumn = {
@@ -416,7 +390,7 @@ export type FooterColumn = {
 };
 
 function footerItem(destination: Destination): FooterNavItem {
-  return { href: destination.path, label: destination.label, icon: destination.icon };
+  return { href: destination.path, label: destination.label };
 }
 
 export function footerColumns(): readonly FooterColumn[] {

@@ -1,173 +1,100 @@
-/** Command bar — fixed top, z 50, three-zone grid. */
+/*
+ * The header (CommandBar.tsx). From 48rem up: a flush, full-bleed 56px bar fixed to the top, one
+ * rule under it, canvas color, its content on the wide container. Below 48rem: an in-flow 48px
+ * bar (lockup, search button, theme), and the search opens full screen.
+ *
+ * `--ds-header-h` and `--ds-island-clearance` live in @repo/ui shell-header.css.
+ */
 
 .ds-bar {
   position: fixed;
-  top: var(--ds-space-2);
-  left: var(--ds-space-2);
-  right: var(--ds-space-2);
-  z-index: var(--ds-z-command-bar);
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--ds-space-3);
-  height: 64px;
-  padding: 0 var(--ds-space-3);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-}
-
-/*
- * The strip above the floating bar.
- *
- * The bar is inset 8px from the top, so on any scrolling page the content passes through that
- * 8px band in full focus — a 44px chapter title sliding across the gap above the bar, clipped
- * by nothing. The bar's own translucency is deliberate (the page should show through it,
- * blurred); the bare strip above it is not.
- *
- * Scoped to `--room` rather than `.ds-bar`, because Explore is a full-bleed map that does not
- * scroll and would only gain an opaque band across the top of the instrument. `SiteShellHeader`
- * puts `ds-bar--room` on every non-Explore bar, which is exactly the set that scrolls; until now
- * that modifier resolved to no rule at all.
- */
-.ds-bar--room {
-  background: var(--ds-surface);
-}
-
-.ds-bar--room::before {
-  content: '';
-  position: fixed;
   top: 0;
-  left: 0;
   right: 0;
-  height: calc(var(--ds-space-2) + env(safe-area-inset-top, 0px));
+  left: 0;
+  z-index: var(--ds-z-command-bar);
+  padding-top: env(safe-area-inset-top, 0px);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   background: var(--ds-canvas);
-  pointer-events: none;
 }
 
-/* ---- brand --------------------------------------------------------------- */
-
-/*
- * `.ds-shell-wordmark` from shell-header.css supplies the artwork and its light/dark swap. This
- * only sets the bar's own spacing and the height cap for a 64px bar. The lockup reads as the
- * site's signature, not a favicon parked beside the search field, so it takes most of that bar
- * height rather than sitting two steps below the controls next to it.
- *
- * Both brand PNGs ship with a wide transparent margin baked into the file, so sizing the *image*
- * to the bar sized mostly empty pixels: at the old 3.25rem the lockup drew 52px of image holding
- * 19.5px of visible wordmark, which is why the brand read as undersized next to a 38px search
- * pill. The sizes below are the image box; the negative margins pull the layout box in to the
- * artwork's own edges, so `--ds-bar-lockup-size` / `--ds-bar-symbol-size` set how big the mark
- * actually *looks* and the bar lays out around the ink rather than around the padding.
- *
- * Trim ratios are measured from the assets' alpha bounds and must be re-measured if the artwork
- * is re-exported (see repo issue on cropping the source PNGs):
- *   lockup 800x450 — ink x 114..712, y 136..304  (L .1425  R .1087  T .3022  B .3222)
- *   symbol 512x512 — ink 33%/57% of the box      (L .3281  R .3184  T .1699  B .2598)
- * The inline ratios below fold in the lockup's 800/450 aspect, since its margins scale with the
- * rendered width while `--ds-bar-lockup-size` names the height.
- */
-.ds-bar__brand {
-  --ds-bar-lockup-size: 5rem;
-  --ds-bar-symbol-size: 3rem;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  color: var(--ds-ink);
-  text-decoration: none;
-  /* Clips the trimmed-away transparent overhang so it cannot sit over — and swallow clicks
-     meant for — the search trigger next to it. Nothing visible is cropped: the negative
-     margins land the box exactly on the artwork's alpha bounds. */
-  overflow: hidden;
-}
-
-/* `max-width: none` and `flex: none` on both: the negative margins deliberately make each image's
-   outer box narrower than its own border box, and the global `img { max-width: 100% }` reset then
-   caps the image at that narrower box while `object-fit: fill` squashes the artwork ~25% to match.
-   The overhang is meant to hang out and be clipped by the anchor's `overflow: hidden`, not to
-   resize the image. `flex: none` stops the flex algorithm reaching the same wrong conclusion. */
-.ds-bar__brand .ds-shell-wordmark__img--lockup {
-  flex: none;
-  max-width: none;
-  height: var(--ds-bar-lockup-size);
-  margin-block: calc(var(--ds-bar-lockup-size) * -0.3022) calc(var(--ds-bar-lockup-size) * -0.3222);
-  margin-inline: calc(var(--ds-bar-lockup-size) * -0.2533) calc(var(--ds-bar-lockup-size) * -0.1932);
-}
-
-.ds-bar__brand .ds-shell-wordmark__img--symbol {
-  flex: none;
-  max-width: none;
-  width: var(--ds-bar-symbol-size);
-  height: var(--ds-bar-symbol-size);
-  margin-block: calc(var(--ds-bar-symbol-size) * -0.1699) calc(var(--ds-bar-symbol-size) * -0.2598);
-  margin-inline: calc(var(--ds-bar-symbol-size) * -0.3281) calc(var(--ds-bar-symbol-size) * -0.3184);
-}
-
-/* ---- search trigger ------------------------------------------------------ */
-
-/*
- * The most important control on the surface. It is a button rather than an input because it opens
- * the palette: an input here would give the reader two places to type and one of them would be a
- * dead end.
- */
-.ds-bar__search {
+.ds-bar__inner {
   display: flex;
   align-items: center;
+  gap: var(--ds-space-6);
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
+  height: var(--ds-header-h);
+  margin-inline: auto;
+}
+
+.ds-bar__brand {
+  --ds-lockup-size: 4rem;
+  color: var(--ds-ink);
+}
+
+/* ---- search ------------------------------------------------------------- */
+
+.ds-bar__search-region {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
   gap: var(--ds-space-2);
-  justify-self: center;
-  width: 100%;
+  min-width: 0;
   max-width: 520px;
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-3);
+}
+
+.ds-bar__search-form {
+  display: contents;
+}
+
+.ds-bar__search {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 40px;
   border: var(--ds-border-width) solid var(--ds-border-control);
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-canvas);
-  color: var(--ds-ink-muted);
-  font-family: inherit;
-  font-size: 0.8125rem;
-  cursor: pointer;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  cursor: text;
   transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+/* The magnifier, drawn by mask so it takes the field's ink in both themes. */
+.ds-bar__search::before {
+  content: '';
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-inline: var(--ds-space-3) var(--ds-space-2);
+  background: var(--ds-ink-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='4.6' fill='none' stroke='black' stroke-width='1.5'/%3E%3Cpath d='m10.6 10.6 3 3' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='4.6' fill='none' stroke='black' stroke-width='1.5'/%3E%3Cpath d='m10.6 10.6 3 3' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 
 .ds-bar__search:hover {
   border-color: var(--ds-border-strong);
 }
 
-.ds-bar__search-text {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/*
- * The bar's search is a real GET form so Enter reaches `/records`. `display: contents` keeps the
- * form element out of the bar's `auto minmax(0, 1fr) auto` grid: the pill inside stays the middle
- * column, exactly where it sat when it was an unwrapped div.
- */
-.ds-bar__search-form {
-  display: contents;
-}
-
-/* ---- the live search combobox -------------------------------------------
-   Same pill, same place, same size as the map's palette trigger, but a real input with a
-   result list under it. The wrapper keeps the pill; the input inside is unstyled so the caret
-   sits where the placeholder was. */
-.ds-bar__search--live {
-  position: relative;
-  cursor: text;
+/* The ring sits on the field, not on the bare input inside it. */
+.ds-bar__search:focus-within {
+  border-color: var(--ds-border-strong);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
 .ds-bar__search-input {
   flex: 1;
+  align-self: stretch;
   min-width: 0;
+  padding: 0 var(--ds-space-3) 0 0;
   border: 0;
   background: none;
-  padding: 0;
   color: var(--ds-ink);
-  font: inherit;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
   outline: none;
 }
 
@@ -175,45 +102,44 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-bar__search--live:focus-within {
-  border-color: var(--ds-accent-graphic);
-}
-
-/* The list floats over the page rather than pushing the bar taller. */
+/* Suggestions float over the page rather than pushing the bar taller. */
 .ds-bar__search-list {
   position: absolute;
   top: calc(100% + var(--ds-space-2));
-  left: 0;
   right: 0;
+  left: 0;
   z-index: var(--ds-z-command-overlay);
+  max-height: min(60vh, 26rem);
   margin: 0;
   padding: var(--ds-space-1);
-  list-style: none;
-  max-height: min(60vh, 26rem);
   overflow-y: auto;
-  border: var(--ds-border-width) solid var(--ds-border);
+  list-style: none;
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-surface);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-contact-plate);
 }
 
 .ds-bar__search-list .ds-typeahead__option {
   display: flex;
   align-items: baseline;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-3);
   width: 100%;
-  padding: var(--ds-space-2) var(--ds-space-3);
+  min-height: 44px;
+  padding: var(--ds-space-3);
   border: 0;
   border-radius: var(--ds-radius-sm);
   background: none;
   color: var(--ds-ink);
   font: inherit;
+  font-size: 0.875rem;
   text-align: left;
   cursor: pointer;
 }
 
 .ds-bar__search-list .ds-typeahead__option--active,
 .ds-bar__search-list .ds-typeahead__option:hover {
-  background: var(--ds-canvas);
+  background: var(--ds-surface-sunken);
 }
 
 .ds-bar__search-list .ds-typeahead__primary {
@@ -224,263 +150,184 @@
   white-space: nowrap;
 }
 
+/* The record kind, as a plain word: a label, not data, so sentence case in Geist. */
 .ds-bar__search-list .ds-typeahead__secondary {
   flex: none;
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  letter-spacing: normal;
+  text-transform: capitalize;
 }
 
 /*
- * The "suggestions are unavailable" note, in the same place and the same pill as the list it
- * stands in for — the reader looks in one spot for the answer either way.
- *
- * Styled here rather than inherited from `typeahead.css`, because the bar does not load that
- * sheet: it re-states every `.ds-typeahead__*` rule it needs under `.ds-bar__search-list` above,
- * and `typeahead.css` is imported by the books catalog alone. A note styled only there would
- * render unpositioned inside the pill on all twelve rooms where this bar is the only search.
+ * "Suggestions are unavailable", in the same place as the list it stands in for. Styled here
+ * because the bar does not load typeahead.css (the books catalog alone imports it).
  */
-.ds-bar__search--live .ds-typeahead__note {
+.ds-bar__search .ds-typeahead__note {
   position: absolute;
   top: calc(100% + var(--ds-space-2));
-  left: 0;
   right: 0;
+  left: 0;
   z-index: var(--ds-z-command-overlay);
   margin: 0;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
+  padding: var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-surface);
+  background: var(--ds-surface-raised);
   color: var(--ds-ink-muted);
   font-size: 0.8125rem;
 }
 
-/* ---- tools --------------------------------------------------------------- */
+/* Phone-only controls. */
+.ds-bar__search-cancel,
+.ds-bar__tool.ds-bar__search-open {
+  display: none;
+}
+
+/* ---- tabs and tools ----------------------------------------------------- */
+
+/* The tabs run the bar's full height, so the current tab's copper bar lands on the bar's rule. */
+.ds-bar__tabs {
+  align-self: stretch;
+  margin-left: auto;
+}
+
+.ds-bar__tabs .ds-tabs__tab {
+  min-height: var(--ds-header-h);
+}
 
 .ds-bar__tools {
   display: flex;
   align-items: center;
-  gap: var(--ds-space-2);
-}
-
-.ds-bar__modes {
-  display: inline-flex;
-  padding: 2px;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-canvas);
-}
-
-.ds-bar__modes button,
-.ds-bar__mode-link {
-  min-height: 28px;
-  padding: 0 var(--ds-space-3);
-  border: 0;
-  border-radius: var(--ds-radius-full);
-  background: transparent;
-  color: var(--ds-ink-muted);
-  font-family: inherit;
-  font-size: 0.78125rem;
-  cursor: pointer;
-}
-
-/* Active Find segment: inset in the track, copper as ink/border, not a filled sticker. */
-.ds-bar__mode-link[aria-current='page'],
-.ds-bar__mode-link[aria-current='true'] {
-  background: var(--ds-surface);
-  color: var(--ds-accent);
-  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent-graphic);
-}
-
-span.ds-bar__mode-link {
-  cursor: default;
-}
-
-/* An anchor in a row of buttons, so it needs the line box the others get from being buttons. */
-.ds-bar__mode-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin-left: 2px;
-  text-decoration: none;
-  transition:
-    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
-    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
-}
-
-/*
- * The hairline marks one specific boundary: the point where the group stops being toggles for the
- * current surface and starts being a link off it. It therefore belongs only to a link that follows
- * a button, not to `.ds-bar__mode-link` as such.
- *
- * On every room the bar renders without mode toggles, so Explore, Story and Rooms are all three
- * mode-links — the old blanket `border-left` drew a rule before each of them, including one on
- * Explore that sat a couple of pixels inside the group's own border and read as a stray line. The
- * sibling selector keeps the separator on the Explore surface (where Rooms really does follow two
- * buttons) and leaves the room bar as three evenly spaced peers.
- */
-.ds-bar__modes button + .ds-bar__mode-link {
-  border-left: var(--ds-border-width) solid var(--ds-border);
-  border-radius: 0 var(--ds-radius-full) var(--ds-radius-full) 0;
-}
-
-.ds-bar__mode-link:hover,
-.ds-bar__mode-link:focus-visible {
-  background: var(--ds-surface);
-  color: var(--ds-ink);
-}
-
-.ds-bar__mode-link[aria-current='page']:hover,
-.ds-bar__mode-link[aria-current='page']:focus-visible,
-.ds-bar__mode-link[aria-current='true']:hover,
-.ds-bar__mode-link[aria-current='true']:focus-visible {
-  background: var(--ds-surface);
-  color: var(--ds-accent);
-}
-
-/* Active Find segment stays inset copper, including while hovered. */
-.ds-bar__modes button[aria-current='true'] {
-  background: var(--ds-surface);
-  color: var(--ds-accent);
-  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent-graphic);
+  gap: var(--ds-space-1);
+  margin-right: calc(var(--ds-space-3) * -1);
 }
 
 .ds-bar__tool {
   position: relative;
   display: inline-grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border: var(--ds-border-width) solid transparent;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
   border-radius: var(--ds-radius-sm);
   background: transparent;
   color: var(--ds-ink-muted);
   cursor: pointer;
+  transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-bar__tool:hover {
   color: var(--ds-ink);
-  border-color: var(--ds-border);
-  background: var(--ds-canvas);
+}
+
+.ds-bar__tool svg {
+  width: 20px;
+  height: 20px;
 }
 
 .ds-bar__badge {
   position: absolute;
-  top: 1px;
-  right: 1px;
-  min-width: 15px;
-  height: 15px;
-  padding: 0 3px;
+  top: 6px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 var(--ds-space-1);
   border-radius: var(--ds-radius-full);
   background: var(--ds-accent-graphic);
-  color: var(--ds-inverse-ink);
+  color: var(--ds-fixed-ink);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
-  line-height: 15px;
+  line-height: 16px;
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- phone --------------------------------------------------------------- */
+/* ---- phone -------------------------------------------------------------- */
 
-/*
- * Below 820px the bar is one row: the brand symbol and the search field — the shape of every
- * mobile search bar. Navigation lives in the tab bar along the bottom edge (PhoneTabBar), so the
- * bar carries no Find links, Rooms disclosure or tools here, and never stacks into two rows.
- *
- * This replaces a layered set of phone overrides (wrap, then a grid that pinned Rooms beside the
- * brand, then a stacked search row, then a 16px input scaled to look 13px) that together made a
- * 110px two-row card with the destinations crammed into its top-right corner.
- */
-@media (max-width: 819px) {
-  :root:root {
-    --ds-island-height: 3.5rem;
-    --ds-island-gap: var(--ds-space-2);
+@media (max-width: 47.9375rem) {
+  /* In flow: the bar scrolls away with the page instead of floating over it. */
+  .ds-bar {
+    position: relative;
   }
 
-  .ds-bar,
-  .ds-bar:has(.ds-bar__search--live) {
-    display: grid;
-    grid-template-columns: 2rem minmax(0, 1fr);
-    grid-template-areas: none;
-    align-items: center;
-    box-sizing: border-box;
-    height: 56px;
-    left: var(--ds-space-3);
-    right: var(--ds-space-3);
-    column-gap: var(--ds-space-2);
-    padding: 0 var(--ds-space-2) 0 var(--ds-space-3);
+  .ds-bar__inner {
+    gap: var(--ds-space-2);
   }
 
   .ds-bar__brand {
-    width: 2rem;
-    max-width: 2rem;
-    min-width: 0;
-    overflow: hidden;
-    --ds-bar-symbol-size: 2rem;
+    --ds-lockup-size: 3.5rem;
+    margin-right: auto;
   }
 
-  /* Symbol alone: brand.md directs squeezed placements to drop the lockup. Stronger than the
-     shared header's theme rule (`[data-theme='dark'] .…--lockup.…--theme-dark`, shell-header.css),
-     which otherwise showed the lockup between 640 and 819px, clipped by this 2rem slot to "B". */
-  :root .ds-bar__brand .ds-shell-wordmark__img.ds-shell-wordmark__img--lockup {
+  .ds-bar__tabs {
     display: none;
   }
 
-  .ds-bar__brand .ds-shell-wordmark__img--symbol {
-    width: 2rem;
-    max-width: 2rem;
+  .ds-bar__tool.ds-bar__search-open {
+    display: inline-grid;
   }
 
-  .ds-bar__brand .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
-    display: block;
-  }
-
-  [data-theme='dark']
-    .ds-bar__brand
-    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+  .ds-bar__search-region {
     display: none;
   }
 
-  [data-theme='dark']
-    .ds-bar__brand
-    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
-    display: block;
-  }
-
-  /* Destinations are the tab bar's job on a phone; the desktop tools have no phone use. */
-  .ds-bar__tools {
-    display: none;
-  }
-
-  .ds-bar__search,
-  .ds-bar__search--live {
-    min-width: 0;
-    width: 100%;
+  /* The search sheet: the same field, full screen. */
+  .ds-bar[data-search-open] .ds-bar__search-region {
+    position: fixed;
+    inset: 0;
+    z-index: var(--ds-z-command-overlay);
+    display: flex;
+    align-items: flex-start;
     max-width: none;
-    justify-content: flex-start;
+    padding: calc(env(safe-area-inset-top, 0px) + var(--ds-space-2)) var(--ds-gutter) 0;
+    background: var(--ds-canvas);
   }
 
-  .ds-bar__search .ds-kbd {
-    display: none;
+  .ds-bar[data-search-open] .ds-bar__search {
+    height: 44px;
   }
 
-  /* iOS zooms the whole page when a field under 16px takes focus, and does not zoom back out.
-     The search row is full width here, so the field simply is 16px — the size mobile search
-     fields use — rather than being scaled down to look smaller. */
+  .ds-bar[data-search-open] .ds-bar__search-list,
+  .ds-bar[data-search-open] .ds-bar__search .ds-typeahead__note {
+    max-height: calc(100dvh - 44px - var(--ds-space-8));
+    border: 0;
+    background: var(--ds-canvas);
+    box-shadow: none;
+  }
+
+  .ds-bar[data-search-open] .ds-bar__search-cancel {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--ds-space-1);
+    border: 0;
+    background: none;
+    color: var(--ds-ink);
+    font-family: var(--ds-font-sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* iOS zooms the page when a field under 16px takes focus and does not zoom back out. */
   .ds-bar__search-input {
     font-size: 16px;
+  }
+
+  html[data-search-sheet='open'] {
+    overflow: hidden;
+  }
+
+  html[data-search-sheet='open'] .ds-tabbar {
+    display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-bar__search {
+  .ds-bar__search,
+  .ds-bar__tool {
     transition-duration: 0.01ms;
-  }
-}
-
-@media (pointer: coarse) {
-  .ds-bar__search-input {
-    min-height: 2.75rem;
   }
 }

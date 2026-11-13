@@ -17,10 +17,7 @@ import {
   FindBarFilters,
   Prose,
   RoomFactList,
-  RoomHandoff,
-  RoomJump,
   RoomSection,
-  roomSectionTone,
   type RoomFact,
 } from '../../components/room';
 import { LegalDisclaimer, humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
@@ -59,25 +56,16 @@ function countBy(values: readonly string[]): Map<string, number> {
   return counts;
 }
 
-const LAW_JUMP = [
-  { id: 'how-to-read', label: 'How to read this', icon: 'methodology' as const },
-  { id: 'catalog', label: 'The catalog', icon: 'law' as const },
-  { id: 'keep-going', label: 'Keep going', icon: 'rooms' as const },
-];
-
 const LAW_READ_FACTS: readonly RoomFact[] = [
   {
-    icon: 'questions',
     title: 'Plain language first',
     body: 'Each entry opens with what the law did, in a sentence you can repeat.',
   },
   {
-    icon: 'evidence',
     title: 'The operative text, quoted',
     body: 'The words that carry the force are quoted exactly, inside quotation marks.',
   },
   {
-    icon: 'source',
     title: 'Checked against the official source',
     body: 'Every entry links to the official text it was checked against.',
   },
@@ -140,15 +128,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
 
   return (
     <>
-      <RoomJump sections={LAW_JUMP} />
-
-      <RoomSection
-        id="how-to-read"
-        icon="methodology"
-        kicker="How to read"
-        title="How to read this catalog"
-        tone={roomSectionTone(0)}
-      >
+      <RoomSection id="how-to-read" title="How to read this catalog">
         <RoomFactList items={LAW_READ_FACTS} />
         <Prose>
           <p>
@@ -162,13 +142,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
         <LegalDisclaimer />
       </RoomSection>
 
-      <RoomSection
-        id="catalog"
-        icon="law"
-        kicker="Catalog"
-        title="Browse statutes and decisions"
-        tone={roomSectionTone(1)}
-      >
+      <RoomSection id="catalog" title="Browse statutes and decisions">
         <div id="browse" className="ds-find-anchor">
           <FindBar
             id="law"
@@ -321,35 +295,6 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
               }
             />
           ) : null}
-        </div>
-      </RoomSection>
-
-      <RoomSection
-        id="keep-going"
-        icon="rooms"
-        kicker="Next"
-        title="Keep going"
-        tone={roomSectionTone(2)}
-      >
-        <div className="ds-room-handoffs">
-          <RoomHandoff
-            href="/methodology"
-            icon="methodology"
-            title="Methodology"
-            line="How a record gets in, and what the evidence grades mean."
-          />
-          <RoomHandoff
-            href="/sources"
-            icon="source"
-            title="Source library"
-            line="The publishers a public claim traces to."
-          />
-          <RoomHandoff
-            href="/data"
-            icon="data"
-            title="Data"
-            line="National series with their sources attached."
-          />
         </div>
       </RoomSection>
     </>

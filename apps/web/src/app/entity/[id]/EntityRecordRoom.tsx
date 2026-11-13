@@ -487,6 +487,7 @@ export async function EntityRecordRoom({
 
   return (
     <Room
+      width="record"
       rail={rail}
       foot={apparatus}
       masthead={

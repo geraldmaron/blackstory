@@ -1,7 +1,7 @@
 /**
  * Support page — utility room edition.
  *
- * Kit components (Room, ReadingEntry, UtilityCard, CardGrid, RoomCard, Prose)
+ * Kit components (Room, PageHeader, CardGrid, RoomCard, Prose)
  * provide the structure and base styling. This file contains support-specific
  * styling and contact box presentation.
  */
@@ -36,12 +36,10 @@
 
 .ds-support__contact-label {
   margin: 0;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
 }
 
 .ds-support__contact-value {

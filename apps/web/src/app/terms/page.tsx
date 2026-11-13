@@ -5,8 +5,9 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room, ReadingEntry, KeepGoing } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../components/room';
 import '../utility.css';
 import { TermsSections } from './TermsSections';
 
@@ -19,20 +20,14 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function TermsPage() {
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/terms"
-        title={
-          <>
-            A notice, not a <em>contract</em>.
-          </>
-        }
-        lede="A notice, not a contract. Reading BlackStory asks nothing of you, so nothing here is written as a bargain: it states what the archive publishes, what you may do with it, and what happens when it gets something wrong."
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/terms')}
+        linkAs={Link}
+        title="A notice, not a contract"
+        dek="A notice, not a contract. Reading BlackStory asks nothing of you, so nothing here is written as a bargain: it states what the archive publishes, what you may do with it, and what happens when it gets something wrong."
       />
       <TermsSections />
-      <KeepGoing paths={['/privacy', '/corrections']} />
-
-      <WalkOffRamp>What this archive publishes, and on what footing.</WalkOffRamp>
     </Room>
   );
 }

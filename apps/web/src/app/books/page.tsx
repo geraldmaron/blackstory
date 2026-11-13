@@ -1,20 +1,19 @@
 /**
- * Banned-books catalog at `/books`: a reading room with a how-to-read chapter, a searchable
- * catalog, and named handoffs. The list is national. It does not invent a join to a place.
+ * Banned-books catalog at `/books`: a reading room with a how-to-read section and a searchable
+ * catalog. The list is national. It does not invent a join to a place.
  */
 import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Notice } from '@repo/ui';
+import { Notice, PageHeader } from '@repo/ui';
 import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
-import { booksCatalogPulseMeta, booksCatalogStats } from './BooksCatalogPulse';
+import { booksCatalogPulseMeta } from './BooksCatalogPulse';
 import { BOOKS_INDEX_LEDE, BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import { DocumentColophon, ReadingEntry, Room, RoomStats } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import { DocumentColophon, parentCrumb, Room } from '../../components/room';
 import '../reading-room.css';
 
 void React;
@@ -35,21 +34,17 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
 
   if (snapshot.books.length === 0) {
     return (
-      <Room ledger>
-        <ReadingEntry
-          pathname="/books"
-          title={
-            <>
-              The books someone asked to <em>remove</em>.
-            </>
-          }
+      <Room width="wide">
+        <PageHeader
+          crumb={parentCrumb('/books')}
+          linkAs={Link}
+          title="The books someone asked to remove"
         />
         <Notice tone="warning" title="The catalog snapshot is unavailable">
           The challenged-books catalog did not load. Nothing documented here is lost. Check back
           shortly, or read the <Link href="/methodology">methodology</Link> for how this catalog is
           built.
         </Notice>
-        <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
       </Room>
     );
   }
@@ -58,22 +53,17 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const suggestCorpus = snapshot.books.map(bannedBookToSuggestCorpusItem);
 
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/books"
-        title={
-          <>
-            The books someone asked to <em>remove</em>.
-          </>
-        }
-        lede={BOOKS_INDEX_LEDE}
+    <Room width="wide">
+      <PageHeader
+        crumb={parentCrumb('/books')}
+        linkAs={Link}
+        title="The books someone asked to remove"
+        dek={BOOKS_INDEX_LEDE}
       />
-      <RoomStats label="The catalog at a glance" stats={booksCatalogStats(snapshot)} />
-      <DocumentColophon facts={booksCatalogPulseMeta(snapshot).slice(-1)} />
 
       <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} snapshot={snapshot} />
 
-      <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
+      <DocumentColophon facts={booksCatalogPulseMeta(snapshot)} />
     </Room>
   );
 }

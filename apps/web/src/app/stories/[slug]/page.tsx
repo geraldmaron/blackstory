@@ -20,7 +20,8 @@ import {
   listPublicStoryListItems,
 } from '../../../lib/stories/source';
 import { nextInCollection, prevInCollection } from '../stories-index';
-import { Note, RecordNav, Room } from '../../../components/room';
+import { Notice } from '@repo/ui';
+import { RecordNav, Room } from '../../../components/room';
 import type { RecordNavTarget } from '../../../components/room';
 import { storyCitedEntities } from '../../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
@@ -78,11 +79,11 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
 
   if (result.source === 'unavailable') {
     return (
-      <Room>
-        <Note kind="Unavailable">
+      <Room width="read">
+        <Notice tone="warning" title="Unavailable">
           This story is temporarily unavailable while we reconnect to the live record.{' '}
           <Link href="/stories">Back to all stories</Link>.
-        </Note>
+        </Notice>
       </Room>
     );
   }
@@ -284,7 +285,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
     ) : undefined;
 
   return (
-    <Room rail={rail} masthead={masthead} {...(apparatus ? { foot: apparatus } : {})}>
+    <Room width="wide" rail={rail} masthead={masthead} {...(apparatus ? { foot: apparatus } : {})}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}

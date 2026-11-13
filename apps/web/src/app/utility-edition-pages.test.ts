@@ -44,7 +44,8 @@ for (const page of ROOM_KIT_PAGES) {
     // a correct conversion for the wrong reason.
     assert.match(source, /from '(?:\.\.\/)+components\/room(?:'|\/(?:Room)')/);
     assert.match(source, /<Room/);
-    assert.match(source, /<ReadingEntry/);
+    assert.match(source, /<PageHeader/);
+    assert.match(source, /<Room width="read"/);
     // The v6 shell must be gone rather than merely unused: two chromes on one page is the drift
     // the kit exists to remove, and an unused import is how the second one comes back.
     assert.doesNotMatch(source, /UtilityEditionShell/);

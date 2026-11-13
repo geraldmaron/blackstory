@@ -12,41 +12,37 @@ export const DATA_PAGE_DESCRIPTION =
   'Census counts of the Black population by decade, how class and conditions compared across race from the 1870s, and published wealth, housing, credit and justice indicators. Every figure names the series behind it and shows the numbers.';
 
 export const DATA_INTRO = {
-  kicker: 'Presence across time',
   lede: 'Black presence is countable across every census, and class and conditions are published decade by decade. Gaps in wealth, housing and justice sit after that spine, each named to its agency. Every figure states its limits and shows the numbers behind it.',
 } as const;
 
 /**
- * The chapter in order. `reading` closes: the rules for reading a figure sit after the figures.
+ * The sections in order (each is an anchor id on the page). `reading` closes: the rules for
+ * reading a figure sit after the figures.
  */
 export const DATA_PAGE_SECTIONS = [
-  { id: 'counted', label: 'Counted', icon: 'time' as const },
+  { id: 'counted', label: 'Counted' },
   /** `lives` is the `#lives` deep-link id; the label is the Lived act. */
-  { id: 'lives', label: 'Lived', icon: 'person' as const },
-  { id: 'gaps', label: 'Measured gaps', icon: 'data' as const },
-  { id: 'reading', label: 'How to read', icon: 'evidence' as const },
+  { id: 'lives', label: 'Lived' },
+  { id: 'gaps', label: 'Measured gaps' },
+  { id: 'reading', label: 'How to read' },
 ] as const;
 
 export type DataPageSectionId = (typeof DATA_PAGE_SECTIONS)[number]['id'];
 
 export const DATA_SECTION_COPY = {
   counted: {
-    kicker: 'Act I · U.S. Census, 1790 to 2020',
     title: 'Counted',
     lede: 'How many Black Americans each decennial census counted, what share of the country that was, and where the count moved between 2010 and 2020. The share path is the time spine the next act continues.',
   },
   lives: {
-    kicker: 'Act II · Lives across the decades',
     title: 'Lived',
     lede: 'How Black, white and Hispanic Americans were spread across class, what their lives measured, and which laws were in force. That reading has its own room. This page keeps the census spine the room continues.',
   },
   gaps: {
-    kicker: 'Act III · Published agency series',
     title: 'Measured gaps',
     lede: 'Wealth, housing, credit and justice indicators as agencies published them. These series do not all share the census decade grid; each keeps its own geography and period.',
   },
   reading: {
-    kicker: 'Limits',
     title: 'How to read these figures',
     lede: 'Three rules hold for every figure in this chapter. The full argument for what a number is allowed to support is on Methodology.',
   },

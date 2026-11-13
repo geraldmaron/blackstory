@@ -14,7 +14,7 @@
  */
 
 import React from 'react';
-import { Card, EmptyState, Notice } from '@repo/ui';
+import { EmptyState, Notice, Surface } from '@repo/ui';
 import type { PublicNotabilityBasisItem, PublicWhyThisAppears } from '@repo/domain';
 import { WHY_THIS_APPEARS_COPY } from './copy';
 
@@ -251,12 +251,12 @@ export function WhyThisAppears({
 
   if (variant === 'card') {
     return (
-      <Card
+      <Surface
         title={WHY_THIS_APPEARS_COPY.heading}
         meta={<span className="ds-mono">{WHY_THIS_APPEARS_COPY.auditableTag}</span>}
       >
         {body}
-      </Card>
+      </Surface>
     );
   }
 

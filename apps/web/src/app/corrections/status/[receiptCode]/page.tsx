@@ -4,8 +4,8 @@
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { EmptyState, Notice } from '@repo/ui';
-import { Room, ReadingEntry } from '../../../../components/room';
+import { EmptyState, Notice, PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../../../components/room';
 import '../../../utility.css';
 import {
   buildDefaultCorrectionRouteDependencies,
@@ -31,8 +31,12 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
 
   if (!status) {
     return (
-      <Room>
-        <ReadingEntry pathname="/corrections/status" title="Correction status" />
+      <Room width="read">
+        <PageHeader
+          crumb={parentCrumb('/corrections/status')}
+          linkAs={Link}
+          title="Correction status"
+        />
         <Notice tone="error" title="Receipt not found">
           No correction matches that receipt code. Check the code and try again. There is no way to
           browse other people’s submissions.
@@ -52,11 +56,12 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
   }
 
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/corrections/status"
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/corrections/status')}
+        linkAs={Link}
         title="Correction status"
-        lede="This page shows only what you need to track your submission. Moderation details stay restricted."
+        dek="This page shows only what you need to track your submission. Moderation details stay restricted."
       />
       <CorrectionStatusPanel status={status} />
     </Room>

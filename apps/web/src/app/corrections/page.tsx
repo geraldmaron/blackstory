@@ -5,7 +5,9 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { CorrectionsSections } from './CorrectionsSections';
-import { Room, ReadingEntry } from '../../components/room';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../components/room';
 import { resolvePublicEntityView } from '../../lib/public-data/source';
 import { isCorrectionTargetType } from './categories';
 import '../utility.css';
@@ -39,15 +41,12 @@ export default async function CorrectionsPage({ searchParams }: CorrectionsPageP
       ? await resolvePublicEntityView(initialTarget).catch(() => undefined)
       : undefined;
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/corrections"
-        title={
-          <>
-            Tell the archive it&apos;s <em>wrong</em>.
-          </>
-        }
-        lede="You get a receipt code and a tracked outcome. A person reads every correction, and nothing you send publishes on arrival."
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/corrections')}
+        linkAs={Link}
+        title="Tell the archive it's wrong"
+        dek="You get a receipt code and a tracked outcome. A person reads every correction, and nothing you send publishes on arrival."
       />
       <CorrectionsSections
         key={`${initialTargetType}:${initialTarget}`}

@@ -4,7 +4,9 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { ReadingEntry, Room } from '../../components/room';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../components/room';
 import { ABOUT_LEDE } from './about-copy';
 import { AboutSections } from './AboutSections';
 import '../reading-room.css';
@@ -21,15 +23,12 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function AboutPage() {
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/about"
-        title={
-          <>
-            Doing my part, and making room for <em>yours</em>.
-          </>
-        }
-        lede={ABOUT_LEDE}
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/about')}
+        linkAs={Link}
+        title="Doing my part, and making room for yours."
+        dek={ABOUT_LEDE}
       />
       <AboutSections />
     </Room>

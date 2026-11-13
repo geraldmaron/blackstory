@@ -9,7 +9,6 @@ import {
   type BooksBrowseItem,
   type BooksDetailViewModel,
 } from './books-view-model';
-import { RoomJump, type RoomJumpSection } from '../../components/room';
 import { BooksRipRow } from './BooksRipRow';
 import { BOOKS_DETAIL } from './books-copy';
 
@@ -18,15 +17,6 @@ const CHALLENGE_STATUS_LABEL: Record<string, string> = {
   banned: 'banned',
   restricted: 'restricted',
 };
-
-/** Same jump row every other room uses (`RoomJump`), not a one-off list. */
-const DETAIL_SECTIONS: readonly RoomJumpSection[] = [
-  { id: 'description', label: 'About this title', icon: 'books' },
-  { id: 'challenges', label: 'Challenge lists', icon: 'errata' },
-  { id: 'citations', label: 'Citations', icon: 'source' },
-  { id: 'purchase-heading', label: 'Purchase and lookup', icon: 'external' },
-  { id: 'related', label: 'Related titles', icon: 'collection' },
-];
 
 export type BooksDetailSectionsProps = {
   readonly view: Extract<BooksDetailViewModel, { readonly kind: 'ok' }>;
@@ -39,14 +29,8 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
   const otherPurchase = book.purchaseLinks.filter((link) => link.retailer !== 'bookshop');
   const activeChallenges = activeBookChallenges(book);
 
-  const tocSections = DETAIL_SECTIONS.filter(
-    (section) => section.id !== 'related' || relatedItems.length > 0 || book.canonicalEntityId,
-  );
-
   return (
     <>
-      <RoomJump sections={tocSections} label="On this page" />
-
       <section className="ds-room-section" aria-labelledby="description-heading" id="description">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.contextKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="description-heading">

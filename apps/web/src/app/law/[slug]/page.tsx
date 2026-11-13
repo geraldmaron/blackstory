@@ -40,7 +40,7 @@ export default async function LawDetailPage({ params }: LawDetailPageProps) {
   const { snapshot, explainer, previous, next } = view;
 
   return (
-    <Room>
+    <Room width="record">
       <LawDetailIntro snapshot={snapshot} />
       <LawDetailSections
         snapshot={snapshot}

@@ -106,9 +106,9 @@ test('every section states its as-of date once, in its head', () => {
   assert.match(sectionsSource, /<Section id="gaps" meta=\{indicatorMeta\}>/);
 });
 
-test('the page off-ramp stays on the walk, not a fabricated Explore population handoff', () => {
+test('the page ends on its figures, with no off-ramp card and no fabricated Explore handoff', () => {
   const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
-  assert.match(pageSource, /WalkOffRamp/);
+  assert.doesNotMatch(pageSource, /WalkOffRamp/);
   assert.doesNotMatch(pageSource, /href: '\/records'/);
   assert.doesNotMatch(pageSource, /\/explore/);
   assert.doesNotMatch(sectionsSource, /id="composition"/);

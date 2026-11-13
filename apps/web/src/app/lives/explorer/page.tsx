@@ -3,8 +3,9 @@ import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 import { LIVES_NATIONAL, livesAreaBySlug } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
-import { DocumentColophon, ReadingEntry, Room } from '../../../components/room';
-import { WalkOffRamp } from '../../walk-off-ramp';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { DocumentColophon, parentCrumb, Room } from '../../../components/room';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../../lib/lives/lives-source';
 import { parseLivesAreaSlug, type RawLivesSearchParams } from '../../../lib/lives/lives-url-state';
 import { LivesSourceNotice } from '../../../components/lives/LivesSourceNotice';
@@ -36,12 +37,12 @@ export default async function LivesExplorerPage({
   const bundle = loaded?.bundle ?? emptyLivesAreaBundle(area);
 
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/lives/explorer"
+    <Room width="wide">
+      <PageHeader
+        crumb={parentCrumb('/lives/explorer')}
+        linkAs={Link}
         title="Evidence appendix"
-        lede="Inspect every available decade, region, definition, coverage note, and cited table behind Lives."
-        showCrumb={false}
+        dek="Inspect every available decade, region, definition, coverage note, and cited table behind Lives."
       />
       <DocumentColophon facts={[`Area · ${bundle.areaName}`, 'Full utility · 1870s to 2020s']} />
 
@@ -58,11 +59,6 @@ export default async function LivesExplorerPage({
       <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={area.slug} />}>
         <LivesTimeline bundle={bundle} areaSlug={area.slug} />
       </Suspense>
-
-      <WalkOffRamp>
-        Method on <a href="/methodology#lives-across-decades">Methodology</a>. Guided experience on{' '}
-        <a href="/lives">Lives</a>.
-      </WalkOffRamp>
     </Room>
   );
 }

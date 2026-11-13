@@ -125,9 +125,7 @@ describe('surface parity · the page body is rendered once', () => {
 describe('surface parity · three entry postures only', () => {
   it('does not invent a fourth page-header posture beyond Field, Record and Reading', () => {
     const allowed = new Set([
-      'ReadingEntry',
       'DocumentColophon',
-      'OrientationInstrument',
       'EntryPosture',
       'SiteShellHeader', // site chrome, not a room entry posture
     ]);

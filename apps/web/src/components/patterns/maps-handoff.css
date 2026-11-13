@@ -1,16 +1,14 @@
 /*
- * Maps handoff — one segmented control per provider (see `MapsHandoff.tsx` for why).
+ * Maps handoff: one joined pair of secondary buttons per provider (see `MapsHandoff.tsx`).
  *
- * The segments are the shared quiet pill (`.ds-cta--quiet .ds-cta--sm`, app/shell.css). What this
- * file adds is the grouping: the pair sits inside one hairline so a provider reads as a single
- * object, and the segments give up their own border to the group rather than drawing a second
- * recipe. Nothing here restates the pill's type, height or radius.
+ * The pair shares one outline so a provider reads as a single object; the segments give up their
+ * own border to it. Height, type and radius are the Button's own.
  */
 
 .ds-maps-handoff {
   display: grid;
   /* auto-fit, not a flex run: at card width the providers stack, and neither one can push the
-     row wider than its container. The old text links overflowed the record page at 632px. */
+     row wider than its container. */
   grid-template-columns: repeat(auto-fit, minmax(13.5rem, max-content));
   gap: var(--ds-space-2);
   align-items: start;
@@ -20,45 +18,32 @@
   display: inline-flex;
   align-items: stretch;
   min-width: 0;
-  border: var(--ds-border-width) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-full);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
   /* Clips the segments' own corners so the pair shares one outline. */
   overflow: hidden;
 }
 
-/*
- * Segment: the quiet pill without its border, because the group draws that. `border-radius: 0`
- * lets the group's `overflow: hidden` round only the outer ends of the pair.
- */
-.ds-maps-handoff__seg.ds-cta {
+.ds-maps-handoff__seg.ds-button {
   flex: 0 1 auto;
   min-width: 0;
   border: 0;
   border-radius: 0;
-  color: var(--ds-ink-muted);
-  white-space: nowrap;
 }
 
 /* The divider between the two segments is the only internal rule. */
 .ds-maps-handoff__seg--place + .ds-maps-handoff__seg--directions {
-  border-left: var(--ds-border-width) solid var(--ds-border-strong);
+  border-left: var(--ds-border-width) solid var(--ds-border-control);
 }
 
-.ds-maps-handoff__seg.ds-cta:hover,
-.ds-maps-handoff__seg.ds-cta:focus-visible {
-  background: var(--ds-surface-raised);
-  color: var(--ds-ink);
+.ds-maps-handoff__seg.ds-button:focus-visible {
+  outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-.ds-maps-handoff__seg.ds-cta:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-copper));
-  outline-offset: -2px;
-}
-
-/* The provider's own name carries more weight than the word "Directions" beside it: the reader
-   is choosing a provider first and an action second. */
-.ds-maps-handoff__seg--place .ds-maps-handoff__name {
-  color: var(--ds-ink);
+/* The provider is chosen first and the action second, so the action word is the quieter one. */
+.ds-maps-handoff__seg--directions .ds-maps-handoff__name {
+  color: var(--ds-ink-muted);
+  font-weight: 500;
 }
 
 .ds-maps-handoff__name {
@@ -74,31 +59,14 @@
 }
 
 /*
- * Compact card (record sheet, narrative card). The sheet's content box is ~388px and a provider
- * pair needs ~230px, so two of them cannot share a row: `auto-fit` would place two 184px tracks
- * and both providers would ellipsise to "Google …" / "Direc…". One provider per row, each sized
- * to its own content rather than stretched across the card.
+ * Compact card (record sheet, narrative card): two pairs cannot share a ~388px row without both
+ * ellipsising, so one provider per row, each sized to its own content.
  */
 .ds-maps-handoff--compact {
   grid-template-columns: minmax(0, max-content);
-  gap: var(--ds-space-2);
 }
 
-.ds-maps-handoff--compact .ds-maps-handoff__seg.ds-cta {
-  min-height: 2rem;
-  padding: 0 var(--ds-space-3);
-  font-size: 12px;
-}
-
-.ds-maps-handoff--compact .ds-maps-handoff__mark {
-  width: 0.8125rem;
-  height: 0.8125rem;
-}
-
-/*
- * Phones. Below this the page column itself is narrower than a provider pair's natural width, so
- * the pair fills the column and its two segments split it evenly instead of ragging.
- */
+/* Phones: the pair fills the column and its two segments split it evenly. */
 @media (max-width: 26rem) {
   .ds-maps-handoff,
   .ds-maps-handoff--compact {
@@ -109,17 +77,7 @@
     width: 100%;
   }
 
-  .ds-maps-handoff__seg.ds-cta {
+  .ds-maps-handoff__seg.ds-button {
     flex: 1 1 auto;
-    justify-content: center;
-  }
-}
-
-/* Touch: the 44px target Apple's HIG asks for. Selector matches the compact override's
-   specificity so a compact card does not keep its 32px. */
-@media (pointer: coarse) {
-  .ds-maps-handoff .ds-maps-handoff__seg.ds-cta,
-  .ds-maps-handoff--compact .ds-maps-handoff__seg.ds-cta {
-    min-height: 2.75rem;
   }
 }

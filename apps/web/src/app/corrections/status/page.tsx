@@ -7,7 +7,9 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
-import { Room, ReadingEntry } from '../../../components/room';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../../components/room';
 import '../../utility.css';
 import { ReceiptLookupForm } from './ReceiptLookupForm';
 
@@ -19,11 +21,12 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function CorrectionStatusLandingPage() {
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/corrections/status"
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/corrections/status')}
+        linkAs={Link}
         title="Check a correction receipt"
-        lede="Enter the receipt code you were given when you submitted a correction. There is no way to browse other people’s submissions."
+        dek="Enter the receipt code you were given when you submitted a correction. There is no way to browse other people’s submissions."
       />
       <ReceiptLookupForm />
     </Room>

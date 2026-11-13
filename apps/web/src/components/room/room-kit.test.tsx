@@ -17,20 +17,20 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { Room } from './Room';
-import { ReadingEntry, DocumentColophon } from './EntryPosture';
+import { DocumentColophon } from './EntryPosture';
 import { Breadcrumb } from './Breadcrumb';
-import { resolveTrail } from './room-trail';
+import { parentCrumb, resolveTrail } from './room-trail';
 import { CardGrid, GroupHeading, RoomCard } from './RoomCards';
 import { RoomSection, RoomHandoff } from './RoomSection';
 import { RoomJump } from './RoomJump';
 import { ChoiceField, Field, fieldControlProps } from './Utility';
 import { FindBar, FindBarFilters } from './FindBar';
 import { Prose, RecordRef } from './Prose';
-import { Anatomy, Connections, Note, Precision, SourceList, TrustBlock } from './Evidence';
+import { Anatomy, Connections, Precision, SourceList, TrustBlock } from './Evidence';
 import { HairlineIndex } from './HairlineIndex';
 import { DataTable } from './DataTable';
 import { Disclosure, UtilityCard, UtilityStep } from './Utility';
-import { EmptyList, OffRamp, RecordNav } from './RoomFoot';
+import { EmptyList, RecordNav } from './RoomFoot';
 import {
   MapMoment,
   momentIsVisible,
@@ -60,16 +60,27 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-describe('room kit · a title is JSX, never a string of markup', () => {
-  // ReadingEntry title is a ReactNode so `<em>` renders in the editorial accent. Passed as a
-  // string attribute instead, React escapes it and the reader sees the literal tags.
+describe('room kit · page titles are plain words', () => {
+  // A quoted title attribute holding markup renders the literal tags.
   it('no room passes markup inside a quoted title attribute', () => {
     const offenders = walk(APP_DIR)
       .filter((file) => file.endsWith('.tsx'))
       .filter((file) => /title="[^"]*<[a-z]/i.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
 
-    assert.deepEqual(offenders, [], 'pass the title as JSX: title={<>Banned <em>books</em></>}');
+    assert.deepEqual(offenders, []);
+  });
+
+  // The copper italic accent word in a headline is retired (direction contract, hard rule 4).
+  it('no PageHeader title carries an <em> accent word', () => {
+    const offenders = walk(APP_DIR)
+      .filter((file) => file.endsWith('.tsx'))
+      .filter((file) =>
+        /<PageHeader\b[^>]*?title=\{\s*<>[^]*?<em>/.test(readFileSync(file, 'utf8')),
+      )
+      .map((file) => path.relative(APP_DIR, file));
+
+    assert.deepEqual(offenders, []);
   });
 });
 
@@ -213,23 +224,14 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 });
 
-describe('room kit · ReadingEntry is the Reading posture mast', () => {
-  it('renders title and lede without a kicker or mono meta row', () => {
-    const html = renderToStaticMarkup(
-      <ReadingEntry
-        pathname="/books"
-        title="Banned books"
-        lede="Every title removed from a public shelf, with the order that removed it."
-        showCrumb={false}
-      />,
-    );
-
-    assert.match(html, /data-posture="reading"/);
-    assert.match(html, /<h1 class="ds-entry__title">Banned books<\/h1>/);
-    assert.match(html, /ds-entry__lede/);
-    assert.doesNotMatch(html, /kicker|ds-room-header/);
-    assert.equal(html.match(/<h1/g)?.length, 1, 'a room renders exactly one h1');
-    assert.equal(html.match(/<header/g)?.length, 1, 'a room renders exactly one header');
+describe('room kit · the Reading posture is the shared PageHeader', () => {
+  it('parentCrumb gives the one step above a room, and nothing for the site root', () => {
+    assert.deepEqual(parentCrumb('/books/the-bluest-eye'), {
+      href: '/books',
+      label: 'Banned books',
+    });
+    assert.deepEqual(parentCrumb('/about'), { href: '/rooms', label: 'Rooms' });
+    assert.equal(parentCrumb('/'), undefined);
   });
 
   it('DocumentColophon carries mono citation facts at the foot', () => {
@@ -283,23 +285,21 @@ describe('room kit · catalog blocks', () => {
     assert.match(html, /<h2 class="ds-room-grouphd">By decade<\/h2>/);
   });
 
-  it('RoomSection is a labelled chapter with a destination plate', () => {
+  it('RoomSection is a labelled section under the shared heading, with no plate or kicker', () => {
     const html = renderToStaticMarkup(
-      <RoomSection
-        id="grades"
-        icon="evidence"
-        kicker="Grades"
-        title="What the grades mean"
-        tone="sunk"
-      >
+      <RoomSection id="grades" title="What the grades mean">
         <p>A grade is never a color on its own.</p>
       </RoomSection>,
     );
-    assert.match(html, /id="grades"/);
-    assert.match(html, /ds-room-section--sunk/);
-    assert.match(html, /ds-room-section__plate/);
-    assert.match(html, /id="grades-heading"/);
-    assert.match(html, /ds-destination-icon--lg/);
+    assert.match(
+      html,
+      /<section id="grades" class="ds-room-section" aria-labelledby="grades-heading">/,
+    );
+    assert.match(
+      html,
+      /<h2 class="ds-section-heading" id="grades-heading">What the grades mean<\/h2>/,
+    );
+    assert.doesNotMatch(html, /plate|kicker|--sunk|ds-destination-icon/);
   });
 
   it('RoomHandoff is a link with a plate, never a buried paragraph', () => {
@@ -311,13 +311,13 @@ describe('room kit · catalog blocks', () => {
     assert.match(html, /Source library/);
   });
 
-  it('RoomJump is a list of hash links that work without JavaScript', () => {
+  it('RoomJump is a plain text list of hash links that work without JavaScript', () => {
     const html = renderToStaticMarkup(
-      <RoomJump sections={[{ id: 'origin', label: 'Why this exists', icon: 'about' }]} />,
+      <RoomJump sections={[{ id: 'origin', label: 'Why this exists' }]} />,
     );
+    assert.match(html, /<nav class="ds-room-toc" aria-label="On this page">/);
     assert.match(html, /href="#origin"/);
-    assert.match(html, /ds-room-jump/);
-    assert.doesNotMatch(html, /aria-current/);
+    assert.doesNotMatch(html, /aria-current|ds-destination-icon/);
   });
 });
 
@@ -414,11 +414,6 @@ describe('room kit · evidence blocks', () => {
 
     const anat = renderToStaticMarkup(<Anatomy cells={[{ label: 'Kind', value: 'Ordinance' }]} />);
     assert.match(anat, /ds-room-anat__v[^>]*>Ordinance</);
-  });
-
-  it('a Note prefixes its kind in the mono register', () => {
-    const html = renderToStaticMarkup(<Note kind="SERIES">Two lanes do not overlap.</Note>);
-    assert.match(html, /SERIES · Two lanes do not overlap\./);
   });
 });
 
@@ -526,23 +521,6 @@ describe('room kit · index, table and utility blocks', () => {
 });
 
 describe('room kit · the ways a room ends', () => {
-  it('an OffRamp carries at most one copper action', () => {
-    const html = renderToStaticMarkup(
-      <OffRamp
-        title="Keep going"
-        actions={[
-          { href: '/records', label: 'Browse the records', emphasis: 'copper' },
-          { href: '/methodology', label: 'How this was built' },
-        ]}
-      >
-        This chapter is built out of records you can open.
-      </OffRamp>,
-    );
-    assert.equal(html.match(/ds-cta--copper/g)?.length, 1);
-    assert.match(html, /ds-cta--quiet/);
-    assert.match(html, /aria-label="Where to go next"/);
-  });
-
   it('RecordNav renders nothing when the session has no neighbors', () => {
     assert.equal(renderToStaticMarkup(<RecordNav />), '');
   });
@@ -560,17 +538,22 @@ describe('room kit · the ways a room ends', () => {
 });
 
 describe('room kit · the column', () => {
-  it('Room renders one main with the document wrapper and sets no width itself', () => {
-    const html = renderToStaticMarkup(
-      <Room>
+  it('Room renders one main on one of the three shared containers, and sets no width itself', () => {
+    const read = renderToStaticMarkup(
+      <Room width="read">
         <p>Body.</p>
       </Room>,
     );
     assert.match(
-      html,
-      /<main class="ds-room" id="main"><div class="ds-room__body"><div class="ds-room__doc">/,
+      read,
+      /<main class="ds-room" id="main"><div class="ds-room__body ds-wrap ds-wrap--read"><div class="ds-room__doc">/,
     );
-    assert.doesNotMatch(html, /max-width/);
+    assert.doesNotMatch(read, /max-width|style=/);
+    assert.match(
+      renderToStaticMarkup(<Room width="wide">{null}</Room>),
+      /class="ds-room__body ds-wrap"/,
+    );
+    assert.match(renderToStaticMarkup(<Room>{null}</Room>), /ds-wrap ds-wrap--record/);
   });
 
   it('puts the masthead and the apparatus band outside the measure, around the body', () => {
@@ -585,7 +568,7 @@ describe('room kit · the column', () => {
     // them run wider than the measure the column is pinned to.
     assert.match(
       html,
-      /ds-room__mast[^]*ds-room__body ds-room__body--railed[^]*ds-room__doc[^]*ds-room__rail[^]*ds-room__foot/,
+      /ds-room__mast[^]*ds-room__body ds-wrap ds-wrap--record ds-room__body--railed[^]*ds-room__doc[^]*ds-room__rail[^]*ds-room__foot/,
     );
   });
 });
@@ -1153,8 +1136,8 @@ describe('room kit · one public control system', () => {
  * `Room` because Lives, the memorial wall and record pages share the kit. An opt-in drifts the
  * way the chapter pattern did, so the list of rooms that must carry it is pinned here.
  */
-describe('room kit · every standalone room is a ledger room', () => {
-  const LEDGER_ROOMS = [
+describe('room kit · every page picks one of the three containers', () => {
+  const PAGES = [
     'about/page.tsx',
     'books/page.tsx',
     'corrections/page.tsx',
@@ -1162,6 +1145,8 @@ describe('room kit · every standalone room is a ledger room', () => {
     'errata/page.tsx',
     'faq/page.tsx',
     'law/page.tsx',
+    'lives/page.tsx',
+    'lives/explorer/page.tsx',
     'methodology/page.tsx',
     'privacy/page.tsx',
     'records/RecordsIndex.tsx',
@@ -1173,18 +1158,20 @@ describe('room kit · every standalone room is a ledger room', () => {
     'terms/page.tsx',
   ] as const;
 
-  it('opens with <Room ledger>', () => {
-    const missing = LEDGER_ROOMS.filter((rel) => {
+  it('names its width on <Room>', () => {
+    const missing = PAGES.filter((rel) => {
       const source = readFileSync(path.join(APP_DIR, rel), 'utf8');
-      return /<Room(?=[\s>])(?!\s+ledger)/.test(source);
+      return !/<Room\s+width="(read|record|wide)"/.test(source);
     });
     assert.deepEqual(missing, []);
   });
 
-  it('the memorial wall and Lives do not', () => {
-    for (const rel of ['memorial/page.tsx', 'lives/page.tsx', 'lives/explorer/page.tsx']) {
-      assert.doesNotMatch(readFileSync(path.join(APP_DIR, rel), 'utf8'), /<Room\s+ledger/);
-    }
+  it('no stylesheet sets a per-route room measure', () => {
+    const offenders = walk(path.join(APP_DIR, '..'))
+      .filter((file) => file.endsWith('.css'))
+      .filter((file) => /--room-doc-w|ds-room--ledger/.test(readFileSync(file, 'utf8')))
+      .map((file) => path.relative(APP_DIR, file));
+    assert.deepEqual(offenders, []);
   });
 });
 

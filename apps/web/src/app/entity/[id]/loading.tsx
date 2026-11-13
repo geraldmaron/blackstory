@@ -46,6 +46,7 @@ export default function EntityLoading() {
         Opening record
       </p>
       <Room
+        width="record"
         masthead={
           <>
             <figure className="ds-record-mast" data-media="mark" aria-hidden="true">

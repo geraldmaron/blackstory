@@ -11,8 +11,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'PrivacySections.tsx'), 'utf8');
 
-test('privacy is a room on the walk, with the shared way back', () => {
-  assert.match(pageSource, /WalkOffRamp/);
+test('privacy is a room on the walk, and ends without the BlackStory off-ramp card', () => {
+  assert.doesNotMatch(pageSource, /WalkOffRamp/);
   assert.doesNotMatch(pageSource, /Open the Atlas|ATLAS_INSTRUMENT/);
   assert.doesNotMatch(pageSource, /['"`]\/banned-books/);
   assert.doesNotMatch(pageSource, /['"`]\/locate['"`]|['"`]\/design-system/);

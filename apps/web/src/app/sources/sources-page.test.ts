@@ -34,7 +34,7 @@ test('the page renders lineage, publisher kinds, and existing surfaces', () => {
   assert.match(sectionsSource, /SOURCE_PUBLISHER_KINDS/);
   assert.match(sectionsSource, /SOURCE_LIBRARY_SURFACES/);
   assert.match(sectionsSource, /SourceLineageDiagram/);
-  assert.match(sectionsSource, /WalkOffRamp/);
+  assert.doesNotMatch(sectionsSource, /WalkOffRamp/);
   assert.match(sectionsSource, /RoomJump/);
   assert.match(sectionsSource, /RoomHandoff/);
   assert.doesNotMatch(sectionsSource, /—/);

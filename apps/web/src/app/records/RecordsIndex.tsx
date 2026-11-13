@@ -9,16 +9,8 @@
  */
 
 import React from 'react';
-import {
-  EmptyList,
-  FindBar,
-  HairlineIndex,
-  OffRamp,
-  OrientationInstrument,
-  ReadingEntry,
-  DocumentColophon,
-  Room,
-} from '../../components/room';
+import { PageHeader } from '@repo/ui';
+import { EmptyList, FindBar, HairlineIndex, DocumentColophon, Room } from '../../components/room';
 import { meterLevelForTier, RecordMeter } from '../../components/entity/RecordChrome';
 import { KindGlyph } from '../../components/map-experience/KindGlyph';
 import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
@@ -152,12 +144,9 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
     previousHref,
     nextHref,
     facets,
-    eraGroups,
-    stateGroups,
     constraints,
     clearAllHref,
     atlasHref,
-    atlasReason,
     collection,
     notice,
     indexHref,
@@ -180,56 +169,9 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
     }),
   ) as Record<string, string>;
 
-  const rail = (
-    <OrientationInstrument
-      where={`${countLabel} in the list`}
-      {...(query.era.length > 0 ? { eraBand: query.era } : {})}
-      moves={[
-        {
-          label: 'Open the map',
-          icon: 'explore' as const,
-          href: atlasHref,
-          note: atlasReason,
-        },
-        ...(eraGroups[0]
-          ? [
-              {
-                label: `Browse ${eraGroups[0].label}`,
-                icon: 'time' as const,
-                href: eraGroups[0].href,
-                note: `${eraGroups[0].count.toLocaleString('en-US')} records`,
-              },
-            ]
-          : []),
-        ...(stateGroups[0]
-          ? [
-              {
-                label: `Browse ${stateGroups[0].label}`,
-                icon: 'place' as const,
-                href: stateGroups[0].href,
-                note: `${stateGroups[0].count.toLocaleString('en-US')} records`,
-              },
-            ]
-          : []),
-      ].slice(0, 3)}
-    />
-  );
-
   return (
-    <Room ledger rail={rail}>
-      <ReadingEntry
-        pathname="/records"
-        title={
-          <>
-            Everything the archive <em>holds</em>.
-          </>
-        }
-        className="ds-records-entry"
-        {...(constraints.length === 0
-          ? { lede: 'The map shows where a record sits. This list shows what the archive holds.' }
-          : {})}
-        showCrumb={false}
-      />
+    <Room width="wide">
+      <PageHeader title="Records" dek={`${totalAll.toLocaleString('en-US')} records`} />
 
       {/* One workbench: the collection heading and view choice, then the find field and facets,
           directly above the rows they narrow. */}
@@ -576,21 +518,6 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           'Readable without the map',
         ]}
       />
-
-      <OffRamp
-        title={
-          <>
-            See the same records in <em>place</em>
-          </>
-        }
-        actions={[
-          { href: atlasHref, label: 'Open this selection on the map', emphasis: 'copper' },
-          { href: '/methodology', label: 'How a record gets in' },
-          { href: '/submit', label: 'Submit a record the archive is missing' },
-        ]}
-      >
-        {atlasReason}
-      </OffRamp>
     </Room>
   );
 }

@@ -7,20 +7,11 @@
  * lives in `room-kit.test.tsx`.
  */
 
-export { Room, type RoomProps } from './Room';
-export {
-  ReadingEntry,
-  DocumentColophon,
-  OrientationInstrument,
-  type EntryPosture,
-  type ReadingEntryProps,
-  type DocumentColophonProps,
-  type OrientationInstrumentProps,
-  type OrientationMove,
-} from './EntryPosture';
+export { Room, type RoomProps, type RoomWidth } from './Room';
+export { DocumentColophon, type EntryPosture, type DocumentColophonProps } from './EntryPosture';
 export { RailGroup, type RailGroupProps, type RailEntry } from './RoomRail';
 export { Breadcrumb, type BreadcrumbProps } from './Breadcrumb';
-export { resolveTrail, roomLabelFor, type RoomCrumb } from './room-trail';
+export { parentCrumb, resolveTrail, roomLabelFor, type RoomCrumb } from './room-trail';
 export {
   GroupHeading,
   CardGrid,
@@ -33,15 +24,11 @@ export {
   RoomSection,
   RoomFactList,
   RoomHandoff,
-  roomSectionTone,
   type RoomSectionProps,
-  type RoomSectionTone,
   type RoomFact,
   type RoomHandoffProps,
 } from './RoomSection';
 export { DocumentPlate, type DocumentPlateProps } from './DocumentPlate';
-export { KeepGoing, type KeepGoingProps } from './KeepGoing';
-export { RoomStats, type RoomStatsProps, type RoomStat } from './RoomStats';
 export { RoomJump, type RoomJumpProps, type RoomJumpSection } from './RoomJump';
 export {
   FindBar,
@@ -62,7 +49,6 @@ export {
   TrustBlock,
   Anatomy,
   Precision,
-  Note,
   type RoomSource,
   type SourceListProps,
   type RoomConnection,
@@ -72,7 +58,6 @@ export {
   type AnatomyCell,
   type AnatomyProps,
   type PrecisionProps,
-  type NoteProps,
 } from './Evidence';
 export {
   HairlineIndex,
@@ -111,11 +96,8 @@ export {
   type MomentFrame,
 } from './MapMoment';
 export {
-  OffRamp,
   RecordNav,
   EmptyList,
-  type OffRampProps,
-  type OffRampAction,
   type RecordNavProps,
   type RecordNavTarget,
   type EmptyListProps,

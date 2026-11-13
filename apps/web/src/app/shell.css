@@ -41,8 +41,17 @@ body {
 .ds-shell-body {
   flex: 1 0 auto;
   min-width: 0;
-  /* Theme-aware shell bar — document pages clear it themselves. */
+  /* The header is fixed from 48rem up; the body starts under it. */
   padding-top: calc(var(--ds-island-clearance));
+}
+
+/* Below 48rem the header is in flow and already pushes the body down. The clearance token stays
+   set on the Door for the fixed map chrome, so the body must not add it a second time. */
+@media (max-width: 47.9375rem) {
+  .ds-shell-body,
+  .ds-shell-offline {
+    padding-top: 0;
+  }
 }
 
 /* —— Surface classes (docs/ui/patterns-surface-classes.md) ——————————————————————————
@@ -149,188 +158,154 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 .ds-shell-offline > * {
-  width: min(100% - (var(--ds-gutter) * 2), var(--ds-grid-max));
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
   margin-inline: auto;
 }
 
-/* —— Footer — theme-aware Surface card (v6 home + sitewide) ——  */
+/* —— Footer: two rows on the wide container ——————————————————————————————————— */
 .ds-shell-footer {
   margin-top: auto;
-  padding: var(--ds-space-8) var(--ds-gutter) var(--ds-space-10);
+  padding-block: var(--ds-space-12) var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink);
   scroll-margin-top: var(--ds-island-clearance);
 }
 
-/* Ink direction: the footer sits directly on the page ground above a hairline — the Surface
-   card frame comes off sitewide, not just here (see RoomCard for the same move). */
-.ds-shell-footer__card {
-  width: min(100%, var(--ds-grid-max));
+.ds-shell-footer__inner {
+  display: grid;
+  gap: var(--ds-space-12);
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
   margin-inline: auto;
-  padding-top: var(--ds-space-8);
-  color: var(--ds-ink);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-shell-footer__inner {
+.ds-shell-footer__top {
   display: grid;
   gap: var(--ds-space-8);
 }
 
 .ds-shell-footer__mast {
   display: grid;
-  gap: var(--ds-space-3);
+  align-content: start;
+  justify-items: start;
+  gap: var(--ds-space-4);
 }
 
-.ds-shell-footer__wordmark {
+.ds-shell-footer__brand {
+  --ds-lockup-size: 4.5rem;
+}
+
+.ds-shell-footer__note {
+  max-width: 34rem;
   margin: 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: clamp(1.75rem, 1.35rem + 1.4vw, 2.5rem);
-  letter-spacing: -0.03em;
-  line-height: 1.08;
-  color: var(--ds-ink);
-}
-
-.ds-shell-footer__wordmark a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-shell-footer__wordmark a:focus-visible {
-  outline: 2px solid var(--ds-accent);
-  outline-offset: 3px;
-}
-
-.ds-shell-footer__tagline {
-  margin: 0;
-  max-width: 42ch;
-  font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
-  line-height: 1.55;
   color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
 }
 
-.ds-shell-footer__tagline a {
-  color: var(--ds-accent);
-}
-
-.ds-shell-footer__tagline a:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
-  outline-offset: var(--ds-focus-offset);
+.ds-shell-footer__note a {
+  color: var(--ds-ink);
+  text-underline-offset: 0.2em;
 }
 
 .ds-shell-footer__columns {
   display: grid;
-  gap: var(--ds-space-8);
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-8) var(--ds-space-6);
 }
 
 .ds-shell-footer__column-title {
-  margin: 0 0 var(--ds-space-3);
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-ink);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
 }
 
 .ds-shell-footer__links {
   display: grid;
-  gap: 0;
-  list-style: none;
   margin: 0;
   padding: 0;
-  font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  list-style: none;
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-shell-footer__links a {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
   min-height: 2.75rem;
   color: var(--ds-ink-muted);
   text-decoration: none;
-  transition:
-    color var(--ds-duration-fast) var(--ds-easing),
-    border-color var(--ds-duration-fast) var(--ds-easing);
+  transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-shell-footer__links a:hover {
-  color: var(--ds-accent);
-}
-
-.ds-shell-footer__links a:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
-  outline-offset: var(--ds-focus-offset);
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .ds-shell-footer__meta-row {
-  display: grid;
-  gap: var(--ds-space-4);
-  padding-top: var(--ds-space-6);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--ds-space-6);
+  padding-top: var(--ds-space-4);
   border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
 }
 
 .ds-shell-footer__meta {
   margin: 0;
-  color: var(--ds-ink-muted);
 }
 
-.ds-shell-footer__maker {
-  margin: 0;
-}
-
-/* Direct child of the grid meta-row, like the staff link below: without justify-self it
-   stretches the full card width and the two policy links drift apart to the card edges. */
 .ds-shell-footer__policy {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-4);
-  justify-self: start;
-  font-size: 0.75rem;
+  gap: var(--ds-space-6);
 }
 
-.ds-shell-footer__policy a {
+/* Row two: every link a 44px target, on its own type. */
+.ds-shell-footer__policy a,
+.ds-shell-footer__operator,
+.ds-shell-footer .ds-maker-credit__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   color: var(--ds-ink-muted);
   text-decoration: none;
 }
 
 .ds-shell-footer__policy a:hover,
-.ds-shell-footer__policy a:focus-visible {
+.ds-shell-footer__operator:hover,
+.ds-shell-footer .ds-maker-credit__link:hover {
   color: var(--ds-ink);
   text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
-.ds-shell-footer__operator {
-  color: var(--ds-ink-muted);
-  text-decoration: none;
+.ds-shell-footer .ds-maker-credit__mark {
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
-/* Direct child of the grid meta-row, so without this it stretches the full card width
-   and reads as a banner rather than the quiet handoff it is. */
-.ds-shell-footer__staff {
-  justify-self: start;
-  font-size: 0.75rem;
+.ds-shell-footer .ds-maker-credit__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
-.ds-shell-footer__operator:hover {
-  color: var(--ds-accent);
-  text-decoration: underline;
+@media (min-width: 48rem) {
+  .ds-shell-footer__columns {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
-.ds-shell-footer__operator:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-shell-footer .ds-maker-credit__link {
-  color: var(--ds-ink-muted);
-}
-
-.ds-shell-footer .ds-maker-credit__link:hover,
-.ds-shell-footer .ds-maker-credit__link:focus-visible {
-  color: var(--ds-accent);
+@media (min-width: 64rem) {
+  .ds-shell-footer__top {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--ds-space-12);
+  }
 }
 
 /* Maker credit — GD mark + personal site link (footer / about / home about). */
@@ -372,11 +347,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 .ds-maker-credit__label {
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .ds-maker-credit__name {
@@ -415,33 +388,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   outline-offset: 3px;
 }
 
-@media (min-width: 40rem) {
-  .ds-shell-footer__columns {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .ds-shell-footer__meta-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: var(--ds-space-6);
-  }
-}
-
-@media (min-width: 64rem) {
-  .ds-shell-footer__columns {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .ds-shell-footer__inner {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.55fr);
-    align-items: start;
-  }
-
-  .ds-shell-footer__meta-row {
-    grid-column: 1 / -1;
-  }
-}
-
 /* —— Skip link (WCAG 2.4.1) ——  */
 .ds-skip-link {
   position: absolute;
@@ -458,7 +404,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 .ds-skip-link:focus,
 .ds-skip-link:focus-visible {
   position: fixed;
-  top: calc(var(--ds-island-offset) + var(--ds-space-2));
+  top: calc(env(safe-area-inset-top, 0px) + var(--ds-space-2));
   left: var(--ds-space-2);
   z-index: var(--ds-z-a11y-escape);
   width: auto;
@@ -482,70 +428,16 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
    `animation-fill-mode: both`, which leaves a permanently non-`none` computed transform, and a
    non-`none` transform makes this element the containing block for the fixed map plate — the
    plate then scrolls with the document instead of holding the viewport. There is no version of
-   a 0.2rem translate worth breaking the persistent plate for. `isolation: isolate` stays: it
-   scopes the page field's stacking to this wrapper without creating a containing block. ——  */
+   a 0.2rem translate worth breaking the persistent plate for. `isolation: isolate` keeps page
+   stacking local to this wrapper without creating a containing block. ——  */
 .ds-shell-page-transition {
   position: relative;
   isolation: isolate;
 }
 
-/* —— Page field — subtle repeating motif behind archive canvases.
-   Decorative only (aria-hidden in PageField.tsx); keep effective contrast low so
-   long-form body copy stays primary. The Instrument never paints one: the plate is the
-   surface there, and a motif over it is decoration competing with data. ——  */
 .ds-shell-page-transition__content {
   position: relative;
   z-index: var(--ds-z-content);
-}
-
-.ds-page-field {
-  position: absolute;
-  inset: 0;
-  z-index: var(--ds-z-decoration);
-  pointer-events: none;
-  background-color: transparent;
-  background-image: var(--ds-page-field-light);
-  background-repeat: repeat;
-  background-size: 20rem 20rem;
-  opacity: 0.055;
-}
-
-[data-theme='dark'] .ds-page-field {
-  background-image: var(--ds-page-field-dark);
-  opacity: 0.075;
-}
-
-/* No motif over the persistent map plate. */
-.ds-shell-page-transition[data-surface='instrument'] .ds-page-field,
-.ds-shell-page-transition[data-surface='door'] .ds-page-field {
-  display: none;
-}
-
-/* Optional page-band corner accents — flat matte, copper-adjacent sand only. */
-.ds-page-field--accents::before,
-.ds-page-field--accents::after {
-  content: '';
-  position: absolute;
-  width: min(28vw, 11rem);
-  height: min(18vw, 4.5rem);
-  background: var(--ds-accent-muted);
-  opacity: 0.035;
-  pointer-events: none;
-}
-
-.ds-page-field--accents::before {
-  top: 0;
-  left: 0;
-}
-
-.ds-page-field--accents::after {
-  right: 0;
-  bottom: 0;
-}
-
-[data-theme='dark'] .ds-page-field--accents::before,
-[data-theme='dark'] .ds-page-field--accents::after {
-  opacity: 0.048;
 }
 
 /* —— Page mast — the room's nameplate. Oversized, ruled, unmistakable ——  */
@@ -553,27 +445,12 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   padding-block: var(--ds-space-12) var(--ds-space-16);
 }
 
-.ds-page__eyebrow,
 .ds-section__kicker {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
   margin: 0;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-/* The copper tick — the recurring orientation mark of the system. */
-.ds-page__eyebrow::before,
-.ds-section__kicker::before {
-  content: '';
-  width: 1.75rem;
-  height: 2px;
-  background: var(--ds-accent-graphic);
 }
 
 .ds-page__title {
@@ -677,27 +554,21 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   margin: var(--ds-space-8) 0 0;
 }
 
-/* —— Action vocabulary — ONE pill recipe, three weights.
-   `.ds-cta` (links) and `.ds-button` (form buttons, components.css) share
-   this recipe exactly. Aliases kept this cycle: --ink/--solid → solid,
-   --ghost/--ghost-dark → quiet-on-ink, --copper → copper. ——  */
+/* —— Legacy action class. The kit `Button` (`.ds-button`, packages/ui components.css) is the one
+   button. `.ds-cta` stays only for call sites in page folders and the map surfaces that later
+   waves migrate; it takes the Button's geometry (44px, radius 8, 14/600) so the two match until
+   it is deleted. Do not add new uses. ——  */
 .ds-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--ds-space-2);
-  /* The design comps draw this pill at 40px with 20px of side padding and a 13px label. The
-     previous 44px/24px/14px was a step larger than every surface it sat on, which is what made
-     pagination and off-ramp actions read as oversized next to the 30px chips beside them. 40px
-     still clears WCAG 2.5.8's 24px target minimum with room to spare. */
-  min-height: 2.5rem;
-  padding: 0 var(--ds-space-5);
-  border-radius: var(--ds-radius-full);
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-sm);
   border: var(--ds-border-width) solid transparent;
   font-family: var(--ds-font-sans);
-  /* Ink direction: a button is a label, not a signpost — drop the caps and tracking that made
-     every action on the site read as mono-adjacent shouting. */
-  font-size: 13px;
+  font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: normal;
   text-transform: none;
@@ -706,22 +577,12 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   transition:
     background-color var(--ds-duration-fast) var(--ds-easing),
     color var(--ds-duration-fast) var(--ds-easing),
-    border-color var(--ds-duration-fast) var(--ds-easing),
-    transform var(--ds-duration-fast) var(--ds-easing),
-    opacity var(--ds-duration-fast) var(--ds-easing);
+    border-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-cta:active {
-  transform: scale(0.98);
-}
-
-/* Dense contexts — pagination, inline row actions, anything sitting in a list rather than
-   closing a section. 36px still clears WCAG 2.5.8's 24px target minimum; the full-size pill
-   is for actions that end a composition, not for a Next control beside a page counter. */
+/* Former dense size; now the same 44px target as every button. */
 .ds-cta--sm {
-  min-height: 2.25rem;
-  padding: 0 var(--ds-space-4);
-  font-size: 12.5px;
+  padding: 0 var(--ds-space-3);
 }
 
 /* THE primary action of a view — copper, max one per composition. */
@@ -819,10 +680,8 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   min-height: 2.75rem;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-caption);
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   text-decoration: none;
   border-bottom: 2px solid var(--ds-accent);
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
@@ -924,11 +783,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 .ds-state-start__coverage-label {
   margin: 0;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .ds-state-start__chips {
@@ -1023,11 +880,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   }
 }
 
-.ds-story-rail__notice {
-  margin: var(--ds-space-3) 0 0;
-  color: var(--ds-ink-subtle);
-}
-
 .ds-story-link {
   display: grid;
   gap: var(--ds-space-3);
@@ -1043,11 +895,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   align-items: center;
   gap: var(--ds-space-2);
   color: var(--ds-ink-subtle);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
@@ -1139,10 +989,8 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 
 .ds-data-strip__label {
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
 }
 
 .ds-data-strip__note {
@@ -1278,11 +1126,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 
 .ds-pill-select__label {
   color: var(--ds-ink-subtle);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .ds-pill-select__control {
@@ -1369,11 +1215,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 .ds-index .ds-result-list__meta {
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 /* —— At a glance — summary before story (cognitive-accessibility law).
@@ -1394,11 +1238,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   gap: var(--ds-space-3);
   margin: 0 0 var(--ds-space-2);
   color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .ds-at-a-glance__grid {
@@ -1418,11 +1260,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 .ds-at-a-glance__row dt {
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-weight: 500;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -1662,8 +1502,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 
@@ -1733,11 +1571,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 .ds-kind-badge__label {
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -2426,30 +2262,22 @@ body:has(.ds-explore-stage[data-results='open']) {
 }
 
 /*
- * Target size (WCAG 2.5.8). Standalone text links in page chrome — footer policies, staff sign-in,
- * the maker credit, a document plate's "Open the entry", the compact wordmark — rendered 17–21px
- * tall: fine for a mouse, a miss for a thumb. They keep their type; only the hit box grows.
+ * Target size (WCAG 2.5.8). A document plate's "Open the entry" rendered 17–21px tall: fine for a
+ * mouse, a miss for a thumb. It keeps its type; only the hit box grows.
  */
-.ds-shell-footer__policy a,
-.ds-shell-footer__staff,
-.ds-shell-footer__maker a,
 .ds-room-plate__link {
   display: inline-flex;
   align-items: center;
   min-height: 24px;
 }
 
+/* The header lockup is 24px of ink; its link is the bar's full height on every pointer. */
 .ds-bar__brand {
-  min-height: 32px;
-  min-width: 32px;
+  min-height: 44px;
 }
 
 @media (pointer: coarse) {
-  .ds-shell-footer__policy a,
-  .ds-shell-footer__staff,
-  .ds-shell-footer__maker a,
-  .ds-room-plate__link,
-  .ds-bar__brand {
+  .ds-room-plate__link {
     min-height: 44px;
   }
 }
@@ -2500,28 +2328,9 @@ main[tabindex='-1']:focus-visible {
   outline-offset: calc(var(--ds-focus-offset) * -1);
 }
 
-/*
- * Touch targets. The logo, the search pill and the footer links were 24 to 40px tall; a thumb needs
- * 44. Only on touch devices, so the desktop bar and footer keep their proportions.
- */
+/* Touch: the header search field is a 44px target on any coarse pointer. */
 @media (pointer: coarse) {
-  .ds-bar__brand {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-  }
-
   .ds-bar__search {
-    min-height: 2.75rem;
-  }
-
-  .ds-shell-footer__wordmark a,
-  .ds-shell-footer__policy a,
-  .ds-shell-footer__operator,
-  .ds-shell-footer .ds-maker-credit__link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2.75rem;
     min-height: 2.75rem;
   }
 }

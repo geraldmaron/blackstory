@@ -2,20 +2,13 @@
  * Reading room surface class — the only stylesheet a Reading route imports.
  *
  * Design law: docs/ui/patterns-reading-room.md, design-direction-v9-surfaces.md §4.
- * Everything drawn here comes from the shared kit; this file sets the measure and the two
- * rules that are specific to a room you read rather than scan.
+ * Everything drawn here comes from the shared kit; this file holds the rules that are specific
+ * to a room you read rather than scan. Widths come from the page's container (`Room width`).
  */
 
 @import '../components/room/room-kit.css';
 
-/* Declared on the room, not the column: the railed grid sizes its first track from this
-   measure so the column-plus-rail pair centers as a unit. The column inherits it. */
-[data-surface='reading'] .ds-room {
-  --room-doc-w: 900px;
-}
-
-/* A reading room ends in an off-ramp. The rule is enforced by room-kit.test.tsx, not by CSS,
-   but the spacing assumes it is the last block in the column. */
+/* The memorial wall (protected) still ends on its off-ramp card; nothing else renders one. */
 [data-surface='reading'] .ds-room-offramp:not(:last-child) {
   margin-bottom: var(--ds-space-8);
 }
@@ -394,8 +387,10 @@ a.ds-errata__row-id {
    challenges, evidence, lookup, related, connected) rendered back to back with no top margin
    and no divider, so the whole page read as one continuous run of orange mono labels instead of
    a sequence of grouped blocks. This is the hairline block the class name promises: a generous
-   gap, then a rule, same register as the state-facet rows and the record index. */
-.ds-room-section {
+   gap, then a rule, same register as the state-facet rows and the record index. Scoped to the
+   books detail sections (they carry their own panel heading); a kit RoomSection is spaced by its
+   SectionHeading. */
+.ds-room-section:has(> .ds-books-edition__panel-heading) {
   margin-top: var(--ds-space-10);
   padding-top: var(--ds-space-8);
   border-top: var(--ds-border-width) solid var(--room-rule-2);
@@ -1081,23 +1076,23 @@ ul.ds-law-idx {
 /* Ledger row (docs/ui/design-direction-v10-rooms.md): in a legal ledger the year is the anchor, so
    it leads the row in display numerals; the kind is a copper tag; citation and gloss sit under the
    title at reading size. */
-.ds-room--ledger .ds-law-idx.ds-room-idx__list {
+.ds-law-idx.ds-room-idx__list {
   grid-template-columns: clamp(4.5rem, 10vw, 8.5rem) minmax(0, 1fr) auto;
   column-gap: var(--ds-space-6);
 }
 
-.ds-room--ledger .ds-law-idx .ds-room-idx__row {
+.ds-law-idx .ds-room-idx__row {
   grid-template-rows: auto auto auto;
   row-gap: 6px;
   padding-block: var(--ds-space-5);
   border-color: var(--ds-ink);
 }
 
-.ds-room--ledger .ds-law-idx .ds-room-idx__glyph {
+.ds-law-idx .ds-room-idx__glyph {
   display: none;
 }
 
-.ds-room--ledger .ds-law-idx .ds-room-idx__era {
+.ds-law-idx .ds-room-idx__era {
   grid-column: 1;
   grid-row: 1 / 4;
   text-align: left;
@@ -1110,7 +1105,7 @@ ul.ds-law-idx {
   color: var(--ds-ink);
 }
 
-.ds-room--ledger .ds-law-idx .ds-room-idx__name {
+.ds-law-idx .ds-room-idx__name {
   grid-column: 2;
   grid-row: 1;
   font-size: var(--ds-text-title);
@@ -1121,7 +1116,7 @@ ul.ds-law-idx {
   display: none;
 }
 
-.ds-room--ledger .ds-law-idx__kind {
+.ds-law-idx__kind {
   display: block;
   grid-column: 3;
   grid-row: 1;
@@ -1133,19 +1128,19 @@ ul.ds-law-idx {
   color: var(--ds-accent);
 }
 
-.ds-room--ledger .ds-law-idx .ds-law-idx__citation {
+.ds-law-idx .ds-law-idx__citation {
   grid-column: 2;
   grid-row: 2;
   white-space: normal;
 }
 
-.ds-room--ledger .ds-law-idx .ds-room-idx__place {
+.ds-law-idx .ds-room-idx__place {
   grid-column: 3;
   grid-row: 2;
   text-align: right;
 }
 
-.ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+.ds-law-idx .ds-law-idx__gloss {
   grid-column: 2 / -1;
   grid-row: 3;
   max-width: 46rem;
@@ -1155,43 +1150,43 @@ ul.ds-law-idx {
 }
 
 @media (max-width: 40rem) {
-  .ds-room--ledger .ds-law-idx.ds-room-idx__list {
+  .ds-law-idx.ds-room-idx__list {
     grid-template-columns: 3.75rem minmax(0, 1fr);
     column-gap: var(--ds-space-3);
   }
 
-  .ds-room--ledger .ds-law-idx .ds-room-idx__row {
+  .ds-law-idx .ds-room-idx__row {
     grid-template-rows: auto;
   }
 
-  .ds-room--ledger .ds-law-idx .ds-room-idx__era {
+  .ds-law-idx .ds-room-idx__era {
     grid-row: 1 / 5;
     font-size: var(--ds-text-title);
   }
 
-  .ds-room--ledger .ds-law-idx__kind,
-  .ds-room--ledger .ds-law-idx .ds-law-idx__citation,
-  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+  .ds-law-idx__kind,
+  .ds-law-idx .ds-law-idx__citation,
+  .ds-law-idx .ds-law-idx__gloss {
     grid-column: 2;
     text-align: left;
   }
 
-  .ds-room--ledger .ds-law-idx__kind {
+  .ds-law-idx__kind {
     grid-row: 2;
   }
 
-  .ds-room--ledger .ds-law-idx .ds-law-idx__citation {
+  .ds-law-idx .ds-law-idx__citation {
     grid-row: 3;
     display: block;
     /* The compact row capped the citation at 120px beside the year; here it has the column. */
     max-width: none;
   }
 
-  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
+  .ds-law-idx .ds-law-idx__gloss {
     grid-row: 4;
   }
 
-  .ds-room--ledger .ds-law-idx .ds-room-idx__place {
+  .ds-law-idx .ds-room-idx__place {
     display: none;
   }
 }
@@ -1522,12 +1517,12 @@ ul.ds-law-idx {
 }
 
 /* Related rooms sit after the names. Ink plates, not copper: this surface takes no accent. */
-.ds-memorial .ds-room-section__plate {
+.ds-memorial .ds-room-handoff__plate {
   color: var(--ds-ink);
 }
 
-.ds-memorial .ds-room-handoff:hover .ds-room-section__plate,
-.ds-memorial .ds-room-handoff:focus-visible .ds-room-section__plate {
+.ds-memorial .ds-room-handoff:hover .ds-room-handoff__plate,
+.ds-memorial .ds-room-handoff:focus-visible .ds-room-handoff__plate {
   color: var(--ds-ink);
   border-color: var(--ds-ink);
 }

@@ -32,8 +32,8 @@ import { BooksAffiliateNotice } from '../BooksAffiliateNotice';
 import { BooksAnatomyStrip } from '../BooksAnatomyStrip';
 import { BooksCoverArt } from '../BooksCoverArt';
 import { coverIsbnForBook } from '../books-cover';
-import { Room, ReadingEntry } from '../../../components/room';
-import { WalkOffRamp } from '../../walk-off-ramp';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../../components/room';
 import '../../reading-room.css';
 import '../../../components/patterns/record-anatomy.css';
 
@@ -138,13 +138,8 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
   }
 
   return (
-    <Room>
-      <ReadingEntry
-        pathname={`/books/${book.slug}`}
-        crumbLabel={book.title}
-        title={book.title}
-        showCrumb={false}
-      />
+    <Room width="record">
+      <PageHeader crumb={parentCrumb(`/books/${book.slug}`)} linkAs={Link} title={book.title} />
 
       <div className="ds-books-edition__intro-grid">
         <BooksCoverArt
@@ -187,10 +182,6 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
       <BooksDetailSections view={view} relatedItems={relatedItems} placePanel={entityPlacePanel} />
 
       {bookshop ? <BooksAffiliateNotice href={bookshop.href} /> : null}
-
-      <WalkOffRamp>
-        This title is in the national list. It does not invent a join to a place.
-      </WalkOffRamp>
     </Room>
   );
 }

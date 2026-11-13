@@ -1,6 +1,7 @@
 /**
- * Notice for notes, warnings, disputes, errors and confirmations, with a mono cue label so the
- * tone is never carried by color alone.
+ * Notice for notes, warnings, disputes, errors and confirmations: an inline note under a 1px rule,
+ * with a cue word so the tone is never carried by color alone. The one notice on the site; do not
+ * add a route-local variant.
  */
 
 import React, { type ReactNode } from 'react';

@@ -1,6 +1,6 @@
 /**
  * Shared loader for the Data ledger figures. Used by `/data` (canonical) and kept
- * colocated with the DataSections props so headline math stays in one place.
+ * colocated with the DataSections props so the figure math stays in one place.
  */
 import { US_STATES } from '@repo/domain/map/geography';
 import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summaries';
@@ -12,8 +12,7 @@ import {
 } from '../../lib/demographics/public-stats-source';
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
 import { timelineChangeStripItems } from '../../components/data/population-change';
-import { formatSharePct } from '../../components/data/chart-utils';
-import type { DataDeltaItem, DataHeadline, DataSectionsProps } from './DataSections';
+import type { DataDeltaItem, DataSectionsProps } from './DataSections';
 
 async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | undefined> {
   try {
@@ -83,68 +82,8 @@ export async function loadDataPageModel(): Promise<DataPageModel> {
   const indicatorsAsOf = formatAsOf(indicators.generatedAt);
   const populationAsOf = formatAsOf(timeline?.generatedAt);
 
-  const homeLast = indicators.cookHomeownership.points.at(-1);
-  const homeGap =
-    homeLast !== undefined
-      ? Math.round(((homeLast.values.white ?? 0) - (homeLast.values.black ?? 0)) * 10) / 10
-      : undefined;
-  const headlines: DataHeadline[] = [
-    ...(lastRow
-      ? [
-          {
-            id: 'population',
-            value: formatSharePct(lastRow.blackPopulation, lastRow.totalPopulation).replace(
-              '%',
-              '',
-            ),
-            unit: '%',
-            label: `of the country counted Black in the ${lastRow.decade} census, ${(lastRow.blackPopulation / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })} million people.`,
-            source: 'U.S. Census Bureau',
-            href: '#population-count',
-          },
-        ]
-      : []),
-    ...(indicators.wealthComparison.ratioValue !== undefined
-      ? [
-          {
-            id: 'wealth',
-            value: indicators.wealthComparison.ratioValue.toLocaleString('en-US'),
-            unit: '×',
-            label: `median wealth of a White family to a Black family, ${indicators.wealthComparison.referencePeriod}.`,
-            source: 'Federal Reserve, Survey of Consumer Finances',
-            href: '#wealth-gap',
-          },
-        ]
-      : []),
-    ...(homeGap !== undefined && homeLast !== undefined
-      ? [
-          {
-            id: 'housing',
-            value: homeGap.toLocaleString('en-US'),
-            unit: 'pts',
-            label: `homeownership gap between White and Black householders in Cook County, ${homeLast.period}.`,
-            source: 'NHGIS, decennial census',
-            href: '#housing-ownership',
-          },
-        ]
-      : []),
-    ...(indicators.imprisonmentComparison.ratioValue !== undefined
-      ? [
-          {
-            id: 'justice',
-            value: indicators.imprisonmentComparison.ratioValue.toLocaleString('en-US'),
-            unit: '×',
-            label: `state imprisonment rate of Black residents to White residents in ${indicators.imprisonmentComparison.geographyLabel}, ${indicators.imprisonmentComparison.referencePeriod}.`,
-            source: 'Bureau of Justice Statistics',
-            href: '#justice-imprisonment',
-          },
-        ]
-      : []),
-  ];
-
   return {
     sections: {
-      headlines,
       timelineRows,
       chartSources,
       deltaItems,

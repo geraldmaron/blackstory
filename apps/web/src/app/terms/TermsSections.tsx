@@ -20,8 +20,7 @@ import React from 'react';
 import Link from 'next/link';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { CORRECTION_PRIVACY_NOTICE } from '../corrections/copy';
-import { RoomJump, RoomSection, roomSectionTone } from '../../components/room';
-import type { DestinationIconId } from '@repo/public-contracts/destinations';
+import { RoomJump, RoomSection } from '../../components/room';
 import './terms.css';
 
 void React;
@@ -40,19 +39,18 @@ const RESOLUTION_DAYS = 30;
 const PAGE_SECTIONS: readonly {
   readonly id: string;
   readonly label: string;
-  readonly icon: DestinationIconId;
 }[] = [
-  { id: 'scope', label: 'Scope', icon: 'about' },
-  { id: 'what-this-is', label: 'What this is', icon: 'records' },
-  { id: 'using', label: 'Using it', icon: 'explore' },
-  { id: 'reuse', label: 'Reuse', icon: 'publication' },
-  { id: 'submissions', label: 'What you send', icon: 'submit' },
-  { id: 'about-you', label: 'A record about you', icon: 'person' },
-  { id: 'copyright', label: 'Copyright', icon: 'correction' },
-  { id: 'accuracy', label: 'Accuracy', icon: 'evidence' },
-  { id: 'liability', label: 'Liability', icon: 'errata' },
-  { id: 'affiliate', label: 'Affiliate links', icon: 'books' },
-  { id: 'changes', label: 'Changes', icon: 'support' },
+  { id: 'scope', label: 'Scope' },
+  { id: 'what-this-is', label: 'What this is' },
+  { id: 'using', label: 'Using it' },
+  { id: 'reuse', label: 'Reuse' },
+  { id: 'submissions', label: 'What you send' },
+  { id: 'about-you', label: 'A record about you' },
+  { id: 'copyright', label: 'Copyright' },
+  { id: 'accuracy', label: 'Accuracy' },
+  { id: 'liability', label: 'Liability' },
+  { id: 'affiliate', label: 'Affiliate links' },
+  { id: 'changes', label: 'Changes' },
 ];
 
 const NOT_THIS_RULES = [
@@ -66,13 +64,7 @@ export function TermsSections() {
     <div className="ds-terms">
       <RoomJump sections={PAGE_SECTIONS} />
 
-      <RoomSection
-        id="scope"
-        icon="about"
-        kicker="What this covers"
-        title="BlackStory, and who runs it"
-        tone={roomSectionTone(0)}
-      >
+      <RoomSection id="scope" title="BlackStory, and who runs it">
         <p className="ds-terms__follow">
           This page covers BlackStory at <span className="ds-phrase-nowrap">blackstory.app</span>{' '}
           and the archive it publishes. It is a notice rather than an agreement: you are not asked
@@ -86,13 +78,7 @@ export function TermsSections() {
         <p className="ds-terms__meta">Last updated: September 2026</p>
       </RoomSection>
 
-      <RoomSection
-        id="what-this-is"
-        icon="records"
-        kicker="The thing itself"
-        title="What this is, and what it is not"
-        tone={roomSectionTone(1)}
-      >
+      <RoomSection id="what-this-is" title="What this is, and what it is not">
         <p className="ds-terms__follow">
           BlackStory is a free, public archive of Black American history. There is nothing to buy
           and nothing to subscribe to, and reading a published page never asks you to sign in. Every
@@ -109,13 +95,7 @@ export function TermsSections() {
         </ol>
       </RoomSection>
 
-      <RoomSection
-        id="using"
-        icon="explore"
-        kicker="Reading"
-        title="Read it, link it, cite it"
-        tone={roomSectionTone(2)}
-      >
+      <RoomSection id="using" title="Read it, link it, cite it">
         <p className="ds-terms__follow">
           No permission is needed to read BlackStory, to link to any page on it, to quote it with
           attribution, or to cite it in your own work. That is what it is for, and asking would
@@ -130,13 +110,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="reuse"
-        icon="publication"
-        kicker="License"
-        title="Reusing what BlackStory writes"
-        tone={roomSectionTone(3)}
-      >
+      <RoomSection id="reuse" title="Reusing what BlackStory writes">
         <p className="ds-terms__follow">
           The writing on BlackStory is published under{' '}
           <a href={LICENSE_DEED} rel="license noopener noreferrer" target="_blank">
@@ -164,13 +138,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="submissions"
-        icon="submit"
-        kicker="Submissions"
-        title="Corrections, leads, and what happens to what you send"
-        tone={roomSectionTone(4)}
-      >
+      <RoomSection id="submissions" title="Corrections, leads, and what happens to what you send">
         <p className="ds-terms__follow">
           You can file a correction, send a research lead, appeal a closed correction, or report
           abuse. Nothing you send appears on the public site as you sent it, and nothing you send is
@@ -193,14 +161,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="about-you"
-        icon="person"
-        kicker="If it is about you"
-        title="If a record about you is wrong"
-        tone={roomSectionTone(5)}
-        className="ds-terms__section--flagged"
-      >
+      <RoomSection id="about-you" title="If a record about you is wrong">
         <p className="ds-terms__follow">
           Tell me. Use the <Link href="/corrections">corrections lane</Link> and say what is wrong
           and which page it is on, or write to{' '}
@@ -216,13 +177,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="copyright"
-        icon="correction"
-        kicker="Rights complaints"
-        title="If something published here is yours"
-        tone={roomSectionTone(6)}
-      >
+      <RoomSection id="copyright" title="If something published here is yours">
         <p className="ds-terms__follow">
           Write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>. Say what the
           material is, give the address of the page it is on, say what right you hold in it, and
@@ -236,13 +191,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="accuracy"
-        icon="evidence"
-        kicker="Accuracy"
-        title="Accuracy, and the limits of this archive"
-        tone={roomSectionTone(7)}
-      >
+      <RoomSection id="accuracy" title="Accuracy, and the limits of this archive">
         <p className="ds-terms__follow">
           The research here is provided as it stands, without warranty of completeness or currency.
           Sources sit on the record itself so you can check the work rather than take it on trust,
@@ -257,13 +206,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="liability"
-        icon="errata"
-        kicker="Liability"
-        title="Limits on liability"
-        tone={roomSectionTone(8)}
-      >
+      <RoomSection id="liability" title="Limits on liability">
         <p className="ds-terms__follow">
           BlackStory is free to read and is run by one person rather than a company. To the extent
           the law allows, I am not liable for indirect or consequential loss arising from the use of
@@ -271,13 +214,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="affiliate"
-        icon="books"
-        kicker="Money"
-        title="Affiliate links"
-        tone={roomSectionTone(9)}
-      >
+      <RoomSection id="affiliate" title="Affiliate links">
         <p className="ds-terms__follow">
           Some book pages link to Bookshop.org through an affiliate program, and a purchase made
           through one of those links pays BlackStory a commission. Nothing here is paid placement:
@@ -286,13 +223,7 @@ export function TermsSections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="changes"
-        icon="support"
-        kicker="Updates"
-        title="Changes and contact"
-        tone={roomSectionTone(10)}
-      >
+      <RoomSection id="changes" title="Changes and contact">
         <p className="ds-terms__follow">
           A material change to this notice is posted here, with a new date at the top. For a
           question about anything on this page, or about how the archive runs, write to{' '}

@@ -258,8 +258,8 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /href="\/memorial"/);
   assert.doesNotMatch(html, /href="\/errata"/);
   assert.match(html, /href="\/methodology[^"]*"/);
-  assert.match(html, /Back to BlackStory/);
-  assert.match(html, /href="\/"/);
+  // The BlackStory off-ramp card is gone (the header lockup is the way home).
+  assert.doesNotMatch(html, /Back to BlackStory|ds-room-offramp/);
   assert.doesNotMatch(html, /id="stories"/);
   assert.doesNotMatch(html, /href="#stories"/);
   assert.doesNotMatch(html, /href="\/books"/);
@@ -502,8 +502,7 @@ test('a place with no place neighbors walks on to another published stand', () =
     }),
   );
   assert.match(html, /African American Research Library and Cultural Center/);
-  assert.match(html, /Back to BlackStory/);
-  assert.match(html, /href="\/"/);
+  assert.doesNotMatch(html, /Back to BlackStory|ds-room-offramp/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dillard-high-school-old"/);
   assert.doesNotMatch(html, /id="stories"/);

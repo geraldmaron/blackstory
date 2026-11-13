@@ -31,28 +31,17 @@ import { formatDataPageValue, formatSharePct } from '../../components/data/chart
 import { rankStateMovers } from '../../components/data/population-change';
 import type { DataSourceRef } from '../../components/data/SourceFootnote';
 import '../../components/data/data-charts.css';
+import { SectionHeading } from '@repo/ui';
 import {
-  DATA_PAGE_SECTIONS,
   DATA_READING_LINKS,
   DATA_READING_RULES,
   DATA_SECTION_COPY,
   DATA_SOURCE_LIBRARY_HANDOFF,
   type DataPageSectionId,
 } from './data-copy';
-import { DataPageNav } from './DataPageNav';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
-import { RoomStats } from '../../components/room';
 
 void React;
-
-export type DataHeadline = {
-  readonly id: string;
-  readonly value: string;
-  readonly unit?: string;
-  readonly label: string;
-  readonly source: string;
-  readonly href: string;
-};
 
 export type DataDeltaItem = {
   readonly id: string;
@@ -62,7 +51,6 @@ export type DataDeltaItem = {
 };
 
 export type DataSectionsProps = {
-  readonly headlines: readonly DataHeadline[];
   readonly timelineRows: readonly NationalPopulationTimelineRow[];
   readonly chartSources: readonly DataSourceRef[];
   readonly deltaItems: readonly DataDeltaItem[];
@@ -178,22 +166,6 @@ function groupedReading(series: DataPageGroupedBarSeries): ReactNode {
   );
 }
 
-function OpeningBeat({ items }: { readonly items: readonly DataHeadline[] }) {
-  return (
-    <RoomStats
-      label="Opening figures"
-      stats={items.map((item) => ({
-        id: item.id,
-        value: item.value,
-        unit: item.unit,
-        label: item.label,
-        source: item.source,
-        href: item.href,
-      }))}
-    />
-  );
-}
-
 function Section({
   id,
   meta,
@@ -204,26 +176,12 @@ function Section({
   readonly children: ReactNode;
 }) {
   const copy = DATA_SECTION_COPY[id];
-  const sectionMeta = DATA_PAGE_SECTIONS.find((entry) => entry.id === id);
   const headingId = `${id}-heading`;
   return (
     <section className="ds-data-section" id={id} aria-labelledby={headingId}>
       <header className="ds-data-section__head">
-        {/* The same chapter head as every other room: a plate, a kicker, a heading. An act on
-            /data and a chapter on /methodology are one object, so they read from one rule set. */}
-        <div className="ds-room-section__head">
-          {sectionMeta ? (
-            <span className="ds-room-section__plate" aria-hidden="true">
-              <DestinationIcon id={sectionMeta.icon} size="lg" />
-            </span>
-          ) : null}
-          <div className="ds-room-section__titles">
-            <p className="ds-room-section__kicker">{copy.kicker}</p>
-            <h2 className="ds-room-section__title ds-data-section__title" id={headingId}>
-              {copy.title}
-            </h2>
-          </div>
-        </div>
+        {/* The shared section heading, as on every other room: no plate, no kicker. */}
+        <SectionHeading id={headingId}>{copy.title}</SectionHeading>
         <p className="ds-data-section__lede">{copy.lede}</p>
         {meta.length > 0 ? (
           <p className="ds-data-section__meta">
@@ -299,7 +257,6 @@ function DeltaFigure({
 }
 
 export function DataSections({
-  headlines,
   timelineRows,
   chartSources,
   deltaItems,
@@ -314,9 +271,6 @@ export function DataSections({
 
   return (
     <>
-      <OpeningBeat items={headlines} />
-      <DataPageNav sections={DATA_PAGE_SECTIONS} />
-
       <Section id="counted" meta={[`As of ${populationAsOf}`, '1790 to 2020, every census']}>
         {hasPopulation ? (
           <div className="ds-data-section__figures">

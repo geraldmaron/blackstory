@@ -25,16 +25,11 @@ const loaderSource = readFileSync(join(here, 'load-data-page-model.ts'), 'utf8')
 
 const allCopy = [
   DATA_PAGE_DESCRIPTION,
-  DATA_INTRO.kicker,
   DATA_INTRO.lede,
   ...DATA_READING_RULES.flatMap((rule) => [rule.kicker, rule.body]),
   ...DATA_READING_LINKS.map((link) => link.label),
   DATA_SOURCE_LIBRARY_HANDOFF.label,
-  ...Object.values(DATA_SECTION_COPY).flatMap((section) => [
-    section.kicker,
-    section.title,
-    section.lede,
-  ]),
+  ...Object.values(DATA_SECTION_COPY).flatMap((section) => [section.title, section.lede]),
   ...DATA_PAGE_SECTIONS.map((section) => section.label),
 ];
 
@@ -80,14 +75,12 @@ test('data sections keep census and indicator chart wiring', () => {
   assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
 });
 
-test('data page keeps section anchors for the section rail', () => {
+test('data page keeps a deep-linkable anchor for every section, under a plain heading', () => {
   for (const section of DATA_PAGE_SECTIONS) {
     assert.match(sectionsSource, new RegExp(`id="${section.id}"`));
-    assert.ok(section.icon, `${section.id} carries a section glyph`);
   }
-  assert.match(sectionsSource, /DataPageNav sections=\{DATA_PAGE_SECTIONS\}/);
-  assert.match(sectionsSource, /DestinationIcon/);
-  assert.match(sectionsSource, /ds-kicker-glyph/);
+  assert.match(sectionsSource, /<SectionHeading/);
+  assert.doesNotMatch(sectionsSource, /DataPageNav|RoomStats|ds-room-section__plate/);
 });
 
 test('reading rules carry orientation glyphs', () => {
@@ -95,19 +88,6 @@ test('reading rules carry orientation glyphs', () => {
     assert.ok(rule.icon, `${rule.kicker} carries a rule glyph`);
   }
   assert.match(sectionsSource, /rule\.icon/);
-});
-
-test('the headline band links into the figures it summarizes', () => {
-  for (const anchor of [
-    '#population-count',
-    '#wealth-gap',
-    '#housing-ownership',
-    '#justice-imprisonment',
-  ]) {
-    assert.match(loaderSource, new RegExp(anchor));
-    const id = anchor.slice(1);
-    assert.match(sectionsSource, new RegExp(`id="${id}"`), `no figure carries ${anchor}`);
-  }
 });
 
 test('data user-facing copy does not leak internal vocabulary', () => {

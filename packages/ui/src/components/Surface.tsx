@@ -1,5 +1,8 @@
 /**
- * Surface card for editorial result and detail groupings.
+ * The one panel recipe: raised fill, 1px rule border, radius 14, no shadow. A surface holds at
+ * most one bordered level; anything inside it is separated by rules, never by another box.
+ *
+ * `floating` is for layers over the map, which get the single soft contact shadow.
  */
 
 import React, { type HTMLAttributes, type ReactNode } from 'react';
@@ -11,35 +14,35 @@ import { headingTag, type HeadingLevel } from '../utils/heading.js';
 // classic JSX transform (see Notice.tsx's identical note).
 void React;
 
-export type CardProps = HTMLAttributes<HTMLElement> & {
+export type SurfaceProps = HTMLAttributes<HTMLElement> & {
   readonly title?: string;
   readonly meta?: ReactNode;
-  readonly interactive?: boolean;
+  readonly floating?: boolean;
   readonly as?: 'article' | 'section' | 'div';
   /** Renders the title as a heading at this level. Defaults to h3. */
   readonly headingLevel?: HeadingLevel;
   readonly children: ReactNode;
 };
 
-export function Card({
+export function Surface({
   title,
   meta,
-  interactive = false,
+  floating = false,
   as: Component = 'article',
   headingLevel = 3,
   className,
   children,
   ...rest
-}: CardProps) {
+}: SurfaceProps) {
   const Heading = headingTag(headingLevel);
 
   return (
     <Component
-      className={cx('ds-card', interactive && 'ds-card--interactive', className)}
+      className={cx('ds-surface', floating && 'ds-surface--floating', className)}
       {...rest}
     >
-      {title ? <Heading className="ds-card__title">{title}</Heading> : null}
-      {meta ? <div className="ds-card__meta">{meta}</div> : null}
+      {title ? <Heading className="ds-surface__title">{title}</Heading> : null}
+      {meta ? <div className="ds-surface__meta">{meta}</div> : null}
       {children}
     </Component>
   );

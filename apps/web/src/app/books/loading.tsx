@@ -6,7 +6,6 @@ void React;
 export default function Loading() {
   return (
     <CatalogLoading
-      pathname="/books"
       label="Taking the books off the shelf…"
       note="Each entry points to its source."
     />

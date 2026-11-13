@@ -14,23 +14,14 @@ import {
   LegalStatusBadge,
   humanizeLegalKind,
 } from '../../components/legal';
-import { GroupHeading, OffRamp, RecordNav, ReadingEntry } from '../../components/room';
+import Link from 'next/link';
+import { buttonClassName, PageHeader } from '@repo/ui';
+import { GroupHeading, parentCrumb, RecordNav, RoomSection } from '../../components/room';
 import type { RecordNavTarget } from '../../components/room';
 import { buildLensHandoff } from '../../lib/map-experience/lens-handoff';
-import { RoomJump, type RoomJumpSection } from '../../components/room';
 import { LawAnatomyStrip } from './LawAnatomyStrip';
 import { jurisdictionLabel, statePostalForJurisdiction } from './LawBrowseSections';
 import type { LawNavTarget } from './law-view-model';
-
-/** Same jump row every other room uses (`RoomJump`), not a one-off list. */
-const DETAIL_SECTIONS: readonly RoomJumpSection[] = [
-  { id: 'what-it-says', label: 'What it says', icon: 'law' },
-  { id: 'what-it-means', label: 'What it means', icon: 'questions' },
-  { id: 'why-it-matters', label: 'Why it matters', icon: 'evidence' },
-  { id: 'rights-today', label: 'Your rights today', icon: 'precision' },
-  { id: 'primary-sources', label: 'Primary sources', icon: 'source' },
-  { id: 'provenance', label: 'Provenance', icon: 'time' },
-];
 
 /**
  * The decade bucket a law's `effectiveYear` falls in, in the exact `"1960s"` shape Explore's
@@ -84,8 +75,6 @@ export function LawDetailSections({ snapshot, explainer, previous, next }: LawDe
   return (
     <>
       <LegalDisclaimer />
-
-      {explainer ? <RoomJump sections={DETAIL_SECTIONS} label="On this page" /> : null}
 
       {explainer ? (
         <section className="ds-law-section" aria-labelledby="explainer-heading">
@@ -150,15 +139,12 @@ export function LawDetailSections({ snapshot, explainer, previous, next }: LawDe
        * from a documented edge between a law and a record, and the heading is the reader's
        * only warning of that before they click through.
        */}
-      <OffRamp
-        title="Records in this jurisdiction and era"
-        actions={[
-          { label: 'See these records', href: recordsHandoff.href, emphasis: 'copper' },
-          { label: 'Methodology', href: '/methodology' },
-        ]}
-      >
-        {recordsHandoff.reason}
-      </OffRamp>
+      <RoomSection id="records-handoff" title="Records in this jurisdiction and era">
+        <p>{recordsHandoff.reason}</p>
+        <Link className={buttonClassName('secondary')} href={recordsHandoff.href}>
+          See these records
+        </Link>
+      </RoomSection>
 
       <RecordNav previous={toRecordNavTarget(previous)} next={toRecordNavTarget(next)} />
     </>
@@ -186,11 +172,10 @@ export function LawDetailIntro({ snapshot }: LawDetailIntroProps) {
        * without the plate rather than with a fabricated one." So there is no plate here, and
        * no placeholder rectangle standing in for one, until that join exists.
        */}
-      <ReadingEntry
-        pathname={`/law/${snapshot.id}`}
-        crumbLabel={snapshot.title}
+      <PageHeader
+        crumb={parentCrumb(`/law/${snapshot.slug}`)}
+        linkAs={Link}
         title={snapshot.title}
-        showCrumb={false}
       />
       <LawAnatomyStrip
         kind={snapshot.kind}

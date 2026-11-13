@@ -47,9 +47,10 @@ test('the header carries the two feed links as mono chips', () => {
   assert.match(pageSource, /href="\/errata\/feed\.xml"/);
 });
 
-test('the off ramp points at /corrections and /methodology', () => {
-  assert.match(pageSource, /href: ['"]\/corrections['"]/);
-  assert.match(pageSource, /href: ['"]\/methodology['"]/);
+test('the log hands off to /corrections and /methodology, with no off-ramp card', () => {
+  assert.match(pageSource, /href="\/corrections"/);
+  assert.match(pageSource, /href="\/methodology"/);
+  assert.doesNotMatch(pageSource, /WalkOffRamp/);
 });
 
 test('errata.css is retired', () => {

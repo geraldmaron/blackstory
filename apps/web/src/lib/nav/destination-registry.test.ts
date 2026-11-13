@@ -224,7 +224,6 @@ describe('destination registry · the footer is derived, not authored', () => {
     const home = destinationFor('/');
     assert.ok(home);
     assert.equal(home.description, undefined);
-    assert.equal(home.menuLine, undefined);
     const explore = destinationFor('/explore');
     assert.equal(explore?.label, 'Map');
     assert.equal(explore?.description, 'The map.');
@@ -252,12 +251,12 @@ describe('destination registry · the footer is derived, not authored', () => {
     }
   });
 
-  it('carries the catalog icon on every footer item', () => {
+  it('links only catalog destinations, labeled as the catalog labels them', () => {
     for (const column of footerColumns()) {
       for (const item of column.items) {
         const destination = destinationFor(item.href);
         assert.ok(destination, `${item.href} must be a catalog destination`);
-        assert.equal(item.icon, destination.icon);
+        assert.equal(item.label, destination.label);
       }
     }
   });

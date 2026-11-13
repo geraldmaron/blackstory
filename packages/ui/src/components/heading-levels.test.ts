@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { Card } from './Card.tsx';
+import { Surface } from './Surface.tsx';
 import { DetailPanel } from './DetailPanel.tsx';
 import { Dialog } from './Dialog.tsx';
 import { EmptyState } from './EmptyState.tsx';
@@ -26,9 +26,10 @@ const cases = [
       createElement(EmptyState, { title: 'No results', headingLevel }, 'Adjust filters.'),
   },
   {
-    name: 'Card',
+    name: 'Surface',
     fallback: ['h3'],
-    render: (headingLevel?: 2 | 4) => createElement(Card, { title: 'Place', headingLevel }, 'Body'),
+    render: (headingLevel?: 2 | 4) =>
+      createElement(Surface, { title: 'Place', headingLevel }, 'Body'),
   },
   {
     name: 'Timeline',

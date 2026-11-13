@@ -16,10 +16,7 @@ import {
   FindBar,
   FindBarFilters,
   RoomFactList,
-  RoomHandoff,
-  RoomJump,
   RoomSection,
-  roomSectionTone,
 } from '../../components/room';
 import type { BannedBookSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
 import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect.js';
@@ -31,13 +28,7 @@ import {
 } from './books-view-model';
 import { BooksCoverArt } from './BooksCoverArt';
 import { BooksSearchTypeahead } from './BooksSearchTypeahead';
-import {
-  BOOKS_ABOUT,
-  BOOKS_CATALOG,
-  BOOKS_JUMP,
-  BOOKS_READ_FACTS,
-  BOOKS_RELATED,
-} from './books-copy';
+import { BOOKS_ABOUT, BOOKS_CATALOG, BOOKS_READ_FACTS } from './books-copy';
 import '../typeahead.css';
 import { formatResultSummary } from '../../lib/discovery/result-summary';
 
@@ -219,15 +210,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
 
   return (
     <>
-      <RoomJump sections={BOOKS_JUMP} />
-
-      <RoomSection
-        id="read"
-        icon="books"
-        kicker={BOOKS_ABOUT.kicker}
-        title={BOOKS_ABOUT.title}
-        tone={roomSectionTone(0)}
-      >
+      <RoomSection id="read" title={BOOKS_ABOUT.title}>
         <Prose>
           <p>{BOOKS_ABOUT.lede}</p>
         </Prose>
@@ -235,18 +218,11 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
           items={BOOKS_READ_FACTS.map((fact) => ({
             title: fact.title,
             body: fact.body,
-            icon: fact.icon,
           }))}
         />
       </RoomSection>
 
-      <RoomSection
-        id="browse"
-        icon="publication"
-        kicker={BOOKS_CATALOG.kicker}
-        title={BOOKS_CATALOG.title}
-        tone={roomSectionTone(1)}
-      >
+      <RoomSection id="browse" title={BOOKS_CATALOG.title}>
         <Prose>
           <p>{BOOKS_CATALOG.lede}</p>
         </Prose>
@@ -349,41 +325,6 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
               ) : null}
             </nav>
           ) : null}
-        </div>
-      </RoomSection>
-
-      <RoomSection
-        id="related"
-        icon="rooms"
-        kicker={BOOKS_RELATED.kicker}
-        title={BOOKS_RELATED.title}
-        tone={roomSectionTone(2)}
-      >
-        <Prose>
-          <p>
-            How the list is built, the statutes and rulings that sat around it, and a way to point
-            at a title that is missing.
-          </p>
-        </Prose>
-        <div className="ds-room-handoffs">
-          <RoomHandoff
-            href="/methodology"
-            icon="methodology"
-            title="How this catalog is built"
-            line="Sources, method, and what a cited challenge means here."
-          />
-          <RoomHandoff
-            href="/law"
-            icon="law"
-            title="Law"
-            line="Statutes and rulings, in plain language."
-          />
-          <RoomHandoff
-            href="/submit"
-            icon="submit"
-            title="Point at a missing title"
-            line="A lead is reviewed. Nothing you send is published as you sent it."
-          />
         </div>
       </RoomSection>
     </>

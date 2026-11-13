@@ -1,13 +1,16 @@
 /**
- * Public site footer — theme-aware Surface card with typographic wordmark, the
- * same three room groups as `/about`, hairline link rows, and maker credit.
+ * Public site footer, two rows on the wide container.
+ *
+ * Row one: the lockup artwork and one sentence (the site's AI disclosure), then the destination
+ * links in plain columns under sentence-case headings. Row two: copyright, the policy pages, the
+ * maker credit and staff sign-in.
  */
 
 import Link from 'next/link';
 import React from 'react';
-import { PRODUCT_NAME } from '@repo/config';
+import { BRAND_ASSETS, PRODUCT_NAME } from '@repo/config';
+import { ShellWordmark } from '@repo/ui';
 import { footerColumns, policyLinks } from '../lib/nav/destination-registry';
-import { DestinationIcon } from './patterns/DestinationIcon';
 import { MakerCredit } from './MakerCredit';
 
 void React;
@@ -21,22 +24,23 @@ export function SiteFooter() {
 
   return (
     <footer className="ds-shell-footer">
-      <div className="ds-shell-footer__card">
-        <div className="ds-shell-footer__inner">
+      <div className="ds-shell-footer__inner">
+        <div className="ds-shell-footer__top">
           <div className="ds-shell-footer__mast">
-            <p className="ds-shell-footer__wordmark">
-              <Link href="/" prefetch={false} aria-label="BlackStory">
-                {PRODUCT_NAME}
-              </Link>
-            </p>
-            <p className="ds-shell-footer__tagline">People. Places. Evidence. Context.</p>
+            <Link
+              className="ds-shell-footer__brand ds-shell-wordmark"
+              href="/"
+              prefetch={false}
+              aria-label={`${PRODUCT_NAME}, home`}
+            >
+              <ShellWordmark lockup={BRAND_ASSETS.lockup} />
+            </Link>
             {/* The one place the site says AI is part of the research and the checking. Record
                 pages carry no per-record note about it; this line, the FAQ and the methodology
                 say it for every page. */}
-            <p className="ds-shell-footer__tagline">
+            <p className="ds-shell-footer__note">
               AI helps with the research and drafting here, and for most records a model from
-              another company checks proposed claims against their sources. Claims link to their
-              sources, so you can check them yourself.{' '}
+              another company checks proposed claims against the sources they link to.{' '}
               <Link href="/methodology#how-a-record-gets-in" prefetch={false}>
                 How a record gets in
               </Link>
@@ -53,7 +57,6 @@ export function SiteFooter() {
                       {/* Footer nav mounts on every route; skip the default viewport prefetch
                           so it doesn't compete with whatever the current page actually needs. */}
                       <Link href={item.href} prefetch={false}>
-                        <DestinationIcon id={item.icon} />
                         {item.label}
                       </Link>
                     </li>
@@ -62,31 +65,28 @@ export function SiteFooter() {
               </div>
             ))}
           </nav>
+        </div>
 
-          <div className="ds-shell-footer__meta-row">
-            <p className="ds-shell-footer__meta ds-mono">
-              © {year} {PRODUCT_NAME} · History, pinned to place.
-            </p>
-            {/* Policy links ride the fine-print row rather than the nav columns above: they are
-                the conventional place a reader looks for them, and a policy page is not somewhere
-                the archive sends anyone browsing. Before this they were in no chrome at all. */}
-            <nav aria-label="Policies" className="ds-shell-footer__policy ds-mono">
-              {policyLinks().map((item) => (
-                <Link key={item.href} href={item.href} prefetch={false}>
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            <MakerCredit variant="footer" className="ds-shell-footer__maker" />
-            <Link
-              className="ds-shell-footer__operator ds-shell-footer__staff ds-mono"
-              href="/admin/login"
-              rel="nofollow"
-              prefetch={false}
-            >
-              Staff sign-in
-            </Link>
-          </div>
+        <div className="ds-shell-footer__meta-row">
+          <p className="ds-shell-footer__meta">
+            © {year} {PRODUCT_NAME}
+          </p>
+          <nav aria-label="Policies" className="ds-shell-footer__policy">
+            {policyLinks().map((item) => (
+              <Link key={item.href} href={item.href} prefetch={false}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <MakerCredit variant="footer" />
+          <Link
+            className="ds-shell-footer__operator"
+            href="/admin/login"
+            rel="nofollow"
+            prefetch={false}
+          >
+            Staff sign-in
+          </Link>
         </div>
       </div>
     </footer>

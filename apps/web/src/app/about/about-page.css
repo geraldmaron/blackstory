@@ -1,14 +1,13 @@
 /**
  * `/about` page-local layout.
  *
- * The room kit owns the surface: column, header, chapter bands, facts and off-ramp. What is
- * left here is the refusals list this page alone renders, plus the foot credits.
+ * The room kit owns the surface: column, header, sections and facts. What is left here is the
+ * refusals list this page alone renders, plus the foot credits.
  *
  * MOBILE FIRST. Any multi-column rule here has to sit inside a `min-width` query.
  *
  * THE PILLARS ARE KIT FACTS. The refusals stay a hairline list: these are limits, and giving
- * them card weight would present them as features. The list takes the kit's centered measure
- * (`ds-room-measure` in the markup), so its width is not set here.
+ * them card weight would present them as features. The list takes the read column's width.
  */
 
 .ds-about-page__refusals {
@@ -34,12 +33,10 @@
   content: 'Never';
   display: block;
   margin-block-end: var(--ds-space-1);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  color: var(--ds-ink);
 }
 
 .ds-about-page__foot {

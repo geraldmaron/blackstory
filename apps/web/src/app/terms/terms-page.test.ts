@@ -33,10 +33,10 @@ const proseLines = sectionsSource
   .filter((line) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'));
 const proseFlat = proseLines.join('\n').replace(/\s+/g, ' ');
 
-test('terms is a room on the walk, with the shared way back', () => {
-  assert.match(pageSource, /WalkOffRamp/);
+test('terms is a room on the walk, and ends without the BlackStory off-ramp card', () => {
+  assert.doesNotMatch(pageSource, /WalkOffRamp/);
   assert.match(pageSource, /<TermsSections \/>/);
-  assert.match(pageSource, /pathname="\/terms"/);
+  assert.match(pageSource, /parentCrumb\('\/terms'\)/);
   assert.doesNotMatch(pageSource, /Open the Atlas|ATLAS_INSTRUMENT/);
   assert.doesNotMatch(pageSource, /['"`]\/design-system/);
 });

@@ -9,10 +9,8 @@
 
 .ds-record-archive__heading {
   margin: 0;
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ds-muted);
 }
 
@@ -63,10 +61,8 @@
 
 .ds-record-archive-contrib__heading {
   margin: 0;
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ds-muted);
 }
 
@@ -77,10 +73,8 @@
 
 .ds-record-visit__visitor-title {
   margin: 0;
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ds-muted);
 }
 
@@ -97,10 +91,8 @@
 
 .ds-record-visit__visitor-row dt {
   margin: 0;
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--ds-muted);
 }
 

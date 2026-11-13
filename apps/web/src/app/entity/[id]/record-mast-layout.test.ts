@@ -52,9 +52,8 @@ test('a story hero sits in its own band with the headline below, no scrim or tex
   );
 });
 
-test('the phone header shows the symbol alone at every width below 820px', () => {
-  assert.match(
-    commandBarCss,
-    /:root \.ds-bar__brand \.ds-shell-wordmark__img\.ds-shell-wordmark__img--lockup \{\s*display:\s*none/,
-  );
+test('the phone header shows the lockup artwork, sized down, never hidden', () => {
+  const phone = commandBarCss.slice(commandBarCss.indexOf('@media (max-width: 47.9375rem)'));
+  assert.match(phone, /\.ds-bar__brand \{\s*--ds-lockup-size:\s*3\.5rem/);
+  assert.doesNotMatch(commandBarCss, /ds-shell-wordmark__img[^{]*\{\s*display:\s*none/);
 });

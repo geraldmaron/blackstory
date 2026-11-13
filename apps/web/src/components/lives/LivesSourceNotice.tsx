@@ -19,23 +19,23 @@ export function LivesSourceNotice({ source, areaName, retryHref }: LivesSourceNo
   if (source === 'snapshot') return null;
   if (source === 'unpublished') {
     return (
-      <div className="lives-source-notice">
-        <Notice tone="warning" title="No counts published for this area yet">
-          This release has no published snapshot for {areaName}. Every figure below reads as not yet
-          counted, which is different from a count of zero.
-        </Notice>
-      </div>
+      <Notice
+        className="lives-source-notice"
+        tone="warning"
+        title="No counts published for this area yet"
+      >
+        This release has no published snapshot for {areaName}. Every figure below reads as not yet
+        counted, which is different from a count of zero.
+      </Notice>
     );
   }
   return (
-    <div className="lives-source-notice">
-      <Notice tone="error" title="These counts could not be read">
-        The stored snapshot for {areaName} is unavailable right now, so no figure below is shown as
-        counted. Nothing here is a count of zero.{' '}
-        <a className="lives-source-notice__retry" href={retryHref}>
-          Try again
-        </a>
-      </Notice>
-    </div>
+    <Notice className="lives-source-notice" tone="error" title="These counts could not be read">
+      The stored snapshot for {areaName} is unavailable right now, so no figure below is shown as
+      counted. Nothing here is a count of zero.{' '}
+      <a className="lives-source-notice__retry" href={retryHref}>
+        Try again
+      </a>
+    </Notice>
   );
 }

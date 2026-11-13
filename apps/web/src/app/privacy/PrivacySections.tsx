@@ -12,8 +12,7 @@
 import React from 'react';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import Link from 'next/link';
-import { RoomJump, RoomSection, roomSectionTone } from '../../components/room';
-import type { DestinationIconId } from '@repo/public-contracts/destinations';
+import { RoomJump, RoomSection } from '../../components/room';
 import './privacy.css';
 
 void React;
@@ -21,15 +20,14 @@ void React;
 const PAGE_SECTIONS: readonly {
   readonly id: string;
   readonly label: string;
-  readonly icon: DestinationIconId;
 }[] = [
-  { id: 'scope', label: 'Scope', icon: 'about' },
-  { id: 'web', label: 'Website', icon: 'records' },
-  { id: 'not-collected', label: 'Not collected', icon: 'privacy' },
-  { id: 'location', label: 'Location', icon: 'precision' },
-  { id: 'integrity', label: 'Abuse checks', icon: 'evidence' },
-  { id: 'corrections', label: 'Corrections', icon: 'correction' },
-  { id: 'changes', label: 'Changes', icon: 'support' },
+  { id: 'scope', label: 'Scope' },
+  { id: 'web', label: 'Website' },
+  { id: 'not-collected', label: 'Not collected' },
+  { id: 'location', label: 'Location' },
+  { id: 'integrity', label: 'Abuse checks' },
+  { id: 'corrections', label: 'Corrections' },
+  { id: 'changes', label: 'Changes' },
 ];
 
 const WEB_INVENTORY = [
@@ -101,13 +99,7 @@ export function PrivacySections() {
     <div className="ds-privacy">
       <RoomJump sections={PAGE_SECTIONS} />
 
-      <RoomSection
-        id="scope"
-        icon="about"
-        kicker="Who this covers"
-        title="BlackStory public website"
-        tone={roomSectionTone(0)}
-      >
+      <RoomSection id="scope" title="BlackStory public website">
         <p className="ds-privacy__follow">
           This policy describes how BlackStory handles information on{' '}
           <span className="ds-phrase-nowrap">blackstory.app</span>. It covers what the site does
@@ -119,13 +111,7 @@ export function PrivacySections() {
         <p className="ds-privacy__meta">Last updated: August 2026</p>
       </RoomSection>
 
-      <RoomSection
-        id="web"
-        icon="records"
-        kicker="Website"
-        title="What this site may process"
-        tone={roomSectionTone(1)}
-      >
+      <RoomSection id="web" title="What this site may process">
         <p className="ds-privacy__follow">
           The public website is read-first. Interactive flows are optional and labeled before you
           use them.
@@ -138,13 +124,7 @@ export function PrivacySections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="not-collected"
-        icon="privacy"
-        kicker="Explicit limits"
-        title="What I do not collect"
-        tone={roomSectionTone(2)}
-      >
+      <RoomSection id="not-collected" title="What I do not collect">
         <p className="ds-privacy__follow">
           These are rules the software follows. If a release ever adds one of the things listed
           here, this page changes before that release ships.
@@ -158,13 +138,7 @@ export function PrivacySections() {
         </ol>
       </RoomSection>
 
-      <RoomSection
-        id="location"
-        icon="precision"
-        kicker="Optional location"
-        title="Location is never required"
-        tone={roomSectionTone(3)}
-      >
+      <RoomSection id="location" title="Location is never required">
         <p className="ds-privacy__follow">
           Location lookup starts only after you press a labeled control; the page never requests
           device location automatically. You can always browse by state or search by place name
@@ -172,13 +146,7 @@ export function PrivacySections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="integrity"
-        icon="evidence"
-        kicker="Abuse protection"
-        title="What the abuse checks look at"
-        tone={roomSectionTone(4)}
-      >
+      <RoomSection id="integrity" title="What the abuse checks look at">
         <p className="ds-privacy__follow">
           Pages that could be hit at scale (search, corrections, lead submission) sit behind rate
           limits and same-origin checks. Nothing those checks record is used to build a marketing
@@ -186,13 +154,7 @@ export function PrivacySections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="corrections"
-        icon="correction"
-        kicker="Submissions"
-        title="Corrections and leads"
-        tone={roomSectionTone(5)}
-      >
+      <RoomSection id="corrections" title="Corrections and leads">
         <p className="ds-privacy__follow">
           When you file a correction, appeal, abuse report, or research lead, you choose what to
           write. Submissions go into a private queue, are kept so they can be opened later, and are
@@ -209,13 +171,7 @@ export function PrivacySections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="changes"
-        icon="support"
-        kicker="Updates"
-        title="Changes and contact"
-        tone={roomSectionTone(6)}
-      >
+      <RoomSection id="changes" title="Changes and contact">
         <p className="ds-privacy__follow">
           A material change to this policy is posted here, with a new date at the top. For a privacy
           request, or a question about how any of this runs, write to{' '}

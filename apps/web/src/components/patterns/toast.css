@@ -47,10 +47,8 @@
   background: none;
   border: var(--ds-border-width) solid var(--ds-accent-graphic);
   border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   color: var(--ds-accent);
   cursor: pointer;
 }

@@ -18,7 +18,7 @@ import { RecordInvestigationReturn } from '../components/discovery/record-invest
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
 import { RecordVisitBlock } from '../components/patterns/RecordVisitBlock';
 import { shouldShowVisitBlock } from '../lib/geography/visit-handoff';
-import { Connections, Room, TrustBlock } from '../components/room';
+import { Connections, RecordNav, Room, TrustBlock } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
 import { recordConfidenceTier } from '../lib/map-experience/build-explore-map-source';
 import type { PlaceDiscoveryReturn } from '../lib/discovery/discovery-state';
@@ -49,8 +49,6 @@ import { WhyThisAppears } from '../components/why-appears';
 import { placeHref } from '../lib/place/public-place-path';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../lib/place/place-slug';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
-import { MAP_BACK } from './walk-back-place';
-import { WalkOffRampView } from './walk-off-ramp';
 import {
   firstPaintEraLink,
   firstPaintLocatorName,
@@ -345,6 +343,7 @@ export function HomeFirstPaint({
 
     return (
       <Room
+        width="record"
         className="ds-home-first-paint"
         rail={rail}
         masthead={
@@ -508,34 +507,24 @@ export function HomeFirstPaint({
 
         <DoorRooms rooms={rooms} />
 
-        <WalkOffRampView
-          placeName={`Back to ${MAP_BACK.displayName}`}
-          href={MAP_BACK.href}
-          title={
-            <>
-              Keep going from <em>{lead.displayName}</em>
-            </>
+        <RecordNav
+          previous={
+            returns.previousHref && returns.previousLabel
+              ? { href: returns.previousHref, label: returns.previousLabel }
+              : undefined
           }
-          extra={[
-            ...(returns.previousHref && returns.previousLabel
-              ? [{ href: returns.previousHref, label: returns.previousLabel }]
-              : []),
-            ...(returns.nextHref && returns.nextLabel
-              ? [{ href: returns.nextHref, label: returns.nextLabel }]
-              : []),
-            { href: returns.listHref, label: returns.listLabel },
-          ]}
-        >
-          {returns.positionLabel
-            ? returns.positionLabel
-            : 'Return to the map, or continue through the list.'}
-        </WalkOffRampView>
+          next={
+            returns.nextHref && returns.nextLabel
+              ? { href: returns.nextHref, label: returns.nextLabel }
+              : undefined
+          }
+        />
       </Room>
     );
   }
 
   return (
-    <Room className="ds-home-first-paint">
+    <Room width="record" className="ds-home-first-paint">
       {story ? (
         <>
           <h1 className="ds-record-mast__title">{story.title}</h1>

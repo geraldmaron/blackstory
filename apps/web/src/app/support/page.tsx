@@ -10,19 +10,9 @@ import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import {
-  Room,
-  ReadingEntry,
-  Prose,
-  CardGrid,
-  RoomCard,
-  RoomSection,
-  roomSectionTone,
-  KeepGoing,
-  RoomJump,
-} from '../../components/room';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room, Prose, CardGrid, RoomCard, RoomSection } from '../../components/room';
 import { DestinationIcon } from '../../components/patterns/DestinationIcon';
-import { WalkOffRamp } from '../walk-off-ramp';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import '../utility.css';
@@ -67,33 +57,15 @@ const SUPPORT_PATHS: readonly {
 
 export default function SupportPage() {
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/support"
-        title={
-          <>
-            How to get an <em>answer</em>.
-          </>
-        }
-        lede="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/support')}
+        linkAs={Link}
+        title="How to get an answer"
+        dek="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
       />
 
-      <RoomJump
-        sections={[
-          { id: 'paths', label: 'The fastest ways in', icon: 'correction' },
-          { id: 'contact', label: 'Reach me', icon: 'support' },
-          { id: 'keep-going', label: 'Keep going', icon: 'rooms' },
-        ]}
-      />
-
-      <RoomSection
-        id="paths"
-        icon="correction"
-        kicker="Start here"
-        title="The fastest ways in"
-        tone={roomSectionTone(0)}
-        className="ds-support__section-paths"
-      >
+      <RoomSection id="paths" title="The fastest ways in" className="ds-support__section-paths">
         <Prose>
           <p className="ds-support__section-intro">
             A question about one specific record is best filed as a correction, because that puts
@@ -118,14 +90,7 @@ export default function SupportPage() {
         </CardGrid>
       </RoomSection>
 
-      <RoomSection
-        id="contact"
-        icon="support"
-        kicker="Mailbox"
-        title="Reach me"
-        tone={roomSectionTone(1)}
-        className="ds-support__section-contact"
-      >
+      <RoomSection id="contact" title="Reach me" className="ds-support__section-contact">
         <Prose>
           <p className="ds-support__contact-intro">
             For anything the corrections form has no field for (how the archive is run, a privacy
@@ -147,10 +112,6 @@ export default function SupportPage() {
           running for as long as I can.
         </p>
       </RoomSection>
-
-      <KeepGoing paths={['/faq', '/submit']} />
-
-      <WalkOffRamp>Saying a record is wrong is the fastest way to change what it says.</WalkOffRamp>
     </Room>
   );
 }

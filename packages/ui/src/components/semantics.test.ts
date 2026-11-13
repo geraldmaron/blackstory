@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { Card } from '../components/Card.tsx';
+import { Surface } from '../components/Surface.tsx';
 import { Citation } from '../components/Citation.tsx';
 import { Confidence } from '../components/Confidence.tsx';
 import { EmptyState } from '../components/EmptyState.tsx';
@@ -116,8 +116,8 @@ test('EmptyState announces via status role', () => {
   assert.match(html, /No results/);
 });
 
-test('Card renders as article by default', () => {
-  const html = renderToStaticMarkup(createElement(Card, { title: 'Place' }, 'Body'));
+test('Surface renders as article by default', () => {
+  const html = renderToStaticMarkup(createElement(Surface, { title: 'Place' }, 'Body'));
   assert.match(html, /<article/);
   assert.match(html, /Place/);
 });
@@ -126,7 +126,7 @@ test('fixture shell markup includes main landmark and h1', () => {
   const html = `
     <main>
       <h1>Design system</h1>
-      ${renderToStaticMarkup(createElement(Card, { title: 'Example' }, 'Content'))}
+      ${renderToStaticMarkup(createElement(Surface, { title: 'Example' }, 'Content'))}
       <img src="/map.png" alt="Map legend schematic" />
     </main>
   `;

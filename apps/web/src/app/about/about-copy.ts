@@ -20,7 +20,6 @@
  * previous hardcoded list pointed twice at `/history`, which has been a redirect for months.
  */
 import { MAKER } from '@repo/config';
-import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../methodology/methodology-copy';
 
 /**
@@ -72,32 +71,22 @@ export const ABOUT_ON_THE_GROUND =
 
 /** What every record stands on. Rules, stated impersonally. */
 export const ABOUT_PILLARS: readonly {
-  readonly kicker: string;
-  readonly icon: DestinationIconId;
   readonly title: string;
   readonly body: string;
 }[] = [
   {
-    kicker: 'Place',
-    icon: 'place',
     title: 'Every record sits somewhere you can stand',
     body: ABOUT_ON_THE_GROUND,
   },
   {
-    kicker: 'Evidence',
-    icon: 'evidence',
     title: 'Citations, and a grade for how sure the archive is',
     body: 'An accepted claim carries its citations and one of four grades: established, corroborated, single source, contested. The grade is spelled out in words beside its mark, so reading it never depends on telling two colors apart. Where the sources disagree, the record says so and keeps both of them.',
   },
   {
-    kicker: 'Precision',
-    icon: 'precision',
     title: 'A point is drawn no sharper than its source',
     body: 'A record known to a county is drawn as a county, and a coarsened point is never labeled as an address.',
   },
   {
-    kicker: 'Living people',
-    icon: 'privacy',
     title: 'The protections are in the code, not in the tone',
     body: 'Public precision stops at a city, a campus or an institution. Current residential addresses for living private people do not appear on public pages, and a record whose living status is unknown is treated as living.',
   },

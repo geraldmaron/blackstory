@@ -1,33 +1,8 @@
 /**
- * Utility surface class — the only stylesheet a Utility route imports.
+ * Utility surface class: the only stylesheet a Utility route imports.
  *
- * Design law: docs/ui/patterns-utility-edition.md, design-direction-v9-surfaces.md §4.
- * A utility room is a task surface: finished and left. The measure is the narrowest of the
- * three and the card stack, not prose, is the primary block.
+ * Design law: docs/ui/patterns-utility-edition.md. A utility room is a task surface, finished and
+ * left. Its width is the read container, chosen by the page (`<Room width="read">`), not here.
  */
 
 @import '../components/room/room-kit.css';
-
-/* Declared on the room, not the column: the railed grid sizes its first track from this
-   measure so the column-plus-rail pair centers as a unit. The column inherits it. */
-[data-surface='utility'] .ds-room {
-  --room-doc-w: 560px;
-}
-
-/* The frame is not the measure. A ledger utility room (Support, Submit, Corrections, Privacy,
-   Terms) opens on the same hero masthead as its siblings, and in a 560px column that headline
-   wrapped to five lines and the page read as a phone layout on a desktop. These rooms take the
-   reading rooms' 900px frame; what stays narrow is the thing that should be narrow, the form and
-   the running text inside it (see the measure rules in room-kit.css). */
-[data-surface='utility'] .ds-room--ledger {
-  --room-doc-w: 900px;
-}
-
-/* Utility titles sit one step down: nothing here is a headline. */
-[data-surface='utility'] .ds-room-header__title {
-  font-size: clamp(26px, 3.2vw, 34px);
-}
-
-[data-surface='utility'] .ds-room-header__lede {
-  font-size: 16.5px;
-}

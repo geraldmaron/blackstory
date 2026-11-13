@@ -1,11 +1,11 @@
 /** Decorative mosaic sources: source-backed names, honest current-image credits and native paging. */
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Notice, Pagination } from '@repo/ui';
+import { Notice, PageHeader, Pagination } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { ATMOSPHERE_TILE_CREDITS } from '../../../components/atmosphere';
 import { getPublicSearchIndex } from '../../../lib/public-data/source';
-import { OffRamp, Prose, Room, ReadingEntry } from '../../../components/room';
+import { parentCrumb, Prose, Room } from '../../../components/room';
 import {
   MOSAIC_CREDITS_PAGE_SIZE,
   mosaicCreditsPage,
@@ -38,15 +38,12 @@ export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
   const records = new Map(read.data.map((record) => [record.id, record]));
 
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/stories/mosaic-credits"
-        title={
-          <>
-            Archive mosaic <em>credits</em>
-          </>
-        }
-        lede="These decorative archive images provide atmosphere. They do not depict the subject of every chapter. Each tile below links to the record associated with it."
+    <Room width="read">
+      <PageHeader
+        crumb={parentCrumb('/stories/mosaic-credits')}
+        linkAs={Link}
+        title="Archive mosaic credits"
+        dek="These decorative archive images provide atmosphere. They do not depict the subject of every chapter. Each tile below links to the record associated with it."
       />
       <Prose>
         <p>
@@ -108,15 +105,6 @@ export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
         itemLabel="tiles"
         hrefForPage={mosaicCreditsHref}
       />
-      <OffRamp
-        title="Keep reading"
-        actions={[
-          { href: '/stories', label: 'All stories', emphasis: 'copper' },
-          { href: '/about', label: 'About the archive' },
-        ]}
-      >
-        The mosaic is atmosphere. The chapters carry the account.
-      </OffRamp>
     </Room>
   );
 }
