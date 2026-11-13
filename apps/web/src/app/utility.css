@@ -1,8 +1,10 @@
 /**
- * Utility surface class: the only stylesheet a Utility route imports.
+ * Utility surface class: the stylesheet a Utility route imports for the room kit.
  *
- * Design law: docs/ui/patterns-utility-edition.md. A utility room is a task surface, finished and
- * left. Its width is the read container, chosen by the page (`<Room width="read">`), not here.
+ * A utility room is a task surface, finished and left. Its width is chosen by the page: the read
+ * container for policy and lookup pages, the record container for a form beside its "what
+ * happens next" aside. Trust blocks come from `components/trust/trust.css`, form parts from
+ * `components/forms/form-kit.css`.
  */
 
 @import '../components/room/room-kit.css';

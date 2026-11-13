@@ -26,7 +26,9 @@ test('every life question has inspected visual evidence, a reading, limits and r
     );
     assert.match(html, /ds-archive-figure/);
     assert.match(html, /Read the image in words/);
-    assert.match(html, /ds-room-handoff/);
+    for (const connection of reading.connections) {
+      assert.ok(html.includes(`class="lives-archive__link" href="${connection.href}"`));
+    }
     assert.equal((html.match(/aria-current="page"/g) ?? []).length, 1);
     assert.doesNotMatch(html, /class="lives-era"/);
   }

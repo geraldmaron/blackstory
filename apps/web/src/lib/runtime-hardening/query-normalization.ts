@@ -10,6 +10,7 @@
  * which loops (`ERR_TOO_MANY_REDIRECTS`) — notably the /search form order q/kind/status/era.
  */
 
+import { isErrataChangeType } from '@repo/domain/trust';
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
 import {
   RECORDS_PAGE_PARAM_ALLOWLIST,
@@ -18,6 +19,7 @@ import {
 } from '../records/records-query';
 import {
   CORRECTIONS_PAGE_PARAM_ALLOWLIST,
+  ERRATA_PAGE_PARAM_ALLOWLIST,
   STORIES_PAGE_PARAM_ALLOWLIST,
   EXPLORE_PAGE_PARAM_ALLOWLIST,
   LAW_PAGE_PARAM_ALLOWLIST,
@@ -90,6 +92,9 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   if (path === '/corrections') {
     return CORRECTIONS_PAGE_PARAM_ALLOWLIST;
   }
+  if (path === '/errata') {
+    return ERRATA_PAGE_PARAM_ALLOWLIST;
+  }
   // `/invention/` is the same reading room as `/place/` and carries the same DiscoveryState,
   // so it must keep the same arrival keys or the edge strips return state before the page runs.
   if (isPublicRecordPath(path)) {
@@ -155,6 +160,11 @@ export function normalizeQueryString(
   for (const key of Object.keys(bag).sort()) {
     const value = firstString(bag[key]);
     if (value === undefined) continue;
+    // Only a real kind of change survives, so a stray `type` cannot fragment the cache.
+    if (path === '/errata' && key === 'type') {
+      if (isErrataChangeType(value)) normalized.set(key, value);
+      continue;
+    }
     if ((path === '/law' || path === '/stories/mosaic-credits') && key === 'page') {
       const page = Number(value);
       if (Number.isSafeInteger(page) && page > 1) normalized.set(key, String(Math.min(page, 1000)));

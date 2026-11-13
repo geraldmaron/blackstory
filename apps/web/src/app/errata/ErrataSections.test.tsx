@@ -1,12 +1,14 @@
 /**
- * ErrataSections coverage: the log is a plain list, never a disclosure, and every row carries
- * the four facts the design law requires. docs/ui/design-direction-v9-surfaces.md §4.2.
+ * The errata log: one row per change grouped by day, long notes clamped with the full text kept,
+ * record ids never shown,
+ * and a record link only when the name resolves to exactly one published record.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ErrataSections, ERRATA_LOG_OPENED_DATE } from './ErrataSections';
+import { resolveErrataRecordHrefs } from './errata-records';
 import type { ErrataEntry } from '../../lib/trust/errata-seed';
 
 void React;
@@ -16,9 +18,15 @@ const SAMPLE_ENTRIES: readonly ErrataEntry[] = [
     id: 'errata_sample_correction',
     timestamp: '2026-08-01T12:00:00.000Z',
     changeType: 'correction',
-    headline: 'Fixed a wrong date',
+    headline: 'Dunbar High School: founding date corrected',
     summary: 'The original entry cited the wrong year for the ordinance.',
-    affectedUrl: '/place/paul-laurence-dunbar-high-school',
+  },
+  {
+    id: 'errata_sample_same_day',
+    timestamp: '2026-08-01T09:00:00.000Z',
+    changeType: 'clarification',
+    headline: 'Bethel Church: pastor’s name spelled out',
+    summary: 'The record now gives the full name.',
   },
   {
     id: 'errata_sample_note',
@@ -26,46 +34,94 @@ const SAMPLE_ENTRIES: readonly ErrataEntry[] = [
     changeType: 'editors_note',
     headline: 'Reworded a caption',
     summary: 'Clarified framing without changing the underlying fact.',
+    affectedUrl: '/methodology',
   },
 ];
 
-test('no row is behind a disclosure', () => {
-  const html = renderToStaticMarkup(<ErrataSections entries={SAMPLE_ENTRIES} />);
-  assert.doesNotMatch(html, /<details/, 'the errata log renders no <details> element');
-  assert.doesNotMatch(html, /<summary/, 'the errata log renders no <summary> element');
-  assert.doesNotMatch(html, /ds-room-draw/, 'the errata log does not reuse the Disclosure block');
-});
-
-test('every row shows date, record link, statement and phase', () => {
-  const html = renderToStaticMarkup(<ErrataSections entries={SAMPLE_ENTRIES} />);
-
-  assert.match(html, /ds-errata__row-date"[^>]*>2026-08-01</);
+test('no row is behind a details disclosure, and a long note keeps its full text in the HTML', () => {
+  const long = 'word '.repeat(60).trim();
+  const html = renderToStaticMarkup(
+    <ErrataSections
+      entries={[
+        ...SAMPLE_ENTRIES,
+        {
+          id: 'errata_sample_many',
+          timestamp: '2026-07-01T09:00:00.000Z',
+          changeType: 'clarification',
+          headline: 'National Register records: terms replaced',
+          summary: long,
+          affectedRecords: ['Lake Nixon', 'Union Tavern'],
+        },
+      ]}
+      recordHrefs={new Map([['errata_sample_many#Lake Nixon', '/entity/ent_lake']])}
+    />,
+  );
+  assert.doesNotMatch(html, /<details|<summary|ds-room-draw/);
+  // Short notes are not clamped; the long one is, with its whole text and its records present.
+  assert.equal(html.match(/data-clamp/g)?.length, 1);
+  assert.match(html, new RegExp(long));
+  assert.match(html, /Read the full note and the 2 records/);
   assert.match(
     html,
-    /<a class="ds-errata__row-id" href="\/place\/paul-laurence-dunbar-high-school">Paul Laurence Dunbar High School</,
+    /<li><a href="\/entity\/ent_lake">Lake Nixon<\/a><\/li><li>Union Tavern<\/li>/,
+  );
+});
+
+test('a row names the record, what changed, the note and the kind of change', () => {
+  const html = renderToStaticMarkup(
+    <ErrataSections
+      entries={SAMPLE_ENTRIES}
+      recordHrefs={new Map([['errata_sample_correction', '/entity/ent_dunbar']])}
+    />,
   );
   assert.match(
     html,
-    /ds-errata__row-statement">Fixed a wrong date\. The original entry cited the wrong year for the ordinance\./,
+    /<a class="ds-errata__name" href="\/entity\/ent_dunbar">Dunbar High School<\/a>/,
   );
-  assert.match(html, /ds-errata__row-phase">Correction</);
-
-  // An entry with no affected record still renders a plain label, not a shop id.
-  assert.match(html, /<span class="ds-errata__row-id">This archive<\/span>/);
-  assert.doesNotMatch(html, /errata_sample_correction|errata_sample_note/);
-  assert.match(html, /ds-errata__row-phase">Editor&#x27;s note</);
+  assert.match(html, /ds-errata__change">Founding date corrected</);
+  assert.match(html, /ds-errata__note">The original entry cited the wrong year/);
+  assert.match(html, /ds-errata__type">Correction</);
+  assert.match(html, /ds-errata__type">Editor&#x27;s note</);
+  // An unresolved record is named, not linked; an archive-level entry names its page.
+  assert.match(html, /<span class="ds-errata__name">Bethel Church<\/span>/);
+  assert.match(html, /<a class="ds-errata__name" href="\/methodology">Methodology<\/a>/);
+  assert.doesNotMatch(html, /errata_sample_/);
 });
 
-test("rows render in the order the entries arrive (reverse chronological is the caller's job)", () => {
+test('each day is one group under its date, with its changes in order', () => {
   const html = renderToStaticMarkup(<ErrataSections entries={SAMPLE_ENTRIES} />);
-  const correctionIndex = html.indexOf('Fixed a wrong date');
-  const noteIndex = html.indexOf('Reworded a caption');
-  assert.ok(correctionIndex < noteIndex && correctionIndex >= 0);
+  assert.equal(html.match(/class="ds-errata__date"/g)?.length, 2);
+  assert.match(html, /<time dateTime="2026-08-01">Aug 1, 2026<\/time>/);
+  assert.equal(html.match(/class="ds-errata__row"/g)?.length, 3);
+});
+
+test('a listed record links the same way, keyed by entry and name', () => {
+  const hrefs = resolveErrataRecordHrefs(
+    [{ ...SAMPLE_ENTRIES[0]!, affectedRecords: ['Lake Nixon', 'Bethel Church'] }],
+    [
+      { id: 'ent_lake', displayName: 'Lake Nixon' },
+      { id: 'ent_bethel_a', displayName: 'Bethel Church' },
+      { id: 'ent_bethel_b', displayName: 'Bethel Church' },
+    ],
+  );
+  assert.equal(hrefs.get('errata_sample_correction#Lake Nixon'), '/entity/ent_lake');
+  assert.equal(hrefs.has('errata_sample_correction#Bethel Church'), false);
+});
+
+test('a record link needs exactly one published record with that name', () => {
+  const hrefs = resolveErrataRecordHrefs(SAMPLE_ENTRIES, [
+    { id: 'ent_dunbar', displayName: 'Dunbar High School' },
+    { id: 'ent_bethel_a', displayName: 'Bethel Church' },
+    { id: 'ent_bethel_b', displayName: 'Bethel  Church' },
+  ]);
+  assert.equal(hrefs.get('errata_sample_correction'), '/entity/ent_dunbar');
+  assert.equal(hrefs.has('errata_sample_same_day'), false);
+  assert.equal(hrefs.has('errata_sample_note'), false);
 });
 
 test('the empty state names the date the log opened, and is never a bare empty page', () => {
   const html = renderToStaticMarkup(<ErrataSections entries={[]} />);
   assert.match(html, /role="status"/);
-  assert.match(html, new RegExp(ERRATA_LOG_OPENED_DATE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(html, new RegExp(ERRATA_LOG_OPENED_DATE));
   assert.doesNotMatch(html, /<ol/);
 });

@@ -1,80 +1,65 @@
 /**
- * Grouped vertical bar chart for Phase 1 indicator time slices on `/data` — NHGIS
- * homeownership, HMDA denial rates, USSC sentences. Server-rendered SVG, no client libs.
+ * Grouped columns across periods: homeownership, mortgage denial rates, sentences, net worth. The
+ * Black series is ink and the comparison a lighter neutral; the series are named at the right edge
+ * beside the latest pair, and every period's values are in its tooltip and the table.
  */
-import Link from 'next/link';
 import React, { type ReactNode } from 'react';
 import type { DataPageGroupedBarSeries } from '@repo/domain/statistics/data-page-series';
 import { DataChartFrame } from './DataChartFrame';
-import { chapterHrefForTheme, formatDataPageValue, niceMax, scaleLinear } from './chart-utils';
+import {
+  Bar,
+  EndLabels,
+  Mark,
+  Plot,
+  Tip,
+  bandLayout,
+  categoryTicks,
+  valueScale,
+} from './chart-kit';
+import { chapterHrefForTheme, formatDataPageValue } from './chart-utils';
+import { axisValue, seriesSubtitle, seriesTone } from './series-format';
+
+void React;
 
 export type GroupedBarIndicatorChartProps = {
   readonly series: DataPageGroupedBarSeries;
   readonly reading?: ReactNode;
-  readonly figureLabel?: string;
   readonly span?: 'wide' | 'half';
   readonly id?: string;
 };
 
-/* A wide figure draws at 720 across; a half-width figure at 480 so its mono labels render
-   near 1:1 instead of downscaling to six pixels beside its sibling. */
-const GEOMETRY = {
-  wide: { width: 720, height: 300, margin: { top: 20, right: 16, bottom: 56, left: 72 } },
-  half: { width: 480, height: 280, margin: { top: 20, right: 12, bottom: 48, left: 60 } },
-} as const;
-
 export function GroupedBarIndicatorChart({
   series,
   reading,
-  figureLabel,
   span,
   id,
 }: GroupedBarIndicatorChartProps) {
-  if (series.points.length === 0 || series.series.length === 0) {
-    return null;
-  }
+  if (series.points.length === 0 || series.series.length === 0) return null;
 
-  const {
-    width: WIDTH,
-    height: HEIGHT,
-    margin: MARGIN,
-  } = GEOMETRY[span === 'half' ? 'half' : 'wide'];
-  const allValues = series.points.flatMap((point) =>
-    series.series.map((def) => point.values[def.id] ?? 0),
+  const { top, ticks } = valueScale(
+    Math.max(
+      ...series.points.flatMap((point) => series.series.map((def) => point.values[def.id] ?? 0)),
+    ),
+    (value) => axisValue(value, series.unit),
   );
-  const maxValue = niceMax(Math.max(...allValues));
-  const plotW = WIDTH - MARGIN.left - MARGIN.right;
-  const plotH = HEIGHT - MARGIN.top - MARGIN.bottom;
-  const groupWidth = plotW / series.points.length;
-  const barGap = 4;
-  const barWidth = (groupWidth - barGap * (series.series.length + 1)) / series.series.length;
-  const yScale = scaleLinear(0, maxValue, MARGIN.top + plotH, MARGIN.top);
-  const zeroY = yScale(0);
-  const yTicks = [0, maxValue / 2, maxValue];
-  const themeLink = chapterHrefForTheme(series.themeId);
+  const y = (value: number) => (value / top) * 100;
+  const { center, width } = bandLayout(series.points.length);
+  const count = series.series.length;
+  // Bars share their band: each gets an equal slice, with a 2px-ish gap between them.
+  const thickness = Math.min(30, 72 / count);
+  const shift = (index: number) => (index - (count - 1) / 2) * (thickness + 4);
+  const chapterHref = chapterHrefForTheme(series.themeId);
+  const last = series.points.at(-1)!;
 
   return (
     <DataChartFrame
-      title={series.title}
+      title={seriesSubtitle(series)}
       {...(reading !== undefined ? { reading } : {})}
-      {...(figureLabel !== undefined ? { figureLabel } : {})}
       {...(span !== undefined ? { span } : {})}
       {...(id !== undefined ? { id } : {})}
-      caption={
-        <>
-          {series.caption} <span className="ds-data-chart__meta">{series.geographyLabel}</span>
-          {themeLink ? (
-            <>
-              {' '}
-              <Link className="ds-data-page__theme-link" href={themeLink}>
-                Read the chapter
-              </Link>
-            </>
-          ) : null}
-        </>
-      }
+      {...(chapterHref ? { chapterHref } : {})}
+      caption={series.caption}
       sources={series.sources}
-      ariaLabel={`${series.title} for ${series.geographyLabel}`}
       textAlternative={
         <table className="ds-data-chart__table">
           <caption>{series.title}</caption>
@@ -92,98 +77,92 @@ export function GroupedBarIndicatorChart({
             {series.points.map((point) => (
               <tr key={point.period}>
                 <th scope="row">{point.period}</th>
-                {series.series.map((def) => (
-                  <td key={def.id}>
-                    {formatDataPageValue(point.values[def.id] ?? 0, series.unit)}
-                  </td>
-                ))}
+                {series.series.map((def) => {
+                  const value = point.values[def.id];
+                  return (
+                    <td key={def.id}>
+                      {value === undefined ? 'N/A' : formatDataPageValue(value, series.unit)}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
         </table>
       }
     >
-      <svg
-        className="ds-data-chart__svg ds-data-chart__svg--wide"
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        role="img"
-        aria-hidden="true"
+      <Plot
+        label={series.title}
+        unit={series.yAxisLabel}
+        size={span === 'half' ? 'md' : 'lg'}
+        yWidth="3rem"
+        endWidth={span === 'half' ? 'min(5.5rem, 26cqi)' : 'min(9rem, 28cqi)'}
+        yTicks={ticks}
+        xTicks={categoryTicks(
+          series.points.map((point) => point.period),
+          center,
+          series.points.length > 8 ? 2 : 1,
+        )}
       >
-        {yTicks.map((tick) => {
-          const y = yScale(tick);
+        {series.points.map((point, index) => {
+          const present = series.series.filter((def) => point.values[def.id] !== undefined);
+          const highest = Math.max(0, ...present.map((def) => point.values[def.id]!));
           return (
-            <g key={tick}>
-              <line
-                className="ds-data-chart__grid-line"
-                x1={MARGIN.left}
-                x2={WIDTH - MARGIN.right}
-                y1={y}
-                y2={y}
-              />
-              <text
-                className="ds-data-chart__axis-label"
-                x={MARGIN.left - 8}
-                y={y + 4}
-                textAnchor="end"
-              >
-                {formatDataPageValue(tick, series.unit)}
-              </text>
-            </g>
-          );
-        })}
-
-        {series.points.map((point, groupIndex) => {
-          const groupX = MARGIN.left + groupIndex * groupWidth;
-          return (
-            <g key={point.period}>
+            <Mark
+              key={point.period}
+              x={center(index)}
+              width={width}
+              first={index === 0}
+              tipY={y(highest)}
+              ariaLabel={`${point.period}: ${present
+                .map(
+                  (def) =>
+                    `${def.label} ${formatDataPageValue(point.values[def.id]!, series.unit)}`,
+                )
+                .join(', ')}`}
+              tip={
+                <Tip
+                  title={point.period}
+                  rows={present.map((def) => ({
+                    value: formatDataPageValue(point.values[def.id]!, series.unit),
+                    label: def.label,
+                    tone: seriesTone(series, def.id),
+                  }))}
+                />
+              }
+            >
               {series.series.map((def, seriesIndex) => {
-                const value = point.values[def.id] ?? 0;
-                const barX = groupX + barGap + seriesIndex * (barWidth + barGap);
-                const barTop = yScale(value);
-                return (
-                  <rect
+                const value = point.values[def.id];
+                return value === undefined ? null : (
+                  <Bar
                     key={def.id}
-                    className="ds-data-chart__mark"
-                    x={barX}
-                    y={barTop}
-                    width={barWidth}
-                    height={Math.max(0, zeroY - barTop)}
-                    fill={def.fill}
-                  >
-                    <title>{`${point.period} · ${def.label}: ${formatDataPageValue(value, series.unit)}`}</title>
-                  </rect>
+                    height={y(value)}
+                    tone={seriesTone(series, def.id)}
+                    thickness={thickness}
+                    shift={shift(seriesIndex)}
+                  />
                 );
               })}
-              <text
-                className="ds-data-chart__axis-label"
-                x={groupX + groupWidth / 2}
-                y={HEIGHT - MARGIN.bottom + 18}
-                textAnchor="middle"
-              >
-                {point.period}
-              </text>
-            </g>
+            </Mark>
           );
         })}
-
-        <text
-          className="ds-data-chart__axis-label"
-          x={14}
-          y={MARGIN.top + plotH / 2}
-          textAnchor="middle"
-          transform={`rotate(-90 14 ${MARGIN.top + plotH / 2})`}
-        >
-          {series.yAxisLabel}
-        </text>
-      </svg>
-      <ul className="ds-data-chart__legend" aria-hidden="true">
-        {series.series.map((def) => (
-          <li key={def.id} className="ds-data-chart__legend-item">
-            <span className="ds-data-chart__legend-swatch" style={{ background: def.fill }} />
-            {def.label}
-          </li>
-        ))}
-      </ul>
+        <EndLabels
+          items={series.series.flatMap((def) => {
+            const value = last.values[def.id];
+            return value === undefined
+              ? []
+              : [
+                  {
+                    id: def.id,
+                    y: y(value),
+                    name: def.label,
+                    value: formatDataPageValue(value, series.unit),
+                    tone: seriesTone(series, def.id),
+                  },
+                ];
+          })}
+        />
+      </Plot>
     </DataChartFrame>
   );
 }

@@ -1,23 +1,25 @@
 /**
- * Horizontal race-pair juxtaposition for `/data` — wealth, imprisonment, cost burden.
- * Flat matte bars with copper accent on the primary series only; full table alternative.
+ * Two groups, one measure, one place and period: two horizontal bars on a shared scale with their
+ * values printed at the end. The Black series is the highlighted one (ink); the comparison is the
+ * lighter neutral. The full table sits behind Numbers.
  */
-import Link from 'next/link';
 import React, { type ReactNode } from 'react';
 import type { DataPageRacePairSeries } from '@repo/domain/statistics/data-page-series';
+import { ChartMarks } from './ChartMarks';
 import { DataChartFrame } from './DataChartFrame';
 import { chapterHrefForTheme, formatDataPageValue } from './chart-utils';
+
+void React;
 
 export type RacePairComparisonChartProps = {
   readonly series: DataPageRacePairSeries;
   readonly reading?: ReactNode;
-  readonly figureLabel?: string;
   readonly span?: 'wide' | 'half';
   readonly id?: string;
+  /** False when a ratio figure beside this one already states the gap, so it is said once. */
+  readonly showGap?: boolean;
 };
 
-/* Color follows the entity across the page: the Black series is ink (viz-1) and the White
-   series copper (viz-2) here, exactly as the grouped-bar fixtures assign them. */
 /**
  * A series' `ratioLabel` is either a true ratio ("White-to-Black wealth ratio") or a difference in
  * percentage points ("Black minus White burden gap"). Only the first is a multiple.
@@ -26,50 +28,31 @@ export function isRatioLabel(label: string | undefined): boolean {
   return /ratio/i.test(label ?? '');
 }
 
-const PRIMARY_FILL = 'var(--ds-viz-1)';
-const COMPARISON_FILL = 'var(--ds-viz-2)';
-
 export function RacePairComparisonChart({
   series,
   reading,
-  figureLabel,
   span,
   id,
+  showGap = true,
 }: RacePairComparisonChartProps) {
   const maxValue = Math.max(series.primary.value, series.comparison.value);
-  if (maxValue <= 0) {
-    return null;
-  }
+  if (maxValue <= 0) return null;
 
-  const primaryWidth = (series.primary.value / maxValue) * 100;
-  const comparisonWidth = (series.comparison.value / maxValue) * 100;
-  const themeLink = chapterHrefForTheme(series.themeId);
+  const chapterHref = chapterHrefForTheme(series.themeId);
+  const rows = [
+    { point: series.primary, tone: 'hi' as const },
+    { point: series.comparison, tone: 'lo' as const },
+  ];
 
   return (
     <DataChartFrame
-      title={series.title}
+      title={`${series.title} · ${series.geographyLabel}, ${series.referencePeriod}`}
       {...(reading !== undefined ? { reading } : {})}
-      {...(figureLabel !== undefined ? { figureLabel } : {})}
       {...(span !== undefined ? { span } : {})}
       {...(id !== undefined ? { id } : {})}
-      caption={
-        <>
-          {series.caption}{' '}
-          <span className="ds-data-chart__meta">
-            {series.geographyLabel} · {series.referencePeriod}
-          </span>
-          {themeLink ? (
-            <>
-              {' '}
-              <Link className="ds-data-page__theme-link" href={themeLink}>
-                Read the chapter
-              </Link>
-            </>
-          ) : null}
-        </>
-      }
+      {...(chapterHref ? { chapterHref } : {})}
+      caption={series.caption}
       sources={series.sources}
-      ariaLabel={`${series.title} for ${series.geographyLabel}`}
       textAlternative={
         <table className="ds-data-chart__table">
           <caption>{series.title}</caption>
@@ -98,41 +81,43 @@ export function RacePairComparisonChart({
         </table>
       }
     >
-      <div className="ds-data-chart__pair-bars" role="img" aria-hidden="true">
-        <div className="ds-data-chart__pair-row">
-          <span className="ds-data-chart__pair-label">{series.primary.label}</span>
-          <div className="ds-data-chart__pair-track">
-            <span
-              className="ds-data-chart__pair-bar"
-              style={{ width: `${primaryWidth}%`, background: PRIMARY_FILL }}
-              title={`${series.primary.label}: ${formatDataPageValue(series.primary.value, series.primary.unit)}`}
-            />
-          </div>
-          <span className="ds-data-chart__pair-value">
-            {formatDataPageValue(series.primary.value, series.primary.unit)}
-          </span>
-        </div>
-        <div className="ds-data-chart__pair-row">
-          <span className="ds-data-chart__pair-label">{series.comparison.label}</span>
-          <div className="ds-data-chart__pair-track">
-            <span
-              className="ds-data-chart__pair-bar"
-              style={{ width: `${comparisonWidth}%`, background: COMPARISON_FILL }}
-              title={`${series.comparison.label}: ${formatDataPageValue(series.comparison.value, series.comparison.unit)}`}
-            />
-          </div>
-          <span className="ds-data-chart__pair-value">
-            {formatDataPageValue(series.comparison.value, series.comparison.unit)}
-          </span>
-        </div>
-      </div>
-      {series.ratioLabel && series.ratioValue !== undefined ? (
-        <p className="ds-data-chart__ratio">
-          <span className="ds-data-chart__ratio-value">
+      <ChartMarks label={series.title}>
+        <ul className="ds-hbars">
+          {rows.map(({ point, tone }, index) => {
+            const value = formatDataPageValue(point.value, point.unit);
+            return (
+              <li
+                key={point.label}
+                className="ds-hbar"
+                data-mark=""
+                tabIndex={index === 0 ? 0 : -1}
+                aria-label={`${point.label}: ${value}`}
+              >
+                <span className="ds-hbar__label" aria-hidden="true">
+                  {point.label}
+                </span>
+                <span className="ds-hbar__track" aria-hidden="true">
+                  <span
+                    className="ds-hbar__fill"
+                    data-tone={tone}
+                    style={{ width: `${(point.value / maxValue) * 100}%` }}
+                  />
+                </span>
+                <span className="ds-hbar__value" aria-hidden="true">
+                  {value}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </ChartMarks>
+      {showGap && series.ratioLabel && series.ratioValue !== undefined ? (
+        <p className="ds-pair-gap">
+          <strong>
             {series.ratioValue.toLocaleString('en-US')}
-            {isRatioLabel(series.ratioLabel) ? '×' : ' pts'}
-          </span>
-          <span>{series.ratioLabel}</span>
+            {isRatioLabel(series.ratioLabel) ? ' to 1' : ' points'}
+          </strong>{' '}
+          {series.ratioLabel}
         </p>
       ) : null}
     </DataChartFrame>

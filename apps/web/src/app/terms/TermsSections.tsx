@@ -21,7 +21,6 @@ import Link from 'next/link';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { CORRECTION_PRIVACY_NOTICE } from '../corrections/copy';
 import { RoomJump, RoomSection } from '../../components/room';
-import './terms.css';
 
 void React;
 
@@ -61,47 +60,50 @@ const NOT_THIS_RULES = [
 
 export function TermsSections() {
   return (
-    <div className="ds-terms">
+    <>
       <RoomJump sections={PAGE_SECTIONS} />
 
       <RoomSection id="scope" title="BlackStory, and who runs it">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           This page covers BlackStory at <span className="ds-phrase-nowrap">blackstory.app</span>{' '}
           and the archive it publishes. It is a notice rather than an agreement: you are not asked
           to accept it, and nothing on it is written to work only if you had.
         </p>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           BlackStory is run by <strong>Gerald Dagher</strong>, an individual. There is no company
           behind it. Write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> about
           anything on this page.
         </p>
-        <p className="ds-terms__meta">Last updated: September 2026</p>
+        <p className="ds-trust-meta">Last updated: September 2026</p>
       </RoomSection>
 
       <RoomSection id="what-this-is" title="What this is, and what it is not">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           BlackStory is a free, public archive of Black American history. There is nothing to buy
           and nothing to subscribe to, and reading a published page never asks you to sign in. Every
           record is research: claims carry the sources they rest on and a stated confidence grade,
           so you can see how firmly a thing is held before you rely on it. How a record earns that
           grade is set out in the <Link href="/methodology">methodology</Link>.
         </p>
-        <ol className="ds-terms__rule-strip" aria-label="What this archive is not">
-          {NOT_THIS_RULES.map((rule) => (
-            <li key={rule} className="ds-terms__rule-row">
-              <span className="ds-terms__rule-text">{rule}</span>
-            </li>
-          ))}
-        </ol>
+        <ul className="ds-trust-list" aria-label="What this archive is not">
+          {NOT_THIS_RULES.map((rule) => {
+            const stop = rule.indexOf('. ');
+            return (
+              <li key={rule}>
+                <strong>{rule.slice(0, stop + 1)}</strong> {rule.slice(stop + 2)}
+              </li>
+            );
+          })}
+        </ul>
       </RoomSection>
 
       <RoomSection id="using" title="Read it, link it, cite it">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           No permission is needed to read BlackStory, to link to any page on it, to quote it with
           attribution, or to cite it in your own work. That is what it is for, and asking would
           waste your time and mine.
         </p>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           One ask, and it is an ask rather than a rule: please do not collect from the site at a
           rate that degrades it for the people trying to read it. What the site currently says to
           crawlers and to automated readers lives at <a href="/robots.txt">/robots.txt</a> and{' '}
@@ -111,7 +113,7 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="reuse" title="Reusing what BlackStory writes">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           The writing on BlackStory is published under{' '}
           <a href={LICENSE_DEED} rel="license noopener noreferrer" target="_blank">
             {LICENSE_NAME}
@@ -120,7 +122,7 @@ export function TermsSections() {
           it, commercially or not. The condition is credit: name BlackStory and link back to the
           page you took it from, and say if you changed it.
         </p>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           That license reaches the writing and the selection, because that is all a license can
           reach. The facts in a record belong to nobody. A date, a name, a street address, a count
           of who was there: those are not anyone&apos;s property, and you may use them with no
@@ -128,7 +130,7 @@ export function TermsSections() {
           the judgment about what to include and what to leave out, and that is the part CC BY 4.0
           asks you to credit.
         </p>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           The license does not reach material that is not BlackStory&apos;s to license. Photographs,
           scanned documents, book cover images, and map tiles come from third parties on their own
           terms, and each record names the source and the terms for the material it displays.
@@ -139,18 +141,18 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="submissions" title="Corrections, leads, and what happens to what you send">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           You can file a correction, send a research lead, appeal a closed correction, or report
           abuse. Nothing you send appears on the public site as you sent it, and nothing you send is
           visible to other readers.
         </p>
-        <blockquote className="ds-terms__quote" cite="/corrections">
-          <p className="ds-terms__quote-text">{CORRECTION_PRIVACY_NOTICE.body}</p>
-          <footer className="ds-terms__quote-source">
+        <blockquote className="ds-trust-quote" cite="/corrections">
+          <p>{CORRECTION_PRIVACY_NOTICE.body}</p>
+          <footer>
             <Link href="/corrections">{CORRECTION_PRIVACY_NOTICE.title}, corrections page</Link>
           </footer>
         </blockquote>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           You get a receipt code, a status you can check with it, and one appeal if a correction is
           closed and you think the outcome was wrong. What you send may be used to correct or extend
           a published record. Send only material you are free to send, and leave out a living
@@ -162,13 +164,13 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="about-you" title="If a record about you is wrong">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           Tell me. Use the <Link href="/corrections">corrections lane</Link> and say what is wrong
           and which page it is on, or write to{' '}
           <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> if you would rather not use a
           form.
         </p>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           A person reads it, not a filter, and the form carries a category for a living-person
           precision or sensitivity concern so it is flagged as one from the start. If the record is
           wrong it gets fixed, and the fix is published in the{' '}
@@ -178,12 +180,12 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="copyright" title="If something published here is yours">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           Write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>. Say what the
           material is, give the address of the page it is on, say what right you hold in it, and
           leave a way to reach you.
         </p>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           I acknowledge a copyright complaint within {ACKNOWLEDGEMENT_HOURS} hours and reach a
           decision within {RESOLUTION_DAYS} days. Material found to be infringing is removed. If I
           think the use was lawful I will say so and say why, and the material stays up while that
@@ -192,14 +194,14 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="accuracy" title="Accuracy, and the limits of this archive">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           The research here is provided as it stands, without warranty of completeness or currency.
           Sources sit on the record itself so you can check the work rather than take it on trust,
           and records change as the evidence changes: a confidence grade moves, a claim gets
           withdrawn, a date gets narrowed. A gap is not a finding either. A place with no record
           here usually means nobody has done that work yet.
         </p>
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           That paragraph describes the archive; it does not excuse it. A disclaimer does not make a
           wrong record less wrong, and it does not relieve me of the work of putting it right. If
           something here is inaccurate, the answer is a correction, not this sentence.
@@ -207,7 +209,7 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="liability" title="Limits on liability">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           BlackStory is free to read and is run by one person rather than a company. To the extent
           the law allows, I am not liable for indirect or consequential loss arising from the use of
           this archive.
@@ -215,7 +217,7 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="affiliate" title="Affiliate links">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           Some book pages link to Bookshop.org through an affiliate program, and a purchase made
           through one of those links pays BlackStory a commission. Nothing here is paid placement:
           the affiliate relationship never decides which books appear or what a record says about
@@ -224,7 +226,7 @@ export function TermsSections() {
       </RoomSection>
 
       <RoomSection id="changes" title="Changes and contact">
-        <p className="ds-terms__follow">
+        <p className="ds-trust-copy">
           A material change to this notice is posted here, with a new date at the top. For a
           question about anything on this page, or about how the archive runs, write to{' '}
           <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
@@ -232,6 +234,6 @@ export function TermsSections() {
           <Link href="/privacy">privacy policy</Link>.
         </p>
       </RoomSection>
-    </div>
+    </>
   );
 }

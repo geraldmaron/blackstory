@@ -40,10 +40,9 @@ export function LivesPlaceAnchors({ areaSlug }: LivesPlaceAnchorsProps) {
 
   return (
     <aside className="lives-anchors" aria-label="Places that illustrate this region">
-      <p className="lives-anchors__kicker">Places that illustrate this region</p>
+      <h3 className="lives-anchors__title">Places that illustrate this region</h3>
       <p className="lives-anchors__note">
-        Figures stay regional. These places open stories and catalog records; they are not city
-        rates on the street.
+        The figures stay regional. These places open stories and records; they are not city rates.
       </p>
       <ul className="lives-anchors__list">
         {anchors.map((anchor) => (

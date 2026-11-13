@@ -1,24 +1,21 @@
 /**
- * Public correction status page. Shows coarse phases only never spam scores, campaign
- * flags, duplicate lists, or other moderation-sensitive metadata.
+ * Public correction status. Shows coarse phases only, never spam scores, campaign flags,
+ * duplicate lists, or other moderation-sensitive metadata. Below the receipt: the appeal when
+ * one is open, and the abuse report.
  */
 import React from 'react';
-import { EmptyState } from '@repo/ui';
 import Link from 'next/link';
+import { SectionHeading } from '@repo/ui';
 import type { PublicCorrectionStatus } from './public-status';
-import { AppealForm } from './AppealForm';
-import { AbuseReportForm } from './AbuseReportForm';
 import { ReceiptBlock } from './ReceiptBlock';
+import { ReceiptFollowUpForm } from './ReceiptFollowUpForm';
+import { ABUSE_REPORT_NOTICE, APPEAL_ELIGIBILITY_NOTICE } from './copy';
 
-// `React` is otherwise unused under this app's own automatic JSX runtime, but keeping it
-// imported makes this file safe to cross-transpile from a consumer whose own tsconfig uses a
-// classic JSX transform, where the JSX below compiles to `React.createElement(...)` calls that
-// need `React` in scope (see `ReceiptBlock.tsx` and `@repo/ui`'s `Notice.tsx` for the same note).
 void React;
 
 export function CorrectionStatusPanel({ status }: { readonly status: PublicCorrectionStatus }) {
   return (
-    <div className="ds-stack">
+    <>
       <ReceiptBlock
         receiptCode={status.receiptCode}
         phase={status.phase}
@@ -27,40 +24,36 @@ export function CorrectionStatusPanel({ status }: { readonly status: PublicCorre
       />
 
       {status.phase === 'closed' && status.outcomeReason ? (
-        <p className="ds-room-field__hint">Declined: {status.outcomeReason}</p>
+        <p className="ds-trust-lead">Declined: {status.outcomeReason}</p>
       ) : null}
 
-      <p className="ds-room-field__hint">
+      <p className="ds-trust-note">
         Nothing you sent is public. If your correction is declined, you get the reason. Volume of
         corrections never changes public confidence or publication, and coordinated activity is
         reviewed separately and is not shown here. An accepted correction appears in{' '}
         <Link href="/errata">Errata</Link> with the record it changed.
       </p>
 
-      {status.appealAvailable ? (
-        <section aria-labelledby="appeal-heading">
-          <h2
-            id="appeal-heading"
-            className="ds-page__title"
-            style={{ fontSize: 'var(--ds-text-lg)' }}
-          >
-            Appeal
-          </h2>
-          <AppealForm receiptCode={status.receiptCode} />
-        </section>
-      ) : (
-        <EmptyState title="Appeal not available">
-          Appeals are limited to one per receipt and only when a correction was closed or a
-          classification dispute was resolved.
-        </EmptyState>
-      )}
-
-      <section aria-labelledby="abuse-heading">
-        <h2 id="abuse-heading" className="ds-page__title" style={{ fontSize: 'var(--ds-text-lg)' }}>
-          Report abuse
-        </h2>
-        <AbuseReportForm receiptCode={status.receiptCode} />
+      <section className="ds-receipt-followup" aria-labelledby="appeal-heading">
+        <SectionHeading id="appeal-heading">Appeal</SectionHeading>
+        {status.appealAvailable ? (
+          <>
+            <p>{APPEAL_ELIGIBILITY_NOTICE}</p>
+            <ReceiptFollowUpForm kind="appeal" receiptCode={status.receiptCode} />
+          </>
+        ) : (
+          <p>
+            Not open for this receipt. An appeal opens once a correction is closed or a
+            classification dispute is resolved, and each receipt gets one.
+          </p>
+        )}
       </section>
-    </div>
+
+      <section className="ds-receipt-followup" aria-labelledby="abuse-heading">
+        <SectionHeading id="abuse-heading">Report abuse</SectionHeading>
+        <p>{ABUSE_REPORT_NOTICE}</p>
+        <ReceiptFollowUpForm kind="abuse" receiptCode={status.receiptCode} />
+      </section>
+    </>
   );
 }

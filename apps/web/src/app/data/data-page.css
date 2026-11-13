@@ -1,14 +1,119 @@
 /**
- * `/data` — the reference ledger's own layout, over the room kit.
- *
- * What lives here is the section anatomy that holds figures in a one- or two-column grid. The figures themselves are drawn by
- * `components/data/data-charts.css`; this sheet only places them.
+ * `/data` page layout: a sticky contents list beside the figures on desktop, plain sections, a
+ * two-up figure grid where two figures form one comparison. The figures themselves are drawn by
+ * `components/data/data-charts.css`, which each figure imports.
  *
  * Named data-page.css, not data-edition.css: room-kit.test.tsx forbids new `*-edition.css`
  * files under `app/`.
  */
 
-/* —— a section ————————————————————————————————————————————————————————————— */
+.ds-data-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ds-data-layout__rail {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .ds-data-layout {
+    grid-template-columns: 12rem minmax(0, 1fr);
+    column-gap: var(--ds-space-12);
+  }
+
+  .ds-data-layout__rail {
+    display: block;
+  }
+
+  .ds-data-contents {
+    position: sticky;
+    top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-8));
+    max-height: calc(100dvh - var(--ds-island-clearance, 56px) - var(--ds-space-12));
+    margin-top: var(--ds-space-12);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+/* —— contents list ———————————————————————————————————————————————————————————— */
+.ds-data-contents__list,
+.ds-data-contents__figures {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-data-contents__list > li + li {
+  margin-top: var(--ds-space-3);
+}
+
+/* Section labels align to the container edge; figure labels indent 12px, and the current bar
+   sits in that indent, outside the text. */
+.ds-data-contents__section,
+.ds-data-contents__figure {
+  position: relative;
+  display: block;
+  padding: var(--ds-space-1) 0;
+  font-family: var(--ds-font-sans);
+  text-decoration: none;
+}
+
+.ds-data-contents__figure {
+  padding-left: var(--ds-space-3);
+}
+
+.ds-data-contents__section {
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-data-contents__figure {
+  font-size: var(--ds-text-caption);
+  line-height: 1.35;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-contents__section:hover,
+.ds-data-contents__figure:hover {
+  color: var(--ds-ink);
+}
+
+.ds-data-contents__figure[aria-current='true'] {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+/* The figure in view carries an ink bar at the left edge: weight and a mark, not color alone. */
+.ds-data-contents__figure[aria-current='true']::before {
+  content: '';
+  position: absolute;
+  top: var(--ds-space-1);
+  bottom: var(--ds-space-1);
+  left: 0;
+  border-left: 2px solid var(--ds-ink);
+}
+
+.ds-data-contents__section:focus-visible,
+.ds-data-contents__figure:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.ds-data-contents__notes {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: var(--ds-space-6) 0 0;
+  padding: var(--ds-space-3) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+/* —— a section —————————————————————————————————————————————————————————————— */
 .ds-data-section {
   scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
 }
@@ -16,8 +121,8 @@
 .ds-data-section__head {
   display: grid;
   gap: var(--ds-space-2);
-  max-width: 62ch;
-  margin-bottom: var(--ds-space-6);
+  max-width: 44rem;
+  margin-bottom: var(--ds-space-8);
 }
 
 .ds-data-section__head > .ds-section-heading {
@@ -25,169 +130,127 @@
 }
 
 .ds-data-section__lede {
-  margin: var(--ds-space-1) 0 0;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.6;
-  color: var(--room-ink-2, var(--ds-ink));
-}
-
-.ds-data-section__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.02em;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
   color: var(--ds-ink-muted);
 }
 
-/* The figure grid: one column, or two where the section asks for it and the room is wide.
-   A half figure shares a row; a wide figure always spans. */
-.ds-data-section__figures {
+.ds-data-section__meta {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* Phone: the first figure starts in the first viewport. The section's dates sit in each figure's
+   footer, and Population's intro restates its first figure. */
+@media (max-width: 47.99rem) {
+  .ds-data-section__meta,
+  #counted .ds-data-section__lede {
+    display: none;
+  }
+
+  .ds-data-section__head {
+    margin-bottom: var(--ds-space-6);
+  }
+}
+
+/* A group inside Measured gaps: Wealth, Housing, Justice. */
+.ds-data-group {
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+}
+
+.ds-data-group + .ds-data-group {
+  margin-top: var(--ds-space-18);
+}
+
+.ds-data-group__title {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+/* The figure grid: one column, two where a pair shares a row and the column is wide. */
+.ds-data-figures {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--ds-space-8) var(--ds-space-8);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-12) var(--ds-space-8);
 }
 
 @media (min-width: 56rem) {
-  .ds-data-section__figures {
+  .ds-data-figures {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .ds-data-section__figures > .ds-datafig:not(.ds-datafig--half) {
+  .ds-data-figures > .ds-datafig:not(.ds-datafig--half) {
     grid-column: 1 / -1;
   }
 }
 
-/* —— the change ledger: three decade deltas as a figure body ——————————————— */
-.ds-data-deltas {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+/* A two-bar comparison alone on a row keeps a readable length. */
+.ds-data-figures > .ds-datafig:not(.ds-datafig--half) .ds-hbars {
+  max-width: 44rem;
 }
 
-.ds-data-delta {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--ds-space-1) var(--ds-space-4);
-  padding: var(--ds-space-3) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+/* —— Lives door, rules, empty ———————————————————————————————————————————————— */
+.ds-data-door {
+  margin: calc(-1 * var(--ds-space-4)) 0 0;
 }
 
-.ds-data-delta:last-child {
-  border-bottom: 0;
-}
-
-.ds-data-delta__label {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink);
-}
-
-.ds-data-delta__value {
-  grid-row: 1 / span 2;
-  grid-column: 2;
-  align-self: center;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ds-ink);
-  text-align: right;
-}
-
-.ds-data-delta__note {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  line-height: 1.5;
-  color: var(--ds-ink-muted);
-}
-
-/* —— the reading rules —————————————————————————————————————————————————————— */
 .ds-data-rules {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1px;
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--ds-rule);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  overflow: hidden;
 }
 
 @media (min-width: 48rem) {
   .ds-data-rules {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--ds-space-8);
   }
 }
 
 .ds-data-rule {
-  padding: var(--ds-space-5);
-  background: var(--ds-surface);
+  padding: var(--ds-space-4) 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-data-rule__kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45em;
+.ds-data-rule__title {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-body);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--ds-tracking-title);
   color: var(--ds-ink);
 }
 
 .ds-data-rule__body {
   margin: 0;
-  font-family: var(--ds-font-editorial);
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
+  line-height: var(--ds-leading-body);
   color: var(--ds-ink-muted);
-}
-
-.ds-data-reading__handoff {
-  margin: var(--ds-space-6) 0 0;
 }
 
 .ds-data-reading__links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--ds-space-2);
-  margin: var(--ds-space-4) 0 0;
+  margin: var(--ds-space-6) 0 0;
 }
 
 .ds-data-empty {
   margin: 0;
-  padding: var(--ds-space-5);
-  border: var(--ds-border-width) dashed var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-4) 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
-  line-height: 1.5;
+  line-height: var(--ds-leading-body);
   color: var(--ds-ink-muted);
-}
-
-.ds-data-lives-entry {
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.5;
-}
-
-.ds-data-lives-entry__cta {
-  margin: 0;
-}
-
-.ds-data-lives-entry__cta a:focus-visible {
-  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
-  outline-offset: 4px;
-  border-radius: var(--ds-radius-sm);
 }

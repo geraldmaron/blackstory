@@ -89,7 +89,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       },
     ],
     entityIds: [],
-    uncertaintyLabel: 'Juxtaposition only until a gated causal claim is attached.',
+    uncertaintyLabel: 'Shown side by side. No source here says one caused the other.',
   },
   {
     id: '1910-count-great-migration-eve',
@@ -212,7 +212,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       },
     ],
     entityIds: ['ent_law_national_labor_relations_act_1935'],
-    uncertaintyLabel: 'Juxtaposition only until a gated causal claim is attached.',
+    uncertaintyLabel: 'Shown side by side. No source here says one caused the other.',
   },
   {
     id: '1930-work-unions',
@@ -336,7 +336,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       },
     ],
     entityIds: [],
-    uncertaintyLabel: 'Juxtaposition only until a gated causal claim is attached.',
+    uncertaintyLabel: 'Shown side by side. No source here says one caused the other.',
   },
   {
     id: '1960-school-brown-aftermath',

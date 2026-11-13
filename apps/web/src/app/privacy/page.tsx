@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
 import '../utility.css';
+import '../../components/trust/trust.css';
 import { PrivacySections } from './PrivacySections';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -24,7 +25,7 @@ export default function PrivacyPage() {
         crumb={parentCrumb('/privacy')}
         linkAs={Link}
         title="What this site collects, and what it won't"
-        dek="What the BlackStory website processes, and what it deliberately does not. There are no accounts and no advertising, and the map asks for your location only when you press a control that says so."
+        dek="No accounts, no advertising, and your location only when you press a control that says so."
       />
       <PrivacySections />
     </Room>

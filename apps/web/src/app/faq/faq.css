@@ -1,0 +1,110 @@
+/**
+ * `/faq`: questions as ruled disclosure rows. The question is the row's heading and its whole
+ * width is the target; the chevron turns when open. The answer opens on its lead sentence.
+ */
+.ds-faq {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-faq__item {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+}
+
+.ds-faq__question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  min-height: 3.5rem;
+  padding-block: var(--ds-space-3);
+  list-style: none;
+  cursor: pointer;
+}
+
+.ds-faq__question::-webkit-details-marker {
+  display: none;
+}
+
+.ds-faq__question h3 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+  text-wrap: pretty;
+}
+
+.ds-faq__question:hover h3 {
+  text-decoration: underline;
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 4px;
+}
+
+.ds-faq__chevron {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-muted);
+  transition: transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-faq__item[open] > .ds-faq__question .ds-faq__chevron {
+  transform: rotate(180deg);
+  color: var(--ds-ink);
+}
+
+.ds-faq__answer {
+  padding: 0 var(--ds-space-8) var(--ds-space-6) 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.62;
+  color: color-mix(in srgb, var(--ds-ink) 86%, var(--ds-canvas));
+}
+
+.ds-faq__answer > p {
+  max-width: 64ch;
+  margin: 0;
+}
+
+.ds-faq__answer > p + p {
+  margin-top: var(--ds-space-3);
+}
+
+.ds-faq__answer > .ds-faq__lead {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
+.ds-faq__answer a {
+  color: var(--ds-accent);
+  text-underline-offset: 3px;
+}
+
+.ds-faq__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-4);
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-faq__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-faq__chevron {
+    transition: none;
+  }
+}

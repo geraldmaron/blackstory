@@ -414,6 +414,18 @@ test('/corrections keeps the CorrectionForm prefill (target, targetType)', () =>
   );
 });
 
+test('/errata keeps a real kind-of-change filter and drops anything else', () => {
+  assert.equal(
+    normalizeQueryString('/errata', { type: 'clarification', page: '2' }),
+    'type=clarification',
+  );
+  assert.equal(normalizeQueryString('/errata', { type: 'bogus' }), '');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/errata?type=correction')),
+    false,
+  );
+});
+
 test('/place keeps DiscoveryState arrival params (from=list + filters)', () => {
   assert.equal(
     normalizeQueryString('/place/paul-laurence-dunbar-high-school', {

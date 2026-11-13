@@ -1,6 +1,11 @@
 /**
- * Lives Across the Decades: visual decade story over the room kit. Charts first, numbers in a
- * disclosure. Emphasis is weight and a copper rule, never color alone.
+ * Lives: the guided reader (`/lives`) and the evidence appendix (`/lives/explorer`).
+ *
+ * The figures inside both are drawn by `components/data/data-charts.css`, which DataChartFrame
+ * imports itself. This sheet lays out the instruments around them: the question picker, the era
+ * scrubber and era panels on /lives; the control row and the decade result panel on the
+ * appendix. One bordered container per instrument; everything else is separated by rules.
+ * Selected is ink weight plus a copper bar, never color alone.
  */
 
 .lives-sr-only {
@@ -15,1577 +20,6 @@
   border: 0;
 }
 
-.lives-regions {
-  display: grid;
-  gap: var(--ds-space-4);
-  margin: var(--ds-space-8) 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: var(--ds-border-width) solid var(--ds-ink);
-}
-
-.lives-regions__item {
-  padding: var(--ds-space-4) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-regions__name {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-}
-
-.lives-timeline {
-  margin-top: var(--ds-space-8);
-}
-
-.lives-anchors {
-  margin: var(--ds-space-6) 0;
-  padding: var(--ds-space-4) 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-anchors__kicker {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-.lives-anchors__note {
-  margin: 0 0 var(--ds-space-3);
-  max-width: 42rem;
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-anchors__list {
-  display: grid;
-  gap: var(--ds-space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 40rem) {
-  .lives-anchors__list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.lives-anchors__chip {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-1);
-  min-height: 100%;
-  padding: 0;
-  color: inherit;
-  text-decoration: none;
-}
-
-.lives-anchors__chip:hover .lives-anchors__name,
-.lives-anchors__chip:focus-visible .lives-anchors__name {
-  color: var(--ds-copper-text);
-}
-
-.lives-anchors__chip:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 2px;
-}
-
-.lives-anchors__name {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-}
-
-.lives-anchors__role {
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-controls {
-  display: block;
-  margin: var(--ds-space-6) 0 var(--ds-space-5);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-}
-
-.lives-controls__group {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ds-space-2);
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.lives-controls__legend {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  width: 100%;
-  margin-bottom: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
-}
-
-.lives-controls__option {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  min-height: 2.75rem;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  font-family: var(--ds-font-sans);
-  background: var(--ds-canvas);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-  cursor: pointer;
-}
-
-.lives-controls__option:has(input:checked) {
-  font-weight: 600;
-  border-color: var(--ds-accent-graphic);
-  box-shadow: inset 3px 0 0 var(--ds-accent-graphic);
-}
-
-.lives-controls__option:has(input:focus-visible) {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.lives-controls__option input:focus-visible {
-  outline: 0;
-}
-
-@media (max-width: 31.25rem) {
-  .lives-controls__group {
-    grid-template-columns: 1fr;
-  }
-}
-
-.lives-rail {
-  display: flex;
-  gap: var(--ds-space-1);
-  overflow-x: auto;
-  padding-bottom: var(--ds-space-2);
-  border-bottom: var(--ds-border-width) solid var(--ds-ink);
-  scrollbar-width: thin;
-}
-
-.lives-rail__tab {
-  flex: 0 0 auto;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-  background: none;
-  border: var(--ds-border-width) solid transparent;
-  border-radius: var(--ds-radius-sm);
-  text-decoration: none;
-  cursor: pointer;
-  transition: color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.lives-rail__tab:hover {
-  color: var(--ds-ink);
-}
-
-.lives-rail__tab[aria-selected='true'],
-.lives-rail__tab[aria-current='page'] {
-  color: var(--ds-canvas);
-  font-weight: 600;
-  background: var(--ds-ink);
-  border-color: var(--ds-ink);
-}
-
-.lives-rail__tab:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 2px;
-}
-
-/* A regime boundary is a short rule before the tab: the break is visible before a reader compares
-   across it. The 1890 gap is dashed. */
-.lives-rail__tab[data-boundary='different_measure']::before,
-.lives-rail__tab[data-boundary='method_note']::before,
-.lives-rail__tab[data-boundary='gap']::before {
-  content: '';
-  position: absolute;
-  top: 20%;
-  bottom: 20%;
-  left: calc(-1 * var(--ds-space-1));
-  border-left: var(--ds-border-width) solid var(--ds-accent);
-}
-
-.lives-rail__tab[data-boundary='method_note']::before {
-  border-left-color: var(--ds-rule);
-}
-
-.lives-rail__tab[data-boundary='gap']::before {
-  border-left-style: dashed;
-}
-
-.lives-panel {
-  margin-top: var(--ds-space-6);
-}
-
-.lives-panel__title {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  margin: 0 0 var(--ds-space-4);
-}
-
-.lives-regime {
-  margin: 0 0 var(--ds-space-6);
-  padding: var(--ds-space-4) var(--ds-space-5);
-  font-family: var(--ds-font-sans);
-  background: var(--ds-surface-raised);
-  border-left: var(--ds-border-width) solid var(--ds-accent);
-}
-
-.lives-regime p {
-  margin: 0 0 var(--ds-space-2);
-}
-
-.lives-regime p:last-child {
-  margin-bottom: 0;
-}
-
-.lives-regime__label {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
-}
-
-.lives-regime__boundary {
-  font-weight: 600;
-}
-
-.lives-regime__note {
-  color: var(--ds-ink-muted);
-}
-
-.lives-frame {
-  margin: 0 0 var(--ds-space-6);
-  font-family: var(--ds-font-editorial);
-}
-
-.lives-table-scroll {
-  margin: 0 0 var(--ds-space-6);
-  overflow-x: auto;
-}
-
-.lives-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--ds-font-sans);
-}
-
-.lives-table caption {
-  margin-bottom: var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  text-align: left;
-  color: var(--ds-ink-muted);
-}
-
-.lives-table th,
-.lives-table td {
-  padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3) 0;
-  text-align: left;
-  vertical-align: top;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-table thead th {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
-  border-bottom-color: var(--ds-ink);
-}
-
-.lives-table [data-emphasis='true'] {
-  font-weight: 600;
-}
-
-.lives-table tbody tr[data-emphasis='true'] th {
-  box-shadow: inset var(--ds-border-width) 0 0 var(--ds-accent);
-  padding-left: var(--ds-space-3);
-}
-
-.lives-cell {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-1);
-}
-
-.lives-cell__value {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-body);
-}
-
-.lives-cell__detail {
-  font-size: var(--ds-text-caption);
-  font-weight: 400;
-  color: var(--ds-ink-muted);
-}
-
-.lives-cell--muted .lives-cell__value {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-cell--wide .lives-cell__value::after {
-  content: ' ~';
-  color: var(--ds-ink-muted);
-}
-
-.lives-rules {
-  margin: var(--ds-space-8) 0 0;
-  padding-top: var(--ds-space-5);
-  border-top: var(--ds-border-width) solid var(--ds-ink);
-}
-
-.lives-rules__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.lives-rule {
-  padding: var(--ds-space-4) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-rule[data-applies='false'] {
-  color: var(--ds-ink-muted);
-}
-
-.lives-rule p {
-  margin: 0 0 var(--ds-space-1);
-}
-
-.lives-rule__name {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-}
-
-.lives-rule__meta,
-.lives-rule__named {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.lives-rule__dispute {
-  font-weight: 600;
-}
-
-.lives-rule__part {
-  max-width: 46rem;
-  margin: var(--ds-space-2) 0;
-}
-
-.lives-rule__label {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-.lives-era__rules .lives-rule:last-child {
-  border-bottom: 0;
-}
-
-.lives-era__more-rules {
-  margin-top: var(--ds-space-2);
-  padding-top: var(--ds-space-3);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-era__more-rules summary {
-  cursor: pointer;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-accent);
-}
-
-.lives-era__more-rules summary:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 2px;
-}
-
-.lives-rules__disclaimer,
-.lives-rules__empty,
-.lives-method {
-  margin-top: var(--ds-space-5);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-area-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-6) 0 0;
-  font-family: var(--ds-font-sans);
-}
-
-.lives-area-nav__link {
-  color: var(--ds-ink-muted);
-  text-decoration: none;
-  border-bottom: var(--ds-border-width) solid transparent;
-}
-
-.lives-area-nav__link:hover,
-.lives-area-nav__link[aria-current='page'] {
-  color: var(--ds-ink);
-  border-bottom-color: var(--ds-accent);
-}
-
-.lives-region-map {
-  margin: 0 0 var(--ds-space-6);
-}
-
-.lives-region-map__nation,
-.lives-region-map__cell {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-1);
-  min-height: 2.75rem;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  color: var(--ds-ink);
-  text-decoration: none;
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-region-map__nation:hover,
-.lives-region-map__cell:hover {
-  border-color: var(--ds-ink-muted);
-}
-
-.lives-region-map__nation {
-  margin-bottom: var(--ds-space-2);
-}
-
-.lives-region-map__grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ds-space-2);
-}
-
-.lives-region-map__name {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-body);
-}
-
-.lives-region-map__summary {
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.4;
-  color: var(--ds-ink-muted);
-}
-
-.lives-region-map__nation[aria-current='page'],
-.lives-region-map__cell[aria-current='page'] {
-  border-color: var(--ds-accent-graphic);
-}
-
-.lives-region-map__nation:focus-visible,
-.lives-region-map__cell:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-@media (max-width: 39.9375rem) {
-  .lives-region-map__grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.lives-count {
-  margin: 0 0 var(--ds-space-6);
-  padding: var(--ds-space-4) var(--ds-space-5);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-}
-
-.lives-count h3 {
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-}
-
-.lives-count__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.lives-count__note + .lives-count__note {
-  margin-top: var(--ds-space-4);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-count__note p {
-  margin: 0 0 var(--ds-space-1);
-}
-
-.lives-count__note:target {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-space-2);
-}
-
-.lives-count__heading {
-  font-weight: 600;
-}
-
-.lives-count__groups,
-.lives-count__sources,
-.lives-cell__definition,
-.lives-table__note {
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.lives-cell__definition {
-  display: block;
-  font-weight: 400;
-}
-
-.lives-cell__why {
-  font-size: var(--ds-text-caption);
-}
-
-.lives-regions__summary {
-  margin: var(--ds-space-1) 0 0;
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-sight {
-  margin: 0 0 var(--ds-space-6);
-  padding: var(--ds-space-4) var(--ds-space-5);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  background: var(--ds-canvas);
-}
-
-.lives-sight h3 {
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-}
-
-.lives-sight__reading {
-  margin: 0 0 var(--ds-space-4);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-sight__drawing {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin: 0 0 var(--ds-space-4);
-}
-
-.lives-sight .lives-count {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-}
-
-.lives-figure {
-  margin: 0 0 var(--ds-space-8);
-}
-
-.lives-figure__head {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-  margin-bottom: var(--ds-space-4);
-}
-
-.lives-figure__title {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-}
-
-.lives-figure__reading {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-figure__caption {
-  margin: var(--ds-space-3) 0 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.lives-figure__numbers {
-  margin-top: var(--ds-space-3);
-}
-
-.lives-figure__numbers summary {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  color: var(--ds-ink-muted);
-}
-
-.lives-figure__numbers summary:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.lives-stacks {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-}
-
-.lives-stack {
-  display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr);
-  gap: var(--ds-space-3);
-  align-items: center;
-}
-
-.lives-stack[data-emphasis='true'] .lives-stack__label {
-  box-shadow: inset var(--ds-border-width) 0 0 var(--ds-accent);
-  padding-left: var(--ds-space-3);
-  font-weight: 600;
-}
-
-.lives-stack__label {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-}
-
-.lives-stack__track {
-  display: flex;
-  min-height: 1.75rem;
-  overflow: hidden;
-  background: var(--ds-surface-sunken);
-  border: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-stack__fill {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  line-height: 1;
-}
-
-.lives-stack__fill[data-bucket='lower'] {
-  background: var(--ds-viz-1);
-  color: var(--ds-canvas);
-}
-
-.lives-stack__fill[data-bucket='middle'] {
-  background: var(--ds-viz-3);
-  color: var(--ds-canvas);
-}
-
-.lives-stack__fill[data-bucket='upper'] {
-  background: color-mix(in srgb, var(--ds-viz-1) 22%, var(--ds-canvas));
-  color: var(--ds-ink);
-}
-
-.lives-stack__fill[data-bucket='unclassified'] {
-  background: var(--ds-rule);
-  color: var(--ds-ink);
-}
-
-.lives-stack__fill[data-selected='true'] {
-  outline: var(--ds-border-width) solid var(--ds-accent-graphic);
-  outline-offset: -1px;
-}
-
-.lives-stack__empty {
-  padding: 0 var(--ds-space-3);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.lives-stack__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-3);
-  margin: var(--ds-space-3) 0 0;
-  padding: 0;
-  list-style: none;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  color: var(--ds-ink-muted);
-}
-
-.lives-stack__legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-}
-
-.lives-stack__legend li::before {
-  content: '';
-  width: 0.75rem;
-  height: 0.75rem;
-  background: var(--ds-rule);
-}
-
-.lives-stack__legend li[data-bucket='lower']::before {
-  background: var(--ds-viz-1);
-}
-
-.lives-stack__legend li[data-bucket='middle']::before {
-  background: var(--ds-viz-3);
-}
-
-.lives-stack__legend li[data-bucket='upper']::before {
-  background: color-mix(in srgb, var(--ds-viz-1) 22%, var(--ds-canvas));
-  border: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-conditions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-6);
-}
-
-.lives-condition__label {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-}
-
-.lives-condition__universe {
-  display: block;
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.lives-condition__row {
-  display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr) 5.5rem;
-  gap: var(--ds-space-2);
-  align-items: center;
-  margin-top: var(--ds-space-2);
-}
-
-.lives-condition__row[data-emphasis='true'] .lives-condition__group {
-  font-weight: 600;
-  box-shadow: inset var(--ds-border-width) 0 0 var(--ds-accent);
-  padding-left: var(--ds-space-2);
-}
-
-.lives-condition__group {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-}
-
-.lives-condition__track {
-  position: relative;
-  min-height: 0.75rem;
-  background: var(--ds-surface-sunken);
-  border: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-condition__bar {
-  display: block;
-  height: 0.75rem;
-  background: var(--ds-viz-1);
-}
-
-.lives-condition__row[data-emphasis='true'] .lives-condition__bar {
-  background: var(--ds-viz-2);
-}
-
-.lives-condition__empty {
-  display: block;
-  padding: 0 var(--ds-space-2);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-micro);
-  color: var(--ds-ink-muted);
-}
-
-.lives-condition__value {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  text-align: right;
-}
-
-@media (max-width: 39.9375rem) {
-  .lives-stack,
-  .lives-condition__row {
-    grid-template-columns: 1fr;
-    gap: var(--ds-space-1);
-  }
-
-  .lives-condition__value {
-    text-align: left;
-  }
-}
-
-/* Immersive room */
-.lives-room__kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  letter-spacing: 0.04em;
-  color: var(--ds-ink-muted);
-}
-
-.lives-unit-kicker {
-  margin: var(--ds-space-4) 0 var(--ds-space-2);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  color: var(--ds-ink);
-}
-
-.lives-money__derived {
-  margin: var(--ds-space-2) 0 0;
-  padding: var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  background: var(--room-sunk);
-}
-
-.lives-money__derived[data-status='derived']::before {
-  content: 'Derived · ';
-  color: var(--ds-accent-text);
-  font-weight: 600;
-}
-
-.lives-panel__definition-note {
-  margin: 0 0 var(--ds-space-4);
-  padding: var(--ds-space-4);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-  color: var(--ds-ink);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  background: var(--room-sunk);
-}
-
-.lives-panel__definition-note strong {
-  display: block;
-  margin-bottom: var(--ds-space-1);
-  font-family: var(--ds-font-display);
-}
-
-/* Hand-drawn scene */
-.lives-scene {
-  margin: var(--ds-space-6) 0 var(--ds-space-5);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-}
-
-.lives-scene__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 14rem;
-}
-
-.lives-scene__stroke {
-  stroke: var(--ds-ink);
-  stroke-width: 1.6;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.lives-scene__stroke--empty {
-  stroke: var(--ds-ink-muted);
-  stroke-dasharray: 4 5;
-}
-
-.lives-scene__stroke--emphasis {
-  stroke: var(--ds-accent-graphic);
-  stroke-width: 2;
-}
-
-.lives-scene__hatch {
-  stroke: var(--ds-ink-muted);
-  stroke-width: 1;
-  opacity: 0.55;
-}
-
-.lives-scene__horizon {
-  stroke: var(--ds-rule);
-  stroke-width: 1.2;
-}
-
-.lives-scene__captions {
-  margin-top: var(--ds-space-4);
-}
-
-.lives-scene__kicker {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
-}
-
-.lives-scene__caption-list {
-  display: grid;
-  gap: var(--ds-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.lives-scene__caption-list li {
-  display: grid;
-  gap: 0.15rem;
-  padding: var(--ds-space-2) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  font-size: var(--ds-text-body-sm);
-}
-
-.lives-scene__caption-list li[data-emphasis] {
-  box-shadow: inset 3px 0 0 var(--ds-accent-graphic);
-  padding-left: var(--ds-space-3);
-}
-
-.lives-scene__caption-list strong {
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-}
-
-.lives-scene__caption-list span {
-  color: var(--ds-ink-muted);
-}
-
-/* World beats */
-.lives-world {
-  margin-top: var(--ds-space-8);
-  padding-top: var(--ds-space-6);
-  border-top: var(--ds-border-width) solid var(--ds-ink);
-}
-
-.lives-world__title {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-}
-
-.lives-world__disclaimer {
-  margin: 0 0 var(--ds-space-5);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-world__list {
-  display: grid;
-  gap: var(--ds-space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.lives-world__beat {
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-}
-
-.lives-world__beat[data-claim='testimony'] {
-  box-shadow: inset 3px 0 0 var(--ds-accent-graphic);
-}
-
-@media (min-width: 48rem) {
-  .lives-world__list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .lives-world__beat[data-claim='testimony'] {
-    grid-column: 1 / -1;
-  }
-}
-
-.lives-world__domain {
-  margin: 0 0 var(--ds-space-1);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ds-accent);
-}
-
-.lives-world__heading {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-}
-
-.lives-world__speaker,
-.lives-world__uncertainty,
-.lives-world__gap-state {
-  margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.lives-world__body {
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body);
-  line-height: 1.55;
-}
-
-.lives-world__citations,
-.lives-world__entities {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: var(--ds-text-caption);
-}
-
-.lives-world__citations a,
-.lives-world__entities a {
-  color: var(--ds-accent-text);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lives-scene__svg {
-    transition: none;
-  }
-}
-
-/* Guided milestone reader. The decade grid above is retained only by /lives/explorer. */
-.lives-milestone {
-  margin-top: var(--ds-space-8);
-}
-
-.lives-milestone__choices {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-2);
-  background: var(--ds-surface-sunken);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-}
-
-.lives-milestone__choices a {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  min-height: 5rem;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-3);
-  color: var(--ds-ink-muted);
-  text-decoration: none;
-  background: transparent;
-  border: var(--ds-border-width) solid transparent;
-  border-radius: var(--ds-radius-sm);
-}
-
-.lives-milestone__choices a:hover {
-  color: var(--ds-ink);
-  border-color: var(--ds-rule);
-}
-
-.lives-milestone__choices a[aria-current='page'] {
-  color: var(--ds-ink);
-  background: var(--ds-surface);
-  border-color: var(--ds-accent-graphic);
-}
-
-.lives-milestone__choices a:focus-visible,
-.lives-milestone a:focus-visible,
-.lives-explorer__return a:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 3px;
-}
-
-.lives-milestone__choices span {
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-}
-
-.lives-milestone__choices small {
-  margin-top: 0.15rem;
-  font-size: var(--ds-text-caption);
-  line-height: 1.25;
-  white-space: normal;
-}
-
-.lives-milestone__opening {
-  display: grid;
-  gap: var(--ds-space-3);
-  max-width: 52rem;
-  margin: clamp(var(--ds-space-10), 8vw, var(--ds-space-24)) 0 var(--ds-space-12);
-}
-
-.lives-milestone__opening > * {
-  margin: 0;
-}
-
-.lives-milestone__kicker,
-.lives-era__eyebrow,
-.lives-era__source-label,
-.lives-milestone__context-kicker {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.lives-milestone__opening h2 {
-  max-width: 12ch;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
-  line-height: 0.94;
-  letter-spacing: -0.045em;
-}
-
-.lives-milestone__opening > p:not([class]) {
-  max-width: 38rem;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  line-height: 1.35;
-}
-
-.lives-milestone__orientation {
-  max-width: 45rem;
-  padding-top: var(--ds-space-4);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-  color: var(--ds-ink-muted);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-milestone__eras {
-  counter-reset: lives-era;
-  border-top: var(--ds-border-width) solid var(--ds-ink);
-}
-
-.lives-era {
-  counter-increment: lives-era;
-  display: grid;
-  gap: var(--ds-space-6);
-  padding: clamp(var(--ds-space-10), 8vw, var(--ds-space-24)) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-ink);
-  scroll-margin-top: 6rem;
-}
-
-.lives-era__header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-}
-
-/* The era's decades. Never wraps mid-range: "1870s–" on one line and "1890s" on the next. */
-.lives-era__years {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-display-3);
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-  white-space: nowrap;
-  color: var(--ds-ink-muted);
-}
-
-.lives-era__header h3.lives-era__years--heading {
-  max-width: none;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-display-2);
-  letter-spacing: -0.05em;
-  color: var(--ds-ink);
-}
-
-.lives-era__header h3 {
-  max-width: 24ch;
-  margin: var(--ds-space-1) 0 var(--ds-space-2);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
-  line-height: 1.02;
-}
-
-.lives-era__universe {
-  max-width: 42rem;
-  margin: 0;
-  color: var(--ds-ink-muted);
-}
-
-.lives-era__values {
-  display: grid;
-  gap: var(--ds-space-4);
-  margin: 0;
-}
-
-.lives-era__value {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  min-width: 0;
-  padding-bottom: var(--ds-space-4);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-era__value dt,
-.lives-era__value dd {
-  position: relative;
-  z-index: 1; /* local: labels and values above their decorative bar within one row */
-  margin: 0;
-}
-
-.lives-era__value dt {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-1);
-  min-width: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-}
-
-.lives-era__value dt small,
-.lives-era__value dd small,
-.lives-era__rules small {
-  display: block;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 400;
-  line-height: 1.4;
-  color: var(--ds-ink-muted);
-}
-
-.lives-era__value dd {
-  text-align: right;
-}
-
-.lives-era__estimate {
-  display: block;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-display-3);
-  font-weight: 600;
-  line-height: 1;
-}
-
-/*
- * Every group's bar carries the same weight: one height, one color, full opacity. A comparison
- * is only readable when its marks are drawn alike, and each row already names its group and
- * prints its value in text, so no group depends on color or emphasis to be identified. The
- * full-width track gives a lone percentage a visible scale.
- */
-.lives-era__bar {
-  grid-column: 1 / -1;
-  display: block;
-  width: 100%;
-  height: 0.5rem;
-  background:
-    linear-gradient(var(--ds-viz-1), var(--ds-viz-1)) left / max(var(--lives-value), 2px) 100%
-      no-repeat,
-    var(--ds-viz-grid);
-}
-
-/*
- * No estimate: an empty track, not a short bar. The 2px minimum fill above exists so a tiny
- * real percentage stays visible, which is exactly why it must never be applied to a value
- * that does not exist — "Withheld" and "Not published" were rendering as near-zero
- * measurements. The reason itself is already stated in words next to this track.
- */
-.lives-era__bar--absent {
-  background: none;
-  border-top: 1px dashed var(--ds-viz-grid);
-  height: 0;
-  align-self: center;
-}
-
-.lives-era__evidence,
-.lives-era__rules {
-  padding: var(--ds-space-4);
-  background: var(--ds-surface-sunken);
-  border: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.lives-era__source-label {
-  margin: 0 0 var(--ds-space-2);
-}
-
-.lives-milestone__sources {
-  display: grid;
-  gap: var(--ds-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: var(--ds-text-caption);
-}
-
-.lives-milestone__sources a,
-.lives-era__rules a,
-.lives-milestone__footer a,
-.lives-explorer__return a {
-  color: var(--ds-accent);
-  text-underline-offset: 0.2em;
-}
-
-.lives-milestone__context {
-  max-width: 46rem;
-  padding: var(--ds-space-6) 0 var(--ds-space-2);
-}
-
-.lives-milestone__context h4 {
-  margin: var(--ds-space-2) 0;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-display-3);
-  line-height: 1.2;
-}
-
-.lives-milestone__context > p:not([class]) {
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.65;
-}
-
-.lives-milestone__speaker {
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.lives-era__rules {
-  border-left-color: var(--ds-accent-graphic);
-}
-
-.lives-era__measure {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-2);
-  margin: 0 0 var(--ds-space-5);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-}
-
-.lives-era__definition {
-  font-size: var(--ds-text-caption);
-  line-height: 1.55;
-  color: var(--ds-ink-muted);
-}
-
-.lives-milestone__timeline-head {
-  padding-block: var(--ds-space-8);
-}
-
-.lives-milestone__timeline-head h3 {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-}
-
-.lives-milestone__timeline-head > p {
-  max-width: 60ch;
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.lives-milestone__year-links,
-.lives-milestone__connections {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-}
-
-.lives-milestone__year-links a,
-.lives-milestone__connections a {
-  display: inline-flex;
-  gap: var(--ds-space-2);
-  align-items: center;
-  min-height: 44px;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  border: 1px solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink);
-  text-underline-offset: 0.2em;
-}
-
-.lives-archive {
-  display: grid;
-  gap: var(--ds-space-6);
-  padding: clamp(1rem, 3vw, 2.5rem);
-  margin-bottom: var(--ds-space-12);
-  background: var(--ds-surface-sunken);
-  border-block: 1px solid var(--ds-rule);
-}
-
-.lives-archive__head > p {
-  margin: 0 0 var(--ds-space-2);
-}
-
-.lives-archive__account {
-  grid-column: 1 / -1;
-  border-top: 1px solid var(--ds-rule);
-  padding-top: var(--ds-space-6);
-}
-.lives-archive__account h4 {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  margin: var(--ds-space-3) 0;
-}
-.lives-archive__account > p:not([class]),
-.lives-archive__account blockquote {
-  max-width: 65ch;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.65;
-}
-.lives-archive__account blockquote {
-  margin: var(--ds-space-5) 0;
-  padding-left: var(--ds-space-4);
-  border-left: 2px solid var(--ds-accent-graphic);
-  font-size: var(--ds-text-editorial-lede);
-}
-.lives-archive__account-scope {
-  max-width: 75ch;
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-.lives-archive__date {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-display-2);
-  letter-spacing: -0.04em;
-}
-.lives-archive__place {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-.lives-archive__head h3 {
-  margin: var(--ds-space-4) 0 0;
-  max-width: 22ch;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
-}
-.lives-archive__reading > p {
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.65;
-  margin: 0 0 var(--ds-space-5);
-}
-.lives-archive__reading > .lives-archive__notice {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.55;
-  border-left: var(--ds-border-width) solid var(--ds-rule);
-  padding-left: var(--ds-space-3);
-}
-.lives-archive__citation {
-  display: block;
-  font-size: var(--ds-text-caption);
-  color: var(--ds-accent);
-  overflow-wrap: anywhere;
-  text-underline-offset: 0.2em;
-}
-.lives-archive__question {
-  display: flex;
-  gap: var(--ds-space-3);
-  align-items: baseline;
-  border-block: 1px solid var(--ds-rule);
-  margin-block: var(--ds-space-6);
-  padding-block: var(--ds-space-4);
-}
-.lives-archive__question p {
-  margin: 0;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-}
-.lives-archive__question > svg {
-  flex: 0 0 auto;
-  color: var(--ds-accent);
-}
-.lives-archive__transcript {
-  margin-top: var(--ds-space-3);
-  font-size: var(--ds-text-caption);
-}
-.lives-archive__transcript summary {
-  min-height: 44px;
-  align-content: center;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-.lives-archive__transcript summary:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 3px;
-}
-
-.lives-milestone__footer,
-.lives-milestone__unavailable,
-.lives-explorer__return {
-  margin: var(--ds-space-10) 0;
-  padding: var(--ds-space-5);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-}
-
-.lives-milestone__footer {
-  display: grid;
-  gap: var(--ds-space-4);
-  align-items: start;
-}
-
-.lives-milestone__footer p,
-.lives-explorer__return {
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-  color: var(--ds-ink-muted);
-}
-
 .lives-source-notice {
   margin: var(--ds-space-6) 0;
 }
@@ -1598,99 +32,716 @@
   text-underline-offset: 0.2em;
 }
 
-.lives-source-notice__retry:focus-visible {
+.lives-source-notice__retry:focus-visible,
+.lives-era__drawer summary:focus-visible,
+.lives-rule__head:focus-visible,
+.lives-archive__transcript summary:focus-visible,
+.lives-account__audio:focus-visible,
+.lives-archive__link:focus-visible,
+.lives-decade-links a:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
-@media (min-width: 40rem) {
-  .lives-milestone__choices {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+/* A short aside: no box, a hairline rule at its left edge. */
+.lives-note {
+  max-width: 44rem;
+  margin: 0;
+  padding: var(--ds-space-1) 0 var(--ds-space-1) var(--ds-space-4);
+  border-left: var(--ds-border-width) solid var(--ds-border-control);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink-muted);
+}
+
+.lives-note strong {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.lives-sources {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+.lives-sources a,
+.lives-archive__citation,
+.lives-milestone__connections a,
+.lives-world a,
+.lives-count__sources a,
+.lives-account__links a,
+.lives-era__drawer a,
+.lives-turn__records a,
+.lives-rule__link,
+.lives-milestone__footer a,
+.lives-cell__why,
+a.lives-anchors__chip .lives-anchors__name,
+.lives-archive .ds-archive-figure__source {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.lives-sources a:hover,
+.lives-archive__citation:hover,
+.lives-milestone__connections a:hover,
+.lives-world a:hover,
+.lives-count__sources a:hover,
+.lives-account__links a:hover,
+.lives-era__drawer a:hover,
+.lives-turn__records a:hover,
+.lives-rule__link:hover,
+.lives-milestone__footer a:hover,
+.lives-cell__why:hover,
+a.lives-anchors__chip:hover .lives-anchors__name,
+.lives-archive .ds-archive-figure__source:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Disclosure summaries: label, then the caret, 44px tall. */
+.lives-caret {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-left: var(--ds-space-2);
+  transition: transform 160ms ease;
+}
+
+details[open] > summary > .lives-caret {
+  transform: rotate(180deg);
+}
+
+.lives-archive__transcript summary::-webkit-details-marker,
+.lives-era__drawer summary::-webkit-details-marker {
+  display: none;
+}
+
+/* —— /lives: the question picker and opening ——————————————————————————————— */
+.lives-milestone__picker {
+  margin: 0 0 var(--ds-space-12);
+}
+
+.lives-milestone__picker .ds-segmented__option {
+  white-space: nowrap;
+}
+
+/*
+ * Phone: a Segmented with more options than one row holds wraps into a two-column grid of whole
+ * labels, never a clipped scroller. Same control, same states.
+ */
+@media (max-width: 47.99rem) {
+  .lives-milestone__picker .ds-segmented,
+  .lives-toolbar .ds-segmented {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
   }
 
-  .lives-milestone__footer {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .lives-milestone__picker .ds-segmented__option,
+  .lives-toolbar .ds-segmented__option {
+    padding: var(--ds-space-1) var(--ds-space-2);
+    white-space: normal;
+    text-align: center;
   }
+
+  .lives-milestone__picker {
+    margin-bottom: var(--ds-space-8);
+  }
+}
+
+.lives-milestone__question {
+  max-width: 42.5rem;
+  margin: 0 0 var(--ds-space-8);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  line-height: var(--ds-leading-title);
+  color: var(--ds-ink);
+  text-wrap: balance;
+}
+
+/* —— the opening object ——————————————————————————————————————————————————— */
+.lives-archive {
+  display: grid;
+  gap: var(--ds-space-6);
+  padding-top: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-archive > .ds-archive-figure > img {
+  max-height: 34rem;
+  border-radius: var(--ds-radius-sm);
 }
 
 @media (min-width: 64rem) {
-  .lives-milestone__choices {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-
-  .lives-era {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: clamp(var(--ds-space-8), 6vw, var(--ds-space-16));
-  }
-
-  .lives-era__header {
-    grid-column: 1 / -1;
-  }
-
-  .lives-era__main {
-    grid-column: 1;
-  }
-
-  .lives-era__side {
-    grid-column: 2;
-  }
-
-  .lives-era--single .lives-era__main {
-    grid-column: 1 / -1;
-  }
-
-  .lives-era__side .lives-milestone__context {
-    padding-top: 0;
-  }
-
   .lives-archive {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    column-gap: var(--ds-space-8);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: var(--ds-space-12);
   }
-  .lives-archive__head {
-    grid-column: 2;
-  }
+
+  /* The object stays beside the reading as it scrolls, so the column never leaves a void. */
   .lives-archive > .ds-archive-figure {
-    grid-column: 1;
-    grid-row: 1 / 3;
+    position: sticky;
+    top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+    grid-row: 1 / span 2;
   }
-  .lives-archive__reading {
+
+  .lives-archive > .ds-archive-figure > img {
+    max-height: min(34rem, 52vh);
+  }
+
+  .lives-archive__account {
     grid-column: 2;
   }
 }
 
-@media (max-width: 31.25rem) {
-  .lives-era__value {
-    grid-template-columns: minmax(0, 1fr) minmax(4.5rem, auto);
+.lives-archive__transcript {
+  margin-top: var(--ds-space-2);
+}
+
+.lives-archive__transcript summary {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-archive__transcript p {
+  margin: 0;
+  font-size: var(--ds-text-caption);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.lives-archive__reading {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-4);
+  max-width: 40rem;
+}
+
+.lives-archive__reading > p {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink);
+}
+
+.lives-archive__reading > .lives-note {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink-muted);
+}
+
+.lives-archive__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* Credit and rights are prose, not data. */
+.lives-archive .ds-archive-figure__credit {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.lives-archive__date {
+  font-family: var(--ds-font-mono);
+  color: var(--ds-ink);
+}
+
+.lives-archive__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: 600;
+  line-height: var(--ds-leading-title);
+  letter-spacing: var(--ds-tracking-display);
+  color: var(--ds-ink);
+  text-wrap: balance;
+}
+
+.lives-archive__reading > .lives-archive__question {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 500;
+  line-height: var(--ds-leading-title);
+  color: var(--ds-ink);
+}
+
+.lives-archive__citation {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.lives-archive__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-archive__link {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.lives-archive__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.lives-archive__account {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 40rem;
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-archive__account h4 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-archive__account blockquote {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-subtitle);
+  line-height: 1.4;
+  color: var(--ds-ink);
+}
+
+.lives-archive__account p {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+}
+
+.lives-archive__account .lives-archive__account-scope,
+.lives-archive__account .lives-archive__meta {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* —— the era strip: the instrument and the one decade control ——————————————— */
+.lives-eras {
+  margin-top: var(--ds-space-18);
+}
+
+/* On the canvas, between two rules. No panel: the selected era is ink weight plus a copper bar. */
+.lives-scrub {
+  padding: var(--ds-space-4) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  container-type: inline-size;
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-4));
+}
+
+.lives-scrub__measure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-scrub__name {
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-scrub__row {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+
+.lives-scrub__era {
+  display: grid;
+  grid-template-rows: 8rem auto auto;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) var(--ds-space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--ds-ink-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lives-scrub__era + .lives-scrub__era {
+  border-left: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-scrub__era:hover,
+.lives-scrub__era[aria-selected='true'] {
+  color: var(--ds-ink);
+}
+
+.lives-scrub__era:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: -2px;
+}
+
+/* Gridlines at 0, half and the top of the scale. */
+.lives-scrub__plot {
+  position: relative;
+  display: block;
+  background:
+    linear-gradient(var(--ds-rule), var(--ds-rule)) 0 0 / 100% 1px no-repeat,
+    linear-gradient(var(--ds-rule), var(--ds-rule)) 0 50% / 100% 1px no-repeat,
+    linear-gradient(var(--ds-rule), var(--ds-rule)) 0 100% / 100% 1px no-repeat;
+}
+
+.lives-scrub__mark,
+.lives-scrub__value::before,
+.lives-scrub__reading::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ds-ink);
+}
+
+.lives-scrub__mark {
+  position: absolute;
+  bottom: calc(var(--at) * 1%);
+  left: var(--ds-space-6);
+  transform: translate(-50%, 50%);
+  box-shadow: 0 0 0 2px var(--ds-canvas);
+}
+
+.lives-scrub__mark[data-lens='white'],
+.lives-scrub__value[data-lens='white']::before,
+.lives-scrub__reading[data-lens='white']::before {
+  background: var(--ds-canvas);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--ds-ink) 60%, var(--ds-canvas)),
+    0 0 0 2px var(--ds-canvas);
+}
+
+.lives-scrub__mark[data-lens='hispanic'],
+.lives-scrub__value[data-lens='hispanic']::before,
+.lives-scrub__reading[data-lens='hispanic']::before {
+  width: 9px;
+  height: 9px;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--ds-ink) 62%, var(--ds-canvas));
+}
+
+/* The three groups sit side by side on the column so equal values never hide each other. */
+.lives-scrub__mark[data-lens='black'] {
+  left: var(--ds-space-3);
+}
+
+.lives-scrub__mark[data-lens='hispanic'] {
+  left: var(--ds-space-8);
+}
+
+.lives-scrub__value {
+  position: absolute;
+  bottom: calc(var(--at) * 1%);
+  left: calc(var(--ds-space-8) + var(--ds-space-4));
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  transform: translateY(50%);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  white-space: nowrap;
+}
+
+.lives-scrub__value::before,
+.lives-scrub__reading::before {
+  width: 6px;
+  height: 6px;
+  box-shadow: none;
+}
+
+.lives-scrub__value[data-lens='white']::before,
+.lives-scrub__reading[data-lens='white']::before {
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ds-ink) 60%, var(--ds-canvas));
+}
+
+.lives-scrub__value[data-lens='hispanic']::before,
+.lives-scrub__reading[data-lens='hispanic']::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 0;
+}
+
+.lives-scrub__readout {
+  display: none;
+}
+
+.lives-scrub__era[data-empty='true'] .lives-scrub__plot {
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ds-ink) 18%, transparent) 0 1px,
+    transparent 1px 6px
+  );
+}
+
+.lives-scrub__none {
+  position: absolute;
+  top: 50%;
+  left: var(--ds-space-2);
+  padding: 0 var(--ds-space-1);
+  transform: translateY(-50%);
+  background: var(--ds-canvas);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  color: var(--ds-ink-muted);
+}
+
+/* A group with no figure in this era, said in words. One line is always reserved. */
+.lives-scrub__missing {
+  display: grid;
+  min-height: 1.4em;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.lives-scrub__label {
+  position: relative;
+  padding-bottom: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+}
+
+.lives-scrub__era[aria-selected='true'] .lives-scrub__label {
+  font-weight: 600;
+}
+
+.lives-scrub__era[aria-selected='true'] .lives-scrub__label::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-bottom: 2px solid var(--ds-accent-graphic);
+}
+
+/* Narrow: each era is a row on a horizontal scale, its values on one line under it. */
+@container (max-width: 34rem) {
+  .lives-scrub__row {
+    grid-auto-flow: row;
+  }
+
+  .lives-scrub__era {
+    grid-template-columns: 5rem minmax(0, 1fr);
+    grid-template-rows: 2rem auto auto;
+    column-gap: var(--ds-space-3);
+    row-gap: var(--ds-space-1);
+    padding: var(--ds-space-3) 0;
+  }
+
+  .lives-scrub__era + .lives-scrub__era {
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+    border-left: 0;
+  }
+
+  .lives-scrub__label {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: start;
+    padding-bottom: var(--ds-space-2);
+  }
+
+  .lives-scrub__era[aria-selected='true'] .lives-scrub__label::after {
+    right: auto;
+    width: 2.5rem;
+  }
+
+  .lives-scrub__plot,
+  .lives-scrub__readout,
+  .lives-scrub__missing {
+    grid-column: 2;
+  }
+
+  .lives-scrub__plot {
+    background:
+      linear-gradient(var(--ds-rule), var(--ds-rule)) 0 0 / 1px 100% no-repeat,
+      linear-gradient(var(--ds-rule), var(--ds-rule)) 50% 0 / 1px 100% no-repeat,
+      linear-gradient(var(--ds-rule), var(--ds-rule)) 100% 0 / 1px 100% no-repeat,
+      linear-gradient(var(--ds-rule), var(--ds-rule)) 0 50% / 100% 1px no-repeat;
+  }
+
+  /* One lane per group, so equal values never hide each other. */
+  .lives-scrub__mark,
+  .lives-scrub__mark[data-lens='black'],
+  .lives-scrub__mark[data-lens='hispanic'] {
+    bottom: 75%;
+    left: calc(var(--at) * 1%);
+    transform: translate(-50%, 50%);
+  }
+
+  .lives-scrub__mark[data-lens='white'] {
+    bottom: 50%;
+  }
+
+  .lives-scrub__mark[data-lens='hispanic'] {
+    bottom: 25%;
+  }
+
+  .lives-scrub__value {
+    display: none;
+  }
+
+  .lives-scrub__readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-1) var(--ds-space-3);
+    min-height: 1.4em;
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-micro);
+    font-variant-numeric: tabular-nums;
+    color: var(--ds-ink);
+  }
+
+  .lives-scrub__reading {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ds-space-1);
+  }
+
+  .lives-scrub__none {
+    left: 0;
   }
 }
 
-/* ---- The era's two flow columns. Nothing inside is pinned to a row. ---- */
+.lives-eras__panel {
+  padding-top: var(--ds-space-12);
+}
 
+/* —— an era ———————————————————————————————————————————————————————————————— */
+.lives-era {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-8);
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+}
+
+@media (min-width: 64rem) {
+  .lives-era {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    column-gap: var(--ds-space-12);
+  }
+
+  .lives-era--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* One stacked column, so the decades and the title never collide at any width. */
+.lives-era__header {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / -1;
+  gap: var(--ds-space-1);
+}
+
+.lives-era__header h3 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: 600;
+  line-height: var(--ds-leading-title);
+  letter-spacing: var(--ds-tracking-display);
+  color: var(--ds-ink);
+  text-wrap: balance;
+}
+
+.lives-era__place {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-era__years {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink);
+  white-space: nowrap;
+}
+
+.lives-era__header .lives-era__years--heading {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+}
+
+/* The era's two flow columns. Nothing inside is pinned to a row. */
 .lives-era__main,
 .lives-era__side {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-space-6);
+  gap: var(--ds-space-8);
   min-width: 0;
 }
 
-/* ---- Era narrative, accounts, and the narrative-led era ---- */
-
 .lives-era__accounts,
 .lives-era__narrative {
-  max-width: 46rem;
-  padding: var(--ds-space-4) 0;
+  max-width: 42rem;
 }
 
 .lives-era__narrative .ds-reading__body > :first-child {
   margin-top: 0;
 }
 
+/* A first-person account: the words first, at reading size, with a hairline to the left. */
 .lives-account {
-  margin: var(--ds-space-3) 0 var(--ds-space-5);
+  margin: 0 0 var(--ds-space-6);
   padding-left: var(--ds-space-4);
-  border-left: 2px solid var(--ds-accent-graphic);
+  border-left: var(--ds-border-width) solid var(--ds-border-control);
 }
 
 .lives-account__quote {
@@ -1699,21 +750,23 @@
 
 .lives-account__quote p {
   margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-subtitle);
   line-height: 1.35;
+  color: var(--ds-ink);
 }
 
 .lives-account__who {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-space-1);
+  gap: 2px;
   margin-bottom: var(--ds-space-3);
 }
 
 .lives-account__name {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-subtitle);
+  font-weight: 600;
 }
 
 .lives-account__meta,
@@ -1721,18 +774,21 @@
 .lives-account__links,
 .lives-account__credit,
 .lives-account__content-note {
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
 
-.lives-account__mediation {
+.lives-account__mediation,
+.lives-account__content-note {
   color: var(--ds-ink);
 }
 
 .lives-account__body {
   margin: 0 0 var(--ds-space-3);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
 }
 
 .lives-account__audio {
@@ -1742,48 +798,45 @@
   margin: var(--ds-space-2) 0;
 }
 
-.lives-account__links a,
-.lives-era__drawer a {
-  color: var(--ds-accent);
-  text-underline-offset: 0.2em;
-}
-
+.lives-account__links,
+.lives-account__credit,
 .lives-account__content-note {
   margin: 0 0 var(--ds-space-2);
-  color: var(--ds-ink);
 }
 
-.lives-era__no-figure {
-  max-width: 46rem;
-  margin: 0;
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) dashed var(--ds-rule);
-  font-size: var(--ds-text-body-sm);
-}
-
-.lives-era__drawer {
-  max-width: 46rem;
-  margin-top: var(--ds-space-3);
-  padding-top: var(--ds-space-3);
+/* The era's comparison: every group on one scale, at the same weight. */
+.lives-era__comparison {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 42rem;
+  padding-top: var(--ds-space-6);
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.lives-era__drawer summary {
-  cursor: pointer;
-  font-family: var(--ds-font-mono);
+.lives-era__universe {
+  margin: 0;
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
-  color: var(--ds-accent);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
 }
 
-.lives-era__drawer summary:focus-visible,
-.lives-account__audio:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 2px;
+.lives-era__definitions {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
 }
 
-.lives-era__gap {
-  max-width: 46rem;
-  margin: var(--ds-space-3) 0 0;
+.lives-era__gap,
+.lives-era__definition {
+  margin: 0;
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   line-height: 1.5;
   color: var(--ds-ink-muted);
@@ -1795,13 +848,79 @@
   color: var(--ds-ink);
 }
 
-/* ---- The Turn: one question before the record ---- */
+.lives-era__no-figure {
+  max-width: 42rem;
+  margin: 0;
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink-muted);
+}
 
+.lives-era__no-figure strong {
+  color: var(--ds-ink);
+}
+
+.lives-era__side-title {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-era__drawer {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-era__drawer summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-milestone__context {
+  display: grid;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+}
+
+.lives-milestone__context h4 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+}
+
+.lives-milestone__context p {
+  margin: 0;
+}
+
+.lives-milestone__context-domain,
+.lives-milestone__speaker {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-milestone__connections {
+  font-size: var(--ds-text-caption);
+}
+
+/* The Turn: one question before the record. */
 .lives-turn {
-  max-width: 46rem;
-  margin: var(--ds-space-5) 0;
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  max-width: 42rem;
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .lives-turn__question {
@@ -1811,11 +930,12 @@
 }
 
 .lives-turn__question legend {
-  padding: 0;
   margin-bottom: var(--ds-space-3);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.45;
+  padding: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 500;
+  line-height: var(--ds-leading-title);
 }
 
 .lives-turn__options {
@@ -1829,17 +949,22 @@
   gap: var(--ds-space-3);
   min-height: 2.75rem;
   padding: var(--ds-space-2) var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
   font-size: var(--ds-text-body-sm);
   cursor: pointer;
 }
 
+.lives-turn__option:hover {
+  background: var(--ds-surface-sunken);
+}
+
 .lives-turn__option input {
-  width: 1.5rem;
-  height: 1.5rem;
-  margin: 0;
   flex: none;
-  accent-color: var(--ds-accent);
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--ds-ink);
 }
 
 .lives-turn__option:has(input:focus-visible) {
@@ -1849,21 +974,725 @@
 
 .lives-turn__option:has(input:checked) {
   border-color: var(--ds-ink);
+  font-weight: 600;
 }
 
 .lives-turn__reveal p {
   margin: var(--ds-space-4) 0 0;
   font-size: var(--ds-text-body);
-  line-height: 1.55;
+  line-height: var(--ds-leading-body);
 }
 
 .lives-turn__reveal .lives-turn__records {
-  font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
-.lives-turn__records a {
-  color: var(--ds-accent);
+/* —— rules: one-line rows that open in place ———————————————————————————————— */
+.lives-rules__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-rule {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-rule__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0.75rem;
+  gap: 2px var(--ds-space-3);
+  align-items: center;
+  min-height: 2.75rem;
+  padding: var(--ds-space-3) 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.lives-rule__head::-webkit-details-marker {
+  display: none;
+}
+
+.lives-rule__name {
+  grid-column: 1;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ds-ink);
+}
+
+.lives-rule__meta {
+  grid-column: 1;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-rule__chevron {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.lives-rule__row[open] .lives-rule__chevron {
+  transform: rotate(180deg);
+}
+
+.lives-rule__head:hover .lives-rule__name {
+  text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.lives-rule[data-applies='false'] .lives-rule__name {
+  font-weight: 500;
+  color: var(--ds-ink-muted);
+}
+
+.lives-rule__body {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+}
+
+.lives-rule__body p {
+  margin: 0;
+}
+
+.lives-rule__part {
+  display: grid;
+  gap: 2px;
+}
+
+.lives-rule__label {
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.lives-rule__applies,
+.lives-rule__named,
+.lives-rule__dispute {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-rule__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  justify-self: start;
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+}
+
+.lives-milestone__unavailable,
+.lives-milestone__footer {
+  max-width: 44rem;
+  margin-top: var(--ds-space-12);
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink-muted);
+}
+
+.lives-milestone__unavailable h3 {
+  margin: 0 0 var(--ds-space-2);
+  font-size: var(--ds-text-subtitle);
+  color: var(--ds-ink);
+}
+
+.lives-milestone__footer {
+  margin-bottom: 0;
+}
+
+.lives-milestone__unavailable p {
+  margin: 0 0 var(--ds-space-3);
+}
+
+/* —— /lives/explorer: one control row, one result panel ————————————————————— */
+.lives-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ds-space-4) var(--ds-space-8);
+}
+
+@media (max-width: 47.99rem) {
+  .lives-toolbar {
+    column-gap: var(--ds-space-4);
+  }
+
+  .lives-toolbar__field--lens {
+    flex: 1;
+  }
+
+  .lives-toolbar__field--lens .ds-segmented {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.lives-toolbar__field {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lives-toolbar__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.lives-toolbar .ds-segmented__option {
+  white-space: nowrap;
+}
+
+/* The Decade control: a native select drawn like the kit's secondary button. */
+.lives-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lives-select__control {
+  min-width: 8rem;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-8) 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+}
+
+.lives-select__control:hover {
+  border-color: var(--ds-ink-muted);
+}
+
+.lives-select__control:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.lives-select .lives-caret {
+  position: absolute;
+  right: var(--ds-space-3);
+  pointer-events: none;
+}
+
+.lives-result {
+  display: grid;
+  gap: var(--ds-space-8);
+  padding-top: var(--ds-space-8);
+}
+
+.lives-result__summary,
+.lives-result__empty {
+  max-width: 42.5rem;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink-muted);
+}
+
+.lives-result__summary strong {
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+/* The decade links the server render shows before the arc's columns take over. */
+.lives-decade-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+}
+
+.lives-decade-links a {
+  color: var(--ds-ink-muted);
+}
+
+.lives-decade-links a[aria-current='page'] {
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+/* Place anchors: a ruled row of links, not chips. */
+.lives-anchors {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.lives-anchors__title {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-anchors__note {
+  margin: 0;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-anchors__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--ds-space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lives-anchors__chip {
+  display: inline-grid;
+  min-height: 2.75rem;
+  align-content: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.lives-anchors__name {
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-anchors__role {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* —— a decade ———————————————————————————————————————————————————————————————— */
+.lives-panel {
+  display: grid;
+  gap: var(--ds-space-12);
+  padding-top: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+}
+
+.lives-panel__head {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 42.5rem;
+}
+
+.lives-panel__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-display);
+  color: var(--ds-ink);
+}
+
+/* The decade's dek: what class means here, and any limit on comparing it with the decade before. */
+.lives-regime {
+  display: grid;
+  gap: var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+}
+
+.lives-regime p {
+  margin: 0;
+  color: var(--ds-ink-muted);
+}
+
+.lives-regime .lives-regime__title {
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-regime .lives-regime__boundary {
+  color: var(--ds-ink);
+  font-weight: 500;
+}
+
+/* What the count could see */
+.lives-sight {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 44rem;
+  container-type: inline-size;
+}
+
+.lives-sight__title,
+.lives-rules__title,
+.lives-frame__title,
+.lives-world__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  line-height: var(--ds-leading-title);
+  color: var(--ds-ink);
+}
+
+.lives-sight__reading {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-sight__bars .ds-hbar {
+  --hbar-label-w: 6rem;
+}
+
+.lives-count__list {
+  display: grid;
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-count__note {
+  display: grid;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-3) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+}
+
+.lives-count__note p {
+  margin: 0;
+}
+
+.lives-count__heading {
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-count__groups,
+.lives-count__sources {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-frame {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 42rem;
+}
+
+.lives-frame p {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+}
+
+/* Class shares: one 100% bar per group. */
+.lives-stacks {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lives-stack {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  outline: none;
+}
+
+.lives-stack:focus-visible {
+  box-shadow: 0 0 0 var(--ds-focus-width) var(--ds-focus-ring);
+}
+
+.lives-stack__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+}
+
+.lives-stack[data-emphasis='true'] .lives-stack__label {
+  font-weight: 600;
+}
+
+.lives-stack__track {
+  display: flex;
+  gap: 2px;
+  height: 1.75rem;
+}
+
+.lives-stack__track[data-absent='true'] {
+  align-items: center;
+  padding: 0 var(--ds-space-2);
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ds-ink) 22%, transparent) 0 1px,
+    transparent 1px 6px
+  );
+  box-shadow: inset 0 0 0 1px var(--ds-rule);
+}
+
+.lives-stack__part {
+  display: flex;
+  align-items: center;
+  min-width: 2px;
+  padding: 0 var(--ds-space-2);
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-canvas);
+  white-space: nowrap;
+}
+
+.lives-stack__part[data-tone='mid'] {
+  background: color-mix(in srgb, var(--ds-ink) 68%, var(--ds-canvas));
+}
+
+.lives-stack__part[data-tone='lo'] {
+  background: color-mix(in srgb, var(--ds-ink) 44%, var(--ds-canvas));
+  color: var(--ds-ink);
+}
+
+[data-theme='dark'] .lives-stack__part[data-tone='lo'] {
+  color: var(--ds-canvas);
+}
+
+.lives-stack__part[data-tone='none'] {
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ds-ink) 30%, transparent) 0 1px,
+    transparent 1px 6px
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ds-ink) 44%, var(--ds-canvas));
+  color: var(--ds-ink);
+}
+
+.lives-stack__empty {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-stack:hover .ds-tip,
+.lives-stack:focus-visible .ds-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Conditions: one small panel per measure. */
+.lives-conditions__silent {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-conditions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--ds-space-8);
+}
+
+.lives-condition {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  container-type: inline-size;
+}
+
+.lives-condition__title {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.lives-condition__universe {
+  margin: 0 0 var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-condition .ds-hbar {
+  --hbar-label-w: 4.5rem;
+  grid-template-columns: var(--hbar-label-w) minmax(0, 1fr) minmax(3rem, auto);
+}
+
+.lives-condition .ds-hbar[data-emphasis='true'] .ds-hbar__label {
+  font-weight: 600;
+}
+
+/* Rules and world beats inside a decade */
+.lives-rules {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 44rem;
+}
+
+.lives-rules__empty,
+.lives-rules__disclaimer {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.lives-world {
+  display: grid;
+  gap: var(--ds-space-3);
+  max-width: 44rem;
+}
+
+.lives-world__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.lives-world__beat {
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+}
+
+.lives-world__beat p {
+  margin: 0;
+}
+
+.lives-world__domain,
+.lives-world__speaker,
+.lives-world__uncertainty,
+.lives-world__gap-state {
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.lives-world__heading {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+}
+
+.lives-world__citations,
+.lives-world__entities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--ds-text-caption);
+}
+
+/* —— numbers tables behind a figure's Numbers toggle —————————————————————————— */
+.lives-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.lives-table caption {
+  padding-bottom: var(--ds-space-2);
+  font-size: var(--ds-text-caption);
+  text-align: left;
+  color: var(--ds-ink-muted);
+}
+
+.lives-table th,
+.lives-table td {
+  padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-2) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.lives-table thead th {
+  font-weight: 500;
+  color: var(--ds-ink-muted);
+}
+
+.lives-table [data-emphasis='true'] {
+  font-weight: 600;
+}
+
+.lives-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lives-cell__value {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink);
+}
+
+.lives-cell__detail,
+.lives-cell__definition {
+  font-size: var(--ds-text-micro);
+  font-weight: 400;
+  color: var(--ds-ink-muted);
+}
+
+.lives-cell__definition {
+  display: block;
+}
+
+.lives-cell--muted .lives-cell__value {
+  font-family: var(--ds-font-sans);
+  color: var(--ds-ink-muted);
+}
+
+.lives-cell--wide .lives-cell__value::after {
+  content: ' ~';
+  color: var(--ds-ink-muted);
+}
+
+.lives-cell__why {
+  font-size: var(--ds-text-micro);
 }

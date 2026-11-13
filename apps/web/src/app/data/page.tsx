@@ -1,6 +1,6 @@
 /**
- * `/data`: the reference ledger. Census counts, a compact door into Lives, and published
- * indicator series. Every figure names the series behind it.
+ * `/data`: the reference ledger. Census counts, a door into Lives, and published indicator
+ * series, with a sticky contents list on desktop. Every figure names the series behind it.
  *
  * Primary arrivals (Rooms, footer, bare `/data`) must paint at the top. Deep links into the
  * Lived act use `/data#lives`. Legacy `?s=lives` hops once to the immersive `/lives` room.
@@ -11,7 +11,7 @@ import { permanentRedirect } from 'next/navigation';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { DocumentColophon, parentCrumb, Room } from '../../components/room';
+import { parentCrumb, Room } from '../../components/room';
 import {
   buildLivesHref,
   parseLivesAreaSlug,
@@ -21,7 +21,6 @@ import {
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections } from './DataSections';
 import { loadDataPageModel } from './load-data-page-model';
-import '../../components/data/data-charts.css';
 import '../reading-room.css';
 import './data-page.css';
 
@@ -59,8 +58,6 @@ export default async function DataPage({
         title="What the numbers show, and what they leave out"
         dek={DATA_INTRO.lede}
       />
-      <DocumentColophon facts={dataModel.colophonFacts} />
-
       <DataSections {...dataModel.sections} />
     </Room>
   );

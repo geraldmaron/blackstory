@@ -40,7 +40,6 @@ function formatAsOf(value: string | undefined): string {
  */
 export type DataPageModel = {
   readonly sections: Omit<DataSectionsProps, 'livesBundle' | 'livesAreaSlug'>;
-  readonly colophonFacts: readonly string[];
 };
 
 export async function loadDataPageModel(): Promise<DataPageModel> {
@@ -93,6 +92,5 @@ export async function loadDataPageModel(): Promise<DataPageModel> {
       populationAsOf,
       indicatorsAsOf,
     },
-    colophonFacts: [`Indicators as of ${indicatorsAsOf}`, '13 figures', '8 agencies'],
   };
 }

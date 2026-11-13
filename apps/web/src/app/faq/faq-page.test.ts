@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { FAQ_ENTRIES, FAQ_LEDE, FAQ_SECTIONS } from './faq-copy';
+import { FAQ_ENTRIES, FAQ_LEDE, FAQ_SECTIONS, faqEntryId } from './faq-copy';
 import { MAKER } from '@repo/config';
 import { destinationFor } from '../../lib/nav/destination-registry';
 import { surfaceClassFor } from '../../lib/nav/surface-classes';
@@ -52,11 +52,23 @@ test('sections render as plain headings with a contents list', () => {
   assert.match(pageSource, /RoomSection/);
 });
 
-test('the answers are open on the page, never behind a disclosure', () => {
-  // The two answers a reader most needs (who runs this, how AI is used) are exactly the two a
-  // collapsed drawer would hide. If this page ever becomes an accordion, that is the cost.
-  assert.doesNotMatch(pageSource, /Disclosure/);
-  assert.doesNotMatch(pageSource, /<details/);
+test('every answer is a native disclosure with its own address', () => {
+  assert.match(pageSource, /<details[^>]*id=\{faqEntryId\(entry\)\}/);
+  assert.match(pageSource, /<summary/);
+  assert.match(pageSource, /FaqHashOpener/);
+  const ids = FAQ_ENTRIES.map((entry) => faqEntryId(entry));
+  assert.equal(new Set(ids).size, ids.length, 'two questions share an anchor');
+  for (const id of ids) assert.match(id, /^[a-z0-9]+(-[a-z0-9]+)*$/);
+});
+
+test('grade definitions are linked from here, never restated', () => {
+  const all = FAQ_ENTRIES.flatMap((entry) => entry.answer).join(' ');
+  assert.doesNotMatch(all, /Established:|Corroborated:|Single source:|Contested:/);
+  assert.ok(
+    FAQ_ENTRIES.some((entry) =>
+      entry.links?.some((link) => link.href === '/methodology#evidence-grades'),
+    ),
+  );
 });
 
 test('the AI question is answered plainly, including what no person checks', () => {

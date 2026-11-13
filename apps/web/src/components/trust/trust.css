@@ -1,0 +1,382 @@
+/**
+ * Trust and utility pages: the blocks they share.
+ *
+ * Every trust page is the read container, a PageHeader, plain h2 sections and (at desktop
+ * widths) the sticky contents list, all from the room kit. What is here is what those pages add:
+ * the one-sentence answer that opens a section, flat related links, a step flow, ruled lists and
+ * definition lists, and the quiet note. No box inside a box, no icon plates, no copper except
+ * links in prose.
+ *
+ * Spacing uses the shared scale only (4, 8, 12, 16, 24, 32, 48, 72).
+ */
+
+/* —— the answer a section opens on ———————————————————————————————————————————
+   One step under the h2 (24) and one over the serif body (17): the subtitle step in ink, so the
+   order reads heading, answer, detail and the answer never competes with its heading. */
+.ds-trust-lead {
+  max-width: 62ch;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ds-ink);
+  text-wrap: pretty;
+}
+
+.ds-room-section > .ds-trust-lead + * {
+  margin-top: var(--ds-space-4);
+}
+
+/* —— flat related links ———————————————————————————————————————————————————— */
+.ds-trust-links {
+  margin: var(--ds-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Straight after a ruled list, that list's closing rule is the links' top rule: one hairline. */
+:is(.ds-room-facts, .ds-trust-list, .ds-trust-dl, .ds-trust-links) + .ds-trust-links {
+  border-top: 0;
+}
+
+.ds-trust-links__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--ds-space-4);
+  align-items: center;
+  min-height: 2.75rem;
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-trust-links__title {
+  grid-column: 1;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-title);
+}
+
+.ds-trust-links__line {
+  grid-column: 1;
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+.ds-trust-links__arrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-muted);
+  transition: transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-trust-links__row:hover .ds-trust-links__title {
+  text-decoration: underline;
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 3px;
+}
+
+.ds-trust-links__row:hover .ds-trust-links__arrow {
+  color: var(--ds-ink);
+  transform: translateX(2px);
+}
+
+/* —— the step flow ————————————————————————————————————————————————————————— */
+.ds-trust-flow {
+  margin: var(--ds-space-6) 0 0;
+}
+
+.ds-trust-flow__caption {
+  margin-bottom: var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.ds-trust-flow__steps {
+  --flow-node: 12px;
+
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-trust-flow__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--flow-node) minmax(0, 1fr);
+  column-gap: var(--ds-space-4);
+  align-content: start;
+  padding-bottom: var(--ds-space-6);
+}
+
+/* The rail: from this node down to the next. */
+.ds-trust-flow__step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--flow-node) + 2px);
+  bottom: 2px;
+  left: calc(var(--flow-node) / 2 - 0.5px);
+  width: 1px;
+  background: var(--ds-border-strong, var(--ds-rule));
+}
+
+.ds-trust-flow__node {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  width: var(--flow-node);
+  height: var(--flow-node);
+  margin-top: 4px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
+.ds-trust-flow__step:last-child .ds-trust-flow__node {
+  background: var(--ds-ink);
+}
+
+.ds-trust-flow__n {
+  grid-column: 2;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  line-height: 1.6;
+  color: var(--ds-ink-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-trust-flow__title {
+  grid-column: 2;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-trust-flow__body {
+  grid-column: 2;
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+.ds-trust-flow__note {
+  max-width: 62ch;
+  margin: 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+/* Across from 40rem: nodes on one rail, each step's text under its node. */
+@media (min-width: 40rem) {
+  .ds-trust-flow__steps {
+    grid-template-columns: repeat(var(--flow-n, 4), minmax(0, 1fr));
+    column-gap: var(--ds-space-4);
+  }
+
+  .ds-trust-flow__step {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    row-gap: 0;
+  }
+
+  .ds-trust-flow__step:not(:last-child)::after {
+    top: calc(4px + var(--flow-node) / 2 - 0.5px);
+    bottom: auto;
+    left: calc(var(--flow-node) + 6px);
+    right: calc(-1 * var(--ds-space-4) + 6px);
+    width: auto;
+    height: 1px;
+  }
+
+  .ds-trust-flow__node {
+    grid-column: 1;
+    grid-row: auto;
+    margin-bottom: var(--ds-space-3);
+  }
+
+  .ds-trust-flow__n,
+  .ds-trust-flow__title,
+  .ds-trust-flow__body {
+    grid-column: 1;
+  }
+}
+
+/* —— a subhead inside a section, over a list or a block it names ———————————————— */
+.ds-room-section > .ds-trust-subhead {
+  margin: var(--ds-space-8) 0 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-room-section > .ds-trust-subhead + * {
+  margin-top: var(--ds-space-3);
+}
+
+/* —— ruled lists ——————————————————————————————————————————————————————————————
+   An enumeration that was hiding in a paragraph. Rules between items, no markers. */
+.ds-trust-list {
+  max-width: 66ch;
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-trust-list > li {
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-trust-list > li > strong:first-child {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+/* —— definition lists: a term and what it means ——————————————————————————————— */
+.ds-trust-dl {
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-trust-dl > div {
+  display: grid;
+  gap: var(--ds-space-1);
+  padding-block: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-trust-dl dt {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-trust-dl dd {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-trust-dl dd + dd {
+  margin-top: var(--ds-space-1);
+}
+
+@media (min-width: 48rem) {
+  .ds-trust-dl--split > div {
+    grid-template-columns: 12rem minmax(0, 1fr);
+    column-gap: var(--ds-space-6);
+  }
+}
+
+/* —— body copy in the sans face, for policy pages that are read as rules ———————— */
+.ds-trust-copy {
+  max-width: 66ch;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+  color: color-mix(in srgb, var(--ds-ink) 86%, var(--ds-canvas));
+}
+
+.ds-room-section > .ds-trust-copy + .ds-trust-copy {
+  margin-top: var(--ds-space-3);
+}
+
+/* —— the quiet note: a limit or an exception, set below what it qualifies ———————— */
+.ds-trust-note {
+  max-width: 62ch;
+  margin: var(--ds-space-4) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-trust-note > strong:first-child {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+/* "Last updated", once, under a policy's first section. */
+.ds-trust-meta {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* —— a quoted rule, carried word for word from another page ——————————————————— */
+.ds-trust-quote {
+  max-width: 62ch;
+  margin: var(--ds-space-4) 0 0;
+  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-4);
+  border-left: var(--ds-border-width) solid var(--ds-ink-muted);
+}
+
+.ds-trust-quote p {
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.6;
+  color: var(--ds-ink);
+}
+
+.ds-trust-quote footer {
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* —— the page foot: a single closing line, ruled off ——————————————————————————— */
+.ds-trust-foot {
+  max-width: 66ch;
+  margin: var(--ds-space-12) 0 0;
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-trust-links__arrow {
+    transition: none;
+  }
+}

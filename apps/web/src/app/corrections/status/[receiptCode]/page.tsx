@@ -1,12 +1,14 @@
 /**
- * correction status page keyed by receipt code. v9 utility room; server-rendered
- * lookup with no moderation-sensitive fields and no enumeration of other submissions.
+ * Correction status page keyed by receipt code. Server-rendered lookup with no
+ * moderation-sensitive fields and no enumeration of other submissions.
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { EmptyState, Notice, PageHeader } from '@repo/ui';
+import { Button, PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../../../components/room';
 import '../../../utility.css';
+import '../../../../components/trust/trust.css';
+import '../../../../components/forms/form-kit.css';
 import {
   buildDefaultCorrectionRouteDependencies,
   lookupPublicStatusByReceipt,
@@ -35,22 +37,19 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
         <PageHeader
           crumb={parentCrumb('/corrections/status')}
           linkAs={Link}
-          title="Correction status"
+          title="Receipt not found"
+          dek="No correction matches that code. There is no way to browse other people’s submissions."
         />
-        <Notice tone="error" title="Receipt not found">
-          No correction matches that receipt code. Check the code and try again. There is no way to
-          browse other people’s submissions.
-        </Notice>
-        <EmptyState
-          title="Need to submit a correction?"
-          action={
-            <Link className="ds-button ds-button--secondary" href="/corrections">
-              Go to corrections
-            </Link>
-          }
-        >
-          Start from the corrections page if you do not yet have a receipt code.
-        </EmptyState>
+        <p className="ds-trust-lead">
+          Check the code against the one you were given: it starts with BB-COR and has sixteen
+          letters and numbers after that.
+        </p>
+        <div className="ds-receipt-missing">
+          <Button href="/corrections/status">Try another code</Button>
+          <Button href="/corrections" variant="quiet">
+            Send a new correction
+          </Button>
+        </div>
       </Room>
     );
   }
@@ -61,7 +60,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
         crumb={parentCrumb('/corrections/status')}
         linkAs={Link}
         title="Correction status"
-        dek="This page shows only what you need to track your submission. Moderation details stay restricted."
+        dek="Only what you need to track your submission. Moderation details stay restricted."
       />
       <CorrectionStatusPanel status={status} />
     </Room>

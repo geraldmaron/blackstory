@@ -714,6 +714,7 @@ span.ds-tabs__tab {
 /* A 44px target that keeps its 20px line's place: the negative block margin gives back the
    extra height, so the title does not move. */
 .ds-page-header__crumb {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-self: start;
@@ -724,6 +725,13 @@ span.ds-tabs__tab {
   font-size: 0.8125rem;
   line-height: 1.25rem;
   text-decoration: none;
+}
+
+/* A 44px hit area around the one-line crumb, without moving it. */
+.ds-page-header__crumb::before {
+  content: '';
+  position: absolute;
+  inset: calc(50% - 1.375rem) -0.5rem;
 }
 
 .ds-page-header__crumb:hover {
@@ -743,7 +751,8 @@ span.ds-tabs__tab {
 }
 
 .ds-page-header__dek {
-  margin: 0;
+  /* 8px grid gap + 4 = 12 under the title, so the dek reads as the title's own line. */
+  margin: var(--ds-space-1) 0 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-subtitle);

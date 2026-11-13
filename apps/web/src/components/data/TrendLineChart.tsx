@@ -1,89 +1,135 @@
 /**
- * Long-arc line chart for `/data` — national series with too many points for a grouped bar
- * chart to hold (a benchmark-year ratio back to 1860, a rate measured every year for two
- * decades). One polyline per named series, points that carry no value for a period are simply
- * skipped rather than drawn at zero, and only a spaced-out subset of periods gets an axis
- * label so 30-plus points do not collide into an unreadable strip. Server-rendered SVG, no
- * client chart libs, same `DataPageGroupedBarSeries` shape `GroupedBarIndicatorChart` reads.
+ * Long-arc lines: a benchmark-year ratio back to 1860, a rate measured every year for two decades.
+ *
+ * When every period is a year, points sit at their true distance in time, so a twenty-year jump
+ * between benchmarks is not drawn as one step. A missing value breaks the line and its span is
+ * hatched and labeled "Not published"; so is a skipped year inside an annual run. Series are named
+ * at the right edge, level with their latest value.
  */
-import Link from 'next/link';
 import React, { type ReactNode } from 'react';
 import type { DataPageGroupedBarSeries } from '@repo/domain/statistics/data-page-series';
 import { DataChartFrame } from './DataChartFrame';
-import { chapterHrefForTheme, formatDataPageValue, niceMax, scaleLinear } from './chart-utils';
+import {
+  Band,
+  Dot,
+  EndLabels,
+  Lines,
+  Mark,
+  Plot,
+  Tip,
+  valueScale,
+  type AxisTick,
+} from './chart-kit';
+import { chapterHrefForTheme, formatDataPageValue } from './chart-utils';
+import { axisValue, seriesSubtitle, seriesTone } from './series-format';
+
+void React;
 
 export type TrendLineChartProps = {
   readonly series: DataPageGroupedBarSeries;
   readonly reading?: ReactNode;
-  readonly figureLabel?: string;
   readonly span?: 'wide' | 'half';
   readonly id?: string;
 };
 
-/* Wider than the grouped-bar geometry: a line chart needs the extra width to space out
-   30-plus points, where a bar chart of the same width would cram them into slivers. */
-const GEOMETRY = {
-  wide: { width: 760, height: 300, margin: { top: 20, right: 16, bottom: 56, left: 64 } },
-  half: { width: 480, height: 280, margin: { top: 16, right: 12, bottom: 48, left: 56 } },
-} as const;
-
-export function TrendLineChart({ series, reading, figureLabel, span, id }: TrendLineChartProps) {
-  if (series.points.length === 0 || series.series.length === 0) {
-    return null;
+/** Year positions when every period is a plain year, else evenly spaced indexes. */
+export function trendPositions(periods: readonly string[]): {
+  readonly x: readonly number[];
+  readonly years: readonly number[] | null;
+} {
+  const years = periods.every((period) => /^\d{4}$/.test(period)) ? periods.map(Number) : null;
+  if (years && years.length > 1) {
+    const first = years[0]!;
+    const span = years.at(-1)! - first || 1;
+    return { x: years.map((year) => ((year - first) / span) * 100), years };
   }
+  const step = 100 / Math.max(1, periods.length - 1);
+  return { x: periods.map((_, index) => index * step), years: null };
+}
 
-  const {
-    width: WIDTH,
-    height: HEIGHT,
-    margin: MARGIN,
-  } = GEOMETRY[span === 'half' ? 'half' : 'wide'];
-  const plotW = WIDTH - MARGIN.left - MARGIN.right;
-  const plotH = HEIGHT - MARGIN.top - MARGIN.bottom;
-  const allValues = series.points.flatMap((point) =>
+/**
+ * Skipped years inside an annual run: a jump of two or three years between points whose
+ * neighbors are one year apart. A long gap between benchmark years is a sampling plan, not a
+ * missing release, and is not marked.
+ */
+export function skippedYears(
+  years: readonly number[],
+): readonly { readonly after: number; readonly before: number }[] {
+  const out: { after: number; before: number }[] = [];
+  for (let index = 1; index < years.length; index += 1) {
+    const jump = years[index]! - years[index - 1]!;
+    if (jump < 2 || jump > 3) continue;
+    const annualBefore = index >= 2 && years[index - 1]! - years[index - 2]! === 1;
+    const annualAfter = index + 1 < years.length && years[index + 1]! - years[index]! === 1;
+    if (annualBefore || annualAfter) out.push({ after: index - 1, before: index });
+  }
+  return out;
+}
+
+export function TrendLineChart({ series, reading, span, id }: TrendLineChartProps) {
+  if (series.points.length === 0 || series.series.length === 0) return null;
+
+  const periods = series.points.map((point) => point.period);
+  const { x, years } = trendPositions(periods);
+  const values = series.points.flatMap((point) =>
     series.series
       .map((def) => point.values[def.id])
       .filter((value): value is number => value !== undefined),
   );
-  const maxValue = niceMax(Math.max(0, ...allValues));
-  const xScale = scaleLinear(
-    0,
-    Math.max(1, series.points.length - 1),
-    MARGIN.left,
-    MARGIN.left + plotW,
+  const { top, ticks } = valueScale(Math.max(0, ...values), (value) =>
+    axisValue(value, series.unit),
   );
-  const yScale = scaleLinear(0, maxValue, MARGIN.top + plotH, MARGIN.top);
-  const yTicks = [0, maxValue / 2, maxValue];
-  const themeLink = chapterHrefForTheme(series.themeId);
+  const y = (value: number) => (value / top) * 100;
+  const chapterHref = chapterHrefForTheme(series.themeId);
 
-  // Roughly eight labels across the span, plus the first and last; never two within half a
-  // step of the end, or the last two years collide into unreadable overlap.
-  const labelStep = Math.max(1, Math.round(series.points.length / 8));
-  const labelEvery = (index: number) =>
-    index === series.points.length - 1 ||
-    (index % labelStep === 0 && series.points.length - 1 - index >= Math.ceil(labelStep / 2));
+  // Hit bands reach halfway to each neighbor.
+  const edges = x.map((value, index) => {
+    const left = index === 0 ? value : (value + x[index - 1]!) / 2;
+    const right = index === x.length - 1 ? value : (value + x[index + 1]!) / 2;
+    return { center: (left + right) / 2, width: Math.max(1.5, right - left) };
+  });
+
+  // About eight labels across, always the first and last, never two crowding the end.
+  const labelGap = years ? (years.at(-1)! - years[0]!) / 7 : periods.length / 7;
+  const xTicks: AxisTick[] = [];
+  periods.forEach((period, index) => {
+    const at = years ? years[index]! : index;
+    const lastAt = xTicks.length > 0 ? (years ? Number(xTicks.at(-1)!.label) : 0) : -Infinity;
+    const isLast = index === periods.length - 1;
+    if (isLast || (years ? at - lastAt >= labelGap : index % Math.ceil(labelGap) === 0)) {
+      const end = years ? years.at(-1)! : periods.length - 1;
+      if (!isLast && end - at < labelGap / 2) return;
+      xTicks.push({ at: x[index]!, label: period, minor: xTicks.length % 2 === 1 && !isLast });
+    }
+  });
+
+  const gaps: { from: number; to: number }[] = [];
+  for (const def of series.series) {
+    series.points.forEach((point, index) => {
+      if (point.values[def.id] !== undefined) return;
+      gaps.push({
+        from: edges[index]!.center - edges[index]!.width / 2,
+        to: edges[index]!.center + edges[index]!.width / 2,
+      });
+    });
+  }
+  if (years) {
+    for (const { after, before } of skippedYears(years)) {
+      gaps.push({ from: x[after]!, to: x[before]! });
+    }
+  }
+
+  const last = series.points.at(-1)!;
 
   return (
     <DataChartFrame
-      title={series.title}
+      title={seriesSubtitle(series)}
       {...(reading !== undefined ? { reading } : {})}
-      {...(figureLabel !== undefined ? { figureLabel } : {})}
       {...(span !== undefined ? { span } : {})}
       {...(id !== undefined ? { id } : {})}
-      caption={
-        <>
-          {series.caption} <span className="ds-data-chart__meta">{series.geographyLabel}</span>
-          {themeLink ? (
-            <>
-              {' '}
-              <Link className="ds-data-page__theme-link" href={themeLink}>
-                Read the chapter
-              </Link>
-            </>
-          ) : null}
-        </>
-      }
+      {...(chapterHref ? { chapterHref } : {})}
+      caption={series.caption}
       sources={series.sources}
-      ariaLabel={`${series.title} for ${series.geographyLabel}`}
       textAlternative={
         <table className="ds-data-chart__table">
           <caption>{series.title}</caption>
@@ -115,105 +161,111 @@ export function TrendLineChart({ series, reading, figureLabel, span, id }: Trend
         </table>
       }
     >
-      <svg
-        className="ds-data-chart__svg ds-data-chart__svg--wide"
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        role="img"
-        aria-hidden="true"
+      <Plot
+        label={series.title}
+        unit={series.yAxisLabel}
+        size={span === 'half' ? 'md' : 'lg'}
+        yWidth="3rem"
+        endWidth={series.series.length > 1 ? 'min(9rem, 28cqi)' : '3.5rem'}
+        yTicks={ticks}
+        xTicks={xTicks}
       >
-        {yTicks.map((tick) => {
-          const y = yScale(tick);
+        {gaps.map((gap) => (
+          <Band
+            key={`${gap.from}-${gap.to}`}
+            from={gap.from}
+            to={gap.to}
+            kind="gap"
+            label="Not published"
+          />
+        ))}
+        <Lines
+          series={series.series.map((def) => ({
+            id: def.id,
+            tone: seriesTone(series, def.id),
+            points: series.points.flatMap((point, index) => {
+              const value = point.values[def.id];
+              const here = value === undefined ? null : { x: x[index]!, y: y(value) };
+              const skipped =
+                years && index > 0 && skippedYears(years).some((gap) => gap.before === index);
+              return skipped ? [null, here] : [here];
+            }),
+          }))}
+        />
+        {series.points.map((point, index) => {
+          const present = series.series.filter((def) => point.values[def.id] !== undefined);
+          const highest = Math.max(0, ...present.map((def) => point.values[def.id]!));
           return (
-            <g key={tick}>
-              <line
-                className="ds-data-chart__grid-line"
-                x1={MARGIN.left}
-                x2={WIDTH - MARGIN.right}
-                y1={y}
-                y2={y}
-              />
-              <text
-                className="ds-data-chart__axis-label"
-                x={MARGIN.left - 8}
-                y={y + 4}
-                textAnchor="end"
-              >
-                {formatDataPageValue(tick, series.unit)}
-              </text>
-            </g>
+            <Mark
+              key={point.period}
+              x={edges[index]!.center}
+              width={edges[index]!.width}
+              first={index === 0}
+              crosshair
+              tipY={y(highest)}
+              ariaLabel={`${point.period}: ${
+                present.length === 0
+                  ? 'not published'
+                  : present
+                      .map(
+                        (def) =>
+                          `${def.label} ${formatDataPageValue(point.values[def.id]!, series.unit)}`,
+                      )
+                      .join(', ')
+              }`}
+              tip={
+                <Tip
+                  title={point.period}
+                  rows={series.series.map((def) => {
+                    const value = point.values[def.id];
+                    return {
+                      value:
+                        value === undefined
+                          ? 'Not published'
+                          : formatDataPageValue(value, series.unit),
+                      label: def.label,
+                      tone: seriesTone(series, def.id),
+                    };
+                  })}
+                />
+              }
+            >
+              {(index === 0 || x[index]! - x[index - 1]! >= 2.5) &&
+              (index === x.length - 1 || x[index + 1]! - x[index]! >= 2.5)
+                ? present.map((def) => (
+                    <Dot
+                      key={def.id}
+                      x={
+                        ((x[index]! - (edges[index]!.center - edges[index]!.width / 2)) /
+                          edges[index]!.width) *
+                        100
+                      }
+                      y={y(point.values[def.id]!)}
+                      tone={seriesTone(series, def.id)}
+                      size="sm"
+                    />
+                  ))
+                : null}
+            </Mark>
           );
         })}
-
-        {series.series.map((def) => {
-          const linePoints = series.points
-            .map((point, index) => {
-              const value = point.values[def.id];
-              return value === undefined ? null : `${xScale(index)},${yScale(value)}`;
-            })
-            .filter((entry): entry is string => entry !== null)
-            .join(' ');
-          return (
-            <polyline
-              key={def.id}
-              fill="none"
-              stroke={def.fill}
-              strokeWidth={2}
-              points={linePoints}
-            />
-          );
-        })}
-
-        {series.points.map((point, index) => (
-          <g key={point.period}>
-            {series.series.map((def) => {
-              const value = point.values[def.id];
-              if (value === undefined) return null;
-              return (
-                <circle
-                  key={def.id}
-                  className="ds-data-chart__mark"
-                  cx={xScale(index)}
-                  cy={yScale(value)}
-                  r={3}
-                  fill={def.fill}
-                  stroke="var(--ds-surface)"
-                  strokeWidth={1.5}
-                >
-                  <title>{`${point.period} · ${def.label}: ${formatDataPageValue(value, series.unit)}`}</title>
-                </circle>
-              );
-            })}
-            {labelEvery(index) ? (
-              <text
-                className="ds-data-chart__axis-label"
-                x={xScale(index)}
-                y={HEIGHT - MARGIN.bottom + 18}
-                textAnchor="middle"
-              >
-                {point.period}
-              </text>
-            ) : null}
-          </g>
-        ))}
-
-        <text
-          className="ds-data-chart__axis-label"
-          x={14}
-          y={MARGIN.top + plotH / 2}
-          textAnchor="middle"
-          transform={`rotate(-90 14 ${MARGIN.top + plotH / 2})`}
-        >
-          {series.yAxisLabel}
-        </text>
-      </svg>
-      <ul className="ds-data-chart__legend" aria-hidden="true">
-        {series.series.map((def) => (
-          <li key={def.id} className="ds-data-chart__legend-item">
-            <span className="ds-data-chart__legend-swatch" style={{ background: def.fill }} />
-            {def.label}
-          </li>
-        ))}
-      </ul>
+        <EndLabels
+          items={series.series.flatMap((def) => {
+            const value = last.values[def.id];
+            return value === undefined
+              ? []
+              : [
+                  {
+                    id: def.id,
+                    y: y(value),
+                    name: series.series.length > 1 ? def.label : '',
+                    value: formatDataPageValue(value, series.unit),
+                    tone: seriesTone(series, def.id),
+                  },
+                ];
+          })}
+        />
+      </Plot>
     </DataChartFrame>
   );
 }

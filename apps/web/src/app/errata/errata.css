@@ -1,0 +1,233 @@
+/**
+ * `/errata`: the dated log. Each day is a group under its date, and each change in it is the
+ * record, its kind, what changed in one line and a two-line note. Ruled rows, no boxes.
+ */
+.ds-errata__kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-bottom: var(--ds-space-6);
+}
+
+.ds-errata__log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-ink-muted);
+}
+
+/* —— a day: its date, then that day's changes ————————————————————————————————— */
+.ds-errata__day {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-errata__date {
+  margin: 0;
+  padding-top: var(--ds-space-6);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+}
+
+.ds-errata__entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* —— one change ———————————————————————————————————————————————————————————— */
+.ds-errata__row {
+  padding-block: var(--ds-space-4);
+}
+
+.ds-errata__row + .ds-errata__row {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* The kind holds the top right of every row, however the name wraps. */
+.ds-errata__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--ds-space-4);
+  margin: 0;
+}
+
+.ds-errata__name {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+  text-wrap: balance;
+}
+
+a.ds-errata__name {
+  text-decoration: underline;
+  text-decoration-color: var(--ds-rule);
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 4px;
+}
+
+a.ds-errata__name:hover {
+  text-decoration-color: currentColor;
+}
+
+.ds-errata__type {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.3;
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
+}
+
+.ds-errata__change {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-errata__more {
+  max-width: 66ch;
+  margin-top: var(--ds-space-2);
+}
+
+.ds-errata__note {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+/* Two lines until opened. The full note, and any record list, stay in the HTML. */
+.ds-errata__more[data-clamp] .ds-errata__note {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.ds-errata__toggle:checked ~ .ds-errata__note {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+.ds-errata__records {
+  display: none;
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-errata__toggle:checked ~ .ds-errata__records {
+  display: block;
+}
+
+.ds-errata__records > li {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-block: var(--ds-space-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-errata__records a {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  color: var(--ds-ink);
+  text-decoration-color: var(--ds-rule);
+  text-underline-offset: 3px;
+}
+
+.ds-errata__records a:hover {
+  text-decoration-color: currentColor;
+}
+
+.ds-errata__toggle-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: calc(-1 * var(--ds-space-3));
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control, var(--ds-rule));
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+
+.ds-errata__toggle-label:hover {
+  text-decoration-color: currentColor;
+}
+
+.ds-errata__toggle:focus-visible ~ .ds-errata__toggle-label {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-errata__close,
+.ds-errata__toggle:checked ~ .ds-errata__toggle-label .ds-errata__open {
+  display: none;
+}
+
+.ds-errata__toggle:checked ~ .ds-errata__toggle-label .ds-errata__close {
+  display: inline;
+}
+
+.ds-errata__empty {
+  margin: 0;
+  padding-block: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-errata__feeds {
+  margin: var(--ds-space-6) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-errata__feeds a {
+  color: var(--ds-ink);
+}
+
+/* Desktop: the date gets its own column and stays in view while its day scrolls past. */
+@media (min-width: 48rem) {
+  .ds-errata__day {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    column-gap: var(--ds-space-6);
+  }
+
+  .ds-errata__date {
+    position: sticky;
+    top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-4));
+    align-self: start;
+    padding-top: calc(var(--ds-space-4) + 3px);
+  }
+}

@@ -1,5 +1,8 @@
 /**
- * Stacked class-share bars for one decade. Tables remain the text alternative, not the first read.
+ * Class shares for one decade: one 100% bar per group, its parts the class bands from the table
+ * the census published that decade. The bands step from light (lower) to ink (upper); each part
+ * prints its share when it has room, and every value is in the tooltip and the table. A group with
+ * nothing published gets a hatched bar and the reason in words.
  */
 import React from 'react';
 import {
@@ -10,8 +13,11 @@ import {
   type LivesLens,
 } from '@repo/domain/statistics/lives';
 import { describeLivesCell, formatLivesPercent } from '../../lib/lives/lives-format';
+import { ChartMarks } from '../data/ChartMarks';
+import { DataChartFrame } from '../data/DataChartFrame';
+import { Tip } from '../data/chart-kit';
 import { LivesClassSharesTable } from './LivesClassSharesTable';
-import { LivesFigure } from './LivesFigure';
+import { drawnValue, sourcesOfCells } from './lives-chart-utils';
 
 void React;
 
@@ -20,6 +26,13 @@ const BUCKET_LABELS: Readonly<Record<LivesClassBucket, string>> = {
   middle: 'Middle',
   upper: 'Upper',
   unclassified: 'Unclassified',
+};
+
+const BUCKET_TONE: Readonly<Record<LivesClassBucket, 'lo' | 'mid' | 'hi' | 'none'>> = {
+  lower: 'lo',
+  middle: 'mid',
+  upper: 'hi',
+  unclassified: 'none',
 };
 
 export type LivesClassSharesChartProps = {
@@ -33,89 +46,115 @@ function bucketsFor(decade: LivesDecadeBundle): readonly LivesClassBucket[] {
     : ['lower', 'middle', 'upper'];
 }
 
+/**
+ * The lower band, because the class arc above this chart already titles the middle band for the
+ * same decade; one figure per number.
+ */
 function readingFor(decade: LivesDecadeBundle, emphasis: LivesLens): string {
-  const middle = decade.classShares[emphasis].middle;
+  const lower = decade.classShares[emphasis].lower;
   const label = LIVES_LENS_LABELS[emphasis];
-  if (middle.state === 'published' && middle.estimate !== undefined) {
-    return `${formatLivesPercent(middle.estimate)} of ${label} ${decade.classLabel.toLowerCase()} sat in the middle band in the ${decade.label}.`;
+  const value = drawnValue(lower);
+  if (value !== null) {
+    return `${formatLivesPercent(value)} of ${label} ${decade.classLabel.toLowerCase()} sat in the lower band in the ${decade.label}`;
   }
-  const display = describeLivesCell(middle);
-  return `${label} middle-band share for the ${decade.label}: ${display.text}.`;
+  return `${label} lower-band share for the ${decade.label}: ${describeLivesCell(lower).text.toLowerCase()}`;
 }
 
 export function LivesClassSharesChart({ decade, emphasis }: LivesClassSharesChartProps) {
   const buckets = bucketsFor(decade);
-  const hasPublishedShare = LIVES_LENSES.some((lens) =>
-    buckets.some((bucket) => {
-      const cell = decade.classShares[lens][bucket];
-      return cell.state === 'published' || cell.state === 'wide_margin';
-    }),
+  const cells = LIVES_LENSES.flatMap((lens) =>
+    buckets.map((bucket) => decade.classShares[lens][bucket]),
   );
-  if (!hasPublishedShare) return null;
+  if (!cells.some((cell) => drawnValue(cell) !== null)) return null;
+
   return (
-    <LivesFigure
-      title={`${decade.classLabel}, ${decade.label}`}
+    <DataChartFrame
+      title={`${decade.classLabel} by group, ${decade.label}`}
       reading={readingFor(decade, emphasis)}
-      caption="Each bar is one group. Segments are class bands from the table the census published that decade, not a comparison of incomes across regimes."
-      ariaLabel={`${decade.classLabel} shares for Black, white and Hispanic Americans in the ${decade.label}`}
+      caption="Each bar is one group. Its parts are the class bands from the table the census published that decade, not a comparison of incomes across measurement regimes."
+      sources={sourcesOfCells(cells)}
       textAlternative={<LivesClassSharesTable decade={decade} emphasis={emphasis} />}
     >
-      <div className="lives-stacks" role="img" aria-hidden="true">
-        {LIVES_LENSES.map((lens) => {
-          const shares = decade.classShares[lens];
-          const hasAny = buckets.some((bucket) => {
-            const cell = shares[bucket];
-            return (
-              (cell.state === 'published' || cell.state === 'wide_margin') &&
-              cell.estimate !== undefined
-            );
-          });
-          return (
-            <div
-              key={lens}
-              className="lives-stack"
-              data-emphasis={lens === emphasis ? 'true' : undefined}
-            >
-              <span className="lives-stack__label">{LIVES_LENS_LABELS[lens]}</span>
-              <div className="lives-stack__track">
-                {hasAny ? (
-                  buckets.map((bucket) => {
-                    const cell = shares[bucket];
-                    const value =
-                      (cell.state === 'published' || cell.state === 'wide_margin') &&
-                      cell.estimate !== undefined
-                        ? cell.estimate
-                        : 0;
-                    if (value <= 0) return null;
-                    return (
-                      <span
-                        key={bucket}
-                        className="lives-stack__fill"
-                        data-bucket={bucket}
-                        style={{ flexGrow: value, flexBasis: 0 }}
-                        title={`${BUCKET_LABELS[bucket]}: ${formatLivesPercent(value)}`}
-                      >
-                        {value >= 12 ? formatLivesPercent(value) : null}
-                      </span>
-                    );
-                  })
-                ) : (
-                  <span className="lives-stack__empty">
-                    {describeLivesCell(shares.middle).text}
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <ul className="lives-stack__legend" aria-hidden="true">
+      <p className="ds-plot__unit" aria-hidden="true">
+        Share of each group, percent
         {buckets.map((bucket) => (
-          <li key={bucket} data-bucket={bucket}>
+          <span key={bucket} className="ds-plot__key">
+            <span
+              className="ds-plot__swatch"
+              data-tone={BUCKET_TONE[bucket] === 'none' ? 'lo' : BUCKET_TONE[bucket]}
+              data-hatched={BUCKET_TONE[bucket] === 'none' ? 'true' : undefined}
+            />
             {BUCKET_LABELS[bucket]}
-          </li>
+          </span>
         ))}
-      </ul>
-    </LivesFigure>
+      </p>
+      <ChartMarks label={`${decade.classLabel} by group`}>
+        <ul className="lives-stacks">
+          {LIVES_LENSES.map((lens, index) => {
+            const shares = buckets.map((bucket) => ({
+              bucket,
+              value: drawnValue(decade.classShares[lens][bucket]),
+            }));
+            const hasAny = shares.some((part) => part.value !== null && part.value > 0);
+            const summary = hasAny
+              ? shares
+                  .filter((part) => part.value !== null)
+                  .map((part) => `${BUCKET_LABELS[part.bucket]} ${formatLivesPercent(part.value!)}`)
+                  .join(', ')
+              : describeLivesCell(decade.classShares[lens].middle).text;
+            return (
+              <li
+                key={lens}
+                className="lives-stack"
+                data-emphasis={lens === emphasis ? 'true' : undefined}
+                data-mark=""
+                tabIndex={index === 0 ? 0 : -1}
+                aria-label={`${LIVES_LENS_LABELS[lens]}: ${summary}`}
+                style={{ '--tip-y': '100%' } as React.CSSProperties}
+              >
+                <span className="lives-stack__label" aria-hidden="true">
+                  {LIVES_LENS_LABELS[lens]}
+                </span>
+                <span
+                  className="lives-stack__track"
+                  data-absent={hasAny ? undefined : 'true'}
+                  aria-hidden="true"
+                >
+                  {hasAny ? (
+                    shares.map((part) =>
+                      part.value === null || part.value <= 0 ? null : (
+                        <span
+                          key={part.bucket}
+                          className="lives-stack__part"
+                          data-tone={BUCKET_TONE[part.bucket]}
+                          style={{ flexGrow: part.value, flexBasis: 0 }}
+                        >
+                          {part.value >= 12 ? formatLivesPercent(part.value) : null}
+                        </span>
+                      ),
+                    )
+                  ) : (
+                    <span className="lives-stack__empty">
+                      {describeLivesCell(decade.classShares[lens].middle).text}
+                    </span>
+                  )}
+                </span>
+                {hasAny ? (
+                  <Tip
+                    title={LIVES_LENS_LABELS[lens]}
+                    rows={shares
+                      .filter((part) => part.value !== null)
+                      .map((part) => ({
+                        value: formatLivesPercent(part.value!),
+                        label: BUCKET_LABELS[part.bucket],
+                      }))}
+                  />
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      </ChartMarks>
+    </DataChartFrame>
   );
 }

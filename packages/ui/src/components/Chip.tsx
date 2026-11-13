@@ -81,7 +81,12 @@ export function Chip({
 
   if (href !== undefined) {
     return (
-      <a className={classes} href={href} aria-label={name}>
+      <a
+        className={classes}
+        href={href}
+        aria-label={name}
+        aria-current={selected && !removable ? 'true' : undefined}
+      >
         {content}
       </a>
     );

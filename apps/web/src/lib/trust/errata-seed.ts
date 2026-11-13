@@ -14,6 +14,8 @@ export type ErrataEntry = {
   readonly summary: string;
   readonly affectedUrl?: string;
   readonly affectedFactId?: string;
+  /** Records one change touched, by display name, when it touched several. */
+  readonly affectedRecords?: readonly string[];
 };
 
 const EDITORIAL_ERRATA: readonly ErrataEntry[] = [
@@ -104,7 +106,29 @@ const EDITORIAL_ERRATA: readonly ErrataEntry[] = [
     changeType: 'clarification',
     headline: 'National Register records: first and only claims narrowed or attributed',
     summary:
-      'Claims of being first or only, and similar claims of rank, are now narrowed or attributed to their source on Holy Family Catholic Church Historic District; Voorhees College Historic District; Africatown Historic District; Lake Nixon; Carver Center; Fayette Street Historic District; Cypress Street Elementary School; Mathews, Courtney, House; St. Mark’s African Methodist Episcopal Church; Hippard House; Clinton AME Zion Church; Union School District 19 1/2; Gibson County Training School; Tuskegee Institute National Historic Site; Greater Friendship Baptist Church; Immanuel High School-AR0280; Aiken Colored Cemetery; Beard Congregational Church; Buck Creek Rosenwald School; and Brown, Dianna, Antique Shop. In each case the only support was the site’s own National Register nomination or another single source, or the evidence supported only a narrower scope.',
+      'Claims of being first or only, and similar claims of rank, are now narrowed or attributed to their source on the records listed with this note. In each case the only support was the site’s own National Register nomination or another single source, or the evidence supported only a narrower scope.',
+    affectedRecords: [
+      'Holy Family Catholic Church Historic District',
+      'Voorhees College Historic District',
+      'Africatown Historic District',
+      'Lake Nixon',
+      'Carver Center',
+      'Fayette Street Historic District',
+      'Cypress Street Elementary School',
+      'Mathews, Courtney, House',
+      'St. Mark’s African Methodist Episcopal Church',
+      'Hippard House',
+      'Clinton AME Zion Church',
+      'Union School District 19 1/2',
+      'Gibson County Training School',
+      'Tuskegee Institute National Historic Site',
+      'Greater Friendship Baptist Church',
+      'Immanuel High School-AR0280',
+      'Aiken Colored Cemetery',
+      'Beard Congregational Church',
+      'Buck Creek Rosenwald School',
+      'Brown, Dianna, Antique Shop',
+    ],
   },
   {
     id: 'errata_outdated_terms_replaced_2026',
@@ -112,7 +136,25 @@ const EDITORIAL_ERRATA: readonly ErrataEntry[] = [
     changeType: 'clarification',
     headline: 'National Register records: outdated terms replaced',
     summary:
-      'Outdated terms used in the archive’s own voice, such as "Negro," "colored" and "a former slave," were replaced on Voorhees College Historic District; Lake Nixon; St. Luke’s Episcopal Church; Mathews, Courtney, House; Mulberry Chapel Methodist Church; Clinton AME Zion Church; Union School District 19 1/2; Union Tavern; Douglass Junior and Senior High School; Asberry, Nettie J. and Henry J., House; Immanuel High School-AR0280; Aiken Colored Cemetery; Campbell Chapel AME Church; Bethel African Methodist Episcopal Church and Parsonage; Berkley North Historic District; and State Street Public School. These terms remain only in proper names and quotations.',
+      'Outdated terms used in the archive’s own voice, such as "Negro," "colored" and "a former slave," were replaced on the records listed with this note. These terms remain only in proper names and quotations.',
+    affectedRecords: [
+      'Voorhees College Historic District',
+      'Lake Nixon',
+      'St. Luke’s Episcopal Church',
+      'Mathews, Courtney, House',
+      'Mulberry Chapel Methodist Church',
+      'Clinton AME Zion Church',
+      'Union School District 19 1/2',
+      'Union Tavern',
+      'Douglass Junior and Senior High School',
+      'Asberry, Nettie J. and Henry J., House',
+      'Immanuel High School-AR0280',
+      'Aiken Colored Cemetery',
+      'Campbell Chapel AME Church',
+      'Bethel African Methodist Episcopal Church and Parsonage',
+      'Berkley North Historic District',
+      'State Street Public School',
+    ],
   },
   {
     id: 'errata_campbell_chapel_ame_2026',

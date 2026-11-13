@@ -1,7 +1,11 @@
 /**
- * Multi-decade class-share arc for Lives: middle-band share by race lens across decades.
- * Sits above the decade drill-in so Lived continues the time spine instead of opening as a
- * separate control panel.
+ * The middle-band class share for each group, decade by decade. The decade the appendix's Decade
+ * control picked is marked with a copper rule. The emphasized group's line is ink; the others are
+ * the neutral comparison. Each column's values are in a keyboard-reachable tip.
+ *
+ * Nothing is bridged. A line breaks where its group was not published and where class was
+ * measured differently from the decade before; a run the emphasized group was not published in
+ * is hatched and labeled, and a change of measure is a labeled rule.
  */
 import React from 'react';
 import {
@@ -12,86 +16,120 @@ import {
 } from '@repo/domain/statistics/lives';
 import { formatLivesPercent } from '../../lib/lives/lives-format';
 import { DataChartFrame } from '../data/DataChartFrame';
-import { niceMax, scaleLinear } from '../data/chart-utils';
+import {
+  Band,
+  Dot,
+  EndLabels,
+  Lines,
+  Mark,
+  Plot,
+  Rule,
+  Tip,
+  bandLayout,
+  categoryTicks,
+  valueScale,
+  type LinePoint,
+} from '../data/chart-kit';
+import { drawnValue, sourcesOfCells } from './lives-chart-utils';
 
 void React;
 
 export type LivesClassArcChartProps = {
   readonly bundle: LivesAreaBundle;
   readonly emphasis: LivesLens;
-  readonly onSelectDecade?: (decade: number) => void;
-  readonly selectedDecade?: number;
+  readonly selectedDecade: number;
   readonly id?: string;
-  readonly figureLabel?: string;
 };
-
-const WIDTH = 960;
-const HEIGHT = 260;
-const MARGIN = { top: 24, right: 20, bottom: 52, left: 48 } as const;
-const PLOT_W = WIDTH - MARGIN.left - MARGIN.right;
-const PLOT_H = HEIGHT - MARGIN.top - MARGIN.bottom;
-
-const LENS_CLASS: Readonly<Record<LivesLens, string>> = {
-  black: 'ds-lives-arc__line--black',
-  white: 'ds-lives-arc__line--white',
-  hispanic: 'ds-lives-arc__line--hispanic',
-};
-
-function middleShare(bundle: LivesAreaBundle, lens: LivesLens, decadeIndex: number): number | null {
-  const decade = bundle.decades[decadeIndex];
-  if (!decade) return null;
-  const cell = decade.classShares[lens].middle;
-  if ((cell.state === 'published' || cell.state === 'wide_margin') && cell.estimate !== undefined) {
-    return cell.estimate;
-  }
-  return null;
-}
 
 export function LivesClassArcChart({
   bundle,
   emphasis,
-  onSelectDecade,
   selectedDecade,
   id,
-  figureLabel,
 }: LivesClassArcChartProps) {
   const decades = bundle.decades;
   if (decades.length < 2) return null;
 
-  const publishedShares = LIVES_LENSES.flatMap((lens) =>
-    decades
-      .map((_, index) => middleShare(bundle, lens, index))
-      .filter((v): v is number => v !== null),
+  const share = (lens: LivesLens, index: number) =>
+    drawnValue(decades[index]!.classShares[lens].middle);
+  const values = LIVES_LENSES.flatMap((lens) =>
+    decades.map((_, index) => share(lens, index)).filter((v): v is number => v !== null),
   );
-  if (publishedShares.length === 0) return null;
+  if (values.length === 0) return null;
 
-  const maxShare = niceMax(Math.max(...publishedShares, 1));
-  const xScale = scaleLinear(0, decades.length - 1, MARGIN.left, MARGIN.left + PLOT_W);
-  const yScale = scaleLinear(0, maxShare, MARGIN.top + PLOT_H, MARGIN.top);
-  const labelEvery = decades.length > 12 ? 2 : 1;
+  const { top, ticks } = valueScale(Math.max(...values), (value) => `${value}%`);
+  const y = (value: number) => (value / top) * 100;
+  const { center, width } = bandLayout(decades.length);
+  const selected = decades.find((entry) => entry.decade === selectedDecade) ?? decades.at(-1)!;
+  const selectedIndex = decades.indexOf(selected);
+  const emphasisValue = share(emphasis, selectedIndex);
 
-  const readingDecade = decades.find((entry) => entry.decade === selectedDecade) ?? decades.at(-1)!;
-  const emphasisCell = readingDecade.classShares[emphasis].middle;
-  const emphasisShare =
-    emphasisCell.estimate !== undefined
-      ? formatLivesPercent(emphasisCell.estimate)
-      : 'not published';
+  // Spans of decades the emphasized group was not published in, each labeled once.
+  const gaps: { from: number; to: number }[] = [];
+  decades.forEach((_, index) => {
+    if (share(emphasis, index) !== null) return;
+    const previous = gaps.at(-1);
+    if (previous && previous.to === index - 1) previous.to = index;
+    else gaps.push({ from: index, to: index });
+  });
+
+  const measureBreaks = decades.flatMap((decade, index) =>
+    decade.boundaryFromPrevious === 'different_measure' && index > 0 ? [index] : [],
+  );
+
+  const lines = LIVES_LENSES.map((lens) => {
+    const points: LinePoint[] = [];
+    decades.forEach((decade, index) => {
+      if (decade.boundaryFromPrevious === 'different_measure' && index > 0) points.push(null);
+      const value = share(lens, index);
+      points.push(value === null ? null : { x: center(index), y: y(value) });
+    });
+    return { id: lens, points, tone: lens === emphasis ? ('hi' as const) : ('lo' as const) };
+  });
+
+  const lastValues = LIVES_LENSES.flatMap((lens) => {
+    for (let index = decades.length - 1; index >= 0; index -= 1) {
+      const value = share(lens, index);
+      if (value !== null) {
+        return index === decades.length - 1
+          ? [
+              {
+                id: lens,
+                y: y(value),
+                name: LIVES_LENS_LABELS[lens],
+                value: formatLivesPercent(value),
+                tone: lens === emphasis ? ('hi' as const) : ('lo' as const),
+              },
+            ]
+          : [];
+      }
+    }
+    return [];
+  });
+
+  const allCells = decades.flatMap((decade) =>
+    LIVES_LENSES.map((lens) => decade.classShares[lens].middle),
+  );
 
   return (
     <DataChartFrame
-      title={`Middle-band share across the decades · ${bundle.areaName}`}
-      {...(figureLabel !== undefined ? { figureLabel } : {})}
+      title={`Middle-band class share by group · ${bundle.areaName}, ${decades[0]!.label} to ${decades.at(-1)!.label}`}
       {...(id !== undefined ? { id } : {})}
       reading={
-        <>
-          In the {readingDecade.label}, {LIVES_LENS_LABELS[emphasis]} middle-band share was{' '}
-          {emphasisShare}. Lines skip decades the census did not publish for that group.
-        </>
+        emphasisValue === null ? (
+          <>
+            {LIVES_LENS_LABELS[emphasis]} middle-band share was not published for the{' '}
+            {selected.label}
+          </>
+        ) : (
+          <>
+            In the {selected.label}, {formatLivesPercent(emphasisValue)} of{' '}
+            {LIVES_LENS_LABELS[emphasis]} {selected.classLabel.toLowerCase()} sat in the middle band
+          </>
+        )
       }
-      caption="Each line is one group’s middle class (or middle work) band as published that decade. Measurement regimes change; gaps in a line are missing publication, not zero."
-      sourceLabel="U.S. Census Bureau"
-      sourceUrl="https://www.census.gov"
-      ariaLabel={`Middle-band class share by race across decades for ${bundle.areaName}`}
+      caption="Each line is one group’s middle class (or middle work) band as the census published it that decade. Class is measured differently across regimes, so a line breaks at each change of measure and wherever a group was not published. A gap is missing publication, not zero."
+      sources={sourcesOfCells(allCells)}
       textAlternative={
         <table className="ds-data-chart__table">
           <caption>Middle-band share by decade and group</caption>
@@ -110,8 +148,12 @@ export function LivesClassArcChart({
               <tr key={decade.decade}>
                 <th scope="row">{decade.label}</th>
                 {LIVES_LENSES.map((lens) => {
-                  const value = middleShare(bundle, lens, index);
-                  return <td key={lens}>{value === null ? '—' : formatLivesPercent(value)}</td>;
+                  const value = share(lens, index);
+                  return (
+                    <td key={lens}>
+                      {value === null ? 'Not published' : formatLivesPercent(value)}
+                    </td>
+                  );
                 })}
               </tr>
             ))}
@@ -119,80 +161,82 @@ export function LivesClassArcChart({
         </table>
       }
     >
-      <svg
-        className="ds-data-chart__svg ds-lives-arc"
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        role="img"
-        aria-hidden="true"
+      <Plot
+        label="Middle-band class share by decade"
+        unit="Share in the middle class band, percent"
+        size="md"
+        endWidth="min(7rem, 22cqi)"
+        yTicks={ticks}
+        xTicks={categoryTicks(
+          decades.map((decade) => decade.label),
+          center,
+          2,
+        )}
       >
-        {LIVES_LENSES.map((lens) => {
-          const points: string[] = [];
-          decades.forEach((_, index) => {
-            const value = middleShare(bundle, lens, index);
-            if (value === null) return;
-            points.push(`${xScale(index).toFixed(1)},${yScale(value).toFixed(1)}`);
-          });
-          if (points.length < 2) return null;
-          return (
-            <polyline
-              key={lens}
-              points={points.join(' ')}
-              fill="none"
-              className={`ds-lives-arc__line ${LENS_CLASS[lens]}`}
-              data-emphasis={lens === emphasis ? 'true' : undefined}
-            />
-          );
-        })}
-        {decades.map((decade, index) => {
-          const selected = decade.decade === selectedDecade;
-          const value = middleShare(bundle, emphasis, index);
-          return (
-            <g key={decade.decade}>
-              {onSelectDecade ? (
-                <rect
-                  x={xScale(index) - 10}
-                  y={MARGIN.top}
-                  width={20}
-                  height={PLOT_H}
-                  className="ds-lives-arc__hit"
-                  onClick={() => onSelectDecade(decade.decade)}
-                  role="presentation"
-                />
-              ) : null}
-              {value !== null ? (
-                <circle
-                  cx={xScale(index)}
-                  cy={yScale(value)}
-                  r={selected ? 5 : 3}
-                  className="ds-lives-arc__dot"
-                  data-emphasis={selected ? 'true' : undefined}
-                />
-              ) : null}
-              {index % labelEvery === 0 || index === decades.length - 1 ? (
-                <text
-                  x={xScale(index)}
-                  y={HEIGHT - 16}
-                  textAnchor="middle"
-                  className="ds-lives-arc__tick"
-                >
-                  {String(decade.decade).slice(2)}s
-                </text>
-              ) : null}
-            </g>
-          );
-        })}
-        <text x={MARGIN.left} y={MARGIN.top - 6} className="ds-lives-arc__axis">
-          {maxShare.toFixed(0)}%
-        </text>
-      </svg>
-      <ul className="ds-lives-arc__legend" aria-hidden="true">
-        {LIVES_LENSES.map((lens) => (
-          <li key={lens} data-emphasis={lens === emphasis ? 'true' : undefined}>
-            <span className={`ds-lives-arc__swatch ${LENS_CLASS[lens]}`} />
-            {LIVES_LENS_LABELS[lens]}
-          </li>
+        {gaps.map((gap) => (
+          <Band
+            key={gap.from}
+            from={center(gap.from) - width / 2}
+            to={center(gap.to) + width / 2}
+            kind="gap"
+            label={gap === gaps[0] || gap.to - gap.from >= 1 ? 'Not published' : ''}
+          />
         ))}
-      </ul>
+        {measureBreaks.map((index, order) => (
+          <Rule
+            key={`m-${index}`}
+            at={center(index) - width / 2}
+            // Two breaks a decade or two apart would print over each other; the first speaks for both.
+            {...(order === 0 || index - measureBreaks[order - 1]! > 2
+              ? { label: 'Measured differently', minor: order > 0 }
+              : {})}
+          />
+        ))}
+        <Rule at={center(selectedIndex)} kind="current" />
+        <Lines series={lines} />
+        {decades.map((decade, index) => {
+          const rows = LIVES_LENSES.map((lens) => {
+            const value = share(lens, index);
+            return {
+              value: value === null ? 'Not published' : formatLivesPercent(value),
+              label: LIVES_LENS_LABELS[lens],
+              tone: lens === emphasis ? ('hi' as const) : ('lo' as const),
+            };
+          });
+          const highest = Math.max(
+            0,
+            ...LIVES_LENSES.map((lens) => share(lens, index) ?? 0).map(y),
+          );
+          const isSelected = index === selectedIndex;
+          return (
+            <Mark
+              key={decade.decade}
+              x={center(index)}
+              width={width}
+              first={index === 0}
+              crosshair
+              selected={isSelected}
+              tipY={highest}
+              ariaLabel={`${decade.label}: ${rows.map((row) => `${row.label} ${row.value}`).join(', ')}`}
+              tip={<Tip title={decade.label} rows={rows} />}
+            >
+              {LIVES_LENSES.map((lens) => {
+                const value = share(lens, index);
+                return value === null ? null : (
+                  <Dot
+                    key={lens}
+                    x={50}
+                    y={y(value)}
+                    tone={lens === emphasis ? 'hi' : 'lo'}
+                    size={isSelected && lens === emphasis ? 'lg' : 'sm'}
+                  />
+                );
+              })}
+            </Mark>
+          );
+        })}
+        <EndLabels items={lastValues} />
+      </Plot>
     </DataChartFrame>
   );
 }

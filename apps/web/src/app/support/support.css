@@ -1,65 +1,32 @@
 /**
- * Support page — utility room edition.
- *
- * Kit components (Room, PageHeader, CardGrid, RoomCard, Prose)
- * provide the structure and base styling. This file contains support-specific
- * styling and contact box presentation.
+ * `/support`: the one action and the address. Everything else is the trust kit.
  */
-
-.ds-support__section-intro,
-.ds-support__contact-intro {
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
+.ds-support__action {
+  margin-top: var(--ds-space-4);
 }
 
-/* First UtilityCard on the page: sits directly under the header lede, so it takes the base
-   kit's block margin off its top edge rather than leaving a second gap on top of the one the
-   header already has below it. Carries forward the old ds-section--flush treatment this
-   section had before the page moved onto the shared UtilityCard. */
-.ds-support__section-paths {
-  margin-top: 0;
-}
-
-/* Last UtilityCard on the page: nothing follows it (no ds-room__foot here), so it drops the
-   base kit's bottom block margin rather than leaving trailing whitespace before the page ends. */
-.ds-support__section-contact {
-  margin-bottom: 0;
-}
-
-.ds-support__contact {
+.ds-support__email {
   margin: var(--ds-space-4) 0 0;
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface-raised);
-}
-
-.ds-support__contact-label {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
   font-weight: 600;
+  letter-spacing: var(--ds-tracking-title);
+  overflow-wrap: anywhere;
 }
 
-.ds-support__contact-value {
-  margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.5;
-}
-
-.ds-support__follow {
-  margin: var(--ds-space-5) 0 0;
-  max-width: 46rem;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-}
-
-.ds-support__follow a {
-  color: var(--ds-accent);
+.ds-support__email a {
+  color: var(--ds-ink);
   text-decoration: underline;
-  text-underline-offset: 0.15em;
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 5px;
+}
+
+.ds-support__email a:hover {
+  text-decoration-thickness: 2px;
+}
+
+@media (max-width: 39.9375rem) {
+  .ds-support__action .ds-button {
+    width: 100%;
+  }
 }

@@ -49,7 +49,6 @@ const V6_EDITION_FAMILIES: readonly string[] = [
   'ds-entity-edition',
   'ds-explore-edition',
   'ds-history-edition',
-  'ds-utility-edition',
 ];
 
 function editionFamilies(): ReadonlyMap<string, number> {
@@ -85,7 +84,7 @@ describe('surface parity · the v6 edition vocabulary only shrinks', () => {
 
     assert.deepEqual(
       offenders,
-      ['components/patterns/utility-edition/utility-edition.css'],
+      [],
       'a per-route stylesheet or panel-chrome module appeared outside app/',
     );
   });
@@ -138,7 +137,6 @@ describe('surface parity · three entry postures only', () => {
       )) {
         const name = match[1]!;
         if (allowed.has(name)) continue;
-        if (name === 'UtilityEditionIntro') continue;
         offenders.push(`${path.relative(SRC_DIR, file)}:${name}`);
       }
     }

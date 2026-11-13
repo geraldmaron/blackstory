@@ -1,68 +1,153 @@
 /**
- * `/about` page-local layout.
+ * `/about` page-local layout: the records-by-state figure and the foot credit.
  *
- * The room kit owns the surface: column, header, sections and facts. What is left here is the
- * refusals list this page alone renders, plus the foot credits.
- *
- * MOBILE FIRST. Any multi-column rule here has to sit inside a `min-width` query.
- *
- * THE PILLARS ARE KIT FACTS. The refusals stay a hairline list: these are limits, and giving
- * them card weight would present them as features. The list takes the read column's width.
+ * MOBILE FIRST. Any multi-column rule here has to sit inside a `min-width` query; the state
+ * grid is the one exception, because a tile map is a fixed 11-column figure at every width.
  */
 
-.ds-about-page__refusals {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* —— records by state ——————————————————————————————————————————————————————— */
+.ds-about-states {
+  margin: var(--ds-space-8) 0 var(--ds-space-6);
 }
 
-.ds-about-page__refusal {
-  padding-block: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.6;
+.ds-about-states__title {
+  margin-bottom: var(--ds-space-4);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-about-states__grid {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  grid-template-rows: repeat(8, auto);
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-about-states__tile {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ds-ink) var(--tile-ink, 4%), var(--ds-canvas));
+  color: var(--tile-text, var(--ds-ink));
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.ds-about-states__tile[data-step='0'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--ds-rule);
   color: var(--ds-ink-muted);
 }
 
-.ds-about-page__refusal:last-child {
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+.ds-about-states__tile[data-step='1'],
+.ds-about-states__swatch[data-step='1'] {
+  --tile-ink: 10%;
 }
 
-.ds-about-page__refusal::before {
-  content: 'Never';
-  display: block;
-  margin-block-end: var(--ds-space-1);
+.ds-about-states__tile[data-step='2'],
+.ds-about-states__swatch[data-step='2'] {
+  --tile-ink: 22%;
+}
+
+.ds-about-states__tile[data-step='3'],
+.ds-about-states__swatch[data-step='3'] {
+  --tile-ink: 40%;
+}
+
+.ds-about-states__tile[data-step='4'],
+.ds-about-states__swatch[data-step='4'] {
+  --tile-ink: 62%;
+  --tile-text: var(--ds-canvas);
+}
+
+.ds-about-states__tile[data-step='5'],
+.ds-about-states__swatch[data-step='5'] {
+  --tile-ink: 88%;
+  --tile-text: var(--ds-canvas);
+}
+
+.ds-about-states__postal {
+  font-size: var(--ds-text-micro);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.ds-about-states__count {
+  display: none;
+  font-size: var(--ds-text-micro);
+  opacity: 0.85;
+}
+
+@media (min-width: 40rem) {
+  .ds-about-states__grid {
+    gap: 4px;
+  }
+
+  .ds-about-states__postal {
+    font-size: var(--ds-text-micro);
+  }
+
+  .ds-about-states__count {
+    display: block;
+  }
+}
+
+.ds-about-states__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  margin-top: var(--ds-space-3);
+}
+
+.ds-about-states__legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
-  font-weight: 600;
-  color: var(--ds-ink);
+  color: var(--ds-ink-muted);
+}
+
+.ds-about-states__legend > span:first-child {
+  margin-right: var(--ds-space-1);
+}
+
+.ds-about-states__legend > span:last-child {
+  margin-left: var(--ds-space-1);
+}
+
+.ds-about-states__swatch {
+  width: 1rem;
+  height: 0.625rem;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ds-ink) var(--tile-ink, 4%), var(--ds-canvas));
+}
+
+.ds-about-states__note {
+  max-width: 44ch;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
 }
 
 .ds-about-page__foot {
-  margin-block-start: var(--ds-space-6);
+  margin-block-start: var(--ds-space-12);
   padding-top: var(--ds-space-4);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  display: grid;
-  gap: var(--ds-space-3);
-}
-
-.ds-about-page__credit {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.04em;
-  line-height: 1.55;
-  color: var(--ds-ink-muted);
-}
-
-.ds-about-page__credit a {
-  color: var(--ds-ink-muted);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
-.ds-about-page__credit a:hover,
-.ds-about-page__credit a:focus-visible {
-  color: var(--ds-ink);
 }

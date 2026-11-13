@@ -45,7 +45,9 @@ for (const page of ROOM_KIT_PAGES) {
     assert.match(source, /from '(?:\.\.\/)+components\/room(?:'|\/(?:Room)')/);
     assert.match(source, /<Room/);
     assert.match(source, /<PageHeader/);
-    assert.match(source, /<Room width="read"/);
+    // Forms sit beside their "what happens next" aside, so they take the record width.
+    const width = page.route === 'submit' || page.route === 'corrections' ? 'record' : 'read';
+    assert.match(source, new RegExp(`<Room width="${width}"`));
     // The v6 shell must be gone rather than merely unused: two chromes on one page is the drift
     // the kit exists to remove, and an unused import is how the second one comes back.
     assert.doesNotMatch(source, /UtilityEditionShell/);

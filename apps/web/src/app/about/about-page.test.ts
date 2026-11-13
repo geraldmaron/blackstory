@@ -59,10 +59,12 @@ test('the page states what the archive refuses to do', () => {
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
 });
 
-test('contribution cards come from the registry; the room catalogue hands off to /rooms', () => {
+test('contribution links come from the registry; the room catalogue hands off to /rooms', () => {
   assert.match(sectionsSource, /destinationsInGroup\('take-part'\)/);
   assert.match(sectionsSource, /cardTitleFor/);
-  assert.match(sectionsSource, /DestinationIcon/);
+  // Flat link rows: no icon plates and no cards.
+  assert.doesNotMatch(sectionsSource, /DestinationIcon|CardGrid|RoomCard|RoomHandoff/);
+  assert.match(sectionsSource, /TrustLinks/);
   assert.match(sectionsSource, /ABOUT_ROOMS_HANDOFF/);
   assert.equal(ABOUT_ROOMS_HANDOFF.href, '/rooms');
   assert.doesNotMatch(sectionsSource, /readRooms|checkRooms|\[\.\.\.readRooms/);
@@ -77,9 +79,22 @@ test('no list is numbered: neither the pillars nor the refusals are a sequence',
 });
 
 test('every multi-column rule is inside a min-width query', () => {
-  // Guards the defect this rewrite fixed: three columns of prose held down to 375px.
-  const beforeFirstQuery = cssSource.split('@media')[0] ?? '';
+  // Guards the defect this rewrite fixed: three columns of prose held down to 375px. The state
+  // tile map is the one exception: it is a fixed 11-column figure, not columns of text.
+  const withoutTileGrid = cssSource.replace(/\.ds-about-states__grid \{[^}]*\}/, '');
+  const beforeFirstQuery = withoutTileGrid.split('@media')[0] ?? '';
   assert.doesNotMatch(beforeFirstQuery, /grid-template-columns:\s*repeat\(/);
+});
+
+test('the map placeholder is gone, replaced by a figure drawn from the register', () => {
+  assert.doesNotMatch(sectionsSource, /MapMoment/);
+  assert.match(sectionsSource, /<RecordsByState/);
+});
+
+test('grade definitions are linked, never restated', () => {
+  const pillars = ABOUT_PILLARS.map((pillar) => pillar.body).join(' ');
+  assert.doesNotMatch(pillars, /established, corroborated/);
+  assert.match(sectionsSource, /\/methodology#evidence-grades/);
 });
 
 test('about links to the source library room', () => {
@@ -122,7 +137,12 @@ test('the page discloses how the long-form writing is made, including the AI use
   // is drafted with AI has been misled by this page's silence. It also has to state the limit,
   // because "AI writes it" without "AI cannot lower the evidence bar" is the wrong half.
   assert.match(sectionsSource, /ABOUT_NEO/);
-  const neo = [...ABOUT_NEO.rules, ...ABOUT_NEO.human, ABOUT_NEO.hand].join(' ');
+  const neo = [
+    ...ABOUT_NEO.rules,
+    ...ABOUT_NEO.steps.map((step) => step.body),
+    ...ABOUT_NEO.human,
+    ABOUT_NEO.hand,
+  ].join(' ');
   assert.match(neo, /\bAI\b/, 'the section says plainly that AI is used');
   assert.match(neo, /written standard/, 'the writing standard is mentioned');
   assert.doesNotMatch(neo, /\.md\b|docs\//, 'no internal file path reaches a reader');

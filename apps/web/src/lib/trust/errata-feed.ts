@@ -5,6 +5,13 @@ import { ERRATA_CHANGE_TYPE_LABELS } from './domain-trust';
 import { TRUST_SITE_NAME } from './site-identity';
 import type { ErrataEntry } from './errata-seed';
 
+/** A feed reader has no record list beside the note, so the names ride in the text. */
+function feedSummary(entry: ErrataEntry): string {
+  return entry.affectedRecords?.length
+    ? `${entry.summary} Records: ${entry.affectedRecords.join('; ')}.`
+    : entry.summary;
+}
+
 function escapeXml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -24,7 +31,7 @@ export function buildErrataJsonFeed(entries: readonly ErrataEntry[], feedUrl: st
       id: entry.id,
       date_published: entry.timestamp,
       title: entry.headline,
-      summary: entry.summary,
+      summary: feedSummary(entry),
       tags: [ERRATA_CHANGE_TYPE_LABELS[entry.changeType]],
       ...(entry.affectedUrl ? { url: entry.affectedUrl } : {}),
     })),
@@ -37,7 +44,7 @@ export function buildErrataRssFeed(entries: readonly ErrataEntry[], feedUrl: str
     .map(
       (entry) => `<item>
   <title>${escapeXml(entry.headline)}</title>
-  <description>${escapeXml(entry.summary)}</description>
+  <description>${escapeXml(feedSummary(entry))}</description>
   <pubDate>${new Date(entry.timestamp).toUTCString()}</pubDate>
   <guid isPermaLink="false">${escapeXml(entry.id)}</guid>
   ${entry.affectedUrl ? `<link>${escapeXml(entry.affectedUrl)}</link>` : ''}

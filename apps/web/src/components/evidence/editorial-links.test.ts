@@ -21,8 +21,9 @@ test('methodology anchors match the live Methodology section ids', () => {
 
 test('livedDecadeHrefForBucket opens the Lives evidence appendix for supported decades', () => {
   assert.equal(livedDecadeHrefForBucket('1930s'), '/lives/explorer?decade=1930');
-  // 1870 is the Lived default decade, so buildLivesHref omits the query param.
-  assert.equal(livedDecadeHrefForBucket('1870s'), '/lives/explorer');
+  assert.equal(livedDecadeHrefForBucket('1870s'), '/lives/explorer?decade=1870');
+  // 2020 is the appendix's default decade, so buildLivesHref omits the query param.
+  assert.equal(livedDecadeHrefForBucket('2020s'), '/lives/explorer');
   assert.equal(livedDecadeHrefForBucket(''), undefined);
   assert.equal(livedDecadeHrefForBucket('1700s'), undefined);
   assert.equal(livedDecadeHrefForBucket('pre-1900'), undefined);

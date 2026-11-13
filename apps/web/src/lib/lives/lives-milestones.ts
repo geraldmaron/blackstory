@@ -253,14 +253,6 @@ function rulesBeginningInEra(
   );
 }
 
-/** The decades a question's visible panels actually span, for the page's own header. */
-export function livesMilestoneSpanLabel(panels: readonly LivesMilestonePanel[]): string | null {
-  const first = panels[0];
-  const last = panels[panels.length - 1];
-  if (!first || !last) return null;
-  return `${first.era.start}s to ${last.era.end}s`;
-}
-
 export function parseLivesMilestone(value: string | readonly string[] | undefined): LivesMilestone {
   const key = typeof value === 'string' ? value : value?.[0];
   return LIVES_MILESTONES.find((milestone) => milestone.key === key) ?? DEFAULT_LIVES_MILESTONE;

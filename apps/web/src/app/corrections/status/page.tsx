@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../../components/room';
 import '../../utility.css';
+import '../../../components/trust/trust.css';
+import '../../../components/forms/form-kit.css';
 import { ReceiptLookupForm } from './ReceiptLookupForm';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -26,9 +28,12 @@ export default function CorrectionStatusLandingPage() {
         crumb={parentCrumb('/corrections/status')}
         linkAs={Link}
         title="Check a correction receipt"
-        dek="Enter the receipt code you were given when you submitted a correction. There is no way to browse other people’s submissions."
+        dek="Enter the code you were given when you sent a correction. There is no way to browse other people’s submissions."
       />
       <ReceiptLookupForm />
+      <p className="ds-trust-foot">
+        No code? <Link href="/corrections">Send a correction</Link> to get one.
+      </p>
     </Room>
   );
 }

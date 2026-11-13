@@ -1,14 +1,13 @@
 /**
- * About body sections — composed into the `/about` room.
- * No header here; the parent room owns the PageHeader.
+ * About body sections, composed into the `/about` room. The parent room owns the PageHeader.
+ *
+ * Each section opens on its strongest sentence (the first paragraph is set as the lead), the
+ * writing process is drawn as the steps it is, and onward links are flat rows. The map
+ * placeholder this page used to carry is replaced by a real figure: published records by state.
  */
 import React from 'react';
 import { MakerCredit } from '../../components/MakerCredit';
-import {
-  cardTitleFor,
-  destinationsInGroup,
-  type Destination,
-} from '../../lib/nav/destination-registry';
+import { cardTitleFor, destinationsInGroup } from '../../lib/nav/destination-registry';
 import {
   ABOUT_CONTRIBUTE,
   ABOUT_NEO,
@@ -20,37 +19,11 @@ import {
   ABOUT_SOURCE_LIBRARY_HANDOFF,
 } from './about-copy';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
-import {
-  CardGrid,
-  MapMoment,
-  Prose,
-  RoomCard,
-  RoomFactList,
-  RoomHandoff,
-  RoomJump,
-  RoomSection,
-} from '../../components/room';
-import { DestinationIcon } from '../../components/patterns/DestinationIcon';
-import './about-page.css';
+import { Prose, RoomFactList, RoomJump, RoomSection } from '../../components/room';
+import { TrustFlow, TrustLinks } from '../../components/trust';
+import { RecordsByState, type StateCount } from './RecordsByState';
 
 void React;
-
-function destinationCard(destination: Destination) {
-  return (
-    <RoomCard
-      key={destination.path}
-      href={destination.path}
-      kind={destination.kind ?? 'ROOM'}
-      title={
-        <>
-          <DestinationIcon id={destination.icon} size="md" />
-          {cardTitleFor(destination)}
-        </>
-      }
-      {...(destination.description === undefined ? {} : { description: destination.description })}
-    />
-  );
-}
 
 const ABOUT_JUMP = [
   { id: 'origin', label: 'Why this exists' },
@@ -62,7 +35,29 @@ const ABOUT_JUMP = [
   { id: 'begin', label: 'Where to begin' },
 ] as const;
 
-export function AboutSections() {
+/** The first paragraph as the section's answer, the rest as prose. */
+function LeadThenProse({ paragraphs }: { readonly paragraphs: readonly string[] }) {
+  const [lead, ...rest] = paragraphs;
+  return (
+    <>
+      <p className="ds-trust-lead">{lead}</p>
+      {rest.length > 0 ? (
+        <Prose>
+          {rest.map((paragraph) => (
+            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+          ))}
+        </Prose>
+      ) : null}
+    </>
+  );
+}
+
+export type AboutSectionsProps = {
+  /** Records per state for the figure; absent when the catalog could not be read. */
+  readonly states?: { readonly counts: readonly StateCount[]; readonly total: number };
+};
+
+export function AboutSections({ states }: AboutSectionsProps) {
   const takePartRooms = destinationsInGroup('take-part');
 
   return (
@@ -70,18 +65,12 @@ export function AboutSections() {
       <RoomJump sections={ABOUT_JUMP} />
 
       <RoomSection id="origin" title="Why this exists">
-        <Prose>
-          {ABOUT_ORIGIN.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-          ))}
-        </Prose>
+        <LeadThenProse paragraphs={ABOUT_ORIGIN} />
       </RoomSection>
 
       <RoomSection id="stance" title={ABOUT_STANCE.heading}>
+        <LeadThenProse paragraphs={ABOUT_STANCE.paragraphs} />
         <Prose>
-          {ABOUT_STANCE.paragraphs.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-          ))}
           <p>
             {ABOUT_STANCE.maker.lead}{' '}
             <a href={ABOUT_STANCE.maker.href} rel="noopener noreferrer">
@@ -92,35 +81,40 @@ export function AboutSections() {
         </Prose>
       </RoomSection>
 
-      <MapMoment
-        camera={{ center: [-96.5, 38.6], zoom: 3.4 }}
-        note="Records sit in every region of the country. That is a claim the archive has to keep county by county rather than assert once."
-      />
-
       <RoomSection id="pillars" title="What every record stands on">
-        <Prose>
-          <p>
-            Four rules travel with every record. They are enforced where the record is built, so you
-            can check each one on any record page instead of taking it on faith.
-          </p>
-        </Prose>
-        <RoomFactList
-          items={ABOUT_PILLARS.map((pillar) => ({
-            title: pillar.title,
-            body: pillar.body,
-          }))}
-        />
-        <RoomHandoff
-          href={ABOUT_SOURCE_LIBRARY_HANDOFF.href}
-          icon="source"
-          title={ABOUT_SOURCE_LIBRARY_HANDOFF.label}
-          line="The publishers the archive cites, and how a URL becomes a citation on a record."
+        <p className="ds-trust-lead">
+          Four rules travel with every record, enforced where the record is built, so you can check
+          each one on any record page instead of taking it on faith.
+        </p>
+        {states === undefined || states.counts.length === 0 ? null : (
+          <RecordsByState states={states.counts} totalRecords={states.total} />
+        )}
+        <RoomFactList items={ABOUT_PILLARS} />
+        <TrustLinks
+          links={[
+            {
+              href: ABOUT_SOURCE_LIBRARY_HANDOFF.href,
+              title: ABOUT_SOURCE_LIBRARY_HANDOFF.label,
+              line: 'Every publisher the archive cites, and how many records cite it.',
+            },
+            {
+              href: '/methodology#evidence-grades',
+              title: 'What the grades mean',
+              line: 'The one rule that sets a record’s grade, and what moves it.',
+            },
+          ]}
         />
       </RoomSection>
 
       <RoomSection id="neo" title={ABOUT_NEO.heading}>
         <Prose>
-          {ABOUT_NEO.rules.map((paragraph) => (
+          {ABOUT_NEO.rules.slice(0, 2).map((paragraph) => (
+            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+          ))}
+        </Prose>
+        <TrustFlow caption="What every piece of writing goes through" steps={ABOUT_NEO.steps} />
+        <Prose>
+          {ABOUT_NEO.rules.slice(2).map((paragraph) => (
             <p key={paragraph.slice(0, 40)}>{paragraph}</p>
           ))}
           {ABOUT_NEO.human.map((paragraph) => (
@@ -131,49 +125,60 @@ export function AboutSections() {
       </RoomSection>
 
       <RoomSection id="refusals" title="What it will not do">
-        <ul className="ds-about-page__refusals">
-          {ABOUT_REFUSALS.map((refusal) => (
-            <li key={refusal.slice(0, 40)} className="ds-about-page__refusal">
-              {refusal}
-            </li>
-          ))}
+        <ul className="ds-trust-list" aria-label="What it will not do">
+          {ABOUT_REFUSALS.map((refusal) => {
+            const stop = refusal.indexOf('. ');
+            return (
+              <li key={refusal.slice(0, 40)}>
+                <strong>{stop > 0 ? refusal.slice(0, stop + 1) : refusal}</strong>
+                {stop > 0 ? ` ${refusal.slice(stop + 2)}` : null}
+              </li>
+            );
+          })}
         </ul>
-        <div className="ds-room-handoffs">
-          <RoomHandoff
-            href="/methodology"
-            icon="methodology"
-            title="Methodology"
-            line="How each of those is decided, and what the evidence grades mean."
-          />
-          <RoomHandoff
-            href="/errata"
-            icon="errata"
-            title="Errata"
-            line="Everything the archive has already gotten wrong and fixed."
-          />
-        </div>
+        <TrustLinks
+          links={[
+            {
+              href: '/methodology',
+              title: 'Methodology',
+              line: 'How each of those is decided.',
+            },
+            {
+              href: '/errata',
+              title: 'Errata',
+              line: 'Everything the archive has already gotten wrong and fixed.',
+            },
+          ]}
+        />
       </RoomSection>
 
       <RoomSection id="contribute" title={ABOUT_CONTRIBUTE.heading}>
+        <LeadThenProse paragraphs={[ABOUT_CONTRIBUTE.lede, ABOUT_CONTRIBUTE.terms]} />
         <Prose>
-          <p>{ABOUT_CONTRIBUTE.lede}</p>
-          <p>{ABOUT_CONTRIBUTE.terms}</p>
           <p>
             {ABOUT_CONTRIBUTE.direct} <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>
           </p>
         </Prose>
-        <CardGrid>{takePartRooms.map(destinationCard)}</CardGrid>
+        <TrustLinks
+          label="Ways to add to it"
+          links={takePartRooms.map((destination) => ({
+            href: destination.path,
+            title: cardTitleFor(destination),
+            ...(destination.description === undefined ? {} : { line: destination.description }),
+          }))}
+        />
       </RoomSection>
 
       <RoomSection id="begin" title="Where to begin">
-        <Prose>
-          <p>{ABOUT_ROOMS_HANDOFF.lede}</p>
-        </Prose>
-        <RoomHandoff
-          href={ABOUT_ROOMS_HANDOFF.href}
-          icon="rooms"
-          title={ABOUT_ROOMS_HANDOFF.label}
-          line="The catalogue of rooms. If a room is not on that list, it is not finished."
+        <p className="ds-trust-lead">{ABOUT_ROOMS_HANDOFF.lede}</p>
+        <TrustLinks
+          links={[
+            {
+              href: ABOUT_ROOMS_HANDOFF.href,
+              title: ABOUT_ROOMS_HANDOFF.label,
+              line: ABOUT_ROOMS_HANDOFF.line,
+            },
+          ]}
         />
       </RoomSection>
 

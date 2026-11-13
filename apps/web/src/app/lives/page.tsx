@@ -4,14 +4,11 @@ import React from 'react';
 import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { PageHeader } from '@repo/ui';
-import { DocumentColophon, Room } from '../../components/room';
+import Link from 'next/link';
+import { parentCrumb, Room } from '../../components/room';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../lib/lives/lives-source';
 import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
-import {
-  buildLivesMilestonePanels,
-  livesMilestoneSpanLabel,
-  parseLivesMilestone,
-} from '../../lib/lives/lives-milestones';
+import { parseLivesMilestone } from '../../lib/lives/lives-milestones';
 import { LivesSourceNotice } from '../../components/lives/LivesSourceNotice';
 import { LivesMilestoneExperience } from '../../components/lives/LivesMilestoneExperience';
 import { resolveStoryCollection } from '../../lib/stories/source';
@@ -53,18 +50,11 @@ export default async function LivesIndexPage({
   return (
     <Room width="wide">
       <PageHeader
+        crumb={parentCrumb('/lives')}
+        linkAs={Link}
         title="Lives across the decades"
-        dek="Follow one ordinary question through changing counts, rules, and accounts of lived experience. Every visible figure is sourced."
+        dek="One ordinary question, followed through the census, the rules in force and the words of the people who lived it."
       />
-      <DocumentColophon
-        facts={[
-          'United States',
-          livesMilestoneSpanLabel(buildLivesMilestonePanels(bundle, milestone, narratives)) ??
-            '1870s to 2020s',
-          'Published comparisons only',
-        ]}
-      />
-
       <LivesSourceNotice
         source={loaded?.source ?? 'unreadable'}
         areaName={bundle.areaName}

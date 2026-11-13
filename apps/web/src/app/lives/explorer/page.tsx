@@ -5,7 +5,7 @@ import { LIVES_NATIONAL, livesAreaBySlug } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { DocumentColophon, parentCrumb, Room } from '../../../components/room';
+import { parentCrumb, Room } from '../../../components/room';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../../lib/lives/lives-source';
 import { parseLivesAreaSlug, type RawLivesSearchParams } from '../../../lib/lives/lives-url-state';
 import { LivesSourceNotice } from '../../../components/lives/LivesSourceNotice';
@@ -42,14 +42,8 @@ export default async function LivesExplorerPage({
         crumb={parentCrumb('/lives/explorer')}
         linkAs={Link}
         title="Evidence appendix"
-        dek="Inspect every available decade, region, definition, coverage note, and cited table behind Lives."
+        dek="Every decade, region, definition and coverage note behind Lives, with the cited tables."
       />
-      <DocumentColophon facts={[`Area · ${bundle.areaName}`, 'Full utility · 1870s to 2020s']} />
-
-      <p className="lives-explorer__return">
-        This is the research view. For the guided experience, <a href="/lives">return to Lives</a>.
-      </p>
-
       <LivesSourceNotice
         source={loaded?.source ?? 'unreadable'}
         areaName={bundle.areaName}

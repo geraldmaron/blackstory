@@ -1,99 +1,92 @@
 /**
- * `/sources` body: publisher kinds, citation lineage, and the public surfaces that already
- * list sources. Counts stay off this page; they are computed on the operator desk from the
- * active release.
+ * `/sources` body: the publishers the released catalog cites, with how many records cite each,
+ * then how a URL becomes a citation and the kinds of publisher the archive weighs differently.
  */
 import React from 'react';
 import Link from 'next/link';
-import { Notice, PageHeader } from '@repo/ui';
-import {
-  parentCrumb,
-  Prose,
-  RoomFactList,
-  RoomHandoff,
-  RoomJump,
-  RoomSection,
-} from '../../components/room';
-import { SourceLineageDiagram } from '../methodology/MethodologyDiagrams';
-import {
-  SOURCE_LIBRARY_SURFACES,
-  SOURCE_LINEAGE_STAGES,
-  SOURCE_PUBLISHER_KINDS,
-} from '../methodology/methodology-copy';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, RoomJump, RoomSection } from '../../components/room';
+import { TrustFlow } from '../../components/trust';
+import { SOURCE_LINEAGE_STAGES, SOURCE_PUBLISHER_KINDS } from '../methodology/methodology-copy';
+import type { SourceLibrary } from './source-library';
+import { SourcesTable } from './SourcesTable';
 
 void React;
 
-const SOURCES_INTRO =
-  'Every public claim on BlackStory traces to a publisher someone can open. This room names the kinds of publishers the archive cites, shows how a URL becomes a citation on a record, and points to where each surface already lists its sources.';
-
 const SOURCES_JUMP = [
+  { id: 'publishers', label: 'Publishers' },
   { id: 'citation-chain', label: 'Citation chain' },
-  { id: 'publisher-kinds', label: 'Publisher kinds' },
-  { id: 'where-sources-appear', label: 'Where they appear' },
+  { id: 'publisher-kinds', label: 'Kinds of publisher' },
 ] as const;
 
-export function SourcesSections() {
+const count = (value: number) => value.toLocaleString('en-US');
+
+function dekFor(library: SourceLibrary | undefined): string {
+  if (library === undefined) {
+    return 'Every public claim on BlackStory traces to a publisher someone can open.';
+  }
+  const citing =
+    library.citingRecords === library.totalRecords
+      ? 'every published record'
+      : `${count(library.citingRecords)} of the ${count(library.totalRecords)} published records`;
+  return `${count(library.rows.length)} publishers, cited by ${citing}.`;
+}
+
+export function SourcesSections({ library }: { readonly library: SourceLibrary | undefined }) {
   return (
     <>
       <PageHeader
         crumb={parentCrumb('/sources')}
         linkAs={Link}
         title="Where the evidence comes from"
-        dek={SOURCES_INTRO}
+        dek={dekFor(library)}
       />
 
       <RoomJump sections={SOURCES_JUMP} />
 
-      <RoomSection id="citation-chain" title="How a URL becomes a citation">
-        <SourceLineageDiagram />
-        <RoomFactList
-          items={SOURCE_LINEAGE_STAGES.map((stage) => ({
-            title: stage.title,
-            body: stage.body,
-          }))}
-        />
-      </RoomSection>
-
-      <RoomSection id="publisher-kinds" title="Publisher kinds">
-        <Prose>
-          <p>
-            BlackStory groups citation hosts under publisher kinds. A government archive is not the
-            same kind of source as a newsroom or a crowd-edited wiki, and the archive treats them
-            differently when grading a claim.
+      <RoomSection id="publishers" title="Publishers">
+        {library === undefined ? (
+          <p className="ds-trust-note" role="status">
+            <strong>The publisher list could not be loaded just now.</strong> Every record page
+            still lists its own sources. Reload this page in a minute, or{' '}
+            <Link href="/records">browse the records</Link>.
           </p>
-        </Prose>
-        <RoomFactList
-          items={SOURCE_PUBLISHER_KINDS.map((entry) => ({
-            title: entry.kind,
-            body: (
-              <>
-                <p>{entry.body}</p>
-                <p className="ds-mono">Examples: {entry.examples}</p>
-              </>
-            ),
-          }))}
-        />
+        ) : library.rows.length === 0 ? (
+          <p className="ds-trust-note" role="status">
+            No published record cites a source yet.
+          </p>
+        ) : (
+          <SourcesTable rows={library.rows} />
+        )}
+        <p className="ds-trust-note">
+          Kind is read from the web address (.gov, .edu, .org), not from a review of the publisher.
+          Wikipedia is listed when a record cites it, and it never counts as one of the two
+          independent sources a grade needs. How a grade reads these sources is on the{' '}
+          <Link href="/methodology#evidence-grades">methodology page</Link>.
+        </p>
       </RoomSection>
 
-      <RoomSection id="where-sources-appear" title="Where sources already appear">
-        <Prose>
-          <p>On the public site, sources already appear in three places:</p>
-        </Prose>
-        <div className="ds-room-handoffs">
-          {SOURCE_LIBRARY_SURFACES.map((surface) => (
-            <RoomHandoff
-              key={surface.href}
-              href={surface.href}
-              icon={surface.icon}
-              title={surface.title}
-              line={surface.body}
-            />
+      <RoomSection id="citation-chain" title="How a URL becomes a citation">
+        <p className="ds-trust-lead">
+          A source is captured when it is found, so the reading survives even if the page does not.
+        </p>
+        <TrustFlow caption="From a research run to a record" steps={SOURCE_LINEAGE_STAGES} />
+      </RoomSection>
+
+      <RoomSection id="publisher-kinds" title="Kinds of publisher">
+        <p className="ds-trust-lead">
+          A government archive is not the same kind of source as a newsroom or a crowd-edited wiki,
+          and a news or reference source never corroborates a claim alone.
+        </p>
+        <dl className="ds-trust-dl ds-trust-dl--split" aria-label="Kinds of publisher">
+          {SOURCE_PUBLISHER_KINDS.map((entry) => (
+            <div key={entry.kind}>
+              <dt>{entry.kind}</dt>
+              <dd>{entry.body}</dd>
+              <dd>For example: {entry.examples}.</dd>
+            </div>
           ))}
-        </div>
-        <Notice tone="note" title="Limitations">
-          Publisher profiles and live counts are computed from the active release at read time. This
-          page names the kinds and the chain; it does not list every publisher or claim count.
-        </Notice>
+        </dl>
       </RoomSection>
     </>
   );

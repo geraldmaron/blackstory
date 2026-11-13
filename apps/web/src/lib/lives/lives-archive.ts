@@ -24,7 +24,6 @@ export type LivesArchiveReading = {
   };
   readonly connections: readonly {
     readonly title: string;
-    readonly line: string;
     readonly href: string;
     readonly icon: DestinationIconId;
   }[];
@@ -32,7 +31,6 @@ export type LivesArchiveReading = {
 
 const duBois = {
   title: 'W. E. B. Du Bois',
-  line: 'The scholar behind the exhibit. Open the person record.',
   href: '/entity/ent_web_du_bois_001',
   icon: 'person',
 } as const;
@@ -91,7 +89,6 @@ const cityReading: LivesArchiveReading = {
     duBois,
     {
       title: 'Nicodemus, Kansas',
-      line: 'A different rural history: Black settlement and community institutions.',
       href: '/place/nicodemus',
       icon: 'place',
     },
@@ -130,7 +127,6 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       duBois,
       {
         title: 'Buying a Home',
-        line: 'Continue into the chapter on housing rules, credit, and ownership.',
         href: '/stories/buying-a-home',
         icon: 'stories',
       },
@@ -166,13 +162,11 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     connections: [
       {
         title: 'Tuskegee University',
-        line: 'Follow the institution’s place record and sources.',
         href: '/place/tuskegee-university',
         icon: 'school',
       },
       {
         title: 'Finishing school',
-        line: 'Follow the next life question: attendance isn’t the same as a diploma.',
         href: '/lives?milestone=education',
         icon: 'publication',
       },
@@ -208,13 +202,11 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     connections: [
       {
         title: 'School desegregation records',
-        line: 'Find the documented cases, schools, and places behind the legal change.',
         href: '/records?q=school%20desegregation',
         icon: 'records',
       },
       {
         title: 'Law',
-        line: 'Follow statutes and decisions beyond one opinion.',
         href: '/law',
         icon: 'law',
       },
@@ -249,13 +241,11 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     connections: [
       {
         title: 'The March on Washington Movement of 1941',
-        line: 'Open the record for the campaign behind the order.',
         href: '/place/march-on-washington-movement-of-1941',
         icon: 'movement',
       },
       {
         title: 'The Gap That Never Closed',
-        line: 'Continue into the chapter on wealth and economic inequality.',
         href: '/stories/the-gap-that-never-closed',
         icon: 'stories',
       },
@@ -277,7 +267,6 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       duBois,
       {
         title: 'The Count',
-        line: 'Read the chapter on census categories and the power to classify.',
         href: '/stories/the-count',
         icon: 'stories',
       },

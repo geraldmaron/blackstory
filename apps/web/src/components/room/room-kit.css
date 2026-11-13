@@ -1799,6 +1799,7 @@ a.ds-room-chip {
   font-size: var(--ds-text-body-sm);
   line-height: 1.35;
   text-decoration: none;
+  text-wrap: balance;
   transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
@@ -1821,6 +1822,14 @@ a.ds-room-chip {
 
 .ds-room-section > .ds-section-heading + * {
   margin-top: 0;
+}
+
+/* The first section under the page header: the header's own 32px foot plus 16 makes the 48
+   a section heading gets, instead of stacking 48 on top of 32. */
+:is(.ds-page-header, .ds-page-header + .ds-room-toc)
+  + .ds-room-section
+  > .ds-section-heading:first-child {
+  margin-top: var(--ds-space-4);
 }
 
 .ds-room-section > * + :not(.ds-section-heading) {

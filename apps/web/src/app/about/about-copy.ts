@@ -80,7 +80,7 @@ export const ABOUT_PILLARS: readonly {
   },
   {
     title: 'Citations, and a grade for how sure the archive is',
-    body: 'An accepted claim carries its citations and one of four grades: established, corroborated, single source, contested. The grade is spelled out in words beside its mark, so reading it never depends on telling two colors apart. Where the sources disagree, the record says so and keeps both of them.',
+    body: 'An accepted claim carries its citations, and every record carries a grade worked out by one published rule. Where the sources disagree, the record says so and keeps both of them.',
   },
   {
     title: 'A point is drawn no sharper than its source',
@@ -102,7 +102,8 @@ export const ABOUT_SOURCE_LIBRARY_HANDOFF = {
 export const ABOUT_ROOMS_HANDOFF = {
   href: '/rooms',
   label: 'Browse the rooms',
-  lede: 'Law, data, lives across the decades, the source library, the memorial wall, the methods behind each record, and the ways to add what is missing all live on one page. If a room is not on that list, it is not finished.',
+  lede: 'Law, data, lives across the decades, the source library, the memorial wall, the methods behind each record, and the ways to add what is missing all live on one page.',
+  line: 'If a room is not on that list, it is not finished.',
 } as const;
 
 /**
@@ -120,11 +121,25 @@ export const ABOUT_NEO = {
   heading: 'How the writing is made',
   rules: [
     'The long-form writing here, the chapters and the articles, is narrated in a single voice. The voice is called Neo. Neo is not a person, not a byline, and signs nothing. It is a written standard, and whoever, or whatever, is doing the writing has to work under it: how a document gets quoted, which sentences have to carry a citation, and which endings are off limits.',
-    'AI drafts that prose. Saying so here is cheaper than letting you find it out. A piece is drafted under the voice document, then read line by line against it for voice and for the dignity of the people in the file, then handed to a separate review whose only job is to attack it: the sentence a specialist would write a letter about, the twelve seconds that travel badly with the paragraph stripped off. A finding from that review is a blocker the writer cannot overrule. After it, the piece still has to clear the code gates on source tiers, citations and length before anything publishes.',
+    'AI drafts that prose. Saying so here is cheaper than letting you find it out. Every piece then goes through the same steps before anything publishes.',
     "None of that can move the evidence bar. Voice never relaxes an evidence gate. Facts are gathered from fetched sources and checked before any prose is written, never from a model's memory, and load-bearing figures need two independent sources. When a detail cannot be sourced, the scene is written without it.",
   ],
   human: [
     "I decide what gets researched, I read every lead and correction, and a release reaches the public site because a person activated it. None of that gets handed to a machine. When the archive is wrong, it's wrong in my name and I fix it where you can see it.",
+  ],
+  /** The passes a piece goes through, in order. Was the middle of one long paragraph. */
+  steps: [
+    { title: 'Drafted', body: 'AI drafts the piece under the voice document.' },
+    {
+      title: 'Read',
+      body: 'Line by line against it, for voice and for the dignity of the people in the file.',
+    },
+    {
+      title: 'Attacked',
+      body: 'A separate review hunts the sentence a specialist would write a letter about. A finding is a blocker the writer cannot overrule.',
+    },
+    { title: 'Gated', body: 'Code gates check source tiers, citations and length.' },
+    { title: 'Released', body: 'A person activates the release.' },
   ],
   hand: 'One part of this is made with a pen and stays that way. The cover plate on an article is a scan of a real drawing: dry felt-tip on cream paper, one weight of line, hatch fills, a sliver of burnt ochre. It is not a generated image and not a stock photo, and that is enforced rather than promised. A plate whose file, link or caption points at a stock library or an image generator cannot publish.',
 } as const;

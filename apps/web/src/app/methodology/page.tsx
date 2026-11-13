@@ -1,6 +1,5 @@
 /**
- * `/methodology` — how a record gets in. See `MethodologySections.tsx` for grade and citation
- * components drawn from the live record-page kit.
+ * `/methodology`: how a record gets in, and the one place the evidence grades are defined.
  */
 import type { Metadata } from 'next';
 import {
@@ -12,6 +11,8 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { MethodologySections } from './MethodologySections';
 import { Room } from '../../components/room';
 import '../reading-room.css';
+import '../../components/trust/trust.css';
+import './methodology.css';
 
 export const revalidate = 3600;
 

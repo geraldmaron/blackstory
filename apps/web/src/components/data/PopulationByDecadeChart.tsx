@@ -1,79 +1,77 @@
 /**
- * National Black population by census decade, 1790–2020 — server-rendered SVG.
+ * The Black population at every census, 1790 to 2020.
  *
- * Consumes the materialized national-timeline snapshot rows. For 1790–1860 the bar is stacked
- * enslaved (base) + free (top) so the two sum to the Black total; from 1870 on the Black total
- * is a single bar. Series fills stay distinct: enslaved uses copper (`--ds-viz-2`), free uses
- * sand (`--ds-viz-4`), and post-1860 Black total uses ink (`--ds-viz-1`) so the enslaved color
- * never continues as if slavery persists after emancipation. A dashed rule marks the 2000
- * measurement-regime boundary ("Black alone", the multiple-race methodology) so the chart never
- * implies pre-2000 and post-2000 counts are perfectly comparable, and 1870 is flagged for the
- * documented Southern undercount. A screen-reader table carries every value, including the
- * free/enslaved split.
+ * For 1790 to 1860 each column is two parts that add up to the Black total: enslaved (solid, the
+ * lower part) and free (hatched, on top). From 1870 the census gives one Black total, drawn in ink,
+ * so no enslaved fill continues past emancipation. The span from 2000 is labeled as measured
+ * differently ("Black alone"), and 1870 carries its documented Southern undercount on the chart.
+ * The two early parts are too thin to label on the columns, so they are keyed beside the unit.
  */
 import React, { type ReactNode } from 'react';
 import type { NationalPopulationTimelineRow } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
-import { formatChartCount, formatSharePct, niceMax, scaleLinear } from './chart-utils';
+import {
+  Band,
+  Bar,
+  Mark,
+  Plot,
+  PointLabel,
+  Rule,
+  Tip,
+  bandLayout,
+  categoryTicks,
+  compactNumber,
+  valueScale,
+  type TipRow,
+} from './chart-kit';
+import { formatChartCount, formatSharePct } from './chart-utils';
 
-/** Copper — enslaved segment only (1790–1860). Must not be reused for post-1860 totals. */
-const FILL_ENSLAVED = 'var(--ds-viz-2)';
-/** Sand — free Black segment stacked on enslaved (1790–1860). */
-const FILL_FREE = 'var(--ds-viz-4)';
-/** Ink — Black population total from 1870 onward (no free/enslaved split in the source). */
-const FILL_BLACK_TOTAL = 'var(--ds-viz-1)';
+void React;
 
 export type PopulationByDecadeChartProps = {
   readonly rows: readonly NationalPopulationTimelineRow[];
   readonly sources: readonly { readonly label: string; readonly url: string }[];
   readonly reading?: ReactNode;
-  readonly figureLabel?: string;
+  readonly span?: 'wide' | 'half';
   readonly id?: string;
 };
-
-// Wider than the shared 640 so 24 decades breathe; scales responsively via viewBox.
-const WIDTH = 960;
-const HEIGHT = 320;
-const MARGIN = { top: 24, right: 20, bottom: 64, left: 84 } as const;
-const PLOT_W = WIDTH - MARGIN.left - MARGIN.right;
-const PLOT_H = HEIGHT - MARGIN.top - MARGIN.bottom;
 
 export function PopulationByDecadeChart({
   rows,
   sources,
   reading,
-  figureLabel,
+  span,
   id,
 }: PopulationByDecadeChartProps) {
-  if (rows.length === 0) {
-    return null;
-  }
+  if (rows.length === 0) return null;
 
-  const maxBlack = niceMax(Math.max(...rows.map((row) => row.blackPopulation)));
-  const xScale = scaleLinear(0, rows.length, MARGIN.left, MARGIN.left + PLOT_W);
-  const yScale = scaleLinear(0, maxBlack, MARGIN.top + PLOT_H, MARGIN.top);
-  const groupWidth = PLOT_W / rows.length;
-  const barWidth = groupWidth * 0.62;
-  const yTicks = [0, maxBlack / 4, maxBlack / 2, (maxBlack * 3) / 4, maxBlack];
-  const zeroY = yScale(0);
-
-  // Boundary marker sits between the last pre-2000 decade and 2000.
-  const boundaryIndex = rows.findIndex((row) => row.opensDefinitionBoundary);
+  const { top, ticks } = valueScale(
+    Math.max(...rows.map((row) => row.blackPopulation)),
+    compactNumber,
+  );
+  const { center, width } = bandLayout(rows.length);
+  const y = (value: number) => (value / top) * 100;
+  const boundary = rows.findIndex((row) => row.opensDefinitionBoundary);
+  const lastSplit = rows.reduce(
+    (found, row, index) => (row.enslavedBlackPopulation !== null ? index : found),
+    -1,
+  );
+  const undercount = rows.findIndex((row) => row.southernUndercountCaveat);
+  const last = rows.length - 1;
 
   return (
     <DataChartFrame
-      title="Black population by decade, 1790 to 2020"
+      title="Black population at each census, 1790 to 2020"
       {...(reading !== undefined ? { reading } : {})}
-      {...(figureLabel !== undefined ? { figureLabel } : {})}
+      {...(span !== undefined ? { span } : {})}
       {...(id !== undefined ? { id } : {})}
       caption={
-        'Enslaved and free counts are stacked for 1790 to 1860 (they add up to the Black total). ' +
-        'From 1870 the Black total is a single bar. The dashed line marks the 2000 switch to ' +
-        '“Black alone” when people could mark more than one race; counts before and after are ' +
-        'not a perfect match. ‡ 1870 is a known Southern undercount.'
+        'Enslaved and free counts are stacked for 1790 to 1860; together they are the Black ' +
+        'total. From 1870 the census gives one Black total. From 2000 the count is “Black alone,” ' +
+        'when people could mark more than one race, so counts before and after are not a perfect ' +
+        'match. The 1870 count is a known Southern undercount.'
       }
       sources={sources}
-      ariaLabel="Bar chart of Black population by census decade, 1790 to 2020"
       textAlternative={
         <table className="ds-data-chart__table">
           <caption>Black population by decade, 1790 to 2020</caption>
@@ -93,7 +91,7 @@ export function PopulationByDecadeChart({
               <tr key={row.decade}>
                 <th scope="row">
                   {row.decade}
-                  {row.southernUndercountCaveat ? ' ‡' : ''}
+                  {row.southernUndercountCaveat ? ' (undercount)' : ''}
                 </th>
                 <td>{formatChartCount(row.blackPopulation)}</td>
                 <td>
@@ -115,200 +113,90 @@ export function PopulationByDecadeChart({
         </table>
       }
     >
-      <svg
-        className="ds-data-chart__svg ds-data-chart__svg--spine"
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        role="img"
-        aria-hidden="true"
+      <Plot
+        label="Black population at each census"
+        unit="Black population, people"
+        size="lg"
+        yWidth="2.75rem"
+        {...(lastSplit > -1
+          ? {
+              keys: [
+                { label: `Enslaved, to ${rows[lastSplit]!.decade}`, tone: 'mid' as const },
+                { label: 'Free', tone: 'lo' as const, hatched: true },
+              ],
+            }
+          : {})}
+        yTicks={ticks}
+        xTicks={categoryTicks(
+          rows.map((row) => row.decade),
+          center,
+          3,
+        )}
       >
-        <defs>
-          <pattern
-            id="ds-viz-hatch"
-            width="6"
-            height="6"
-            patternUnits="userSpaceOnUse"
-            patternTransform="rotate(45)"
-          >
-            <line x1="0" y1="0" x2="0" y2="6" stroke="var(--ds-canvas)" strokeWidth="2.2" />
-          </pattern>
-        </defs>
-        {yTicks.map((tick) => {
-          const y = yScale(tick);
-          return (
-            <g key={tick}>
-              <line
-                className="ds-data-chart__grid-line"
-                x1={MARGIN.left}
-                x2={WIDTH - MARGIN.right}
-                y1={y}
-                y2={y}
-              />
-              <text
-                className="ds-data-chart__axis-label"
-                x={MARGIN.left - 8}
-                y={y + 4}
-                textAnchor="end"
-              >
-                {formatChartCount(Math.round(tick))}
-              </text>
-            </g>
-          );
-        })}
-
-        {boundaryIndex > 0
-          ? (() => {
-              const x = xScale(boundaryIndex);
-              return (
-                <g>
-                  <line
-                    x1={x}
-                    x2={x}
-                    y1={MARGIN.top}
-                    y2={zeroY}
-                    stroke="var(--ds-ink-muted)"
-                    strokeDasharray="4 4"
-                  />
-                  <text
-                    className="ds-data-chart__axis-label"
-                    x={x + 4}
-                    y={MARGIN.top + 10}
-                    textAnchor="start"
-                  >
-                    2000: “Black alone”
-                  </text>
-                </g>
-              );
-            })()
-          : null}
-
-        {rows.map((row, index) => {
-          const centerX = xScale(index + 0.5);
-          const barX = centerX - barWidth / 2;
-          const blackTop = yScale(row.blackPopulation);
-          const showLabel = index % 2 === 0 || index === rows.length - 1;
-
-          // Split decades: enslaved base + free on top; else a single ink Black-total bar.
-          const segments: readonly {
-            key: string;
-            from: number;
-            to: number;
-            fill: string;
-            hatched?: boolean;
-          }[] =
-            row.enslavedBlackPopulation !== null && row.freeBlackPopulation !== null
-              ? [
-                  {
-                    key: 'enslaved',
-                    from: 0,
-                    to: row.enslavedBlackPopulation,
-                    fill: FILL_ENSLAVED,
-                  },
-                  {
-                    key: 'free',
-                    from: row.enslavedBlackPopulation,
-                    to: row.blackPopulation,
-                    fill: FILL_FREE,
-                    hatched: true,
-                  },
-                ]
-              : [
-                  {
-                    key: 'black',
-                    from: 0,
-                    to: row.blackPopulation,
-                    fill: FILL_BLACK_TOTAL,
-                  },
-                ];
-
-          return (
-            <g key={row.decade}>
-              {segments.map((segment) => {
-                const top = yScale(segment.to);
-                const bottom = yScale(segment.from);
-                return (
-                  <g key={segment.key}>
-                    <rect
-                      className="ds-data-chart__mark"
-                      x={barX}
-                      y={top}
-                      width={barWidth}
-                      height={Math.max(0, bottom - top)}
-                      fill={segment.fill}
-                    >
-                      <title>{`${row.decade} · ${segment.key === 'enslaved' ? 'Enslaved' : segment.key === 'free' ? 'Free' : 'Black population'}: ${formatChartCount(segment.to - segment.from)}`}</title>
-                    </rect>
-                    {/*
-                     * brand.md: colour is never the only signal. The free series carries
-                     * --ds-viz-4, which is 2.06:1 on the light canvas and so below the 3:1
-                     * minimum for a meaningful graphic. The hatch tells the two series apart
-                     * without touching a shared brand token.
-                     */}
-                    {segment.hatched ? (
-                      <rect
-                        x={barX}
-                        y={top}
-                        width={barWidth}
-                        height={Math.max(0, bottom - top)}
-                        fill="url(#ds-viz-hatch)"
-                        aria-hidden="true"
-                      />
-                    ) : null}
-                  </g>
-                );
-              })}
-              {showLabel ? (
-                <text
-                  className="ds-data-chart__axis-label"
-                  x={centerX}
-                  y={HEIGHT - MARGIN.bottom + 18}
-                  textAnchor="middle"
-                >
-                  {row.decade}
-                  {row.southernUndercountCaveat ? '‡' : ''}
-                </text>
-              ) : null}
-              {index === rows.length - 1 ? (
-                <text
-                  className="ds-data-chart__axis-label"
-                  x={centerX}
-                  y={blackTop - 6}
-                  textAnchor="middle"
-                >
-                  {formatSharePct(row.blackPopulation, row.totalPopulation)}
-                </text>
-              ) : null}
-            </g>
-          );
-        })}
-
-        <text
-          className="ds-data-chart__axis-label"
-          x={14}
-          y={MARGIN.top + PLOT_H / 2}
-          textAnchor="middle"
-          transform={`rotate(-90 14 ${MARGIN.top + PLOT_H / 2})`}
-        >
-          Black population
-        </text>
-      </svg>
-      <ul className="ds-data-chart__legend" aria-hidden="true">
-        <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: FILL_ENSLAVED }} />
-          Enslaved (1790 to 1860)
-        </li>
-        <li className="ds-data-chart__legend-item">
-          {/* The swatch carries the same hatch as the bar, so the legend matches what is drawn. */}
-          <span
-            className="ds-data-chart__legend-swatch ds-data-chart__legend-swatch--hatched"
-            style={{ background: FILL_FREE }}
+        {boundary > 0 ? (
+          <Band
+            from={center(boundary) - width / 2}
+            to={100}
+            kind="break"
+            label="“Black alone” from 2000"
           />
-          Free (1790 to 1860)
-        </li>
-        <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: FILL_BLACK_TOTAL }} />
-          Black population (1870 to 2020)
-        </li>
-      </ul>
+        ) : null}
+        {undercount > -1 ? (
+          <Rule at={center(undercount)} label={`${rows[undercount]!.decade} undercount`} />
+        ) : null}
+        {rows.map((row, index) => {
+          const split = row.enslavedBlackPopulation !== null && row.freeBlackPopulation !== null;
+          const tipRows: TipRow[] = split
+            ? [
+                {
+                  value: formatChartCount(row.blackPopulation),
+                  label: 'Black, total',
+                  tone: 'none',
+                },
+                {
+                  value: formatChartCount(row.enslavedBlackPopulation!),
+                  label: 'enslaved',
+                  tone: 'mid',
+                },
+                { value: formatChartCount(row.freeBlackPopulation!), label: 'free', tone: 'lo' },
+              ]
+            : [
+                {
+                  value: formatChartCount(row.blackPopulation),
+                  label: `Black, ${formatSharePct(row.blackPopulation, row.totalPopulation)} of all`,
+                  tone: 'hi',
+                },
+              ];
+          return (
+            <Mark
+              key={row.decade}
+              x={center(index)}
+              width={width}
+              first={index === 0}
+              tipY={y(row.blackPopulation)}
+              ariaLabel={`${row.decade}: ${tipRows.map((tip) => `${tip.label} ${tip.value}`).join(', ')}${row.southernUndercountCaveat ? ', a known undercount' : ''}`}
+              tip={<Tip title={`${row.decade} census`} rows={tipRows} />}
+            >
+              {split ? (
+                <>
+                  <Bar height={y(row.enslavedBlackPopulation!)} tone="mid" />
+                  <Bar
+                    offset={y(row.enslavedBlackPopulation!)}
+                    height={y(row.freeBlackPopulation!)}
+                    tone="lo"
+                    hatched
+                  />
+                </>
+              ) : (
+                <Bar height={y(row.blackPopulation)} tone="hi" />
+              )}
+            </Mark>
+          );
+        })}
+        <PointLabel x={center(last)} y={y(rows[last]!.blackPopulation)} strong>
+          {compactNumber(rows[last]!.blackPopulation)}
+        </PointLabel>
+      </Plot>
     </DataChartFrame>
   );
 }

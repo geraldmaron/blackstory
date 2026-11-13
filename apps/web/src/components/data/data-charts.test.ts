@@ -98,16 +98,22 @@ test('PopulationByDecadeChart keeps enslaved, free, and post-1860 total as disti
   const html = renderToStaticMarkup(
     createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES }),
   );
-  // Legend must not conflate enslaved with Black total under one swatch.
+  // The key never conflates enslaved with the Black total under one swatch.
   assert.doesNotMatch(html, /Enslaved \/ Black total/);
-  assert.match(html, /Enslaved \(1790 to 1860\)/);
-  assert.match(html, /Free \(1790 to 1860\)/);
-  assert.match(html, /Black population \(1870 to 2020\)/);
-  // Copper (viz-2) is reserved for the enslaved segment; post-1860 totals use ink (viz-1).
-  assert.match(html, /fill="var\(--ds-viz-2\)"/);
-  assert.match(html, /fill="var\(--ds-viz-4\)"/);
-  assert.match(html, /fill="var\(--ds-viz-1\)"/);
-  assert.doesNotMatch(html, /fillOpacity/);
+  assert.match(html, /Enslaved, to \d{4}</);
+  assert.match(html, />Free</);
+  // Enslaved is the mid tone, free is hatched, and the total from 1870 is ink. The enslaved tone is
+  // drawn once per split decade and never continues past emancipation.
+  const split = SAMPLE_TIMELINE.filter((row) => row.enslavedBlackPopulation !== null).length;
+  const totals = SAMPLE_TIMELINE.length - split;
+  assert.equal((html.match(/class="ds-fig-bar" data-tone="mid"/g) ?? []).length, split);
+  assert.equal(
+    (html.match(/class="ds-fig-bar" data-tone="lo" data-hatched="true"/g) ?? []).length,
+    split,
+  );
+  assert.equal((html.match(/class="ds-fig-bar" data-tone="hi"/g) ?? []).length, totals);
+  // Copper is not a series color.
+  assert.doesNotMatch(html, /--ds-viz-2|accent/);
 });
 
 test('PopulationByDecadeChart returns nothing when rows are empty', () => {

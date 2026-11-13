@@ -1,27 +1,18 @@
 /**
- * Diverging horizontal bar chart of state-level Black population movers for one decade pair.
- * Gains extend right, losses extend left — presence framing, no crime-heat red.
+ * Where the Black population rose or fell between two censuses: a sorted diverging bar. State
+ * names sit in a fixed column, gains run right from the zero line in ink and losses run left in a
+ * lighter neutral, and every value is printed at its bar's end with its sign, so direction is
+ * never carried by color alone.
  */
-import React, { type ReactNode } from 'react';
+import React, { type CSSProperties, type ReactNode } from 'react';
+import { ChartMarks } from './ChartMarks';
 import { DataChartFrame } from './DataChartFrame';
-import { CHART_MARGIN, CHART_WIDTH, formatChartCount, scaleLinear } from './chart-utils';
-import {
-  buildStateShiftBarRows,
-  divergingBarDomain,
-  type StateShiftBarRow,
-} from './state-population-shift';
+import { Tip } from './chart-kit';
+import { formatChartCount } from './chart-utils';
+import { buildStateShiftBarRows, divergingBarDomain } from './state-population-shift';
 import { formatStateChangeLine, type StateChangeLike } from './population-change';
 
 void React;
-
-const ROW_HEIGHT = 28;
-const CENTER_GUTTER = 8;
-// Row labels are full state/territory names (up to "District of Columbia"), much longer
-// than the numeric axis labels the shared CHART_MARGIN.left is sized for — use a wider
-// label column here so long names don't get clipped against the SVG's left edge.
-const LABEL_MARGIN_LEFT = 152;
-// Space reserved beyond the longest bar for its value label, so the label never clips.
-const VALUE_LABEL_ROOM = 64;
 
 export type StatePopulationShiftChartProps = {
   readonly fromDecade: string;
@@ -30,7 +21,6 @@ export type StatePopulationShiftChartProps = {
   readonly stateNameByFips: Readonly<Record<string, string>>;
   readonly sources?: readonly { readonly label: string; readonly url: string }[];
   readonly reading?: ReactNode;
-  readonly figureLabel?: string;
   readonly id?: string;
 };
 
@@ -45,67 +35,10 @@ function formatSignedPp(value: number): string {
   return `${abs} pp`;
 }
 
-function StateShiftBars({
-  rows,
-  maxAbs,
-  centerX,
-  barMaxWidth,
-}: {
-  readonly rows: readonly StateShiftBarRow[];
-  readonly maxAbs: number;
-  readonly centerX: number;
-  readonly barMaxWidth: number;
-}) {
-  const magnitudeScale = scaleLinear(0, maxAbs, 0, barMaxWidth);
-  const top = CHART_MARGIN.top;
-
-  return (
-    <>
-      <line
-        className="ds-data-chart__grid-line"
-        x1={centerX}
-        x2={centerX}
-        y1={top}
-        y2={top + rows.length * ROW_HEIGHT}
-      />
-      {rows.map((row, index) => {
-        const y = top + index * ROW_HEIGHT + ROW_HEIGHT / 2;
-        const magnitude = magnitudeScale(Math.abs(row.blackAbsoluteChange));
-        const isGain = row.blackAbsoluteChange >= 0;
-        const barX = isGain ? centerX + CENTER_GUTTER / 2 : centerX - CENTER_GUTTER / 2 - magnitude;
-        return (
-          <g key={row.stateFips}>
-            <text
-              className="ds-data-chart__axis-label"
-              x={LABEL_MARGIN_LEFT - 8}
-              y={y + 4}
-              textAnchor="end"
-            >
-              {row.stateName}
-            </text>
-            <rect
-              className="ds-data-chart__mark"
-              x={barX}
-              y={y - 10}
-              width={Math.max(magnitude, 1)}
-              height={20}
-              fill={isGain ? 'var(--ds-accent-graphic)' : 'var(--ds-viz-3)'}
-            >
-              <title>{formatStateChangeLine(row, row.stateName)}</title>
-            </rect>
-            <text
-              className="ds-data-chart__axis-label"
-              x={isGain ? barX + magnitude + 6 : barX - 6}
-              y={y + 4}
-              textAnchor={isGain ? 'start' : 'end'}
-            >
-              {formatChartCount(Math.abs(row.blackAbsoluteChange))}
-            </text>
-          </g>
-        );
-      })}
-    </>
-  );
+function signedCount(value: number): string {
+  if (value > 0) return `+${formatChartCount(value)}`;
+  if (value < 0) return `−${formatChartCount(Math.abs(value))}`;
+  return '0';
 }
 
 export function StatePopulationShiftChart({
@@ -115,33 +48,26 @@ export function StatePopulationShiftChart({
   stateNameByFips,
   sources,
   reading,
-  figureLabel,
   id,
 }: StatePopulationShiftChartProps) {
-  const rows = buildStateShiftBarRows(changes, stateNameByFips);
-  if (rows.length === 0) {
-    return null;
-  }
+  const rows = [...buildStateShiftBarRows(changes, stateNameByFips)].sort(
+    (a, b) => b.blackAbsoluteChange - a.blackAbsoluteChange,
+  );
+  if (rows.length === 0) return null;
 
   const { maxAbs } = divergingBarDomain(rows);
-  const plotHeight = rows.length * ROW_HEIGHT;
-  const plotWidth = CHART_WIDTH - LABEL_MARGIN_LEFT - CHART_MARGIN.right;
-  const centerX = LABEL_MARGIN_LEFT + plotWidth / 2;
-  const barMaxWidth = plotWidth / 2 - CENTER_GUTTER - VALUE_LABEL_ROOM;
-  const viewHeight = CHART_MARGIN.top + plotHeight + CHART_MARGIN.bottom;
+  const title = `Where the Black population rose or fell, ${fromDecade} to ${toDecade}`;
 
   return (
     <DataChartFrame
-      title={`Where Black population rose or fell, ${fromDecade} to ${toDecade}`}
+      title={title}
       {...(sources !== undefined ? { sources } : {})}
       {...(reading !== undefined ? { reading } : {})}
-      {...(figureLabel !== undefined ? { figureLabel } : {})}
       {...(id !== undefined ? { id } : {})}
-      caption={`States with the largest gains or losses in Black population between ${fromDecade} and ${toDecade}. Bars go right for gains and left for losses. Share change is percentage points of each state’s total population.`}
-      ariaLabel={`Diverging bar chart of state Black population change from ${fromDecade} to ${toDecade}`}
+      caption={`The states and territories with the largest gains and losses in Black population between ${fromDecade} and ${toDecade}, sorted from largest gain to largest loss. Share change, in the table, is percentage points of each state’s total population.`}
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>{`Where Black population rose or fell, ${fromDecade} to ${toDecade}`}</caption>
+          <caption>{title}</caption>
           <thead>
             <tr>
               <th scope="col">State or territory</th>
@@ -161,46 +87,68 @@ export function StatePopulationShiftChart({
         </table>
       }
     >
-      <svg
-        className="ds-data-chart__svg ds-data-chart__svg--ledger"
-        viewBox={`0 0 ${CHART_WIDTH} ${viewHeight}`}
-        role="img"
-        aria-hidden="true"
-      >
-        <StateShiftBars rows={rows} maxAbs={maxAbs} centerX={centerX} barMaxWidth={barMaxWidth} />
-        <text
-          className="ds-data-chart__axis-label"
-          x={centerX - barMaxWidth / 2}
-          y={viewHeight - 12}
-          textAnchor="middle"
-        >
-          Losses
-        </text>
-        <text
-          className="ds-data-chart__axis-label"
-          x={centerX + barMaxWidth / 2}
-          y={viewHeight - 12}
-          textAnchor="middle"
-        >
-          Gains
-        </text>
-      </svg>
-      <ul className="ds-data-chart__legend" aria-hidden="true">
-        <li className="ds-data-chart__legend-item">
-          <span
-            className="ds-data-chart__legend-swatch"
-            style={{ background: 'var(--ds-accent-graphic)' }}
-          />
-          Black population gains
-        </li>
-        <li className="ds-data-chart__legend-item">
-          <span
-            className="ds-data-chart__legend-swatch"
-            style={{ background: 'var(--ds-viz-3)' }}
-          />
-          Black population losses
-        </li>
-      </ul>
+      <ChartMarks label={`Black population change by state, ${fromDecade} to ${toDecade}`}>
+        <div className="ds-diverge__head" aria-hidden="true">
+          <span />
+          <span>Fewer Black residents</span>
+          <span>More Black residents</span>
+        </div>
+        <ul className="ds-diverge">
+          {rows.map((row, index) => {
+            const gain = row.blackAbsoluteChange >= 0;
+            const bar = (
+              <span
+                className="ds-diverge__bar"
+                style={{ '--len': Math.abs(row.blackAbsoluteChange) / maxAbs } as CSSProperties}
+              />
+            );
+            const value = (
+              <span className="ds-diverge__value">{signedCount(row.blackAbsoluteChange)}</span>
+            );
+            return (
+              <li
+                key={row.stateFips}
+                className="ds-diverge__row"
+                data-mark=""
+                tabIndex={index === 0 ? 0 : -1}
+                aria-label={formatStateChangeLine(row, row.stateName)}
+                style={{ '--tip-y': '100%' } as CSSProperties}
+              >
+                <span className="ds-diverge__name" aria-hidden="true">
+                  {row.stateName}
+                </span>
+                <span className="ds-diverge__side ds-diverge__side--loss" aria-hidden="true">
+                  {gain ? null : (
+                    <>
+                      {value}
+                      {bar}
+                    </>
+                  )}
+                </span>
+                <span className="ds-diverge__side ds-diverge__side--gain" aria-hidden="true">
+                  {gain ? (
+                    <>
+                      {bar}
+                      {value}
+                    </>
+                  ) : null}
+                </span>
+                <Tip
+                  title={row.stateName}
+                  rows={[
+                    {
+                      value: signedCount(row.blackAbsoluteChange),
+                      label: 'Black residents',
+                      tone: gain ? 'hi' : 'lo',
+                    },
+                    { value: formatSignedPp(row.shareChangePp), label: 'of state share' },
+                  ]}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </ChartMarks>
     </DataChartFrame>
   );
 }

@@ -41,21 +41,16 @@ test('no room on this surface renders a details/summary disclosure', () => {
   }
 });
 
-test('the header carries the two feed links as mono chips', () => {
-  assert.match(pageSource, /ds-room-chip/);
+test('the page links both feeds and filters by kind of change through plain links', () => {
   assert.match(pageSource, /href="\/errata\/feed\.json"/);
   assert.match(pageSource, /href="\/errata\/feed\.xml"/);
+  assert.match(pageSource, /href=\{`\/errata\?type=\$\{kind\}`\}/);
 });
 
 test('the log hands off to /corrections and /methodology, with no off-ramp card', () => {
-  assert.match(pageSource, /href="\/corrections"/);
-  assert.match(pageSource, /href="\/methodology"/);
-  assert.doesNotMatch(pageSource, /WalkOffRamp/);
-});
-
-test('errata.css is retired', () => {
-  assert.doesNotMatch(pageSource, /errata\.css/);
-  assert.doesNotMatch(sectionsSource, /errata\.css/);
+  assert.match(pageSource, /href: '\/corrections'/);
+  assert.match(pageSource, /href: '\/methodology#how-a-record-gets-in'/);
+  assert.doesNotMatch(pageSource, /WalkOffRamp|RoomHandoff/);
 });
 
 test('errata does not print shop record ids', () => {

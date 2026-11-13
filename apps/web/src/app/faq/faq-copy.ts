@@ -11,8 +11,8 @@
  * this and the honest answer to "will this last" is his to give. Nothing here says "we".
  *
  * EVERY ANSWER IS CHECKABLE. Nothing is described here that the repository does not already do:
- *   - grades and their definitions: `packages/domain/src/facts/confidence.ts` and
- *     `app/methodology/methodology-copy.ts` (`EVIDENCE_GRADE_DEFINITIONS`)
+ *   - grades: defined once, on `/methodology` (`RECORD_GRADE_DEFINITIONS` in
+ *     `app/methodology/methodology-copy.ts`); this page links there rather than restating them
  *   - precision and dignity rules: `methodology-copy.ts` (`DIGNITY_RULES`)
  *   - coverage honesty: `methodology-copy.ts` (`LIMITATION_RULES`) and `components/story/story-copy.ts`
  *   - corrections, receipt code, one appeal: `app/corrections/CorrectionsSections.tsx`
@@ -49,14 +49,23 @@ export type FaqEntry = {
 };
 
 export type FaqSection = {
-  /** Anchor id, also used by the contents list at the top. */
+  /** Anchor id, also used by the contents list beside the page. */
   readonly id: string;
   readonly heading: string;
   readonly entries: readonly FaqEntry[];
 };
 
 export const FAQ_LEDE =
-  'Plain answers to what people actually ask, including the two most people are too polite to ask: who is behind this, and how much of it is made by a machine.';
+  'Short, plain answers, including the two most people are too polite to raise: who is behind this, and how much of it a machine made.';
+
+/** A question's own address on the page: its words, lowercased and hyphenated. */
+export function faqEntryId(entry: Pick<FaqEntry, 'question'>): string {
+  return entry.question
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
 export const FAQ_SECTIONS: readonly FaqSection[] = [
   {
@@ -163,12 +172,12 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
         ],
       },
       {
-        question: 'What does the confidence grade mean?',
+        question: 'What does the grade on a record mean?',
         answer: [
-          'How sure the archive is, in four steps. Established: several independent, high-authority sources agree and there is no serious dispute. Corroborated: two or more independent sources support it, and any gaps left do not undo the core claim. Single source: one source that meets the citation bar, not necessarily wrong and not yet checked against another. Contested: credible sources disagree, or the claim rests on a source with a known reliability problem, and the record names the disagreement.',
-          'The grade is always spelled out in words beside its mark, so reading it never depends on telling two colors apart. Crime statistics never enter it. A grade measures independence and closeness to the event, nothing else.',
+          'How well the sources back the record: a letter, A, B or C, or Not graded when no claim on it cites a source yet. It is printed as a letter, so reading it never depends on telling two colors apart.',
+          'One rule sets it, and the methodology page states that rule and what moves a grade. It is defined there and nowhere else, so the definition cannot drift between pages.',
         ],
-        links: [{ href: '/methodology#evidence-grades', label: 'Grades, with the marks' }],
+        links: [{ href: '/methodology#evidence-grades', label: 'What the grades mean' }],
       },
       {
         question: 'Why is there almost nothing near me?',

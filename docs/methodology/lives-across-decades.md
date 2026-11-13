@@ -21,13 +21,12 @@ A reader chooses a region, a lens (Black, white or Hispanic), a **unit of analys
 (household, child, or woman), and a class tier, then moves through the decades from the 1870s
 to the 2020s. Each decade shows:
 
-1. **A hand-drawn street** whose layers hatch from published cells (and optional modeled affordance).
-2. **What the count could see:** who the census counted, how, what is missing, and what that meant.
-3. **The share of each group in each class tier.**
-4. **Measured conditions for each group:** homeownership, schooling, work, city living and more.
-5. **The laws and court rulings in force** for that region and group.
-6. **World beats or gap cards** for housing, school, policy, justice, testimony, war, and related domains.
-7. **A short narrative frame** that states only what the rest of the decade already shows.
+1. **What the count could see:** who the census counted, how, what is missing, and what that meant.
+2. **The share of each group in each class tier.**
+3. **Measured conditions for each group:** homeownership, schooling, work, city living and more.
+4. **The laws and court rulings in force** for that region and group.
+5. **World beats or gap cards** for housing, school, policy, justice, testimony, war, and related domains.
+6. **A short narrative frame** that states only what the rest of the decade already shows.
 
 All three groups are always on screen. The lens changes which one is emphasized, never which ones are
 visible. The unit names the subject. The surface never invents a person, assigns a fate, or invites a
