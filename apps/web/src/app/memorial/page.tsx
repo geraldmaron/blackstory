@@ -4,13 +4,11 @@
  * Names stay names. This is the national memorial, not a join from this
  * place's record, and wall names do not follow `/entity/ent_…`.
  *
- * Converted to the v9 room kit (SP-22). Renders through Room and OffRamp. The
- * MemorialWallAtmosphere (handwritten names canvas) is the opening field;
- * MemorialSections renders the accessible list below the fold.
- *
- * The first screen is the wall and one quiet link down to the list. No title,
- * lede, or intro prose over the names. `__opening` reserves the opening
- * viewport so the list starts below the fold.
+ * The room's masthead is the MemorialWallAtmosphere: a full screen of handwritten names at
+ * several depths, one name at a time brought forward, and the inscription at its foot. Scrolling
+ * steps closer: the wall dims as the list (MemorialSections, the complete accessible path to every
+ * name) rises over it. No title or lede over the names, and no controls on the opening screen.
+ * The wall sits inside `<main>` so the inscription, which is real text, is inside a landmark.
  */
 
 import type { Metadata } from 'next';
@@ -40,14 +38,15 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function MemorialPage() {
   return (
     <div className="ds-memorial">
-      <MemorialWallSection
-        seedKey={MEMORIAL_WALL_SEED}
-        messageLines={MEMORIAL_HELD_MESSAGE_LINES}
-        entityLinksByName={{}}
-      />
-      <Room>
-        <div className="ds-memorial__opening" />
-
+      <Room
+        masthead={
+          <MemorialWallSection
+            seedKey={MEMORIAL_WALL_SEED}
+            messageLines={MEMORIAL_HELD_MESSAGE_LINES}
+            entityLinksByName={{}}
+          />
+        }
+      >
         <MemorialSections />
 
         <WalkOffRamp title="This wall is national">

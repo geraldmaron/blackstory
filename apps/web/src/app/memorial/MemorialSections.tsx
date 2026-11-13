@@ -10,7 +10,6 @@ import {
   memorialNamesByInitial,
 } from '../../components/patterns/memorial-wall/memorial-names';
 import { MEMORIAL_LIST_NOTE } from './memorial-copy';
-import { MemorialListContrastZone } from './MemorialListContrastZone';
 import { MemorialLetterJump } from './MemorialLetterJump';
 import { RoomHandoff } from '../../components/room';
 
@@ -47,7 +46,7 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
   const anyLinked = groups.some((group) => group.names.some((name) => entityLinksByName[name]));
 
   return (
-    <MemorialListContrastZone>
+    <div className="ds-memorial__list-zone">
       {/*
         No panel, no numeral, no kicker. This list is not section 01 of a publication and it is
         not a card: it is the names, and every frame drawn around them was chrome asserting
@@ -133,6 +132,6 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
           />
         </div>
       </article>
-    </MemorialListContrastZone>
+    </div>
   );
 }

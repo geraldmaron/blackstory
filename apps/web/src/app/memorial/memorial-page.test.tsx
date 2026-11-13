@@ -155,3 +155,21 @@ test('letter headings announce a letter and a name count as words without changi
   assert.match(html, /aria-label="A: \d+ names"/);
   assert.ok(html.includes('ds-memorial__group-count'));
 });
+
+test('the wall is decorative, its inscription is real text, and nothing on it announces or counts', async () => {
+  const { MemorialWallAtmosphere } =
+    await import('../../components/patterns/memorial-wall/MemorialWallAtmosphere');
+  const { MEMORIAL_HELD_MESSAGE_LINES } = await import('./memorial-copy');
+  const html = renderToStaticMarkup(
+    <MemorialWallAtmosphere messageLines={MEMORIAL_HELD_MESSAGE_LINES} />,
+  );
+  // The canvas and the name brought forward are hidden from assistive tech; the list is the path.
+  assert.match(html, /<canvas[^>]*aria-hidden="true"/);
+  assert.match(html, /class="ds-memorial-wall__presence"[^>]*aria-hidden="true"/);
+  // The inscription is outside every aria-hidden subtree, so a screen reader hears it.
+  const inscription = html.slice(html.indexOf('ds-memorial-wall__inscription"'));
+  assert.ok(inscription.includes(MEMORIAL_HELD_MESSAGE_LINES[0]!));
+  assert.doesNotMatch(inscription, /aria-hidden/);
+  // No live region rotating names into a screen reader, and no controls on the opening.
+  assert.doesNotMatch(html, /aria-live|role="status"|<button/);
+});

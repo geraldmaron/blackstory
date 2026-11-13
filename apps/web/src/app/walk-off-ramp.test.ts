@@ -13,7 +13,7 @@ import { WalkOffRampView } from './walk-off-ramp';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('the copper back control is BlackStory', () => {
+test('the back control is BlackStory', () => {
   const html = renderToStaticMarkup(
     createElement(WalkOffRampView, {
       placeName: MAP_BACK.displayName,

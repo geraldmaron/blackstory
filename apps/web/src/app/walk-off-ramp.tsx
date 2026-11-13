@@ -28,7 +28,8 @@ export function WalkOffRampView({
       <h2 className="ds-room-offramp__title">{title ?? placeName}</h2>
       <p>{children}</p>
       <div className="ds-room-offramp__acts">
-        <Link className={buttonClassName('primary')} href={href}>
+        {/* Secondary, in ink: the memorial takes no copper accent, and this card is drawn only here. */}
+        <Link className={buttonClassName('secondary')} href={href}>
           {placeName}
         </Link>
       </div>
