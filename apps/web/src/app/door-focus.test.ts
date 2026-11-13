@@ -14,6 +14,7 @@ const SPOTLIGHT = {
   era: '1960s',
   summary: 'A test summary.',
   evidenceCount: 2,
+  sourceCount: 2,
   kindLabel: 'place',
   precision: 'city',
 };

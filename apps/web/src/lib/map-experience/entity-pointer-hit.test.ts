@@ -1,21 +1,17 @@
 /**
- * Padded Explore pointer hits: unclustered pins win; clusters carry drill-in coordinates.
+ * Padded Explore pointer hits: record discs win; place tokens carry their key and extent.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
-  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
-  EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-  EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
 import {
   ENTITY_POINTER_HIT_PAD_PX,
   MAP_CLICK_TOLERANCE_PX,
-  clusterSourceIdForLayer,
   entityIdFromProperties,
   pointerHitBox,
   resolveEntityPointerHit,
@@ -30,11 +26,19 @@ test('pointer hit box is a square pad around the click', () => {
   assert.ok(MAP_CLICK_TOLERANCE_PX < ENTITY_POINTER_HIT_PAD_PX);
 });
 
-test('unclustered entityId wins when the pad also covers a cluster', () => {
+test('a record disc wins when the pad also covers a place token', () => {
   const hit = resolveEntityPointerHit([
     {
       layerId: EXPLORE_CLUSTER_LAYER_ID,
-      properties: { cluster_id: 9, point_count: 12 },
+      properties: {
+        placeKey: 'city-dc-washington',
+        level: 'city',
+        point_count: 312,
+        west: -77.1,
+        south: 38.8,
+        east: -76.9,
+        north: 39,
+      },
     },
     {
       layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
@@ -44,39 +48,44 @@ test('unclustered entityId wins when the pad also covers a cluster', () => {
   assert.deepEqual(hit, { kind: 'entity', entityId: 'ent_dunbar_school_001' });
 });
 
-test('cluster hits carry the GeoJSON source that owns the cluster id', () => {
-  assert.equal(clusterSourceIdForLayer(EXPLORE_CLUSTER_LAYER_ID), EXPLORE_ENTITIES_SOURCE_ID);
-  assert.equal(
-    clusterSourceIdForLayer(EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID),
-    EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-  );
+test('place token hits carry the place key, level and member extent', () => {
   const hit = resolveEntityPointerHit([
     {
       layerId: EXPLORE_CLUSTER_LAYER_ID,
-      properties: { cluster_id: 4, point_count: 3 },
-      coordinates: [-77.03, 38.89],
+      properties: {
+        placeKey: 'city-dc-washington',
+        level: 'city',
+        point_count: 312,
+        west: -77.1,
+        south: 38.8,
+        east: -76.9,
+        north: 39,
+      },
     },
   ]);
   assert.deepEqual(hit, {
-    kind: 'cluster',
-    clusterId: 4,
-    sourceId: EXPLORE_ENTITIES_SOURCE_ID,
-    center: [-77.03, 38.89],
+    kind: 'place',
+    placeKey: 'city-dc-washington',
+    level: 'city',
+    bounds: [-77.1, 38.8, -76.9, 39],
   });
-  assert.deepEqual(
+  // A malformed token (no extent, unknown level) is not a hit.
+  assert.equal(
     resolveEntityPointerHit([
+      { properties: { placeKey: 'state-ga', level: 'state', point_count: 3 } },
       {
-        layerId: EXPLORE_CLUSTER_LAYER_ID,
-        properties: { cluster_id: '4', point_count: '3' },
-        coordinates: [-77.03, 38.89],
+        properties: {
+          placeKey: 'x',
+          level: 'planet',
+          point_count: 3,
+          west: 0,
+          south: 0,
+          east: 1,
+          north: 1,
+        },
       },
     ]),
-    {
-      kind: 'cluster',
-      clusterId: 4,
-      sourceId: EXPLORE_ENTITIES_SOURCE_ID,
-      center: [-77.03, 38.89],
-    },
+    undefined,
   );
 });
 
@@ -90,14 +99,14 @@ test('empty or nameless features do not select', () => {
   assert.equal(entityIdFromProperties({ entityId: 'ent_ok' }), 'ent_ok');
 });
 
-test('MapStage drills into clusters instead of opening a leaf record sheet', () => {
+test('MapStage drills into places instead of opening a leaf record sheet', () => {
   const mapStage = readFileSync(
     fileURLToPath(new URL('../../components/map-stage/MapStage.tsx', import.meta.url)),
     'utf8',
   );
   assert.match(mapStage, /handleEntityPointerClick/);
-  assert.match(mapStage, /getClusterExpansionZoom/);
-  assert.match(mapStage, /expandClusterFromPointerHit/);
+  assert.match(mapStage, /drillIntoPlace/);
+  assert.match(mapStage, /notify\(listenersRef\.current, 'placeSelect', hit\.placeKey\)/);
   assert.match(mapStage, /notify\(listenersRef\.current, 'deselect'\)/);
   assert.doesNotMatch(mapStage, /getClusterLeaves/);
   assert.match(mapStage, /pointerHitBox/);

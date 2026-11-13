@@ -151,6 +151,7 @@ function firstPaintProperties(
     eraBuckets: [],
     ...(earliestDecade !== null ? { earliestDecade } : {}),
     evidenceCount: 0,
+    sourceCount: 0,
     confidenceTier: 'unrated',
     topicTags: [],
     shade: properties.shade,

@@ -47,6 +47,11 @@ import { humanizeToken } from '../../../components/entity/format';
 import { RecordMap } from '../../../components/map-embed/RecordMap';
 import { buildEvidenceCards } from '../../../lib/evidence';
 import { confidenceTierPhrase } from '../../../lib/evidence/confidence-language';
+import {
+  claimSourceKey as sourceKey,
+  countClaimSources,
+  evidenceCountWords,
+} from '../../../lib/map-experience/evidence-grade';
 import { confidenceIconFor } from '../../../lib/map-experience/confidence-icons';
 import { buildExploreMapSource } from '../../../lib/map-experience/build-explore-map-source';
 import { ERA_NOT_DOCUMENTED_LABEL } from '../../../lib/map-experience/entity-era-facts';
@@ -177,10 +182,6 @@ function shortPlace(entity: PublicEntityView): string | undefined {
   return readable(location) ? location : undefined;
 }
 
-function sourceKey(claim: PublicEntityView['claims'][number]): string {
-  return (claim.citationHref ?? claim.citationSource ?? claim.citationLabel ?? '').trim();
-}
-
 function publisherOf(claim: PublicEntityView['claims'][number]): string {
   return claim.citationSource
     .trim()
@@ -267,7 +268,6 @@ export function EntityRecordView({
       ...(card.retraction ? { retraction: card.retraction } : {}),
     };
   });
-  const sourceCount = new Set(shownClaims.map(sourceKey).filter((key) => key.length > 0)).size;
   const shownKeys = new Set(shownClaims.map(sourceKey));
   const alsoCited = [
     ...new Map(
@@ -307,9 +307,7 @@ export function EntityRecordView({
         ),
       detail:
         evidence.length > 0
-          ? sourceCount > 0
-            ? `${plural(evidence.length, 'claim')} from ${plural(sourceCount, 'source')}`
-            : plural(evidence.length, 'claim')
+          ? evidenceCountWords(entity.claims.length, countClaimSources(entity.claims))
           : 'No accepted claims yet',
     },
   ];

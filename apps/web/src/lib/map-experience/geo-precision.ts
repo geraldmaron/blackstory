@@ -16,6 +16,11 @@ import {
   type JurisdictionBBox,
 } from '@repo/domain/geography/display-radius';
 import { US_STATES } from '@repo/domain/map/geography';
+import {
+  CLASSIFIED_PRECISIONS,
+  precisionBandFor,
+  type PrecisionBand,
+} from '@repo/domain/map/place-groups';
 
 /** Finest-known public precision -> the GeoPrecisionTier its radius circle should render at.  */
 const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> = {
@@ -50,21 +55,21 @@ export type LocationPrecision =
  */
 export type RecordMark = 'dot' | 'ring' | 'none';
 
-const PRECISION_MARKS: Readonly<Record<string, RecordMark>> = {
-  address: 'dot',
+const MARK_BY_BAND: Readonly<Record<PrecisionBand, RecordMark>> = {
   site: 'dot',
-  institution: 'dot',
   // A campus is block precision (the tier table above): an area, never one site.
-  campus: 'ring',
-  neighborhood: 'ring',
-  city: 'ring',
+  area: 'ring',
   county: 'none',
   state: 'none',
-  country: 'none',
 };
 
+/** The precisions the shared band table classifies, each with its mark. */
+const PRECISION_MARKS: Readonly<Record<string, RecordMark>> = Object.fromEntries(
+  CLASSIFIED_PRECISIONS.map((precision) => [precision, MARK_BY_BAND[precisionBandFor(precision)]]),
+);
+
 export function recordMarkFor(precision: string): RecordMark {
-  return PRECISION_MARKS[precision] ?? 'ring';
+  return MARK_BY_BAND[precisionBandFor(precision)];
 }
 
 /** The precisions that draw each mark, for MapLibre `match` expressions built from this table. */

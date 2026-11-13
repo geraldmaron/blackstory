@@ -4,19 +4,7 @@
  */
 import { brandPalette, mapPalettes } from '@repo/ui';
 
-export const EXPLORE_CLUSTER_CONFIG = {
-  /** Pixel radius for grouping nearby points — tighter than default so metro clouds collapse. */
-  clusterRadius: 52,
-  /**
-   * Groups hold through state and regional zoom; individual records emerge past this. Below
-   * `zoomForLocationPrecision('city')` (10), so a framed city or finer record always draws as
-   * its own mark and never hides inside a group.
-   */
-  clusterMaxZoom: 9,
-  clusterMinPoints: 2,
-} as const;
-
-/** Group circle radii by point_count: three steps, no zoom scaling, no color. */
+/** Place-token circle radii by record count: three steps, no zoom scaling, no color. */
 export const CLUSTER_RADIUS_BY_COUNT: ReadonlyArray<readonly [minCount: number, radius: number]> = [
   [0, 11],
   [10, 15],

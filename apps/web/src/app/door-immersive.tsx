@@ -23,7 +23,7 @@
  * Explore instruments mount over the same plate. `/explore` stays the deep-link URL.
  *
  * Pins with public hrefs stay clickable: a marker on the live plate goes through the stage's own
- * `select` and cluster-expand paths and hands off to browse.
+ * `select` and place-token paths and hands off to browse.
  */
 'use client';
 

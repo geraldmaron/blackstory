@@ -12,6 +12,7 @@
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
 import { recordMarkFor } from './geo-precision';
 import { stateLabelPoints } from './state-labels';
+import { countyLookupFor, type CountyGeometryCollection } from './county-hatch';
 
 export type JurisdictionTagFeature = {
   readonly type: 'Feature';
@@ -39,14 +40,23 @@ function isDrawn(feature: ExploreMapFeature): boolean {
 let labelPointByState: ReadonlyMap<string, readonly [number, number]> | undefined;
 
 /**
- * Where the map actually draws a record: its own point when it gets a mark, else its state's
- * jurisdiction tag (the label point). Framing and the "already visible" test use this, so a
- * county record is never framed at a coordinate where nothing is drawn.
+ * Where the map actually draws a record: its own point when it gets a mark, else the place that
+ * counts it: its county's anchor once the county geometry is in (the place map's county token),
+ * else its state's label point. Framing and the "already visible" test use this, so a county
+ * record is never framed at a coordinate where nothing is drawn.
  */
-export function renderedAnchorFor(feature: ExploreMapFeature): readonly [number, number] {
+export function renderedAnchorFor(
+  feature: ExploreMapFeature,
+  counties?: CountyGeometryCollection,
+): readonly [number, number] {
   const [lng, lat] = feature.geometry.coordinates;
   const postalCode = feature.properties.statePostalCode;
   if (isDrawn(feature) || !postalCode) return [lng, lat];
+  const county =
+    counties && feature.properties.precision === 'county'
+      ? countyLookupFor(counties)(lng, lat)
+      : undefined;
+  if (county) return county.anchor;
   labelPointByState ??= new Map(
     stateLabelPoints().map((point) => [point.postalCode, [point.lng, point.lat] as const]),
   );

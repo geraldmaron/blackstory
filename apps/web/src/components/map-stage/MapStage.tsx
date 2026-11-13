@@ -67,7 +67,6 @@ import {
   type DecadeMorphAnimationHandle,
   type DensityColorMorphState,
 } from '../../app/map/decade-layer-transition';
-import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
 import {
   bindMapResizeLifecycle,
   bindWebGlContextRecovery,
@@ -80,10 +79,6 @@ import {
   pointerHitBox,
   resolveEntityPointerHit,
 } from '../../lib/map-experience/entity-pointer-hit';
-import {
-  clampClusterExpansionZoom,
-  clusterExpandDurationMs,
-} from '../../lib/map-experience/cluster-expand';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -99,6 +94,7 @@ import {
 } from '../../lib/map-experience/camera-presets';
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
 import { drawnRecordCollection } from '../../lib/map-experience/record-marks';
+import { placeDrillZoom, SITE_MIN_ZOOM } from '../../lib/map-experience/place-map';
 import type { StateDensityLevel } from '../../lib/map-experience/density';
 import type { CountyChoroplethLevel } from '../../lib/map-experience/county-choropleth';
 import type { StateChoroplethLevel } from '../../lib/map-experience/state-choropleth';
@@ -140,9 +136,11 @@ import {
   setSelectedEntityFilter,
 } from './selection-sync';
 import {
+  entitiesSourceData,
   fetchStatePolygons,
   loadStatePolygonsWithDensity,
   requestCountyPolygonLoad,
+  setPlaceLeaderData,
   waitForGeoJsonSourceData,
 } from './geo-source-loaders';
 import { readViewport } from './viewport-geometry';
@@ -689,14 +687,14 @@ export function MapStageProvider({
   );
 
   /**
-   * Where a record's disc is on screen, for a photo card to anchor to. Only past cluster max zoom,
-   * where records draw as individual discs (below it they are inside a cluster), and only when the
-   * disc is inside the map's box.
+   * Where a record's disc is on screen, for a photo card to anchor to. Only from the site level,
+   * where records draw as individual discs (below it they are inside a place token), and only when
+   * the disc is inside the map's box.
    */
   const entityHoverTarget = useCallback(
     (entityId: string) => {
       const map = mapRef.current;
-      if (!map || map.getZoom() <= EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) return null;
+      if (!map || map.getZoom() < SITE_MIN_ZOOM) return null;
       const point = entityPoint(entityId);
       if (!point) return null;
       const { x, y } = map.project([point.lng, point.lat]);
@@ -882,7 +880,7 @@ export function MapStageProvider({
       GeoJSONSource | undefined;
     if (entitiesIncoming) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-      entitiesIncoming.setData(drawnRecordCollection(cfg.featureCollection) as any);
+      entitiesIncoming.setData(entitiesSourceData(cfg) as any);
       await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_INCOMING_SOURCE_ID);
       dropInIncomingPins(map);
     }
@@ -945,7 +943,8 @@ export function MapStageProvider({
       const entities = map.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
       if (entities) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-        entities.setData(drawnRecordCollection(cfg.featureCollection) as any);
+        entities.setData(entitiesSourceData(cfg) as any);
+        setPlaceLeaderData(map, cfg);
         await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_SOURCE_ID);
       }
       if (generation !== decadeFadeGenerationRef.current) return;
@@ -1464,25 +1463,27 @@ export function MapStageProvider({
         );
       }
 
-      function expandClusterFromPointerHit(
-        hit: Extract<NonNullable<ReturnType<typeof pointerHitAt>>, { kind: 'cluster' }>,
+      /** A place token opens its place: the camera closes in to the next level, and the surface
+       * (Explore) scopes its list to the place. Never opens a record. */
+      function drillIntoPlace(
+        hit: Extract<NonNullable<ReturnType<typeof pointerHitAt>>, { kind: 'place' }>,
       ): void {
         notify(listenersRef.current, 'deselect');
-        const source = activeMap.getSource(hit.sourceId) as GeoJSONSource | undefined;
-        if (!source) return;
-        void source
-          .getClusterExpansionZoom(hit.clusterId)
-          .then((expansionZoom) => {
-            activeMap.easeTo({
-              center: [hit.center[0], hit.center[1]],
-              zoom: clampClusterExpansionZoom(expansionZoom, activeMap.getZoom()),
-              duration: clusterExpandDurationMs(prefersReducedMotion()),
-              easing: CAMERA_EASING_SLOW_OUT,
-            });
-          })
-          .catch(() => {
-            // Cluster may have dissolved between click and lookup.
-          });
+        const [west, south, east, north] = hit.bounds;
+        const framed = activeMap.cameraForBounds(
+          [
+            [west, south],
+            [east, north],
+          ],
+          { padding: 48 },
+        );
+        activeMap.easeTo({
+          center: framed?.center ?? [(west + east) / 2, (south + north) / 2],
+          zoom: placeDrillZoom(hit.level, framed?.zoom, MAP_MAX_ZOOM),
+          duration: prefersReducedMotion() ? 0 : 420,
+          easing: CAMERA_EASING_SLOW_OUT,
+        });
+        notify(listenersRef.current, 'placeSelect', hit.placeKey);
       }
 
       function handleEntityPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
@@ -1496,7 +1497,7 @@ export function MapStageProvider({
           notify(listenersRef.current, 'select', hit.entityId);
           return;
         }
-        expandClusterFromPointerHit(hit);
+        drillIntoPlace(hit);
       }
 
       function handleEntityPointerClick(event: MapMouseEvent) {
@@ -1608,9 +1609,7 @@ export function MapStageProvider({
           setHoveredEntityFilter(activeMap, lifted);
         }
         hoverTo(
-          hit?.kind === 'entity' && activeMap.getZoom() > EXPLORE_CLUSTER_CONFIG.clusterMaxZoom
-            ? hit.entityId
-            : null,
+          hit?.kind === 'entity' && activeMap.getZoom() >= SITE_MIN_ZOOM ? hit.entityId : null,
         );
       });
       activeMap.getCanvas().addEventListener('mouseleave', () => {

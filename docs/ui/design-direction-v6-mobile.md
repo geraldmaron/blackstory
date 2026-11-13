@@ -61,7 +61,7 @@ Fixed dark archive basemap (does not flip with OS theme). Extend the existing di
 |---|---|
 | Basemap | OpenFreeMap dark plate: **land background** (warm charcoal) + ocean water fill + sand coastline stroke + landcover texture + zoom-scaled state bounds + street casing/fill; place-state / place-city / street-label with flat matte halos. Land/ocean must stay distinct at national zoom (Pacific coastline readable). Cluster count symbols ignore placement so they do not drop California / west-coast state labels. |
 | Pins | Kind-family shade + glyph stroke signatures; evidence/confidence size; national zoom scale ≥ ~0.55 so CONUS is not dust. Fill opacity readable (~0.68) while geography still shows through. |
-| Clusters | Copper aggregate discs; size (not heat color) by count; zoom-scaled radius + count type. |
+| Clusters | (Mobile still ships this; the web map moved to place tokens, see patterns-place-map.md, 2026-11-13.) Copper aggregate discs; size (not heat color) by count; zoom-scaled radius + count type. |
 | Selection | Dual ring: Archive Paper inner + Copper Pin outer orientation ring; `easeTo` with `EXPLORE_MAP_VIEW_PADDING` (chrome top / peek sheet bottom); instant jump when reduce-motion. |
 | Dignity | No heatmap / density color ramps; confidence not color-alone; zoom ceiling `MAP_MAX_ZOOM` (12); points no sharper than redacted precision. |
 | Camera | Named presets (`national` / `state` / `locality` / `point`); first-open CONUS uses padded `initialViewState`. Portrait national floor is `MAP_MIN_ZOOM` 2 (not desktop z3) so California / west coast stay in the clear band between Pin Pulse mast and peek sheet; `US_BOUNDS` matches domain CONUS with Pacific west margin. |

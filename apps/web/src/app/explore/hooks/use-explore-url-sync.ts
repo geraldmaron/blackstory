@@ -29,6 +29,8 @@ export type ExploreUrlSyncLens = {
   readonly satellite: boolean;
   readonly lines: boolean;
   readonly selectedId: string | undefined;
+  /** The place the list is scoped to (`?place=`). */
+  readonly placeKey?: string | undefined;
 };
 
 /**
@@ -57,6 +59,7 @@ export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSync
     sat: lens.satellite,
     lines: lens.lines,
     ...(lens.stateCode ? { state: lens.stateCode } : {}),
+    ...(lens.placeKey ? { place: lens.placeKey } : {}),
     ...(lens.evidenceFloor === 'A' || lens.evidenceFloor === 'B' || lens.evidenceFloor === 'C'
       ? { floor: lens.evidenceFloor }
       : {}),

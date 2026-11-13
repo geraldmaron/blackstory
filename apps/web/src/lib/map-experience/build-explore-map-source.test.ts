@@ -214,6 +214,31 @@ test('a living person with a precise residential coordinate never reaches the ou
   assert.notEqual(lng, rawLng);
 });
 
+test('a deceased person keeps the published precision and the feature carries claim and source counts', () => {
+  const base = listPublicEntities()[0]!;
+  const claim = base.claims[0]!;
+  const person: PublicEntityView = {
+    ...base,
+    id: 'ent_test_deceased_person',
+    kind: 'person' as never,
+    locationPrecision: 'neighborhood',
+    livingStatus: 'deceased',
+    claims: [claim, { ...claim, object: 'another' }],
+  };
+  const anchor = { lat: 38.919052, lng: -77.017035, geohash: 'dqcjr', matchMethod: 'manual' };
+  const build = (entity: PublicEntityView) =>
+    buildExploreMapSource([entity], { geoAnchorFor: () => anchor }).featureCollection.features[0]!
+      .properties;
+
+  const deceased = build(person);
+  assert.equal(deceased.precision, 'neighborhood');
+  assert.equal(deceased.evidenceCount, 2);
+  assert.equal(deceased.sourceCount, 1);
+  // No recorded status still fails safe to the living-person cap.
+  const { livingStatus: _omit, ...unrecorded } = person;
+  assert.equal(build(unrecorded).precision, 'city');
+});
+
 test('jurisdiction-scoped area records build polygon geometry, never point geometry', () => {
   const features = buildJurisdictionAreaFeatures([
     {

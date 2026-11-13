@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
 import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
-import { DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG, plateForScheme } from '../../lib/map-experience';
+import { DIGNITY_PALETTE, plateForScheme } from '../../lib/map-experience';
 import { brandPalette, lightnessDelta, mapPalettes } from '@repo/ui';
 import {
   COUNTY_LABELS_MIN_ZOOM,
@@ -85,23 +85,26 @@ function buildStyleFixture(
   });
 }
 
-test('the entities source groups nearby records and carries no kind counters', () => {
+test('the entities source groups records by place, never by pixel clustering', () => {
   const style = buildStyleFixture('presence');
   const entitiesSource = style.sources['explore-entities'] as {
     cluster?: boolean;
-    clusterRadius?: number;
-    clusterMaxZoom?: number;
-    clusterProperties?: Record<string, unknown>;
+    data: { features: { properties: Record<string, unknown> }[] };
   };
-  assert.equal(entitiesSource.cluster, true);
-  assert.equal(entitiesSource.clusterRadius, EXPLORE_CLUSTER_CONFIG.clusterRadius);
-  assert.equal(entitiesSource.clusterMaxZoom, EXPLORE_CLUSTER_CONFIG.clusterMaxZoom);
-  assert.equal(entitiesSource.clusterProperties, undefined);
-  // A framed city-precision record (zoom 10) always draws as its own mark.
-  assert.ok(EXPLORE_CLUSTER_CONFIG.clusterMaxZoom < 10);
+  assert.equal(entitiesSource.cluster, undefined);
+  const tokens = entitiesSource.data.features.filter((f) => 'point_count' in f.properties);
+  assert.ok(tokens.length > 0, 'place tokens are in the source');
+  for (const token of tokens) {
+    assert.match(String(token.properties.placeKey), /^(state|county|city)-/);
+    assert.ok(Number(token.properties.minZoom) < Number(token.properties.maxZoom));
+  }
+  // Every token, record mark and count layer is cut to its zoom band.
+  for (const id of [EXPLORE_CLUSTER_LAYER_ID, EXPLORE_UNCLUSTERED_POINT_LAYER_ID]) {
+    assert.match(JSON.stringify((layerById(style, id) as { filter?: unknown }).filter), /"zoom"/);
+  }
 });
 
-test('clusteringEnabled: false disables GeoJSON clustering on the entities source', () => {
+test('clusteringEnabled: false draws every record as its own mark with no tokens', () => {
   const source = buildExploreMapSource(listPublicEntities());
   const style = buildExploreMapStyle({
     featureCollection: source.featureCollection,
@@ -109,8 +112,10 @@ test('clusteringEnabled: false disables GeoJSON clustering on the entities sourc
     layerMode: 'off',
     clusteringEnabled: false,
   });
-  const entitiesSource = style.sources['explore-entities'] as { cluster?: boolean };
-  assert.equal(entitiesSource.cluster, false);
+  const entitiesSource = style.sources['explore-entities'] as {
+    data: { features: { properties: Record<string, unknown> }[] };
+  };
+  assert.ok(entitiesSource.data.features.every((f) => !('point_count' in f.properties)));
 });
 
 test('selected-entity layer exists and starts with an empty filter', () => {
@@ -691,18 +696,13 @@ test('both entity buffers promote entityId, so the decade morph can address reco
    * unless one is promoted from the properties. Both buffers need it, because the hold marks are
    * written to each: rest on the current buffer, zero on the incoming one.
    *
-   * Safe alongside clustering, and this is the part worth stating rather than assuming. MapLibre's
-   * own `getId` (maplibre-gl 5.24, GeoJSONSource) reads the promoted property first and falls back
-   * to `cluster_id` only when that property is absent — which is exactly the cluster case, since a
-   * cluster carries no `entityId`. So leaves are addressable by record id and clusters keep their
-   * generated ids and go on animating, which is correct: a cluster is a different shape in each
-   * decade.
+   * A place token carries no `entityId`, so it has no promoted id and is never held: a token is
+   * a different count in each decade.
    */
   const style = buildStyleFixture('presence');
   for (const sourceId of ['explore-entities', 'explore-entities-incoming']) {
-    const source = style.sources[sourceId] as { promoteId?: string; cluster?: boolean };
+    const source = style.sources[sourceId] as { promoteId?: string };
     assert.equal(source.promoteId, 'entityId', `${sourceId} must promote entityId`);
-    assert.equal(source.cluster, true, `${sourceId} still clusters`);
   }
 });
 

@@ -63,7 +63,7 @@ Read platform preference: web `@media (prefers-reduced-motion: reduce)` (already
 - **Keyboard:** `Explore the map` and `Close` are real buttons in tab order. Entities are focusable in Engaged; `Enter`/`Space` selects; `Escape` closes. Focus moves to `Close` on engage and returns to `Explore the map` on close.
 - **Focus-visible:** copper/paper `:focus-visible` ring on every control and entity.
 - **Touch:** all controls ≥44px.
-- **No color-alone:** selection is signaled by the ring *and* the label chip, not hue alone. Entity kind still carries its glyph per `patterns-map-entity-encoding.md`.
+- **No color-alone:** selection is signaled by the ring *and* the label chip, not hue alone. Kind does not change the map mark; precision does (dot, ring, none) per `patterns-map-entity-encoding.md`, and kind shows in lists and badges.
 - **Announce state:** engage/close toggles `aria-pressed`; the map region gets an `aria-label` that names the current framing.
 - **Locked map is inert to AT:** in Rest/Invite the marker layer is `aria-hidden` and non-focusable so screen-reader and keyboard users are not trapped in a map they cannot yet use.
 

@@ -3,10 +3,11 @@ import type { InspectorRecord } from '../../../components/map-experience/RecordI
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';
 import type { ChromeInset } from '../../../lib/map-experience/chrome-padding';
-import { evidenceLabel } from '../../../lib/map-experience/evidence-grade';
+import { evidenceCountWords, evidenceLabel } from '../../../lib/map-experience/evidence-grade';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import { renderedAnchorFor } from '../../../lib/map-experience/record-marks';
+import { loadedCountyPolygons } from '../../../components/map-stage/geo-source-loaders';
 import { withQuery } from '../../../lib/discovery/discovery-arrival';
 import {
   resolveExplorePinEntityId,
@@ -50,7 +51,7 @@ export function useRecordSelection(
 
   const frame = useCallback(
     (feature: ExploreMapFeature) => {
-      const [lng, lat] = renderedAnchorFor(feature);
+      const [lng, lat] = renderedAnchorFor(feature, loadedCountyPolygons());
       camera.frameRecord(
         {
           center: [lng, lat],
@@ -153,7 +154,7 @@ export function useRecordSelection(
       story: properties.oneLineStory,
       precision: properties.precision,
       confidenceTier: properties.confidenceTier,
-      evidenceLabel: evidenceLabel(properties.confidenceTier, properties.evidenceCount),
+      evidenceLabel: `${evidenceLabel(properties.confidenceTier)} · ${evidenceCountWords(properties.evidenceCount, properties.sourceCount ?? 0)}`,
       ...(properties.eraBuckets[0] ? { decade: properties.eraBuckets[0] } : {}),
       ...(properties.href ? { href: withQuery(properties.href, placeArrivalQuery) } : {}),
     };

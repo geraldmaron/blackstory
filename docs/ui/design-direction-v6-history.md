@@ -218,6 +218,6 @@ Optional future: `EditionFactIcon` on narrative card facts when entity geo is av
 
 - [`design-direction-v6-home.md`](./design-direction-v6-home.md) — edition card stack origin
 - [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) — decade scrubber + facet row reference
-- [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) — kind chips and composition bars
+- [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) — kind chips and composition bars (superseded by patterns-place-map.md, 2026-11-13)
 - [`patterns-site-footer.md`](./patterns-site-footer.md) — footer on non-explore routes
 - [`design-direction-v5.md`](./design-direction-v5.md) — non-history surfaces remain on v5 until superseded

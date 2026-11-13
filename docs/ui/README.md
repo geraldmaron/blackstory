@@ -51,7 +51,8 @@ Staff intake uses [Admin intake](./patterns-admin-intake.md) for queue navigatio
 |---|---|---|---|
 | **Source library** | [`patterns-source-library.md`](./patterns-source-library.md) | `app/admin/sources/collection-guidance.tsx`, existing `story-review` primitives | Staff collection guidance, separate from publisher usage |
 | **Record anatomy layout** | [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) | `RecordAnatomyPanel`, `record-anatomy.css`, mobile `AnatomySection` | Reusable |
-| **Map entity encoding** | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `MapExperienceLegend.tsx`, `explore-style.ts` | Binding (map surfaces) |
+| **Map entity encoding** | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `geo-precision.ts`, `record-marks.ts`, `explore-style.ts` | Binding (point marks by precision; mobile not yet adopted) |
+| **Place map** | [`patterns-place-map.md`](./patterns-place-map.md) | `place-groups.ts`, `place-map.ts`, `explore-style.ts` | Binding (`/explore` grouping, Door plate) |
 | **Map canvas lifecycle** | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | Binding (cross-browser WebGL) |
 | **Edition fact icon** | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
 | **Destination icon** | [`patterns-destination-icon.md`](./patterns-destination-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |

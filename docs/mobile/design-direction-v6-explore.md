@@ -25,7 +25,7 @@ Mobile Explore is the **place-first atlas** entry: `/` redirects to `/explore` (
 
 ## Map encoding
 
-Binding: [`patterns-map-entity-encoding.md`](../ui/patterns-map-entity-encoding.md).
+Describes what mobile ships today. The web map moved to precision marks and place tokens ([`patterns-map-entity-encoding.md`](../ui/patterns-map-entity-encoding.md), [`patterns-place-map.md`](../ui/patterns-place-map.md)); mobile has not adopted them yet.
 
 | Channel | Mobile implementation |
 |---|---|

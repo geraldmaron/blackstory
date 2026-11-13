@@ -34,6 +34,8 @@ export type StoryRecordSpotlight = {
   readonly era: string;
   readonly summary: string;
   readonly evidenceCount: number;
+  /** Distinct sources behind those claims; 0 when unknown. */
+  readonly sourceCount: number;
   readonly kindLabel: string;
   /** Stored public precision: how close the camera may push and which mark the callout draws. */
   readonly precision: string;
@@ -94,6 +96,7 @@ export function toStoryRecordSpotlight(feature: ExploreMapFeature): StoryRecordS
     era: properties.eraBuckets[0] ?? 'Undated',
     summary: properties.oneLineStory,
     evidenceCount: properties.evidenceCount,
+    sourceCount: properties.sourceCount ?? 0,
     kindLabel: properties.kindFamily,
     precision: properties.precision,
   };

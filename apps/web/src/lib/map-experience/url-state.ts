@@ -24,6 +24,7 @@
 import { parseRecordsQuery, type RecordsSort } from '../records/records-query';
 import { isPopulationDecade } from '@repo/domain/demographics/population-decades';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
+import { PLACE_KEY_PATTERN } from '@repo/domain/map/place-groups';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
 import {
   coercePopulationGeoForDecade,
@@ -69,6 +70,12 @@ export type ExploreViewState = {
   readonly selected?: string;
   /** USPS state DC postal code when a state shape is selected on the map.  */
   readonly state?: string;
+  /**
+   * The place the map and list are scoped to (`state-ga`, `county-13121`, `city-ga-atlanta`;
+   * `docs/ui/patterns-place-map.md`). A focus instruction like `selected`: it frames the camera
+   * on arrival, and the list shows exactly that place's records.
+   */
+  readonly place?: string;
   /** Map overlay model — `off` hides all choropleth/density fills. */
   readonly layerMode: ExploreLayerMode;
   /** Geography for population layers — state (1790–2020) or county (2000–2020 only). */
@@ -161,6 +168,7 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'zoom',
   'selected',
   'state',
+  'place',
   'sat',
   'lines',
   'decade',
@@ -368,6 +376,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const selectedRaw = matchOrUndefined(firstValue(raw.selected)?.trim(), RECORD_ID);
   const stateCandidate = firstValue(raw.state)?.trim().toUpperCase();
   const stateRaw = matchOrUndefined(stateCandidate, STATE_POSTAL);
+  const placeRaw = matchOrUndefined(firstValue(raw.place)?.trim(), PLACE_KEY_PATTERN);
   const satRaw = firstValue(raw.sat);
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = matchOrUndefined(firstValue(raw.decade)?.trim(), DECADE);
@@ -436,6 +445,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
       : {}),
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
+    ...(placeRaw ? { place: placeRaw } : {}),
     layerMode,
     ...(popGeo ? { popGeo } : {}),
     ...(popDecade ? { popDecade } : {}),
@@ -483,6 +493,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   }
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
+  if (state.place) params.set('place', state.place);
   if (state.layerMode !== 'off') params.set('layerMode', state.layerMode);
   if (
     (state.layerMode === 'blackShare' || state.layerMode === 'blackChange') &&

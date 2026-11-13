@@ -29,6 +29,11 @@
       "types": "./dist/map/map-source.d.ts",
       "import": "./dist/map/map-source.js"
     },
+    "./map/place-groups": {
+      "development": "./src/map/place-groups.ts",
+      "types": "./dist/map/place-groups.d.ts",
+      "import": "./dist/map/place-groups.js"
+    },
     "./map/fixtures": {
       "development": "./src/map/fixtures.ts",
       "types": "./dist/map/fixtures.d.ts",

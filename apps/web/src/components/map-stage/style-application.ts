@@ -40,6 +40,8 @@ import {
   EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
   EXPLORE_POINT_SHADOW_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
+  EXPLORE_PLACE_LEADER_LAYER_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
 import { buildExploreMapStyle, stateLabelFilters } from '../../app/map/explore-style';
 import {
@@ -87,10 +89,12 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
  * tags, then the selection on top. Added once then paint-refreshed on style rebuild. */
 export const ENTITY_LAYER_IDS = new Set([
   EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_PLACE_LEADER_LAYER_ID,
   EXPLORE_POINT_SHADOW_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
   EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_INCOMING_LAYER_ID,
@@ -164,9 +168,8 @@ export function applyGeographyStyle(
   const paintOmit = options?.preserveDecadeFadeOpacities ? DECADE_FADE_OMIT_CHANNELS : undefined;
 
   if (recreateEntities) {
-    // Clustering is baked into the GeoJSON source at add time — toggling it requires a
-    // deliberate remove/re-add of the entities source + its layers. Do this only on an
-    // explicit grouping flip (not on every data patch), and tear layers down first.
+    // A grouping flip (place tokens on or off) rebuilds the entities source and its layers
+    // from scratch, tearing the layers down first. Only on an explicit flip, never per patch.
     for (const layerId of ENTITY_LAYER_IDS) {
       if (map.getLayer(layerId)) map.removeLayer(layerId);
     }
@@ -287,5 +290,6 @@ export function buildStyleForScheme(
     satellite: cfg.satellite,
     colorScheme,
     hatchedCountyKeys: hatchedCountyKeys(cfg.featureCollection, loadedCountyPolygons()),
+    ...(loadedCountyPolygons() ? { counties: loadedCountyPolygons()! } : {}),
   });
 }

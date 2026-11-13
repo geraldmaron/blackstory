@@ -16,7 +16,11 @@ import {
   EXPLORE_STATE_DENSITY_SOURCE_ID,
   EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_COUNTY_HATCH_LAYER_ID,
+  EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_PLACE_LEADERS_SOURCE_ID,
 } from '../../app/map/explore-layer-ids';
+import { drawnRecordCollection } from '../../lib/map-experience/record-marks';
+import { placeLeaderCollection, placeMapCollection } from '../../lib/map-experience/place-map';
 import { buildExploreMapStyle } from '../../app/map/explore-style';
 import { hatchedCountyKeys } from '../../lib/map-experience/county-hatch';
 import { readDocumentColorScheme } from './color-scheme';
@@ -170,10 +174,41 @@ export function requestCountyPolygonLoad(map: MapLibreMap, cfg: StageConfig): vo
     ((cfg.layerMode === 'blackShare' || cfg.layerMode === 'blackChange') && popGeo === 'county');
   if (!needsCountyGeometry) return;
   void loadCountyPolygons(map, cfg.countyChoroplethLevels)
-    .then(() => syncCountyHatch(map, cfg))
+    .then(() => {
+      syncCountyHatch(map, cfg);
+      refreshPlaceGroups(map, cfg);
+    })
     .catch((error) => {
       console.error('[MapStage] county polygon load failed', error);
     });
+}
+
+/**
+ * What the entities source holds for a config: place tokens plus record marks on a grouped
+ * plate (`place-map.ts`), every record's own mark on an ungrouped one. Grouping reads whatever
+ * county geometry has loaded so far.
+ */
+export function entitiesSourceData(cfg: StageConfig): unknown {
+  return cfg.clusteringEnabled
+    ? placeMapCollection(cfg.featureCollection, countyPolygons)
+    : drawnRecordCollection(cfg.featureCollection);
+}
+
+/** The spread-site leaders matching `entitiesSourceData`. */
+export function setPlaceLeaderData(map: MapLibreMap, cfg: StageConfig): void {
+  const source = map.getSource(EXPLORE_PLACE_LEADERS_SOURCE_ID) as GeoJSONSource | undefined;
+  if (!source || !cfg.clusteringEnabled) return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+  source.setData(placeLeaderCollection(cfg.featureCollection, countyPolygons) as any);
+}
+
+/** County tokens need the county geometry; once it lands, regroup what is on the plate. */
+function refreshPlaceGroups(map: MapLibreMap, cfg: StageConfig): void {
+  if (!cfg.clusteringEnabled) return;
+  const source = map.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+  source?.setData(entitiesSourceData(cfg) as any);
+  setPlaceLeaderData(map, cfg);
 }
 
 /** Turns the county hatch on for the counties holding county records, once the geometry is in. */

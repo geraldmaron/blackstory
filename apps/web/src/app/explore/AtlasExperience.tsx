@@ -95,6 +95,8 @@ import { useReaderActions } from './hooks/use-reader-actions';
 import { useLocateMe } from './hooks/use-locate-me';
 import { useCommandContext } from './hooks/use-command-context';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
+import { scopedBounds, scopedMixInWords, usePlaceScope } from './hooks/use-place-scope';
+import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
 import { clearPinContinuity, readPinContinuity } from '../../lib/discovery/pin-continuity';
@@ -257,14 +259,29 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     resetLens,
   } = useLensFilters(view, toasts);
 
+  /* —— The selected place: the map and the list both narrow to exactly its records. —— */
+  const {
+    placeKey,
+    setPlaceKey,
+    scope: placeScope,
+  } = usePlaceScope(stage, view.allFeatures, initial.viewState.place);
+  const inPlace = useCallback(
+    (features: readonly ExploreMapFeature[]) =>
+      placeScope ? features.filter((f) => placeScope.ids.has(f.properties.entityId)) : features,
+    [placeScope],
+  );
+  const placeFiltered = useMemo(() => inPlace(filtered), [inPlace, filtered]);
+  const placeGhosts = useMemo(() => inPlace(ghosts), [inPlace, ghosts]);
+  const placeSorted = useMemo(() => inPlace(sorted), [inPlace, sorted]);
+
   const overlapFeatures = useMemo(
     () =>
       overlapIds
-        ? sorted.filter((feature) => overlapIds.includes(feature.properties.entityId))
+        ? placeSorted.filter((feature) => overlapIds.includes(feature.properties.entityId))
         : null,
-    [overlapIds, sorted],
+    [overlapIds, placeSorted],
   );
-  const listed = overlapFeatures ?? sorted;
+  const listed = overlapFeatures ?? placeSorted;
 
   /** Overlapping records always open a chooser: the list, narrowed to them. */
   useEffect(
@@ -288,7 +305,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       offInteract();
     };
   }, [stage]);
-  useEffect(() => setOverlapIds(null), [filtered]);
+  useEffect(() => setOverlapIds(null), [filtered, placeKey]);
 
   const holdingPlaceArrival = useMemo(
     () =>
@@ -343,6 +360,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     satellite: layers.satellite,
     lines: layers.routes,
     selectedId,
+    placeKey,
   });
 
   const populationLevels = usePopulationChoropleth(layerMode, view.viewState);
@@ -350,13 +368,13 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   useMapSync(
     stage,
     view,
-    filtered,
+    placeFiltered,
     layers,
     layerMode,
     selectedId,
     stateCode,
     populationLevels,
-    ghosts,
+    placeGhosts,
     `${period.start}-${period.end}-${period.includeUndated ? 1 : 0}`,
   );
 
@@ -413,7 +431,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     sheetReach,
     setLayers,
     // A selection, or one about to be restored from the home hand-off, holds the camera.
-    () => selectedIdRef.current !== undefined || readPinContinuity() !== null,
+    // A `?place=` arrival frames its place instead.
+    () =>
+      selectedIdRef.current !== undefined ||
+      readPinContinuity() !== null ||
+      initial.viewState.place !== undefined,
   );
   const { selectedFeature, selectedIndex, select, selectById, stepRecord, inspectorRecord } =
     useRecordSelection(
@@ -441,6 +463,18 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     deepLinkRef.current = undefined;
     selectById(pending);
   }, [plateReady, selectById, view.allFeatures]);
+
+  /**
+   * A shared `?place=` link frames its place once the plate is live and the place resolves. A tap
+   * on a token already moved the camera itself (MapStage), so only the arrival frames here.
+   */
+  const placeArrivalRef = useRef(initial.viewState.place);
+  useEffect(() => {
+    if (!plateReady || !placeScope || placeArrivalRef.current !== placeScope.key) return;
+    placeArrivalRef.current = undefined;
+    const bounds = scopedBounds(placeFiltered);
+    if (bounds) camera.frameArea({ kind: 'bounds', bounds, label: placeScope.name });
+  }, [camera, placeFiltered, placeScope, plateReady]);
 
   /**
    * The home hand-off: a pin (or an overlapping group of pins) the reader chose on the Door. A
@@ -691,6 +725,15 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   ).length;
 
   const echoes = [
+    ...(placeKey
+      ? [
+          {
+            key: 'place',
+            label: placeScope?.name ?? 'Selected place',
+            onClear: () => setPlaceKey(undefined),
+          },
+        ]
+      : []),
     ...(overlapIds
       ? [
           {
@@ -744,6 +787,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       {unresolvedScope !== undefined ? (
         <p className="ds-xcol__note" role="status">
           {unresolvedScope}
+        </p>
+      ) : null}
+      {placeScope && !overlapIds && listed.length > 0 ? (
+        <p className="ds-xcol__note">
+          {placeScope.name}. {scopedMixInWords(listed)}.
         </p>
       ) : null}
       <ExploreRecordList
@@ -862,8 +910,15 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
                     {echo.label}
                   </Chip>
                 ))}
-                {columnConstraints.length > 1 ? (
-                  <Button variant="quiet" className="ds-xcol__clear" onClick={resetLens}>
+                {columnConstraints.length + (placeKey ? 1 : 0) > 1 ? (
+                  <Button
+                    variant="quiet"
+                    className="ds-xcol__clear"
+                    onClick={() => {
+                      resetLens();
+                      setPlaceKey(undefined);
+                    }}
+                  >
                     Clear all
                   </Button>
                 ) : null}

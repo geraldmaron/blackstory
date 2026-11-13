@@ -12,7 +12,6 @@ import { brandPalette } from '@repo/ui';
 import {
   DENSITY_TIER_FILL,
   DIGNITY_PALETTE,
-  EXPLORE_CLUSTER_CONFIG,
   CLUSTER_RADIUS_BY_COUNT,
   OPENFREEMAP_GLYPHS_URL,
   OPENFREEMAP_SOURCE_ID,
@@ -36,6 +35,12 @@ import {
   drawnRecordCollection,
   jurisdictionTagCollection,
 } from '../../lib/map-experience/record-marks';
+import {
+  placeLeaderCollection,
+  placeMapCollection,
+  SITE_MIN_ZOOM,
+} from '../../lib/map-experience/place-map';
+import type { CountyGeometryCollection } from '../../lib/map-experience/county-hatch';
 import {
   precisionsWithMark,
   recordMarkFor,
@@ -86,6 +91,9 @@ import {
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
   EXPLORE_COUNTY_HATCH_LAYER_ID,
+  EXPLORE_PLACE_LEADER_LAYER_ID,
+  EXPLORE_PLACE_LEADERS_SOURCE_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
   JURISDICTION_HATCH_IMAGE_ID,
 } from './explore-layer-ids';
 import {
@@ -145,6 +153,9 @@ export {
   EXPLORE_GHOST_POINT_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  EXPLORE_PLACE_LEADER_LAYER_ID,
+  EXPLORE_PLACE_LEADERS_SOURCE_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
   JURISDICTION_HATCH_IMAGE_ID,
 } from './explore-layer-ids';
 /**
@@ -359,6 +370,17 @@ export const JURISDICTION_TAG_MIN_ZOOM = 5.5;
  */
 const GROUP_COLLISION_PADDING_PX = (CLUSTER_RADIUS_BY_COUNT.at(-1)?.[1] ?? 20) - 4;
 
+/**
+ * Draws a feature only inside its `[minZoom, maxZoom)` band: place tokens per level, site records
+ * from the site level. Features without a band (the ungrouped embed) always draw. MapLibre
+ * evaluates zoom in a filter at integer zooms, which is why the level thresholds are integers.
+ */
+const IN_ZOOM_BAND = [
+  'all',
+  ['>=', ['zoom'], ['coalesce', ['get', 'minZoom'], 0]],
+  ['<', ['zoom'], ['coalesce', ['get', 'maxZoom'], 99]],
+] as unknown as ExpressionSpecification;
+
 /** Group sizes: three steps, never implying precision (`CLUSTER_RADIUS_BY_COUNT`). */
 function groupRadiusExpression(): ExpressionSpecification {
   const [small, medium, large] = CLUSTER_RADIUS_BY_COUNT;
@@ -435,11 +457,14 @@ export type BuildExploreMapStyleInput = {
   readonly popGeo?: ExplorePopulationGeo;
   readonly historyEdgesEnabled?: boolean;
   /**
-   * When true, nearby points aggregate while zoomed out (opt-in via `/explore?group=1`). When false, every
-   * unclustered disc stays visible at national/regional zoom — the shareable `group`
-   * URL toggle on `/explore`.
+   * When true (the default), records are grouped by place: state, county and city tokens by zoom,
+   * site records on their own from the site level (`place-map.ts`). When false, every record
+   * draws its own mark and county/state records count in jurisdiction tags (the one-record
+   * RecordMap embed).
    */
   readonly clusteringEnabled?: boolean;
+  /** County geometry once loaded: county tokens need it; without it records group by state. */
+  readonly counties?: CountyGeometryCollection;
   /** Site theme — map plate and street ink follow light/dark. */
   readonly colorScheme?: MapColorScheme;
   /**
@@ -505,13 +530,11 @@ function shadowPaint(plate: MapPlate, opacity: number, offset: [number, number])
 }
 
 /**
- * Builds the full `/explore` MapLibre style: entity points with a radius-affordance
- * halo (precision-tier rendering), optional clustering when zoomed out, an optional
- * state-level presence/density fill ("presence, not just incidents"), and a
+ * Builds the full `/explore` MapLibre style: records grouped by place (state, county, city
+ * tokens by zoom, site records on their own from the site level; `docs/ui/patterns-place-map.md`),
+ * an optional state-level presence/density fill ("presence, not just incidents"), and a
  * jurisdiction-area polygon layer (area records render as geometry, never as a point;
- * empty today, see `build-explore-map-source.ts`).
- * Clustering config (`EXPLORE_CLUSTER_CONFIG`) sets radius and max zoom; cluster taps
- * ease the camera to expansion zoom (see `cluster-expand.ts`) rather than opening a leaf record.
+ * empty today, see `build-explore-map-source.ts`). A token tap selects its place (MapStage).
  */
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   const colorScheme = input.colorScheme ?? 'dark';
@@ -526,10 +549,16 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   const overlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : PLATE_STATE_FILL_OPACITY;
   const countyOverlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : COUNTY_FILL_OPACITY;
   const popGeo = input.popGeo ?? DEFAULT_POPULATION_GEO;
-  /* County- and state-precision records draw no point (`recordMarkFor`): they leave the
-     entities source and are counted in a jurisdiction tag instead. */
-  const drawn = drawnRecordCollection(input.featureCollection);
-  const tags = jurisdictionTagCollection(input.featureCollection);
+  /* Grouped by place, county and state records are counted in their place's token. Ungrouped,
+     they draw no point (`recordMarkFor`) and are counted in a jurisdiction tag instead. */
+  const empty = { type: 'FeatureCollection' as const, features: [] };
+  const drawn = clusteringEnabled
+    ? placeMapCollection(input.featureCollection, input.counties)
+    : drawnRecordCollection(input.featureCollection);
+  const leaders = clusteringEnabled
+    ? placeLeaderCollection(input.featureCollection, input.counties)
+    : empty;
+  const tags = clusteringEnabled ? empty : jurisdictionTagCollection(input.featureCollection);
   const ghosts = input.ghostCollection
     ? drawnRecordCollection(input.ghostCollection)
     : { type: 'FeatureCollection' as const, features: [] };
@@ -629,18 +658,15 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       [EXPLORE_ENTITIES_SOURCE_ID]: {
         type: 'geojson',
         // Address features by their record id so the decade morph can hold records that appear in
-        // both decades. This is safe alongside clustering: MapLibre promotes
-        // the property when it is there and keeps its generated id for a cluster, which has none.
+        // both decades. A place token has no record id and is never held.
         promoteId: 'entityId',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: drawn as any,
-        ...(clusteringEnabled
-          ? {
-              cluster: true,
-              clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
-              clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
-            }
-          : { cluster: false }),
+      },
+      [EXPLORE_PLACE_LEADERS_SOURCE_ID]: {
+        type: 'geojson',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        data: leaders as any,
       },
       [EXPLORE_JURISDICTION_TAGS_SOURCE_ID]: {
         type: 'geojson',
@@ -663,13 +689,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         promoteId: 'entityId',
         // Dual-buffer pin stack — empty until a decade/filter crossdissolve stages the next frame.
         data: { type: 'FeatureCollection', features: [] },
-        ...(clusteringEnabled
-          ? {
-              cluster: true,
-              clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
-              clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
-            }
-          : { cluster: false }),
       },
       [EXPLORE_HISTORY_EDGES_SOURCE_ID]: {
         type: 'geojson',
@@ -1199,11 +1218,20 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        // A spread site's leader back to the true point it shares: the spread is a reading aid,
+        // the stored coordinate is where the line ends.
+        id: EXPLORE_PLACE_LEADER_LAYER_ID,
+        type: 'line',
+        source: EXPLORE_PLACE_LEADERS_SOURCE_ID,
+        minzoom: SITE_MIN_ZOOM,
+        paint: { 'line-color': plate.markInk, 'line-width': 1, 'line-opacity': 0.55 },
+      },
+      {
         // The site pin's flat contact shadow. A ring has none: it marks an area, not a spot.
         id: EXPLORE_POINT_SHADOW_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['all', ['!', ['has', 'point_count']], markIs('dot')],
+        filter: ['all', ['!', ['has', 'point_count']], markIs('dot'), IN_ZOOM_BAND],
         paint: { ...DECADE_TRANSITION_PAINT, ...shadowPaint(plate, 1, SHADOW_OFFSET) },
       },
       {
@@ -1212,7 +1240,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['!', ['has', 'point_count']],
+        filter: ['all', ['!', ['has', 'point_count']], IN_ZOOM_BAND],
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1223,7 +1251,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_CLUSTER_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['has', 'point_count'],
+        filter: ['all', ['has', 'point_count'], IN_ZOOM_BAND],
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1238,7 +1266,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_CLUSTER_COUNT_LAYER_ID,
         type: 'symbol',
         source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['has', 'point_count'],
+        filter: ['all', ['has', 'point_count'], IN_ZOOM_BAND],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
           'text-size': 12,
@@ -1251,24 +1279,46 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: { 'text-color': plate.groupText },
       },
       {
+        // The county or city a token counts, under it. A state token prints nothing: the state
+        // label already names it. Yields to counts and other names rather than overprinting.
+        id: EXPLORE_PLACE_NAME_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        filter: ['all', ['has', 'point_count'], ['!=', ['get', 'label'], ''], IN_ZOOM_BAND],
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-size': 11,
+          'text-font': ['Noto Sans Bold'],
+          'text-anchor': 'top',
+          'text-offset': [0, 1.6],
+          'text-max-width': 12,
+          'text-padding': 2,
+        },
+        paint: {
+          'text-color': plate.tagText,
+          'text-halo-color': plate.placeLabelHalo,
+          'text-halo-width': haloWidth(2),
+        },
+      },
+      {
         id: EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-        filter: ['all', ['!', ['has', 'point_count']], markIs('dot')],
+        filter: ['all', ['!', ['has', 'point_count']], markIs('dot'), IN_ZOOM_BAND],
         paint: shadowPaint(plate, 0, SHADOW_OFFSET),
       },
       {
         id: EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-        filter: ['!', ['has', 'point_count']],
+        filter: ['all', ['!', ['has', 'point_count']], IN_ZOOM_BAND],
         paint: pinPaint(plate, 0),
       },
       {
         id: EXPLORE_CLUSTER_INCOMING_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-        filter: ['has', 'point_count'],
+        filter: ['all', ['has', 'point_count'], IN_ZOOM_BAND],
         paint: {
           'circle-radius': groupRadiusExpression(),
           'circle-color': plate.groupFill,
@@ -1281,7 +1331,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
         type: 'symbol',
         source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-        filter: ['has', 'point_count'],
+        filter: ['all', ['has', 'point_count'], IN_ZOOM_BAND],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
           'text-size': 12,

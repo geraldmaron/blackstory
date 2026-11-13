@@ -20,11 +20,18 @@ export const EXPLORE_STATE_LABELS_SOURCE_ID = 'explore-state-labels';
 export const EXPLORE_STATE_LABEL_LAYER_ID = 'explore-state-label';
 export const EXPLORE_STATE_LABEL_SELECTED_LAYER_ID = 'explore-state-label-selected';
 
+/** Place tokens (`place-map.ts`): a state, county or city with its record count. The ids keep
+ * their old "cluster" names because every hit test and transition table addresses them. */
 export const EXPLORE_CLUSTER_LAYER_ID = 'explore-clusters';
 export const EXPLORE_CLUSTER_INCOMING_LAYER_ID = 'explore-clusters-incoming';
 
 export const EXPLORE_CLUSTER_COUNT_LAYER_ID = 'explore-cluster-count';
 export const EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID = 'explore-cluster-count-incoming';
+/** The place's name under a county or city token. */
+export const EXPLORE_PLACE_NAME_LAYER_ID = 'explore-place-name';
+/** Thin leaders from a spread site back to the true point it shares (`place-map.ts`). */
+export const EXPLORE_PLACE_LEADERS_SOURCE_ID = 'explore-place-leaders';
+export const EXPLORE_PLACE_LEADER_LAYER_ID = 'explore-place-leader';
 /** Every drawn record: a dot at the site, a hollow ring at the neighborhood or city. */
 export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
 export const EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID = 'explore-point-incoming';

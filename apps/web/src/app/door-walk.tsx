@@ -15,6 +15,7 @@ import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
 import { copyFor, headingParts } from '../components/story/story-copy';
 import { DoorRecordLink } from './door-record-link';
+import { evidenceCountWords } from '../lib/map-experience/evidence-grade';
 
 void React;
 
@@ -188,7 +189,7 @@ export function DoorWalkCard({
             <p className="ds-door-walk__record-line">{spotlight.summary}</p>
             <p className="ds-door-walk__record-foot">
               <span className="ds-door-walk__mono">
-                {spotlight.evidenceCount === 1 ? '1 source' : `${spotlight.evidenceCount} sources`}
+                {evidenceCountWords(spotlight.evidenceCount, spotlight.sourceCount)}
               </span>
               {spotlightHref ? (
                 <DoorRecordLink className="ds-door-walk__link" href={spotlightHref}>
