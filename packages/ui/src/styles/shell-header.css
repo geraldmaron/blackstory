@@ -47,13 +47,14 @@ html {
   margin-inline: calc(var(--ds-lockup-size) * -0.2533) calc(var(--ds-lockup-size) * -0.1932);
 }
 
-.ds-shell-wordmark__img--theme-dark,
-[data-theme='dark'] .ds-shell-wordmark__img--theme-light {
-  display: none;
+/* The nearest ground picks the artwork (tokens.css `--ds-lockup-on-*`), so a lockup on an ink
+   header in the light theme still shows the dark-canvas artwork. */
+.ds-shell-wordmark__img--theme-light {
+  display: var(--ds-lockup-on-light, block);
 }
 
-[data-theme='dark'] .ds-shell-wordmark__img--theme-dark {
-  display: block;
+.ds-shell-wordmark__img--theme-dark {
+  display: var(--ds-lockup-on-dark, none);
 }
 
 @media (max-width: 47.9375rem) {

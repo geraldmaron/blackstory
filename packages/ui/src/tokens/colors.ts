@@ -122,25 +122,25 @@ export type MapPalette = {
 };
 
 export const lightMap: MapPalette = {
-  land: '#f6f2e9',
-  water: '#c7bdaa',
-  line: '#bdb19a',
-  line2: '#a2957c',
-  road: '#e6dcc6',
+  land: '#fbf8f2',
+  water: '#e2b89a',
+  line: '#a2957c',
+  line2: '#6d675f',
+  road: '#ebe4d6',
   label: '#6d675f',
   labelHi: '#2e2a24',
-  halo: '#f8f5ee',
+  halo: '#fbf8f2',
 };
 
 export const darkMap: MapPalette = {
-  land: '#38332b',
-  water: '#0a0a0c',
-  line: '#665e4f',
-  line2: '#776c5a',
-  road: '#474034',
-  label: '#9e9587',
-  labelHi: '#ded7c9',
-  halo: '#16130f',
+  land: '#ebe3d3',
+  water: '#0a0a0a',
+  line: '#6d675f',
+  line2: '#2a2622',
+  road: '#ddd4c3',
+  label: '#6d675f',
+  labelHi: '#2e2a24',
+  halo: '#f4efe5',
 };
 
 export const mapPalettes = {
@@ -237,6 +237,36 @@ export const themePalettes = {
   light: lightTheme,
   dark: darkTheme,
 } as const;
+
+/**
+ * Color-blocked grounds (art direction v2): the copper and sand blocks a page is broken into. Paper
+ * and ink grounds reuse the light and dark roles. Every text on copper or sand is Black Ink; the
+ * primary action there is an ink plate with paper type. Mirrors `[data-ground]` in tokens.css.
+ */
+export type GroundPalette = {
+  readonly ground: string;
+  readonly ink: string;
+  readonly borderControl: string;
+  readonly primaryBg: string;
+  readonly primaryInk: string;
+};
+
+export const groundPalettes = {
+  copper: {
+    ground: brandPalette.copperPin,
+    ink: brandPalette.blackInk,
+    borderControl: brandPalette.blackInk,
+    primaryBg: brandPalette.blackInk,
+    primaryInk: brandPalette.archivePaper,
+  },
+  sand: {
+    ground: brandPalette.pageSand,
+    ink: brandPalette.blackInk,
+    borderControl: brandPalette.blackInk,
+    primaryBg: brandPalette.blackInk,
+    primaryInk: brandPalette.archivePaper,
+  },
+} as const satisfies Record<'copper' | 'sand', GroundPalette>;
 
 export const statusPalettes = {
   light: lightStatus,

@@ -136,6 +136,7 @@ export function ExploreColumn({
     <aside
       ref={rootRef}
       className={cx('ds-xcol', sheet && 'ds-xcol--sheet')}
+      data-ground="paper"
       aria-label="Records on the map"
       aria-busy={busy || undefined}
       data-view={view}

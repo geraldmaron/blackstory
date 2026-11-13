@@ -18,8 +18,9 @@ import {
 const css = readFileSync(new URL('../styles/tokens.css', import.meta.url), 'utf8');
 
 const themeSelectors: Record<ThemeName, string> = {
-  light: ":root,\n[data-theme='light'] {",
-  dark: "[data-theme='dark'] {",
+  light:
+    ":root,\n[data-theme='light'],\n[data-ground='paper'],\n[data-ground='copper'],\n[data-ground='sand'] {",
+  dark: "[data-theme='dark'],\n[data-ground='ink'] {",
 };
 
 function themeBlock(theme: ThemeName): Map<string, string> {

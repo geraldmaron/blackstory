@@ -168,118 +168,69 @@ export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
   unrated: DIGNITY_PALETTE.confidenceUnrated,
 };
 
-/** Light plate water: near-neutral gray, never a hue near copper. */
-const LIGHT_PLATE_WATER = '#BFBDB8';
-
 /** Light plate ocean — pure white per cartography direction (pre-flash matches in map-surfaces.css). */
 export const LIGHT_PLATE_OCEAN = '#FFFFFF';
 
 /**
- * Plate color for a scheme.
+ * Plate color for a scheme: a PAPER chart laid on the ink table, in both themes (art direction v2).
  *
- * `land`, `water`, `stateBounds` and `countyLine` come from `mapPalettes` in `@repo/ui`, which is
- * the source of truth for the plate: MapLibre styles are JSON, not CSS, so the TypeScript export
- * leads and `tokens.css` mirrors it. Those four carry the ΔL\* contract from design law §3 and are
- * contract-tested in `map-contrast.test.ts` — do not hand-tune them here.
+ * Dark theme: the lower 48 (`land`) is one deeper paper step than its neighbors (`ocean`, the
+ * background, Surface paper), so the country reads; water and the surround are ink; state lines
+ * are ink hairlines. Light theme: the table is paper already, so the lower 48 lifts to Surface
+ * white on an Archive Paper surround and the water is a sand tint. Alaska, Hawaii and Puerto Rico
+ * take the neighbors' step (the `EXPLORE_US_LAND_LAYER_ID` filter).
  *
- * The remaining members are still local literals. They are pin, cluster, density and history
- * encoding, not plate cartography, and §3 does not govern them.
+ * `land`, `water`, `stateBounds`, labels and halo come from `mapPalettes` in `@repo/ui` (the
+ * source of truth, ΔL* contract in `map-contrast.test.ts`). The marks are copper in both themes:
+ * a copper pin holds 3:1 on every land step (`contrast.test.ts`), and every pin also carries an
+ * ink ring, so its edge never depends on the copper alone.
  */
 export function plateForScheme(scheme: MapColorScheme) {
-  if (scheme === 'light') {
-    return {
-      /**
-       * The background is LAND. The plate draws real cartography: OpenFreeMap's `water`
-       * source-layer paints the oceans, lakes and rivers over it, so coastline comes from the
-       * tiles rather than from the edge of the state polygons. Before this the background was
-       * water and the only landmass was the 49 state shapes, which is why the plate read as a
-       * floating chart of the United States with no coast, no lakes and no continent around it.
-       */
-      ocean: mapPalettes.light.land,
-      land: mapPalettes.light.land,
-      /** A neutral gray step below the paper land (the same ΔL* as the token): the token's tan
-       *  read as a copper wash once zoomed in over reservoirs and rivers. */
-      water: LIGHT_PLATE_WATER,
-      /** Country boundary. Solid and heavier than `stateBounds`. */
-      countryBounds: mapPalettes.light.line2,
-      road: mapPalettes.light.road,
-      /** Place labels from the vector tiles: state register and city/town register. */
-      placeLabel: mapPalettes.light.label,
-      placeLabelHi: mapPalettes.light.labelHi,
-      placeLabelHalo: mapPalettes.light.halo,
-      /** The selected state's abbreviation, beside its copper outline. */
-      selectedStateLabel: brandPalette.copperTextLight,
-      selected: DIGNITY_PALETTE.selectedDark,
-      densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
-      densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
-      street: DIGNITY_PALETTE.streetLight,
-      streetLabel: DIGNITY_PALETTE.streetLabelLight,
-      /** Single records: ink on the paper land. */
-      markInk: '#2A2622',
-      /** Groups: paper circles with an ink hairline and an ink count. Never copper. */
-      groupFill: brandPalette.archivePaper,
-      // Ink-strong enough that a paper circle still stands off the paper land.
-      groupStroke: '#6D675F',
-      groupText: brandPalette.blackInk,
-      /** Jurisdiction tags: quiet, the same register as the state labels. */
-      tagText: '#6D675F',
-      /** On paper land a paper halo vanishes; ink keeps the selected mark's edge. */
-      selectedHalo: brandPalette.blackInk,
-      /** State bounds. `line` is contrast-held against `land` by design law §3. */
-      stateBounds: mapPalettes.light.line,
-      /**
-       * County hairlines stay a local value. The §3 token table has no county role — its `line-2`
-       * is the *country* border, heavier than `line`, and using it here would make counties
-       * out-read states. Stone is deliberate: `rule` (#D7D0C4) vanishes against land.
-       */
-      countyLine: brandPalette.stone,
-      /** County name labels — stone text + white halo (WCAG: color is not the only boundary signal). */
-      countyLabel: brandPalette.stone,
-      countyLabelHalo: LIGHT_PLATE_OCEAN,
-      /**
-       * History relationship lines — copper brown on white (≥3:1 non-text). pageSand
-       * (`pointHalo`) reads as invisible wash on the light plate (~2.3:1).
-       */
-      historyEdge: brandPalette.copperTextLight,
-      /** Selected relationship line — Copper Pin accent (navigational signal). */
-      historyEdgeSelected: brandPalette.copperPin,
-    } as const;
-  }
+  const palette = mapPalettes[scheme];
+  const light = scheme === 'light';
   return {
-    /** See the light branch: the background is land, and the tiles supply the water. */
-    ocean: mapPalettes.dark.land,
-    land: mapPalettes.dark.land,
-    water: mapPalettes.dark.water,
-    countryBounds: mapPalettes.dark.line2,
-    road: mapPalettes.dark.road,
-    placeLabel: mapPalettes.dark.label,
-    placeLabelHi: mapPalettes.dark.labelHi,
-    placeLabelHalo: mapPalettes.dark.halo,
-    selectedStateLabel: brandPalette.copperDark,
-    selected: DIGNITY_PALETTE.selected,
-    densityUnknown: DIGNITY_PALETTE.densityUnknownFill,
-    densityDisabled: DIGNITY_PALETTE.densityDisabledFill,
-    street: DIGNITY_PALETTE.streetDark,
-    streetLabel: DIGNITY_PALETTE.streetLabelDark,
-    /** Single records: paper on the ink land. */
-    markInk: brandPalette.archivePaper,
-    /** Groups: the inverse, ink on paper. Never copper. */
-    groupFill: '#E9E3D7',
-    groupStroke: '#E9E3D7',
-    groupText: brandPalette.blackInk,
-    tagText: '#A39B8F',
-    selectedHalo: brandPalette.archivePaper,
-    stateBounds: mapPalettes.dark.line,
-    /** Local, for the reason given on the light branch: §3 has no county role. */
-    countyLine: DIGNITY_PALETTE.selected,
-    countyLabel: DIGNITY_PALETTE.streetLabelDark,
-    countyLabelHalo: DIGNITY_PALETTE.ocean,
     /**
-     * History relationship lines — copper on ink (≥3:1). pageSand blends into presence
-     * density fills; copperDark stays a clear navigational signal without alarm red.
+     * The background layer: the land around the lower 48 (Canada, Mexico, Alaska, the islands).
+     * The tiles supply the water over it. Archive Paper on light, Surface paper on dark.
      */
-    historyEdge: brandPalette.copperDark,
-    historyEdgeSelected: DIGNITY_PALETTE.point,
+    ocean: light ? brandPalette.archivePaper : brandPalette.surface,
+    /** The lower 48 (the token's land): Surface white on light, one deeper paper step on dark. */
+    land: palette.land,
+    water: palette.water,
+    countryBounds: palette.line2,
+    road: palette.road,
+    placeLabel: palette.label,
+    placeLabelHi: palette.labelHi,
+    placeLabelHalo: palette.halo,
+    /** The selected state's abbreviation, beside its copper outline: copper text on paper. */
+    selectedStateLabel: brandPalette.copperTextLight,
+    selected: DIGNITY_PALETTE.selectedDark,
+    densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
+    densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
+    street: DIGNITY_PALETTE.streetLight,
+    streetLabel: DIGNITY_PALETTE.streetLabelLight,
+    /** Single records: a copper pin head (site) or an open copper ring (city), ink-ringed. */
+    markInk: brandPalette.copperPin,
+    markRing: brandPalette.blackInk,
+    /** The flat contact shadow under a pin: ink, offset, no blur. */
+    markShadow: 'rgba(10, 10, 10, 0.28)',
+    /** Groups: a copper disc with an ink count and a sand outer ring (decoration only). */
+    groupFill: brandPalette.copperPin,
+    groupStroke: brandPalette.pageSand,
+    groupText: brandPalette.blackInk,
+    /** Jurisdiction tags: ink on paper, at the state's label point. */
+    tagText: brandPalette.blackInk,
+    /** Area precision is shown as an area: a sand hatch over the jurisdiction. */
+    hatch: brandPalette.pageSand,
+    /** Pins outside the brushed decades: a sand ghost. */
+    ghost: brandPalette.pageSand,
+    selectedHalo: brandPalette.archivePaper,
+    stateBounds: palette.line,
+    countyLine: brandPalette.stone,
+    countyLabel: brandPalette.stone,
+    countyLabelHalo: palette.halo,
+    historyEdge: brandPalette.copperTextLight,
+    historyEdgeSelected: brandPalette.copperPin,
   } as const;
 }
 

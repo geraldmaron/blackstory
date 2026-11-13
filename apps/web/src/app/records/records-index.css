@@ -24,7 +24,45 @@ body:has(.ds-records) .ds-reading-progress {
   margin-left: auto;
 }
 
-/* —— research rows —————————————————————————————————————————————————————————— */
+/* —— header: the title at display scale, the count as a giant copper numeral ———————— */
+.ds-records-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title count'
+    'dek count';
+  align-items: end;
+  column-gap: var(--ds-space-8);
+  padding-block: var(--ds-space-12) var(--ds-space-8);
+}
+
+.ds-records-head__title {
+  grid-area: title;
+}
+
+.ds-records-head__count {
+  grid-area: count;
+  align-self: end;
+  /* Crop the numeral's descender space so it sits on the same floor as the dek. */
+  margin-bottom: -0.06em;
+}
+
+.ds-records-head__dek {
+  grid-area: dek;
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* —— the list: one paper sheet on the table ——————————————————————————————————— */
+.ds-records-paper {
+  margin-top: var(--ds-space-6);
+  padding-block: var(--ds-space-2);
+}
+
 .ds-records-list {
   margin: 0;
   padding: 0;
@@ -36,14 +74,18 @@ body:has(.ds-records) .ds-reading-progress {
   scroll-margin-top: calc(var(--records-bar-h) + var(--ds-space-4));
 }
 
+.ds-record:last-child {
+  border-bottom: 0;
+}
+
 .ds-record__link {
   display: grid;
-  /* A fixed kind and place track, so every summary starts on one edge. */
-  grid-template-columns: 17.5rem minmax(0, 1fr) auto;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
   grid-template-areas:
-    'name name data'
-    'meta summary summary';
-  align-items: baseline;
+    'thumb name data'
+    'thumb meta data'
+    'thumb summary data';
+  align-items: start;
   gap: var(--ds-space-1) var(--ds-space-6);
   padding: var(--ds-space-4) var(--ds-space-2);
   margin-inline: calc(var(--ds-space-2) * -1);
@@ -61,21 +103,45 @@ body:has(.ds-records) .ds-reading-progress {
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
+/* The record's image at tile size, or a sand tile with the kind's glyph in ink (a paper tile on
+   a sand band, where sand would vanish). */
+.ds-record__thumb {
+  grid-area: thumb;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-material-sand);
+  color: var(--ds-material-ink);
+}
+
+[data-ground='sand'] .ds-record__thumb {
+  background: var(--ds-material-paper);
+}
+
+.ds-record__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .ds-record__name {
   grid-area: name;
   min-width: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-  font-weight: 600;
-  line-height: 1.5rem;
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.2;
   letter-spacing: var(--ds-tracking-title);
   text-wrap: pretty;
 }
 
 .ds-record__link:hover .ds-record__name {
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
 }
 
 .ds-record__name b,
@@ -89,6 +155,7 @@ body:has(.ds-records) .ds-reading-progress {
   overflow: hidden;
   color: var(--ds-ink);
   font-size: var(--ds-text-body-sm);
+  font-weight: 500;
   line-height: 1.25rem;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -104,22 +171,25 @@ body:has(.ds-records) .ds-reading-progress {
 
 .ds-record__summary {
   grid-area: summary;
+  display: -webkit-box;
   min-width: 0;
+  margin-top: var(--ds-space-1);
   overflow: hidden;
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.25rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
+/* Right column: the decade as a bold mono numeral, the grade as a boxed letter under it. */
 .ds-record__data {
   grid-area: data;
   display: grid;
-  /* "Undated" is the widest decade value; decades sit flush right against the grade. */
-  grid-template-columns: 7ch auto;
-  align-items: baseline;
-  column-gap: 2ch;
+  justify-items: end;
+  align-content: start;
+  gap: var(--ds-space-2);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
@@ -127,41 +197,50 @@ body:has(.ds-records) .ds-reading-progress {
   white-space: nowrap;
 }
 
-/* Fixed sub-columns: the letters stack in one column whatever the source count reads. */
-.ds-record__evidence {
-  display: grid;
-  grid-template-columns: 1ch 12ch;
-  align-items: baseline;
-  column-gap: 1ch;
+.ds-record__decade {
+  color: var(--ds-accent);
+  font-size: var(--ds-text-title);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.ds-record__decade {
-  text-align: right;
+.ds-record__evidence {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
 }
 
 .ds-record__ungraded {
-  grid-column: 1 / -1;
+  font-family: var(--ds-font-sans);
 }
 
 .ds-record__letter {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: var(--ds-border-width-strong) solid var(--ds-ink);
+  border-radius: 4px;
   color: var(--ds-ink);
   font-weight: 700;
 }
 
-/* The timeline's row: one line, the band states the decade. Kind and place follow the name. */
+/* The timeline's row: one line, the band states the decade. A small tile, then the name. */
 .ds-record__link--compact {
-  grid-template-columns: fit-content(60%) minmax(0, 1fr) auto;
-  grid-template-areas: 'name meta data';
+  grid-template-columns: 2.75rem fit-content(55%) minmax(0, 1fr) auto;
+  grid-template-areas: 'thumb name meta data';
+  align-items: center;
   gap: var(--ds-space-1) var(--ds-space-4);
-  padding-block: var(--ds-space-3);
+  padding-block: var(--ds-space-2);
+}
+
+.ds-record__link--compact .ds-record__thumb {
+  width: 2.75rem;
 }
 
 .ds-record__link--compact .ds-record__name {
-  font-size: var(--ds-text-body);
-}
-
-.ds-record__link--compact .ds-record__data {
-  grid-template-columns: auto;
+  font-size: var(--ds-text-subtitle);
 }
 
 /* —— pager ———————————————————————————————————————————————————————————————— */
@@ -237,19 +316,36 @@ body:has(.ds-records) .ds-reading-progress {
 
 /* —— phone ————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
-  .ds-records .ds-page-header {
+  .ds-records-head {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'title'
+      'count'
+      'dek';
     padding-block: var(--ds-space-8) var(--ds-space-4);
   }
 
-  /* The decade the list is sorted by stays on line one, the evidence on line two. */
+  .ds-records-head__count {
+    justify-self: start;
+    margin: var(--ds-space-2) 0 0;
+  }
+
+  .ds-records-paper {
+    margin-inline: calc(var(--ds-gutter) * -1);
+  }
+
   .ds-record__link {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
     grid-template-areas:
-      'name decade'
-      'meta evidence'
-      'summary summary';
+      'thumb name decade'
+      'thumb meta evidence'
+      'summary summary summary';
     gap: var(--ds-space-1) var(--ds-space-3);
     padding-block: var(--ds-space-3);
+  }
+
+  .ds-record__thumb {
+    width: 3.5rem;
   }
 
   .ds-record__data {
@@ -259,6 +355,7 @@ body:has(.ds-records) .ds-reading-progress {
   .ds-record__decade {
     grid-area: decade;
     justify-self: end;
+    font-size: var(--ds-text-subtitle);
   }
 
   .ds-record__evidence {
@@ -266,18 +363,11 @@ body:has(.ds-records) .ds-reading-progress {
     justify-self: end;
   }
 
-  .ds-record__summary {
-    display: -webkit-box;
-    white-space: normal;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
   .ds-record__link--compact {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
     grid-template-areas:
-      'name name'
-      'meta evidence';
+      'thumb name evidence'
+      'thumb meta evidence';
   }
 
   /* Under the chips, flush to the gutter. */

@@ -10,13 +10,14 @@
  * callout off the headline. Until this mount has framed the plate, the field keeps the canvas
  * color over it, then fades to let it through.
  *
- * The page does not scroll. The walk is a stepper in the dock, so there is no dead space between
- * chapters and the wheel is never taken from the reader.
+ * The first screen does not move: the walk is a stepper in the dock. Below it the page scrolls
+ * into four color-blocked chapters (`door-chapters.tsx`) that slide up over the fixed map, then
+ * the footer. Browse has neither.
  *
- * Material: flat. The opening column has no box: it sits on the map over a canvas-colored scrim
- * that fades out a little past the column, so the type never sits on a marker. The column shares
- * the header's left edge (the wide container). The chapter card is the kit's Surface recipe, and
- * as a layer over the map it takes the one contact shadow, as does the callout.
+ * Material (art direction v2): the map is a paper chart on the ink table. The opening is a solid
+ * INK block on the chart's lower left, the headline at display scale; the chapter card and the
+ * spotlight callout are small PAPER sheets with page bands, pinned to the chart. No scrim: the
+ * blocks are opaque, flat, and hard-edged. The column shares the header's left edge.
  */
 
 .ds-door {
@@ -24,7 +25,7 @@
      command-bar.css computes it) and the window is everything right of it. */
   --ds-door-edge: max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2));
   --ds-door-bottom: var(--ds-space-12);
-  --ds-door-dock-w: min(30rem, 40vw);
+  --ds-door-dock-w: min(42rem, 44vw);
   position: relative;
   box-sizing: border-box;
   /* Everything on the opening is fixed to the viewport, so the page holds no height of its own
@@ -72,24 +73,6 @@
   transition: opacity var(--ds-door-browse-ms) var(--ds-ease-cinematic);
 }
 
-/*
- * The scrim under the dock: canvas color at 85% under the type, fading to nothing 72px past the
- * column, and fading in from the top so it reads as light falling off, not as a sidebar.
- */
-.ds-door-journey::before {
-  content: '';
-  position: fixed;
-  top: var(--ds-island-clearance);
-  bottom: 0;
-  left: 0;
-  width: calc(var(--ds-door-edge) + var(--ds-door-dock-w) + var(--ds-space-18));
-  /* Opaque under the text: a group drawn there (Hawaii, at the national frame) would otherwise
-     ghost through the headline. The map shows again past the column and above it. */
-  background: linear-gradient(to right, var(--ds-canvas) 55%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 45%);
-  pointer-events: none;
-}
-
 .ds-door-journey--browse {
   opacity: 0;
   pointer-events: none;
@@ -118,12 +101,15 @@
   pointer-events: auto;
 }
 
-/* The opening: no box, type on the scrim. */
+/* The opening: a solid ink block on the chart, hard-edged, with the headline at display scale. */
 .ds-door-open {
   display: grid;
   gap: var(--ds-space-4);
   min-width: 0;
+  padding: var(--ds-space-8) var(--ds-space-8) var(--ds-space-8);
+  border-radius: var(--ds-radius-md);
   color: var(--ds-ink);
+  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
 /* Without JavaScript there is no walk to start; the records link and the notice remain. */
@@ -140,32 +126,36 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(3rem, min(5.4vw, 9vh), 4.5rem);
-  letter-spacing: -0.04em;
-  line-height: 0.92;
+  /* Sized so the longest phase of the morph ("Their Story") fits the dock: 96px at 1440. */
+  font-size: clamp(4.5rem, min(6.7vw, 15vh), 12.5rem);
+  letter-spacing: -0.045em;
+  line-height: 0.84;
   color: var(--ds-ink);
   text-wrap: nowrap;
 }
 
-/* Second tier: smaller, set close under the subject so the two lines read as one statement. */
+/* Second tier: the place, in Newsreader italic and sand, set close under the subject. */
 .ds-door-open__headline .ds-hero-headline-morph__trailer {
   display: block;
-  margin-top: var(--ds-space-1);
-  font-size: 0.5em;
-  letter-spacing: -0.03em;
+  margin-top: var(--ds-space-2);
+  color: var(--ds-numeral-soft);
+  font-family: var(--ds-font-editorial);
+  font-size: 0.42em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   line-height: 1.05;
 }
 
-/* The trailer's emphasis is set plain: no copper, no change of face. */
 .ds-door-open__headline em {
-  font-style: normal;
+  font-style: italic;
 }
 
 .ds-door-open__line {
-  max-width: 26rem;
+  max-width: 30rem;
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   line-height: 1.5;
   color: var(--ds-ink);
   text-wrap: pretty;
@@ -179,18 +169,22 @@
   margin-top: var(--ds-space-2);
 }
 
-/* —— The walk card ——————————————————————————————————————————————————————————————————— */
+/* —— The walk card: a paper sheet with page bands, pinned to the chart ————————————————— */
 .ds-door-walk {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  max-width: 32rem;
   max-height: 100%;
   padding: var(--ds-space-6);
-  background: var(--ds-surface-raised);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  padding-left: calc(var(--ds-space-6) + var(--ds-band-w) * 3);
+  border: var(--ds-border-width) solid var(--ds-material-ink);
   border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-contact-plate);
+  box-shadow:
+    inset var(--ds-band-w) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
   color: var(--ds-ink);
   animation: ds-door-walk-in var(--ds-duration-base) var(--ds-ease-entrance) both;
 }
@@ -294,7 +288,7 @@
 .ds-door-walk__heading {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
-  font-size: 1.625rem;
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.12;
@@ -394,11 +388,13 @@
 }
 
 .ds-door-walk__sweep-decade {
-  font-family: var(--ds-font-mono);
-  font-size: 1.5rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--ds-numeral-accent);
 }
 
 .ds-door-walk__sweep-track {
@@ -412,7 +408,7 @@
 .ds-door-walk__sweep-fill {
   display: block;
   height: 100%;
-  background: var(--ds-ink);
+  background: var(--ds-accent-graphic);
   transition: inline-size var(--ds-duration-fast) linear;
 }
 
@@ -434,8 +430,9 @@
 
 .ds-door-walk__figure-value {
   margin: 0;
+  color: var(--ds-numeral-accent);
   font-family: var(--ds-font-display);
-  font-size: 1.25rem;
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
@@ -546,39 +543,48 @@
   transition: opacity var(--ds-duration-base) var(--ds-easing);
 }
 
-/* Selected record: copper with a paper halo. Dot for a site, hollow ring for a city. */
+/* The spotlight record, drawn as the map draws a selected record (explore-style.ts): a copper pin
+   at 1.6x with an ink ring for a site, an open copper ring for a city. */
 .ds-door-callout__mark {
   box-sizing: border-box;
   border-radius: 50%;
 }
 
 .ds-door-callout__mark--dot {
-  width: 8px;
-  height: 8px;
-  margin: -4px 0 0 -4px;
-  background: var(--ds-accent-graphic);
-  box-shadow: 0 0 0 2px var(--ds-fixed-paper);
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--ds-fixed-ink);
+  background: var(--ds-material-copper);
 }
 
 .ds-door-callout__mark--ring {
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
-  border: 2px solid var(--ds-accent-graphic);
-  box-shadow: 0 0 0 2px var(--ds-fixed-paper);
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 4px solid var(--ds-material-copper);
 }
 
 .ds-door-callout__leader {
-  background: var(--ds-ink-muted);
+  background: var(--ds-fixed-ink);
 }
 
+/* A small paper sheet with page bands, hard-edged in ink, pinned to the chart by the leader. */
 .ds-door-callout__card {
   box-sizing: border-box;
-  width: 16.5rem;
-  background: var(--ds-surface-raised);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  width: 17.5rem;
+  padding-left: calc(var(--ds-band-w) * 3);
+  border: var(--ds-border-width) solid var(--ds-fixed-ink);
   border-radius: var(--ds-radius-sm);
-  box-shadow: var(--ds-contact-plate);
+  box-shadow:
+    inset var(--ds-band-w) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
+}
+
+/* The callout already names its pin; the map's own name flag would say it twice. */
+body:has(.ds-door-callout[data-shown='true']) .ds-pin-flag {
+  display: none;
 }
 
 .ds-door-callout[data-shown='true'] .ds-door-callout__card {
@@ -736,22 +742,6 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     max-height: calc(58dvh - var(--ds-tabbar-h));
   }
 
-  /* The scrim rises from the tab bar to a little above the dock. */
-  .ds-door-journey::before {
-    top: auto;
-    right: 0;
-    width: auto;
-    height: calc(
-      var(--ds-door-dock-h, 18rem) + var(--ds-door-bottom) + var(--ds-tabbar-h) + var(--ds-space-18)
-    );
-    background: linear-gradient(
-      to top,
-      var(--ds-canvas) calc(100% - var(--ds-space-18)),
-      transparent
-    );
-    mask-image: none;
-  }
-
   body:has(.ds-door-journey:not(.ds-door-journey--browse)) {
     /* The tab bar floats over the fixed map; the page has nothing under it to clear. */
     padding-bottom: 0;
@@ -769,8 +759,12 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     gap: var(--ds-space-3);
   }
 
+  .ds-door-open {
+    padding: var(--ds-space-6);
+  }
+
   .ds-door-open__headline {
-    font-size: clamp(2.5rem, 12vw, 3.5rem);
+    font-size: clamp(3.5rem, 19vw, 5.5rem);
   }
 
   .ds-door-open__line {
@@ -1142,7 +1136,13 @@ body:has(.ds-door) .ds-shell > .ds-bar {
   pointer-events: auto;
 }
 
+/* The footer closes the journey under its chapters; browse (and cold /explore) has none. */
 body:has(.ds-door) .ds-shell-footer {
+  z-index: 3; /* local: above the fixed field and dock, with the chapters */
+  pointer-events: auto;
+}
+
+body:has(.ds-door-journey--browse) .ds-shell-footer {
   display: none;
 }
 
@@ -1158,4 +1158,361 @@ body:has(.ds-door) .ds-door__field {
 
 body:has(.ds-door) .ds-door-journey {
   z-index: 2; /* local: dock over the pin field; gaps pass clicks through */
+}
+
+/* —— Below the fold: four color-blocked chapters over the fixed map ———————————————————— */
+.ds-door-chapters {
+  position: relative;
+  z-index: 3; /* local: above the fixed field, dock and callout */
+  margin-top: 100dvh;
+  pointer-events: auto;
+}
+
+.ds-door:has(.ds-door-journey--browse) .ds-door-chapters {
+  display: none;
+}
+
+.ds-door-ch {
+  display: grid;
+  align-items: center;
+  min-height: min(100dvh, 60rem);
+  overflow: hidden;
+}
+
+.ds-door-ch__inner {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-6);
+}
+
+.ds-door-ch__title {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+}
+
+.ds-door-ch__title--plain {
+  max-width: 18ch;
+  font-size: var(--ds-text-display-title);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ds-door-ch__numeral {
+  font-size: clamp(5rem, 1rem + 15vw, 15rem);
+}
+
+.ds-door-ch__title-line {
+  font-size: var(--ds-text-display-2);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.ds-door-ch__line {
+  max-width: 34rem;
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.45;
+}
+
+/* Paper: three record sheets peek up from the block's foot, cropped by it. */
+.ds-door-ch--count {
+  padding-bottom: 0;
+}
+
+.ds-door-ch__sheets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-6);
+  width: 100%;
+  margin: var(--ds-space-8) 0 calc(var(--ds-space-18) * -1);
+  padding: 0;
+  list-style: none;
+}
+
+.ds-door-ch__sheets > li:nth-child(2) {
+  transform: translateY(var(--ds-space-8));
+}
+
+.ds-door-ch__sheets > li:nth-child(3) {
+  transform: translateY(var(--ds-space-4));
+}
+
+/* The sheets sit on paper, so they take the raised paper step and an ink edge. */
+.ds-door-ch__sheet {
+  --ds-sheet-pad: var(--ds-space-6);
+  display: grid;
+  gap: var(--ds-space-2);
+  min-height: 22rem;
+  border-color: var(--ds-material-ink);
+  background: var(--ds-surface-raised);
+}
+
+.ds-door-ch__sheet-media {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  margin-bottom: var(--ds-space-2);
+  overflow: hidden;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-material-sand);
+  color: var(--ds-material-ink);
+}
+
+.ds-door-ch__sheet-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ds-door-ch__sheet-decade {
+  font-size: var(--ds-text-display-2);
+}
+
+.ds-door-ch__sheet-name {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.15;
+}
+
+.ds-door-ch__sheet-name a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-door-ch__sheet-name a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* The whole sheet is the target; the name is the link. */
+.ds-door-ch__sheet-name a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.ds-door-ch__sheet-place {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+}
+
+/* Copper: the lead chapter's cover runs edge to edge across the top of the block. */
+.ds-door-ch--story {
+  align-items: start;
+  padding-top: 0;
+}
+
+.ds-door-ch__cover {
+  height: min(56dvh, 34rem);
+  overflow: hidden;
+  background: var(--ds-material-ink);
+}
+
+.ds-door-ch__cover img,
+.ds-door-ch__cover .ds-stories-cover__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ds-door-ch--story .ds-door-ch__inner {
+  margin-top: calc(var(--ds-space-18) * -1);
+}
+
+.ds-door-ch__years {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  background: var(--ds-material-ink);
+  color: var(--ds-material-sand);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body);
+  font-weight: 600;
+}
+
+.ds-door-ch__story-title {
+  max-width: 16ch;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-title);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ds-door-ch__story-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-door-ch__story-title a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 4px;
+  text-underline-offset: 0.08em;
+}
+
+.ds-door-ch__dek {
+  max-width: 40rem;
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.ds-door-ch__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4);
+}
+
+/* Sand: the decade axis, drawn large in ink. */
+.ds-door-ch__axis {
+  width: 100%;
+  margin: var(--ds-space-6) 0 0;
+}
+
+.ds-door-ch__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: clamp(14rem, 40dvh, 26rem);
+  margin: 0;
+  padding: 0 0 var(--ds-space-8);
+  list-style: none;
+  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
+}
+
+.ds-door-ch__bar {
+  position: relative;
+  flex: 1 1 0;
+  height: 100%;
+  min-width: 0;
+}
+
+.ds-door-ch__bar a {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-door-ch__bar-fill {
+  display: block;
+  width: 100%;
+  /* A decade with one record still shows a sliver, never nothing. */
+  height: max(2px, calc(var(--bar) * 100%));
+  background: var(--ds-ink);
+  transform-origin: bottom;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-door-ch__bar a:hover .ds-door-ch__bar-fill,
+.ds-door-ch__bar a:focus-visible .ds-door-ch__bar-fill {
+  background: var(--ds-material-copper);
+}
+
+.ds-door-ch__bar-year {
+  position: absolute;
+  bottom: calc(var(--ds-space-8) * -1 - var(--ds-space-2));
+  left: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* Ink: the grade marks drawn large. */
+.ds-door-ch__grades {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-6);
+  width: 100%;
+  margin: var(--ds-space-6) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-door-ch__grade a {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-6);
+  border: var(--ds-border-width-strong) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-door-ch__grade a:hover {
+  border-color: var(--ds-accent-graphic);
+}
+
+.ds-door-ch__grade-mark {
+  display: grid;
+  place-items: center;
+  width: 7rem;
+  height: 7rem;
+  border: 6px solid var(--ds-numeral-soft);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-numeral-soft);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-1);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ds-door-ch__grade-label {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+}
+
+.ds-door-ch__grade-count {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-door-ch {
+    min-height: 0;
+  }
+
+  .ds-door-ch__sheets,
+  .ds-door-ch__grades {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds-door-ch__sheets {
+    margin-bottom: var(--ds-space-8);
+  }
+
+  .ds-door-ch__sheets > li:nth-child(n) {
+    transform: none;
+  }
+
+  .ds-door-ch__sheet {
+    min-height: 0;
+  }
+
+  .ds-door-ch__bar-year {
+    font-size: var(--ds-text-caption);
+  }
+
+  .ds-door-ch__grade-mark {
+    width: 4.5rem;
+    height: 4.5rem;
+    font-size: var(--ds-text-display-2);
+  }
 }

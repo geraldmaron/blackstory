@@ -464,14 +464,17 @@
 /* Copper plate carries dark ink text in BOTH themes (accessible-pairs table: #0A0A0A on
    #B86B2A; raw copper never carries light body text). */
 .ds-button--primary {
-  border-color: var(--ds-accent-graphic);
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink);
+  border-color: var(--ds-primary-bg);
+  background: var(--ds-primary-bg);
+  color: var(--ds-primary-ink);
 }
 
+/* Pressing into the table: the plate drops a step toward ink, and a 2px ink rule under it marks
+   hover without relying on the color change. */
 .ds-button--primary:hover:not(:disabled) {
-  border-color: var(--ds-accent);
-  background: color-mix(in srgb, var(--ds-accent-graphic) 86%, var(--ds-ink));
+  border-color: var(--ds-primary-bg);
+  background: color-mix(in srgb, var(--ds-primary-bg) 86%, var(--ds-primary-ink));
+  box-shadow: inset 0 -2px 0 var(--ds-primary-ink);
 }
 
 .ds-button--secondary:hover:not(:disabled) {
@@ -593,7 +596,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
-  padding: 0 var(--ds-space-3);
+  padding: 0 var(--ds-space-4);
   border: 0;
   background: none;
   color: var(--ds-ink-muted);
@@ -603,7 +606,9 @@
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: color var(--ds-duration-fast) var(--ds-easing);
+  transition:
+    color var(--ds-duration-fast) var(--ds-easing),
+    background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-tabs__tab:hover {
@@ -611,8 +616,9 @@
 }
 
 .ds-tabs__tab[aria-current='page'] {
-  color: var(--ds-ink);
-  font-weight: 600;
+  background: var(--ds-primary-bg);
+  color: var(--ds-primary-ink);
+  font-weight: 650;
 }
 
 /* The page you are on, with nowhere to go: not a control. */
@@ -620,24 +626,16 @@ span.ds-tabs__tab {
   cursor: default;
 }
 
-/* The current mark is a bar under the label, not a box around it, and never color alone. */
-.ds-tabs__tab[aria-current='page']::after {
-  content: '';
-  position: absolute;
-  right: var(--ds-space-3);
-  bottom: 0;
-  left: var(--ds-space-3);
-  height: 2px;
-  background: var(--ds-accent-graphic);
-}
+/* The current tab is a copper block tab (ink type on copper; ink with paper type on a copper or
+   sand ground). The block's shape and the heavier weight carry it without the color. */
 
 /* —— Segmented: options on the same data —————————————————————————————————————— */
 .ds-segmented {
   display: inline-flex;
   gap: 2px;
   padding: 2px;
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface-sunken);
 }
 
 .ds-segmented__option {
@@ -661,12 +659,12 @@ span.ds-tabs__tab {
   color: var(--ds-ink);
 }
 
+/* Selected: an inverse thumb (ink on paper grounds, paper on ink) with heavier weight. */
 .ds-segmented__option[aria-current='page'],
 .ds-segmented__option:has(> .ds-segmented__input:checked) {
-  background: var(--ds-surface-raised);
-  box-shadow: var(--ds-contact-hairline);
-  color: var(--ds-ink);
-  font-weight: 600;
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-weight: 650;
 }
 
 .ds-segmented__input {
@@ -748,6 +746,23 @@ span.ds-tabs__tab {
   line-height: 1.06;
   letter-spacing: var(--ds-tracking-display);
   text-wrap: balance;
+}
+
+/* —— PageTitle: the display-scale title (56-120px) ——————————————————————————— */
+.ds-page-title,
+.ds-page-header--display .ds-page-header__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-title);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  font-kerning: normal;
+}
+
+.ds-page-header--display .ds-page-header__text {
+  max-width: none;
 }
 
 .ds-page-header__dek {
@@ -1060,5 +1075,113 @@ span.ds-tabs__tab {
 @media (min-width: 48rem) {
   :root {
     --ds-gutter: var(--ds-space-6);
+  }
+}
+
+/* —— Sheet: a paper document on the table ———————————————————————————————————— */
+/* Paper with a hard 1px edge (no blur), radius 14, and three page bands (sand, copper, ink, 4px
+   each) along one edge: a pattern echoing the logo's page bands, never the book or pin shape.
+   The bands are inset fills, so they follow the radius without clipping the sheet's popovers. */
+.ds-sheet {
+  --ds-sheet-pad: var(--ds-space-8);
+  position: relative;
+  padding: var(--ds-sheet-pad);
+  padding-left: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  box-shadow:
+    inset var(--ds-band-w) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
+  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
+}
+
+.ds-sheet--bands-end {
+  padding-left: var(--ds-sheet-pad);
+  padding-right: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
+  box-shadow:
+    inset calc(var(--ds-band-w) * -1) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * -2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * -3) 0 0 var(--ds-band-3);
+}
+
+.ds-sheet--bands-none {
+  padding-left: var(--ds-sheet-pad);
+  box-shadow: none;
+}
+
+/* Sheets slide up onto the table from where they already are: no fade, so nothing is ever
+   invisible if the animation does not run. Collapses with --ds-duration-sheet. */
+@keyframes ds-sheet-in {
+  from {
+    transform: translateY(16px);
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-sheet {
+    --ds-sheet-pad: var(--ds-space-4);
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+
+/* —— Block: a full-bleed color band that breaks a page into chapters ————————————— */
+.ds-block {
+  position: relative;
+  padding-block: var(--ds-section-md);
+}
+
+/* Bands wipe in once as they scroll into view, where the browser can tie motion to scroll. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ds-block--wipe {
+      animation: ds-block-wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+@keyframes ds-block-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* —— DisplayNumeral: dates, decades and counts as graphic elements ———————————— */
+.ds-numeral {
+  display: block;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-numeral);
+  font-weight: 600;
+  font-variant-numeric: lining-nums;
+  font-kerning: normal;
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  white-space: nowrap;
+  color: var(--ds-numeral-accent);
+  animation: ds-numeral-settle var(--ds-duration-slow) var(--ds-ease-entrance) both;
+}
+
+.ds-numeral--soft {
+  color: var(--ds-numeral-soft);
+}
+
+.ds-numeral--ink {
+  color: var(--ds-ink);
+}
+
+.ds-numeral--title {
+  font-size: var(--ds-text-display-title);
+}
+
+@keyframes ds-numeral-settle {
+  from {
+    transform: translateY(0.08em);
   }
 }

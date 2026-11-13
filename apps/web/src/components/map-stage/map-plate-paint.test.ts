@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { StyleSpecification } from 'maplibre-gl';
-import { mapPalettes } from '@repo/ui';
+import { plateForScheme } from '../../lib/map-experience/dignity-style';
 import {
   buildArchiveBaseStyle,
   collectLayerPaintUpdates,
@@ -128,7 +128,6 @@ test('buildArchiveBaseStyle paints the pre-load frame from the scheme land token
   // The plate's background is LAND: the tiles' `water` source-layer paints the oceans and
   // lakes over it. A water-colored pre-load frame would flash the inverse of the map that is
   // about to arrive — a continent-shaped hole rather than a continent.
-  assert.equal(backgroundColor('light'), mapPalettes.light.land);
-  assert.equal(backgroundColor('dark'), mapPalettes.dark.land);
-  assert.notEqual(backgroundColor('light'), backgroundColor('dark'));
+  assert.equal(backgroundColor('light'), plateForScheme('light').ocean);
+  assert.equal(backgroundColor('dark'), plateForScheme('dark').ocean);
 });

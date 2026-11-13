@@ -245,6 +245,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setNearby,
     distances,
     filtered,
+    ghosts,
     nearestMeters,
     sorted,
     kindCounts,
@@ -345,7 +346,18 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
   const populationLevels = usePopulationChoropleth(layerMode, view.viewState);
 
-  useMapSync(stage, view, filtered, layers, layerMode, selectedId, stateCode, populationLevels);
+  useMapSync(
+    stage,
+    view,
+    filtered,
+    layers,
+    layerMode,
+    selectedId,
+    stateCode,
+    populationLevels,
+    ghosts,
+    `${period.start}-${period.end}-${period.includeUndated ? 1 : 0}`,
+  );
 
   // Reapplied on every `styledata`: `patchData` rebuilds the style, which resets layout
   // properties set through the live instance.
@@ -599,11 +611,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     setSavedOpen,
   });
 
-  /* The inspector's photo rides on the pin hover card's photo index, fetched only once a record
-     is selected or a pin hovered, never on load. */
+  /* The photo index feeds the list's thumbnails, the inspector's image and the pin hover card. It
+     waits for the plate to be ready, so it never competes with the map's first paint. */
   const photos = usePhotoIndex(
     '/atlas/photos',
-    selectedId !== undefined || atlasHoverTarget !== null,
+    plateReady || selectedId !== undefined || atlasHoverTarget !== null,
   );
   const inspector = inspectorRecord
     ? {
@@ -736,6 +748,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         period={periodIsActive(period) ? period : undefined}
         selectedId={selectedId}
         onSelect={select}
+        photos={photos}
         distanceLabels={distanceLabels}
         emptyState={
           <EmptyState
@@ -917,7 +930,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         </ExploreColumn>
       )}
 
-      {!phone && !chromeHidden && mode === 'atlas' ? <div className="ds-xdock">{brush}</div> : null}
+      {!phone && !chromeHidden && mode === 'atlas' ? (
+        <div className="ds-xdock" data-ground="ink">
+          {brush}
+        </div>
+      ) : null}
 
       {mode === 'atlas' && !chromeHidden && stage.mapAvailable ? (
         <MapControls

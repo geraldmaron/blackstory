@@ -26,6 +26,11 @@ import {
 } from '../lib/discovery/story-collection';
 import { buildAtlasShell } from './explore/explore-view-model';
 import { DoorImmersive } from './door-immersive';
+import { DoorChapters } from './door-chapters';
+import { loadRecordsIndex, recordsQueryCacheKey } from './records/load-records-index';
+import { listPublicStoryListItems } from '../lib/stories/source';
+import { buildStoriesFront } from './stories/stories-index';
+import { buildEntityPhotoIndex } from '../lib/map-experience/entity-photo-index';
 import { DoorNoscript } from './door-noscript';
 import './door-home.css';
 import './explore/explore.css';
@@ -95,6 +100,9 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
     : null;
   const spotlightPinId = resolveDoorFocusPinId(spotlight?.entityId ?? null, features);
 
+  // Below the fold on the journey only; cold `/explore` is the map and nothing under it.
+  const chapters_ = initialBrowse ? null : await loadDoorChapters(entities);
+
   const noscriptView = initialBrowse
     ? { ...shell, filteredFeatures: noscriptFeatures.slice(0, NOSCRIPT_ROW_CAP) }
     : null;
@@ -116,6 +124,29 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
         spotlightPinId={spotlightPinId}
         initialBrowse={initialBrowse}
       />
+      {chapters_ ? <DoorChapters {...chapters_} /> : null}
     </main>
   );
+}
+
+/** The figures under the Door: the register's own index, its first records and the lead story. */
+async function loadDoorChapters(entities: Parameters<typeof buildEntityPhotoIndex>[0]) {
+  const [{ model }, stories] = await Promise.all([
+    loadRecordsIndex(recordsQueryCacheKey({})),
+    listPublicStoryListItems().catch(() => ({ items: [] as const })),
+  ]);
+  const photos = buildEntityPhotoIndex(entities);
+  // The earliest records on the register, preferring ones with an image.
+  const withPhoto = model.rows.filter((row) => photos[row.id]);
+  const picks = [...withPhoto, ...model.rows.filter((row) => !photos[row.id])].slice(0, 3);
+  return {
+    total: model.totalMatched,
+    records: picks.map((row) => ({
+      row,
+      ...(photos[row.id] ? { photoUrl: photos[row.id]!.url } : {}),
+    })),
+    lead: stories.items.length > 0 ? buildStoriesFront(stories.items).lead : undefined,
+    decades: model.facets.era,
+    grades: model.facets.evidence,
+  };
 }

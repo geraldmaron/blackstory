@@ -6,7 +6,10 @@
  */
 
 :root,
-[data-theme='light'] {
+[data-theme='light'],
+[data-ground='paper'],
+[data-ground='copper'],
+[data-ground='sand'] {
   color-scheme: light;
 
   /*
@@ -92,17 +95,18 @@
    * map-contrast.test.ts asserts the CIE L* deltas in both themes. Change a value and run
    * `pnpm --filter @repo/ui test` before assuming it is safe.
    */
-  --ds-map-land: #f6f2e9;
-  --ds-map-water: #c7bdaa;
-  --ds-map-line: #bdb19a;
-  --ds-map-line-2: #a2957c;
-  --ds-map-road: #e6dcc6;
+  --ds-map-land: #fbf8f2;
+  --ds-map-water: #e2b89a;
+  --ds-map-line: #a2957c;
+  --ds-map-line-2: #6d675f;
+  --ds-map-road: #ebe4d6;
   --ds-map-label: #6d675f;
   --ds-map-label-hi: #2e2a24;
-  --ds-map-halo: #f8f5ee;
+  --ds-map-halo: #fbf8f2;
 }
 
-[data-theme='dark'] {
+[data-theme='dark'],
+[data-ground='ink'] {
   color-scheme: dark;
 
   /*
@@ -179,14 +183,145 @@
    * at the floor, so land is the only side of the land/water pair with room to move, and without
    * that separation coastlines and state lines vanish at continental zoom. See map-contrast.test.ts.
    */
-  --ds-map-land: #38332b;
-  --ds-map-water: #0a0a0c;
-  --ds-map-line: #665e4f;
-  --ds-map-line-2: #776c5a;
-  --ds-map-road: #474034;
-  --ds-map-label: #9e9587;
-  --ds-map-label-hi: #ded7c9;
-  --ds-map-halo: #16130f;
+  --ds-map-land: #ebe3d3;
+  --ds-map-water: #0a0a0a;
+  --ds-map-line: #6d675f;
+  --ds-map-line-2: #2a2622;
+  --ds-map-road: #ddd4c3;
+  --ds-map-label: #6d675f;
+  --ds-map-label-hi: #2e2a24;
+  --ds-map-halo: #f4efe5;
+}
+
+/*
+ * Lockup artwork per ground. The light-canvas artwork shows wherever the nearest ground is light
+ * (light theme, a paper sheet, a sand or copper block); the dark-canvas artwork wherever it is
+ * ink. A custom property inherits, so the nearest ground wins without a descendant selector.
+ */
+:root,
+[data-theme='light'],
+[data-ground='paper'],
+[data-ground='copper'],
+[data-ground='sand'] {
+  --ds-lockup-on-light: block;
+  --ds-lockup-on-dark: none;
+}
+
+[data-theme='dark'],
+[data-ground='ink'] {
+  --ds-lockup-on-light: none;
+  --ds-lockup-on-dark: block;
+}
+
+/*
+ * Materials: the archive table and what lies on it (art direction v2). Three materials at full
+ * strength, independent of the theme the way a printed sheet is:
+ *
+ *   ink    the table. Header, map surround, prev/next blocks.
+ *   paper  documents. Anything read is a paper sheet with ink on it.
+ *   copper / sand  pins, numerals, bands, the primary action, whole color-blocked sections.
+ *
+ * `data-ground` on an element re-points every role token under it, so a kit component placed on
+ * a sheet or a block picks up that ground's colors with no variant prop. paper reuses the light
+ * roles and ink the dark roles (the selector lists above); copper and sand reuse light status
+ * trios and override text, edges and accent below. Measured pairs (WCAG ratio):
+ *
+ *   ink #0a0a0a on paper #f4efe5 17.3 / on light-table sheet #fffdf8 19.5
+ *   stone #6d675f on paper 4.9 / on #fffdf8 5.5
+ *   copper text #8e4f2a on paper 5.6 / on #fffdf8 6.3
+ *   copper pin #b86b2a on paper 3.5 / on #fffdf8 4.0 (large text and marks only)
+ *   paper #f4efe5 on ink #0a0a0a 17.3; muted #bdb5a9 on #131110 8.9; copper #d07a32 on ink 6.1
+ *   ink on copper #b86b2a 4.9 (every text on copper is ink; nothing muted)
+ *   ink on sand #d8a178 8.8 (every text on sand is ink; stone fails at 2.5)
+ *   paper on ink, used for the primary action on copper and sand: 17.3
+ *
+ * Asserted in tokens/contrast.test.ts (groundPalettes).
+ */
+:root {
+  --ds-material-paper: #fffdf8;
+  --ds-material-ink: #0a0a0a;
+  --ds-material-copper: #b86b2a;
+  --ds-material-sand: #d8a178;
+  /* The three page bands at a sheet's edge, outermost first. A pattern, never the logo. */
+  --ds-band-w: 4px;
+  --ds-band-1: #d8a178;
+  --ds-band-2: #b86b2a;
+  --ds-band-3: #0a0a0a;
+}
+
+/* On the dark table a sheet is Archive Paper; on the light table it is the brightest paper step. */
+[data-theme='dark'] {
+  --ds-material-paper: #f4efe5;
+}
+
+[data-ground] {
+  background-color: var(--ds-canvas);
+  color: var(--ds-ink);
+  /* The primary action: copper with ink type, except on copper and sand, where it is ink. */
+  --ds-primary-bg: var(--ds-accent-graphic);
+  --ds-primary-ink: #0a0a0a;
+  /* Display numerals: `accent` carries meaning (3:1 large), `soft` is the quieter step. */
+  --ds-numeral-accent: var(--ds-accent-graphic);
+  --ds-numeral-soft: var(--ds-accent-muted);
+}
+
+:root {
+  --ds-primary-bg: var(--ds-accent-graphic);
+  --ds-primary-ink: #0a0a0a;
+  --ds-numeral-accent: var(--ds-accent-graphic);
+  --ds-numeral-soft: var(--ds-accent-graphic);
+}
+
+[data-theme='dark'] {
+  --ds-numeral-soft: #d8a178;
+}
+
+[data-ground='paper'] {
+  --ds-canvas: var(--ds-material-paper);
+  --ds-surface: var(--ds-material-paper);
+  /* Sand on paper is 1.7:1, a fill only; a numeral there steps to copper. */
+  --ds-numeral-soft: var(--ds-accent-graphic);
+}
+
+[data-ground='ink'] {
+  --ds-canvas: var(--ds-material-ink);
+  --ds-numeral-soft: #d8a178;
+}
+
+[data-ground='copper'],
+[data-ground='sand'] {
+  --ds-ink: #0a0a0a;
+  --ds-ink-muted: #0a0a0a;
+  --ds-ink-subtle: #0a0a0a;
+  --ds-border: rgb(10 10 10 / 24%);
+  --ds-rule: rgb(10 10 10 / 24%);
+  --ds-border-control: #0a0a0a;
+  --ds-border-strong: #0a0a0a;
+  --ds-focus-ring: #0a0a0a;
+  --ds-accent: #0a0a0a;
+  --ds-accent-graphic: #0a0a0a;
+  --ds-primary-bg: #0a0a0a;
+  --ds-primary-ink: #f4efe5;
+  --ds-numeral-accent: #0a0a0a;
+  --ds-numeral-soft: #0a0a0a;
+}
+
+[data-ground='copper'] {
+  --ds-canvas: var(--ds-material-copper);
+  --ds-surface: var(--ds-material-copper);
+  --ds-surface-sunken: #a65f25;
+  --ds-surface-raised: #c27737;
+  --ds-focus-ring-offset: var(--ds-material-copper);
+  --ds-accent-muted: #0a0a0a;
+}
+
+[data-ground='sand'] {
+  --ds-canvas: var(--ds-material-sand);
+  --ds-surface: var(--ds-material-sand);
+  --ds-surface-sunken: #cc9369;
+  --ds-surface-raised: #e0ae89;
+  --ds-focus-ring-offset: var(--ds-material-sand);
+  --ds-accent-muted: #b86b2a;
 }
 
 :root {
@@ -249,6 +384,11 @@
    */
   /* The ledger room masthead (docs/ui/design-direction-v10-rooms.md). One per surface, and only
      where the headline is a sentence; display-1 stays the ceiling everywhere else. */
+  /* Art direction v2: page titles at 56-120px and display numerals at 72-200px. */
+  --ds-text-display-numeral: clamp(4.5rem, 1.6rem + 11vw, 12.5rem);
+  --ds-text-display-title: clamp(3.5rem, 1.9rem + 5.6vw, 7.5rem);
+  --ds-tracking-numeral: -0.04em;
+  --ds-leading-numeral: 0.82;
   --ds-text-display-hero: clamp(2.75rem, 1.3rem + 6vw, 6rem);
   --ds-text-display-1: clamp(2.5rem, 1.4rem + 4.6vw, 5rem);
   --ds-text-display-2: clamp(2rem, 1.35rem + 2.7vw, 3.25rem);
@@ -335,6 +475,8 @@
   --ds-duration-fast: 160ms;
   --ds-duration-base: 280ms;
   --ds-duration-slow: 480ms;
+  /* A sheet sliding onto the table. */
+  --ds-duration-sheet: 240ms;
   --ds-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
   /*
@@ -480,6 +622,7 @@
     --ds-duration-fast: 0.01ms;
     --ds-duration-base: 0.01ms;
     --ds-duration-slow: 0.01ms;
+    --ds-duration-sheet: 0.01ms;
     --ds-duration-cinematic: 0.01ms;
     --ds-duration-chapter: 0.01ms;
     --ds-stagger-beat: 0ms;

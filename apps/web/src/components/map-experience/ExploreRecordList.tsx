@@ -13,6 +13,7 @@
  */
 'use client';
 
+import { KindGlyph } from './KindGlyph';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
@@ -66,6 +67,8 @@ export type ExploreRecordListProps = {
   readonly emptyState?: React.ReactNode;
   /** The brushed decade range: each row then shows its first decade inside it. */
   readonly period?: CollectionPeriod | undefined;
+  /** Record id to its thumbnail URL; a row without one shows a sand tile with its kind glyph. */
+  readonly photos?: Readonly<Record<string, { readonly url: string }>> | null;
   readonly className?: string;
 };
 
@@ -77,6 +80,7 @@ export function ExploreRecordList({
   emptyState,
   period,
   className,
+  photos,
 }: ExploreRecordListProps) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
@@ -180,6 +184,14 @@ export function ExploreRecordList({
                 }
               }}
             >
+              <span className="ds-xlist__thumb" aria-hidden="true">
+                {photos?.[id]?.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- remote Commons thumbnail
+                  <img src={photos[id]!.url} alt="" loading="lazy" decoding="async" />
+                ) : (
+                  <KindGlyph kind={properties.kind} size={18} />
+                )}
+              </span>
               <span className="ds-xlist__line">
                 <span className="ds-xlist__name">{properties.displayName}</span>
                 <span className="ds-xlist__decade">

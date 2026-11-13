@@ -31,17 +31,19 @@ import {
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
 
-test('decade morph duration is a slow ambient dissolve (~1.6s), not the 480ms UI token', () => {
-  assert.equal(DECADE_LAYER_FADE_MS, 1600);
-  assert.equal(decadeLayerFadeDurationMs(false), 1600);
+test('decade morph is the 400ms drop-in, capped where the art direction caps it', () => {
+  assert.equal(DECADE_LAYER_FADE_MS, 400);
+  assert.equal(decadeLayerFadeDurationMs(false), 400);
   assert.equal(decadeLayerFadeDurationMs(true), 0);
 });
 
-test('Explore must not request the ambient morph on patchData', () => {
-  // The 1.6s dual-buffer dissolve reads as lag on a decade or filter click, which is a direct
-  // interaction. Explore's decade crossfade is the 420ms pin transition in
-  // decade-transition.ts; the ambient morph belongs to surfaces that move the camera on their
-  // own. The helpers below stay exercised by the unit tests in this file.
+test('Explore morphs only on a brushed range, and never longer than 400ms', () => {
+  // A long dual-buffer dissolve read as lag on a filter click. Explore asks for the morph only
+  // when the brushed decade range changes (use-map-sync.ts), where arriving pins drop in and
+  // leaving ones ghost, and the morph is capped at 400ms; every other lens change snaps.
+  assert.ok(DECADE_LAYER_FADE_MS <= 400);
+  const sync = readFileSync(new URL('../explore/hooks/use-map-sync.ts', import.meta.url), 'utf8');
+  assert.match(sync, /\{ fade: brushed \}/);
   const atlasSource = readFileSync(
     new URL('../explore/AtlasExperience.tsx', import.meta.url),
     'utf8',

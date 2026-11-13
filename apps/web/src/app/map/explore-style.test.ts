@@ -34,6 +34,8 @@ import {
   EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
   EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_US_LAND_LAYER_ID,
+  EXPLORE_POINT_SHADOW_LAYER_ID,
   JURISDICTION_TAG_MIN_ZOOM,
   PLATE_BACKGROUND_OPACITY,
   PLATE_STATE_FILL_OPACITY,
@@ -313,7 +315,8 @@ test('the state-selected fill and density fallback tints are relocated DIGNITY_P
   const restingColor = colorAExpr[2] as unknown[];
   const tierFallback = restingColor[2] as unknown[];
   const tierOutputs = matchExpressionOutputs(tierFallback);
-  assert.ok(tierOutputs.includes(DIGNITY_PALETTE.densityUnknownFill));
+  assert.ok(tierOutputs.includes(plateForScheme('dark').densityUnknown));
+  assert.ok(Object.values(DIGNITY_PALETTE).includes(plateForScheme('dark').densityUnknown));
 
   // With no data to show, this layer is simply the landmass.
   const densityLayerOff = layerById(off, EXPLORE_STATE_DENSITY_LAYER_ID);
@@ -432,11 +435,24 @@ test('the plate reads as a map: land, water and boundaries come from the tokens'
   // over it. That is what produces a real coastline: the previous pairing (water background,
   // state polygons as the only landmass) drew the United States floating with no continent
   // around it, no Great Lakes and no Gulf.
+  // The background is the land around the lower 48; the lower 48 itself (the token's land) is
+  // its own fill from the state polygons, one paper step off, so the country reads.
   const darkBg = layerById(dark, 'background').paint?.['background-color'];
   const lightBg = layerById(light, 'background').paint?.['background-color'];
-  assert.equal(darkBg, mapPalettes.dark.land);
-  assert.equal(lightBg, mapPalettes.light.land);
-  assert.notEqual(darkBg, lightBg);
+  assert.equal(darkBg, plateForScheme('dark').ocean);
+  assert.equal(lightBg, plateForScheme('light').ocean);
+  assert.equal(
+    layerById(dark, EXPLORE_US_LAND_LAYER_ID).paint?.['fill-color'],
+    mapPalettes.dark.land,
+  );
+  assert.equal(
+    layerById(light, EXPLORE_US_LAND_LAYER_ID).paint?.['fill-color'],
+    mapPalettes.light.land,
+  );
+  for (const scheme of ['light', 'dark'] as const) {
+    const plate = plateForScheme(scheme);
+    assert.ok(lightnessDelta(plate.ocean, plate.land) >= 3, `${scheme} lower 48 must read`);
+  }
 
   // The water fill is the coastline. Without this layer the plate has no sea.
   assert.equal(layerById(dark, 'plate-water').paint?.['fill-color'], mapPalettes.dark.water);
@@ -449,8 +465,8 @@ test('the plate reads as a map: land, water and boundaries come from the tokens'
     mapPalettes.light.line2,
   );
   const lightPlate = plateForScheme('light');
-  // Light water is a neutral gray, not the token's tan: no fill near the copper hue.
-  assert.notEqual(lightPlate.water, mapPalettes.light.water);
+  // Light water is the token's sand tint.
+  assert.equal(lightPlate.water, mapPalettes.light.water);
   assert.equal(lightPlate.land, mapPalettes.light.land);
   assert.equal(lightPlate.stateBounds, mapPalettes.light.line);
   // County lines are deliberately not a token: §3's `line-2` is the country border, and it is
@@ -534,8 +550,9 @@ test('history relationship edge lines use theme-aware copper and toggle visibili
   assert.equal(lightEdge.paint?.['line-opacity'], 0.9);
   assert.equal(lightIncoming.paint?.['line-opacity'], 0);
 
+  // Both themes draw on paper land, so both use the copper text step.
   assert.equal(darkEdge.paint?.['line-color'], darkPlate.historyEdge);
-  assert.equal(darkEdge.paint?.['line-color'], brandPalette.copperDark);
+  assert.equal(darkEdge.paint?.['line-color'], brandPalette.copperTextLight);
   assert.notEqual(darkEdge.paint?.['line-color'], DIGNITY_PALETTE.pointHalo);
   assert.equal(darkSelected.paint?.['line-color'], darkPlate.historyEdgeSelected);
 });
@@ -613,7 +630,7 @@ test('dark plate draws its water and boundaries from the dark token set', () => 
     colorScheme: 'dark',
   });
   const darkPlate = plateForScheme('dark');
-  assert.equal(layerById(dark, 'background').paint?.['background-color'], mapPalettes.dark.land);
+  assert.equal(layerById(dark, 'background').paint?.['background-color'], darkPlate.ocean);
   assert.equal(layerById(dark, 'plate-water').paint?.['fill-color'], mapPalettes.dark.water);
   assert.equal(darkPlate.water, mapPalettes.dark.water);
   assert.equal(
@@ -714,14 +731,24 @@ test('the mark is a dot for site precision and a hollow ring for neighborhood or
   assert.deepEqual(match[1], ['get', 'precision']);
   // Campus is block precision: a ring, never a site dot.
   assert.deepEqual([...(match[2] as string[])].sort(), ['address', 'institution', 'site']);
-  assert.equal(radius[2], 4, '8px dot');
+  assert.equal(radius[2], 6, '12px pin head');
   assert.equal(radius[3], 7, '14px ring');
   const fill = point.paint?.['circle-color'] as unknown[];
   assert.equal(fill[3], 'rgba(0,0,0,0)', 'the ring is hollow');
+  // The pin is copper with an ink ring; the ring is a copper stroke.
+  assert.equal(fill[2], brandPalette.copperPin);
+  const stroke = point.paint?.['circle-stroke-color'] as unknown[];
+  assert.deepEqual([stroke[2], stroke[3]], [brandPalette.blackInk, brandPalette.copperPin]);
+  // Only a site pin casts the contact shadow: the shadow layer is filtered to the dot shape.
+  const shadow = layerById(style, EXPLORE_POINT_SHADOW_LAYER_ID) as LayerLike & {
+    filter?: unknown;
+  };
+  assert.match(JSON.stringify(shadow.filter), /"site"/);
+  assert.doesNotMatch(JSON.stringify(shadow.filter), /"city"/);
   assert.ok(!JSON.stringify(point.paint).includes('kind'), 'kind is never encoded on the mark');
 });
 
-test('groups are paper circles in three sizes with a count, never copper', () => {
+test('groups are copper discs in three sizes with an ink count, never a precision shape', () => {
   for (const scheme of ['light', 'dark'] as const) {
     const source = buildExploreMapSource(listPublicEntities());
     const style = buildExploreMapStyle({
@@ -733,7 +760,9 @@ test('groups are paper circles in three sizes with a count, never copper', () =>
     const group = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
     const plate = plateForScheme(scheme);
     assert.equal(group.paint?.['circle-color'], plate.groupFill);
-    assert.notEqual(group.paint?.['circle-color'], DIGNITY_PALETTE.point);
+    assert.equal(plate.groupFill, brandPalette.copperPin);
+    // Ink count on copper is 4.9:1.
+    assert.equal(plate.groupText, brandPalette.blackInk);
     const steps = group.paint?.['circle-radius'] as unknown[];
     assert.equal(steps[0], 'step');
     assert.equal(steps.length, 7, 'three size steps');
@@ -742,7 +771,7 @@ test('groups are paper circles in three sizes with a count, never copper', () =>
   }
 });
 
-test('a selected dot is copper with a paper halo, a selected ring stays hollow; the tag is copper', () => {
+test('a selected pin grows in copper with an ink ring, a selected ring stays hollow; the tag is copper', () => {
   const style = buildStyleFixture('off');
   const selected = layerById(style, EXPLORE_SELECTED_POINT_LAYER_ID);
   // `['case', <is dot>, dot value, ring value]`: selection never fills a ring into a site.
@@ -751,12 +780,15 @@ test('a selected dot is copper with a paper halo, a selected ring stays hollow; 
   assert.equal(dotColor, DIGNITY_PALETTE.point);
   assert.equal(ringColor, 'rgba(0,0,0,0)');
   const stroke = selected.paint?.['circle-stroke-color'] as unknown[];
-  assert.equal(stroke[2], plateForScheme('dark').selectedHalo);
+  assert.equal(stroke[2], plateForScheme('dark').markRing);
   assert.equal(stroke[3], DIGNITY_PALETTE.point);
   const width = selected.paint?.['circle-stroke-width'] as unknown[];
-  assert.deepEqual([width[2], width[3]], [2, 3]);
+  assert.deepEqual([width[2], width[3]], [2, 4]);
+  // Larger than the resting mark (1.6x), so selection never reads by color alone.
+  const radius = selected.paint?.['circle-radius'] as unknown[];
+  assert.deepEqual([radius[2], radius[3]], [6 * 1.6, 7 * 1.6]);
   const tag = layerById(style, EXPLORE_SELECTED_TAG_LAYER_ID);
-  assert.equal(tag.paint?.['text-color'], DIGNITY_PALETTE.point);
+  assert.equal(tag.paint?.['text-color'], brandPalette.copperTextLight);
   assert.deepEqual(selectedTagFilterExpression('ent_a'), ['in', '|ent_a|', ['get', 'ids']]);
 });
 

@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { Chip, PageHeader, buttonClassName } from '@repo/ui';
+import { Chip, DisplayNumeral, PageTitle, Sheet, buttonClassName } from '@repo/ui';
 import { Room } from '../../components/room';
 import { RecordsTimeline } from '../../components/discovery/records-chronology';
 import {
@@ -212,9 +212,11 @@ function countPhrase(count: number): string {
 
 export type RecordsIndexProps = {
   readonly model: RecordsIndexModel;
+  /** Record id to its thumbnail URL, for the rows on this page that have an image. */
+  readonly photos?: Readonly<Record<string, string>>;
 };
 
-export function RecordsIndexRoom({ model }: RecordsIndexProps) {
+export function RecordsIndexRoom({ model, photos = {} }: RecordsIndexProps) {
   const {
     query,
     rows,
@@ -294,7 +296,7 @@ export function RecordsIndexRoom({ model }: RecordsIndexProps) {
               : (startPage.get(section.decade) ?? null)
             : null,
           rows: section.rows.map((row) => (
-            <RecordRow key={row.id} row={row} query={query.q} compact />
+            <RecordRow key={row.id} row={row} query={query.q} compact photoUrl={photos[row.id]} />
           )),
         }))}
       />
@@ -302,11 +304,19 @@ export function RecordsIndexRoom({ model }: RecordsIndexProps) {
   } else {
     const anchors = decadeJumps.length > 0 ? decadeAnchors(rows) : new Map<string, string>();
     body = (
-      <ol className="ds-records-list">
-        {rows.map((row) => (
-          <RecordRow key={row.id} row={row} query={query.q} anchor={anchors.get(row.id)} />
-        ))}
-      </ol>
+      <Sheet className="ds-records-paper">
+        <ol className="ds-records-list">
+          {rows.map((row) => (
+            <RecordRow
+              key={row.id}
+              row={row}
+              query={query.q}
+              anchor={anchors.get(row.id)}
+              photoUrl={photos[row.id]}
+            />
+          ))}
+        </ol>
+      </Sheet>
     );
   }
 
@@ -316,7 +326,15 @@ export function RecordsIndexRoom({ model }: RecordsIndexProps) {
 
   return (
     <Room width="wide" className="ds-records">
-      <PageHeader title="Records" dek={countLabel} />
+      {/* The title at display scale with the count beside it as a giant copper numeral. The dek
+          says the count in words (and how it is narrowed), so the numeral is not read twice. */}
+      <header className="ds-records-head">
+        <PageTitle className="ds-records-head__title">Records</PageTitle>
+        <DisplayNumeral className="ds-records-head__count" decorative>
+          {model.totalMatched.toLocaleString('en-US')}
+        </DisplayNumeral>
+        <p className="ds-records-head__dek">{countLabel}</p>
+      </header>
       {toolbar}
 
       {constraints.length > 0 ? (

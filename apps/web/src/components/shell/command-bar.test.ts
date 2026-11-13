@@ -56,9 +56,11 @@ test('the header has one search field and no floating island, pill track or Room
   assert.match(source, /<Tabs\b/);
   // Home is the lockup, never a tab.
   assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
-  // Flush and full bleed: fixed to the top edge with a rule under it, no inset or radius.
+  // Flush and full bleed: fixed to the top edge on an ink ground in both themes, no inset or
+  // radius; the search is a paper field on it.
   assert.match(css, /\.ds-bar \{[^}]*top:\s*0;[^}]*left:\s*0;/s);
-  assert.match(css, /\.ds-bar \{[^}]*border-bottom:/s);
+  assert.match(source, /className=\{cx\('ds-bar', className\)\}\s*data-ground="ink"/);
+  assert.match(read('CommandBarSearch.tsx'), /data-ground="paper"/);
   assert.doesNotMatch(css, /\.ds-bar \{[^}]*border-radius/s);
 });
 
@@ -82,7 +84,10 @@ test('below 48rem the header is in flow and the tab bar takes the tabs; never at
 
 test('the current tab is marked by more than color', () => {
   const tabCss = read('tab-bar.css');
-  assert.match(tabCss, /\.ds-tabbar__tab\[aria-current='page'\] \{[^}]*font-weight:\s*600/s);
-  assert.match(tabCss, /\.ds-tabbar__tab\[aria-current='page'\]::before/);
+  // A copper block tile with a heavier label: shape and weight, not the hue alone.
+  assert.match(
+    tabCss,
+    /\.ds-tabbar__tab\[aria-current='page'\] \{[^}]*background:\s*var\(--ds-primary-bg\)[^}]*font-weight:\s*650/s,
+  );
   assert.match(read('PhoneTabBar.tsx'), /aria-label="Main"/);
 });

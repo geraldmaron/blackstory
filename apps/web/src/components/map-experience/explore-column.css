@@ -1,6 +1,7 @@
 /*
  * The Explore layout (ExploreColumn.tsx, AtlasExperience.tsx): a full-canvas map, one flush
- * 380px column on the left, the decade histogram docked on the map's bottom edge, and the zoom
+ * 380px column on the left (a PAPER sheet on the ink table, `data-ground="paper"`, its page bands
+ * on its inner edge against the map), the decade histogram docked on the map's bottom edge, and the zoom
  * and locate stack bottom-right. Below 768px the column is a bottom sheet over the map.
  *
  * `--ds-xcol-detent-h` (set on `.ds-atlas` by AtlasExperience) is the sheet's resting height, so
@@ -21,8 +22,12 @@
   display: flex;
   flex-direction: column;
   width: var(--ds-xcol-w);
-  border-right: var(--ds-border-width) solid var(--ds-rule);
+  padding-right: calc(var(--ds-band-w) * 3);
   background: var(--ds-canvas);
+  box-shadow:
+    inset calc(var(--ds-band-w) * -1) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * -2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * -3) 0 0 var(--ds-band-3);
   color: var(--ds-ink);
   pointer-events: auto;
 }
@@ -46,7 +51,7 @@
   min-width: 0;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.015em;
@@ -201,14 +206,14 @@
 }
 
 /* —— The histogram on the map's bottom edge ————————————————————————————————— */
+/* An ink strip in both themes (`data-ground="ink"` on the dock): sand bars, copper brushed range. */
 .ds-xdock {
   position: fixed;
   right: 0;
   bottom: 0;
   left: var(--ds-xcol-w);
   z-index: var(--ds-z-atlas-instruments);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  background: var(--ds-material-ink);
   pointer-events: auto;
 }
 
@@ -226,10 +231,10 @@ body:has(.ds-atlas .ds-xcol) {
     bottom: var(--ds-tabbar-h);
     width: auto;
     height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 160px));
-    border-top: var(--ds-border-width) solid var(--ds-rule);
-    border-right: 0;
+    padding-right: 0;
+    border-top: var(--ds-border-width) solid var(--ds-material-ink);
     border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
-    box-shadow: var(--ds-contact-plate);
+    box-shadow: none;
     transition: height var(--ds-duration-base) var(--ds-ease-entrance);
   }
 

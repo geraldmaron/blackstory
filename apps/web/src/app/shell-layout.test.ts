@@ -168,21 +168,18 @@ describe('horizontal overflow guards', () => {
 describe('shell footer theme tokens', () => {
   // The footer sits on the page ground above a hairline: no card, no fixed charcoal, and copper
   // nowhere (copper is for the current thing and the one primary action).
-  it('styles the footer as a theme-aware ground with a top hairline, not a card', () => {
+  it('styles the footer as a copper block closing on a sand band, its type from the ground', () => {
     assert.doesNotMatch(shellCss, /\.ds-shell-footer__card/);
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer\s*\{[^}]*border-top:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
-    );
-    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    assert.match(shellCss, /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);
-    assert.match(shellCss, /\.ds-shell-footer__links a:hover\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+    // The grounds set every color: ink type on copper and on sand, never a hardcoded hex.
+    const footer = readFileSync(join(here, '../components/SiteFooter.tsx'), 'utf8');
+    assert.match(footer, /className="ds-shell-footer" data-ground="copper"/);
+    assert.match(footer, /className="ds-shell-footer__legal" data-ground="sand"/);
+    assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     const footerRules = shellCss.slice(
-      shellCss.indexOf('/* —— Footer: two rows'),
+      shellCss.indexOf('/* —— Footer: a copper block'),
       shellCss.indexOf('/* Maker credit'),
     );
-    assert.doesNotMatch(footerRules, /--ds-accent/);
+    assert.doesNotMatch(footerRules, /#[0-9a-f]{3,6}\b/i);
     assert.doesNotMatch(footerRules, /text-transform:\s*uppercase/);
     assert.doesNotMatch(
       shellCss,
@@ -192,16 +189,14 @@ describe('shell footer theme tokens', () => {
 });
 
 describe('maker credit theme marks', () => {
-  it('swaps inline GD marks with [data-theme] like the shell wordmark', () => {
-    assert.match(shellCss, /\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*block/s);
-    assert.match(shellCss, /\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*none/s);
+  it('swaps inline GD marks by the nearest ground, like the shell wordmark', () => {
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*none/s,
+      /\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*var\(--ds-lockup-on-light, block\)/s,
     );
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*block/s,
+      /\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*var\(--ds-lockup-on-dark, none\)/s,
     );
   });
 });

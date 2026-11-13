@@ -1,15 +1,16 @@
 /**
- * Public site footer, two rows on the wide container.
+ * Public site footer: a full-bleed copper block closing on a sand band.
  *
- * Row one: the lockup artwork and one sentence (the site's AI disclosure), then the destination
- * links in plain columns under sentence-case headings. Row two: copyright, the policy pages, the
- * maker credit and staff sign-in.
+ * The copper block carries the core line at display scale, a paper sheet holding the lockup and
+ * one sentence (the site's AI disclosure), and the destination links in columns under
+ * sentence-case headings. The lockup sits on paper because its copper pin would vanish on copper.
+ * The sand band carries copyright, the policy pages, the maker credit and staff sign-in.
  */
 
 import Link from 'next/link';
 import React from 'react';
 import { BRAND_ASSETS, PRODUCT_NAME } from '@repo/config';
-import { ShellWordmark } from '@repo/ui';
+import { Sheet, ShellWordmark } from '@repo/ui';
 import { footerColumns, policyLinks } from '../lib/nav/destination-registry';
 import { MakerCredit } from './MakerCredit';
 
@@ -23,10 +24,11 @@ export function SiteFooter() {
   const columns = footerColumns();
 
   return (
-    <footer className="ds-shell-footer">
+    <footer className="ds-shell-footer" data-ground="copper">
       <div className="ds-shell-footer__inner">
+        <p className="ds-shell-footer__line">History, pinned to place.</p>
         <div className="ds-shell-footer__top">
-          <div className="ds-shell-footer__mast">
+          <Sheet className="ds-shell-footer__mast">
             <Link
               className="ds-shell-footer__brand ds-shell-wordmark"
               href="/"
@@ -45,7 +47,7 @@ export function SiteFooter() {
                 How a record gets in
               </Link>
             </p>
-          </div>
+          </Sheet>
 
           <nav aria-label="Footer" className="ds-shell-footer__columns">
             {columns.map((column) => (
@@ -66,7 +68,9 @@ export function SiteFooter() {
             ))}
           </nav>
         </div>
+      </div>
 
+      <div className="ds-shell-footer__legal" data-ground="sand">
         <div className="ds-shell-footer__meta-row">
           <p className="ds-shell-footer__meta">
             © {year} {PRODUCT_NAME}

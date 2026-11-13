@@ -73,6 +73,15 @@ import {
   EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_POINT_SHADOW_LAYER_ID,
+  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
+  EXPLORE_HOVER_SHADOW_LAYER_ID,
+  EXPLORE_HOVER_POINT_LAYER_ID,
+  EXPLORE_GHOSTS_SOURCE_ID,
+  EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_US_LAND_LAYER_ID,
+  EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  JURISDICTION_HATCH_IMAGE_ID,
 } from './explore-layer-ids';
 import {
   COUNTY_LABELS_MIN_ZOOM,
@@ -123,6 +132,15 @@ export {
   EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_POINT_SHADOW_LAYER_ID,
+  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
+  EXPLORE_HOVER_SHADOW_LAYER_ID,
+  EXPLORE_HOVER_POINT_LAYER_ID,
+  EXPLORE_GHOSTS_SOURCE_ID,
+  EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_US_LAND_LAYER_ID,
+  EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  JURISDICTION_HATCH_IMAGE_ID,
 } from './explore-layer-ids';
 /**
  * OpenMapTiles `transportation.class` width ladder — motorway heaviest down through residential
@@ -282,12 +300,24 @@ export function stateLabelFilters(postalCode: string | undefined): {
   };
 }
 
-/** A dot at the site, a hollow ring at the neighborhood or city (`recordMarkFor`). */
-const DOT_RADIUS_PX = 4;
+/**
+ * A copper pin head at the site, an open copper ring of the same diameter at the neighborhood or
+ * city (`recordMarkFor`): "the town, not the spot" is visible in the shape. About 12px at rest.
+ */
+const PIN_RADIUS_PX = 6;
+/** The city ring is a touch wider than the pin: it marks an area, never a spot. */
 const RING_RADIUS_PX = 7;
-const SELECTED_HALO_PX = 2;
-/** A selected ring's copper stroke: twice the resting ring's weight. */
-const SELECTED_RING_PX = 3;
+const PIN_RING_PX = 1.25;
+const RING_STROKE_PX = 2.5;
+/** Selection scales the same shape 1.6x; it never turns a ring into a pin. */
+export const SELECTED_SCALE = 1.6;
+const SELECTED_PIN_RING_PX = 2;
+const SELECTED_RING_STROKE_PX = 4;
+/** The flat contact shadow: offset down-right, no blur. Hover widens it and lifts the pin 2px. */
+const SHADOW_OFFSET: [number, number] = [1.5, 2];
+const HOVER_SHADOW_OFFSET: [number, number] = [2.5, 4];
+/** Pins outside the brushed decades fade to a sand ghost at this opacity. */
+export const GHOST_OPACITY = 0.2;
 
 function markIs(mark: RecordMark): ExpressionSpecification {
   return [
@@ -302,6 +332,17 @@ function markIs(mark: RecordMark): ExpressionSpecification {
 function byMark(dot: unknown, ring: unknown): ExpressionSpecification {
   return ['case', markIs('dot'), dot, ring] as unknown as ExpressionSpecification;
 }
+
+/** The sand ring around a group: decoration only, it encodes nothing. */
+const GROUP_RING_PX = 3;
+
+/** The resting mark radius by shape, for the selection ease (`setSelectedEntityFilter`). */
+export function markRadiusExpression(scale = 1): ExpressionSpecification {
+  return byMark(PIN_RADIUS_PX * scale, RING_RADIUS_PX * scale);
+}
+
+/** The state hatch stops at county scale. */
+const HATCH_MAX_ZOOM = 9;
 
 /** Jurisdiction tags draw from regional zoom up, never at national scale. */
 export const JURISDICTION_TAG_MIN_ZOOM = 5.5;
@@ -401,7 +442,45 @@ export type BuildExploreMapStyleInput = {
    * the basemap only: which records are on the plate, and how they are encoded, are untouched.
    */
   readonly satellite?: boolean;
+  /**
+   * Records the lens matches outside the brushed decades. Drawn as a sand ghost so time reads on
+   * the map (a brushed-out pin fades rather than vanishes); never hittable, never grouped.
+   */
+  readonly ghostCollection?: ExploreMapFeatureCollection;
 };
+
+/** Paint for one state's hatch: on where the state holds county- or state-precision records. */
+function hatchOpacityExpression(postalCodes: readonly string[]): ExpressionSpecification | number {
+  if (postalCodes.length === 0) return 0;
+  return [
+    'match',
+    ['get', 'postalCode'],
+    [...postalCodes],
+    0.7,
+    0,
+  ] as unknown as ExpressionSpecification;
+}
+
+/** The pin layers for one entities buffer: a site pin and a city ring, shape by precision. */
+function pinPaint(plate: MapPlate, opacity: number) {
+  return {
+    'circle-radius': byMark(PIN_RADIUS_PX, RING_RADIUS_PX),
+    'circle-color': byMark(plate.markInk, 'rgba(0,0,0,0)'),
+    'circle-opacity': opacity,
+    'circle-stroke-width': byMark(PIN_RING_PX, RING_STROKE_PX),
+    'circle-stroke-color': byMark(plate.markRing, plate.markInk),
+    'circle-stroke-opacity': opacity,
+  };
+}
+
+function shadowPaint(plate: MapPlate, opacity: number, offset: [number, number]) {
+  return {
+    'circle-radius': PIN_RADIUS_PX + PIN_RING_PX,
+    'circle-color': plate.markShadow,
+    'circle-opacity': opacity,
+    'circle-translate': offset,
+  };
+}
 
 /**
  * Builds the full `/explore` MapLibre style: entity points with a radius-affordance
@@ -429,6 +508,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
      entities source and are counted in a jurisdiction tag instead. */
   const drawn = drawnRecordCollection(input.featureCollection);
   const tags = jurisdictionTagCollection(input.featureCollection);
+  const ghosts = input.ghostCollection
+    ? drawnRecordCollection(input.ghostCollection)
+    : { type: 'FeatureCollection' as const, features: [] };
+  const hatchedStates = tags.features.map((tag) => tag.properties.postalCode);
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =
     input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
@@ -530,6 +613,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: tags as any,
       },
+      [EXPLORE_GHOSTS_SOURCE_ID]: {
+        type: 'geojson',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        data: ghosts as any,
+      },
       [EXPLORE_STATE_LABELS_SOURCE_ID]: {
         type: 'geojson',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
@@ -591,6 +679,33 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
          as state polygons floating on a flat field: no coastline, no Great Lakes, no Canada or
          Mexico, and no place names between the state abbreviations and street labels at z11.
          `docs/ui/patterns-map-canvas.md`; reference build `.design-mocks/blackstory-atlas-v9.html`. */
+      {
+        // The lower-48, one paper step off the neighbors so the country reads on the chart. Under
+        // the water layer, so lakes and coastline still cut it.
+        id: EXPLORE_US_LAND_LAYER_ID,
+        type: 'fill',
+        source: EXPLORE_STATE_DENSITY_SOURCE_ID,
+        filter: ['!', ['in', ['get', 'postalCode'], ['literal', ['AK', 'HI', 'PR']]]],
+        layout: { visibility: satellite ? 'none' : 'visible' },
+        paint: { 'fill-color': plate.land },
+      },
+      {
+        /* Area precision shown as an area: a state holding county- or state-precision records
+           carries a sand hatch, and its tag gives the count. County polygons load only past
+           `COUNTY_LINES_MIN_ZOOM`, so the hatch is the state's (never a county's). Under the water
+           layer, so rivers and coast cut it; gone past regional zoom, where a whole-state hatch
+           says nothing about the streets in view. */
+        id: EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+        type: 'fill',
+        source: EXPLORE_STATE_DENSITY_SOURCE_ID,
+        minzoom: JURISDICTION_TAG_MIN_ZOOM,
+        maxzoom: HATCH_MAX_ZOOM,
+        paint: {
+          'fill-pattern': JURISDICTION_HATCH_IMAGE_ID,
+          'fill-opacity': hatchOpacityExpression(hatchedStates),
+          'fill-opacity-transition': { duration: 0 },
+        },
+      },
       {
         // Oceans, lakes and wide rivers. This is what gives the plate a coastline: without it
         // the only edge on the map is the outer boundary of the state polygon set.
@@ -1007,8 +1122,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: unselectedTagFilterExpression(undefined),
         layout: {
           'text-field': ['get', 'label'],
-          'text-size': 10,
-          'text-font': ['Noto Sans Regular'],
+          'text-size': 11,
+          'text-font': ['Noto Sans Bold'],
           'text-offset': [0, 1.4],
           'text-max-width': 24,
           'text-letter-spacing': 0.04,
@@ -1017,13 +1132,35 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
         paint: {
           'text-color': plate.tagText,
-          'text-halo-color': plate.ocean,
-          'text-halo-width': haloWidth(1.2),
+          'text-halo-color': plate.placeLabelHalo,
+          'text-halo-width': haloWidth(2),
         },
       },
       {
-        // One layer, two shapes: a solid dot where the archive holds the site, a hollow ring
-        // where it holds the neighborhood or city. Kind is never encoded here.
+        // Brushed-out records: a sand ghost at the record's own drawn place, under every live mark.
+        id: EXPLORE_GHOST_POINT_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_GHOSTS_SOURCE_ID,
+        paint: {
+          'circle-radius': byMark(PIN_RADIUS_PX, RING_RADIUS_PX),
+          'circle-color': byMark(plate.ghost, 'rgba(0,0,0,0)'),
+          'circle-opacity': GHOST_OPACITY,
+          'circle-stroke-width': byMark(0, RING_STROKE_PX),
+          'circle-stroke-color': plate.ghost,
+          'circle-stroke-opacity': GHOST_OPACITY,
+        },
+      },
+      {
+        // The site pin's flat contact shadow. A ring has none: it marks an area, not a spot.
+        id: EXPLORE_POINT_SHADOW_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        filter: ['all', ['!', ['has', 'point_count']], markIs('dot')],
+        paint: { ...DECADE_TRANSITION_PAINT, ...shadowPaint(plate, 1, SHADOW_OFFSET) },
+      },
+      {
+        // One layer, two shapes: a copper pin head where the archive holds the site, an open
+        // copper ring where it holds the neighborhood or city. Kind is never encoded here.
         id: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
@@ -1031,12 +1168,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
-          'circle-radius': byMark(DOT_RADIUS_PX, RING_RADIUS_PX),
-          'circle-color': byMark(plate.markInk, 'rgba(0,0,0,0)'),
-          'circle-opacity': ENTITY_POINT_FILL_OPACITY,
-          'circle-stroke-width': byMark(1, 1.5),
-          'circle-stroke-color': byMark(plate.ocean, plate.markInk),
-          'circle-stroke-opacity': 0.9,
+          ...pinPaint(plate, ENTITY_POINT_FILL_OPACITY),
         },
       },
       {
@@ -1050,7 +1182,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'circle-radius': groupRadiusExpression(),
           'circle-color': plate.groupFill,
           'circle-opacity': ENTITY_CLUSTER_OPACITY,
-          'circle-stroke-width': 1,
+          'circle-stroke-width': GROUP_RING_PX,
           'circle-stroke-color': plate.groupStroke,
         },
       },
@@ -1061,7 +1193,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: ['has', 'point_count'],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
-          'text-size': 11,
+          'text-size': 12,
           'text-font': ['Noto Sans Bold'],
           // A count always draws, and claims the whole group circle in the collision index (the
           // padding reaches the largest circle's edge), so no tag or label prints across a group.
@@ -1071,18 +1203,18 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: { 'text-color': plate.groupText },
       },
       {
+        id: EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
+        filter: ['all', ['!', ['has', 'point_count']], markIs('dot')],
+        paint: shadowPaint(plate, 0, SHADOW_OFFSET),
+      },
+      {
         id: EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-radius': byMark(DOT_RADIUS_PX, RING_RADIUS_PX),
-          'circle-color': byMark(plate.markInk, 'rgba(0,0,0,0)'),
-          'circle-opacity': 0,
-          'circle-stroke-width': byMark(1, 1.5),
-          'circle-stroke-color': byMark(plate.ocean, plate.markInk),
-          'circle-stroke-opacity': 0,
-        },
+        paint: pinPaint(plate, 0),
       },
       {
         id: EXPLORE_CLUSTER_INCOMING_LAYER_ID,
@@ -1093,7 +1225,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'circle-radius': groupRadiusExpression(),
           'circle-color': plate.groupFill,
           'circle-opacity': 0,
-          'circle-stroke-width': 1,
+          'circle-stroke-width': GROUP_RING_PX,
           'circle-stroke-color': plate.groupStroke,
         },
       },
@@ -1104,7 +1236,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: ['has', 'point_count'],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
-          'text-size': 11,
+          'text-size': 12,
           'text-font': ['Noto Sans Bold'],
           'text-allow-overlap': true,
         },
@@ -1126,26 +1258,43 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-ignore-placement': true,
         },
         paint: {
-          'text-color': DIGNITY_PALETTE.point,
-          'text-halo-color': plate.ocean,
-          'text-halo-width': haloWidth(1.2),
+          'text-color': brandPalette.copperTextLight,
+          'text-halo-color': plate.placeLabelHalo,
+          'text-halo-width': haloWidth(2),
         },
       },
       {
-        // Selected, in its own shape: a site dot turns copper with a paper halo; a ring stays a
-        // hollow ring, drawn in copper and heavier, so selection never sharpens a city record
-        // into a site. Copper on the map means the current thing and nothing else.
+        // Hover: the pin lifts 2px and its contact shadow widens. Filtered to one record by
+        // `setHoveredEntityFilter`; a ring lifts without a shadow.
+        id: EXPLORE_HOVER_SHADOW_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        filter: ['all', selectedPointFilterExpression(undefined), markIs('dot')],
+        paint: shadowPaint(plate, 1, HOVER_SHADOW_OFFSET),
+      },
+      {
+        id: EXPLORE_HOVER_POINT_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        filter: selectedPointFilterExpression(undefined),
+        paint: { ...pinPaint(plate, 1), 'circle-translate': [0, -2] },
+      },
+      {
+        // Selected, in its own shape, 1.6x: a site pin grows with a heavier ink ring; a ring
+        // stays an open ring, heavier, so selection never sharpens a city record into a site.
+        // The radius eases up from rest (`setSelectedEntityFilter`); the paper name flag is a DOM
+        // marker (`selection-flag.ts`), because map glyphs cannot set Schibsted.
         id: EXPLORE_SELECTED_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: selectedPointFilterExpression(undefined),
         paint: {
-          // Larger than the mark it replaces, so selection never reads by color alone.
-          'circle-radius': byMark(DOT_RADIUS_PX + 2, RING_RADIUS_PX + 1),
-          'circle-color': byMark(DIGNITY_PALETTE.point, 'rgba(0,0,0,0)'),
+          'circle-radius': byMark(PIN_RADIUS_PX * SELECTED_SCALE, RING_RADIUS_PX * SELECTED_SCALE),
+          'circle-radius-transition': { duration: 200 },
+          'circle-color': byMark(plate.markInk, 'rgba(0,0,0,0)'),
           'circle-opacity': 1,
-          'circle-stroke-width': byMark(SELECTED_HALO_PX, SELECTED_RING_PX),
-          'circle-stroke-color': byMark(plate.selectedHalo, DIGNITY_PALETTE.point),
+          'circle-stroke-width': byMark(SELECTED_PIN_RING_PX, SELECTED_RING_STROKE_PX),
+          'circle-stroke-color': byMark(plate.markRing, plate.markInk),
           'circle-stroke-opacity': 1,
         },
       },

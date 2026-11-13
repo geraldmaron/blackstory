@@ -12,6 +12,10 @@ import { FilterButton } from './FilterButton.tsx';
 import { PageHeader, SectionHeading } from './PageHeader.tsx';
 import { Segmented } from './Segmented.tsx';
 import { Tabs } from './Tabs.tsx';
+import { Block } from './Block.tsx';
+import { DisplayNumeral } from './DisplayNumeral.tsx';
+import { PageTitle } from './PageTitle.tsx';
+import { Sheet } from './Sheet.tsx';
 
 test('Button renders a button by default and an anchor with href', () => {
   const button = renderToStaticMarkup(createElement(Button, { variant: 'quiet' }, 'Go'));
@@ -112,4 +116,27 @@ test('PageHeader is crumb, h1, dek and actions; SectionHeading is an h2', () => 
     renderToStaticMarkup(createElement(SectionHeading, {}, 'Sources')),
     /^<h2 class="ds-section-heading">Sources<\/h2>$/,
   );
+});
+
+test('Sheet and Block set the ground their children read their colors from', () => {
+  const sheet = renderToStaticMarkup(createElement(Sheet, { as: 'article' }, 'Text'));
+  assert.match(sheet, /^<article class="ds-sheet" data-ground="paper">/);
+  const inner = renderToStaticMarkup(createElement(Sheet, { bands: 'end' }, 'List'));
+  assert.match(inner, /class="ds-sheet ds-sheet--bands-end"/);
+  const block = renderToStaticMarkup(createElement(Block, { tone: 'copper', wipe: true }, 'x'));
+  assert.match(
+    block,
+    /^<section class="ds-block ds-block--copper ds-block--wipe" data-ground="copper">/,
+  );
+});
+
+test('DisplayNumeral is read unless it repeats a value stated nearby', () => {
+  const read = renderToStaticMarkup(createElement(DisplayNumeral, null, '4,387'));
+  assert.doesNotMatch(read, /aria-hidden/);
+  const echo = renderToStaticMarkup(
+    createElement(DisplayNumeral, { decorative: true, tone: 'soft' }, '1750s'),
+  );
+  assert.match(echo, /class="ds-numeral ds-numeral--soft" aria-hidden="true"/);
+  const title = renderToStaticMarkup(createElement(PageTitle, null, 'Records'));
+  assert.equal(title, '<h1 class="ds-page-title">Records</h1>');
 });

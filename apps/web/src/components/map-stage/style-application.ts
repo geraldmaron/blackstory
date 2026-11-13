@@ -32,6 +32,13 @@ import {
   EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_HOVER_POINT_LAYER_ID,
+  EXPLORE_HOVER_SHADOW_LAYER_ID,
+  EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
+  EXPLORE_POINT_SHADOW_LAYER_ID,
+  EXPLORE_US_LAND_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
 import { buildExploreMapStyle, stateLabelFilters } from '../../app/map/explore-style';
 import {
@@ -49,6 +56,8 @@ export const SELECTED_LINE_ID = 'explore-state-selected-line';
 export const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
   SATELLITE_LAYER_ID,
+  EXPLORE_US_LAND_LAYER_ID,
+  EXPLORE_JURISDICTION_HATCH_LAYER_ID,
   'plate-water',
   'plate-boundary-country',
   'plate-place-city',
@@ -73,14 +82,19 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
  * beneath groups, incoming dual-buffer layers above the current stack, then the jurisdiction
  * tags, then the selection on top. Added once then paint-refreshed on style rebuild. */
 export const ENTITY_LAYER_IDS = new Set([
+  EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_POINT_SHADOW_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_JURISDICTION_TAG_LAYER_ID,
   EXPLORE_SELECTED_TAG_LAYER_ID,
+  EXPLORE_HOVER_SHADOW_LAYER_ID,
+  EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
 ]);
 /** Sources whose real geometry arrives from a lazy client fetch (`loadStatePolygonsWithDensity`,
@@ -260,6 +274,7 @@ export function buildStyleForScheme(
 ): StyleSpecification {
   return buildExploreMapStyle({
     featureCollection: cfg.featureCollection,
+    ghostCollection: cfg.ghostCollection,
     jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
     layerMode: cfg.layerMode,
     popGeo: cfg.popGeo,

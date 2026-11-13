@@ -65,21 +65,11 @@
     height: 20px;
   }
 
-  /* Current: ink label, heavier weight and a copper bar on the top edge. Never color alone. */
+  /* Current: a copper block tile with an ink label and heavier weight. Never color alone. */
   .ds-tabbar__tab[aria-current='page'] {
-    color: var(--ds-ink);
-    font-weight: 600;
-  }
-
-  .ds-tabbar__tab[aria-current='page']::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: 50%;
-    width: 32px;
-    height: 2px;
-    background: var(--ds-accent-graphic);
-    transform: translateX(-50%);
+    background: var(--ds-primary-bg);
+    color: var(--ds-primary-ink);
+    font-weight: 650;
   }
 
   .ds-tabbar__tab:focus-visible {

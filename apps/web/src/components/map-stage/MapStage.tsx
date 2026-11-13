@@ -121,6 +121,11 @@ import {
   type ExploreSearchCenterMarkerInput,
 } from '../../lib/map-experience/explore-search-marker';
 import { readDocumentColorScheme } from './color-scheme';
+import { bindHatchImage } from './hatch-image';
+import { buildSelectionFlagElement } from './selection-flag';
+import { dropInIncomingPins } from './selection-sync';
+import { EXPLORE_GHOSTS_SOURCE_ID } from '../../app/map/explore-layer-ids';
+import { recordMarkFor } from '../../lib/map-experience/geo-precision';
 import { EMPTY_EDGE_COLLECTION, EMPTY_FEATURE_COLLECTION, type StageConfig } from './stage-config';
 import {
   applyGeographyStyle,
@@ -131,6 +136,7 @@ import {
   setHistoryEdgeData,
   setHistoryEdgesVisibility,
   setSelectedEdgeFilter,
+  setHoveredEntityFilter,
   setSelectedEntityFilter,
 } from './selection-sync';
 import {
@@ -212,6 +218,8 @@ type MaplibreModule = typeof MapLibreNamespace;
  * plain re-render props. */
 export type MapStageDataPatch = {
   readonly featureCollection: ExploreMapFeatureCollection;
+  /** Records the lens matches outside the brushed decades, drawn as sand ghosts. */
+  readonly ghostCollection?: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly layerMode: ExploreLayerMode;
   readonly popGeo?: ExplorePopulationGeo;
@@ -399,6 +407,8 @@ type EntityPoint = {
   readonly name: string;
   readonly lng: number;
   readonly lat: number;
+  /** False for county- and state-precision records, which draw no point. */
+  readonly drawn: boolean;
 };
 
 /** Point records by id, so a hover or a selection finds its record without scanning thousands. */
@@ -417,6 +427,7 @@ function indexEntityPoints(
       name: typeof props.displayName === 'string' ? props.displayName : 'Documented record',
       lng,
       lat,
+      drawn: recordMarkFor(props.precision) !== 'none',
     });
   }
   return byId;
@@ -573,6 +584,7 @@ export function MapStageProvider({
         layerMode: 'off',
       }),
     featureCollection: initialFeatureCollection ?? EMPTY_FEATURE_COLLECTION,
+    ghostCollection: EMPTY_FEATURE_COLLECTION,
     jurisdictionAreaFeatures: initialJurisdictionAreaFeatures ?? [],
     layerMode: 'off',
     popGeo: DEFAULT_POPULATION_GEO,
@@ -653,6 +665,29 @@ export function MapStageProvider({
     return entityIndexRef.current.byId.get(entityId);
   }, []);
 
+  /** The paper name flag on the selected pin (`selection-flag.ts`). */
+  const selectionFlagRef = useRef<{ readonly id: string; readonly marker: Marker } | null>(null);
+  const syncSelectionFlag = useCallback(
+    (map: MapLibreMap, entityId: string | undefined) => {
+      const maplibregl = maplibreglRef.current;
+      if (selectionFlagRef.current?.id === entityId) return;
+      selectionFlagRef.current?.marker.remove();
+      selectionFlagRef.current = null;
+      const point = entityId ? entityPoint(entityId) : undefined;
+      if (!entityId || !point?.drawn || !maplibregl) return;
+      const marker = new maplibregl.Marker({
+        element: buildSelectionFlagElement(point.name),
+        anchor: 'bottom',
+        // The stem starts above the grown pin (1.6 x 6px radius), not on its center.
+        offset: [0, -12],
+      })
+        .setLngLat([point.lng, point.lat])
+        .addTo(map);
+      selectionFlagRef.current = { id: entityId, marker };
+    },
+    [entityPoint],
+  );
+
   /**
    * Where a record's disc is on screen, for a photo card to anchor to. Only past cluster max zoom,
    * where records draw as individual discs (below it they are inside a cluster), and only when the
@@ -732,6 +767,7 @@ export function MapStageProvider({
         setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
         setSelectedEdgeFilter(map, configRef.current.selectedEdge);
         setSelectedEntityFilter(map, configRef.current.selectedEntity);
+        syncSelectionFlag(map, configRef.current.selectedEntity);
         if (!options?.skipPrimaryDensityLoad) {
           void loadStatePolygonsWithDensity(
             map,
@@ -752,7 +788,7 @@ export function MapStageProvider({
         console.error('[MapStage] style/data apply failed', error);
       }
     },
-    [],
+    [syncSelectionFlag],
   );
   applyStyleAndDataRef.current = applyStyleAndData;
 
@@ -781,8 +817,10 @@ export function MapStageProvider({
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
       const popGeo = patch.popGeo ?? configRef.current.popGeo;
       const satellite = patch.satellite ?? configRef.current.satellite;
+      const ghostCollection = patch.ghostCollection ?? EMPTY_FEATURE_COLLECTION;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
+        ghostCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         layerMode: patch.layerMode,
         popGeo,
@@ -796,6 +834,7 @@ export function MapStageProvider({
         ...configRef.current,
         style,
         featureCollection: patch.featureCollection,
+        ghostCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         layerMode: patch.layerMode,
         popGeo,
@@ -845,7 +884,12 @@ export function MapStageProvider({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
       entitiesIncoming.setData(drawnRecordCollection(cfg.featureCollection) as any);
       await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_INCOMING_SOURCE_ID);
+      dropInIncomingPins(map);
     }
+    // Pins leaving the brushed range become sand ghosts as the new frame arrives.
+    const ghosts = map.getSource(EXPLORE_GHOSTS_SOURCE_ID) as GeoJSONSource | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+    ghosts?.setData(drawnRecordCollection(cfg.ghostCollection) as any);
     const edgesIncoming = map.getSource(EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID) as
       GeoJSONSource | undefined;
     if (edgesIncoming) {
@@ -1070,28 +1114,32 @@ export function MapStageProvider({
     return () => observer.disconnect();
   }, [applyStyleAndData, syncPlatePaintToTheme]);
 
-  const applyViewState = useCallback((patch: MapStageViewPatch) => {
-    configRef.current = {
-      ...configRef.current,
-      selectedState: patch.selectedState,
-      selectedEdge: patch.selectedEdge,
-      selectedEntity: patch.selectedEntity,
-    };
-    const map = mapRef.current;
-    if (!map) return;
-    const apply = () => {
-      const { selectedState, selectedEdge, selectedEntity } = configRef.current;
-      setSelectedStateFilter(map, selectedState);
-      setSelectedEdgeFilter(map, selectedEdge);
-      setSelectedEntityFilter(map, selectedEntity);
-    };
-    // A selection made while sources are still loading (the home hand-off lands mid-flight,
-    // as the catalog replaces the first-paint pins) used to be dropped, leaving the record
-    // framed with no copper mark. Apply it as soon as the map settles instead, reading the
-    // latest selection then.
-    if (map.isStyleLoaded()) apply();
-    else map.once('idle', apply);
-  }, []);
+  const applyViewState = useCallback(
+    (patch: MapStageViewPatch) => {
+      configRef.current = {
+        ...configRef.current,
+        selectedState: patch.selectedState,
+        selectedEdge: patch.selectedEdge,
+        selectedEntity: patch.selectedEntity,
+      };
+      const map = mapRef.current;
+      if (!map) return;
+      const apply = () => {
+        const { selectedState, selectedEdge, selectedEntity } = configRef.current;
+        setSelectedStateFilter(map, selectedState);
+        setSelectedEdgeFilter(map, selectedEdge);
+        setSelectedEntityFilter(map, selectedEntity);
+        syncSelectionFlag(map, selectedEntity);
+      };
+      // A selection made while sources are still loading (the home hand-off lands mid-flight,
+      // as the catalog replaces the first-paint pins) used to be dropped, leaving the record
+      // framed with no copper mark. Apply it as soon as the map settles instead, reading the
+      // latest selection then.
+      if (map.isStyleLoaded()) apply();
+      else map.once('idle', apply);
+    },
+    [syncSelectionFlag],
+  );
 
   const runFlyPreset = useCallback(
     (name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) =>
@@ -1340,6 +1388,7 @@ export function MapStageProvider({
         });
 
         mapRef.current = map;
+        bindHatchImage(map);
         if (process.env.NODE_ENV !== 'production') {
           // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
@@ -1516,6 +1565,8 @@ export function MapStageProvider({
        * A short intent delay on the way in, none on the way out (`PinPhotoCard`'s contract).
        */
       let hoverWanted: string | null = null;
+      /** The pin drawn lifted under the pointer (`setHoveredEntityFilter`). */
+      let liftedPin: string | undefined;
       let hoverShown = false;
       let hoverTimer: ReturnType<typeof setTimeout> | null = null;
       const hoverTo = (entityId: string | null) => {
@@ -1545,13 +1596,22 @@ export function MapStageProvider({
       activeMap.on('mousemove', (event: MapMouseEvent) => {
         const hit = pointerHitAt(event.point);
         activeMap.getCanvas().style.cursor = hit ? 'pointer' : '';
+        const lifted = hit?.kind === 'entity' ? hit.entityId : undefined;
+        if (lifted !== liftedPin) {
+          liftedPin = lifted;
+          setHoveredEntityFilter(activeMap, lifted);
+        }
         hoverTo(
           hit?.kind === 'entity' && activeMap.getZoom() > EXPLORE_CLUSTER_CONFIG.clusterMaxZoom
             ? hit.entityId
             : null,
         );
       });
-      activeMap.getCanvas().addEventListener('mouseleave', () => hoverTo(null));
+      activeMap.getCanvas().addEventListener('mouseleave', () => {
+        hoverTo(null);
+        liftedPin = undefined;
+        setHoveredEntityFilter(activeMap, undefined);
+      });
       // The card is placed once, beside the disc; once the camera moves the disc is elsewhere.
       activeMap.on('movestart', () => hoverTo(null));
 

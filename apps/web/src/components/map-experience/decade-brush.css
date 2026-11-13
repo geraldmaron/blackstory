@@ -82,17 +82,19 @@
   flex: 1 1 0;
   min-width: 0;
   border-radius: 1px 1px 0 0;
-  background: color-mix(in srgb, var(--ds-ink) 34%, transparent);
+  /* Sand bars on the ink strip (copper on paper, where sand fails 3:1). */
+  background: var(--ds-numeral-soft);
   pointer-events: none;
   transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-xbrush--active .ds-xbrush__bar {
-  background: color-mix(in srgb, var(--ds-ink) 18%, transparent);
+  background: color-mix(in srgb, var(--ds-numeral-soft) 30%, transparent);
 }
 
+/* The brushed range: copper and at full height; outside it the bars fade (never color alone). */
 .ds-xbrush--active .ds-xbrush__bar--in {
-  background: var(--ds-ink);
+  background: var(--ds-accent-graphic);
 }
 
 /* The brushed span: a faint wash behind the in-range bars so a sparse range still reads. */
@@ -101,7 +103,7 @@
   top: 0;
   bottom: 0;
   z-index: 0; /* local: the wash sits under the bars */
-  background: color-mix(in srgb, var(--ds-ink) 7%, transparent);
+  background: color-mix(in srgb, var(--ds-accent-graphic) 14%, transparent);
   pointer-events: none;
 }
 

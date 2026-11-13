@@ -29,6 +29,7 @@ import {
 } from '../../../lib/map-experience/kind-encoding';
 import type { ExploreLayerMode } from '../../../lib/map-experience/url-state';
 import type { ExploreViewModel } from '../explore-view-model';
+import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import { decadeStartYear } from './atlas-feature-helpers';
 import { sortExploreRows, type ExploreRowSort } from '../../../lib/map-experience/explore-rows';
 import {
@@ -214,6 +215,36 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     () => (nearby && distances ? applyNearbyRadius(lensFiltered, nearby, distances) : lensFiltered),
     [distances, lensFiltered, nearby],
   );
+
+  /**
+   * What the brushed decades leave out: records every other filter keeps but the period excludes.
+   * The map draws them as sand ghosts so time reads on the plate instead of pins vanishing.
+   */
+  const ghosts = useMemo<readonly ExploreMapFeature[]>(() => {
+    if (!periodIsActive(period) || !view.collectionFacts) return [];
+    const {
+      periodStart: _start,
+      periodEnd: _end,
+      includeUndated: _undated,
+      ...unbrushed
+    } = collectionState as typeof collectionState & {
+      periodStart?: string;
+      periodEnd?: string;
+      includeUndated?: boolean;
+    };
+    const kept = new Set(filtered.map((feature) => feature.properties.entityId));
+    const matches = matchExploreCollection(view.collectionFacts, unbrushed, collectionMembers);
+    return drawableCollection(view.allFeatures, matches).filter(
+      (feature) => !kept.has(feature.properties.entityId),
+    );
+  }, [
+    period,
+    view.collectionFacts,
+    view.allFeatures,
+    collectionState,
+    collectionMembers,
+    filtered,
+  ]);
 
   /** Distance to the closest record the lens shows, inside the radius or not, so "nothing within
    * 5 miles" can still say where the nearest one is. */
@@ -480,6 +511,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setNearby,
     distances,
     filtered,
+    ghosts,
     nearestMeters,
     sorted,
     kindCounts,

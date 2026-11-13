@@ -26,7 +26,7 @@ export function PhoneTabBar({ pathname, browsing }: PhoneTabBarProps) {
   const current = currentTabFor(pathname);
 
   return (
-    <nav className="ds-tabbar" aria-label="Main">
+    <nav className="ds-tabbar" aria-label="Main" data-ground="ink">
       {SHELL_TABS.map((tab) => {
         const isCurrent = current === tab.id;
         const mark = (

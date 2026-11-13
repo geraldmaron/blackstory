@@ -96,8 +96,9 @@ function contrastRatio(fg: string, bg: string): number {
 test('history relationship edge plate colors meet WCAG 1.4.11 (≥3:1) on both themes', () => {
   const light = plateForScheme('light');
   const dark = plateForScheme('dark');
+  // The chart is paper in both themes, so both draw edges in the copper text step.
   assert.equal(light.historyEdge, brandPalette.copperTextLight);
-  assert.equal(dark.historyEdge, brandPalette.copperDark);
+  assert.equal(dark.historyEdge, brandPalette.copperTextLight);
   assert.notEqual(light.historyEdge, DIGNITY_PALETTE.pointHalo);
   assert.notEqual(dark.historyEdge, DIGNITY_PALETTE.pointHalo);
   assert.ok(
@@ -108,6 +109,9 @@ test('history relationship edge plate colors meet WCAG 1.4.11 (≥3:1) on both t
     contrastRatio(dark.historyEdge, dark.ocean) >= 3,
     `dark historyEdge ${dark.historyEdge} on ${dark.ocean} must be ≥3:1`,
   );
+  for (const plate of [light, dark]) {
+    assert.ok(contrastRatio(plate.historyEdge, plate.land) >= 3, 'edges on the lower 48');
+  }
   assert.ok(
     contrastRatio(DIGNITY_PALETTE.pointHalo, light.ocean) < 3,
     'pageSand must fail on white',

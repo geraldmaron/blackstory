@@ -1,6 +1,7 @@
 /*
- * The header (CommandBar.tsx). From 48rem up: a flush, full-bleed 56px bar fixed to the top, one
- * rule under it, canvas color, its content on the wide container. Below 48rem: an in-flow 48px
+ * The header (CommandBar.tsx). From 48rem up: a flush, full-bleed 56px bar fixed to the top on an
+ * ink ground in both themes (`data-ground="ink"`), its content on the wide container. The search
+ * is a paper field, the one bright instrument on the bar; the current tab is a copper block. Below 48rem: an in-flow 48px
  * bar (lockup, search button, theme), and the search opens full screen.
  *
  * `--ds-header-h` and `--ds-island-clearance` live in @repo/ui shell-header.css.
@@ -13,7 +14,6 @@
   left: 0;
   z-index: var(--ds-z-command-bar);
   padding-top: env(safe-area-inset-top, 0px);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   background: var(--ds-canvas);
 }
 
@@ -53,9 +53,10 @@
   align-items: center;
   min-width: 0;
   height: 40px;
-  border: var(--ds-border-width) solid var(--ds-border-control);
+  border: var(--ds-border-width) solid var(--ds-canvas);
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
   cursor: text;
   transition: border-color var(--ds-duration-fast) var(--ds-easing);
 }
@@ -78,10 +79,11 @@
   border-color: var(--ds-border-strong);
 }
 
-/* The ring sits on the field, not on the bare input inside it. */
+/* The ring sits on the field, not on the bare input inside it. The field is paper on the ink
+   bar, so its ring is copper (6.1:1 on ink), not the paper ground's ink ring. */
 .ds-bar__search:focus-within {
   border-color: var(--ds-border-strong);
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline: var(--ds-focus-width) solid var(--ds-fixed-accent);
   outline-offset: var(--ds-focus-offset);
 }
 
@@ -187,14 +189,20 @@
 
 /* ---- tabs and tools ----------------------------------------------------- */
 
-/* The tabs run the bar's full height, so the current tab's copper bar lands on the bar's rule. */
+/* The tabs run the bar's full height, so the current tab is a copper block from edge to edge. */
 .ds-bar__tabs {
   align-self: stretch;
   margin-left: auto;
 }
 
+.ds-bar__tabs {
+  gap: 0;
+}
+
 .ds-bar__tabs .ds-tabs__tab {
   min-height: var(--ds-header-h);
+  padding-inline: var(--ds-space-6);
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-bar__tools {

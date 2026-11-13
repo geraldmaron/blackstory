@@ -818,7 +818,7 @@ export function DoorImmersive({
         ) : null}
         <div className="ds-door__dock" ref={dockRef} data-step={step === 0 ? 'open' : 'walk'}>
           {step === 0 ? (
-            <section className="ds-door-open" aria-labelledby="door-open-heading">
+            <section className="ds-door-open" aria-labelledby="door-open-heading" data-ground="ink">
               <HeroHeadlineMorph className="ds-door-open__headline" id="door-open-heading" />
               <p className="ds-door-open__line">{DOOR_OPEN_LINE}</p>
               <div className="ds-door-open__actions">

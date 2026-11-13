@@ -52,7 +52,7 @@ export type CalloutPlacement = {
 
 const INSET = 16;
 /** A single record's mark (a ring, the larger of the two) with its halo. */
-const SINGLE_MARK_RADIUS_PX = 8;
+const SINGLE_MARK_RADIUS_PX = 10;
 const GAP = 24;
 /** The attribution's 44px "i" plus a gap, in the window's bottom-right corner. */
 const ATTRIBUTION_CLEARANCE = 44 + 8;
@@ -167,9 +167,13 @@ export function placeCallout(
 
 /** The plate's group circles and record marks on screen, as boxes the card should not cover. */
 function markObstacles(map: EventedMap, plate: DOMRect): Box[] {
-  const features = map.queryRenderedFeatures(undefined, {
-    layers: [EXPLORE_CLUSTER_LAYER_ID, EXPLORE_UNCLUSTERED_POINT_LAYER_ID],
-  });
+  // Before the entity layers mount (a cold load, a style rebuild) there is nothing to avoid, and
+  // querying a missing layer throws.
+  const layers = [EXPLORE_CLUSTER_LAYER_ID, EXPLORE_UNCLUSTERED_POINT_LAYER_ID].filter((id) =>
+    map.getLayer(id),
+  );
+  if (layers.length === 0) return [];
+  const features = map.queryRenderedFeatures(undefined, { layers });
   return features.map((feature) => {
     const count = Number((feature.properties as { point_count?: number }).point_count ?? 0);
     const radius =
@@ -197,6 +201,7 @@ type EventedMap = AtlasCameraTarget & {
     geometry: undefined,
     options: { layers: string[] },
   ): { geometry: unknown; properties: unknown }[];
+  getLayer(id: string): unknown;
 };
 
 export type DoorSpotlightCalloutProps = {
@@ -314,7 +319,7 @@ export function DoorSpotlightCallout({
     >
       <span className={`ds-door-callout__mark ds-door-callout__mark--${mark}`} ref={markRef} />
       <span className="ds-door-callout__leader" ref={leaderRef} />
-      <div className="ds-door-callout__card" ref={cardRef}>
+      <div className="ds-door-callout__card" ref={cardRef} data-ground="paper">
         <DoorRecordLink className="ds-door-callout__link" href={href}>
           <span className="ds-door-callout__name">{name}</span>
           {locality ? <span className="ds-door-callout__place">{locality}</span> : null}

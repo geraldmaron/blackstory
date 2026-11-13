@@ -8,8 +8,12 @@
  *
  * `compact` is the timeline's row: one line, no summary, because the band already states the
  * decade and the reader is scanning time, not reading.
+ *
+ * Every row opens on a tile: the record's own image when it has one, else a sand tile with the
+ * kind's glyph. The tile is decorative; the name beside it identifies the record.
  */
 import React from 'react';
+import { KindGlyph } from '../../components/map-experience/KindGlyph';
 import { gradeDescription } from '../../lib/map-experience/evidence-grade';
 import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
 import type { RecordsRow } from '../../lib/records/build-records-index';
@@ -42,9 +46,11 @@ export type RecordRowProps = {
   readonly compact?: boolean;
   /** Anchor id for the first row of a decade, the target of "Jump to decade". */
   readonly anchor?: string | undefined;
+  /** The record's rights-cleared image, when it has one. */
+  readonly photoUrl?: string | undefined;
 };
 
-export function RecordRow({ row, query, compact = false, anchor }: RecordRowProps) {
+export function RecordRow({ row, query, compact = false, anchor, photoUrl }: RecordRowProps) {
   const kind = kindEncodingFor(row.kind).label;
   const summary =
     query.length > 0
@@ -56,6 +62,22 @@ export function RecordRow({ row, query, compact = false, anchor }: RecordRowProp
         className={compact ? 'ds-record__link ds-record__link--compact' : 'ds-record__link'}
         href={row.href}
       >
+        <span
+          className="ds-record__thumb"
+          data-photo={photoUrl === undefined ? undefined : 'true'}
+          aria-hidden="true"
+        >
+          {photoUrl === undefined ? (
+            <KindGlyph
+              kind={row.kind}
+              {...(row.mapTone ? { mapTone: row.mapTone } : {})}
+              size={22}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- remote Commons thumbnail
+            <img src={photoUrl} alt="" loading="lazy" decoding="async" />
+          )}
+        </span>
         <span className="ds-record__name">
           <Segments segments={highlightSegments(row.name, query)} />
         </span>

@@ -17,6 +17,8 @@ import { redirect } from 'next/navigation';
 import { recordsHref } from '../../lib/records/build-records-index';
 import { RecordsIndexRoom } from './RecordsIndex';
 import { loadRecordsIndex, recordsQueryCacheKey } from './load-records-index';
+import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
+import { buildEntityPhotoIndex } from '../../lib/map-experience/entity-photo-index';
 import '../reading-room.css';
 import './records-index.css';
 
@@ -74,6 +76,19 @@ export default async function RecordsPage({ searchParams }: RecordsPageProps) {
     redirect(recordsHref({ ...query, collection: 'missing', page: 1 }));
   }
 
+  // Thumbnails for the rows on this page only: the record's rights-cleared image, by record id.
+  const { data: entities } = await getSharedPublicEntities();
+  const photoIndex = buildEntityPhotoIndex(entities);
+  const pageRows = [
+    ...model.rows,
+    ...(model.chronology?.sections.flatMap((section) => section.rows) ?? []),
+  ];
+  const photos: Record<string, string> = {};
+  for (const row of pageRows) {
+    const photo = photoIndex[row.id];
+    if (photo) photos[row.id] = photo.url;
+  }
+
   return (
     <>
       {/*
@@ -87,7 +102,7 @@ export default async function RecordsPage({ searchParams }: RecordsPageProps) {
       {model.nextHref === undefined ? null : (
         <link rel="next" href={new URL(model.nextHref, SITE_URL).toString()} />
       )}
-      <RecordsIndexRoom model={model} />
+      <RecordsIndexRoom model={model} photos={photos} />
     </>
   );
 }

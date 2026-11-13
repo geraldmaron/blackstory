@@ -14,7 +14,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { Button, cx } from '@repo/ui';
+import { Button, cx, DisplayNumeral } from '@repo/ui';
 import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icons';
 import {
   evidenceCountPhrase,
@@ -92,6 +92,11 @@ export function RecordInspector({ record, position, onStep, className }: RecordI
       ) : null}
 
       <div className="ds-inspector__body">
+        {record.decade ? (
+          <DisplayNumeral className="ds-inspector__numeral" decorative>
+            {record.decade}
+          </DisplayNumeral>
+        ) : null}
         <p className="ds-inspector__meta">
           {/* One line, like the list row: a long place never pushes the record below the fold. */}
           <span className="ds-inspector__where" title={place ? `${kind} · ${place}` : undefined}>

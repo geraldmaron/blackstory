@@ -17,7 +17,7 @@ function readLabel(item: PublicStoryListItemDoc): string {
   return item.format === 'entry' ? 'Read the entry' : 'Read the chapter';
 }
 
-function CoverImage({
+export function CoverImage({
   item,
   width,
   eager = false,

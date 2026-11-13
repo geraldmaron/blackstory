@@ -12,6 +12,10 @@
  *
  * On a phone the rail dissolves into the column (`display: contents`): media sits under the meta
  * line, and the actions become the sticky bottom row. Everything renders on the server.
+ *
+ * Material (art direction v2): the record is one paper Sheet on the ink table, with the record's
+ * year or decade as a display numeral beside the title, the citation line as a copper block, the
+ * record file as a sand block at the sheet's foot, and prev/next as two ink blocks under it.
  */
 import React, { type ReactNode } from 'react';
 import Link from 'next/link';
@@ -26,7 +30,7 @@ import {
   faPenToSquare,
   faQuoteLeft,
 } from '@fortawesome/free-solid-svg-icons';
-import { buttonClassName, SectionHeading } from '@repo/ui';
+import { buttonClassName, DisplayNumeral, SectionHeading, Sheet } from '@repo/ui';
 import '../../app/record-page.css';
 
 void React;
@@ -110,6 +114,17 @@ export function formatRecordDate(value: string | undefined): string | undefined 
     day: 'numeric',
     timeZone: 'UTC',
   });
+}
+
+/**
+ * The display numeral beside the title: the first year or decade the When fact states ("1670s"
+ * from "1670s to 1940s", "1968", "2022" from "2022-2023"). Nothing when the record is undated.
+ * It repeats the citation line, so it is decorative.
+ */
+export function recordNumeral(facts: readonly RecordFact[]): string | undefined {
+  const when = facts.find((fact) => fact.label === 'When')?.value;
+  if (typeof when !== 'string') return undefined;
+  return /\b\d{4}s?\b/.exec(when)?.[0];
 }
 
 function wordCount(text: string): number {
@@ -221,7 +236,13 @@ function RecordPager({ label, position, previous, next }: RecordPagerProps) {
   return (
     <nav className="ds-recpage__pager" aria-label={label}>
       {previous ? (
-        <Link className="ds-recpage__step" href={previous.href} rel="prev" prefetch={false}>
+        <Link
+          className="ds-recpage__step"
+          href={previous.href}
+          rel="prev"
+          prefetch={false}
+          data-ground="ink"
+        >
           <span className="ds-recpage__step-dir">
             <Icon icon={faArrowLeft} />
             Previous
@@ -238,6 +259,7 @@ function RecordPager({ label, position, previous, next }: RecordPagerProps) {
           href={next.href}
           rel="next"
           prefetch={false}
+          data-ground="ink"
         >
           <span className="ds-recpage__step-dir">
             Next
@@ -267,123 +289,138 @@ export function RecordPage({
   file,
   pager,
 }: RecordPageProps) {
+  const numeral = recordNumeral(facts);
   return (
     <main className="ds-room ds-recpage" id="main">
-      <article className="ds-recpage__grid ds-wrap ds-wrap--record" aria-labelledby="record-title">
-        <header className="ds-recpage__head">
-          <Link className="ds-recpage__crumb" href={crumb.href} prefetch={false}>
-            <Icon icon={faArrowLeft} />
-            {crumb.label}
-          </Link>
-          <h1 id="record-title" className="ds-recpage__title">
-            {title}
-          </h1>
-          {meta.length > 0 ? (
-            <ul className="ds-recpage__meta">
-              {meta.map((item) => (
-                <li key={item.label} className="ds-recpage__meta-item">
-                  <Icon icon={item.icon} />
-                  {item.label}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </header>
-
-        <RecordLede text={ledeText}>{lede ?? ledeText}</RecordLede>
-        {note ? <div className="ds-recpage__note">{note}</div> : null}
-
-        <dl className="ds-recpage__facts" aria-label="Record at a glance">
-          {facts.map((fact) => (
-            <div key={fact.label} className="ds-recpage__fact">
-              <dt className="ds-recpage__fact-label">{fact.label}</dt>
-              <dd className="ds-recpage__fact-value">{fact.value}</dd>
-              {fact.detail ? <dd className="ds-recpage__fact-detail">{fact.detail}</dd> : null}
-            </div>
-          ))}
-        </dl>
-
-        <aside className="ds-recpage__rail" aria-label="Where to go from this record">
-          {media ? <div className="ds-recpage__media">{media}</div> : null}
-          {actions.extra ? (
-            <div className="ds-recpage__extra">
-              <a
-                className={buttonClassName('quiet', 'ds-recpage__action')}
-                href={actions.extra.href}
-                target="_blank"
-                rel={actions.extra.rel ?? 'noopener noreferrer'}
-              >
-                {actions.extra.label}
-                <Icon icon={faArrowUpRightFromSquare} />
-              </a>
-              {actions.extra.note ? (
-                <p className="ds-recpage__extra-note">{actions.extra.note}</p>
-              ) : null}
-            </div>
-          ) : null}
-          <nav className="ds-recpage__actions" aria-label="Record actions">
-            {actions.map ? (
-              <Link
-                className={buttonClassName('secondary', 'ds-recpage__action')}
-                href={actions.map.href}
-                prefetch={false}
-              >
-                <Icon icon={faMapLocationDot} />
-                {actions.map.label ?? 'Open on the map'}
-              </Link>
+      <div className="ds-recpage__desk ds-wrap">
+        <Sheet as="article" className="ds-recpage__grid" aria-labelledby="record-title">
+          <header className="ds-recpage__head">
+            {numeral ? (
+              <DisplayNumeral className="ds-recpage__numeral" tone="soft" decorative>
+                {numeral}
+              </DisplayNumeral>
             ) : null}
-            {sourcesAnchor ? (
-              <a
-                className={buttonClassName(
-                  'secondary',
-                  'ds-recpage__action ds-recpage__phone-only',
-                )}
-                href={`#${sourcesAnchor}`}
-              >
-                <Icon icon={faQuoteLeft} />
-                Sources
-              </a>
-            ) : null}
-            {actions.externalMapsHref ? (
-              <a
-                className={buttonClassName('quiet', 'ds-recpage__action ds-recpage__action--icon')}
-                href={actions.externalMapsHref}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Icon icon={faDiamondTurnRight} />
-                <span className="ds-recpage__action-label">Open in maps</span>
-              </a>
-            ) : null}
-            <Link
-              className={buttonClassName('quiet', 'ds-recpage__action ds-recpage__action--icon')}
-              href={actions.correctionHref}
-              prefetch={false}
-            >
-              <Icon icon={faPenToSquare} />
-              <span className="ds-recpage__action-label">Suggest a correction</span>
+            <Link className="ds-recpage__crumb" href={crumb.href} prefetch={false}>
+              <Icon icon={faArrowLeft} />
+              {crumb.label}
             </Link>
-          </nav>
-        </aside>
+            <h1 id="record-title" className="ds-recpage__title">
+              {title}
+            </h1>
+            {meta.length > 0 ? (
+              <ul className="ds-recpage__meta">
+                {meta.map((item) => (
+                  <li key={item.label} className="ds-recpage__meta-item">
+                    <Icon icon={item.icon} />
+                    {item.label}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </header>
 
-        <div className="ds-recpage__body">{children}</div>
+          <RecordLede text={ledeText}>{lede ?? ledeText}</RecordLede>
+          {note ? <div className="ds-recpage__note">{note}</div> : null}
 
-        <footer className="ds-recpage__file" aria-labelledby="record-file-title">
-          <h2 id="record-file-title" className="ds-recpage__file-title">
-            Record file
-          </h2>
-          <dl className="ds-recpage__file-rows">
-            {file.map((row) => (
-              <div key={row.label} className="ds-recpage__file-row">
-                <dt>{row.label}</dt>
-                <dd>{row.value}</dd>
+          <dl className="ds-recpage__facts" aria-label="Record at a glance" data-ground="copper">
+            {facts.map((fact) => (
+              <div key={fact.label} className="ds-recpage__fact">
+                <dt className="ds-recpage__fact-label">{fact.label}</dt>
+                <dd className="ds-recpage__fact-value">{fact.value}</dd>
+                {fact.detail ? <dd className="ds-recpage__fact-detail">{fact.detail}</dd> : null}
               </div>
             ))}
           </dl>
-        </footer>
+
+          <aside className="ds-recpage__rail" aria-label="Where to go from this record">
+            {media ? <div className="ds-recpage__media">{media}</div> : null}
+            {actions.extra ? (
+              <div className="ds-recpage__extra">
+                <a
+                  className={buttonClassName('quiet', 'ds-recpage__action')}
+                  href={actions.extra.href}
+                  target="_blank"
+                  rel={actions.extra.rel ?? 'noopener noreferrer'}
+                >
+                  {actions.extra.label}
+                  <Icon icon={faArrowUpRightFromSquare} />
+                </a>
+                {actions.extra.note ? (
+                  <p className="ds-recpage__extra-note">{actions.extra.note}</p>
+                ) : null}
+              </div>
+            ) : null}
+            <nav className="ds-recpage__actions" aria-label="Record actions">
+              {actions.map ? (
+                <Link
+                  className={buttonClassName('secondary', 'ds-recpage__action')}
+                  href={actions.map.href}
+                  prefetch={false}
+                >
+                  <Icon icon={faMapLocationDot} />
+                  {actions.map.label ?? 'Open on the map'}
+                </Link>
+              ) : null}
+              {sourcesAnchor ? (
+                <a
+                  className={buttonClassName(
+                    'secondary',
+                    'ds-recpage__action ds-recpage__phone-only',
+                  )}
+                  href={`#${sourcesAnchor}`}
+                >
+                  <Icon icon={faQuoteLeft} />
+                  Sources
+                </a>
+              ) : null}
+              {actions.externalMapsHref ? (
+                <a
+                  className={buttonClassName(
+                    'quiet',
+                    'ds-recpage__action ds-recpage__action--icon',
+                  )}
+                  href={actions.externalMapsHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon icon={faDiamondTurnRight} />
+                  <span className="ds-recpage__action-label">Open in maps</span>
+                </a>
+              ) : null}
+              <Link
+                className={buttonClassName('quiet', 'ds-recpage__action ds-recpage__action--icon')}
+                href={actions.correctionHref}
+                prefetch={false}
+              >
+                <Icon icon={faPenToSquare} />
+                <span className="ds-recpage__action-label">Suggest a correction</span>
+              </Link>
+            </nav>
+          </aside>
+
+          <div className="ds-recpage__body">{children}</div>
+
+          <footer
+            className="ds-recpage__file"
+            aria-labelledby="record-file-title"
+            data-ground="sand"
+          >
+            <h2 id="record-file-title" className="ds-recpage__file-title">
+              Record file
+            </h2>
+            <dl className="ds-recpage__file-rows">
+              {file.map((row) => (
+                <div key={row.label} className="ds-recpage__file-row">
+                  <dt>{row.label}</dt>
+                  <dd>{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </footer>
+        </Sheet>
 
         {pager ? <RecordPager {...pager} /> : null}
-      </article>
+      </div>
     </main>
   );
 }

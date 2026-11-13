@@ -1,32 +1,37 @@
 /**
- * The Records timeline: decade bands on a vertical axis. The decade label and its density bar
- * stay in view (sticky) while the band's rows scroll past; the rows sit on the axis line, and a
- * run of empty decades is a dashed stretch of the same line with its name.
+ * The Records timeline: each decade a full-bleed color band (paper and ink alternating, sand for
+ * the page's busiest decades, `bandTones`). The decade is a display numeral that stays in view
+ * (sticky) while the band's rows scroll past; the rows sit on the band's own ground, so a row on a
+ * paper band reads ink on paper and a row on an ink band paper on ink. A run of empty decades is
+ * named on a quiet line between bands.
  *
  * Rows are the register's own (`.ds-record`, records-index.css). `--records-bar-h` is the sticky
  * toolbar above, set on `.ds-records`.
  */
 
 .ds-records-timeline {
-  --timeline-mark-w: 11rem;
+  --timeline-mark-w: minmax(0, 5fr);
   --timeline-sticky-top: calc(var(--ds-island-clearance) + var(--records-bar-h, 0px));
+  /* Full bleed out of the wide container: the bands run edge to edge. */
+  margin-inline: calc(50% - 50vw);
+  margin-top: var(--ds-space-6);
 }
 
 .ds-records-timeline__band {
   display: grid;
-  grid-template-columns: var(--timeline-mark-w) minmax(0, 1fr);
-  column-gap: var(--ds-space-8);
+  grid-template-columns: var(--timeline-mark-w) minmax(0, 7fr);
+  column-gap: var(--ds-space-12);
+  padding: var(--ds-space-12) max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2));
   scroll-margin-top: var(--records-bar-h, 0px);
 }
 
-/* The mark's year sits level with the band's first row. */
 .ds-records-timeline__mark {
   position: sticky;
-  top: var(--timeline-sticky-top);
+  top: calc(var(--timeline-sticky-top) + var(--ds-space-4));
   align-self: start;
   display: grid;
-  gap: var(--ds-space-1);
-  padding-block: var(--ds-space-3) 0;
+  gap: var(--ds-space-3);
+  min-width: 0;
 }
 
 .ds-records-timeline__year {
@@ -35,90 +40,60 @@
   font-size: var(--ds-text-display-3);
   font-weight: 650;
   line-height: 1;
-  letter-spacing: var(--ds-tracking-display);
-  font-variant-numeric: tabular-nums;
 }
 
-.ds-records-timeline__band[data-undated] .ds-records-timeline__year {
-  font-size: var(--ds-text-display-3);
-  line-height: 1.75rem;
+/* The decade at 160px on a wide screen, scaling down with the viewport. */
+.ds-records-timeline__year .ds-numeral {
+  font-size: clamp(4rem, 1rem + 9vw, 10rem);
 }
 
 .ds-records-timeline__total {
   margin: 0;
-  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .ds-records-timeline__continued {
   margin: 0;
-  color: var(--ds-ink-subtle);
+  color: var(--ds-ink-muted);
   font-size: var(--ds-text-caption);
 }
 
-/* The axis: the rows column's left edge, with a tick where each band begins. */
 .ds-records-timeline__rows {
-  position: relative;
   margin: 0;
+  padding: 0;
   list-style: none;
-  /* One 24px step closes every band. A one-row band is as tall as its mark, so no band leaves
-     a hole below it. */
-  padding: 0 0 var(--ds-space-6) var(--ds-space-6);
-  border-left: var(--ds-border-width) solid var(--ds-border-strong);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
-.ds-records-timeline__rows::before {
-  content: '';
-  position: absolute;
-  top: calc(var(--ds-space-3) + 0.75rem);
-  left: 0;
-  width: var(--ds-space-4);
-  height: 2px;
-  background: var(--ds-ink);
-}
-
-.ds-records-timeline__band[data-undated] .ds-records-timeline__rows {
-  border-left-style: dashed;
-}
-
-/* Decades with no records between two bands: the axis goes on, dashed, and says so. */
+/* Decades with no records between two bands: named on the table, between the blocks. */
 .ds-records-timeline__gap {
-  display: grid;
-  grid-template-columns: var(--timeline-mark-w) minmax(0, 1fr);
-  column-gap: var(--ds-space-8);
   margin: 0;
-}
-
-.ds-records-timeline__gap > span {
-  grid-column: 2;
-  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-6);
-  border-left: var(--ds-border-width) dashed var(--ds-border-strong);
-  color: var(--ds-ink-subtle);
-  font-size: var(--ds-text-caption);
+  padding: var(--ds-space-4) max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2));
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body);
   font-style: italic;
 }
 
-/* Phone and small tablet: the label becomes a sticky band header across the column. */
 @media (max-width: 47.9375rem) {
   .ds-records-timeline__band {
     grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--ds-space-4);
+    padding-block: var(--ds-space-8);
   }
 
   .ds-records-timeline__mark {
-    z-index: 1; /* local: the sticky band header over its own rows */
+    position: static;
     grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
+    align-items: end;
     column-gap: var(--ds-space-4);
-    padding-block: var(--ds-space-3);
-    border-bottom: var(--ds-border-width) solid var(--ds-rule);
-    background: var(--ds-canvas);
   }
 
-  .ds-records-timeline__year {
-    font-size: var(--ds-text-display-3);
-    line-height: 1.75rem;
+  .ds-records-timeline__year .ds-numeral {
+    font-size: clamp(3.5rem, 18vw, 5rem);
   }
 
   .ds-records-timeline__total {
@@ -127,26 +102,5 @@
 
   .ds-records-timeline__continued {
     grid-column: 1 / -1;
-  }
-
-  .ds-records-timeline__rows {
-    padding: 0 0 var(--ds-space-6) var(--ds-space-4);
-  }
-
-  .ds-records-timeline__mark {
-    padding-block: var(--ds-space-3);
-  }
-
-  .ds-records-timeline__rows::before {
-    display: none;
-  }
-
-  .ds-records-timeline__gap {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .ds-records-timeline__gap > span {
-    grid-column: 1;
-    padding-left: var(--ds-space-4);
   }
 }

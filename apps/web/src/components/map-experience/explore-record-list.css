@@ -25,10 +25,12 @@
 .ds-xlist__row {
   position: absolute;
   inset: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--ds-space-1);
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: var(--ds-space-3);
+  row-gap: var(--ds-space-1);
   height: 68px;
   padding: 0 var(--ds-space-4) 0 var(--ds-space-6);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
@@ -46,23 +48,45 @@
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* The selected row carries the map's own selected mark: a copper dot with a paper halo. Never
-   the fill alone. */
+/* The selected row: copper with ink type (copper on paper, the selected thing anywhere), plus
+   the map's own selected mark at its edge. Never the fill alone. */
 .ds-xlist__row--selected {
-  background: var(--ds-surface-raised);
+  background: var(--ds-material-copper);
+  color: var(--ds-material-ink);
+  --ds-ink: var(--ds-material-ink);
+  --ds-ink-muted: var(--ds-material-ink);
 }
 
 .ds-xlist__row--selected::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: var(--ds-space-2);
-  width: 8px;
-  height: 8px;
-  margin-top: -4px;
+  left: var(--ds-space-1);
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%);
+  border: 2px solid var(--ds-material-ink);
   border-radius: var(--ds-radius-full);
-  background: var(--ds-accent-graphic);
-  box-shadow: 0 0 0 2px var(--ds-canvas);
+  background: var(--ds-material-paper);
+}
+
+/* A record's image at tile size, or a sand tile with its kind glyph. */
+.ds-xlist__thumb {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-material-sand);
+  color: var(--ds-material-ink);
+}
+
+.ds-xlist__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .ds-xlist__line {
@@ -109,5 +133,11 @@
 }
 
 .ds-xlist__decade {
+  color: var(--ds-accent);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 700;
+}
+
+.ds-xlist__row--selected .ds-xlist__decade {
   color: var(--ds-ink);
 }

@@ -18,6 +18,8 @@ export type PageHeaderProps = {
   readonly actions?: ReactNode;
   /** Renders the crumb with a framework link (Next's `Link`). */
   readonly linkAs?: ElementType;
+  /** Sets the title at display scale (the PageTitle step). */
+  readonly display?: boolean;
   readonly className?: string;
 };
 
@@ -27,10 +29,11 @@ export function PageHeader({
   crumb,
   actions,
   linkAs: LinkAs = 'a',
+  display = false,
   className,
 }: PageHeaderProps) {
   return (
-    <header className={cx('ds-page-header', className)}>
+    <header className={cx('ds-page-header', display && 'ds-page-header--display', className)}>
       <div className="ds-page-header__text">
         {crumb ? (
           <LinkAs className="ds-page-header__crumb" href={crumb.href}>

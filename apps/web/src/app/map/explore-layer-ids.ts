@@ -28,7 +28,22 @@ export const EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID = 'explore-cluster-count-in
 /** Every drawn record: a dot at the site, a hollow ring at the neighborhood or city. */
 export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
 export const EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID = 'explore-point-incoming';
-/** Copper fill with a paper halo for the currently selected record. */
+/** The flat ink contact shadow under a site pin, on each entities buffer. */
+export const EXPLORE_POINT_SHADOW_LAYER_ID = 'explore-point-shadow';
+export const EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID = 'explore-point-shadow-incoming';
+/** The hovered pin, lifted 2px over a wider shadow. */
+export const EXPLORE_HOVER_SHADOW_LAYER_ID = 'explore-point-hover-shadow';
+export const EXPLORE_HOVER_POINT_LAYER_ID = 'explore-point-hover';
+/** Records the lens matches but the brushed decades exclude: a sand ghost, never hittable. */
+export const EXPLORE_GHOSTS_SOURCE_ID = 'explore-ghosts';
+export const EXPLORE_GHOST_POINT_LAYER_ID = 'explore-ghost-point';
+/** The lower-48 one paper step off its neighbors, so the country reads on the chart. */
+export const EXPLORE_US_LAND_LAYER_ID = 'plate-us-land';
+/** Area precision shown as an area: a sand hatch over states holding county/state records. */
+export const EXPLORE_JURISDICTION_HATCH_LAYER_ID = 'explore-jurisdiction-hatch';
+/** The hatch pattern image, added to the map at runtime (`hatch-image.ts`). */
+export const JURISDICTION_HATCH_IMAGE_ID = 'bs-sand-hatch';
+/** The selected record: the same shape, 1.6x, copper with an ink ring. */
 export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
 /** County- and state-precision records, counted at the state's label point ("3 statewide"). */
 export const EXPLORE_JURISDICTION_TAGS_SOURCE_ID = 'explore-jurisdiction-tags';

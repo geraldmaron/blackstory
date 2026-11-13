@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import { nationalFieldPatch } from '../../../lib/map-experience/national-field';
@@ -21,15 +21,23 @@ export function useMapSync(
   stateCode: string,
   /** The Black-population choropleth tiers for `layerMode` (`usePopulationChoropleth`). */
   populationLevels: PopulationChoroplethLevels = NO_POPULATION_CHOROPLETH,
+  /** Lens matches outside the brushed decades, drawn as sand ghosts. */
+  ghosts: readonly ExploreMapFeature[] = [],
+  /** The brushed range as a key; a change of range alone fades and drops the pins in. */
+  periodKey = '',
 ) {
+  const lastPeriodKey = useRef(periodKey);
   /** Keep the plate showing exactly what the list shows. One lens, two renderings of it. The
    * base is the same national field the Door paints; the lens only adds to it. */
   useEffect(() => {
+    const brushed = lastPeriodKey.current !== periodKey;
+    lastPeriodKey.current = periodKey;
     stage.patchData(
       nationalFieldPatch(
         { type: 'FeatureCollection', features: layers.pins ? filtered : [] },
         {
           layerMode,
+          ghostCollection: { type: 'FeatureCollection', features: layers.pins ? ghosts : [] },
           densityLevels: view.densityLevels,
           satellite: layers.satellite,
           historyEdgeCollection: view.edgeLineCollection,
@@ -38,9 +46,14 @@ export function useMapSync(
           ...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {}),
         },
       ),
+      // Brushing the decade strip morphs: leaving pins ghost, arriving pins drop in. Every other
+      // lens change snaps, as before.
+      { fade: brushed },
     );
   }, [
+    periodKey,
     filtered,
+    ghosts,
     layers.pins,
     layers.satellite,
     layerMode,

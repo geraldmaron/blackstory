@@ -61,8 +61,8 @@ for (const clusteringEnabled of [true, false]) {
   }
 }
 
-/** The precision mark evaluates to the contract sizes: an 8px dot for site precision and a
- * 14px ring for neighborhood or city, read from the feature's own stored precision. */
+/** The precision mark evaluates to the contract sizes: a 12px pin for site precision and a
+ * 14px open ring for neighborhood or city, read from the feature's own stored precision. */
 test('the record mark radius follows stored precision, evaluated by the style-spec runtime', () => {
   const style = buildExploreMapStyle({
     featureCollection: source.featureCollection,
@@ -83,8 +83,8 @@ test('the record mark radius follows stored precision, evaluated by the style-sp
   const expression = (created as any).value;
   const radius = (precision: string): number =>
     expression.evaluate({ zoom: 10 }, { properties: { precision }, id: 0, type: 1 });
-  assert.equal(radius('site'), 4);
-  assert.equal(radius('address'), 4);
+  assert.equal(radius('site'), 6);
+  assert.equal(radius('address'), 6);
   assert.equal(radius('city'), 7);
   assert.equal(radius('neighborhood'), 7);
 });

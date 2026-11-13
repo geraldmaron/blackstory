@@ -35,13 +35,15 @@ import {
   EXPLORE_STATE_DENSITY_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
+  EXPLORE_POINT_SHADOW_LAYER_ID,
 } from './explore-layer-ids';
 
 /**
- * Full dual-buffer morph duration. Sized for a slow ambient read against the
- * ~4.2s hero decade dwell (settled frame remains readable for most of the dwell).
+ * Full dual-buffer morph duration: arriving pins fade and drop in over 400ms (art direction v2
+ * caps the decade drop-in at 400ms). Short against the ~4.2s hero decade dwell.
  */
-export const DECADE_LAYER_FADE_MS = 1600;
+export const DECADE_LAYER_FADE_MS = 400;
 
 /** Alias — same duration; name stresses crossdissolve (not out→empty→in). */
 export const DECADE_CROSSFADE_MS = DECADE_LAYER_FADE_MS;
@@ -68,9 +70,15 @@ export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[]
     paintKey: 'circle-stroke-opacity',
     restOpacity: 0.9,
   },
+  { layerId: EXPLORE_POINT_SHADOW_LAYER_ID, paintKey: 'circle-opacity', restOpacity: 1 },
   {
     layerId: EXPLORE_CLUSTER_LAYER_ID,
     paintKey: 'circle-opacity',
+    restOpacity: ENTITY_CLUSTER_OPACITY,
+  },
+  {
+    layerId: EXPLORE_CLUSTER_LAYER_ID,
+    paintKey: 'circle-stroke-opacity',
     restOpacity: ENTITY_CLUSTER_OPACITY,
   },
   { layerId: EXPLORE_CLUSTER_COUNT_LAYER_ID, paintKey: 'text-opacity', restOpacity: 1 },
@@ -89,9 +97,15 @@ export const DECADE_CROSSFADE_IN_TARGETS: readonly DecadeCrossfadePaintTarget[] 
     paintKey: 'circle-stroke-opacity',
     restOpacity: 0.9,
   },
+  { layerId: EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID, paintKey: 'circle-opacity', restOpacity: 1 },
   {
     layerId: EXPLORE_CLUSTER_INCOMING_LAYER_ID,
     paintKey: 'circle-opacity',
+    restOpacity: ENTITY_CLUSTER_OPACITY,
+  },
+  {
+    layerId: EXPLORE_CLUSTER_INCOMING_LAYER_ID,
+    paintKey: 'circle-stroke-opacity',
     restOpacity: ENTITY_CLUSTER_OPACITY,
   },
   { layerId: EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID, paintKey: 'text-opacity', restOpacity: 1 },

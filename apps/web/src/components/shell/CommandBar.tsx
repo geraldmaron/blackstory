@@ -178,6 +178,7 @@ export function CommandBar({
     <>
       <header
         className={cx('ds-bar', className)}
+        data-ground="ink"
         data-browse-chrome="true"
         data-search-open={searchOpen ? 'true' : undefined}
       >

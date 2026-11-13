@@ -22,7 +22,10 @@
    is why this sits above the token block rather than beside the section it belongs to. */
 @import './precision.css';
 
-.ds-room {
+/* Re-declared on every ground inside a room, so a paper sheet or a copper block resolves the
+   aliases against its own ink and canvas rather than inheriting the table's. */
+.ds-room,
+.ds-room [data-ground] {
   /* Mock --ink-2: body prose, one step down from a heading but not yet muted. */
   --room-ink-2: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
   /* Mock --ink-3 / --ink-4: secondary copy and mono data. */

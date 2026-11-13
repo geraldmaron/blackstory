@@ -250,7 +250,7 @@ test('the Door and Explore rest on one national-field patch', () => {
   assert.doesNotMatch(atlas, /patchData\(/);
 });
 
-test('door CSS keeps one fixed full-bleed plate under a fixed dock, with no page scroll', () => {
+test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters scroll over it', () => {
   assert.doesNotMatch(css, /scroll-snap/);
   assert.match(css, /\.ds-door__field[\s\S]*position:\s*fixed/);
   assert.match(css, /\.ds-door__dock\s*\{[^}]*position:\s*fixed/);
@@ -259,20 +259,17 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock, with no page
   // No viewport-height chapters: the dead space between cards is gone.
   assert.doesNotMatch(css, /ds-door-journey__chapter|ds-door-journey__card/);
   assert.doesNotMatch(css, /mix-blend-mode:\s*multiply/);
-  // Flat material: the contact shadow on floating layers only, no glass or glow. The only
-  // gradients are the scrim under the headline column and the fade on a walk body with more below.
-  const scrimFree = css
-    .replace(/\.ds-door-journey::before\s*\{[^}]*\}/g, '')
-    .replace(/\.ds-door-walk__body\[data-more='true'\]\s*\{[^}]*\}/g, '');
+  // Flat material: no glass or glow, and no scrim. The only gradient is the mask that fades a walk
+  // body with more below.
+  const scrimFree = css.replace(/\.ds-door-walk__body\[data-more='true'\]\s*\{[^}]*\}/g, '');
   assert.doesNotMatch(
     scrimFree.replace(/box-shadow:\s*var\(--ds-contact-[a-z]+\);/g, ''),
     /radial-gradient|linear-gradient|box-shadow:\s*0 0 [1-9]|backdrop-filter/,
   );
-  // The scrim is opaque under the text, so no group ghosts through the headline.
-  assert.match(
-    css,
-    /\.ds-door-journey::before\s*\{[^}]*linear-gradient\(to right, var\(--ds-canvas\) 55%, transparent\)/,
-  );
+  // The opening is a solid block under the text (no fading scrim), so no group ghosts through
+  // the headline.
+  assert.doesNotMatch(css, /\.ds-door-journey::before/);
+  assert.match(css, /\.ds-door-open \{[^}]*padding:[^}]*border-radius: var\(--ds-radius-md\)/);
   // Radii are 8 / 14 only here: no pills, and uppercase mono stays on data.
   assert.doesNotMatch(css, /--ds-radius-full|999px|text-transform:\s*uppercase(?![^}]*ds-hero)/);
   // The column shares the header's left edge (the wide container) and sits 48px off the bottom.
