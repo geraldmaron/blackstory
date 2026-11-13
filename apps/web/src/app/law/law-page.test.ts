@@ -12,8 +12,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const indexPageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'LawBrowseSections.tsx'), 'utf8');
 const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
-const detailSectionsSource = readFileSync(join(here, 'LawDetailSections.tsx'), 'utf8');
-const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
+const detailViewSource = readFileSync(join(here, '[slug]', 'LawRecordView.tsx'), 'utf8');
 
 test('law index is the catalog room; /law/browse is a config redirect only', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
@@ -58,41 +57,13 @@ test('every rendered browse control is in the edge param allowlist', async () =>
   }
 });
 
-test('law detail page uses anatomy strip without gutter mosaic', () => {
-  assert.doesNotMatch(detailPageSource, /EditionAtmosphereMosaic/);
-  assert.doesNotMatch(detailPageSource, /LAW_EDITION_MOSAIC_SEED/);
-  assert.match(detailSectionsSource, /LawAnatomyStrip/);
-  assert.match(anatomySource, /EditionFactIcon/);
-});
-
-test('the anatomy strip names topics by label, the way the browse chips do', async () => {
-  // The detail page printed "constitutional · criminal-justice" while /law chips said
-  // "Constitutional" and "Criminal justice".
-  const React = await import('react');
-  const { renderToStaticMarkup } = await import('react-dom/server');
-  const { LawAnatomyStrip } = await import('./LawAnatomyStrip');
-  const markup = renderToStaticMarkup(
-    React.createElement(LawAnatomyStrip, {
-      kind: 'constitutional-amendment',
-      lawStatus: 'in_force',
-      jurisdictionId: 'federal',
-      citation: 'U.S. Const. amend. XIII',
-      topics: ['constitutional', 'criminal-justice'],
-    }),
-  );
-  assert.match(markup, /Constitutional · Criminal justice/);
-  assert.doesNotMatch(markup, /criminal-justice/);
-});
-
-test('law detail page renders through the room kit, with no edition chrome left', () => {
-  assert.doesNotMatch(detailPageSource, /law-panel-chrome/);
-  assert.doesNotMatch(detailPageSource, /law-edition\.css/);
-  assert.doesNotMatch(detailPageSource, /data-law-edition="v6"/);
-  assert.match(detailPageSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
-  assert.match(detailPageSource, /<Room width="record">/);
-  assert.doesNotMatch(detailSectionsSource, /law-panel-chrome/);
-  assert.doesNotMatch(detailSectionsSource, /ds-law-edition__panel/);
-  assert.match(detailSectionsSource, /<PageHeader/);
+test('law detail page renders the shared record anatomy, with no edition chrome left', () => {
+  assert.match(detailPageSource, /LawRecordView/);
+  assert.match(detailViewSource, /<RecordPage/);
+  for (const src of [detailPageSource, detailViewSource]) {
+    assert.doesNotMatch(src, /EditionAtmosphereMosaic|law-panel-chrome|law-edition\.css/);
+    assert.doesNotMatch(src, /LawAnatomyStrip|RoomJump|LegalDisclaimer/);
+  }
 });
 
 test('law browse lede preserved without em dashes, and the room is not titled civil rights law', () => {
@@ -105,36 +76,29 @@ test('law browse lede preserved without em dashes, and the room is not titled ci
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /civil rights/i);
 });
 
-// The contract covers the connected-records hand-off, camera dignity, prev/next navigation, and
-// deliberate absence of a jurisdiction plate. `law-detail-sections.test.tsx` exercises the real
-// seed data through the real `buildLensHandoff` guard; these pin the source-level contract.
+// `[slug]/law-record.test.tsx` exercises the real seed data through the real `buildLensHandoff`
+// guard; these pin the source-level contract.
 
-test('the connected-records heading reads exactly "Records in this jurisdiction and era"', () => {
-  assert.match(detailSectionsSource, /title="Records in this jurisdiction and era"/);
-  // Not a hand written href: the link is built through the one typed handoff builder so it can
-  // never drift from the Explore URL allowlist (docs/ui/patterns-lens-handoff.md §1).
-  assert.match(detailSectionsSource, /buildLensHandoff/);
-  assert.doesNotMatch(detailSectionsSource, /href=\{?['"`]\/explore/);
+test('the map hand-off is built through the one typed handoff builder', () => {
+  // Never a hand-written href, so it cannot drift from the Explore URL allowlist
+  // (docs/ui/patterns-lens-handoff.md §1).
+  assert.match(detailViewSource, /buildLensHandoff/);
+  assert.doesNotMatch(detailViewSource, /href=\{?['"`]\/explore/);
 });
 
 test('no camera move is reachable on the law detail room: no shared map plate is imported', () => {
-  // The dignity gate's spirit applies to abstractions too: a law has no camera at all, because
-  // it has no plate at all (see the jurisdiction-plate comment in LawDetailSections.tsx).
-  for (const src of [detailPageSource, detailSectionsSource]) {
-    assert.doesNotMatch(src, /MapMoment/);
+  for (const src of [detailPageSource, detailViewSource]) {
+    assert.doesNotMatch(src, /MapMoment|RecordMap/);
     assert.doesNotMatch(src, /flyTo|pushIn|orbit/i);
   }
 });
 
 test('the jurisdiction plate is deliberately absent, not faked with a placeholder', () => {
-  // No plate component, and no placeholder standing in for one — see the comment in
-  // LawDetailIntro explaining that the state-code-to-polygon join does not exist yet.
-  assert.doesNotMatch(detailSectionsSource, /JurisdictionPlate|ds-law-plate|ds-jurisdiction-plate/);
-  assert.match(detailSectionsSource, /state-code-to-polygon join/);
+  assert.doesNotMatch(detailViewSource, /JurisdictionPlate|ds-law-plate|ds-jurisdiction-plate/);
+  assert.match(detailViewSource, /state-code-to-polygon join/);
 });
 
-test('law detail page carries prev/next through the view model into RecordNav', () => {
-  assert.match(detailSectionsSource, /RecordNav/);
-  assert.match(detailPageSource, /previous/);
-  assert.match(detailPageSource, /\bnext\b/);
+test('law detail page carries prev/next through the view model into the pager', () => {
+  assert.match(detailViewSource, /previous/);
+  assert.match(detailViewSource, /\bnext\b/);
 });

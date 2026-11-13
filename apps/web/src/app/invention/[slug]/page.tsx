@@ -6,18 +6,17 @@
  * address to exist. It rode `/place/{slug}` only because the stand test admits anything that is
  * not a living private person, which is a test for who may be named, not for what a place is.
  *
- * It renders the RECORD room, not Place's map-led first-paint room. The question a reader brings
- * to an invention is who made it, what it was, and what changed — inventor, patent receipt,
- * impact beat, sources — and the first-paint room answers where something is instead. The pin
- * still exists on the record where the cohort documented a work site, labeled as the work site.
+ * It renders the one record page every family shares. An invention is never a visit: its place
+ * is where the work was documented, shown as the Where fact at its stored precision, with no
+ * directions and no claim that the object still stands.
  *
  * A slug that resolves to anything other than an invention permanently redirects to `/place/`,
  * which is the mirror of the invention redirect the place page does.
  */
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { EntityRecordRoom } from '../../entity/[id]/EntityRecordRoom';
-import { familyForKind } from '../../record-first-paint';
+import { EntityRecordPage } from '../../entity/[id]/EntityRecordPage';
+import { familyForKind } from '../../record-family';
 import {
   discoveryFromSearchParams,
   recordArrivalQuery,
@@ -64,5 +63,5 @@ export default async function InventionPage({ params, searchParams }: InventionP
   if (familyForKind(entity.kind) !== 'invention') {
     permanentRedirect(withQuery(`/place/${slug}`, recordArrivalQuery(rawArrival)));
   }
-  return EntityRecordRoom({ entity, arrival: discoveryFromSearchParams(rawArrival) });
+  return EntityRecordPage({ entity, arrival: discoveryFromSearchParams(rawArrival) });
 }

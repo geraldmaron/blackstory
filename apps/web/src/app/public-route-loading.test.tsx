@@ -40,14 +40,14 @@ const LOADING_BOUNDARIES = [
     route: '/books/[slug]',
     dir: 'books/[slug]',
     Loading: BookLoading,
-    label: 'Taking the book off the shelf…',
+    label: 'Opening record',
   },
   { route: '/law', dir: 'law', Loading: LawLoading, label: 'Pulling the law entries…' },
   {
     route: '/law/[slug]',
     dir: 'law/[slug]',
     Loading: LawEntryLoading,
-    label: 'Pulling up the entry…',
+    label: 'Opening record',
   },
   { route: '/stories', dir: 'stories', Loading: StoriesLoading, label: 'Laying out the stories…' },
   {
@@ -68,7 +68,7 @@ const LOADING_BOUNDARIES = [
     Loading: RecordsLoading,
     label: 'Pulling the records together…',
   },
-  // Place and invention render the shared record room, so they reuse the record skeleton.
+  // Every record family (entity, place, invention, law, book) shares one record skeleton.
   { route: '/place/[slug]', dir: 'place/[slug]', Loading: PlaceLoading, label: 'Opening record' },
   {
     route: '/invention/[slug]',

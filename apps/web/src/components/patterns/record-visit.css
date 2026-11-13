@@ -16,29 +16,6 @@
 }
 
 /*
- * On the place page and the stacked entity column, Visit is the first beat after the mast, not
- * a micro kicker. Compact (sheet) and rail keep the quiet label so they do not compete with the
- * record name those surfaces already showed.
- */
-.ds-record-visit.ds-record-beat .ds-record-visit__heading,
-.ds-record-visit--main .ds-record-visit__heading {
-  font-family: var(--ds-font-display);
-  font-size: var(--rec-h2, 1.25rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  text-transform: none;
-  color: var(--ds-ink);
-}
-
-.ds-record-visit.ds-record-beat .ds-record-visit__address,
-.ds-record-visit--main .ds-record-visit__address {
-  font-size: var(--rec-body, 0.96875rem);
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-/*
  * Address is a supporting fact under the Visit kicker, not a headline. Body/UI scale and
  * regular weight so it never overpowers the section label or standing copy.
  */
@@ -201,22 +178,6 @@
   font-weight: 500;
 }
 
-.ds-record-visit--rail {
-  gap: var(--ds-space-2);
-}
-
-@media (max-width: 67.99rem) {
-  .ds-record-visit--rail {
-    display: none;
-  }
-}
-
-@media (min-width: 68rem) {
-  .ds-record-visit--main {
-    display: none;
-  }
-}
-
 @media (max-width: 47.9375rem) {
   .ds-record-visit .ds-maps-handoff {
     grid-template-columns: minmax(0, 1fr);
@@ -225,16 +186,4 @@
   .ds-record-visit .ds-maps-handoff__provider {
     width: 100%;
   }
-}
-
-.ds-record-visit--rail .ds-record-visit__heading {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }

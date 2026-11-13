@@ -12,7 +12,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const indexSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const detailSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
-const ripRowSource = readFileSync(join(here, 'BooksRipRow.tsx'), 'utf8');
+const detailViewSource = readFileSync(join(here, '[slug]', 'BookRecordView.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
 
 test('books index is the catalog room; /books/browse is a config redirect only', () => {
@@ -39,39 +39,35 @@ test('books browse ends on the catalog, without the BlackStory off-ramp card', (
   assert.doesNotMatch(detailSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
 });
 
-test('books detail page uses anatomy strip and cover art without gutter mosaic', () => {
-  assert.doesNotMatch(detailSource, /EditionAtmosphereMosaic/);
-  assert.doesNotMatch(detailSource, /BOOKS_EDITION_MOSAIC_SEED/);
-  assert.match(detailSource, /BooksAnatomyStrip/);
-  assert.match(detailSource, /BooksCoverArt/);
+test('books detail page renders the shared record anatomy with the cover as its media', () => {
+  assert.match(detailSource, /BookRecordView/);
   assert.match(detailSource, /buildBooksRelatedItems/);
-  assert.doesNotMatch(detailSource, /ds-entity-mast/);
+  assert.match(detailViewSource, /<RecordPage/);
+  assert.match(detailViewSource, /BooksCoverArt/);
+  for (const src of [detailSource, detailViewSource]) {
+    assert.doesNotMatch(src, /EditionAtmosphereMosaic|books-panel-chrome|books-edition\.css/);
+    assert.doesNotMatch(src, /BooksAnatomyStrip|WalkOffRamp|ds-books-edition__panel-title/);
+  }
 });
 
-test('books detail page renders through the room kit, with no edition chrome left', () => {
-  const detailSectionsSource = readFileSync(join(here, 'BooksDetailSections.tsx'), 'utf8');
-  assert.doesNotMatch(detailSource, /books-panel-chrome/);
-  assert.doesNotMatch(detailSource, /books-edition\.css/);
-  assert.doesNotMatch(detailSource, /data-books-edition="v6"/);
-  assert.match(detailSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
-  assert.match(detailSource, /<Room width="record">/);
-  assert.match(detailSource, /<PageHeader/);
-  assert.doesNotMatch(detailSectionsSource, /books-panel-chrome/);
-  // The route-owned box wrapper (`ds-books-edition__panel--<variant>`) is gone; the element
-  // labels it left behind (`__panel-title`, `__panel-heading`) are content, not chrome, and stay.
-  assert.doesNotMatch(detailSectionsSource, /ds-books-edition__panel--/);
+test('the affiliate link is one quiet action, disclosed directly under it, never copper', () => {
+  assert.match(detailViewSource, /Buy on Bookshop \(affiliate\)/);
+  assert.match(detailViewSource, /sponsored/);
+  // The disclosure travels with the link (RecordPage prints `note` under it), not in the file.
+  assert.match(detailViewSource, /note: BOOKS_DETAIL\.affiliateNotice/);
+  assert.doesNotMatch(detailViewSource, /label: 'Affiliate link'/);
+  assert.doesNotMatch(detailViewSource, /ds-cta--copper|buttonClassName\('primary'/);
 });
 
 test('books browse renders cover-led kit rows, not the retired rip row or HairlineIndex', () => {
   // Catalog indexes share `ds-room-idx` slots. Books cannot use HairlineIndex: that block's
   // glyph track is a 16px icon and its name clips to one line, which is how this catalog
-  // read as a pin list. Related titles on the detail page still use BooksRipRow.
+  // read as a pin list.
   assert.match(browseSectionsSource, /ds-books-idx/);
   assert.match(browseSectionsSource, /BooksCoverArt/);
   assert.match(browseSectionsSource, /ds-books-idx__gloss/);
   assert.doesNotMatch(browseSectionsSource, /HairlineIndex/);
   assert.doesNotMatch(browseSectionsSource, /BooksRipRow/);
-  assert.match(ripRowSource, /BooksCoverArt/);
 });
 
 test('books browse facet chips use the room kit chip vocabulary', () => {
@@ -97,7 +93,7 @@ test('books browse preserves GET filter and sort URL contract', () => {
 });
 
 test('books user-facing copy avoids em dashes on touched surfaces', () => {
-  const sources = [indexSource, detailSource, browseSectionsSource, copySource];
+  const sources = [indexSource, detailSource, detailViewSource, browseSectionsSource, copySource];
   for (const source of sources) {
     assert.doesNotMatch(source, /—/);
   }
@@ -115,4 +111,24 @@ test('the catalog room states the census limit and does not speak as an institut
   assert.match(browseSectionsSource, /id="read"/);
   assert.match(browseSectionsSource, /id="browse"/);
   assert.match(browseSectionsSource, /name="state"/);
+});
+
+test('the When cell is never sharper than the challenge reports', async () => {
+  const { challengeWhen } = await import('./[slug]/BookRecordView');
+  assert.deepEqual(challengeWhen([{ schoolYear: '2022-2023' }, { schoolYear: '2022-2023' }]), {
+    label: 'When',
+    value: '2022-2023',
+    detail: 'Challenge school year',
+  });
+  assert.deepEqual(challengeWhen([{ schoolYear: '2023-2024' }, { schoolYear: '2021-2022' }]), {
+    label: 'When',
+    value: '2021 to 2024',
+    detail: 'Challenge school years',
+  });
+  assert.deepEqual(challengeWhen([{ challengeYear: 2023 }]), {
+    label: 'When',
+    value: '2023',
+    detail: 'Challenge year',
+  });
+  assert.deepEqual(challengeWhen([]), { label: 'When', value: 'Not dated yet' });
 });

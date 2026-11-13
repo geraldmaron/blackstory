@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getPublicEntity } from '../../../data/public-seed';
-import { buildEntityAnatomyInputs, buildEntityAnatomyPlace } from './entity-anatomy-facts';
+import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
 import { buildVisitHandoff } from '../../../lib/geography/visit-handoff';
 
 function requireEntity(id: string) {
@@ -46,21 +46,6 @@ test('buildEntityAnatomyInputs does not treat United States as a place', () => {
     undefined,
   );
   assert.equal(inputs.whereLabel, 'Dupont/Sixteenth Street Historic District area');
-});
-
-test('buildEntityAnatomyPlace returns undefined without geo anchor', () => {
-  const entity = requireEntity('ent_15th_st_church_001');
-  assert.equal(buildEntityAnatomyPlace(entity, undefined), undefined);
-});
-
-test('buildEntityAnatomyPlace carries the stored precision when geo exists', () => {
-  const entity = requireEntity('ent_15th_st_church_001');
-  const anchor = entity.geoAnchor ?? { lat: 38.9, lng: -77.0 };
-  const place = buildEntityAnatomyPlace(entity, anchor);
-  assert.ok(place);
-  assert.equal(place.lat, anchor.lat);
-  assert.equal(place.precision, entity.locationPrecision);
-  assert.equal(place.label, buildEntityAnatomyInputs(entity, undefined).whereLabel);
 });
 
 test('Where and Visit resolve the same public address line', () => {

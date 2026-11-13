@@ -80,6 +80,13 @@
   font-size: 0.625rem;
 }
 
+/* The "i" stays a 24px mark but takes a 44px hit area, inside the control's 10px corner margin. */
+.ds-record-map .maplibregl-ctrl-attrib-button::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ds-record-map__canvas {
     transition: none;

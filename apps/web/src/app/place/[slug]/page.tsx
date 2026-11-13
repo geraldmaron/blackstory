@@ -1,13 +1,20 @@
 /**
- * A published place at a public slug. Walked into from the map. The title is
- * the place. Back is BlackStory at `/`. Never `/entity/ent_…`.
- * Arrival query params may carry DiscoveryState for map/list return and list prev/next.
+ * A published place at a public slug. It renders the one record page every family shares
+ * (`EntityRecordPage`); arrival query params carry the map/list return and list prev/next.
  *
  * An invention that still holds an indexed place address permanently redirects to
- * `/invention/{slug}`; the room itself is shared (`app/record-first-paint.tsx`).
+ * `/invention/{slug}`, carrying the slug verbatim so a `{slug}--{entityId}` address survives.
  */
 import type { Metadata } from 'next';
-import { RecordFirstPaint, recordFirstPaintMetadata } from '../../record-first-paint';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { EntityRecordPage } from '../../entity/[id]/EntityRecordPage';
+import { familyForKind } from '../../record-family';
+import { loadPlaceRecord } from '../place-record';
+import {
+  discoveryFromSearchParams,
+  recordArrivalQuery,
+  withQuery,
+} from '../../../lib/discovery/discovery-state';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,10 +25,18 @@ type PlacePageProps = {
 
 export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {
   const { slug } = await params;
-  return recordFirstPaintMetadata('place', slug);
+  const place = await loadPlaceRecord(slug);
+  if (!place) return { title: 'Place not found' };
+  return { title: place.displayName, description: place.summary };
 }
 
 export default async function PlacePage({ params, searchParams }: PlacePageProps) {
   const { slug } = await params;
-  return RecordFirstPaint({ family: 'place', slug, searchParams: await searchParams });
+  const rawArrival = await searchParams;
+  const place = await loadPlaceRecord(slug);
+  if (!place) notFound();
+  if (familyForKind(place.kind) !== 'place') {
+    permanentRedirect(withQuery(`/invention/${slug}`, recordArrivalQuery(rawArrival)));
+  }
+  return EntityRecordPage({ entity: place, arrival: discoveryFromSearchParams(rawArrival) });
 }

@@ -12,9 +12,9 @@
  * public address before it 404s. A record that was WITHDRAWN rather than merged has no survivor,
  * carries no redirect row, and still 404s, which is the honest answer for it.
  *
- * The page body is `./EntityRecordRoom`, shared with `/invention/{slug}`: Next lets a route file
- * export only its own known members, so the room cannot live in this file and still be rendered
- * by another family.
+ * The page body is `./EntityRecordPage`, shared with `/place/{slug}` and `/invention/{slug}`: Next
+ * lets a route file export only its own known members, so it cannot live in this file and still
+ * be rendered by another family.
  */
 import { notFound, permanentRedirect } from 'next/navigation';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
@@ -31,7 +31,7 @@ import {
 import { canStandHere, isInternalRecordLabel } from '../../../lib/place/public-place-path';
 import { publicRecordHref, placeSlugCollisionCounts } from '../../../lib/place/place-slug';
 import type { PublicEntityView } from '../../../data/public-seed';
-import { EntityRecordRoom } from './EntityRecordRoom';
+import { EntityRecordPage } from './EntityRecordPage';
 
 /**
  * Caches rendered records with hourly revalidation. In-place corrections can remain stale
@@ -134,5 +134,5 @@ export default async function EntityPage({ params, searchParams }: EntityPagePro
     permanentRedirect(withQuery(address, arrivalQuery));
   }
 
-  return EntityRecordRoom({ entity, arrival: discoveryFromSearchParams(rawArrival) });
+  return EntityRecordPage({ entity, arrival: discoveryFromSearchParams(rawArrival) });
 }

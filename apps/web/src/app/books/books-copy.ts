@@ -46,24 +46,9 @@ export const BOOKS_READ_FACTS = [
 ] as const;
 
 export const BOOKS_DETAIL = {
-  introKicker: 'Challenged book',
-  contextKicker: 'Context',
-  contextTitle: 'About this title',
-  challengesKicker: 'Challenges',
-  challengesTitle: 'States on challenge lists',
   challengesLede:
-    'Validated USPS codes for challenges currently reported, unknown, banned, or restricted. Rescinded and retained entries are omitted. Codes follow cited public reports, not a claim of statewide removal.',
-  evidenceKicker: 'Evidence',
-  evidenceTitle: 'Citations',
-  affiliateKicker: 'Affiliate',
-  affiliateTitle: 'Buy on Bookshop',
+    'Challenges still reported, banned, restricted or of unstated outcome. Rescinded and retained challenges are left out. A state here follows a cited report; it is not a claim that the book left every school in that state.',
+  /** One sentence, printed directly under the Bookshop link it discloses. */
   affiliateNotice:
-    'This is a paid affiliate link. BlackStory earns a commission when you buy through it, and Bookshop.org also supports independent bookstores.',
-  lookupKicker: 'Lookup',
-  lookupTitle: 'Purchase and identifiers',
-  lookupFootnote: 'Open Library is a free catalog reference, not a purchase path.',
-  relatedKicker: 'Related',
-  relatedTitle: 'More in this catalog',
-  connectedKicker: 'Connected',
-  connectedTitle: 'Keep going',
+    'BlackStory earns a commission on a purchase through this link, and that never decides which titles appear.',
 } as const;

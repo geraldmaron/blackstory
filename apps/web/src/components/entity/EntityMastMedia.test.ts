@@ -1,6 +1,6 @@
 /**
  * SSR markup smoke tests for the entity mast photo chain and pin-and-serve path.
- * Mirrors the render-to-static-markup pattern used by RecordGapNotice.test.ts.
+ * Renders with renderToStaticMarkup, the pattern the other entity component tests use.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';

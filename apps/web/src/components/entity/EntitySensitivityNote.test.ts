@@ -8,11 +8,11 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { getDisclaimer, SENSITIVITY_CLASS_PRESENTATION_LABELS } from '@repo/domain/disclaimers';
-import { EntitySensitivityBanner } from './EntitySensitivityBanner';
+import { EntitySensitivityNote } from './EntitySensitivityNote';
 
 test('renders the registry class label and sensitive-content disclaimer body for a place-kind entity', () => {
   const html = renderToStaticMarkup(
-    createElement(EntitySensitivityBanner, {
+    createElement(EntitySensitivityNote, {
       sensitivity: {
         class: 'contested_legacy',
         note: 'Documented dispute over a 1920s land-use displacement action.',
@@ -35,7 +35,7 @@ test('renders the registry class label and sensitive-content disclaimer body for
 
 test('never renders the non-endorsement disclaimer for a non-person entity kind', () => {
   const html = renderToStaticMarkup(
-    createElement(EntitySensitivityBanner, {
+    createElement(EntitySensitivityNote, {
       sensitivity: {
         class: 'contested_legacy',
         note: 'Documented dispute.',

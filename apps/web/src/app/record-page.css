@@ -1,36 +1,1010 @@
 /**
- * Record page surface class: the only stylesheet a Record route imports.
+ * The record page (components/patterns/RecordPage.tsx): one anatomy for entity, place, invention,
+ * law and book. The only stylesheet a record route loads besides the shared kit.
  *
- * Design law: docs/ui/patterns-record-page.md. A record is scanned, not read; the evidence blocks
- * (anatomy, trust, sources, connections) carry the weight instead of prose.
+ * Desktop: a 964px record container, a main column beside a 300px sticky rail. Phone and tablet:
+ * one column in the contract's order (title, meta, media, lede, citation line, body), with the
+ * rail's actions pinned as a bottom row above the tab bar.
+ *
+ * Spacing uses the scale 4, 8, 12, 16, 24, 32, 48, 72 only. No box inside a box: the record file
+ * is the page's one bordered panel; lists are separated by 1px rules.
  */
 
 @import '../components/room/room-kit.css';
 
+.ds-recpage {
+  padding-block: var(--ds-space-6) var(--ds-space-18);
+  color: var(--ds-ink);
+}
+
+.ds-recpage__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'head'
+    'media'
+    'extra'
+    'lede'
+    'note'
+    'facts'
+    'body'
+    'file'
+    'pager'
+    'actions';
+  align-items: start;
+}
+
+.ds-recpage__icon {
+  width: 0.875em;
+  height: 0.875em;
+  flex: none;
+}
+
+/* —— 1. crumb, title, meta ———————————————————————————————————————————————— */
+.ds-recpage__head {
+  grid-area: head;
+  display: grid;
+  gap: var(--ds-space-3);
+  min-width: 0;
+}
+
+.ds-recpage__crumb {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 44px;
+  margin-block: calc(-1 * var(--ds-space-3)) calc(-1 * var(--ds-space-2));
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ds-recpage__crumb:hover {
+  color: var(--ds-ink);
+}
+
+.ds-recpage__crumb .ds-recpage__icon {
+  transition: transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-recpage__crumb:hover .ds-recpage__icon {
+  transform: translateX(-3px);
+}
+
+.ds-recpage__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 650;
+  line-height: 1.04;
+  letter-spacing: var(--ds-tracking-display);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.ds-recpage__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+/* Each item wraps whole with its glyph, so a wrap never strands punctuation at a line start. */
+.ds-recpage__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  white-space: nowrap;
+}
+
+/* —— 2. lede ——————————————————————————————————————————————————————————————— */
+.ds-recpage__lede {
+  grid-area: lede;
+  min-width: 0;
+  margin-top: var(--ds-space-6);
+}
+
+.ds-recpage__lede-text {
+  margin: 0;
+  max-width: 62ch;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.5;
+  color: var(--ds-ink);
+  text-wrap: pretty;
+}
+
+.ds-recpage__lede[data-clamp] .ds-recpage__lede-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
+}
+
+.ds-recpage__lede-toggle:checked ~ .ds-recpage__lede-text {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+.ds-recpage__lede-close,
+.ds-recpage__lede-toggle:checked ~ .ds-recpage__lede-more .ds-recpage__lede-open {
+  display: none;
+}
+
+.ds-recpage__lede-toggle:checked ~ .ds-recpage__lede-more .ds-recpage__lede-close {
+  display: inline;
+}
+
+.ds-recpage__lede-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+
+.ds-recpage__lede-more:hover {
+  text-decoration-color: currentColor;
+}
+
+.ds-recpage__lede-toggle:focus-visible ~ .ds-recpage__lede-more {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+/* A content note: one quiet line, never a warning slab. */
+.ds-recpage__note {
+  grid-area: note;
+  max-width: 62ch;
+  margin-top: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ds-recpage__note strong {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-recpage__note-more summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.ds-recpage__note-toggle {
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-recpage__note-more summary:hover .ds-recpage__note-toggle {
+  color: var(--ds-ink);
+  text-decoration-color: currentColor;
+}
+
+.ds-recpage__note-more summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-recpage__note-more p {
+  margin: 0 0 var(--ds-space-2);
+}
+
+/* —— 3. the citation line ——————————————————————————————————————————————— */
+.ds-recpage__facts {
+  grid-area: facts;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: var(--ds-space-8) 0 0;
+  border-block: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__fact {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-1);
+  min-width: 0;
+  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-4) 0;
+}
+
+.ds-recpage__fact + .ds-recpage__fact {
+  padding-left: var(--ds-space-4);
+  border-left: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__fact-label {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-recpage__fact-value,
+.ds-recpage__fact-detail {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ds-recpage__fact-value {
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ds-recpage__fact-detail {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.ds-recpage__grade {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+/* A 44px hit area around a 20px line, without moving the cell's text. */
+.ds-recpage__grade::after {
+  content: '';
+  position: absolute;
+  inset: -12px -4px;
+}
+
+/* The glyph carries the tier's hue; the word carries the meaning. */
+.ds-recpage__grade .ds-recpage__icon,
+.ds-grade-tag__glyph {
+  color: var(--grade-hue, var(--ds-ink-muted));
+}
+
+.ds-grade-tag--high {
+  --grade-hue: var(--ds-confidence-high-fg);
+}
+
+.ds-grade-tag--medium {
+  --grade-hue: var(--ds-confidence-medium-fg);
+}
+
+.ds-grade-tag--low {
+  --grade-hue: var(--ds-confidence-low-fg);
+}
+
+/* —— 4. the rail: media and actions —————————————————————————————————————— */
+.ds-recpage__rail {
+  display: contents;
+}
+
+.ds-recpage__media {
+  grid-area: media;
+  display: grid;
+  gap: var(--ds-space-4);
+  min-width: 0;
+  margin-top: var(--ds-space-6);
+}
+
+.ds-recpage__photo {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+}
+
+.ds-recpage__photo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 26rem;
+  object-fit: contain;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+}
+
+.ds-recpage__photo .ds-entity-photo__credit {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.ds-recpage__actions {
+  grid-area: actions;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ds-space-2);
+}
+
+.ds-recpage__action {
+  justify-content: flex-start;
+}
+
+.ds-recpage__action.ds-button--secondary {
+  justify-content: center;
+}
+
+/* The book's affiliate link, with its disclosure directly beneath it. */
+.ds-recpage__extra {
+  grid-area: extra;
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-1);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-recpage__extra .ds-recpage__action {
+  gap: var(--ds-space-2);
+}
+
+.ds-recpage__extra-note {
+  margin: 0;
+  max-width: 40ch;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-recpage__phone-only {
+  display: none;
+}
+
+/* —— 5. body beats ———————————————————————————————————————————————————————— */
+.ds-recpage__body {
+  grid-area: body;
+  min-width: 0;
+}
+
+.ds-recpage__beat .ds-section-heading {
+  scroll-margin-top: calc(56px + var(--ds-space-6));
+}
+
+.ds-recpage__prose {
+  max-width: 65ch;
+  color: var(--room-ink-2);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: var(--ds-leading-editorial);
+}
+
+.ds-recpage__prose p {
+  margin: 0 0 var(--ds-space-4);
+}
+
+.ds-recpage__prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* Typed connections, citing stories, a law's agencies: ruled two-line rows, the whole row the link. */
+.ds-recpage__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__link-row {
+  position: relative;
+  display: grid;
+  gap: var(--ds-space-1);
+  min-height: 44px;
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__link-name {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+/* The row is the hit target; the focus ring still draws on the link itself. */
+.ds-recpage__link-name::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.ds-recpage__link-row:hover .ds-recpage__link-name {
+  color: var(--ds-accent);
+}
+
+.ds-recpage__link-name--external {
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-recpage__link-name--external .ds-recpage__icon {
+  width: 0.75em;
+  height: 0.75em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-recpage__link-relation {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
 /*
- * THE SHELL. A record sits on the record container (964px, `.ds-wrap--record`). Its masthead, fact
- * strip and apparatus band run full bleed, so they inset their content by the same amount the
- * container is inset from the viewport, and every block on the page shares one left edge.
- *
- * THE TEXT MEASURE is the main column beside the 300px rail: the lede, credits, standfirsts and
- * prose all end on the same vertical line as the column they sit in.
+ * One link style for every link that is not running prose: evidence titles, the citation line's
+ * grade, table cells, record-file values, quiet asides. Ink with a 1px control underline; copper
+ * only on hover. Copper at rest is for links inside prose paragraphs (the lede and body beats).
  */
-[data-surface='record'] .ds-room {
-  --record-shell-w: var(--ds-width-record);
-  --record-shell-pad: max(var(--ds-gutter), calc((100% - var(--record-shell-w)) / 2));
-  --rec-text-w: calc(var(--ds-width-record) - 300px - var(--ds-space-12));
+a.ds-evidence__title,
+.ds-evidence__archive,
+.ds-recpage__grade,
+.ds-recpage__table a,
+.ds-recpage__file a,
+.ds-recpage__aside a,
+.ds-recpage__terms a {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
-[data-surface='record'] .ds-room__mast {
-  background: var(--ds-canvas);
+a.ds-evidence__title:hover,
+.ds-evidence__archive:hover,
+.ds-recpage__grade:hover,
+.ds-recpage__table a:hover,
+.ds-recpage__file a:hover,
+.ds-recpage__aside a:hover,
+.ds-recpage__terms a:hover {
+  color: var(--ds-accent);
+  text-decoration-color: currentColor;
 }
 
-/* The record's own prose is a caption register, not a chapter register. */
-[data-surface='record'] .ds-room-prose {
-  font-size: var(--ds-text-subtitle);
-  line-height: 1.65;
+/* A quiet line under a beat: the legal disclaimer, a report's limits. */
+.ds-recpage__aside,
+.ds-recpage__terms {
+  max-width: 62ch;
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-[data-surface='record'] .ds-room-anat {
-  margin-block: var(--ds-space-6);
+/* A book cover: the real art, at its own proportion, never stretched to the rail. */
+.ds-recpage .ds-recpage__cover {
+  justify-self: start;
+  width: min(100%, 180px);
+  margin: 0;
+}
+
+/* A cover that fails to load leaves no initials plate behind. */
+.ds-recpage .ds-books-edition__cover--placeholder {
+  display: none;
+}
+
+.ds-recpage .ds-recpage__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ds-radius-sm);
+}
+
+/* A ruled data table (book challenges). */
+.ds-recpage__table-wrap {
+  overflow-x: auto;
+}
+
+.ds-recpage__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-recpage__table th {
+  padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-2) 0;
+  color: var(--ds-ink-muted);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  text-align: left;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__table td {
+  padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3) 0;
+  vertical-align: top;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/*
+ * Below 768px a five-column table cannot hold a district name, so each challenge becomes a ruled
+ * two-line row from the same markup: state and district, then school year, status and source.
+ */
+@media (max-width: 47.99rem) {
+  .ds-recpage__table,
+  .ds-recpage__table tbody {
+    display: block;
+  }
+
+  .ds-recpage__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ds-recpage__table tbody {
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__table tr {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'state    district district'
+      'year     status   source';
+    align-items: baseline;
+    gap: var(--ds-space-1) var(--ds-space-3);
+    padding-block: var(--ds-space-3);
+    border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .ds-recpage__cell--state,
+  .ds-recpage__cell--district {
+    font-family: var(--ds-font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .ds-recpage__cell--state {
+    grid-area: state;
+  }
+
+  .ds-recpage__cell--district {
+    grid-area: district;
+  }
+
+  .ds-recpage__cell--year {
+    grid-area: year;
+  }
+
+  .ds-recpage__cell--status {
+    grid-area: status;
+    color: var(--ds-ink-muted);
+  }
+
+  .ds-recpage__cell--source {
+    grid-area: source;
+    justify-self: start;
+  }
+}
+
+.ds-recpage__cell--year {
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.ds-recpage__plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+/* —— "What the sources say": the numbered evidence list ————————————————— */
+.ds-evidence {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: evidence;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-evidence__item {
+  position: relative;
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-8);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  counter-increment: evidence;
+  scroll-margin-top: calc(56px + var(--ds-space-6));
+}
+
+.ds-evidence__item::before {
+  content: counter(evidence);
+  position: absolute;
+  top: calc(var(--ds-space-4) + 0.3em);
+  left: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-evidence__item:target {
+  background: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
+}
+
+.ds-evidence__statement {
+  margin: 0;
+  max-width: 62ch;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.55;
+}
+
+.ds-evidence__source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.ds-evidence__publisher {
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence__title {
+  color: var(--ds-ink);
+  font-weight: 500;
+}
+
+.ds-evidence__archive {
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence__date,
+.ds-evidence__note {
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+}
+
+.ds-evidence__date {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+}
+
+.ds-grade-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-evidence__flag {
+  max-width: 62ch;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-dispute-bg);
+  color: var(--ds-dispute-fg);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ds-evidence__flag--retracted {
+  background: var(--ds-error-bg);
+  color: var(--ds-error-fg);
+}
+
+.ds-evidence__alternates {
+  margin: var(--ds-space-2) 0 0;
+  padding-left: var(--ds-space-4);
+}
+
+/* —— 6. the record file ————————————————————————————————————————————————— */
+.ds-recpage__file {
+  grid-area: file;
+  margin-top: var(--ds-space-12);
+  padding: var(--ds-space-6);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+}
+
+.ds-recpage__file-title {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-display);
+  font-size: 1.125rem;
+  font-weight: 650;
+  letter-spacing: var(--ds-tracking-title);
+}
+
+.ds-recpage__file-rows {
+  display: grid;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ds-recpage__file-row {
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+  gap: var(--ds-space-1) var(--ds-space-4);
+  padding-block: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__file-row dt {
+  color: var(--ds-ink-muted);
+}
+
+.ds-recpage__file-row dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* —— 7. the pager ————————————————————————————————————————————————————————— */
+.ds-recpage__pager {
+  grid-area: pager;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--ds-space-4);
+  margin-top: var(--ds-space-8);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__step {
+  display: grid;
+  gap: var(--ds-space-1);
+  min-height: 44px;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-recpage__step--next {
+  justify-items: end;
+  text-align: right;
+}
+
+.ds-recpage__step-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-recpage__step-name {
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ds-recpage__step:hover .ds-recpage__step-name {
+  color: var(--ds-accent);
+}
+
+.ds-recpage__position {
+  padding-top: 2px;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* —— loading geometry ———————————————————————————————————————————————————— */
+.ds-recpage__sk-title {
+  height: 2.75rem;
+  width: 70%;
+}
+
+.ds-recpage__sk-line {
+  height: 1.125rem;
+  margin-block: var(--ds-space-2);
+}
+
+.ds-recpage__sk-media {
+  aspect-ratio: 16 / 10;
+}
+
+/* —— phone and tablet: one column, actions pinned at the bottom ———————— */
+@media (max-width: 63.99rem) {
+  .ds-recpage__media:has(.ds-recpage__photo) .ds-record-map {
+    display: none;
+  }
+
+  .ds-recpage__media {
+    max-width: 40rem;
+  }
+
+  .ds-recpage__actions {
+    position: sticky;
+    bottom: var(--ds-tabbar-h, 0px);
+    z-index: 5; /* local: above the record body it pins over, inside this page only */
+    flex-direction: row;
+    align-items: center;
+    margin: var(--ds-space-8) calc(-1 * var(--ds-gutter)) 0;
+    padding: var(--ds-space-2) var(--ds-gutter);
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+    background: var(--ds-canvas);
+  }
+
+  /* A long map label ("Georgia records from the 2020s on the map") wraps to two lines rather
+     than pushing Sources off the row; it is never truncated, since the label is the claim. */
+  .ds-recpage__action.ds-button--secondary {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-inline: var(--ds-space-3);
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .ds-recpage__phone-only {
+    display: inline-flex;
+  }
+
+  /* Four actions share 358px: the labeled buttons drop their glyphs so the words fit on one line. */
+  .ds-recpage__actions .ds-button--secondary .ds-recpage__icon {
+    display: none;
+  }
+
+  .ds-recpage__action.ds-recpage__phone-only {
+    flex: 0 0 auto;
+  }
+
+  .ds-recpage__action--icon {
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+
+  .ds-recpage__action--icon .ds-recpage__action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ds-recpage__action--icon .ds-recpage__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+@media (max-width: 30rem) {
+  .ds-recpage__facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds-recpage__fact {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    column-gap: var(--ds-space-3);
+    padding: var(--ds-space-3) 0;
+  }
+
+  .ds-recpage__fact + .ds-recpage__fact {
+    padding-left: 0;
+    border-left: 0;
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__fact-label {
+    grid-row: span 2;
+  }
+
+  .ds-recpage__fact-detail {
+    grid-column: 2;
+  }
+
+  .ds-recpage__file {
+    padding: var(--ds-space-4);
+  }
+
+  .ds-recpage__file-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds-recpage__pager {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .ds-recpage__position {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    text-align: center;
+  }
+}
+
+/* —— desktop: column plus sticky rail ———————————————————————————————— */
+@media (min-width: 64rem) {
+  .ds-recpage {
+    padding-top: var(--ds-space-8);
+  }
+
+  .ds-recpage__grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-rows: auto auto auto auto 1fr auto auto;
+    grid-template-areas:
+      'head  rail'
+      'lede  rail'
+      'note  rail'
+      'facts rail'
+      'body  rail'
+      'file  file'
+      'pager pager';
+    column-gap: var(--ds-space-12);
+  }
+
+  .ds-recpage__rail {
+    grid-area: rail;
+    position: sticky;
+    top: calc(56px + var(--ds-space-6));
+    display: grid;
+    gap: var(--ds-space-6);
+    padding-top: var(--ds-space-8);
+  }
+
+  .ds-recpage__rail > * {
+    grid-area: auto;
+  }
+
+  .ds-recpage__media,
+  .ds-recpage__extra {
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-recpage__crumb .ds-recpage__icon {
+    transition: none;
+  }
 }

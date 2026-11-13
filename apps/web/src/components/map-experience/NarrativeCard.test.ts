@@ -38,7 +38,10 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
 });
 
 test('Where matches Visit and does not duplicate maps exits when Visit is present', () => {
-  const feature = requireFeature('ent_15th_st_church_001');
+  // Visit renders only for a site-precision point (shouldShowVisitBlock); the seed church is held
+  // to the neighborhood, so it is lifted to site precision here.
+  const seeded = requireFeature('ent_15th_st_church_001');
+  const feature = { ...seeded, properties: { ...seeded.properties, precision: 'site' } };
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
   const { properties } = feature;
 
@@ -59,6 +62,13 @@ test('Where matches Visit and does not duplicate maps exits when Visit is presen
   assert.match(html, /aria-label="Browse Place records"/);
   assert.match(html, /href="\/records\?status=active"/);
   void properties;
+});
+
+test('a neighborhood-precision record gets no visit block and no directions', () => {
+  const html = renderToStaticMarkup(
+    createElement(NarrativeCard, { feature: requireFeature('ent_15th_st_church_001') }),
+  );
+  assert.doesNotMatch(html, /ds-record-visit|ds-maps-handoff/);
 });
 
 test('Where links to maps when the record is not visitable', () => {

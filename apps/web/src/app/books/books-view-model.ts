@@ -416,32 +416,26 @@ export function listBooksStaticParams(
   return snapshot.books.map((book) => ({ slug: book.slug }));
 }
 
-/** Related titles for detail depart panel: same author or overlapping challenge states. */
+/**
+ * Other titles by the same author: a typed relationship (shared authorship). Sharing a
+ * challenge state is collection membership, not a connection, so it never qualifies.
+ */
 export function buildBooksRelatedItems(
   snapshot: BannedBooksListingSnapshot,
   book: BannedBookRecord,
   limit = 4,
 ): readonly BooksBrowseItem[] {
   const authorNames = new Set(book.authors.map((entry) => entry.name));
-  const stateCodes = new Set(bannedBookReportedStates(book));
-
-  const scored = snapshot.books
-    .filter((entry) => entry.slug !== book.slug)
-    .map((entry) => {
-      const entryAuthors = entry.authors.map((author) => author.name);
-      const sharedAuthor = entryAuthors.some((name) => authorNames.has(name));
-      const entryStates = bannedBookReportedStates(entry);
-      const sharedStates = entryStates.filter((code) => stateCodes.has(code)).length;
-      const score = (sharedAuthor ? 10 : 0) + sharedStates;
-      return { entry, score };
-    })
-    .filter(({ score }) => score > 0)
-    .sort((left, right) => {
-      if (right.score !== left.score) return right.score - left.score;
-      return left.entry.title.localeCompare(right.entry.title, undefined, { sensitivity: 'base' });
-    });
-
-  return scored.slice(0, limit).map(({ entry }) => recordToBrowseItem(entry));
+  return snapshot.books
+    .filter(
+      (entry) =>
+        entry.slug !== book.slug && entry.authors.some((author) => authorNames.has(author.name)),
+    )
+    .sort((left, right) =>
+      left.title.localeCompare(right.title, undefined, { sensitivity: 'base' }),
+    )
+    .slice(0, limit)
+    .map(recordToBrowseItem);
 }
 
 export function stateLabel(code: string): string {

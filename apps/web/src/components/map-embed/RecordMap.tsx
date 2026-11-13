@@ -3,9 +3,11 @@
 /**
  * The one embedded map: a record's place on a record page, a place page or a story inset.
  *
- * Framed at the zoom its stored precision allows (`zoomForLocationPrecision`) and marked the way
- * the atlas marks a selected record (`recordMarkFor`): a copper dot at a site, a copper ring at a
- * neighborhood or city, no mark at all for a county or state. MapLibre's cooperative gestures keep
+ * Framed at the zoom its stored precision allows (`zoomForLocationPrecision`, capped by `maxZoom`
+ * where a small frame needs context) and marked the way the atlas marks a selected record
+ * (`recordMarkFor`): a copper dot at a site, a copper ring at a neighborhood or city, no mark at
+ * all for a county or state. A site dot carries the label beside it, so the frame still says what
+ * is there when the tiles around it are empty (a swamp, a field). MapLibre's cooperative gestures keep
  * one finger (and a plain wheel) scrolling the page. "Open on the map" hands off to /explore with
  * the record selected, where the same `frameRecord` contract frames it.
  *
@@ -41,10 +43,14 @@ const MARK_SOURCE = 'record-map-mark';
 export type RecordMapProps = {
   readonly lat: number;
   readonly lng: number;
-  /** The place in words: the caption, and the map's accessible name. */
+  /** The place in words: the caption, the site dot's map label, and the map's accessible name. */
   readonly label: string;
   /** Stored public precision; decides the zoom and the mark. */
   readonly precision: string;
+  /** A closest zoom for a small frame; never frames closer than the precision allows either way. */
+  readonly maxZoom?: number;
+  /** False where the page states the place itself (a record page's citation line). */
+  readonly caption?: boolean;
   /** `/explore?selected=…` (`exploreRecordHref`). Omit where the page already links to the map. */
   readonly exploreHref?: string;
   readonly className?: string;
@@ -62,12 +68,23 @@ function styleFor(scheme: ReturnType<typeof readDocumentColorScheme>) {
   });
 }
 
-function addMark(map: MapLibreMap, lng: number, lat: number, precision: string): void {
+function addMark(
+  map: MapLibreMap,
+  lng: number,
+  lat: number,
+  precision: string,
+  label: string,
+): void {
   const mark = recordMarkFor(precision);
   if (mark === 'none' || map.getSource(MARK_SOURCE)) return;
+  const plate = plateForScheme(readDocumentColorScheme());
   map.addSource(MARK_SOURCE, {
     type: 'geojson',
-    data: { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [lng, lat] } },
+    data: {
+      type: 'Feature',
+      properties: { label },
+      geometry: { type: 'Point', coordinates: [lng, lat] },
+    },
   });
   // The atlas's selected mark: copper with a paper halo, at the mark's own size.
   map.addLayer({
@@ -78,12 +95,44 @@ function addMark(map: MapLibreMap, lng: number, lat: number, precision: string):
       'circle-radius': mark === 'dot' ? 5 : 7,
       'circle-color': DIGNITY_PALETTE.point,
       'circle-stroke-width': 2,
-      'circle-stroke-color': plateForScheme(readDocumentColorScheme()).selectedHalo,
+      'circle-stroke-color': plate.selectedHalo,
+    },
+  });
+  // A ring sits on a named neighborhood or city the plate already labels; a site dot does not.
+  if (mark !== 'dot' || label.length === 0) return;
+  map.addLayer({
+    id: `${MARK_SOURCE}-label`,
+    type: 'symbol',
+    source: MARK_SOURCE,
+    layout: {
+      'text-field': ['get', 'label'],
+      'text-font': ['Noto Sans Regular'],
+      'text-size': 12,
+      'text-max-width': 10,
+      'text-anchor': 'left',
+      'text-justify': 'left',
+      'text-offset': [0.9, 0],
+      'text-allow-overlap': true,
+      'text-ignore-placement': true,
+    },
+    paint: {
+      'text-color': plate.placeLabelHi,
+      'text-halo-color': plate.placeLabelHalo,
+      'text-halo-width': 1.4,
     },
   });
 }
 
-export function RecordMap({ lat, lng, label, precision, exploreHref, className }: RecordMapProps) {
+export function RecordMap({
+  lat,
+  lng,
+  label,
+  precision,
+  maxZoom = MAP_MAX_ZOOM,
+  caption = true,
+  exploreHref,
+  className,
+}: RecordMapProps) {
   const slotRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<Status>('idle');
@@ -135,7 +184,7 @@ export function RecordMap({ lat, lng, label, precision, exploreHref, className }
           container,
           style: styleFor(readDocumentColorScheme()),
           center: [lng, lat],
-          zoom: Math.min(zoomForLocationPrecision(precision), MAP_MAX_ZOOM),
+          zoom: Math.min(zoomForLocationPrecision(precision), maxZoom, MAP_MAX_ZOOM),
           minZoom: MAP_MIN_ZOOM,
           maxZoom: MAP_MAX_ZOOM,
           attributionControl: false,
@@ -168,7 +217,7 @@ export function RecordMap({ lat, lng, label, precision, exploreHref, className }
             if (!cancelled) resizeMapInPlace(active);
           },
         );
-        active.on('style.load', () => addMark(active, lng, lat, precision));
+        active.on('style.load', () => addMark(active, lng, lat, precision, label.trim()));
         active.once('load', () => {
           if (!cancelled) setStatus('ready');
         });
@@ -193,7 +242,7 @@ export function RecordMap({ lat, lng, label, precision, exploreHref, className }
       guard?.detach();
       map?.remove();
     };
-  }, [wanted, lat, lng, precision]);
+  }, [wanted, lat, lng, precision, maxZoom, label]);
 
   const place = label.trim();
 
@@ -209,15 +258,17 @@ export function RecordMap({ lat, lng, label, precision, exploreHref, className }
           />
         </div>
       )}
-      <figcaption className="ds-record-map__caption">
-        <span className="ds-record-map__place">{place}</span>
-        <span className="ds-record-map__precision">{precisionInWords(precision)}</span>
-        {exploreHref ? (
-          <a className="ds-record-map__open" href={exploreHref}>
-            Open on the map
-          </a>
-        ) : null}
-      </figcaption>
+      {caption ? (
+        <figcaption className="ds-record-map__caption">
+          <span className="ds-record-map__place">{place}</span>
+          <span className="ds-record-map__precision">{precisionInWords(precision)}</span>
+          {exploreHref ? (
+            <a className="ds-record-map__open" href={exploreHref}>
+              Open on the map
+            </a>
+          ) : null}
+        </figcaption>
+      ) : null}
     </figure>
   );
 }
