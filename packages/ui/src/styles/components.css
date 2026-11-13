@@ -633,7 +633,7 @@
   align-items: center;
   justify-content: center;
   min-width: 2.75rem;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
   border-radius: 6px;
   color: var(--ds-ink-muted);

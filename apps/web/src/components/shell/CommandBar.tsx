@@ -131,7 +131,6 @@ export function CommandBar({
 
   const closeSearch = useCallback(() => {
     setSearchOpen(false);
-    openerRef.current?.focus();
   }, []);
 
   // A route change (a picked suggestion, a submitted search) ends the phone search sheet.
@@ -142,7 +141,11 @@ export function CommandBar({
   // The phone sheet is modal: the page behind it goes inert and stops scrolling, Escape closes it.
   useEffect(() => {
     if (!searchOpen) return;
-    const behind = document.querySelectorAll('.ds-shell-body, .ds-shell-footer, .ds-tabbar');
+    // The header's own brand link, tabs and tools sit behind the sheet too; leaving them focusable
+    // let Tab walk out of a dialog that declares aria-modal.
+    const behind = document.querySelectorAll(
+      '.ds-shell-body, .ds-shell-footer, .ds-tabbar, .ds-bar__brand, .ds-bar__tabs, .ds-bar__tools',
+    );
     behind.forEach((element) => element.setAttribute('inert', ''));
     document.documentElement.dataset.searchSheet = 'open';
     document.getElementById(BAR_SEARCH_INPUT_ID)?.focus();
@@ -153,6 +156,8 @@ export function CommandBar({
     return () => {
       behind.forEach((element) => element.removeAttribute('inert'));
       delete document.documentElement.dataset.searchSheet;
+      // Focus goes back to the opener only now: it sits in the tools group, which was inert.
+      openerRef.current?.focus();
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [searchOpen, closeSearch]);
