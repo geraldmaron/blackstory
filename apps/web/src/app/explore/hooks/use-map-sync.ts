@@ -37,7 +37,6 @@ export function useMapSync(
    * this parameter existed.
    */
   populationLevels: PopulationChoroplethLevels = NO_POPULATION_CHOROPLETH,
-  grouping = view.viewState.group,
 ) {
   const fadeNextPatchRef = useRef(fadeNextPatch);
   fadeNextPatchRef.current = fadeNextPatch;
@@ -51,7 +50,6 @@ export function useMapSync(
         {
           layerMode: view.viewState.layerMode,
           densityLevels: view.densityLevels,
-          clusteringEnabled: grouping,
           satellite,
           historyEdgeCollection: view.edgeLineCollection,
           stateChoroplethLevels: populationLevels.stateChoroplethLevels,
@@ -68,7 +66,6 @@ export function useMapSync(
     stage,
     view.densityLevels,
     view.edgeLineCollection,
-    grouping,
     view.viewState.layerMode,
     populationLevels,
   ]);

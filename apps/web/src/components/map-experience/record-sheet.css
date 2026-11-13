@@ -1,33 +1,22 @@
 /**
- * Record sheet — right slab, z 40, above the instruments and below the palette.
- *
- * Built as one of the instruments rather than as a modal that arrived over them: same matte
- * surface, hairline and radius as the lens and the results rail. What marks it as the thing the
- * reader is currently holding is the photograph it opens on, when the release has one, and the
- * copper kicker in its own header when it does not.
- *
- * Anatomy, top to bottom: top strip (Record · position · step · close), mast (the photo, credit
- * printed on it), identity (pills, name, story), the place and evidence rows, the visit block,
- * the precision note, the actions, then Sources, Documented connections and Cited in.
+ * Record inspector, z 40, above the instruments and below the palette. It takes the results
+ * list's slot: opening a record replaces the list it was chosen from, and closing it puts the
+ * list back. Sized to its content, never a full-height slab.
  */
 
 .ds-sheet {
   position: fixed;
   top: var(--ds-atlas-top);
-  /*
-   * The sheet takes the results rail's slot. It is the same object in the same place: opening a
-   * record replaces the list it was chosen from, and closing it puts the list back. Above
-   * 1150px the two coexist and the sheet moves one column left — see below.
-   */
   right: var(--ds-space-4);
-  bottom: var(--ds-atlas-bottom);
   z-index: var(--ds-z-record-sheet);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: min(430px, calc(100vw - var(--ds-space-4) * 2));
+  max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom));
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
+  box-shadow: var(--ds-contact-overlap);
   overflow: hidden;
 }
 
@@ -35,43 +24,43 @@
   outline: none;
 }
 
-/* ---- top strip ----------------------------------------------------------- */
+.ds-sheet:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
 
+/* Kind and place, then close. On a phone this row is also the drag handle. */
 .ds-sheet__top {
   display: flex;
   align-items: center;
-  gap: var(--ds-space-1);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-2) var(--ds-space-2) 0 var(--ds-space-6);
 }
 
-.ds-sheet__kicker-label {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.ds-sheet__spacer {
+.ds-sheet__meta {
   flex: 1;
-}
-
-.ds-sheet__position {
-  min-width: 62px;
-  text-align: center;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin: 0;
+  font-size: 0.875rem;
   color: var(--ds-ink-muted);
 }
 
-.ds-sheet__step,
-.ds-sheet__close {
+.ds-sheet__meta > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-sheet__close,
+.ds-sheet__step {
   display: inline-grid;
+  flex: none;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border: 0;
   border-radius: var(--ds-radius-sm);
   background: transparent;
@@ -79,431 +68,113 @@
   cursor: pointer;
 }
 
-.ds-sheet__step:hover,
-.ds-sheet__close:hover {
+.ds-sheet__close:hover,
+.ds-sheet__step:hover {
   color: var(--ds-ink);
   background: var(--ds-canvas);
 }
 
-.ds-sheet__close {
-  margin-left: var(--ds-space-2);
-  border-left: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: 0 var(--ds-radius-sm) var(--ds-radius-sm) 0;
-  padding-left: var(--ds-space-1);
-  width: 34px;
+.ds-sheet__close:focus-visible,
+.ds-sheet__step:focus-visible,
+.ds-sheet__open:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
-
-/* ---- body ---------------------------------------------------------------- */
 
 .ds-sheet__body {
   display: grid;
-  gap: var(--ds-space-5);
   align-content: start;
-  padding: var(--ds-space-5);
+  padding: var(--ds-space-1) var(--ds-space-6) var(--ds-space-6);
   overflow-y: auto;
   overscroll-behavior: contain;
-}
-
-/* ---- mast ---------------------------------------------------------------- */
-
-/*
- * The photo bleeds to the sheet's edges: negative margins undo the body padding so the mast is
- * the sheet's own top edge, the way the place page's mast is the page's. The identity block
- * below keeps the padding, so the name sits on the surface, not on the picture.
- */
-.ds-sheet__mast {
-  position: relative;
-  margin: calc(var(--ds-space-5) * -1) calc(var(--ds-space-5) * -1) 0;
-  background: var(--ds-canvas);
-  /* Deliberately no `overflow: hidden`. In a grid row the figure's automatic minimum size is
-     zero once it becomes a scroll container, and Chrome then sized the row to the caption alone
-     and drew the identity block under the picture. Nothing here needs clipping: the image is a
-     block and the credit is inside it. */
-}
-
-/* The image carries the ratio, not the figure, so the row has an intrinsic height to measure. */
-.ds-sheet__photo-frame {
-  display: block;
-}
-
-.ds-sheet__photo {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  object-position: center 30%;
-}
-
-.ds-sheet__credit {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  margin: 0;
-  padding: var(--ds-space-6) var(--ds-space-4) var(--ds-space-2);
-  background: linear-gradient(to top, color-mix(in srgb, #0a0a0a 72%, transparent), transparent);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.02em;
-  line-height: 1.4;
-  color: #f4efe5;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 0.4);
-}
-
-/* When there is a mast, the body's first gap is the mast's own bottom; pull the identity up
-   a step so the pills sit close under the picture. */
-.ds-sheet__body[data-media='photo'] .ds-sheet__identity {
-  margin-top: calc(var(--ds-space-2) * -1);
-}
-
-.ds-sheet__identity {
-  display: grid;
-  gap: var(--ds-space-2);
-}
-
-/*
- * The pill row is `ds-rec-pills` from the record chrome, so kind, era and grade look here exactly
- * as they look on the record page. Only the bottom margin is the sheet's own.
- */
-.ds-sheet__pills {
-  margin: 0 0 var(--ds-space-1);
 }
 
 .ds-sheet__name {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.75rem;
+  font-size: 1.5rem;
+  line-height: 1.15;
   font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
   color: var(--ds-ink);
   text-wrap: balance;
 }
 
-/*
- * The name links to the record page and inherits the display setting whole — the heading should
- * not change size or weight because it became clickable. Only the underline on hover marks it.
- */
-.ds-sheet__name-link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-sheet__name-link:hover,
-.ds-sheet__name-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1.5px;
-  text-decoration-color: var(--ds-accent-graphic);
-}
-
-.ds-sheet__story {
-  margin: 0;
-  font-family: var(--ds-font-editorial);
-  font-size: 1rem;
-  line-height: 1.58;
-  color: var(--ds-ink);
-}
-
-.ds-sheet__anatomy {
-  margin: 0;
-}
-
-/*
- * The facts, as a list of rows rather than a two-column data grid.
- *
- * The shared anatomy panel draws a mono-caps label column beside an editorial value column, which
- * is right under a record page's masthead and wrong in a 430px instrument: the label column set
- * the measure, so "New Jersey Ave NW campus" wrapped over three lines beside the word WHERE. Here
- * each fact is one row, label left and value right, divided by the same hairline the rest of the
- * sheet already uses.
- */
-.ds-sheet__anatomy .ds-record-anatomy__facts {
-  display: block;
-  padding: 0;
-}
-
-.ds-sheet__anatomy .ds-record-anatomy__fact {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  padding: 9px 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-sheet__anatomy .ds-record-anatomy__fact:last-child {
-  border-bottom: 0;
-}
-
-.ds-sheet__anatomy .ds-record-anatomy__fact-label {
-  flex: none;
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ds-ink-muted);
-}
-
-.ds-sheet__anatomy .ds-record-anatomy__fact-value {
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
-  font-weight: 500;
-  text-align: right;
-}
-
-/* ---- actions ------------------------------------------------------------- */
-
-/*
- * Footer actions stay secondary to the record. One copper primary max (Open record, or Fly
- * when there is no page href). Save / Cite / Share are quiet text controls, not a button wall.
- */
-.ds-sheet__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2) var(--ds-space-3);
-}
-
-/* Shared by the `Open record` anchor and the button actions, so the two sit on one baseline. */
-.ds-sheet__action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.5rem;
-  text-decoration: none;
-  padding: 0 var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-full, 999px);
-  background: transparent;
-  color: var(--ds-ink);
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.ds-sheet__action:hover {
-  border-color: var(--ds-border-strong);
-  background: var(--ds-canvas);
-}
-
-.ds-sheet__action:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-copper));
-  outline-offset: 2px;
-}
-
-/* One filled button per panel — the accent hierarchy's primary role. §8. */
-.ds-sheet__action--primary {
-  border-color: var(--ds-accent-graphic);
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink, var(--ds-inverse-ink));
-}
-
-.ds-sheet__action--primary:hover {
-  background: var(--ds-accent);
-  border-color: var(--ds-accent);
-  color: var(--ds-fixed-ink, var(--ds-inverse-ink));
-}
-
-/* Quiet text peers (Save / Cite / Share): content stays louder than chrome. */
-.ds-sheet__action--quiet {
-  min-height: 2.5rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--ds-ink-muted);
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-}
-
-.ds-sheet__action--quiet:hover {
-  background: transparent;
-  border: 0;
-  color: var(--ds-accent);
-}
-
-.ds-sheet__action[aria-pressed='true'] {
-  color: var(--ds-accent);
-}
-
-.ds-sheet__action--quiet[aria-pressed='true'] {
-  border: 0;
-  color: var(--ds-accent);
-}
-
-/* Visit block inside the sheet: address is a fact row, maps exits stay text. */
-.ds-sheet__visit .ds-record-visit__address {
-  font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: var(--ds-ink);
-}
-
-.ds-sheet__visit .ds-record-visit__standing {
-  font-size: 0.75rem;
-}
-
-/* ---- groups -------------------------------------------------------------- */
-
-.ds-sheet__group {
-  display: grid;
-  gap: var(--ds-space-2);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-/* Sans, sentence case, ink. Accent mono caps made "SOURCES" the loudest thing in a panel whose
-   subject is the record above it, and there are three of them. */
-.ds-sheet__group-label {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-2);
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ds-ink);
-}
-
-.ds-sheet__group-hint {
-  margin-left: auto;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0.04em;
-  color: var(--ds-ink-muted);
-}
-
-.ds-sheet__empty {
-  margin: 0;
-  font-size: 0.8125rem;
+/* Two lines, then the record page carries the rest. */
+.ds-sheet__summary {
+  display: -webkit-box;
+  margin: var(--ds-space-2) 0 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
 
-.ds-sheet__sources {
+.ds-sheet__facts {
   display: grid;
+  gap: var(--ds-space-1);
+  margin: var(--ds-space-4) 0 0;
+  padding: var(--ds-space-3) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-size: 0.875rem;
+  color: var(--ds-ink);
+}
+
+.ds-sheet__fact dd {
   margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-.ds-sheet__source {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
+.ds-sheet__evidence {
+  display: flex;
+  align-items: center;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-2) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  font-size: 0.8125rem;
-  line-height: 1.45;
 }
 
-.ds-sheet__source:last-child {
-  border-bottom: 0;
+.ds-sheet__count {
+  color: var(--ds-ink-muted);
 }
 
-.ds-sheet__source-index {
+.ds-sheet__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-sheet__open {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-accent-graphic);
+  color: var(--ds-fixed-ink, var(--ds-inverse-ink));
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ds-sheet__open:hover {
+  background: var(--ds-accent);
+}
+
+.ds-sheet__pager {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.ds-sheet__position {
+  min-width: 72px;
+  text-align: center;
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
   color: var(--ds-ink-muted);
-  padding-top: 2px;
-}
-
-.ds-sheet__source-text {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.ds-sheet__source-detail {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  color: var(--ds-ink-muted);
-}
-
-.ds-sheet__connections {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ds-sheet__connection {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-2) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  font-size: 0.8125rem;
-  color: var(--ds-ink);
-}
-
-.ds-sheet__connection:last-child {
-  border-bottom: 0;
-}
-
-.ds-sheet__connection .ds-kind-glyph {
-  color: var(--ds-ink-muted);
-}
-
-/*
- * A connection with no page of its own still selects on the plate, so it is a button. Stripped
- * back to the anchor's look rather than given a second appearance: the two rows sit in the same
- * list and differing chrome would imply a difference in the record, not in its routing.
- */
-.ds-sheet__connection-select {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  cursor: pointer;
-}
-
-/*
- * Chapter titles are sentences, not names, so this list wraps where the connection list does not.
- * The relation keeps its own line at the end rather than being pushed off the right edge.
- */
-.ds-sheet__chapters .ds-sheet__connection {
-  flex-wrap: wrap;
-  align-items: baseline;
-}
-
-.ds-sheet__chapters .ds-sheet__connection > a {
-  flex: 1 1 12rem;
-}
-
-.ds-sheet__relation {
-  margin-left: auto;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
-}
-
-/*
- * Wide enough for both columns: the sheet opens to the left of the results rail rather than over
- * it, so the row the reader clicked stays on screen next to the record it opened. That comparison
- * is the whole reason this sheet is non-modal; covering the list threw it away.
- *
- * 1150px is the width at which the two fit with the lens still in place:
- * 300 (lens) + 430 (sheet) + 344 (rail) + gutters.
- */
-@media (min-width: 1150px) {
-  .ds-sheet {
-    right: calc(var(--ds-space-4) + 344px + var(--ds-space-3));
-  }
 }
 
 @media (max-width: 819px), (max-height: 559px) {
@@ -514,10 +185,5 @@
     bottom: var(--ds-atlas-dock-clearance);
     width: auto;
     max-height: var(--ds-atlas-sheet-peek);
-  }
-
-  /* The picture carries the ratio (as on wide screens), not the figure that also holds the credit. */
-  .ds-sheet__photo {
-    aspect-ratio: 16 / 9;
   }
 }

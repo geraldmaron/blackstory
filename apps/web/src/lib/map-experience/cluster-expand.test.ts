@@ -8,7 +8,6 @@ import {
   clampClusterExpansionZoom,
   clusterCenterFromCoordinates,
   clusterExpandDurationMs,
-  exploreClusterProperties,
 } from './cluster-expand';
 import { MAP_MAX_ZOOM } from './camera-presets';
 
@@ -31,11 +30,4 @@ test('clusterCenterFromCoordinates rejects invalid coordinates', () => {
   assert.equal(clusterCenterFromCoordinates(undefined), undefined);
   assert.equal(clusterCenterFromCoordinates([Number.NaN, 1]), undefined);
   assert.deepEqual(clusterCenterFromCoordinates([-77.03, 38.89]), [-77.03, 38.89]);
-});
-
-test('exploreClusterProperties tracks per-family counts for dominant paint', () => {
-  const props = exploreClusterProperties();
-  assert.equal(Object.keys(props).length, 6);
-  assert.ok(props.inventions_n);
-  assert.deepEqual(props.people_n, ['+', ['case', ['==', ['get', 'kindFamily'], 'people'], 1, 0]]);
 });

@@ -1,23 +1,21 @@
 'use client';
 
 /**
- * The map's own controls: locate, zoom, and north. Every maps app puts these on the map itself,
- * so that is where readers look for them; before this, locating lived as a small text link inside
- * the Filters panel and zoom only existed inside the hidden camera console.
+ * The map's own controls: zoom, locate, and north. Every maps app puts these on the map itself,
+ * so that is where readers look for them.
  *
- * One vertical group, 44px targets (WCAG 2.5.5), the same surface recipe as the dock chips. The
- * compass only appears once the plate is rotated, and pressing it straightens it.
+ * One vertical group, 44px targets (WCAG 2.5.5). Grouping nearby records is not a control: it is
+ * always on. The compass only appears once the plate is rotated, and pressing it straightens it.
  */
 import React from 'react';
 import { cx } from '@repo/ui';
-import { GroupingToggle } from './GroupingToggle';
 import './map-controls.css';
 
 void React;
 
 export type MapControlsProps = {
-  readonly grouping?: boolean;
-  readonly onToggleGrouping?: () => void;
+  /** Zoom by a whole step; the caller drives the camera. */
+  readonly onZoom: (delta: 1 | -1) => void;
   readonly onLocate: () => void;
   readonly locating: boolean;
   /** True while the reader's own position is the active "near" constraint. */
@@ -32,8 +30,7 @@ export type MapControlsProps = {
 export const COMPASS_THRESHOLD_DEGREES = 1;
 
 export function MapControls({
-  grouping,
-  onToggleGrouping,
+  onZoom,
   onLocate,
   locating,
   located,
@@ -53,9 +50,33 @@ export function MapControls({
       role="group"
       aria-label="Map controls"
     >
-      {onToggleGrouping ? (
-        <GroupingToggle enabled={grouping ?? true} onToggle={onToggleGrouping} />
-      ) : null}
+      <div className="ds-map-controls__stack">
+        <button
+          type="button"
+          className="ds-map-controls__btn"
+          onClick={() => onZoom(1)}
+          aria-label="Zoom in"
+        >
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M10 4v12M4 10h12"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="ds-map-controls__btn"
+          onClick={() => onZoom(-1)}
+          aria-label="Zoom out"
+        >
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
       <button
         type="button"
         className="ds-map-controls__btn ds-map-controls__locate"
@@ -84,12 +105,6 @@ export function MapControls({
         </svg>
       </button>
 
-      {/*
-       * No zoom here. CameraConsole owns zoom — "zoom lives in the console, so the map keeps
-       * one control vocabulary" (CameraConsole.test.ts). Both components mount in the same
-       * AtlasExperience render, so this stack put a second identical "Zoom in" and "Zoom out"
-       * on screen and a screen reader read each twice.
-       */}
       {rotated ? (
         <button
           type="button"

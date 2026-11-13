@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { FIRST_PAINT_PIN_SIZE_REM, RECORD_LOCATOR_PIN_PX } from './first-paint-pin-tokens';
+import { FIRST_PAINT_PIN_SIZE_REM } from './first-paint-pin-tokens';
 
 const pinPlateCss = readFileSync(
   fileURLToPath(new URL('../../app/first-paint-pin-plate.css', import.meta.url)),
@@ -21,10 +21,6 @@ const mapStage = readFileSync(
 );
 const shellCss = readFileSync(
   fileURLToPath(new URL('../../app/shell.css', import.meta.url)),
-  'utf8',
-);
-const locatorCss = readFileSync(
-  fileURLToPath(new URL('../../components/patterns/record-locator.css', import.meta.url)),
   'utf8',
 );
 const mapFrameCss = readFileSync(
@@ -73,12 +69,6 @@ test('SSR pin plate sits at map-plate tier under Explore instrument chrome', () 
   );
   assert.match(atlasCss, /\.ds-atlas\s*\{[^}]*z-index:\s*var\(--ds-z-content\)/s);
   assert.match(shellCss, /\.ds-map-stage\s*\{[^}]*isolation:\s*isolate/s);
-});
-
-test('record locator pin uses copper ring without box-shadow', () => {
-  assert.match(locatorCss, new RegExp(`${RECORD_LOCATOR_PIN_PX}px`));
-  assert.match(locatorCss, /--ds-accent-graphic/);
-  assert.doesNotMatch(locatorCss, /box-shadow/);
 });
 
 test('search center marker uses graphic copper, not text copper', () => {

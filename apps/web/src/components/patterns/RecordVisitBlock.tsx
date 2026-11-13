@@ -3,14 +3,13 @@
  * Address and phone (when present) pair with standard flat icons; icons are never the only signal.
  */
 import React from 'react';
-import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { buildVisitHandoff, type VisitHandoffInput } from '../../lib/geography/visit-handoff';
 import { MapsHandoff } from './MapsHandoff';
 import type { PublicVisitContactField } from '../../lib/geography/public-visit-contact';
 import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { Precision } from '../room';
-import { RecordPlacePreview } from './RecordPlacePreview';
+import { RecordMap } from '../map-embed/RecordMap';
 import { visitFactIconFor, type VisitFactIconKey } from './edition-fact-icon';
 import './record-visit.css';
 import './record-archive.css';
@@ -20,8 +19,9 @@ void React;
 export type RecordVisitBlockProps = VisitHandoffInput & {
   readonly className?: string;
   readonly showLocator?: boolean;
-  readonly atlasHref?: string;
   readonly locatorLabel?: string;
+  /** "Open on the map" under the map, where the page carries no other link to it. */
+  readonly exploreHref?: string;
   readonly compact?: boolean;
 };
 
@@ -81,8 +81,8 @@ function VisitorField({
 export function RecordVisitBlock({
   className,
   showLocator = false,
-  atlasHref,
   locatorLabel,
+  exploreHref,
   compact = false,
   ...input
 }: RecordVisitBlockProps) {
@@ -106,12 +106,12 @@ export function RecordVisitBlock({
         <p className="ds-record-visit__standing">{visit.visitStanding}</p>
       ) : null}
       {showLocator && input.lat !== undefined && input.lng !== undefined ? (
-        <RecordPlacePreview
+        <RecordMap
           lat={input.lat}
           lng={input.lng}
           label={locatorLabel ?? visit.addressLine}
-          // In a page, a live map; in a compact sheet floating over the live map, the locator.
-          interactive={!compact}
+          precision={input.locationPrecision}
+          {...(exploreHref ? { exploreHref } : {})}
         />
       ) : null}
       {contact ? (
@@ -144,7 +144,7 @@ export function RecordVisitBlock({
       {/*
        * Both maps apps, same destination: a reader picks the one on their phone. The exits are
        * quiet, never copper — an external handoff is not the primary action of any view it sits
-       * on, and "Fly to place" / "See it on the map" are the in-app job it must not compete with.
+       * on, and "Open on the map" is the in-app job it must not compete with.
        */}
       <MapsHandoff
         className={compact ? 'ds-maps-handoff--compact' : ''}
@@ -162,17 +162,6 @@ export function RecordVisitBlock({
           },
         ]}
       />
-      {/*
-       * The archive's own map is a different destination from a provider's, so it stays a text
-       * link rather than joining the provider controls: same row would read as a third provider.
-       */}
-      {atlasHref ? (
-        <p className="ds-record-visit__inapp">
-          <Link className="ds-record-visit__link" href={atlasHref} scroll={false}>
-            See this place on the archive map
-          </Link>
-        </p>
-      ) : null}
     </section>
   );
 }

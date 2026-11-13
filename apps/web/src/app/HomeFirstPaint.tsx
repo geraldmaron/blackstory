@@ -15,7 +15,8 @@ import { EntityMastMedia, RecordPhotoCredit } from '../components/entity/EntityM
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
 import { RecordInvestigationReturn } from '../components/discovery/record-investigation-return';
-import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
+import { RecordMap } from '../components/map-embed/RecordMap';
+import { exploreRecordHref } from '../lib/map-experience/url-state';
 import { RecordVisitBlock } from '../components/patterns/RecordVisitBlock';
 import { shouldShowVisitBlock } from '../lib/geography/visit-handoff';
 import { Connections, RecordNav, Room, TrustBlock } from '../components/room';
@@ -300,22 +301,17 @@ export function HomeFirstPaint({
             className="ds-record-visit--rail"
             showLocator={geo !== undefined}
             {...(locatorName !== undefined ? { locatorLabel: locatorName } : {})}
+            exploreHref={exploreRecordHref(lead.id)}
             {...visitInput}
           />
         ) : geo && locatorName ? (
-          <div className="ds-record-rail-map">
-            <RecordPlacePreview
-              lat={geo.lat}
-              lng={geo.lng}
-              label={locatorName}
-              accessibleName={locatorName}
-              interactive
-              neighborhood
-            />
-            <p className="ds-record-mast__map-note">
-              Published location precision: {precisionValue}.
-            </p>
-          </div>
+          <RecordMap
+            lat={geo.lat}
+            lng={geo.lng}
+            label={locatorName}
+            precision={lead.locationPrecision}
+            exploreHref={exploreRecordHref(lead.id)}
+          />
         ) : null}
 
         <nav className="ds-record-toc" aria-label="On this record">

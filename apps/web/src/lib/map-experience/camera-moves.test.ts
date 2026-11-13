@@ -14,6 +14,8 @@ import {
   CAMERA_FALLBACK_ZOOM,
   CAMERA_FLY_CURVE,
   createCamera,
+  planRecordFrame,
+  pointInVisibleBounds,
   type CameraAnimationOptions,
   type CameraApi,
   type CameraDeps,
@@ -132,7 +134,11 @@ function exerciseAllMoves(h: Harness): void {
   h.camera.tilt();
   h.camera.spotlight();
   h.camera.trace();
-  h.camera.flyToRecord({ center: [-86.81, 33.52], place: 'Birmingham, Alabama' });
+  h.camera.frameRecord({
+    center: [-86.81, 33.52],
+    precision: 'city',
+    place: 'Birmingham, Alabama',
+  });
 }
 
 test('every flyTo carries the van Wijk curve', () => {
@@ -170,8 +176,8 @@ test('reduced motion collapses every duration to zero', () => {
 test('essential marks reader-triggered moves and never ambient ones', () => {
   const reader = harness();
   reader.camera.wide({ trigger: 'reader' });
-  reader.camera.flyToRecord(
-    { center: [-90, 35], place: 'Jackson, Mississippi' },
+  reader.camera.frameRecord(
+    { center: [-90, 35], precision: 'city', place: 'Jackson, Mississippi' },
     { trigger: 'reader' },
   );
   for (const call of reader.calls) {
@@ -331,18 +337,95 @@ test('trace establishes wide before drawing corridors', () => {
   assert.equal(h.announcements.at(-1), 'Trace · 7 corridors');
 });
 
-test('flyToRecord lands at record framing with padding applied once', () => {
-  const h = harness();
-  h.camera.flyToRecord({ center: [-86.81, 33.52], place: 'Birmingham, Alabama' });
+test('frameRecord eases once to the precision zoom, padded for the post-selection chrome', () => {
+  const h = harness({ pitch: 30, bearing: 20 });
+  const padding = { top: 72, right: 40, bottom: 40, left: 420 };
+  h.camera.frameRecord(
+    { center: [-86.81, 33.52], precision: 'city', place: 'Birmingham, Alabama' },
+    { padding },
+  );
 
-  const flight = h.calls[0]?.options;
-  assert.equal(h.calls[0]?.method, 'flyTo');
-  assert.equal(flight?.zoom, 12.6);
-  assert.equal(flight?.pitch, 0, 'records open flat');
-  assert.equal(flight?.bearing, 0, 'records open north-up');
-  assert.equal(flight?.curve, CAMERA_FLY_CURVE);
-  assert.deepEqual(flight?.padding, { top: 96, right: 40, bottom: 160, left: 40 });
-  assert.equal(h.announcements[0], 'Fly to · Birmingham, Alabama');
+  assert.equal(h.calls.length, 1);
+  const move = h.calls[0];
+  assert.equal(move?.method, 'easeTo', 'one ease, never a flight');
+  assert.equal(move?.options.zoom, 10, 'city precision frames at 10');
+  assert.equal(move?.options.duration, 900);
+  assert.equal(move?.options.pitch, undefined, 'pitch is preserved');
+  assert.equal(move?.options.bearing, undefined, 'bearing is preserved');
+  assert.deepEqual(move?.options.padding, padding, 'padding is the chrome after selection');
+  assert.equal(h.announcements[0], 'Record · Birmingham, Alabama');
+});
+
+test('frameRecord does not move when the mark is already visible at or above target zoom', () => {
+  const h = harness({ zoom: 11 });
+  const visible: MapLike = {
+    ...h.map,
+    project: () => ({ x: 700, y: 400 }),
+    getContainer: () => ({ clientWidth: 1440, clientHeight: 900 }),
+  };
+  const camera = createCamera({
+    map: visible,
+    padding: () => ({ top: 72, right: 40, bottom: 40, left: 420 }),
+    reducedMotion: () => false,
+    announce: () => {},
+  });
+  camera.frameRecord({ center: [-90, 35], precision: 'city', place: 'Jackson' });
+  assert.equal(h.calls.length, 0, 'already framed: the camera stays put');
+
+  // Same zoom, but the mark sits under the inspector column: pan at the reader's zoom.
+  const hidden = createCamera({
+    map: { ...visible, project: () => ({ x: 200, y: 400 }) },
+    padding: () => ({ top: 72, right: 40, bottom: 40, left: 420 }),
+    reducedMotion: () => false,
+    announce: () => {},
+  });
+  hidden.frameRecord({ center: [-90, 35], precision: 'city', place: 'Jackson' });
+  assert.equal(h.calls.length, 1);
+  assert.equal(h.calls[0]?.options.zoom, 11, 'never zooms out from 11 to the city zoom of 10');
+});
+
+test('planRecordFrame: precision zoom, never zoom out, stay put when visible, reduced motion cuts', () => {
+  assert.deepEqual(
+    planRecordFrame({ precision: 'site', currentZoom: 4, markInView: false, reducedMotion: false }),
+    { zoom: 14, duration: 900 },
+  );
+  assert.equal(
+    planRecordFrame({
+      precision: 'neighborhood',
+      currentZoom: 4,
+      markInView: true,
+      reducedMotion: false,
+    })?.zoom,
+    12,
+    'visible but too far out still moves in',
+  );
+  assert.equal(
+    planRecordFrame({ precision: 'state', currentZoom: 9, markInView: false, reducedMotion: false })
+      ?.zoom,
+    9,
+    'a state record never pulls the reader out from 9 to 6',
+  );
+  assert.equal(
+    planRecordFrame({
+      precision: 'county',
+      currentZoom: 8,
+      markInView: true,
+      reducedMotion: false,
+    }),
+    null,
+  );
+  assert.deepEqual(
+    planRecordFrame({ precision: 'city', currentZoom: 4, markInView: false, reducedMotion: true }),
+    { zoom: 10, duration: 0 },
+  );
+});
+
+test('pointInVisibleBounds excludes the chrome inset', () => {
+  const size = { width: 1440, height: 900 };
+  const inset = { top: 72, right: 40, bottom: 40, left: 420 };
+  assert.equal(pointInVisibleBounds({ x: 700, y: 400 }, size, inset), true);
+  assert.equal(pointInVisibleBounds({ x: 300, y: 400 }, size, inset), false);
+  assert.equal(pointInVisibleBounds({ x: 700, y: 50 }, size, inset), false);
 });
 
 test('a new move cancels the one in flight', () => {
@@ -399,7 +482,11 @@ test('the dignity gate turns a refused move into a silent no-op', () => {
 
     // The dignified moves still work on the same record.
     camera.wide();
-    camera.flyToRecord({ center: [-86.81, 33.52], place: 'Birmingham, Alabama' });
+    camera.frameRecord({
+      center: [-86.81, 33.52],
+      precision: 'city',
+      place: 'Birmingham, Alabama',
+    });
     assert.equal(calls.length, 2, 'arrival and framing stay available');
   } finally {
     console.warn = realWarn;
@@ -420,12 +507,6 @@ test('the library never reaches for maplibre-gl at runtime', async () => {
     !/^import\s+(?!type)[^;]*from\s+'maplibre-gl'/m.test(source),
     'camera-moves must stay testable in plain Node',
   );
-});
-
-test('flyToRecord never zooms a reader out from a closer view', () => {
-  const h = harness({ zoom: 14.5 });
-  h.camera.flyToRecord({ center: [-86.81, 33.52], place: 'Birmingham, Alabama' });
-  assert.equal(h.calls[0]?.options.zoom, 14.5);
 });
 
 test('frameArea centers north-up and flat, padded for the chrome, and is never gated', () => {

@@ -172,11 +172,3 @@
     opacity: 0.6;
   }
 }
-
-.ds-map-controls > .ds-button {
-  min-height: 44px;
-}
-
-.ds-map-controls > .ds-button--secondary {
-  background: var(--ds-surface);
-}

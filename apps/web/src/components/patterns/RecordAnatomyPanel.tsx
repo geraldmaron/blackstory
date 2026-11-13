@@ -1,6 +1,6 @@
 /**
- * Shared record anatomy panel: compact map preview beside inline fact rows
- * (Kind / Where / Era / Evidence). Used on home featured records and Explore spotlight.
+ * Shared record anatomy panel: the record's map (`RecordMap`) beside inline fact rows
+ * (Kind / Where / Era / Evidence).
  */
 import React from 'react';
 import { buildExternalMapsSearchUrl } from '../../lib/geography/external-maps-url';
@@ -8,7 +8,7 @@ import { resolvePublicAddressLine } from '../../lib/geography/public-address';
 import { RecordMeter, type RecordMeterProps } from '../entity/RecordChrome';
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
 import { EditionFactIcon, type EditionFactIconProps } from './EditionFactIcon';
-import { RecordPlacePreview } from './RecordPlacePreview';
+import { RecordMap } from '../map-embed/RecordMap';
 // The panel owns its own stylesheet rather than trusting each route to import it. `/entity/[id]`
 // did not, and the place block fell back to the UA `<figure>` margin — 40px a side inside a 192px
 // rail, which is what left the map 112px wide.
@@ -38,7 +38,8 @@ export type RecordAnatomyPlace = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
-  readonly precisionCaption?: string;
+  /** Stored public precision: RecordMap frames and marks the place by it, and says it in words. */
+  readonly precision: string;
 };
 
 export type RecordAnatomyPanelProps = {
@@ -101,7 +102,9 @@ function whereFactValue(
 
 function PlaceSlot({ place }: { readonly place: RecordAnatomyPlace | undefined }) {
   if (place) {
-    return <RecordPlacePreview lat={place.lat} lng={place.lng} label={place.label} />;
+    return (
+      <RecordMap lat={place.lat} lng={place.lng} label={place.label} precision={place.precision} />
+    );
   }
 
   return (
@@ -152,9 +155,6 @@ export function RecordAnatomyPanel({
           ))}
         </dl>
       </div>
-      {place?.precisionCaption ? (
-        <p className="ds-record-anatomy__precision">{place.precisionCaption}</p>
-      ) : null}
     </section>
   );
 }

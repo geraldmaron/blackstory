@@ -15,7 +15,6 @@ import {
 } from '../../lib/map-experience/metadata-hrefs';
 import { entityEraFact } from '../../lib/map-experience/entity-era-facts';
 import { placeLabelFor } from '../../lib/map-experience/place-label';
-import { radiusAffordanceLabel } from '../../lib/map-experience/geo-precision';
 import {
   RecordAnatomyPanel,
   type RecordAnatomyFact,
@@ -63,7 +62,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     lat,
     lng,
     label: whereLabel,
-    precisionCaption: radiusAffordanceLabel(properties.geoPrecisionTier, properties.radiusMeters),
+    precision: properties.precision,
   };
   const visitInput = buildVisitHandoffFromMapFeature({
     displayName: properties.displayName,

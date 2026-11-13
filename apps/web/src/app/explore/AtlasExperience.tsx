@@ -50,7 +50,6 @@ import { CollectionsDrawer } from '../../components/patterns/CollectionsDrawer';
 import { EmptyState } from '../../components/patterns/EmptyState';
 import { ToastStack, useToasts } from '../../components/patterns/Toast';
 import { AnnotationOverlay } from '../../components/map-experience/AnnotationOverlay';
-import { CameraConsole } from '../../components/map-experience/CameraConsole';
 import { LensPanel, type LensLayerKey } from '../../components/map-experience/LensPanel';
 import { SheetPresence } from '../../components/map-experience/SheetPresence';
 import { MapExperienceLegend } from '../../components/map-experience/MapExperienceLegend';
@@ -85,6 +84,8 @@ import { useLensFilters } from './hooks/use-lens-filters';
 import { useMapSync } from './hooks/use-map-sync';
 import { usePopulationChoropleth } from './hooks/use-population-choropleth';
 import { useAtlasCamera } from './hooks/use-atlas-camera';
+import { useReducedMotion } from '../../lib/motion/use-reduced-motion';
+import { CAMERA_EASING_SLOW_OUT } from '../../lib/map-experience/camera-presets';
 import { useRecordSelection } from './hooks/use-record-selection';
 import {
   emitExplorePinSelect,
@@ -102,6 +103,9 @@ import { clearPinContinuity, readPinContinuity } from '../../lib/discovery/pin-c
 import './atlas.css';
 
 void React;
+
+/** A zoom button step: short, ease-out, a cut under reduced motion. */
+const ZOOM_STEP_MS = 250;
 
 /**
  * Basemap symbol layers the "Place labels" Lens chip governs (state/city and street names —
@@ -126,7 +130,6 @@ const NARROW_INSTRUMENTS = [
   { key: 'lens', label: 'Filters' },
   { key: 'results', label: 'Records' },
   { key: 'decade', label: 'When' },
-  { key: 'camera', label: 'View' },
 ] as const satisfies readonly { key: keyof PanelVisibility; label: string }[];
 
 /** Renders at every width in both states, so opening and closing Filters is one control. */
@@ -168,7 +171,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     panels,
     setPanels,
     narrow,
-    bothColumns,
     chromeHidden,
     setChromeHidden,
     showPanel,
@@ -188,7 +190,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const [focusAfterPanels, setFocusAfterPanels] = useState<string | null>(null);
 
   const hidePanel = useCallback(
-    (panel: 'lens' | 'results' | 'decade' | 'camera') => {
+    (panel: keyof PanelVisibility) => {
       setPanels((current) => ({ ...current, [panel]: false }));
       setFocusAfterPanels(`.ds-atlas__dock [data-dock="${panel}"]`);
     },
@@ -196,7 +198,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   );
 
   const restorePanel = useCallback(
-    (panel: 'lens' | 'results' | 'decade' | 'camera') => {
+    (panel: keyof PanelVisibility) => {
       showPanel(panel);
       setFocusAfterPanels(panel === 'lens' ? '.ds-lens__head' : '.ds-results__head');
     },
@@ -233,8 +235,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     const foldSheets = () => {
       if (!narrowRef.current) return;
       setPanels((current) =>
-        current.lens || current.results || current.decade || current.camera
-          ? { lens: false, results: false, decade: false, camera: false }
+        current.lens || current.results || current.decade
+          ? { lens: false, results: false, decade: false }
           : current,
       );
     };
@@ -260,7 +262,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     () => initial.viewState.selected,
   );
   const setSelectedIdRef = useRef(setSelectedId);
-  const [grouping, setGrouping] = useState(() => initial.viewState.group);
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
   const [overlapIds, setOverlapIds] = useState<readonly string[] | null>(null);
 
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
@@ -281,7 +284,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     sweepDecade,
     topicId,
     setTopicId,
-    activeTopicLabel,
     status,
     layerMode,
     setLayerMode,
@@ -383,7 +385,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     topicId,
     status,
     layerMode,
-    group: grouping,
     satellite: layers.satellite,
     lines: layers.routes,
     selectedId,
@@ -413,7 +414,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     stateCode,
     sweepClearingPlate,
     populationLevels,
-    grouping,
   );
 
   // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
@@ -427,7 +427,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         {
           layerMode,
           densityLevels: view.densityLevels,
-          clusteringEnabled: grouping,
           satellite: layers.satellite,
           historyEdgeCollection: view.edgeLineCollection,
           stateChoroplethLevels: populationLevels.stateChoroplethLevels,
@@ -444,7 +443,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     stage,
     view.densityLevels,
     view.edgeLineCollection,
-    grouping,
     populationLevels,
   ]);
 
@@ -500,28 +498,50 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   }, [atlasHoverTarget, selectedId, stage]);
 
   const [legendOpen, setLegendOpen] = useState(false);
-  const { camera, readout, spotlight, runMove, bearing } = useAtlasCamera(
+  const reducedMotion = useReducedMotion();
+  const { camera, readout, spotlight, bearing, selectionPadding } = useAtlasCamera(
     stage,
     panels,
     chromeHidden,
     // The padding is for the panel: the camera reserves room whenever something is selected.
     selectedId !== undefined,
     setLayers,
+    // A selection, or one about to be restored from the home hand-off, holds the camera.
+    () => selectedIdRef.current !== undefined || readPinContinuity() !== null,
   );
   const { selectedFeature, selectedIndex, select, selectById, stepRecord, sheetRecord } =
     useRecordSelection(
       stage,
       camera,
+      selectionPadding,
       overlapFeatures ?? sorted,
       selectedId,
       setSelectedId,
-      view.edgeLineCatalog.allTime.edges,
-      view.citesEdge,
       view.allFeatures,
       holdingPlaceArrival,
     );
 
-  /** Restore the last map→record pin when the URL did not already select one. */
+  /**
+   * A deep link (`/explore?selected=`, the record page's "Open on the map") frames its record
+   * through the same contract as a click, once the plate is live and carries the record's point.
+   */
+  const deepLinkRef = useRef(initial.viewState.selected);
+  const [plateReady, setPlateReady] = useState(false);
+  useEffect(() => stage.subscribe('ready', () => setPlateReady(true)), [stage]);
+  useEffect(() => {
+    const pending = deepLinkRef.current;
+    if (!plateReady || pending === undefined) return;
+    if (!view.allFeatures.some((feature) => feature.properties.entityId === pending)) return;
+    deepLinkRef.current = undefined;
+    selectById(pending);
+  }, [plateReady, selectById, view.allFeatures]);
+
+  /**
+   * The home hand-off: a pin (or an overlapping group of pins) the reader chose on the Door.
+   * The Door's pins carry first-paint `pin-N` ids, so a single pin goes through the pin select
+   * path, which remembers its coordinates and re-resolves to the real entity once the catalog
+   * replaces those ids. Overlaps open the chooser, never the first record.
+   */
   const continuityRestoredRef = useRef(false);
   useEffect(() => {
     if (continuityRestoredRef.current) return;
@@ -529,22 +549,19 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     const saved = readPinContinuity();
     if (!saved) return;
     continuityRestoredRef.current = true;
-    /*
-     * The Door's pins carry first-paint `pin-N` ids. Selecting one by id alone opened the sheet and
-     * then dropped it a second later, when the catalog replaced those ids. Going through the pin
-     * select path remembers the pin's coordinates, so the selection re-resolves to the real entity.
-     */
-    const pin = { pinId: saved.entityId, lng: saved.lng, lat: saved.lat };
-    if (resolveExplorePinEntityId(pin, view.allFeatures)) {
-      emitExplorePinSelect(pin);
-    } else {
-      camera.flyToRecord({
-        center: [saved.lng, saved.lat],
-        place: saved.label ?? 'Place',
-      });
-    }
     clearPinContinuity();
-  }, [camera, initial.viewState.selected, view.allFeatures]);
+    if (saved.overlap && saved.overlap.length > 0) {
+      const ids = saved.overlap
+        .map((pin) => resolveExplorePinEntityId(pin, view.allFeatures))
+        .filter((id): id is string => id !== undefined);
+      if (ids.length > 0) {
+        setOverlapIds(ids);
+        restorePanel('results');
+      }
+      return;
+    }
+    emitExplorePinSelect({ pinId: saved.entityId, lng: saved.lng, lat: saved.lat });
+  }, [initial.viewState.selected, restorePanel, view.allFeatures]);
   const { copy, citationFor } = useReaderActions(toasts);
   /**
    * The radius chip the reader last picked, kept even before anything is located: pick "5 mi",
@@ -557,7 +574,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         setNearby(null);
         return;
       }
-      if (area.source === 'device') setGrouping(false);
       const { meters, label } = radiusRef.current;
       setNearby({
         ...area,
@@ -708,43 +724,22 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   });
 
   const sheetOpen = sheetRecord !== null;
-  /* The sheet's mast reads the same photo index the pin hover card does, fetched once, lazily,
-     the first time a sheet opens. See `use-photo-index.ts`. */
   /*
-   * The rail's thumbnails ride on the same index, and still never on load: the fetch starts on
-   * the first sign a reader is looking at records (a sheet opening, a pin hovered, or the pointer
-   * or focus entering the rail), and every row that has a photo fills in from then on.
+   * The rail's thumbnails ride on the pin hover card's photo index, and never on load: the fetch
+   * starts on the first sign a reader is looking at records (a pin hovered, or the pointer or
+   * focus entering the rail), and every row that has a photo fills in from then on.
    */
   const [railTouched, setRailTouched] = useState(false);
-  const sheetPhotos = usePhotoIndex(
-    '/atlas/photos',
-    sheetOpen || railTouched || atlasPinPhotoTarget !== null,
-  );
-  const sheetPhoto = sheetOpen && sheetRecord ? (sheetPhotos?.[sheetRecord.id] ?? null) : null;
-  /* The record the sheet last showed, so a closing sheet can animate away still showing it
-     (`SheetPresence`). Derived state, updated during render only when a new record opens. */
-  const [leavingSheet, setLeavingSheet] = useState<{
-    readonly record: typeof sheetRecord;
-    readonly photo: typeof sheetPhoto;
-  }>({ record: null, photo: null });
-  if (
-    sheetRecord !== null &&
-    (sheetRecord !== leavingSheet.record || sheetPhoto !== leavingSheet.photo)
-  ) {
-    setLeavingSheet({ record: sheetRecord, photo: sheetPhoto });
-  }
+  const railPhotos = usePhotoIndex('/atlas/photos', railTouched || atlasPinPhotoTarget !== null);
+  /* The record the inspector last showed, so a closing inspector can animate away still showing
+     it (`SheetPresence`). Derived state, updated during render only when a new record opens. */
+  const [leavingSheet, setLeavingSheet] = useState<typeof sheetRecord>(null);
+  if (sheetRecord !== null && sheetRecord !== leavingSheet) setLeavingSheet(sheetRecord);
 
   const showLens = panels.lens && !chromeHidden && mode === 'atlas';
-  /*
-   * The rail survives a selection once there is room for both columns: the sheet opens one column
-   * to its left and the row the reader clicked stays visible beside the record it opened. Below
-   * that width the sheet takes the rail's slot, so the rail stands down rather than being covered.
-   */
+  /* The inspector takes the list's slot: one column, list or record, never both side by side. */
   const showResults =
-    panels.results &&
-    !chromeHidden &&
-    mode === 'atlas' &&
-    (bothColumns || selectedId === undefined);
+    panels.results && !chromeHidden && mode === 'atlas' && selectedId === undefined;
 
   /**
    * The collection strip rides with the instruments: gone when chrome is hidden, and gone while a
@@ -848,16 +843,12 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   /** Compact: is any sheet up? The on-map controls ride above it (map-controls.css). */
   const compactSheetOpen =
     narrow &&
-    (showLens ||
-      showResults ||
-      sheetOpen ||
-      (mode === 'atlas' && !chromeHidden && (panels.decade || panels.camera)));
+    (showLens || showResults || sheetOpen || (mode === 'atlas' && !chromeHidden && panels.decade));
   /** Wide: the controls sit in the top-right corner of the *free* map, left of any right column. */
   const controlsRight = (() => {
     if (narrow) return null;
     const edge = 16;
     const gap = 12;
-    if (sheetOpen && showResults) return edge + 344 + gap + 430 + gap;
     if (sheetOpen) return edge + 430 + gap;
     if (showResults) return edge + 344 + gap;
     return edge;
@@ -1006,7 +997,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
       <SheetPresence show={showResults}>
         <ResultsRail
-          photos={sheetPhotos}
+          photos={railPhotos}
           onIntent={() => setRailTouched(true)}
           features={overlapFeatures ?? sorted}
           total={view.allFeatures.length}
@@ -1068,22 +1059,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           scope={scopeStatus}
         />
       </SheetPresence>
-      <SheetPresence show={mode === 'atlas' && !chromeHidden && panels.camera}>
-        <CameraConsole
-          onMove={runMove}
-          onZoom={(delta) => {
-            const map = stage.getMap();
-            if (!map) return;
-            map.easeTo({ zoom: map.getZoom() + delta, duration: 260 } as never);
-          }}
-          bearing={bearing}
-          onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
-          activeRecord={selectedFeature?.properties ?? null}
-          lens={{ topicId, topicLabel: activeTopicLabel }}
-          spotlit={camera.isSpotlit()}
-        />
-      </SheetPresence>
-
       {/*
        * The dock. Two different objects sharing one row of chips.
        *
@@ -1134,10 +1109,14 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
       {mode === 'atlas' && !chromeHidden && stage.mapAvailable ? (
         <MapControls
-          grouping={grouping}
-          onToggleGrouping={() => {
-            setOverlapIds(null);
-            setGrouping((current) => !current);
+          onZoom={(delta) => {
+            const map = stage.getMap();
+            if (!map) return;
+            map.easeTo({
+              zoom: map.getZoom() + delta,
+              duration: reducedMotion ? 0 : ZOOM_STEP_MS,
+              easing: CAMERA_EASING_SLOW_OUT,
+            } as never);
           }}
           onLocate={nearMe}
           locating={locateStatus === 'locating'}
@@ -1172,25 +1151,12 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
 
       <SheetPresence show={sheetOpen}>
         <RecordSheet
-          record={sheetRecord ?? leavingSheet.record}
-          photo={sheetOpen ? sheetPhoto : leavingSheet.photo}
+          record={sheetRecord ?? leavingSheet}
           onClose={() => setSelectedId(undefined)}
           {...(selectedIndex >= 0
             ? { position: { index: selectedIndex + 1, total: (overlapFeatures ?? sorted).length } }
             : {})}
           onStep={stepRecord}
-          onSelectConnection={selectById}
-          onFlyToPlace={() => {
-            if (selectedFeature) select(selectedFeature);
-          }}
-          onSave={() => {
-            if (selectedFeature) toggleSave(selectedFeature);
-          }}
-          saved={selectedId ? savedSet.has(selectedId) : false}
-          onCite={() => {
-            if (selectedFeature) copy(citationFor(selectedFeature), 'Citation copied.');
-          }}
-          onShare={commandContext.copyShareLink}
         />
       </SheetPresence>
 
@@ -1201,10 +1167,10 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         states={paletteStates}
         destinations={destinations}
         context={commandContext}
-        onOpenRecord={(record, fly) => {
+        onOpenRecord={(record) => {
           const feature = featureById(record.id);
           if (feature) {
-            select(feature, fly);
+            select(feature);
             setPaletteOpen(false);
             return;
           }

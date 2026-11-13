@@ -620,20 +620,10 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-explore-legend__kind-label {
-  font-size: inherit;
-  color: inherit;
-}
-
 .ds-explore-legend__kind-list li {
   display: flex;
   align-items: center;
   gap: var(--ds-space-2);
-}
-
-.ds-explore-legend__kind-glyph-name {
-  color: inherit;
-  opacity: 0.85;
 }
 
 .ds-legend-glyph {
@@ -641,44 +631,26 @@
   display: inline-block;
   width: 0.75rem;
   height: 0.75rem;
-  border: var(--ds-border-width) solid var(--ds-border);
-}
-
-.ds-explore-stage__results .ds-legend-glyph,
-.ds-explore-legend .ds-legend-glyph {
-  border-color: color-mix(in srgb, currentColor 12%, transparent);
+  border: var(--ds-border-width) solid color-mix(in srgb, currentColor 12%, transparent);
 }
 
 .ds-legend-glyph--circle {
   border-radius: 50%;
 }
 
-.ds-legend-glyph--square {
-  border-radius: 2px;
-}
-
-.ds-legend-glyph--diamond {
-  border-radius: 2px;
-  transform: rotate(45deg);
-}
-
-.ds-legend-glyph--ring {
-  border-radius: 50%;
-  border-width: 2px;
-}
-
-.ds-explore-legend__size-scale {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--ds-space-2);
-  margin-bottom: var(--ds-space-2);
-}
-
-.ds-explore-legend__size-dot {
-  display: inline-block;
+/* A map mark drawn at its real pixel size: dot, ring, group or selected. */
+.ds-legend-mark {
   flex: 0 0 auto;
+  display: inline-block;
   border-radius: 50%;
-  background: var(--ds-accent-graphic);
+}
+
+/* The jurisdiction tag, as the map draws it. */
+.ds-legend-tag {
+  flex: 0 0 auto;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--ds-ink-muted);
 }
 
 .ds-explore-legend__list {

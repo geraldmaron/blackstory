@@ -1,0 +1,87 @@
+/*
+ * The one embedded map (RecordMap.tsx): a framed canvas, then the place, its precision in words,
+ * and the hand-off to the full map. No box around the caption; one hairline frame on the canvas.
+ */
+
+.ds-record-map {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+}
+
+.ds-record-map__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  /* The plate's own land, so the frame reads as the map before the first tile paints. */
+  background: var(--ds-map-land);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.ds-record-map__canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+}
+
+.ds-record-map__frame[data-status='ready'] .ds-record-map__canvas {
+  opacity: 1;
+}
+
+.ds-record-map__canvas:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(-1 * var(--ds-focus-width));
+}
+
+.ds-record-map__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-map__place {
+  color: var(--ds-ink);
+}
+
+.ds-record-map__open {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-left: auto;
+  color: var(--ds-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+.ds-record-map__open:hover {
+  color: var(--ds-accent);
+}
+
+.ds-record-map__open:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-record-map .maplibregl-ctrl-attrib {
+  font-size: 0.625rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-record-map__canvas {
+    transition: none;
+  }
+}

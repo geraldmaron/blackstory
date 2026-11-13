@@ -1,0 +1,36 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "dev:web"],
+      "port": 3048
+    },
+    {
+      "name": "web-op",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "dev:web:op"],
+      "port": 3048
+    },
+    {
+      "name": "web-maintenance",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "MAINTENANCE_MODE=1",
+        "MAINTENANCE_BYPASS_TOKEN=local-dev-bypass-token",
+        "pnpm",
+        "run",
+        "dev:web"
+      ],
+      "port": 3048
+    },
+    {
+      "name": "design-mocks",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4173", "--bind", "127.0.0.1"],
+      "port": 4173,
+      "url": "http://localhost:4173"
+    }
+  ]
+}

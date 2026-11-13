@@ -33,29 +33,10 @@ import {
 import { MAP_LABEL_NAME_FIELD } from '../../lib/map-experience/label-expression';
 import { DECADE_TRANSITION_PAINT } from '../../lib/map-experience/decade-transition';
 import {
-  KIND_ENCODING_ENTRIES,
-  KIND_FAMILY_ENTRIES,
-  DEFAULT_KIND_ENCODING,
-  MAP_SEMANTIC_TONE_ENCODING,
-} from '../../lib/map-experience/kind-encoding';
-import { clusterDominantFamilyShadeExpression } from '../../lib/map-experience/cluster-encoding';
-import { exploreClusterProperties } from '../../lib/map-experience/cluster-expand';
-import {
-  blendFirstPaintWithKindExpression,
-  firstPaintOrKindRadiusExpression,
-  firstPaintOrKindStrokeWidthExpression,
-  firstPaintPointColorExpression,
-  firstPaintPointOpacityExpression,
-  literalPaintNumber,
-} from '../../lib/map-experience/first-paint-map-paint';
-import {
-  markerHaloRadiusExpression,
-  markerRadiusExpression,
-  MARKER_ZOOM_SCALE_STOPS,
-  markerRadiusPlusExpression,
-  markerRadiusPlusScaledExpression,
-  zoomScaledNumericExpression,
-} from '../../lib/map-experience/marker-size';
+  drawnRecordCollection,
+  jurisdictionTagCollection,
+} from '../../lib/map-experience/record-marks';
+import { precisionsWithMark, type RecordMark } from '../../lib/map-experience/geo-precision';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -78,17 +59,15 @@ import {
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
-  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  EXPLORE_JURISDICTION_TAG_LAYER_ID,
+  EXPLORE_JURISDICTION_TAGS_SOURCE_ID,
+  EXPLORE_SELECTED_TAG_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
@@ -120,17 +99,15 @@ export {
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
-  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  EXPLORE_JURISDICTION_TAG_LAYER_ID,
+  EXPLORE_JURISDICTION_TAGS_SOURCE_ID,
+  EXPLORE_SELECTED_TAG_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
@@ -247,93 +224,10 @@ function streetFillWidthExpression(): ExpressionSpecification {
   ] as unknown as ExpressionSpecification;
 }
 
-/**
- * Approximate meters-per-pixel at zoom 0 under spherical Web Mercator, ignoring latitude
- * distortion (the same order of approximation this repo already uses for state bounding boxes
- * see `packages/domain/src/map/us-geography.ts`'s module doc "good enough for national-zoom …
- * never survey-grade"). `pixels(zoom) = radiusMeters * 2^zoom / WEB_MERCATOR_METERS_AT_ZOOM_0`
- * is the exact conversion; `precisionRadiusPixelsExpression()` below reproduces it as a valid
- * style expression.
- */
-const WEB_MERCATOR_METERS_AT_ZOOM_0 = 156_543.03392;
-
-/**
- * Reference zoom for the two-stop exponential-interpolate below. MapLibre's style-spec validator
- * rejects a bare `['zoom']` nested inside arithmetic ("\"zoom\" expression may only be used as
- * input to a top-level \"step\" or \"interpolate\" expression" confirmed against
- * `@maplibre/maplibre-gl-style-spec`'s `validateStyleMin`, since `zoom` may only be the direct
- * input of a top-level `step`/`interpolate`), so `radiusMeters * 2^zoom / METERS_AT_ZOOM_0` cannot
- * be written directly. Web Mercator resolution doubles every zoom level, so an
- * `['exponential', 2]` interpolate from `(0, 0)` to `(REFERENCE_ZOOM, pixelsAt(REFERENCE_ZOOM))`
- * reproduces that formula to within a fraction of a pixel (verified against the style-spec's own
- * expression evaluator: <0.03% error by z12, past which this map hands off to HTML markers) —
- * the same idiom MapLibre's own "scale-based circle radius" example uses for a meters-based
- * radius.
- */
-const PRECISION_RADIUS_REFERENCE_ZOOM = 20;
-
-/**
- * Data-driven radius-affordance circle radius (px), from each feature's own `radiusMeters`
- * property (`geoPrecisionTierForPublicPrecision` / `resolveDisplayRadiusMeters` in
- * `geo-precision.ts`; attached at `radius.ok ? radiusMeters : <absent>` by
- * `build-explore-map-source.ts`). A feature with no `radiusMeters` (a precision tier that failed
- * closed rather than guessing a bbox) coalesces to `0` — invisible, not a fabricated ring.
- */
-function precisionRadiusPixelsExpression(): ExpressionSpecification {
-  const pixelsAtReferenceZoom = [
-    '/',
-    ['*', ['coalesce', ['get', 'radiusMeters'], 0], Math.pow(2, PRECISION_RADIUS_REFERENCE_ZOOM)],
-    WEB_MERCATOR_METERS_AT_ZOOM_0,
-  ] as unknown as ExpressionSpecification;
-  return [
-    'interpolate',
-    ['exponential', 2],
-    ['zoom'],
-    0,
-    0,
-    PRECISION_RADIUS_REFERENCE_ZOOM,
-    pixelsAtReferenceZoom,
-  ] as unknown as ExpressionSpecification;
-}
-
-/**
- * kind -> shade + glyph paint. Every entity kind gets a `DIGNITY_PALETTE` shade (via
- * `kind-encoding.ts`, so color is one source of truth) AND a non-color fill/stroke signature
- * (WCAG 1.4.1 color is never the only signal), keyed by glyph identity rather than kind so two
- * kinds that ever shared a glyph would automatically share a signature too:
- *  - `circle` (place): solid fill, thin rim the map's original default marker treatment.
- *  - `square` (school): solid fill, a disproportionately thick rim ("blocky").
- *  - `diamond` (event): solid fill, thin rim, PLUS a second offset unfilled ring layer
- *    (`EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID` below) an "orbit ring" marker.
- *  - `ring` (institution): mostly-hollow fill, thick Stone rim a literal ring.
- * MapLibre `circle`-type layers cannot render literal square/diamond geometry (no shape
- * parameter exists in the style spec), and this style declares no icon sprite, so no `symbol`
- * layer could draw those true shapes either. Text symbol layers do work: the style sets `glyphs`
- * to `OPENFREEMAP_GLYPHS_URL` and `EXPLORE_CLUSTER_COUNT_LAYER_ID` below renders live cluster
- * counts through it, so the missing piece is a sprite, not a glyph server. `MapExperienceLegend`
- * renders the literal circle/square/diamond/ring shapes via CSS, which has no such limitation;
- * this fill/stroke vocabulary is the canvas-side echo of the same four glyph identities.
- */
-type KindGlyphPaintSignature = {
-  readonly opacity: number;
-  readonly strokeWidth: number;
-  readonly strokeColor: string;
-};
-
-/** Unclustered solid-fill disc opacity — translucent enough to read basemap/county
- * hairlines through the marker while kind shade stays readable. HTML hit-targets
- * used to repeat this value in CSS; the map draws every zoom itself now. */
-export const ENTITY_POINT_FILL_OPACITY = 0.52;
-/** Soft halo under every unclustered point. */
-export const ENTITY_HALO_OPACITY = 0.16;
-/** Precision-radius affordance circle opacity — fainter than the halo. A resolved radius can
- * span a whole jurisdiction (state tier), so this has to read as ground the marker sits on
- * without flooding the basemap the halo/point discs above it still carry the readable shade. */
-export const ENTITY_PRECISION_RADIUS_OPACITY = 0.1;
-/** Cluster aggregate disc opacity (grouped view). */
-export const ENTITY_CLUSTER_OPACITY = 0.55;
-/** Institution "ring" glyph — mostly hollow by design. */
-export const ENTITY_RING_FILL_OPACITY = 0.2;
+/** Record mark opacity. Marks are opaque: precision is carried by shape, never by fading. */
+export const ENTITY_POINT_FILL_OPACITY = 1;
+/** Group circle opacity. Opaque paper, so a group reads as a single counted object. */
+export const ENTITY_CLUSTER_OPACITY = 1;
 
 /**
  * Opaque plate fills — memorial names live as a MapLibre symbol layer in the
@@ -342,7 +236,7 @@ export const ENTITY_RING_FILL_OPACITY = 0.2;
  */
 export const PLATE_BACKGROUND_OPACITY = 1;
 /**
- * The density tint sits over real cartography now, not in place of it, so it is translucent:
+ * The opt-in density tint sits over real cartography, not in place of it, so it is translucent:
  * at 1 it hid every lake, river and park inside a state outline.
  */
 export const PLATE_STATE_FILL_OPACITY = 0.82;
@@ -351,14 +245,10 @@ export const PLATE_STATE_FILL_OPACITY = 0.82;
 export const COUNTY_FILL_OPACITY = 0.85;
 
 /**
- * Filter for the single-feature selection ring layer (`EXPLORE_SELECTED_POINT_LAYER_ID`).
- * This is the ONLY place selection state touches a MapLibre expression: it is a `setFilter`
- * on a dedicated one-feature layer, never a re-filter/re-encode of the main entities source
- * or its point/halo layers (whose filters and paint never reference `entityId`/selection —
- * see `patterns-cinematic-map.md` §2 rule 5 / §6). Selecting or deselecting therefore mutates
- * only this tiny layer's filter; every neighboring pin's paint is untouched and does not repaint.
- * Exported so both the initial style (empty selection) and `MapStage`'s live `setFilter` calls
- * share one definition instead of hand-rolling the expression twice.
+ * Filter for the single-feature selection layer (`EXPLORE_SELECTED_POINT_LAYER_ID`) and the
+ * selected jurisdiction tag. This is the ONLY place selection state touches a MapLibre
+ * expression: a `setFilter` on dedicated layers, never a re-filter of the main entities source,
+ * so selecting never repaints a neighboring mark.
  */
 export function selectedPointFilterExpression(
   entityId: string | undefined,
@@ -367,196 +257,50 @@ export function selectedPointFilterExpression(
   return ['==', ['get', 'entityId'], value] as unknown as ExpressionSpecification;
 }
 
-// ---------------------------------------------------------------------------
-// Selected pulse ring (docs/ui/patterns-cinematic-map.md §3 "Selection pulse",
-// §3 "Reduced motion"). Copper ring, one feature, loops 1.8s ease-in-out
-// scaling ~1x -> ~2.1x while fading 0.9 -> 0.12. Reduced motion replaces the
-// loop with a single static enlarged ring (opacity ~0.85, scale ~1.35). Mirrors
-// mobile's `apps/mobile/src/features/map/entity-paint.ts` pulse constants/pure
-// functions so both platforms hit the same target visual values.
-// ---------------------------------------------------------------------------
-
-/** Halo offset the selection ring renders beyond the base marker radius (matches mobile's
- * `ENTITY_SELECTED_RADIUS_OFFSET` and the `EXPLORE_SELECTED_POINT_LAYER_ID` layer's base radius). */
-export const ENTITY_SELECTED_RADIUS_OFFSET = 6;
-/** One full pulse loop, ease-in-out (spec §3). */
-export const ENTITY_SELECTED_PULSE_DURATION_MS = 1800;
-/** Ring scale at the start (`progress === 0`) of the loop. */
-export const ENTITY_SELECTED_PULSE_SCALE_FROM = 1;
-/** Ring scale at the end (`progress === 1`) of the loop — spec's "~2.1". */
-export const ENTITY_SELECTED_PULSE_SCALE_TO = 2.1;
-/** Stroke opacity at the start of the loop — spec's "0.9". */
-export const ENTITY_SELECTED_PULSE_OPACITY_FROM = 0.9;
-/** Stroke opacity at the end of the loop — spec's "0.12". */
-export const ENTITY_SELECTED_PULSE_OPACITY_TO = 0.12;
-/** Reduced-motion static ring scale — spec's "~1.35". */
-export const ENTITY_SELECTED_PULSE_STATIC_SCALE = 1.35;
-/** Reduced-motion static ring opacity — spec's "~0.85". */
-export const ENTITY_SELECTED_PULSE_STATIC_OPACITY = 0.85;
-
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.min(1, value));
+/** The tag counting a selected county- or state-precision record turns copper. */
+export function selectedTagFilterExpression(entityId: string | undefined): ExpressionSpecification {
+  const value = entityId && entityId.length > 0 ? `|${entityId}|` : '||';
+  return ['in', value, ['get', 'ids']] as unknown as ExpressionSpecification;
 }
 
-/** Cosine ease-in-out over `[0, 1]`; symmetric acceleration in and out. Exported so the pulse
- * curve is unit-testable independent of `requestAnimationFrame`/MapLibre. */
-export function pulseEaseInOut(progress: number): number {
-  const clamped = clamp01(progress);
-  return (1 - Math.cos(clamped * Math.PI)) / 2;
-}
-
-function lerp(from: number, to: number, eased: number): number {
-  return from + (to - from) * eased;
-}
-
-/**
- * The selection ring's radius as a zoom-only expression, for one record whose marker radius
- * (`markerRadius()`) is already known. Same stops and scale as `markerRadiusPlusScaledExpression`,
- * with the record's data term folded in as a number: MapLibre treats a paint value that reads
- * feature data as data-driven and rebuilds the source's tiles every time it changes, so an
- * animated ring must not read feature data.
- */
-export function selectedRingRadiusExpression(
-  dataRadius: number,
-  extraScale: number,
+/** Every other tag: the selected one is drawn once, by the selected layer. */
+export function unselectedTagFilterExpression(
+  entityId: string | undefined,
 ): ExpressionSpecification {
-  const stops = MARKER_ZOOM_SCALE_STOPS.flatMap(([zoom, scale]) => [
-    zoom,
-    (dataRadius + ENTITY_SELECTED_RADIUS_OFFSET) * scale * extraScale,
-  ]);
-  return ['interpolate', ['linear'], ['zoom'], ...stops] as ExpressionSpecification;
+  return ['!', selectedTagFilterExpression(entityId)] as unknown as ExpressionSpecification;
 }
 
-/**
- * Selected pulse ring paint for one animation frame. `progress` is `[0, 1]` within the loop;
- * the caller (`MapStage`'s `startSelectedEntityPulse`) is the only thing that ticks it via
- * `requestAnimationFrame`, so this stays a pure function of one number. Pass the selected
- * record's `dataRadius` for the per-frame value: without it the expression reads feature data,
- * which is only fit for a one-off write (see `selectedRingRadiusExpression`).
- */
-export function entitySelectedPulseRadiusExpression(
-  progress: number,
-  dataRadius?: number,
-): ExpressionSpecification {
-  const eased = pulseEaseInOut(progress);
-  const scale = lerp(ENTITY_SELECTED_PULSE_SCALE_FROM, ENTITY_SELECTED_PULSE_SCALE_TO, eased);
-  return dataRadius === undefined
-    ? markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, scale)
-    : selectedRingRadiusExpression(dataRadius, scale);
-}
+/** A dot at the site, a hollow ring at the neighborhood or city (`recordMarkFor`). */
+const DOT_RADIUS_PX = 4;
+const RING_RADIUS_PX = 7;
+const SELECTED_HALO_PX = 2;
 
-/** Stroke opacity for one animation frame at `progress` — same ease-in-out curve as the radius. */
-export function entitySelectedPulseOpacity(progress: number): number {
-  const eased = pulseEaseInOut(progress);
-  return lerp(ENTITY_SELECTED_PULSE_OPACITY_FROM, ENTITY_SELECTED_PULSE_OPACITY_TO, eased);
-}
-
-/** Reduced-motion static ring radius: no timer, fixed enlarged scale. */
-export function entitySelectedPulseStaticRadiusExpression(
-  dataRadius?: number,
-): ExpressionSpecification {
-  return dataRadius === undefined
-    ? markerRadiusPlusScaledExpression(
-        ENTITY_SELECTED_RADIUS_OFFSET,
-        ENTITY_SELECTED_PULSE_STATIC_SCALE,
-      )
-    : selectedRingRadiusExpression(dataRadius, ENTITY_SELECTED_PULSE_STATIC_SCALE);
-}
-
-const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
-  // Solid-fill kinds sit below full opacity so geography stays legible through the disc.
-  // `ring` stays far lower; mostly-hollow IS its glyph signature.
-  circle: {
-    opacity: ENTITY_POINT_FILL_OPACITY,
-    strokeWidth: 1.5,
-    strokeColor: DIGNITY_PALETTE.selected,
-  },
-  square: {
-    opacity: ENTITY_POINT_FILL_OPACITY,
-    strokeWidth: 4,
-    strokeColor: DIGNITY_PALETTE.selected,
-  },
-  diamond: {
-    opacity: ENTITY_POINT_FILL_OPACITY,
-    strokeWidth: 1.5,
-    strokeColor: DIGNITY_PALETTE.selected,
-  },
-  ring: {
-    opacity: ENTITY_RING_FILL_OPACITY,
-    strokeWidth: 3,
-    strokeColor: DIGNITY_PALETTE.kindInstitutionStroke,
-  },
-};
-
-const DEFAULT_GLYPH_PAINT_SIGNATURE: KindGlyphPaintSignature = GLYPH_PAINT_SIGNATURE.circle!;
-
-function glyphSignatureFor(glyph: string): KindGlyphPaintSignature {
-  return GLYPH_PAINT_SIGNATURE[glyph] ?? DEFAULT_GLYPH_PAINT_SIGNATURE;
-}
-
-/** Builds a `['match', ['get', 'kind'], k1, v1, k2, v2, ..., fallback]` expression from
- * `KIND_ENCODING_ENTRIES`, so every kind-keyed paint property here is generated from the same
- * table `kind-encoding.ts` exports rather than re-listing `place | school | event | institution`
- * by hand at each call site. */
-function kindMatchExpression(
-  valueForEntry: (entry: (typeof KIND_ENCODING_ENTRIES)[number][1]) => string | number,
-  fallback: string | number,
-): ExpressionSpecification {
-  const cases = KIND_ENCODING_ENTRIES.flatMap(([kind, entry]) => [kind, valueForEntry(entry)]);
-  // `cases` is a variable-length spread, so this array's inferred shape is not one of
-  // `ExpressionSpecification`'s fixed-length tuple variants; go through `unknown` (same escape
-  // hatch this repo already uses for other MapLibre expression/filter casts, e.g.
-  // `ExploreMapCanvas.tsx`'s `as unknown as [string, ...unknown[]]`).
-  return ['match', ['get', 'kind'], ...cases, fallback] as unknown as ExpressionSpecification;
-}
-
-function kindColorExpression(): ExpressionSpecification {
-  // Prefer the denormalized `shade` property (same hex KindBadge uses via displayEncodingFor).
-  // Fall back to kind/mapTone match tables for any older GeoJSON that lacks `shade`.
-  const semanticCases = Object.entries(MAP_SEMANTIC_TONE_ENCODING).flatMap(([tone, entry]) => [
-    tone,
-    entry.shade,
-  ]);
-  const kindCases = KIND_FAMILY_ENTRIES.flatMap(([family, entry]) => [family, entry.shade]);
+function markIs(mark: RecordMark): ExpressionSpecification {
   return [
-    'case',
-    ['has', 'shade'],
-    ['get', 'shade'],
-    ['has', 'mapTone'],
-    ['match', ['get', 'mapTone'], ...semanticCases, DEFAULT_KIND_ENCODING.shade],
-    [
-      'match',
-      ['coalesce', ['get', 'kindFamily'], ['get', 'kind']],
-      ...kindCases,
-      DEFAULT_KIND_ENCODING.shade,
-    ],
+    'match',
+    ['get', 'precision'],
+    precisionsWithMark(mark),
+    true,
+    false,
   ] as unknown as ExpressionSpecification;
 }
 
-function kindFillOpacityExpression(): ExpressionSpecification {
-  return kindMatchExpression(
-    (entry) => glyphSignatureFor(entry.glyph).opacity,
-    DEFAULT_GLYPH_PAINT_SIGNATURE.opacity,
-  );
+function byMark(dot: unknown, ring: unknown): ExpressionSpecification {
+  return ['case', markIs('dot'), dot, ring] as unknown as ExpressionSpecification;
 }
 
-function kindStrokeWidthExpression(): ExpressionSpecification {
-  // Zoom-scale rims with the fill disc — a fixed 1.5–4px stroke on a nationally shrunk
-  // ~1–2px fill reads as every entity lit/selected (bright plate.selected wash).
-  return zoomScaledNumericExpression(
-    kindMatchExpression(
-      (entry) => glyphSignatureFor(entry.glyph).strokeWidth,
-      DEFAULT_GLYPH_PAINT_SIGNATURE.strokeWidth,
-    ),
-  );
-}
-
-function kindStrokeColorExpression(rimColor: string): ExpressionSpecification {
-  return kindMatchExpression(
-    (entry) => (entry.glyph === 'ring' ? DIGNITY_PALETTE.kindInstitutionStroke : rimColor),
-    rimColor,
-  );
+/** Group sizes: three steps, never implying precision (`CLUSTER_RADIUS_BY_COUNT`). */
+function groupRadiusExpression(): ExpressionSpecification {
+  const [small, medium, large] = CLUSTER_RADIUS_BY_COUNT;
+  return [
+    'step',
+    ['get', 'point_count'],
+    small![1],
+    medium![0],
+    medium![1],
+    large![0],
+    large![1],
+  ] as unknown as ExpressionSpecification;
 }
 
 /**
@@ -657,30 +401,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   const overlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : PLATE_STATE_FILL_OPACITY;
   const countyOverlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : COUNTY_FILL_OPACITY;
   const popGeo = input.popGeo ?? DEFAULT_POPULATION_GEO;
-  /** National field: Page Sand records / copper walks; kind encoding past locality zoom. */
-  const entityPointColor = blendFirstPaintWithKindExpression(
-    kindColorExpression(),
-    firstPaintPointColorExpression(),
-  );
-  const clusterShade = clusterDominantFamilyShadeExpression();
-  const entityPointOpacity = blendFirstPaintWithKindExpression(
-    kindFillOpacityExpression(),
-    firstPaintPointOpacityExpression(),
-  );
-  const entityPointRadius = firstPaintOrKindRadiusExpression(markerRadiusExpression());
-  const entityHaloRadius = firstPaintOrKindRadiusExpression(markerHaloRadiusExpression());
-  const entityHaloOpacity = blendFirstPaintWithKindExpression(
-    literalPaintNumber(ENTITY_HALO_OPACITY),
-    literalPaintNumber(0),
-  );
-  const entityStrokeWidth = firstPaintOrKindStrokeWidthExpression(kindStrokeWidthExpression());
-  const entityPrecisionRadiusPixels = precisionRadiusPixelsExpression();
-  // Invisible at the national field, same as the halo — a radius affordance is meaningless
-  // zoomed out past the point where individual records are even distinguishable.
-  const entityPrecisionRadiusOpacity = blendFirstPaintWithKindExpression(
-    literalPaintNumber(ENTITY_PRECISION_RADIUS_OPACITY),
-    literalPaintNumber(0),
-  );
+  /* County- and state-precision records draw no point (`recordMarkFor`): they leave the
+     entities source and are counted in a jurisdiction tag instead. */
+  const drawn = drawnRecordCollection(input.featureCollection);
+  const tags = jurisdictionTagCollection(input.featureCollection);
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =
     input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
@@ -768,15 +492,19 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // the property when it is there and keeps its generated id for a cluster, which has none.
         promoteId: 'entityId',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-        data: input.featureCollection as any,
+        data: drawn as any,
         ...(clusteringEnabled
           ? {
               cluster: true,
               clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
               clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
-              clusterProperties: exploreClusterProperties(),
             }
           : { cluster: false }),
+      },
+      [EXPLORE_JURISDICTION_TAGS_SOURCE_ID]: {
+        type: 'geojson',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        data: tags as any,
       },
       [EXPLORE_ENTITIES_INCOMING_SOURCE_ID]: {
         type: 'geojson',
@@ -789,7 +517,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               cluster: true,
               clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
               clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
-              clusterProperties: exploreClusterProperties(),
             }
           : { cluster: false }),
       },
@@ -1113,21 +840,17 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'line',
         source: EXPLORE_STATE_DENSITY_SOURCE_ID,
         paint: {
-          // Warm hairlines, not stark paper strokes — state bounds are the
-          // chart's ruling, and the entity stack must always read above them. Dashed, so an
-          // internal division never reads as heavy as the solid country border above it.
+          // Hairlines: state bounds are the chart's ruling, and every mark reads above them.
           'line-color': plate.stateBounds,
           'line-width': [
             'interpolate',
             ['linear'],
             ['zoom'],
             3,
-            0.6,
+            0.5,
             8,
-            1.3,
+            1,
           ] as unknown as ExpressionSpecification,
-          'line-dasharray': [3, 2],
-          'line-opacity': 0.75,
         },
       },
       {
@@ -1204,41 +927,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        // Precision-radius affordance — painted under the halo/point so it reads as ground the
-        // marker sits on. Only features carrying a resolved `radiusMeters` draw one; every other
-        // feature coalesces to a 0px radius (see `precisionRadiusPixelsExpression` above), and
-        // the `has` filter keeps that explicit rather than relying on an invisible-but-present
-        // circle.
-        id: EXPLORE_PRECISION_RADIUS_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['all', ['!', ['has', 'point_count']], ['has', 'radiusMeters']],
-        paint: {
-          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
-          ...DECADE_TRANSITION_PAINT,
-          'circle-radius': entityPrecisionRadiusPixels,
-          'circle-color': entityPointColor,
-          'circle-opacity': entityPrecisionRadiusOpacity,
-        },
-      },
-      {
-        id: EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
-          ...DECADE_TRANSITION_PAINT,
-          // data-driven radius (marker-size.ts's formula + the fixed halo offset), one
-          // source of truth with the point layer below. Halo uses the same kind/tone shade as
-          // the point (and KindBadge) at low opacity — a neutral sand wash was washing every
-          // marker toward the same warm tone and hiding kind color coding.
-          'circle-radius': entityHaloRadius,
-          'circle-color': entityPointColor,
-          'circle-opacity': entityHaloOpacity,
-        },
-      },
-      {
+        // One layer, two shapes: a solid dot where the archive holds the site, a hollow ring
+        // where it holds the neighborhood or city. Kind is never encoded here.
         id: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
@@ -1246,34 +936,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
-          // National zoom: Page Sand records / copper walks. Locality: kind shade + glyph rim.
-          'circle-radius': entityPointRadius,
-          'circle-color': entityPointColor,
-          'circle-opacity': entityPointOpacity,
-          'circle-stroke-width': entityStrokeWidth,
-          'circle-stroke-color': kindStrokeColorExpression(plate.selected),
-        },
-      },
-      {
-        // the `event` kind's "diamond" glyph a second, unfilled ring offset around the
-        // point marker (see the `GLYPH_PAINT_SIGNATURE` doc comment above for why this
-        // approximates rather than draws literal diamond geometry). Filtered to `event` only;
-        // every other kind's glyph is fully carried by the point layer above.
-        id: EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
-        paint: {
-          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
-          ...DECADE_TRANSITION_PAINT,
-          // Offset ring via marker-size.ts's top-level zoom interpolate — `['+', radiusExpr, 4]`
-          // would nest the zoom expression and be rejected by the style spec (see
-          // `markerRadiusPlusExpression`'s doc comment).
-          'circle-radius': markerRadiusPlusExpression(4),
-          'circle-color': entityPointColor,
-          'circle-opacity': 0,
-          'circle-stroke-width': zoomScaledNumericExpression(1.5),
-          'circle-stroke-color': entityPointColor,
+          'circle-radius': byMark(DOT_RADIUS_PX, RING_RADIUS_PX),
+          'circle-color': byMark(plate.markInk, 'rgba(0,0,0,0)'),
+          'circle-opacity': ENTITY_POINT_FILL_OPACITY,
+          'circle-stroke-width': byMark(1, 1.5),
+          'circle-stroke-color': byMark(plate.ocean, plate.markInk),
           'circle-stroke-opacity': 0.9,
         },
       },
@@ -1285,65 +952,14 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
-          // Zoom-outermost interpolate (MapLibre paint restriction) × count steps — national
-          // frames keep aggregates small so dense catalogs do not blot geography.
-          'circle-radius': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            3,
-            [
-              '*',
-              [
-                'step',
-                ['get', 'point_count'],
-                CLUSTER_RADIUS_BY_COUNT[0]![1],
-                CLUSTER_RADIUS_BY_COUNT[1]![0],
-                CLUSTER_RADIUS_BY_COUNT[1]![1],
-                CLUSTER_RADIUS_BY_COUNT[2]![0],
-                CLUSTER_RADIUS_BY_COUNT[2]![1],
-                CLUSTER_RADIUS_BY_COUNT[3]![0],
-                CLUSTER_RADIUS_BY_COUNT[3]![1],
-              ],
-              0.45,
-            ],
-            5.5,
-            [
-              '*',
-              [
-                'step',
-                ['get', 'point_count'],
-                CLUSTER_RADIUS_BY_COUNT[0]![1],
-                CLUSTER_RADIUS_BY_COUNT[1]![0],
-                CLUSTER_RADIUS_BY_COUNT[1]![1],
-                CLUSTER_RADIUS_BY_COUNT[2]![0],
-                CLUSTER_RADIUS_BY_COUNT[2]![1],
-                CLUSTER_RADIUS_BY_COUNT[3]![0],
-                CLUSTER_RADIUS_BY_COUNT[3]![1],
-              ],
-              0.85,
-            ],
-            9,
-            [
-              'step',
-              ['get', 'point_count'],
-              CLUSTER_RADIUS_BY_COUNT[0]![1],
-              CLUSTER_RADIUS_BY_COUNT[1]![0],
-              CLUSTER_RADIUS_BY_COUNT[1]![1],
-              CLUSTER_RADIUS_BY_COUNT[2]![0],
-              CLUSTER_RADIUS_BY_COUNT[2]![1],
-              CLUSTER_RADIUS_BY_COUNT[3]![0],
-              CLUSTER_RADIUS_BY_COUNT[3]![1],
-            ],
-          ],
-          'circle-color': clusterShade,
+          'circle-radius': groupRadiusExpression(),
+          'circle-color': plate.groupFill,
           'circle-opacity': ENTITY_CLUSTER_OPACITY,
-          'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': clusterShade,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': plate.groupStroke,
         },
       },
       {
-        // Cluster count label — glyphs now supplied via OpenFreeMap fonts.
         id: EXPLORE_CLUSTER_COUNT_LAYER_ID,
         type: 'symbol',
         source: EXPLORE_ENTITIES_SOURCE_ID,
@@ -1351,20 +967,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
           'text-size': 11,
-          'text-font': ['Noto Sans Regular'],
+          'text-font': ['Noto Sans Bold'],
+          'text-allow-overlap': true,
         },
-        paint: { 'text-color': plate.clusterText },
-      },
-      {
-        id: EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-radius': markerHaloRadiusExpression(),
-          'circle-color': kindColorExpression(),
-          'circle-opacity': 0,
-        },
+        paint: { 'text-color': plate.groupText },
       },
       {
         id: EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
@@ -1372,25 +978,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
-          'circle-radius': markerRadiusExpression(),
-          'circle-color': kindColorExpression(),
+          'circle-radius': byMark(DOT_RADIUS_PX, RING_RADIUS_PX),
+          'circle-color': byMark(plate.markInk, 'rgba(0,0,0,0)'),
           'circle-opacity': 0,
-          'circle-stroke-width': kindStrokeWidthExpression(),
-          'circle-stroke-color': kindStrokeColorExpression(plate.selected),
-          'circle-stroke-opacity': 0,
-        },
-      },
-      {
-        id: EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
-        paint: {
-          'circle-radius': markerRadiusPlusExpression(4),
-          'circle-color': kindColorExpression(),
-          'circle-opacity': 0,
-          'circle-stroke-width': zoomScaledNumericExpression(1.5),
-          'circle-stroke-color': kindColorExpression(),
+          'circle-stroke-width': byMark(1, 1.5),
+          'circle-stroke-color': byMark(plate.ocean, plate.markInk),
           'circle-stroke-opacity': 0,
         },
       },
@@ -1400,59 +992,11 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
         filter: ['has', 'point_count'],
         paint: {
-          'circle-radius': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            3,
-            [
-              '*',
-              [
-                'step',
-                ['get', 'point_count'],
-                CLUSTER_RADIUS_BY_COUNT[0]![1],
-                CLUSTER_RADIUS_BY_COUNT[1]![0],
-                CLUSTER_RADIUS_BY_COUNT[1]![1],
-                CLUSTER_RADIUS_BY_COUNT[2]![0],
-                CLUSTER_RADIUS_BY_COUNT[2]![1],
-                CLUSTER_RADIUS_BY_COUNT[3]![0],
-                CLUSTER_RADIUS_BY_COUNT[3]![1],
-              ],
-              0.45,
-            ],
-            5.5,
-            [
-              '*',
-              [
-                'step',
-                ['get', 'point_count'],
-                CLUSTER_RADIUS_BY_COUNT[0]![1],
-                CLUSTER_RADIUS_BY_COUNT[1]![0],
-                CLUSTER_RADIUS_BY_COUNT[1]![1],
-                CLUSTER_RADIUS_BY_COUNT[2]![0],
-                CLUSTER_RADIUS_BY_COUNT[2]![1],
-                CLUSTER_RADIUS_BY_COUNT[3]![0],
-                CLUSTER_RADIUS_BY_COUNT[3]![1],
-              ],
-              0.85,
-            ],
-            9,
-            [
-              'step',
-              ['get', 'point_count'],
-              CLUSTER_RADIUS_BY_COUNT[0]![1],
-              CLUSTER_RADIUS_BY_COUNT[1]![0],
-              CLUSTER_RADIUS_BY_COUNT[1]![1],
-              CLUSTER_RADIUS_BY_COUNT[2]![0],
-              CLUSTER_RADIUS_BY_COUNT[2]![1],
-              CLUSTER_RADIUS_BY_COUNT[3]![0],
-              CLUSTER_RADIUS_BY_COUNT[3]![1],
-            ],
-          ],
-          'circle-color': clusterShade,
+          'circle-radius': groupRadiusExpression(),
+          'circle-color': plate.groupFill,
           'circle-opacity': 0,
-          'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': clusterShade,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': plate.groupStroke,
         },
       },
       {
@@ -1463,23 +1007,70 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
           'text-size': 11,
-          'text-font': ['Noto Sans Regular'],
+          'text-font': ['Noto Sans Bold'],
+          'text-allow-overlap': true,
         },
-        paint: { 'text-color': plate.clusterText, 'text-opacity': 0 },
+        paint: { 'text-color': plate.groupText, 'text-opacity': 0 },
       },
       {
+        // County- and state-precision records, counted at the state's label point. Never a
+        // point: a pin would claim a place the archive does not hold.
+        id: EXPLORE_JURISDICTION_TAG_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_JURISDICTION_TAGS_SOURCE_ID,
+        filter: unselectedTagFilterExpression(undefined),
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-size': 10,
+          'text-font': ['Noto Sans Regular'],
+          'text-offset': [0, 1.4],
+          'text-max-width': 24,
+          'text-letter-spacing': 0.04,
+          // A tag that would collide gives way at this zoom and returns as the reader zooms in.
+          'text-padding': 4,
+        },
+        paint: {
+          'text-color': plate.tagText,
+          'text-halo-color': plate.ocean,
+          'text-halo-width': haloWidth(1.2),
+        },
+      },
+      {
+        id: EXPLORE_SELECTED_TAG_LAYER_ID,
+        type: 'symbol',
+        source: EXPLORE_JURISDICTION_TAGS_SOURCE_ID,
+        filter: selectedTagFilterExpression(undefined),
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-size': 11,
+          'text-font': ['Noto Sans Bold'],
+          'text-offset': [0, 1.3],
+          'text-max-width': 24,
+          'text-letter-spacing': 0.04,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+        },
+        paint: {
+          'text-color': DIGNITY_PALETTE.point,
+          'text-halo-color': plate.ocean,
+          'text-halo-width': haloWidth(1.2),
+        },
+      },
+      {
+        // Selected: copper fill and a paper halo, at the mark's own size. Copper on the map
+        // means the current thing and nothing else.
         id: EXPLORE_SELECTED_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: selectedPointFilterExpression(undefined),
         paint: {
-          'circle-radius': markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
-          'circle-color': 'rgba(0,0,0,0)',
-          'circle-stroke-width': zoomScaledNumericExpression(2.5),
-          // Copper orientation ring (graphic accent) — MapStage pulses stroke opacity when selected.
-          'circle-stroke-color': DIGNITY_PALETTE.point,
-          'circle-stroke-opacity': 1,
+          // Larger than the mark it replaces, so selection never reads by color alone.
+          'circle-radius': byMark(DOT_RADIUS_PX + 2, RING_RADIUS_PX + 1),
+          'circle-color': DIGNITY_PALETTE.point,
           'circle-opacity': 1,
+          'circle-stroke-width': SELECTED_HALO_PX,
+          'circle-stroke-color': plate.selectedHalo,
+          'circle-stroke-opacity': 1,
         },
       },
     ],

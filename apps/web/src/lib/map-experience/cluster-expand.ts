@@ -2,7 +2,6 @@
  * Pure helpers for expanding MapLibre GeoJSON clusters on the Explore plate.
  * Cluster taps zoom in until the aggregate splits; they never open a leaf record sheet.
  */
-import type { ExpressionSpecification } from 'maplibre-gl';
 import { MAP_MAX_ZOOM } from './camera-presets';
 
 /** Minimum zoom advance when MapLibre cannot resolve an expansion level. */
@@ -34,23 +33,4 @@ export function clusterCenterFromCoordinates(
   if (typeof lng !== 'number' || typeof lat !== 'number') return undefined;
   if (!Number.isFinite(lng) || !Number.isFinite(lat)) return undefined;
   return [lng, lat];
-}
-
-/** MapLibre `clusterProperties` counters for dominant kind-family paint. */
-export function exploreClusterProperties(): Record<string, ExpressionSpecification> {
-  const properties: Record<string, ExpressionSpecification> = {};
-  for (const family of [
-    'people',
-    'places',
-    'organizations',
-    'events',
-    'sources',
-    'inventions',
-  ] as const) {
-    properties[`${family}_n`] = [
-      '+',
-      ['case', ['==', ['get', 'kindFamily'], family], 1, 0],
-    ] as unknown as ExpressionSpecification;
-  }
-  return properties;
 }

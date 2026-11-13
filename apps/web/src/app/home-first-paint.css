@@ -20,52 +20,6 @@
   color: var(--ds-ink-muted);
 }
 
-/*
- * The neighbourhood locator, when a place has no photograph, sits in the rail with the Visit block
- * (the entity room's arrangement) and keeps its own frame. It used to share the headline's row
- * inside a 632px column, which left the title 385px wide. It pans and zooms cooperatively
- * (InteractiveRecordLocator): one finger or a plain wheel still scrolls the page.
- */
-.ds-record-rail-map {
-  overflow: hidden;
-  margin-bottom: var(--ds-space-6);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-}
-
-.ds-record-rail-map .ds-record-anatomy__place {
-  position: relative;
-  margin: 0;
-}
-
-.ds-record-rail-map .ds-record-anatomy__place-caption {
-  display: none;
-}
-
-.ds-record-rail-map .ds-embed-map,
-.ds-record-rail-map .ds-locator:not(.ds-embed-map__standin) {
-  position: relative;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-}
-
-/* The frame states its precision in words under the map, so a coarse pin is never read as exact. */
-.ds-record-mast__map-note {
-  margin: 0;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  background: var(--ds-surface);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.03em;
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
-}
-
 /* The evidence band reads as the second beat of the mast: values at name-adjacent weight. */
 .ds-home-first-paint .ds-record-evidence-strip {
   margin-top: var(--ds-space-6);

@@ -3,11 +3,11 @@
  *
  * This extends `camera-presets.ts` rather than replacing it: the slow-out easing, the zoom
  * envelope and the reduced-motion posture all come from there. What this module adds is the
- * *vocabulary* — wide, push, orbit, tilt, spotlight, trace, fly-to-record — which is how the
- * archive argues with the map (design-direction-v9-atlas.md §4.1).
+ * *vocabulary* — wide, push, orbit, tilt, spotlight, trace — plus `frameRecord`, the one
+ * selection contract every surface uses to show a record (home, /explore, embeds).
  *
  * No `maplibre-gl` runtime import. The map is a structural `MapLike`, the same split
- * `camera-presets.ts` / `marker-size.ts` / `kind-encoding.ts` already use, so the whole move set
+ * `camera-presets.ts` / `kind-encoding.ts` already use, so the whole move set
  * is unit-testable in plain Node against a recording fake.
  *
  * Three rules here are not stylistic and must not be tuned per call site:
@@ -18,11 +18,17 @@
  */
 
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import { CAMERA_EASING_SLOW_OUT, MAP_MIN_ZOOM, type CameraEasing } from './camera-presets';
+import {
+  CAMERA_EASING_SLOW_OUT,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
+  type CameraEasing,
+} from './camera-presets';
 import { isMoveAllowed, type RecordLike as DignityRecord } from './camera-dignity';
 import type { ChromeInset } from './chrome-padding';
+import { zoomForLocationPrecision } from './geo-precision';
 
-export type CameraMove = 'wide' | 'push' | 'orbit' | 'tilt' | 'spotlight' | 'trace' | 'flyToRecord';
+export type CameraMove = 'wide' | 'push' | 'orbit' | 'tilt' | 'spotlight' | 'trace' | 'frameRecord';
 
 /** What `frameArea` lands on: an explicit box (a search radius, or "you plus your nearest
  * records"), or a single point at a zoom. */
@@ -51,7 +57,7 @@ export const CAMERA_MOVE_DURATIONS = {
   tilt: 900,
   spotlight: 720,
   trace: 900,
-  flyToRecord: 2200,
+  frameRecord: 900,
 } as const satisfies Record<CameraMove, number>;
 
 /** Pitch the tilt move toggles between. */
@@ -72,24 +78,50 @@ const PUSH_PITCH = 48;
 const PUSH_ZOOM_STEP = 2.6;
 const PUSH_MIN_ZOOM = 8.4;
 
-const RECORD_ZOOM = 12.6;
-/** A record is framed north-up and flat. A tilted, rotated arrival on every pin click turned the
- * compass "twisted" after each selection and left readers re-orienting the map to read it. Tilt
- * and orbit stay available as deliberate moves in the camera console. */
-const RECORD_PITCH = 0;
-const RECORD_BEARING = 0;
-/** Never zoom a reader *out* to open a record they clicked while zoomed further in. */
-const RECORD_MAX_ZOOM = 16;
-
 /** Locate framing: neighbourhood scale, north-up, flat — what every maps app does for "you". */
 export const LOCATE_ZOOM = 13.2;
-const LOCATE_MAX_ZOOM = 15;
 const LOCATE_DURATION = 1400;
 
 const SPOTLIGHT_DEFAULT_RADIUS_PERCENT = 20;
 
 /** Linear easing. An orbit that eases would read as a nervous drift, not a steady rotation. */
 const LINEAR_EASING: CameraEasing = (t) => t;
+
+/**
+ * The selection contract's decision, pure so it is testable without a map.
+ *
+ * Target zoom comes from the record's stored precision (`zoomForLocationPrecision`). The camera
+ * never zooms OUT from a closer view the reader chose, and does not move at all when the mark is
+ * already inside the unobscured bounds at or above that zoom. Otherwise it makes one
+ * `frameRecord`-length ease-out move, or a cut under reduced motion. `null` means stay put.
+ */
+export function planRecordFrame(input: {
+  readonly precision: string;
+  readonly currentZoom: number;
+  readonly markInView: boolean;
+  readonly reducedMotion: boolean;
+}): { readonly zoom: number; readonly duration: number } | null {
+  const target = Math.min(zoomForLocationPrecision(input.precision), MAP_MAX_ZOOM);
+  if (input.markInView && input.currentZoom >= target) return null;
+  return {
+    zoom: Math.max(input.currentZoom, target),
+    duration: input.reducedMotion ? 0 : CAMERA_MOVE_DURATIONS.frameRecord,
+  };
+}
+
+/** True when a projected point sits inside the canvas minus the chrome that covers it. */
+export function pointInVisibleBounds(
+  point: { readonly x: number; readonly y: number },
+  size: { readonly width: number; readonly height: number },
+  inset: ChromeInset,
+): boolean {
+  return (
+    point.x >= inset.left &&
+    point.x <= size.width - inset.right &&
+    point.y >= inset.top &&
+    point.y <= size.height - inset.bottom
+  );
+}
 
 export type CameraAnimationOptions = {
   center?: LngLat;
@@ -122,6 +154,9 @@ export type MapLike = {
     options: { padding: ChromeInset },
   ): { zoom?: number } | undefined;
   setMinZoom?(zoom: number): unknown;
+  /** Screen position of a coordinate, for the "already visible" test. Absent on a bare fake. */
+  project?(lngLat: LngLat): { x: number; y: number };
+  getContainer?(): { clientWidth: number; clientHeight: number };
 };
 
 export type SpotlightTarget = { center: LngLat; radiusPercent: number } | null;
@@ -166,10 +201,17 @@ export type SpotlightOptions = MoveOptions & {
 };
 export type TraceOptions = MoveOptions & { readonly corridorCount?: number };
 
-export type RecordTarget = {
+export type RecordFrameTarget = {
   readonly center: LngLat;
+  /** The record's stored public precision (`ExploreMapFeatureProperties.precision`). */
+  readonly precision: string;
   /** Place name for the readout, e.g. "Birmingham, Alabama". */
   readonly place: string;
+};
+
+export type FrameRecordOptions = MoveOptions & {
+  /** The chrome that will be visible AFTER the selection (the open inspector included). */
+  readonly padding?: ChromeInset;
 };
 
 export type CameraApi = {
@@ -179,7 +221,8 @@ export type CameraApi = {
   tilt(options?: MoveOptions): void;
   spotlight(options?: SpotlightOptions): void;
   trace(options?: TraceOptions): void;
-  flyToRecord(record: RecordTarget, options?: MoveOptions): void;
+  /** The selection contract: every pin click, list row, prev/next and deep link lands here. */
+  frameRecord(record: RecordFrameTarget, options?: FrameRecordOptions): void;
   /**
    * Frames a place the reader asked to see — their own location, a searched address, a radius.
    * Pure geography, so it is never dignity-gated: it is not about any record.
@@ -411,7 +454,7 @@ export function createCamera(deps: CameraDeps): CameraApi {
           duration,
           pitch: 0,
           bearing: 0,
-          maxZoom: LOCATE_MAX_ZOOM,
+          maxZoom: MAP_MAX_ZOOM,
           easing: CAMERA_EASING_SLOW_OUT,
           essential,
         });
@@ -443,21 +486,37 @@ export function createCamera(deps: CameraDeps): CameraApi {
     announce(`Locate · ${frame.label}`);
   }
 
-  function flyToRecord(record: RecordTarget, options?: MoveOptions): void {
+  function markInView(center: LngLat, inset: ChromeInset): boolean {
+    const point = map.project?.(center);
+    const container = map.getContainer?.();
+    if (!point || !container) return false;
+    return pointInVisibleBounds(
+      point,
+      { width: container.clientWidth, height: container.clientHeight },
+      inset,
+    );
+  }
+
+  function frameRecord(record: RecordFrameTarget, options?: FrameRecordOptions): void {
+    const inset = options?.padding ?? padding();
+    const plan = planRecordFrame({
+      precision: record.precision,
+      currentZoom: map.getZoom(),
+      markInView: markInView(record.center, inset),
+      reducedMotion: reducedMotion(),
+    });
+    if (!plan) return;
     cancel();
-    map.flyTo({
+    // Pitch and bearing are left out on purpose: the reader's tilt and turn survive a selection.
+    map.easeTo({
       center: record.center,
-      zoom: Math.min(RECORD_MAX_ZOOM, Math.max(RECORD_ZOOM, map.getZoom())),
-      pitch: RECORD_PITCH,
-      bearing: RECORD_BEARING,
-      curve: CAMERA_FLY_CURVE,
-      speed: 0.9,
+      zoom: plan.zoom,
+      duration: plan.duration,
       easing: CAMERA_EASING_SLOW_OUT,
-      duration: durationFor(options?.durationMs, CAMERA_MOVE_DURATIONS.flyToRecord),
-      padding: padding(),
+      padding: inset,
       essential: isEssential(options),
     });
-    announce(`Fly to · ${record.place}`);
+    announce(`Record · ${record.place}`);
   }
 
   return {
@@ -467,7 +526,7 @@ export function createCamera(deps: CameraDeps): CameraApi {
     tilt,
     spotlight,
     trace,
-    flyToRecord,
+    frameRecord,
     frameArea,
     resetBearing,
     cancel,

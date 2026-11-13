@@ -72,11 +72,9 @@ export function defaultPostureFor(surface: SurfaceClass | null): PlatePosture {
 /**
  * Whether a Framed slot claim may be granted on this surface at all.
  *
- * False on Instrument for a reason that is easy to miss: `RecordAnatomyPanel` is shared between
- * the record page and Explore's record sheet, so the same `RecordPlacePreview` that borrows the
- * plate on `/entity/[id]` also renders inside a sheet floating OVER the live plate. A sheet cannot
- * borrow the plate it is floating over. Refusing the claim here is what makes that case fall back
- * to a static block with no extra prop and no caller having to know which surface it is on.
+ * False on Instrument: a panel floating over the live plate cannot borrow the plate it is
+ * floating over, so a moment rendered there falls back to its caption with no extra prop and no
+ * caller having to know which surface it is on.
  *
  * False on Utility because a parked plate on a task surface should stay unbuilt, not be woken by
  * a stray moment.

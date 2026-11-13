@@ -21,12 +21,7 @@
  * never snap. Reduced motion collapses to a cut.
  */
 import type { Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
-import {
-  ENTITY_CLUSTER_OPACITY,
-  ENTITY_HALO_OPACITY,
-  ENTITY_POINT_FILL_OPACITY,
-  ENTITY_PRECISION_RADIUS_OPACITY,
-} from './explore-style';
+import { ENTITY_CLUSTER_OPACITY, ENTITY_POINT_FILL_OPACITY } from './explore-style';
 import {
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
@@ -35,14 +30,9 @@ import {
   EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
@@ -68,21 +58,6 @@ export type DecadeCrossfadePaintTarget = {
 export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[] = [
   { layerId: EXPLORE_HISTORY_EDGES_LAYER_ID, paintKey: 'line-opacity', restOpacity: 0.9 },
   { layerId: EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID, paintKey: 'line-opacity', restOpacity: 1 },
-  // No `EXPLORE_PRECISION_RADIUS_*_INCOMING` counterpart exists (unlike halo/point/glyph below):
-  // the radius affordance has no dual-buffer partner to crossfade into. Listing it here still
-  // fades it out smoothly with everything else rather than leaving a static ring visible while
-  // its neighbors dissolve, and `restoreDecadeFadePaintFromStyle` snaps it back to the rebuilt
-  // style's (already new-decade) expression at promote, same as every other out-only channel.
-  {
-    layerId: EXPLORE_PRECISION_RADIUS_LAYER_ID,
-    paintKey: 'circle-opacity',
-    restOpacity: ENTITY_PRECISION_RADIUS_OPACITY,
-  },
-  {
-    layerId: EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-    paintKey: 'circle-opacity',
-    restOpacity: ENTITY_HALO_OPACITY,
-  },
   {
     layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
     paintKey: 'circle-opacity',
@@ -90,11 +65,6 @@ export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[]
   },
   {
     layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-    paintKey: 'circle-stroke-opacity',
-    restOpacity: 0.9,
-  },
-  {
-    layerId: EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
     paintKey: 'circle-stroke-opacity',
     restOpacity: 0.9,
   },
@@ -110,22 +80,12 @@ export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[]
 export const DECADE_CROSSFADE_IN_TARGETS: readonly DecadeCrossfadePaintTarget[] = [
   { layerId: EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID, paintKey: 'line-opacity', restOpacity: 0.9 },
   {
-    layerId: EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-    paintKey: 'circle-opacity',
-    restOpacity: ENTITY_HALO_OPACITY,
-  },
-  {
     layerId: EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
     paintKey: 'circle-opacity',
     restOpacity: ENTITY_POINT_FILL_OPACITY,
   },
   {
     layerId: EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
-    paintKey: 'circle-stroke-opacity',
-    restOpacity: 0.9,
-  },
-  {
-    layerId: EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
     paintKey: 'circle-stroke-opacity',
     restOpacity: 0.9,
   },

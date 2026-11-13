@@ -68,7 +68,7 @@ export type Command = {
 };
 
 /**
- * Every camera move a reader can invoke by key. `flyToRecord` is deliberately absent: it needs a
+ * Every camera move a reader can invoke by key. `frameRecord` is deliberately absent: it needs a
  * record, so it is reached by selecting one, not by pressing a key with nothing in hand.
  */
 export const KEYED_CAMERA_MOVES = ['wide', 'push', 'orbit', 'tilt', 'spotlight', 'trace'] as const;

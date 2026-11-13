@@ -26,18 +26,17 @@ function mountSeed(): string {
 /** The body of the `sync` effect's `setPanels({ ... })` call. */
 function viewportSync(): string {
   const match = hook.match(
-    /const sync = \(\) => \{[\s\S]*?setPanels\(\(current\) => \(\{([\s\S]*?)\}\)\);/,
+    /const sync = \(\) => \{[\s\S]*?setPanels\(\(\) => \(\{([\s\S]*?)\}\)\);/,
   );
   assert.ok(match, 'viewport sync setPanels not found');
   return match[1] ?? '';
 }
 
-test('Lens, Results, and Time seed open; Camera stays restored-on-demand', () => {
+test('Lens, Results, and Time seed open', () => {
   const seed = mountSeed();
   for (const panel of ['lens', 'results', 'decade']) {
     assert.match(seed, new RegExp(`${panel}: true,`), `${panel} must seed open`);
   }
-  assert.match(seed, /camera: false/);
 });
 
 test('compact viewports open map-first; wider ones open the Lens', () => {
@@ -49,7 +48,6 @@ test('Records open only when both side panels fit; Time opens whenever not compa
   const sync = viewportSync();
   assert.match(sync, /results: !isNarrow && !isMid,/);
   assert.match(sync, /decade: !isNarrow,/);
-  assert.match(sync, /camera: isNarrow \? false : current\.camera/);
 });
 
 test('compact is narrow OR short, from the one shared definition', () => {

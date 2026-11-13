@@ -128,7 +128,10 @@ describe('explore map underlay', () => {
     assert.match(mapStage, /notify\(listenersRef\.current, 'ready'\)/);
     assert.match(mapStage, /if \(event === 'ready' && plateReadyRef\.current\)/);
     assert.match(atlasCamera, /stage\.subscribe\('ready'/);
-    assert.match(atlasCamera, /camera\.wide\(\{ trigger: 'ambient' \}\), delay\)/);
+    assert.match(
+      atlasCamera,
+      /if \(!hasSelectionRef\.current\(\)\) camera\.wide\(\{ trigger: 'ambient' \}\)/,
+    );
     assert.doesNotMatch(atlasCamera, /stage\.mapAvailable\]\)/);
   });
 

@@ -1,22 +1,17 @@
 'use client';
 
 /**
- * Accessible legend for the map: explains kind shades + glyphs, semantic tones
- * (massacre / plantation / epicenter as shade-only overlays), size, density,
- * precision, and confidence (green→orange ramp with glyphs). Color is never the
- * only signal (WCAG 1.4.1). The Color Key lists the encoding vocabulary the map
- * can paint; tones do not claim a shape of their own (kind glyph is preserved).
+ * How to read the map, in words and swatches. The marks say how precisely the archive can place
+ * a record and nothing else: a dot is a site, a ring is a neighborhood or city, a tag at a state's
+ * label counts records known only to the county or state. Kind is shown in the list and the
+ * inspector, never by mark color. Copper is the selected record.
  *
- * A compact color key stays visible above the disclosure. The longer “Reading this
- * map” guide uses a native `<details>`/`<summary>` for keyboard and screen-reader
- * support without custom JS. Explore embeds this inside the instrument chassis Color
- * key tab (`embedded`); standalone surfaces may pass `onHide`. Visibility / tab state
- * is owned by Explore URL chrome, not this component.
+ * A compact key stays visible above a native `<details>` disclosure (keyboard and screen-reader
+ * support without custom JS). The opt-in area layers (record density, population share and
+ * change) add their own tier rows when on.
  */
 import React, { useEffect, useState } from 'react';
 import {
-  CONFIDENCE_TIER_COLOR,
-  CONFIDENCE_TIER_GLYPH,
   DENSITY_TIER_FILL,
   DIGNITY_PALETTE,
   POPULATION_CHANGE_TIER_FILL,
@@ -27,51 +22,9 @@ import {
   type MapColorScheme,
 } from '../../lib/map-experience/dignity-style';
 import type { ExploreLayerMode, ExplorePopulationGeo } from '../../lib/map-experience/url-state';
-import {
-  KIND_FAMILY_ENTRIES,
-  SEMANTIC_TONE_ENTRIES,
-  type MapEntityGlyph,
-} from '../../lib/map-experience/kind-encoding';
-import { MARKER_RADIUS_MAX, MARKER_RADIUS_MIN } from '../../lib/map-experience/marker-size';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
-
-const KIND_GLYPH_CLASS: Readonly<Record<MapEntityGlyph, string>> = {
-  circle: 'ds-legend-glyph--circle',
-  square: 'ds-legend-glyph--square',
-  diamond: 'ds-legend-glyph--diamond',
-  ring: 'ds-legend-glyph--ring',
-};
-
-/** Map-canvas echo of each glyph identity (MapLibre circle layers cannot draw true squares). */
-const KIND_GLYPH_MAP_ECHO: Readonly<Record<MapEntityGlyph, string>> = {
-  circle: 'disc',
-  square: 'thick-rim disc',
-  diamond: 'orbit-ring disc',
-  ring: 'hollow disc',
-};
-
-const SIZE_SCALE_STEPS: readonly number[] = [
-  MARKER_RADIUS_MIN,
-  Math.round((MARKER_RADIUS_MIN + MARKER_RADIUS_MAX) / 2),
-  MARKER_RADIUS_MAX,
-];
-
-/** Cluster disc radii at locality zoom — mirrors `CLUSTER_RADIUS_BY_COUNT` in explore-style. */
-const CLUSTER_SIZE_ROWS = [
-  ['2 to 9 records', CLUSTER_RADIUS_BY_COUNT[0]![1]],
-  ['10 to 49 records', CLUSTER_RADIUS_BY_COUNT[1]![1]],
-  ['50 to 199 records', CLUSTER_RADIUS_BY_COUNT[2]![1]],
-  ['200+ records', CLUSTER_RADIUS_BY_COUNT[3]![1]],
-] as const;
-
-const CONFIDENCE_TIER_ROWS = [
-  ['high', 'High'],
-  ['medium', 'Medium'],
-  ['low', 'Low'],
-  ['unrated', 'Unrated'],
-] as const;
 
 const SHARE_TIER_ROWS = [
   ['trace', 'Under 2%'],
@@ -95,48 +48,25 @@ const PRESENCE_TIER_ROWS = [
   ['concentrated', 'Concentrated'],
 ] as const;
 
+/** Group sizes, from `CLUSTER_RADIUS_BY_COUNT`: three steps. */
+const GROUP_SIZE_ROWS = [
+  ['2 to 9 records', CLUSTER_RADIUS_BY_COUNT[0]![1]],
+  ['10 to 99 records', CLUSTER_RADIUS_BY_COUNT[1]![1]],
+  ['100 or more', CLUSTER_RADIUS_BY_COUNT[2]![1]],
+] as const;
+
 export type MapExperienceLegendProps = {
-  /** Seeds the initial open/closed state of the `<details>` disclosure. Defaults to open
-   * (`false`). See this module's doc comment for the full props contract. */
+  /** Seeds the initial open/closed state of the `<details>` disclosure. Defaults to open. */
   readonly defaultCollapsed?: boolean;
   readonly layerMode?: ExploreLayerMode;
   readonly popGeo?: ExplorePopulationGeo;
   /** Optional override for tests; live UI reads `document.documentElement.dataset.theme`. */
   readonly colorScheme?: MapColorScheme;
-  /** When set, renders a “Hide key” control beside the Color key heading (standalone chrome). */
+  /** When set, renders a “Hide key” control beside the key heading (standalone chrome). */
   readonly onHide?: () => void;
-  /**
-   * When true, omits the Color key heading/hide row — Explore’s instrument chassis already
-   * labels the Color key tab and owns hide/show.
-   */
+  /** When true, omits the key heading/hide row: the host labels it. */
   readonly embedded?: boolean;
 };
-
-function LegendSwatch(props: { readonly glyph: MapEntityGlyph; readonly shade: string }) {
-  const { glyph, shade } = props;
-  return (
-    <span
-      className={`ds-legend-glyph ${KIND_GLYPH_CLASS[glyph]}`}
-      style={
-        glyph === 'ring'
-          ? { backgroundColor: 'transparent', borderColor: shade }
-          : { backgroundColor: shade }
-      }
-      aria-hidden="true"
-    />
-  );
-}
-
-/** Tone swatches are shade-only discs — tones never override kind shape on the map. */
-function ToneSwatch(props: { readonly shade: string }) {
-  return (
-    <span
-      className="ds-legend-glyph ds-legend-glyph--circle"
-      style={{ backgroundColor: props.shade }}
-      aria-hidden="true"
-    />
-  );
-}
 
 function LineSwatch(props: { readonly color: string }) {
   return (
@@ -148,19 +78,40 @@ function LineSwatch(props: { readonly color: string }) {
   );
 }
 
+function MarkSwatch(props: {
+  readonly size: number;
+  readonly fill: string;
+  readonly stroke: string;
+  readonly strokeWidth: number;
+}) {
+  return (
+    <span
+      className="ds-legend-mark"
+      style={{
+        width: props.size,
+        height: props.size,
+        backgroundColor: props.fill,
+        boxShadow: `inset 0 0 0 ${props.strokeWidth}px ${props.stroke}`,
+      }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function TierSwatch(props: { readonly color: string }) {
+  return (
+    <span
+      className="ds-legend-glyph ds-legend-glyph--circle"
+      style={{ backgroundColor: props.color }}
+      aria-hidden="true"
+    />
+  );
+}
+
 /** Live document theme — client-only (useEffect). Never call during render/SSR. */
 function readDocumentColorScheme(): MapColorScheme {
   if (typeof document === 'undefined') return 'light';
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
-}
-
-/**
- * Stable initial scheme for SSR + first client paint. Reading `document` in the
- * useState initializer would SSR as `light` and hydrate as `dark` when the bootstrap
- * script already set `data-theme`, flipping plate-bound LineSwatch colors.
- */
-function initialColorScheme(override: MapColorScheme | undefined): MapColorScheme {
-  return override ?? 'light';
 }
 
 function MapColorKey(props: {
@@ -176,14 +127,12 @@ function MapColorKey(props: {
   return (
     <div
       className={embedded ? 'ds-map-color-key ds-map-color-key--embedded' : 'ds-map-color-key'}
-      {...(embedded
-        ? { 'aria-label': 'Color key' }
-        : { 'aria-labelledby': 'map-color-key-heading' })}
+      {...(embedded ? { 'aria-label': 'Map key' } : { 'aria-labelledby': 'map-color-key-heading' })}
     >
       {embedded ? null : (
         <div className="ds-explore-stage__panel-header">
           <h3 className="ds-explore-legend__subhead" id="map-color-key-heading">
-            Color key
+            Map key
           </h3>
           {onHide ? (
             <button
@@ -199,6 +148,45 @@ function MapColorKey(props: {
       )}
       <ul className="ds-explore-legend__kind-list">
         <li>
+          <MarkSwatch size={8} fill={plate.markInk} stroke={plate.markInk} strokeWidth={0} />
+          <span>Placed at the site</span>
+        </li>
+        <li>
+          <MarkSwatch size={14} fill="transparent" stroke={plate.markInk} strokeWidth={1.5} />
+          <span>Placed to the neighborhood or city</span>
+        </li>
+        <li>
+          <span className="ds-legend-tag" aria-hidden="true">
+            3 statewide
+          </span>
+          <span>Placed to the county or state, counted at the state label</span>
+        </li>
+        <li>
+          <MarkSwatch
+            size={10}
+            fill={DIGNITY_PALETTE.point}
+            stroke={plate.selectedHalo}
+            strokeWidth={2}
+          />
+          <span>Selected record</span>
+        </li>
+      </ul>
+      <p className="ds-explore-legend__note">Groups of nearby records</p>
+      <ul className="ds-explore-legend__kind-list">
+        {GROUP_SIZE_ROWS.map(([label, radius]) => (
+          <li key={label}>
+            <MarkSwatch
+              size={radius * 2}
+              fill={plate.groupFill}
+              stroke={plate.groupStroke}
+              strokeWidth={1}
+            />
+            <span>{label}</span>
+          </li>
+        ))}
+      </ul>
+      <ul className="ds-explore-legend__kind-list">
+        <li>
           <LineSwatch color={plate.stateBounds} />
           <span>State outline</span>
         </li>
@@ -206,47 +194,14 @@ function MapColorKey(props: {
           <LineSwatch color={plate.countyLine} />
           <span>County line</span>
         </li>
-        <li>
-          <LineSwatch color={DIGNITY_PALETTE.point} />
-          <span>Selected state</span>
-        </li>
-      </ul>
-      <p className="ds-explore-legend__note">Record kind groups</p>
-      <ul className="ds-explore-legend__kind-list">
-        {KIND_FAMILY_ENTRIES.map(([family, entry]) => (
-          <li key={family}>
-            <LegendSwatch glyph={entry.glyph} shade={entry.shade} />
-            <span>
-              {entry.label}{' '}
-              <span className="ds-explore-legend__kind-glyph-name">
-                ({entry.glyph} → {KIND_GLYPH_MAP_ECHO[entry.glyph]})
-              </span>
-            </span>
-          </li>
-        ))}
-      </ul>
-      <p className="ds-explore-legend__note">
-        Historical tones (shade only; shape stays with kind)
-      </p>
-      <ul className="ds-explore-legend__kind-list">
-        {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
-          <li key={tone}>
-            <ToneSwatch shade={entry.shade} />
-            <span>{entry.label}</span>
-          </li>
-        ))}
       </ul>
       {layerMode === 'presence' ? (
         <>
-          <p className="ds-explore-legend__note">Record presence by state</p>
+          <p className="ds-explore-legend__note">Record density by state</p>
           <ul className="ds-explore-legend__kind-list">
             {PRESENCE_TIER_ROWS.map(([tier, label]) => (
               <li key={tier}>
-                <span
-                  className="ds-legend-glyph ds-legend-glyph--circle"
-                  style={{ backgroundColor: DENSITY_TIER_FILL[tier] }}
-                  aria-hidden="true"
-                />
+                <TierSwatch color={DENSITY_TIER_FILL[tier]} />
                 <span>{label}</span>
               </li>
             ))}
@@ -261,11 +216,7 @@ function MapColorKey(props: {
           <ul className="ds-explore-legend__kind-list">
             {SHARE_TIER_ROWS.map(([tier, label]) => (
               <li key={tier}>
-                <span
-                  className="ds-legend-glyph ds-legend-glyph--circle"
-                  style={{ backgroundColor: POPULATION_SHARE_TIER_FILL[tier] }}
-                  aria-hidden="true"
-                />
+                <TierSwatch color={POPULATION_SHARE_TIER_FILL[tier]} />
                 <span>{label}</span>
               </li>
             ))}
@@ -281,85 +232,36 @@ function MapColorKey(props: {
             {CHANGE_TIER_ROWS.map(([tier, label]) => (
               <li key={tier}>
                 <span aria-hidden="true">{POPULATION_CHANGE_TIER_GLYPH[tier]} </span>
-                <span
-                  className="ds-legend-glyph ds-legend-glyph--circle"
-                  style={{ backgroundColor: POPULATION_CHANGE_TIER_FILL[tier] }}
-                  aria-hidden="true"
-                />
+                <TierSwatch color={POPULATION_CHANGE_TIER_FILL[tier]} />
                 <span>{label}</span>
               </li>
             ))}
           </ul>
         </>
       ) : null}
-      <p className="ds-explore-legend__note">Marker size (single records)</p>
-      <div className="ds-explore-legend__size-scale" aria-hidden="true">
-        {SIZE_SCALE_STEPS.map((diameter) => (
-          <span
-            key={diameter}
-            className="ds-explore-legend__size-dot"
-            style={{ width: diameter, height: diameter }}
-          />
-        ))}
-      </div>
-      <p className="ds-explore-legend__note">
-        Larger discs mean more accepted claims on that record ({MARKER_RADIUS_MIN} to{' '}
-        {MARKER_RADIUS_MAX}px at locality zoom). Confidence is separate below.
-      </p>
-      <p className="ds-explore-legend__note">Cluster size (Group nearby on)</p>
-      <ul className="ds-explore-legend__kind-list">
-        {CLUSTER_SIZE_ROWS.map(([label, radius]) => (
-          <li key={label}>
-            <span
-              className="ds-explore-legend__size-dot"
-              style={{ width: radius, height: radius }}
-              aria-hidden="true"
-            />
-            <span>{label}</span>
-          </li>
-        ))}
-      </ul>
-      <p className="ds-explore-legend__note">Evidence confidence (glyph + color)</p>
-      <ul className="ds-explore-legend__kind-list">
-        {CONFIDENCE_TIER_ROWS.map(([tier, label]) => (
-          <li key={tier}>
-            <span style={{ color: CONFIDENCE_TIER_COLOR[tier] }} aria-hidden="true">
-              {CONFIDENCE_TIER_GLYPH[tier]}{' '}
-            </span>
-            <span>{label}</span>
-          </li>
-        ))}
-      </ul>
-      <p className="ds-explore-legend__note">
-        Five kind-group colors pair with shape signatures; historical tones override shade only.
-        Color is never the only signal.
-      </p>
     </div>
   );
 }
 
 export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
   const defaultCollapsed = props.defaultCollapsed ?? false;
-  const layerMode = props.layerMode ?? 'presence';
+  const layerMode = props.layerMode ?? 'off';
   const popGeo = props.popGeo ?? 'county';
   const onHide = props.onHide;
   const embedded = props.embedded ?? false;
-  const [colorScheme, setColorScheme] = useState<MapColorScheme>(() =>
-    initialColorScheme(props.colorScheme),
-  );
+  // SSR and first paint use the override or light; the live theme is read after mount, so the
+  // swatches never differ between server and client.
+  const [colorScheme, setColorScheme] = useState<MapColorScheme>(props.colorScheme ?? 'light');
 
   useEffect(() => {
     if (props.colorScheme) {
       setColorScheme(props.colorScheme);
       return;
     }
-    // After mount only — matches the live theme without SSR/CSR divergence.
     const sync = () => setColorScheme(readDocumentColorScheme());
     sync();
     const observer = new MutationObserver((mutations) => {
-      if (mutations.some((mutation) => mutation.attributeName === 'data-theme')) {
-        sync();
-      }
+      if (mutations.some((mutation) => mutation.attributeName === 'data-theme')) sync();
     });
     observer.observe(document.documentElement, {
       attributes: true,
@@ -382,126 +284,39 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
           Reading this map
         </summary>
         <div className="ds-explore-legend__body">
-          <section aria-labelledby="explore-legend-kind-heading">
-            <h3 className="ds-explore-legend__subhead" id="explore-legend-kind-heading">
-              Kind groups
-            </h3>
-            <p className="ds-explore-legend__note">
-              Color marks one of five kind groups on the map (People, Places, Organizations, Events,
-              Sources). Micro-kinds inside a group share that shade; shape still follows the
-              specific kind (circle, square, diamond, or ring rim signatures on the canvas).
-            </p>
-            <ul className="ds-explore-legend__kind-list">
-              {KIND_FAMILY_ENTRIES.map(([family, entry]) => (
-                <li key={family}>
-                  <LegendSwatch glyph={entry.glyph} shade={entry.shade} />
-                  <span className="ds-explore-legend__kind-label">
-                    {entry.label}{' '}
-                    <span className="ds-explore-legend__kind-glyph-name">
-                      ({entry.kinds.join(', ')})
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section aria-labelledby="explore-legend-tone-heading">
-            <h3 className="ds-explore-legend__subhead" id="explore-legend-tone-heading">
-              Historical tones
-            </h3>
-            <p className="ds-explore-legend__note">
-              When topic tags or the record title identify a massacre, plantation, or Black
-              epicenter (for example Tulsa&rsquo;s Greenwood / Black Wall Street), the marker shade
-              follows that tone while keeping the record&rsquo;s kind shape. Use the Tone filter to
-              show only those records. A tone may be rare in the current catalog until matching
-              titles or topics are present.
-            </p>
-            <ul className="ds-explore-legend__kind-list">
-              {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
-                <li key={tone}>
-                  <ToneSwatch shade={entry.shade} />
-                  <span className="ds-explore-legend__kind-label">
-                    {entry.label}{' '}
-                    <span className="ds-explore-legend__kind-glyph-name">(shade only)</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section aria-labelledby="explore-legend-size-heading">
-            <h3 className="ds-explore-legend__subhead" id="explore-legend-size-heading">
-              Size
-            </h3>
-            <div className="ds-explore-legend__size-scale" aria-hidden="true">
-              {SIZE_SCALE_STEPS.map((diameter) => (
-                <span
-                  key={diameter}
-                  className="ds-explore-legend__size-dot"
-                  style={{ width: diameter, height: diameter }}
-                />
-              ))}
-            </div>
-            <p className="ds-explore-legend__note">
-              A larger marker means more accepted claims on that record &mdash; small does not mean
-              less true, only less evidenced so far. Cluster discs grow with the number of records
-              grouped at that zoom. Confidence is shown separately (glyph + green-to-orange color),
-              never by size alone.
-            </p>
-          </section>
-
           <dl className="ds-explore-legend__list">
             <div>
-              <dt>Points</dt>
+              <dt>Marks</dt>
               <dd>
-                A shaded circle around a marker is a radius affordance, not a boundary &mdash; it
-                shows how precisely the location is known, never an exact address.
+                A mark is drawn only as precisely as the archive can place the record. A dot is the
+                site itself. A ring is a neighborhood or a city, never a street corner. A record
+                known only to its county or state gets no mark: it is counted in the tag under that
+                state&rsquo;s label.
               </dd>
             </div>
             <div>
-              <dt>Clusters</dt>
+              <dt>Groups</dt>
               <dd>
-                When &ldquo;Group nearby&rdquo; is on, a number inside a marker means several
-                records share this map location at the current zoom. Tap a cluster to zoom in until
-                it splits; open a single pin or list row when you are ready to read one record. Turn
-                grouping off to see every disc even when zoomed out.
+                A numbered circle holds several nearby records at this zoom. Select it to zoom in
+                until it splits. A group never says where any one record is.
               </dd>
             </div>
             <div>
-              <dt>Opening a record</dt>
+              <dt>Kind</dt>
               <dd>
-                Activating a pin or a list row opens the full entity page &mdash; evidence, context,
-                and chronology &mdash; not a floating preview card on the map.
+                Kind is shown in the list and in the record, not by the color of a mark. Copper
+                marks the record you selected.
               </dd>
             </div>
             <div>
-              <dt>Streets</dt>
-              <dd>
-                Road lines and names appear as you zoom in (roughly city scale and closer) so places
-                can be read against a street network, not only state outlines.
-              </dd>
-            </div>
-            <div>
-              <dt>State labels</dt>
-              <dd>
-                Two-letter state abbreviations orient the national and regional view. The selected
-                state&rsquo;s label turns copper; labels fade out as you zoom into a state.
-              </dd>
-            </div>
-            <div>
-              <dt>County names</dt>
-              <dd>County names fade in with county lines as you zoom past the national frame.</dd>
-            </div>
-            <div>
-              <dt>Map data model</dt>
+              <dt>Area layers</dt>
               <dd>
                 {layerMode === 'off' ? (
-                  <>Choose a model in the toolbar to shade geography beneath the pins.</>
+                  <>No area shading is on. Record density and population layers are optional.</>
                 ) : layerMode === 'presence' ? (
                   <>
-                    States are shaded by how many documented records they contain: presence of
-                    evidence in this archive, not incidents, severity, or population counts.
+                    States are shaded by how many documented records this archive holds there. It
+                    shows where the archive has reached so far, not where history happened.
                   </>
                 ) : layerMode === 'blackShare' ? (
                   <>
@@ -512,51 +327,17 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
                 ) : (
                   <>
                     {popGeo === 'state' ? 'States' : 'Counties'} are shaded by change in Black share
-                    between the selected decades; copper tones mark gain, stone tones mark loss.
-                    Arrows in the tier list are a second signal; color is never the only cue.
+                    between the selected decades. Arrows in the tier list are a second signal; color
+                    is never the only cue.
                   </>
                 )}
               </dd>
             </div>
-            {layerMode === 'presence' ? (
-              <div>
-                <dt>Record presence shading</dt>
-                <dd>
-                  Darker copper means more documented records in a state, never more danger, never a
-                  claim that a lighter state lacks history. See the color key above for the three
-                  presence tiers.
-                </dd>
-              </div>
-            ) : null}
-            {layerMode === 'blackShare' ? (
-              <div>
-                <dt>Black population share tiers</dt>
-                <dd>See the color key above for the share tiers and labels.</dd>
-              </div>
-            ) : null}
-            {layerMode === 'blackChange' ? (
-              <div>
-                <dt>Black share change tiers</dt>
-                <dd>See the color key above for gain and loss tiers with arrow glyphs.</dd>
-              </div>
-            ) : null}
             <div>
-              <dt>Confidence</dt>
+              <dt>Streets</dt>
               <dd>
-                <span style={{ color: CONFIDENCE_TIER_COLOR.high }} aria-hidden="true">
-                  {CONFIDENCE_TIER_GLYPH.high}
-                </span>{' '}
-                High (green),{' '}
-                <span style={{ color: CONFIDENCE_TIER_COLOR.medium }} aria-hidden="true">
-                  {CONFIDENCE_TIER_GLYPH.medium}
-                </span>{' '}
-                medium (olive),{' '}
-                <span style={{ color: CONFIDENCE_TIER_COLOR.low }} aria-hidden="true">
-                  {CONFIDENCE_TIER_GLYPH.low}
-                </span>{' '}
-                low (orange), and <span aria-hidden="true">{CONFIDENCE_TIER_GLYPH.unrated}</span>{' '}
-                unrated reflect how strongly the strongest accepted claim on a record is evidenced
-                &mdash; shown as a glyph, a word, and a color ramp, never color alone.
+                Road lines and names appear as you zoom in, so places can be read against a street
+                network, not only state outlines.
               </dd>
             </div>
           </dl>

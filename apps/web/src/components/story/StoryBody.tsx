@@ -237,10 +237,6 @@ function Block({
               lat={block.lat}
               lng={block.lng}
               precision={block.precision}
-              kind={block.kind}
-              topicTags={block.topicTags}
-              displayName={block.displayName}
-              {...(block.topicIds !== undefined ? { topicIds: block.topicIds } : {})}
             />
           </div>
         </ArtifactDrawer>

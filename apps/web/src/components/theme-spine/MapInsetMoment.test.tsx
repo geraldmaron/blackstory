@@ -1,14 +1,12 @@
 /**
- * Unit coverage for the theme-spine MapInsetMoment.
- *
- * SP-08 turned this from a second MapLibre mount into an adapter over the room kit's `MapMoment`:
- * it contributes a slot the persistent plate moves into, and the Explore hand-off built from the
- * block's `entityId`. The assertions follow — what is checked is the caption, the hand-off URL and
- * the absence of a second map, not a panel's aria-label.
+ * Unit coverage for the theme-spine MapInsetMoment: a chapter's map inset is the shared
+ * RecordMap, framed by the record's stored precision, with one hand-off into /explore.
  */
 
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MapInsetMoment } from './MapInsetMoment';
@@ -24,60 +22,28 @@ const baseProps = {
 };
 
 describe('MapInsetMoment', () => {
-  it('renders the place as the moment caption, which carries the point without a map', () => {
+  it('renders the place and its precision in words as server HTML', () => {
     const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
+    assert.match(html, /<figure class="ds-record-map">/);
     assert.match(html, /Fifteenth Street Presbyterian Church/);
-    assert.match(html, /ds-mapmoment__caption/);
-  });
-
-  it('contributes a slot rather than building a second map', () => {
-    const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
-    assert.match(html, /ds-mapmoment__plate/);
-    // Server-rendered with no stage above it, the moment states the degrade rather than showing
-    // an empty rectangle. This is also exactly what a reader with no JavaScript gets.
-    assert.match(html, /The map is unavailable\. The caption below carries the point\./);
+    assert.match(html, /Placed to the neighborhood/);
   });
 
   it('links into /explore with the entity pre-selected via the shared selected= convention', () => {
     const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
-    assert.match(html, /href="\/explore\?[^"]*selected=ent_15th_st_church_001[^"]*"/);
+    assert.match(
+      html,
+      /href="\/explore\?[^"]*selected=ent_15th_st_church_001[^"]*">Open on the map</,
+    );
   });
 
-  it('derives PLATE - STILL from a violence-adjacent entity, with no plain prop set at the call site (SP-26)', () => {
-    const html = renderToStaticMarkup(
-      <MapInsetMoment
-        {...baseProps}
-        kind="event"
-        topicTags={['Lynching']}
-        displayName="Duluth lynchings"
-      />,
+  it('never moves its own camera, so no inset can dramatize a place (P-04)', () => {
+    const source = readFileSync(
+      fileURLToPath(new URL('../map-embed/RecordMap.tsx', import.meta.url)),
+      'utf8',
     );
-    assert.match(html, /data-plain="1"/);
-    assert.match(html, /Plate · Still/);
-  });
-
-  it('stays PLATE - LIVE for a non-violent entity, and for no subject at all', () => {
-    const withNeutralSubject = renderToStaticMarkup(
-      <MapInsetMoment {...baseProps} kind="place" topicTags={['museum']} />,
-    );
-    assert.match(withNeutralSubject, /Plate · Live/);
-
-    const withNoSubject = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
-    assert.match(withNoSubject, /Plate · Live/);
-  });
-
-  it('renders identically regardless of theme class on an ancestor (both themes safe)', () => {
-    const light = renderToStaticMarkup(
-      <div data-theme="light">
-        <MapInsetMoment {...baseProps} />
-      </div>,
-    );
-    const dark = renderToStaticMarkup(
-      <div data-theme="dark">
-        <MapInsetMoment {...baseProps} />
-      </div>,
-    );
-    assert.match(light, /ds-mapmoment/);
-    assert.match(dark, /ds-mapmoment/);
+    assert.doesNotMatch(source, /\.(flyTo|easeTo|fitBounds)\(/);
+    assert.match(source, /zoomForLocationPrecision\(precision\)/);
+    assert.match(source, /cooperativeGestures: true/);
   });
 });

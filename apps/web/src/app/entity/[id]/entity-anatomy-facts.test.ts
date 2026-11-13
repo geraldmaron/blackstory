@@ -53,13 +53,13 @@ test('buildEntityAnatomyPlace returns undefined without geo anchor', () => {
   assert.equal(buildEntityAnatomyPlace(entity, undefined), undefined);
 });
 
-test('buildEntityAnatomyPlace carries precision caption when geo exists', () => {
+test('buildEntityAnatomyPlace carries the stored precision when geo exists', () => {
   const entity = requireEntity('ent_15th_st_church_001');
   const anchor = entity.geoAnchor ?? { lat: 38.9, lng: -77.0 };
   const place = buildEntityAnatomyPlace(entity, anchor);
   assert.ok(place);
   assert.equal(place.lat, anchor.lat);
-  assert.ok(place.precisionCaption);
+  assert.equal(place.precision, entity.locationPrecision);
   assert.equal(place.label, buildEntityAnatomyInputs(entity, undefined).whereLabel);
 });
 

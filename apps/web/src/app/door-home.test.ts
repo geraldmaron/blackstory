@@ -201,7 +201,7 @@ test('the Door and Explore rest on one national-field patch', () => {
     fileURLToPath(new URL('./explore/AtlasExperience.tsx', import.meta.url)),
     'utf8',
   );
-  assert.match(field, /NATIONAL_FIELD_GROUPING = true/);
+  assert.match(field, /clusteringEnabled: true,/);
   assert.match(mapSync, /nationalFieldPatch\(/);
   assert.match(atlas, /nationalFieldPatch\(/);
 });
@@ -347,10 +347,5 @@ test('a reader without a plate is told so, where the map would be, and sent to t
     /<noscript>[\s\S]*ds-door__noscript[\s\S]*href="\/records"[\s\S]*<\/noscript>/,
   );
   assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);
-  // On a phone the captions hide, but the note must not.
-  assert.match(
-    css,
-    /@media \(max-width: 899px\)[\s\S]*\.ds-door__field-caption\s*\{\s*display:\s*none/,
-  );
   assert.doesNotMatch(css, /\.ds-door__field-chrome\s*\{\s*display:\s*none/);
 });

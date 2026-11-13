@@ -8,19 +8,19 @@ export const EXPLORE_CLUSTER_CONFIG = {
   /** Pixel radius for grouping nearby points — tighter than default so metro clouds collapse. */
   clusterRadius: 52,
   /**
-   * Keep aggregates through state/locality; individuals emerge past this zoom.
-   * Must stay below `MAP_MAX_ZOOM` so expansion flights remain inside the envelope.
+   * Groups hold through state and regional zoom; individual records emerge past this. Below
+   * `zoomForLocationPrecision('city')` (10), so a framed city or finer record always draws as
+   * its own mark and never hides inside a group.
    */
-  clusterMaxZoom: 12,
+  clusterMaxZoom: 9,
   clusterMinPoints: 2,
 } as const;
 
-/** Cluster disc radii by point_count, then scaled by zoom in explore-style (national shrink). */
+/** Group circle radii by point_count: three steps, no zoom scaling, no color. */
 export const CLUSTER_RADIUS_BY_COUNT: ReadonlyArray<readonly [minCount: number, radius: number]> = [
-  [0, 10],
-  [10, 14],
-  [50, 18],
-  [200, 22],
+  [0, 11],
+  [10, 15],
+  [100, 20],
 ];
 
 /** OpenFreeMap vector tiles + fonts — free street basemap under the archive layers. */
@@ -54,7 +54,6 @@ export const DIGNITY_PALETTE = {
   point: brandPalette.copperPin,
   pointHalo: brandPalette.pageSand,
   cluster: brandPalette.copperInk,
-  clusterText: brandPalette.archivePaper,
   densityLow: 'rgba(184, 107, 42, 0.12)',
   densityMid: 'rgba(184, 107, 42, 0.28)',
   densityHigh: 'rgba(184, 107, 42, 0.5)',
@@ -211,7 +210,16 @@ export function plateForScheme(scheme: MapColorScheme) {
       streetCasing: DIGNITY_PALETTE.streetCasingLight,
       street: DIGNITY_PALETTE.streetLight,
       streetLabel: DIGNITY_PALETTE.streetLabelLight,
-      clusterText: DIGNITY_PALETTE.selectedDark,
+      /** Single records: ink on the paper land. */
+      markInk: '#2A2622',
+      /** Groups: paper circles with an ink hairline and an ink count. Never copper. */
+      groupFill: brandPalette.archivePaper,
+      groupStroke: '#8C857A',
+      groupText: brandPalette.blackInk,
+      /** Jurisdiction tags: quiet, the same register as the state labels. */
+      tagText: '#6D675F',
+      /** On paper land a paper halo vanishes; ink keeps the selected mark's edge. */
+      selectedHalo: brandPalette.blackInk,
       /** State bounds. `line` is contrast-held against `land` by design law §3. */
       stateBounds: mapPalettes.light.line,
       /**
@@ -249,7 +257,14 @@ export function plateForScheme(scheme: MapColorScheme) {
     streetCasing: DIGNITY_PALETTE.streetCasingDark,
     street: DIGNITY_PALETTE.streetDark,
     streetLabel: DIGNITY_PALETTE.streetLabelDark,
-    clusterText: DIGNITY_PALETTE.selectedDark,
+    /** Single records: paper on the ink land. */
+    markInk: brandPalette.archivePaper,
+    /** Groups: the inverse, ink on paper. Never copper. */
+    groupFill: '#E9E3D7',
+    groupStroke: '#E9E3D7',
+    groupText: brandPalette.blackInk,
+    tagText: '#A39B8F',
+    selectedHalo: brandPalette.archivePaper,
     stateBounds: mapPalettes.dark.line,
     /** Local, for the reason given on the light branch: §3 has no county role. */
     countyLine: DIGNITY_PALETTE.selected,
@@ -365,7 +380,6 @@ export function plateOverImagery(scheme: MapColorScheme): MapPlate {
       countryBounds: brandPalette.blackInk,
       stateBounds: brandPalette.blackInk,
       countyLine: brandPalette.blackInk,
-      clusterText: brandPalette.blackInk,
     } as const;
   }
   return {
@@ -379,7 +393,6 @@ export function plateOverImagery(scheme: MapColorScheme): MapPlate {
     countryBounds: brandPalette.archivePaper,
     stateBounds: brandPalette.archivePaper,
     countyLine: brandPalette.archivePaper,
-    clusterText: brandPalette.archivePaper,
   } as const;
 }
 

@@ -20,24 +20,16 @@ export const EXPLORE_CLUSTER_INCOMING_LAYER_ID = 'explore-clusters-incoming';
 
 export const EXPLORE_CLUSTER_COUNT_LAYER_ID = 'explore-cluster-count';
 export const EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID = 'explore-cluster-count-incoming';
-/** Precision-radius affordance circle (geoPrecisionTier / radiusMeters) — the shaded circle the
- * Size legend and `NarrativeCard`'s `radiusAffordanceLabel` describe, painted under the halo/point
- * so it reads as ground the marker sits on, not another marker. Renders only for features
- * carrying a resolved `radiusMeters` (`resolveDisplayRadiusMeters`'s fail-closed `ok: false`
- * tiers get no ring at all, never a guessed one). */
-export const EXPLORE_PRECISION_RADIUS_LAYER_ID = 'explore-point-precision-radius';
-export const EXPLORE_UNCLUSTERED_HALO_LAYER_ID = 'explore-point-halo';
-export const EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID = 'explore-point-halo-incoming';
+/** Every drawn record: a dot at the site, a hollow ring at the neighborhood or city. */
 export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
 export const EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID = 'explore-point-incoming';
-/** the `event` kind's "diamond" glyph approximation — a second thin, unfilled ring
- * offset around the point marker (see kind-encoding.ts's module doc for why this is an
- * approximation rather than literal diamond geometry). */
-export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID = 'explore-point-event-glyph';
-export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID =
-  'explore-point-event-glyph-incoming';
-/** Copper orientation ring for the currently selected entity (not a heat signal). */
+/** Copper fill with a paper halo for the currently selected record. */
 export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
+/** County- and state-precision records, counted at the state's label point ("3 statewide"). */
+export const EXPLORE_JURISDICTION_TAGS_SOURCE_ID = 'explore-jurisdiction-tags';
+export const EXPLORE_JURISDICTION_TAG_LAYER_ID = 'explore-jurisdiction-tag';
+/** The tag that counts the selected record, in copper. */
+export const EXPLORE_SELECTED_TAG_LAYER_ID = 'explore-jurisdiction-tag-selected';
 export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';
 export const EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID = 'explore-state-density-fill-incoming';
 /**

@@ -19,9 +19,8 @@
   }
 }
 
-/* The place block's own layout moved to `record-locator.css`, which `RecordPlacePreview` imports
-   itself. What stays here is the empty state, which this panel renders when a record has no
-   anchor at all and the preview component is never mounted. */
+/* The place block is `RecordMap`, which styles itself. What stays here is the empty state, which
+   this panel renders when a record has no anchor at all. */
 .ds-record-anatomy__place--empty {
   align-items: center;
   justify-content: center;
@@ -126,15 +125,5 @@
 
 /* Quieter kind glyph in anatomy context; evidence tier colors stay on the glyph. */
 .ds-record-anatomy .ds-edition-fact-icon--kind-muted {
-  color: var(--ds-ink-muted);
-}
-
-.ds-record-anatomy__precision {
-  margin: 0;
-  padding: var(--ds-space-2) var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  line-height: 1.45;
   color: var(--ds-ink-muted);
 }

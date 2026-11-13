@@ -182,8 +182,8 @@ test('no status or skin framing in kind labels or legend prose', () => {
   );
   assert.match(
     renderedProse,
-    /kind groups/i,
-    'the legend must state that color encodes kind groups (and historical tones)',
+    /not by the color of a mark/,
+    'the legend must state that mark color does not encode kind',
   );
 });
 

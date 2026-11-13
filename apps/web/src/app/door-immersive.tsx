@@ -33,11 +33,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  clearPinContinuity,
-  readPinContinuity,
-  savePinContinuity,
-} from '../lib/discovery/pin-continuity';
+import { savePinContinuity } from '../lib/discovery/pin-continuity';
 import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';
 import type { StateDensityLevel } from '../lib/map-experience/density';
 import { CAMERA_EASING_SLOW_OUT } from '../lib/map-experience/camera-presets';
@@ -804,44 +800,10 @@ export function DoorImmersive({
     [measureFrameBoxes, stage],
   );
 
-  /** Chapter camera. The chapter's own MapLibre spec, flown the way the Explore story flies it.
-   * Pin continuity wins the first frame when returning from a record, then clears. */
+  /** Chapter camera. The chapter's own MapLibre spec, flown the way the Explore story flies it. */
   const camera: DoorFocusCamera = focus.camera;
-  const continuityRestoredRef = useRef(false);
   useEffect(() => {
     if (!plateLive) return;
-    if (!continuityRestoredRef.current) {
-      const saved = readPinContinuity();
-      if (saved) {
-        continuityRestoredRef.current = true;
-        const map = stage.getMap();
-        if (map) {
-          map.stop();
-          const zoom = saved.zoom ?? 10.5;
-          const target = {
-            center: [saved.lng, saved.lat] as [number, number],
-            zoom,
-            pitch: 0,
-            bearing: 0,
-          };
-          if (firstFrameRef.current || prefersReducedMotion()) {
-            map.easeTo({ ...target, duration: 0 } as never);
-          } else {
-            map.flyTo({
-              ...target,
-              duration: CHAPTER_FLIGHT_MS,
-              curve: CAMERA_FLY_CURVE,
-              easing: CAMERA_EASING_SLOW_OUT,
-              essential: false,
-            } as never);
-          }
-          firstFrameRef.current = false;
-          setFramed(true);
-          clearPinContinuity();
-          return;
-        }
-      }
-    }
     /*
      * Browse skips journey framing (`applyCamera` returns false while armed) because Atlas owns
      * the camera. Cold `/explore` mounts already in browse, so without this path `framed` never
@@ -856,7 +818,7 @@ export function DoorImmersive({
     if (!applyCamera(firstFrameRef.current)) return;
     firstFrameRef.current = false;
     setFramed(true);
-  }, [applyCamera, camera, plateLive, stage]);
+  }, [applyCamera, camera, plateLive]);
 
   /**
    * Re-frame when the map window or the canvas changes: a window resize, the bar wrapping, a
@@ -917,34 +879,46 @@ export function DoorImmersive({
     return byId;
   }, [pins]);
   /*
-   * Clicking an entity while the cinematic journey is playing means "stop the tour, show me
-   * that one" — the same thing every other pin click on this map already does once Explore owns
-   * it (`useRecordSelection`: "Pin clicks stay on the plate and open the record sheet"), not a
-   * navigation away. Previously this called `openDoorPin`, which not only never toggled journey
-   * mode off but for `/door/pin/*` targets did a hard `window.location.assign` — the most
-   * jarring possible exit, and the reported bug. Save continuity exactly as that navigation
-   * always did, then hand off to the existing smooth browse-mode transition (`enterBrowse`,
-   * door-home.css's `--ds-door-browse-ms` morph) instead. `AtlasExperience`'s own
-   * continuity-restore effect (`pin-continuity.ts`) picks the saved pin up once it mounts and
-   * opens that entity's record sheet — the same map, no page navigation.
+   * Clicking an entity while the journey is playing means "stop the tour, show me that one": the
+   * same selection every pin click on this map makes. The Door saves the pin, hands off to browse
+   * (`enterBrowse`, the same plate, no navigation), and Explore restores it through the one
+   * `frameRecord` contract. Overlapping pins hand off as a group and open the chooser.
    */
-  useEffect(
-    () =>
-      stage.subscribe('select', (entityId) => {
-        if (browseModeRef.current) return;
-        const href = hrefByPinId.get(entityId);
-        const feature = pins.features.find((row) => row.properties.entityId === entityId);
-        if (!href || !feature) return;
-        savePinContinuity({
-          entityId,
-          lng: feature.geometry.coordinates[0]!,
-          lat: feature.geometry.coordinates[1]!,
-          label: feature.properties.displayName,
-        });
-        enterBrowse();
-      }),
-    [enterBrowse, hrefByPinId, pins.features, stage],
-  );
+  useEffect(() => {
+    const pinFor = (entityId: string) => {
+      const feature = pins.features.find((row) => row.properties.entityId === entityId);
+      return feature
+        ? {
+            pinId: entityId,
+            lng: feature.geometry.coordinates[0]!,
+            lat: feature.geometry.coordinates[1]!,
+            label: feature.properties.displayName,
+          }
+        : null;
+    };
+    const offSelect = stage.subscribe('select', (entityId) => {
+      if (browseModeRef.current || !hrefByPinId.has(entityId)) return;
+      const pin = pinFor(entityId);
+      if (!pin) return;
+      savePinContinuity({ entityId, lng: pin.lng, lat: pin.lat, label: pin.label });
+      enterBrowse();
+    });
+    const offOverlap = stage.subscribe('overlap', (entityIds) => {
+      if (browseModeRef.current) return;
+      const overlap = entityIds
+        .map(pinFor)
+        .filter((pin): pin is NonNullable<typeof pin> => pin !== null)
+        .map(({ pinId, lng, lat }) => ({ pinId, lng, lat }));
+      const first = overlap[0];
+      if (!first) return;
+      savePinContinuity({ entityId: first.pinId, lng: first.lng, lat: first.lat, overlap });
+      enterBrowse();
+    });
+    return () => {
+      offSelect();
+      offOverlap();
+    };
+  }, [enterBrowse, hrefByPinId, pins.features, stage]);
 
   /** Pin photos rise from live markers. */
   const [pinPhotoTarget, setPinPhotoTarget] = useState<PinPhotoHoverTarget | null>(null);
@@ -1002,14 +976,7 @@ export function DoorImmersive({
       >
         {/* The map window. Measured for the camera frame (door-field-frame.ts); the plate shows
             through it once this mount has framed it. Nothing is drawn in it. */}
-        <div className="ds-door__window" ref={windowRef} aria-hidden="true">
-          {/* Phones only (door-home.css): the band above the opening sheet is the map, and a tap
-              on it opens the full-screen map (the click handler on the journey). Decorative —
-              "Browse the map" is the labelled control for the same action. */}
-          {browseMode || plateUnavailable ? null : (
-            <span className="ds-door__tap-hint">Tap to explore the map</span>
-          )}
-        </div>
+        <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
         <div className="ds-door__field-chrome" ref={chromeRef}>
           {plateUnavailable ? (
             /* No WebGL: the journey chapters below still carry the visit. The field itself holds
@@ -1048,27 +1015,7 @@ export function DoorImmersive({
                 </p>
               )}
             </div>
-          ) : browseMode ? null : (
-            <>
-              {/* The count lives on the opening sheet; this is the plate's legend, nothing else. */}
-              <p className="ds-door__field-caption">
-                <span className="ds-door__legend ds-door__legend--ink" aria-hidden="true" />
-                click a pin
-                <span className="ds-door__legend ds-door__legend--walk" aria-hidden="true" />
-                walk
-              </p>
-              {/*
-                Rotation is available here (`gesture-lock.ts`'s ambient posture hands `dragRotate`
-                back on a precise pointer) but nothing said so, and the gesture a reader reaches
-                for first is a trackpad twist, which no browser outside Safari reports to a page
-                at all. Naming the modifier is the whole fix: shift plus a drag or a two-finger
-                swipe.
-              */}
-              <p className="ds-door__field-caption ds-door__field-caption--gesture">
-                shift + drag or swipe to turn the map
-              </p>
-            </>
-          )}
+          ) : null}
           {/*
             Arms browse on this plate. Not duplicated in the Find bar — Map is the destination;
             this CTA (and "Browse the map" on the sheets) is how you enter the filter posture.

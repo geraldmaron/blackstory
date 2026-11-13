@@ -7,10 +7,6 @@ import type { PublicEntityView } from '../../../data/public-seed';
 import { recordConfidenceTier } from '../../../lib/map-experience/build-explore-map-source';
 import { entityEraFact } from '../../../lib/map-experience/entity-era-facts';
 import { displayEncodingFor } from '../../../lib/map-experience/kind-encoding';
-import {
-  geoPrecisionTierForPublicPrecision,
-  radiusAffordanceLabel,
-} from '../../../lib/map-experience/geo-precision';
 import { resolvePublicAddressLine } from '../../../lib/geography/public-address';
 import { livedDecadeHrefForEra } from '../../../components/evidence/editorial-links';
 import type { ConfidenceTierKey } from '../../../lib/map-experience/confidence-icons';
@@ -114,7 +110,6 @@ export function buildEntityAnatomyPlace(
   if (!geoAnchor) {
     return undefined;
   }
-  const tier = geoPrecisionTierForPublicPrecision(entity.locationPrecision);
   return {
     lat: geoAnchor.lat,
     lng: geoAnchor.lng,
@@ -125,6 +120,6 @@ export function buildEntityAnatomyPlace(
       locationPrecision: entity.locationPrecision,
       kind: entity.kind,
     }),
-    precisionCaption: radiusAffordanceLabel(tier, undefined),
+    precision: entity.locationPrecision,
   };
 }

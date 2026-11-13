@@ -55,35 +55,6 @@
   pointer-events: none;
 }
 
-/* The cue for tap-to-explore. Only where the map is a backdrop the reader cannot otherwise reach:
-   a phone-width touch screen, once the live plate is showing through the band. Wider screens
-   show the "Browse the map" chip instead. */
-.ds-door__tap-hint {
-  display: none;
-}
-
-@media (pointer: coarse) and (max-width: 819px) {
-  .ds-door__field[data-plate='live'] .ds-door__tap-hint {
-    position: absolute;
-    left: 50%;
-    /* The opening sheet overlaps the window's lower edge by its rule and lip; sit above it. */
-    bottom: calc(var(--ds-space-3) + 20px);
-    display: inline-flex;
-    align-items: center;
-    min-height: 32px;
-    padding: var(--ds-space-1) var(--ds-space-3);
-    transform: translateX(-50%);
-    white-space: nowrap;
-    font-family: var(--ds-font-sans);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--ds-ink);
-    background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
-    border: var(--ds-border-width) solid var(--ds-border);
-    border-radius: var(--ds-radius-pill);
-  }
-}
-
 .ds-door__field-chrome {
   /* Fixed above the journey stack so Browse / captions stay hittable (field itself is z-0). */
   position: fixed;
@@ -98,24 +69,6 @@
   justify-content: flex-start;
   gap: var(--ds-space-3);
   pointer-events: none;
-}
-
-.ds-door__field-caption {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
-  margin: 0;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.03em;
-  line-height: 1.4;
-  color: var(--ds-ink-muted);
-  pointer-events: auto;
 }
 
 /*
@@ -322,22 +275,6 @@ html[data-door-browse='1'] .ds-door {
   }
 }
 
-/*
- * The rotate hint. Hidden wherever rotation is not actually handed back: the ambient posture
- * keeps a full gesture lock on a coarse primary pointer, because a one-finger drag on touch IS
- * the page's scroll (gesture-lock.ts). A hint for a gesture the plate refuses is worse than no
- * hint, so the media query matches the lock rather than restating it in prose.
- */
-.ds-door__field-caption--gesture {
-  text-transform: lowercase;
-}
-
-@media (pointer: coarse) {
-  .ds-door__field-caption--gesture {
-    display: none;
-  }
-}
-
 .ds-door__live {
   position: absolute;
   width: 1px;
@@ -348,24 +285,6 @@ html[data-door-browse='1'] .ds-door {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-.ds-door__legend {
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-}
-
-.ds-door__legend--ink {
-  background: color-mix(in srgb, var(--ds-ink) 62%, transparent);
-}
-
-.ds-door__legend--walk {
-  margin-left: var(--ds-space-2);
-  width: 0.625rem;
-  height: 0.625rem;
-  background: var(--ds-accent-graphic);
 }
 
 .ds-door__walk-rail {
@@ -1206,16 +1125,11 @@ body:has(.ds-door) .ds-door-journey {
     height: var(--ds-door-band);
   }
 
-  /* Captions are desktop chrome; Filters stays — phones need a path into the instrument. */
   .ds-door__field-chrome {
     top: var(--ds-space-2);
     left: var(--ds-space-2);
     right: var(--ds-space-2);
     justify-content: flex-end;
-  }
-
-  .ds-door__field-caption {
-    display: none;
   }
 
   .ds-door__filters {

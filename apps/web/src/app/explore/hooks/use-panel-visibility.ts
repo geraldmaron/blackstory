@@ -8,27 +8,17 @@ import {
 } from '../../../lib/layout/compact-viewport';
 
 /**
- * Which floating instruments are on screen. Four, not two: `decade` (the time panel) and `camera`
- * (the camera console) joined the pair because the narrow layout switches between all four rather
- * than stacking them — at 390px the console sat inside the results sheet's band and the readout
- * shared the dock's offset.
+ * Which floating instruments are on screen. Three, not two: `decade` (the time panel) joined the
+ * pair because the narrow layout switches between all three rather than stacking them.
  */
 export type PanelVisibility = {
   readonly lens: boolean;
   readonly results: boolean;
   readonly decade: boolean;
-  readonly camera: boolean;
 };
 
 /** Below this the instruments cannot all coexist; see `narrowLayout` and the panel CSS. */
 // (compact = narrow OR short; see lib/layout/compact-viewport.ts)
-
-/**
- * Above this the record sheet and the results rail both fit, so opening a record does not hide
- * the list it came from: 300 (lens) + 430 (sheet) + 344 (rail) + gutters. Kept in step with the
- * `min-width: 1150px` rule in `record-sheet.css`.
- */
-const BOTH_COLUMNS_BREAKPOINT = 1150;
 
 function isNarrowViewport(): boolean {
   return typeof window !== 'undefined' && isCompactViewport(window.innerWidth, window.innerHeight);
@@ -67,7 +57,7 @@ export function usePanelVisibility() {
   const [savedOpen, setSavedOpen] = useState(false);
   /**
    * All four open is the wide default. On a narrow viewport four panels would cover the plate
-   * between them, so only Lens (the filters) stays open; Results, Decade and Camera collapse
+   * between them, so only Lens (the filters) stays open; Results and Decade collapse
    * to the dock and the reader brings one in when asked. Landing on Explore with every panel
    * collapsed would leave a map with no visible controls. Lens is the instrument that remains
    * open at every width. Server-rendered as the wide layout and corrected after mount.
@@ -76,41 +66,31 @@ export function usePanelVisibility() {
     lens: true,
     results: true,
     decade: true,
-    // Camera console stays behind an explicit restore; landing with every copper instrument
-    // open made Explore feel like a second cockpit (plan.md decision 3).
-    camera: false,
   });
   const [narrow, setNarrow] = useState(false);
-  const [bothColumns, setBothColumns] = useState(false);
   const [chromeHidden, setChromeHidden] = useState(false);
 
   useEffect(() => {
     const query = window.matchMedia(COMPACT_MEDIA_QUERY);
-    const wideQuery = window.matchMedia(`(min-width: ${BOTH_COLUMNS_BREAKPOINT}px)`);
     const midQuery = window.matchMedia(SINGLE_SIDE_PANEL_MEDIA_QUERY);
     const sync = () => {
       const isNarrow = query.matches;
       const isMid = !isNarrow && midQuery.matches;
       setNarrow(isNarrow);
-      setBothColumns(wideQuery.matches);
-      setPanels((current) => ({
+      setPanels(() => ({
         // Compact opens map-first: the dock's Filters chip is one tap away, and a sheet covering
         // 40% of a phone on arrival hid the very map the reader came for.
         lens: !isNarrow,
         // Mid widths (tablet portrait) hold one side panel: two left a 140px strip of map.
         results: !isNarrow && !isMid,
         decade: !isNarrow,
-        // Preserve an explicit reader open; otherwise stay closed at rest.
-        camera: isNarrow ? false : current.camera,
       }));
     };
     sync();
     query.addEventListener('change', sync);
-    wideQuery.addEventListener('change', sync);
     midQuery.addEventListener('change', sync);
     return () => {
       query.removeEventListener('change', sync);
-      wideQuery.removeEventListener('change', sync);
       midQuery.removeEventListener('change', sync);
     };
   }, []);
@@ -123,7 +103,6 @@ export function usePanelVisibility() {
             lens: panel === 'lens',
             results: panel === 'results',
             decade: panel === 'decade',
-            camera: panel === 'camera',
           }
         : isSingleSidePanelViewport() && (panel === 'lens' || panel === 'results')
           ? {
@@ -147,7 +126,6 @@ export function usePanelVisibility() {
     panels,
     setPanels,
     narrow,
-    bothColumns,
     chromeHidden,
     setChromeHidden,
     showPanel,

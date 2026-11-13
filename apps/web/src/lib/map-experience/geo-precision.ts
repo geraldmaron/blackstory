@@ -17,11 +17,6 @@ import {
 } from '@repo/domain/geography/display-radius';
 import { US_STATES } from '@repo/domain/map/geography';
 
-const METERS_PER_MILE = 1609.344;
-const METERS_PER_FOOT = 0.3048;
-/** Below this span, user-facing copy uses feet; at/above, nearest quarter-mile. */
-const FEET_DISPLAY_CEILING_METERS = METERS_PER_MILE * 0.25;
-
 /** Finest-known public precision -> the GeoPrecisionTier its radius circle should render at.  */
 const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> = {
   address: 'exact-site',
@@ -42,26 +37,65 @@ export function geoPrecisionTierForPublicPrecision(publicPrecision: string): Geo
   return PUBLIC_PRECISION_TO_GEO_TIER[publicPrecision] ?? 'locality';
 }
 
+export type LocationPrecision =
+  'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
+
 /**
- * Camera zoom matched to a record's public precision.
+ * How a record is drawn on any map, decided by its stored public precision and nothing else.
  *
- * Moved here from `entity-location-map-style.ts` when SP-08 retired the second MapLibre instance
- * that module existed to style. It belongs with the rest of the precision vocabulary rather than
- * with any one map's paint: it is the same "never draw a point sharper than its source" rule the
- * radius resolver enforces, expressed as a camera rather than a circle. A county-precision record
- * that flew to z13 would show a street corner the archive never claimed.
+ * `dot` is a solid point (the archive holds the site), `ring` a hollow ring (it holds the
+ * neighborhood or city, never a street corner), and `none` draws no point at all (county or state
+ * precision: the record is counted in its jurisdiction tag instead). Kind never changes the mark.
+ * An unclassified precision fails soft to `ring`, the same posture as the radius tier above.
  */
-export function zoomForLocationPrecision(
-  precision:
-    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address',
-): number {
-  if (precision === 'state') return 6;
-  if (precision === 'county') return 8;
-  if (precision === 'city') return 10;
+export type RecordMark = 'dot' | 'ring' | 'none';
+
+const PRECISION_MARKS: Readonly<Record<string, RecordMark>> = {
+  address: 'dot',
+  site: 'dot',
+  institution: 'dot',
+  campus: 'dot',
+  neighborhood: 'ring',
+  city: 'ring',
+  county: 'none',
+  state: 'none',
+  country: 'none',
+};
+
+export function recordMarkFor(precision: string): RecordMark {
+  return PRECISION_MARKS[precision] ?? 'ring';
+}
+
+/** The precisions that draw each mark, for MapLibre `match` expressions built from this table. */
+export function precisionsWithMark(mark: RecordMark): string[] {
+  return Object.entries(PRECISION_MARKS)
+    .filter(([, value]) => value === mark)
+    .map(([precision]) => precision);
+}
+
+/** The precision as a reader reads it: where the archive can place this record. */
+export function precisionInWords(precision: string): string {
+  const mark = recordMarkFor(precision);
+  if (mark === 'dot') return 'Placed at the site';
+  if (precision === 'neighborhood') return 'Placed to the neighborhood';
+  if (precision === 'county') return 'Placed to the county';
+  if (precision === 'state' || precision === 'country') return 'Placed to the state';
+  return 'Placed to the city';
+}
+
+/**
+ * Camera zoom matched to a record's public precision: the zoom `frameRecord` lands on and the
+ * zoom every embedded RecordMap opens at. Exact 14 (the map's ceiling), neighborhood 12, city 10,
+ * county 8, state 6. A county-precision record framed at z13 would show a street corner the
+ * archive never claimed.
+ */
+export function zoomForLocationPrecision(precision: string): number {
+  const mark = recordMarkFor(precision);
+  if (mark === 'dot') return 14;
   if (precision === 'neighborhood') return 12;
-  if (precision === 'site') return 15;
-  if (precision === 'address') return 16;
-  return 13;
+  if (precision === 'county') return 8;
+  if (precision === 'state' || precision === 'country') return 6;
+  return 10;
 }
 
 /**
@@ -108,30 +142,4 @@ export function resolveDisplayRadiusMeters(
     return { ok: true, radiusMeters: displayRadiusMeters({ tier, jurisdictionBBox: state.bbox }) };
   }
   return { ok: false, reason: 'jurisdiction_bbox_unresolved' };
-}
-
-/**
- * User-facing ± span for a display-radius affordance (US framing).
- * Under ~0.25 mi: feet (nearest 10 ft). At/above: nearest quarter-mile (`0.25 mi`, `0.5 mi`, …).
- */
-export function formatDisplayRadiusSpan(meters: number): string {
-  const safe = Math.max(0, meters);
-  if (safe >= FEET_DISPLAY_CEILING_METERS) {
-    const quarterMiles = Math.round((safe / METERS_PER_MILE) * 4) / 4;
-    return `${Math.max(0.25, quarterMiles)} mi`;
-  }
-  const feet = safe / METERS_PER_FOOT;
-  return `${Math.round(feet / 10) * 10} ft`;
-}
-
-/** Words-only radius affordance line for map cards and entity previews. */
-export function radiusAffordanceLabel(
-  geoPrecisionTier: string,
-  radiusMeters: number | undefined,
-): string {
-  if (radiusMeters === undefined) {
-    return `Shown at ${geoPrecisionTier} precision (radius affordance unavailable).`;
-  }
-  const span = formatDisplayRadiusSpan(radiusMeters);
-  return `Shown at ${geoPrecisionTier} precision. The marker represents a ±${span} area, not an exact address.`;
 }

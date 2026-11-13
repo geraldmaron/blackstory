@@ -1,7 +1,7 @@
 import { useEffect, useRef, type RefObject } from 'react';
 
 /** Which sheet a drag handle belongs to. `record` is the record sheet; the rest are dock panels. */
-export type CompactSheetKey = 'lens' | 'results' | 'decade' | 'camera' | 'record';
+export type CompactSheetKey = 'lens' | 'results' | 'decade' | 'record';
 
 /** Handle selector → the sheet it moves and the key it reports when dismissed. */
 const HANDLES: readonly {
@@ -12,7 +12,6 @@ const HANDLES: readonly {
   { handle: '.ds-lens__head', sheet: '.ds-lens', key: 'lens' },
   { handle: '.ds-results__head', sheet: '.ds-results', key: 'results' },
   { handle: '.ds-time-panel__header', sheet: '.ds-time-panel', key: 'decade' },
-  { handle: '.ds-camera__head', sheet: '.ds-camera', key: 'camera' },
   { handle: '.ds-sheet__top', sheet: '.ds-sheet', key: 'record' },
 ];
 

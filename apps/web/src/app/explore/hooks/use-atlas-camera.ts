@@ -8,10 +8,9 @@ import {
   type SetStateAction,
 } from 'react';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
-import { createCamera, type CameraMove } from '../../../lib/map-experience/camera-moves';
+import { createCamera } from '../../../lib/map-experience/camera-moves';
 import { chromePadding } from '../../../lib/map-experience/chrome-padding';
 import { useReducedMotion } from '../../../lib/motion/use-reduced-motion';
-import { MIGRATION_CORRIDORS } from '../../../lib/map-experience/migration-corridors';
 import type { LensLayers } from '../../../components/map-experience/LensPanel';
 import type { PanelVisibility } from './use-panel-visibility';
 
@@ -31,6 +30,12 @@ export function useAtlasCamera(
   chromeHidden: boolean,
   sheetOpen: boolean,
   setLayers: Dispatch<SetStateAction<LensLayers>>,
+  /**
+   * True once a record is selected or about to be (a home pin hand-off, a deep link). The
+   * establishing shot never runs over a selection: it used to fire 400ms after a home pin click
+   * and throw the reader back to the national view with the inspector open.
+   */
+  hasSelection: () => boolean,
 ) {
   const [readout, setReadout] = useState('');
   const [spotlight, setSpotlight] = useState<{ x: number; y: number; radius: number } | null>(null);
@@ -58,6 +63,24 @@ export function useAtlasCamera(
   const reducedMotionRef = useRef(reducedMotion);
   reducedMotionRef.current = reducedMotion;
 
+  const padFor = useCallback(
+    (sheet: boolean) =>
+      chromePadding({
+        viewportWidth: typeof window === 'undefined' ? 1440 : window.innerWidth,
+        viewportHeight: typeof window === 'undefined' ? 900 : window.innerHeight,
+        lensOpen: paddingRef.current.lens,
+        resultsOpen: paddingRef.current.results,
+        sheetOpen: sheet,
+      }),
+    [],
+  );
+  /**
+   * The chrome visible AFTER a selection: the inspector is open by definition. Passed to
+   * `frameRecord` explicitly, because `paddingRef` only learns the sheet is open on the next
+   * render, which framed the first selection as if nothing covered it.
+   */
+  const selectionPadding = useCallback(() => padFor(true), [padFor]);
+
   const camera = useMemo(
     () =>
       createCamera({
@@ -74,15 +97,11 @@ export function useAtlasCamera(
           getPitch: () => stage.getMap()?.getPitch() ?? 0,
           getCenter: () => stage.getMap()?.getCenter() ?? { lng: -96.5, lat: 38.6 },
           stop: () => stage.getMap()?.stop(),
+          // Off-canvas when the map is not alive yet: the record is framed rather than skipped.
+          project: (lngLat) => stage.getMap()?.project(lngLat as never) ?? { x: -1, y: -1 },
+          getContainer: () => stage.getMap()?.getContainer() ?? { clientWidth: 0, clientHeight: 0 },
         },
-        padding: () =>
-          chromePadding({
-            viewportWidth: typeof window === 'undefined' ? 1440 : window.innerWidth,
-            viewportHeight: typeof window === 'undefined' ? 900 : window.innerHeight,
-            lensOpen: paddingRef.current.lens,
-            resultsOpen: paddingRef.current.results,
-            sheetOpen: paddingRef.current.sheet,
-          }),
+        padding: () => padFor(paddingRef.current.sheet),
         reducedMotion: () => reducedMotionRef.current,
         announce: setReadout,
         setRoutes: (visible) => setLayers((current) => ({ ...current, routes: visible })),
@@ -102,7 +121,7 @@ export function useAtlasCamera(
           );
         },
       }),
-    [stage, setLayers],
+    [padFor, stage, setLayers],
   );
 
   /** The camera readout clears itself, so a stale "Orbit" does not sit under the map forever. */
@@ -122,13 +141,19 @@ export function useAtlasCamera(
    * Door still gets the shot. Under reduced motion the shot is a cut and takes no beat.
    */
   const framed = useRef(false);
+  const hasSelectionRef = useRef(hasSelection);
+  hasSelectionRef.current = hasSelection;
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const unsubscribe = stage.subscribe('ready', () => {
       if (framed.current) return;
       framed.current = true;
+      if (hasSelectionRef.current()) return;
       const delay = reducedMotionRef.current ? 0 : ESTABLISHING_SHOT_DELAY_MS;
-      timer = setTimeout(() => camera.wide({ trigger: 'ambient' }), delay);
+      timer = setTimeout(() => {
+        // Checked again at fire time: a selection made during the beat wins.
+        if (!hasSelectionRef.current()) camera.wide({ trigger: 'ambient' });
+      }, delay);
     });
     return () => {
       unsubscribe();
@@ -136,19 +161,5 @@ export function useAtlasCamera(
     };
   }, [camera, stage]);
 
-  const runMove = useCallback(
-    (move: CameraMove) => {
-      const options = { trigger: 'reader' as const };
-      if (move === 'wide') camera.wide(options);
-      else if (move === 'push') camera.push(options);
-      else if (move === 'orbit') camera.orbit(options);
-      else if (move === 'tilt') camera.tilt(options);
-      else if (move === 'spotlight') camera.spotlight(options);
-      else if (move === 'trace')
-        camera.trace({ ...options, corridorCount: MIGRATION_CORRIDORS.length });
-    },
-    [camera],
-  );
-
-  return { camera, readout, spotlight, setSpotlight, runMove, bearing } as const;
+  return { camera, readout, spotlight, setSpotlight, bearing, selectionPadding } as const;
 }

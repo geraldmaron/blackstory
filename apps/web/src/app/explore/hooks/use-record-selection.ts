@@ -2,19 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAc
 import type { SheetRecord } from '../../../components/map-experience/RecordSheet';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';
+import type { ChromeInset } from '../../../lib/map-experience/chrome-padding';
 import { evidenceLabel } from '../../../lib/map-experience/evidence-grade';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
-import type { HistoryEdgeView } from '../../../lib/history/build-history-graph';
-import type { CitesEdgeIndex } from '../../../lib/release/build-cites-edge';
-import { storiesCiting } from '../../../lib/release/build-cites-edge';
-import {
-  buildSheetConnections,
-  buildSheetSources,
-} from '../../../lib/map-experience/build-sheet-detail';
-import { buildVisitHandoffFromMapFeature } from '../../../lib/geography/visit-handoff';
 import { withQuery } from '../../../lib/discovery/discovery-arrival';
-import { eraFor } from './atlas-feature-helpers';
 import {
   resolveExplorePinEntityId,
   subscribeExplorePinSelect,
@@ -22,8 +14,10 @@ import {
 } from '../../../lib/map-experience/explore-pin-select';
 
 /**
- * The selected record: its index in the current sort order, the sheet's view of it, and the
- * actions that move the selection (pin click, keyboard step, plate click via `subscribe`).
+ * The selected record: its index in the current sort order, the inspector's view of it, and the
+ * actions that move the selection. Every one of them (pin click, list row, prev/next, a connection,
+ * the home hand-off, a deep link) goes through `selectById`/`select` and so through the one
+ * `frameRecord` contract: same zoom rule, same 900ms ease, same padding.
  *
  * `selectedId` itself is owned by the caller, not this hook: the camera needs to know whether the
  * sheet is open (for its padding) without depending on this hook's `camera` input, so the id has
@@ -32,15 +26,11 @@ import {
 export function useRecordSelection(
   stage: MapStageHandle,
   camera: CameraApi,
+  /** The chrome visible after the selection opens the inspector (`useAtlasCamera`). */
+  selectionPadding: () => ChromeInset,
   sorted: readonly ExploreMapFeature[],
   selectedId: string | undefined,
   setSelectedId: Dispatch<SetStateAction<string | undefined>>,
-  /**
-   * The ALL-TIME edge slice, not the active decade's. The decade rail filters what the plate
-   * draws; it must not filter what a record is documented by (SP-20).
-   */
-  allTimeEdges: readonly HistoryEdgeView[] = [],
-  citesEdge: CitesEdgeIndex = {},
   /** Every feature in the catalog, so a connection can resolve to a record the lens filtered out. */
   allFeatures: readonly ExploreMapFeature[] = sorted,
   /** Place arrival query (`from=map` + DiscoveryState filters). Empty when unnarrowed. */
@@ -57,21 +47,31 @@ export function useRecordSelection(
     return byId;
   }, [allFeatures]);
 
-  /** Selects a connected record, flying to it when the plate is carrying that pin. */
+  const frame = useCallback(
+    (feature: ExploreMapFeature) => {
+      const [lng, lat] = feature.geometry.coordinates;
+      camera.frameRecord(
+        {
+          center: [lng, lat],
+          precision: feature.properties.precision,
+          place: placeLabelFor(feature),
+        },
+        { padding: selectionPadding(), trigger: 'reader' },
+      );
+    },
+    [camera, selectionPadding],
+  );
+
+  /** Selects a record by id and frames it when the plate carries its point. */
   const selectById = useCallback(
     (entityId: string) => {
-      const feature = featuresById.get(entityId);
-      if (feature) {
-        const [lng, lat] = feature.geometry.coordinates;
-        setSelectedId(entityId);
-        camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
-        return;
-      }
-      // No pin for it in this catalog: select it anyway so the rail and URL agree, without a
-      // camera move to nowhere.
       setSelectedId(entityId);
+      const feature = featuresById.get(entityId);
+      // No point for it in this catalog: select it anyway so the list and URL agree, without a
+      // camera move to nowhere.
+      if (feature) frame(feature);
     },
-    [camera, featuresById, setSelectedId],
+    [featuresById, frame, setSelectedId],
   );
 
   const selectedFeature = useMemo(() => {
@@ -89,13 +89,11 @@ export function useRecordSelection(
   );
 
   const select = useCallback(
-    (feature: ExploreMapFeature, fly = true) => {
+    (feature: ExploreMapFeature) => {
       setSelectedId(feature.properties.entityId);
-      if (!fly) return;
-      const [lng, lat] = feature.geometry.coordinates;
-      camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
+      frame(feature);
     },
-    [camera, setSelectedId],
+    [frame, setSelectedId],
   );
 
   const stepRecord = useCallback(
@@ -109,14 +107,8 @@ export function useRecordSelection(
     [select, selectedIndex, sorted],
   );
 
-  /** Pin clicks stay on the plate and open the record sheet. Place pages are a sheet CTA. */
-  useEffect(
-    () =>
-      stage.subscribe('select', (entityId) => {
-        setSelectedId(entityId);
-      }),
-    [setSelectedId, stage],
-  );
+  /** A pin click is a selection like any other: it opens the inspector and frames the record. */
+  useEffect(() => stage.subscribe('select', selectById), [selectById, stage]);
 
   useEffect(
     () =>
@@ -151,93 +143,20 @@ export function useRecordSelection(
 
   const sheetRecord = useMemo<SheetRecord | null>(() => {
     if (!selectedFeature) return null;
-    // A reader who clicks a pin during story mode is asking for the same detail a click gets in
-    // Explore mode. The sheet renders on both a chapter's left and right layouts; when it would sit
-    // on the same side as the current chapter card, StoryMode forces every chapter card to the
-    // opposite side for as long as the sheet is open (see `.ds-story--sheet-open` in
-    // story-mode.css) rather than the sheet giving way — the reader asked to see the record.
-    const sources = selectedFeature.properties.evidenceCount;
+    const { properties } = selectedFeature;
     return {
-      id: selectedFeature.properties.entityId,
-      name: selectedFeature.properties.displayName,
-      kind: selectedFeature.properties.kind,
-      ...(selectedFeature.properties.mapTone
-        ? { mapTone: selectedFeature.properties.mapTone }
-        : {}),
+      id: properties.entityId,
+      name: properties.displayName,
+      kind: properties.kind,
+      ...(properties.mapTone ? { mapTone: properties.mapTone } : {}),
       place: placeLabelFor(selectedFeature),
-      /*
-       * The record's own pin, taken from the feature the reader just clicked.
-       *
-       * Without this the sheet fell through to `RecordAnatomyPanel`'s empty slot and read "Place
-       * not pinned" — on a record that is, by definition, a pin on the map it was opened from.
-       * Every record reachable from the plate has coordinates; that is what put it there.
-       */
-      anatomyPlace: {
-        lng: selectedFeature.geometry.coordinates[0],
-        lat: selectedFeature.geometry.coordinates[1],
-        label: placeLabelFor(selectedFeature),
-      },
-      era: eraFor(selectedFeature),
-      story: selectedFeature.properties.oneLineStory,
-      precision: selectedFeature.properties.geoPrecisionTier,
-      confidenceTier: selectedFeature.properties.confidenceTier,
-      evidenceLabel: evidenceLabel(selectedFeature.properties.confidenceTier, sources),
-      /*
-       * The count travels even though the citations do not: the map payload is a count and a
-       * confidence tier, not a bibliography (see ExploreMapFeatureProperties). Passing only
-       * `sources: []` made the plate state "0 sources / no sources are published for this record
-       * yet" directly under its own "Grade A · 1 source", which is both a self-contradiction and
-       * false about a record whose page cites a source.
-       */
-      sourceCount: sources,
-      ...(selectedFeature.properties.href
-        ? { href: withQuery(selectedFeature.properties.href, placeArrivalQuery) }
-        : {}),
-      sources: buildSheetSources(allTimeEdges, selectedFeature.properties.entityId),
-      connections: buildSheetConnections(
-        allTimeEdges,
-        selectedFeature.properties.entityId,
-        (entityId) => {
-          const feature = featuresById.get(entityId);
-          if (!feature) return undefined;
-          return {
-            name: feature.properties.displayName,
-            kind: feature.properties.kind,
-            ...(feature.properties.mapTone ? { mapTone: feature.properties.mapTone } : {}),
-            ...(feature.properties.href
-              ? { href: withQuery(feature.properties.href, placeArrivalQuery) }
-              : {}),
-          };
-        },
-      ),
-      citingStories: storiesCiting(citesEdge, selectedFeature.properties.entityId),
-      visitInput: buildVisitHandoffFromMapFeature({
-        displayName: selectedFeature.properties.displayName,
-        locationPrecision: selectedFeature.properties.precision,
-        kind: selectedFeature.properties.kind,
-        lat: selectedFeature.geometry.coordinates[1],
-        lng: selectedFeature.geometry.coordinates[0],
-        ...(selectedFeature.properties.locationLabel !== undefined
-          ? { locationLabel: selectedFeature.properties.locationLabel }
-          : {}),
-        ...(selectedFeature.properties.jurisdictionLabel !== undefined
-          ? { jurisdictionLabel: selectedFeature.properties.jurisdictionLabel }
-          : {}),
-        ...(selectedFeature.properties.status !== undefined
-          ? { status: selectedFeature.properties.status }
-          : {}),
-        ...(selectedFeature.properties.livingStatus !== undefined
-          ? { livingStatus: selectedFeature.properties.livingStatus }
-          : {}),
-        ...(selectedFeature.properties.sensitivityClass !== undefined
-          ? { sensitivityClass: selectedFeature.properties.sensitivityClass }
-          : {}),
-        ...(selectedFeature.properties.visitClaims !== undefined
-          ? { claims: selectedFeature.properties.visitClaims }
-          : {}),
-      }),
+      story: properties.oneLineStory,
+      precision: properties.precision,
+      confidenceTier: properties.confidenceTier,
+      evidenceLabel: evidenceLabel(properties.confidenceTier, properties.evidenceCount),
+      ...(properties.href ? { href: withQuery(properties.href, placeArrivalQuery) } : {}),
     };
-  }, [allTimeEdges, citesEdge, featuresById, placeArrivalQuery, selectedFeature]);
+  }, [placeArrivalQuery, selectedFeature]);
 
   return {
     selectedFeature,

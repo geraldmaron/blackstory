@@ -216,9 +216,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     [view.allFeatures],
   );
 
-  /** The active topic's display label, when one is selected — the composition gate below and
-   * `CameraConsole`'s lens-level move refusal both need it, since a topic slug does not always
-   * spell out the violence term its own label does. */
+  /** The active topic's display label, when one is selected: the composition gate below needs
+   * it, since a topic slug does not always spell out the violence term its own label does. */
   const activeTopicLabel = useMemo(
     () => (topicId ? (topicCounts.find((entry) => entry.id === topicId)?.label ?? null) : null),
     [topicId, topicCounts],
@@ -439,7 +438,6 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setSweepDecade,
     topicId,
     setTopicId,
-    activeTopicLabel,
     status,
     setStatus,
     layerMode,

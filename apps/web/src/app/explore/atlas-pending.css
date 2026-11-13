@@ -26,7 +26,7 @@
   top: var(--ds-atlas-top);
   right: var(--ds-space-4);
   width: var(--ds-results-w);
-  height: min(26rem, calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right)));
+  height: min(26rem, calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom)));
 }
 
 .ds-atlas-pending__panel--time {

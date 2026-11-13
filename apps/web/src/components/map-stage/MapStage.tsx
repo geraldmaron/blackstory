@@ -53,21 +53,11 @@ import {
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
-  EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
-import {
-  buildExploreMapStyle,
-  ENTITY_SELECTED_PULSE_DURATION_MS,
-  ENTITY_SELECTED_RADIUS_OFFSET,
-  entitySelectedPulseOpacity,
-  entitySelectedPulseRadiusExpression,
-  entitySelectedPulseStaticRadiusExpression,
-  ENTITY_SELECTED_PULSE_STATIC_OPACITY,
-} from '../../app/map/explore-style';
-import { markerRadius, markerRadiusPlusExpression } from '../../lib/map-experience/marker-size';
+import { buildExploreMapStyle } from '../../app/map/explore-style';
 import {
   applyDensityBlendProgress,
   applyDecadeHoldFeatureState,
@@ -106,6 +96,7 @@ import type {
   JurisdictionAreaFeature,
 } from '../../lib/map-experience/build-explore-map-source';
 import {
+  CAMERA_EASING_SLOW_OUT,
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
   PLATE_OPENING_PADDING_PX,
@@ -114,6 +105,7 @@ import {
   type CameraPresetName,
 } from '../../lib/map-experience/camera-presets';
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
+import { drawnRecordCollection } from '../../lib/map-experience/record-marks';
 import type { StateDensityLevel } from '../../lib/map-experience/density';
 import type { CountyChoroplethLevel } from '../../lib/map-experience/county-choropleth';
 import type { StateChoroplethLevel } from '../../lib/map-experience/state-choropleth';
@@ -400,6 +392,8 @@ export type AtlasCameraTarget = {
   getCenter(): { lng: number; lat: number };
   /** The element MapLibre draws in — the box a surface frames its camera against. */
   getContainer(): HTMLElement;
+  /** Screen position of a coordinate — `frameRecord`'s "already visible" test. */
+  project(lngLat: never): { x: number; y: number };
   /** Whether a flight, ease or gesture is in progress — a refit must not cut one short. */
   isMoving(): boolean;
   stop(): unknown;
@@ -449,8 +443,6 @@ type EntityPoint = {
   readonly name: string;
   readonly lng: number;
   readonly lat: number;
-  readonly evidenceCount: number;
-  readonly confidenceTier: string;
 };
 
 /** Point records by id, so a hover or a selection finds its record without scanning thousands. */
@@ -465,13 +457,10 @@ function indexEntityPoints(
     const props = feature.properties;
     const entityId = props.entityId;
     if (typeof entityId !== 'string' || byId.has(entityId)) continue;
-    const evidence = Number(props.evidenceCount);
     byId.set(entityId, {
       name: typeof props.displayName === 'string' ? props.displayName : 'Documented record',
       lng,
       lat,
-      evidenceCount: Number.isFinite(evidence) ? evidence : 0,
-      confidenceTier: typeof props.confidenceTier === 'string' ? props.confidenceTier : 'unrated',
     });
   }
   return byId;
@@ -589,7 +578,6 @@ export function MapStageProvider({
   const searchCenterMarkerRef = useRef<Marker | null>(null);
   const searchAreaRef = useRef<SearchAreaInput | null>(null);
   /** Soft opacity pulse on the GL selected ring — canceled when selection clears. */
-  const selectedPulseRafRef = useRef<number | null>(null);
   const stateLabelMarkersRef = useRef<
     Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
   >(new Map());
@@ -789,89 +777,6 @@ export function MapStageProvider({
     if (map) stateLabelsAttachedRef.current = show;
   }, []);
 
-  const stopSelectedEntityPulse = useCallback(() => {
-    if (selectedPulseRafRef.current !== null) {
-      cancelAnimationFrame(selectedPulseRafRef.current);
-      selectedPulseRafRef.current = null;
-    }
-    const map = mapRef.current;
-    if (map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) {
-      // Reset to the base (un-pulsed) ring — scale 1x, full opacity.
-      map.setPaintProperty(
-        EXPLORE_SELECTED_POINT_LAYER_ID,
-        'circle-radius',
-        markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
-      );
-      map.setPaintProperty(EXPLORE_SELECTED_POINT_LAYER_ID, 'circle-stroke-opacity', 1);
-    }
-  }, []);
-
-  const startSelectedEntityPulse = useCallback(
-    (entityId: string) => {
-      stopSelectedEntityPulse();
-      const map = mapRef.current;
-      if (!map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
-      /*
-       * The ring's size as a plain number, not read from the feature. The layer's own radius reads
-       * each record's evidence and confidence (`['get', …]`), and MapLibre rebuilds a source's
-       * tiles whenever a data-driven paint value changes — so pulsing that expression re-tiled
-       * every record on the map on every animation frame. A zoom-only expression is redrawn from
-       * the GPU buffers it already has.
-       */
-      const point = entityPoint(entityId);
-      const dataRadius = markerRadius(
-        point?.evidenceCount ?? 0,
-        point?.confidenceTier ?? 'unrated',
-      );
-      if (prefersReducedMotion()) {
-        // Reduced motion (patterns-cinematic-map.md §3): no loop — a single static
-        // enlarged ring (scale ~1.35, opacity ~0.85).
-        map.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-radius',
-          entitySelectedPulseStaticRadiusExpression(dataRadius),
-        );
-        map.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-stroke-opacity',
-          ENTITY_SELECTED_PULSE_STATIC_OPACITY,
-        );
-        return;
-      }
-
-      const startedAt = performance.now();
-      const tick = (now: number) => {
-        if (configRef.current.selectedEntity !== entityId || !mapRef.current) {
-          selectedPulseRafRef.current = null;
-          return;
-        }
-        const activeMap = mapRef.current;
-        if (!activeMap.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) {
-          selectedPulseRafRef.current = null;
-          return;
-        }
-        // 1.8s ease-in-out loop — ring scales ~1x -> ~2.1x while fading 0.9 -> 0.12
-        // (patterns-cinematic-map.md §3 "Selection pulse").
-        const progress =
-          ((now - startedAt) % ENTITY_SELECTED_PULSE_DURATION_MS) /
-          ENTITY_SELECTED_PULSE_DURATION_MS;
-        activeMap.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-radius',
-          entitySelectedPulseRadiusExpression(progress, dataRadius),
-        );
-        activeMap.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-stroke-opacity',
-          entitySelectedPulseOpacity(progress),
-        );
-        selectedPulseRafRef.current = requestAnimationFrame(tick);
-      };
-      selectedPulseRafRef.current = requestAnimationFrame(tick);
-    },
-    [stopSelectedEntityPulse, entityPoint],
-  );
-
   const applyStyleAndData = useCallback(
     (options?: {
       readonly recreateEntitiesSource?: boolean;
@@ -922,12 +827,6 @@ export function MapStageProvider({
         setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
         setSelectedEdgeFilter(map, configRef.current.selectedEdge);
         setSelectedEntityFilter(map, configRef.current.selectedEntity);
-        const selectedId = configRef.current.selectedEntity;
-        if (selectedId && selectedId.length > 0) {
-          startSelectedEntityPulse(selectedId);
-        } else {
-          stopSelectedEntityPulse();
-        }
         if (!options?.skipPrimaryDensityLoad) {
           void loadStatePolygonsWithDensity(
             map,
@@ -948,7 +847,7 @@ export function MapStageProvider({
         console.error('[MapStage] style/data apply failed', error);
       }
     },
-    [startSelectedEntityPulse, stopSelectedEntityPulse],
+    [],
   );
   applyStyleAndDataRef.current = applyStyleAndData;
 
@@ -1043,7 +942,7 @@ export function MapStageProvider({
       GeoJSONSource | undefined;
     if (entitiesIncoming) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-      entitiesIncoming.setData(cfg.featureCollection as any);
+      entitiesIncoming.setData(drawnRecordCollection(cfg.featureCollection) as any);
       await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_INCOMING_SOURCE_ID);
     }
     const edgesIncoming = map.getSource(EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID) as
@@ -1101,7 +1000,7 @@ export function MapStageProvider({
       const entities = map.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
       if (entities) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-        entities.setData(cfg.featureCollection as any);
+        entities.setData(drawnRecordCollection(cfg.featureCollection) as any);
         await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_SOURCE_ID);
       }
       if (generation !== decadeFadeGenerationRef.current) return;
@@ -1284,13 +1183,8 @@ export function MapStageProvider({
       setSelectedStateFilter(map, patch.selectedState);
       setSelectedEdgeFilter(map, patch.selectedEdge);
       setSelectedEntityFilter(map, patch.selectedEntity);
-      if (patch.selectedEntity && patch.selectedEntity.length > 0) {
-        startSelectedEntityPulse(patch.selectedEntity);
-      } else {
-        stopSelectedEntityPulse();
-      }
     },
-    [startSelectedEntityPulse, stopSelectedEntityPulse, updateStateLabelSelection],
+    [updateStateLabelSelection],
   );
 
   const runFlyPreset = useCallback(
@@ -1623,6 +1517,7 @@ export function MapStageProvider({
               center: [hit.center[0], hit.center[1]],
               zoom: clampClusterExpansionZoom(expansionZoom, activeMap.getZoom()),
               duration: clusterExpandDurationMs(prefersReducedMotion()),
+              easing: CAMERA_EASING_SLOW_OUT,
             });
           })
           .catch(() => {
@@ -1631,12 +1526,10 @@ export function MapStageProvider({
       }
 
       function handleEntityPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
+        // Overlapping records always open a chooser, on every posture: picking the first would
+        // open a record the reader may not have meant.
         if (hit.kind === 'overlap') {
-          if (postureRef.current === 'live') {
-            notify(listenersRef.current, 'overlap', hit.entityIds);
-          } else if (hit.entityIds[0]) {
-            notify(listenersRef.current, 'select', hit.entityIds[0]);
-          }
+          notify(listenersRef.current, 'overlap', hit.entityIds);
           return;
         }
         if (hit.kind === 'entity') {
@@ -1794,10 +1687,6 @@ export function MapStageProvider({
       decadeMorphAnimationRef.current?.cancel();
       decadeMorphAnimationRef.current = null;
       mapStyleReadyRef.current = false;
-      if (selectedPulseRafRef.current !== null) {
-        cancelAnimationFrame(selectedPulseRafRef.current);
-        selectedPulseRafRef.current = null;
-      }
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       resizeLifecycleRef.current?.disconnect();
       contextRecoveryRef.current?.disconnect();

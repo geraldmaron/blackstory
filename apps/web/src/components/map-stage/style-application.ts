@@ -21,15 +21,13 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
+  EXPLORE_JURISDICTION_TAG_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  EXPLORE_SELECTED_TAG_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
@@ -69,21 +67,18 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
   EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
 ]);
-/** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: halo beneath
- * point beneath the event glyph ring, clusters above singles, selected ring on top. Incoming
- * dual-buffer layers sit above the current stack and below the selected ring. Added once
- * then paint-refreshed on style rebuild (theme plate stroke, kind shade expressions). */
+/** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: record marks
+ * beneath groups, incoming dual-buffer layers above the current stack, then the jurisdiction
+ * tags, then the selection on top. Added once then paint-refreshed on style rebuild. */
 export const ENTITY_LAYER_IDS = new Set([
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
+  EXPLORE_JURISDICTION_TAG_LAYER_ID,
+  EXPLORE_SELECTED_TAG_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
 ]);
 /** Sources whose real geometry arrives from a lazy client fetch (`loadStatePolygonsWithDensity`,
@@ -195,8 +190,8 @@ export function applyGeographyStyle(
   // paint/layout sync). Removing them on every apply read as a full map refresh and killed
   // MapLibre opacity transitions. New layers still append beneath the entity stack when the
   // halo anchor already exists.
-  const entityAnchor = map.getLayer(EXPLORE_UNCLUSTERED_HALO_LAYER_ID)
-    ? EXPLORE_UNCLUSTERED_HALO_LAYER_ID
+  const entityAnchor = map.getLayer(EXPLORE_UNCLUSTERED_POINT_LAYER_ID)
+    ? EXPLORE_UNCLUSTERED_POINT_LAYER_ID
     : undefined;
   for (const layer of style.layers ?? []) {
     if (GEOGRAPHY_LAYER_IDS.has(layer.id)) {

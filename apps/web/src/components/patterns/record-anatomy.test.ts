@@ -62,8 +62,7 @@ test('renders inline fact rows without legacy column strip classes', () => {
         lat: 38.9098,
         lng: -77.0143,
         label: 'Dunbar High School',
-        precisionCaption:
-          'Shown at block precision. The marker represents a ±660 ft area, not an exact address.',
+        precision: 'campus',
       },
     }),
   );
@@ -75,7 +74,7 @@ test('renders inline fact rows without legacy column strip classes', () => {
   assert.match(html, /ds-edition-fact-icon--kind-muted/);
   assert.match(html, /ds-edition-fact-icon--evidence-high/);
   assert.match(html, /Record at a glance/);
-  assert.match(html, /not an exact address/);
+  assert.match(html, /Placed at the site/);
   assert.match(
     html,
     /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=Washington%2C%20D.C.%20%40%2038\.9098%2C-77\.0143"/,
@@ -124,6 +123,7 @@ test('Where is not a maps link when the caller already owns Visit handoff', () =
         lat: 38.9098,
         lng: -77.0143,
         label: 'Washington, D.C.',
+        precision: 'city',
       },
       linkWhereToMaps: false,
     }),

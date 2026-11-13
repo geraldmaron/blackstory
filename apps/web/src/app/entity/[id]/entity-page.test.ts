@@ -15,10 +15,7 @@ const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 // and `/invention/{slug}` renders the same room.
 const roomSource = readFileSync(join(here, 'EntityRecordRoom.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'EntityRoomSections.tsx'), 'utf8');
-const placeSource = readFileSync(
-  join(here, '../../../components/patterns/RecordPlacePreview.tsx'),
-  'utf8',
-);
+const placeSource = readFileSync(join(here, '../../../components/map-embed/RecordMap.tsx'), 'utf8');
 const mediaSource = readFileSync(
   join(here, '../../../components/entity/EntityMastMedia.tsx'),
   'utf8',
@@ -92,7 +89,11 @@ test('entity media fail-closed: mark fallback on photo exhaustion', () => {
 });
 
 test('entity map fail-closed: the place block still makes its point with no plate', () => {
-  assert.match(placeSource, /<figcaption className="ds-record-anatomy__place-caption">\{label\}/);
+  // The caption (place and precision in words) is HTML outside the canvas, and the canvas is
+  // dropped entirely when WebGL fails.
+  assert.match(placeSource, /<figcaption className="ds-record-map__caption">/);
+  assert.match(placeSource, /precisionInWords\(precision\)/);
+  assert.match(placeSource, /status === 'failed' \? null/);
   assert.doesNotMatch(placeSource, /idle=/);
   assert.doesNotMatch(placeSource, /^import .*MapsExternalLink/m);
   assert.doesNotMatch(placeSource, /<MapsExternalLink/);

@@ -13,8 +13,6 @@ const mapStage = read('../../components/map-stage/MapStage.tsx');
 const mapControlsCss = read('../../components/map-experience/map-controls.css');
 const atlasCss = read('./atlas.css');
 const atlas = read('./AtlasExperience.tsx');
-const tabBar = read('../../components/shell/PhoneTabBar.tsx');
-const tabBarCss = read('../../components/shell/tab-bar.css');
 const heroMorph = read('../../components/story/HeroHeadlineMorph.tsx');
 const shellCss = read('../shell.css');
 
@@ -24,9 +22,9 @@ test('records are drawn by the map, not as one HTML marker each', () => {
   assert.match(mapStage, /notify\(listenersRef\.current, 'pinHover', target\)/);
 });
 
-test('the selection pulse animates a zoom-only ring, never the data-driven one', () => {
-  assert.match(mapStage, /entitySelectedPulseRadiusExpression\(progress, dataRadius\)/);
-  assert.match(mapStage, /entitySelectedPulseStaticRadiusExpression\(dataRadius\)/);
+test('selection is a static copper mark: no pulse loop on the map (P-04)', () => {
+  assert.doesNotMatch(mapStage, /requestAnimationFrame\(tick\)/);
+  assert.doesNotMatch(mapStage, /SelectedEntityPulse/);
 });
 
 test('state labels are written only on change, leave the map while invisible, and do not transition', () => {
@@ -45,7 +43,7 @@ test('the map controls slide by transform, never by animating an inset', () => {
 });
 
 test('Explore sheets animate away instead of vanishing', () => {
-  for (const sheet of ['LensPanel', 'ResultsRail', 'TimePanel', 'CameraConsole', 'RecordSheet']) {
+  for (const sheet of ['LensPanel', 'ResultsRail', 'TimePanel', 'RecordSheet']) {
     assert.match(
       atlas,
       new RegExp(`<SheetPresence show=\\{[^}]+\\}>\\s*<${sheet}\\b`),
@@ -57,14 +55,6 @@ test('Explore sheets animate away instead of vanishing', () => {
     /\[data-presence='leaving'\][^{]*\{[^}]*animation:\s*ds-compact-sheet-leave/s,
   );
   assert.match(atlasCss, /\.ds-atlas > \.ds-sheet-presence > \.ds-lens/);
-});
-
-test('the Rooms sheet slides away by every route and drags to dismiss', () => {
-  assert.doesNotMatch(tabBar, /sheetRef\.current\?\.close\(\)/);
-  assert.match(tabBar, /onCancel=\{/);
-  assert.match(tabBar, /onPointerMove=\{onHeadPointerMove\}/);
-  assert.match(tabBarCss, /\.ds-tabbar-sheet\[open\]\[data-closing\]\s*\{[^}]*translateY\(100%\)/s);
-  assert.match(tabBarCss, /\.ds-tabbar-sheet\[data-closing\]::backdrop/);
 });
 
 test('the Door headline is paced by timers and settles when it is not on screen', () => {

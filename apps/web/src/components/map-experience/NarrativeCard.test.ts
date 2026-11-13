@@ -74,12 +74,10 @@ test('Where links to maps when the record is not visitable', () => {
   assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 1);
 });
 
-test('renders the radius affordance as words, never as a bare number with no context', () => {
+test('states the location precision in words beside the map, never as a bare number', () => {
   const feature = requireFeature('ent_dunbar_school_001');
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
-  assert.match(html, /precision/);
-  assert.match(html, /not an exact address/);
-  assert.match(html, /ds-record-anatomy__precision/);
+  assert.match(html, /class="ds-record-map__precision">Placed (at|to) the [a-z]+</);
 });
 
 test('renders edition fact strip and browse controls when browseControls props are provided', () => {

@@ -172,10 +172,6 @@ describe('horizontal overflow guards', () => {
       join(here, '../components/map-experience/record-sheet.css'),
       'utf8',
     );
-    const cameraCss = readFileSync(
-      join(here, '../components/map-experience/camera-console.css'),
-      'utf8',
-    );
     const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
     const timeCss = readFileSync(join(here, '../components/map-experience/time-panel.css'), 'utf8');
     for (const [name, source] of [
@@ -183,7 +179,6 @@ describe('horizontal overflow guards', () => {
       ['lens', lensCss],
       ['results', resultsCss],
       ['sheet', sheetCss],
-      ['camera', cameraCss],
       ['atlas', atlasCss],
       ['time', timeCss],
     ] as const) {

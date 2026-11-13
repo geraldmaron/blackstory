@@ -175,10 +175,10 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
     utm_source: 'x',
     junk: '1',
   });
-  // Default layerMode=presence is omitted from the canonical query (cleaner revisit URLs).
+  // The opt-in density layer survives; the retired `group` opt-out is dropped.
   assert.equal(
     qs,
-    'era=1970s&kind=school&selected=ent_dunbar_school_001&state=DC&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
+    'era=1970s&kind=school&selected=ent_dunbar_school_001&state=DC&layerMode=presence&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
   );
 });
 
@@ -321,9 +321,9 @@ test('normalizeQueryString preserves /explore?state= revisit links', () => {
 });
 
 test('normalizeQueryString canonicalizes explore layerMode', () => {
-  // density→presence is the default layer; omit layerMode from the canonical query.
-  assert.equal(normalizeQueryString('/explore', { density: 'true' }), '');
-  assert.equal(normalizeQueryString('/explore', { density: 'false' }), 'layerMode=off');
+  // No area shading is the default; the legacy density flag maps onto the opt-in layer.
+  assert.equal(normalizeQueryString('/explore', { density: 'true' }), 'layerMode=presence');
+  assert.equal(normalizeQueryString('/explore', { density: 'false' }), '');
   assert.equal(
     normalizeQueryString('/explore', { layerMode: 'blackShare', popGeo: 'state' }),
     'layerMode=blackShare&popGeo=state',

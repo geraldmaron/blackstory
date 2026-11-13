@@ -15,7 +15,7 @@
  * This module is pure data + a DOM-element factory; it never touches a live `maplibregl.Map`
  * instance mounting/positioning markers against a real map is the consuming surface's job (see
  * the integration contract in `buildStateLabelMarkers`'s doc comment below). That keeps this
- * module unit-testable in plain Node, the same split `marker-size.ts` and `kind-encoding.ts` use.
+ * module unit-testable in plain Node, the same split `kind-encoding.ts` uses.
  */
 // Subpath import (not the package barrel): the barrel re-exports ./publication, which pulls in
 // `node:crypto` at module scope. This module is imported by MapStage.tsx ('use client'), so
