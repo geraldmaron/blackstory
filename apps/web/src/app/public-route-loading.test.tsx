@@ -49,12 +49,12 @@ const LOADING_BOUNDARIES = [
     Loading: LawEntryLoading,
     label: 'Opening record',
   },
-  { route: '/stories', dir: 'stories', Loading: StoriesLoading, label: 'Laying out the stories…' },
+  { route: '/stories', dir: 'stories', Loading: StoriesLoading, label: 'Loading stories' },
   {
     route: '/stories/[slug]',
     dir: 'stories/[slug]',
     Loading: StoryLoading,
-    label: 'Turning to the story…',
+    label: 'Loading the story',
   },
   {
     route: '/stories/mosaic-credits',

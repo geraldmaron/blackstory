@@ -8,10 +8,24 @@ import { test } from 'node:test';
 import { headingAnchorId } from './StoryBody';
 import { readFileSync } from 'node:fs';
 
-test('primary documents are visible on entry and story images share the archive figure', () => {
+test('every artifact renders open on the wide track: nothing is folded into a drawer', () => {
   const source = readFileSync(new URL('./StoryBody.tsx', import.meta.url), 'utf8');
-  assert.match(source, /case 'primaryDocument':[\s\S]*?<ArtifactDrawer\s+open/);
-  assert.match(source, /case 'image':[\s\S]*?<ArchiveFigure/);
+  assert.doesNotMatch(source, /<details|ArtifactDrawer/);
+  for (const block of ['figure', 'primaryDocument', 'timeline', 'mapInset', 'dispute', 'image']) {
+    assert.match(
+      source,
+      new RegExp(`case '${block}':[\\s\\S]*?ds-story-wide`),
+      `${block} breaks out onto the wide track`,
+    );
+  }
+  assert.match(source, /case 'image':[\s\S]*?<StoryFigure/);
+});
+
+test('the dispute standing line speaks without "we"', () => {
+  const source = readFileSync(new URL('./StoryBody.tsx', import.meta.url), 'utf8');
+  const line = /standingLine="([^"]*)"/.exec(source)?.[1] ?? '';
+  assert.ok(line.length > 0);
+  assert.doesNotMatch(line, /\bwe\b/i);
 });
 
 test('the id is stable and readable: index prefix plus a slug of the text', () => {

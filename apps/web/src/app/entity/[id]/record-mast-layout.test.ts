@@ -22,15 +22,9 @@ test('a record photo is shown whole in the rail, never cropped behind type', () 
   assert.doesNotMatch(recordCss, /ds-record-mast/);
 });
 
-test('a story hero sits in its own band with the headline below, no scrim or text shadow', () => {
-  assert.match(
-    articleCss,
-    /\.ds-reading-mast__photo \{[^}]*position:\s*relative;[^}]*height:\s*clamp/s,
-  );
-  assert.doesNotMatch(
-    articleCss,
-    /\.ds-reading-mast\[data-media='photo'\] \.ds-reading-mast__title[^{]*\{[^}]*text-shadow/s,
-  );
+test('a story hero is the whole picture under the headline: no blurred fill, scrim or text shadow', () => {
+  assert.match(articleCss, /\.ds-story-mast > \.ds-story-mast__hero \{[^}]*grid-column:\s*wide/s);
+  assert.doesNotMatch(articleCss, /ds-fit-photo__backdrop|text-shadow|backdrop-filter/);
 });
 
 test('the phone header shows the lockup artwork, sized down, never hidden', () => {

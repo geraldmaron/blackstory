@@ -1,21 +1,16 @@
 /**
- * Renders a hydrated story's body blocks in order, dispatching each typed
- * block to its component. Prose carries inline citation superscripts; data
- * blocks reuse the existing evidence components (chart, DataMoment, EraTimeline,
- * MapInsetMoment, DisputeBlock) and show their source numbers.
+ * Renders a hydrated story's body blocks in order. The body is a three-track grid: prose sits on
+ * the 680px reading measure, and every artifact (chart, figure run, primary document, timeline,
+ * map inset, dispute, archive image, table, video) breaks out onto the 964px wide track, open.
+ * Nothing is folded into a drawer: the evidence is part of the reading, and it is what breaks the
+ * column of prose.
  *
- * Reading-surface conventions (tuned on the redlining chapter, then rolled out):
- *  - Charts/graphs (`figure`) render open and are never collapsible — the data
- *    picture is part of the argument, not an aside.
- *  - Primary documents begin open so the evidence is part of the reading experience.
- *    Other evidence drawers remain collapsible. Native details keep keyboard access
- *    and work without JavaScript.
- *  - Consecutive `stat` blocks coalesce into one compact comparison rail instead
- *    of a vertical wall of full-width cards.
+ * Consecutive `stat` blocks coalesce into one row of figure callouts: the numbers the chapter's
+ * own data carries, set as numbers rather than left inside sentences.
  */
 import React from 'react';
 import { DisputeBlock } from '../theme-spine/DisputeBlock';
-import { EraTimeline } from '../theme-spine/EraTimeline';
+import { EraTimeline, timelinePoints } from '../theme-spine/EraTimeline';
 import { MapInsetMoment } from '../theme-spine/MapInsetMoment';
 import { ThemeImpactMetricChart } from '../theme-impact/ThemeImpactMetricChart';
 import type {
@@ -27,8 +22,12 @@ import { extractChapterHeadings } from '../../lib/stories/heading-anchors';
 import { storyVideoSource, storyVideoWatchUrl } from '@repo/schemas';
 import { StoryCitationMarks, StoryInline, StoryProse } from './StoryProse';
 import { StoryVideo } from './StoryVideo';
-import { ArchiveFigure } from '../room/Evidence';
-import { DestinationIcon } from '../patterns/DestinationIcon';
+import { StoryFigure } from './StoryFigure';
+// The artifacts' own sheets travel with the body, so every surface that renders one (the story
+// page, /lives, the admin preview) gets them without remembering to import them.
+import '../theme-spine/theme-spine.css';
+import '../theme-impact/theme-impact.css';
+import './story-image.css';
 
 void React;
 
@@ -37,11 +36,10 @@ export type StoryBodyProps = {
 };
 
 /**
- * Anchor id for an h3 subheading. Prefixed with the block's own index in `story.blocks` —
- * stable and guaranteed unique by construction — with a readable slug appended so the URL
- * fragment still says something about the section. h2 section headings get their id from
- * `extractChapterHeadings` instead (the same function the rail's "In this chapter" nav reads),
- * so the two can never drift apart; h3s have no rail entry to stay in sync with.
+ * Anchor id for an h3 subheading. Prefixed with the block's own index in `story.blocks` (stable
+ * and unique by construction) with a readable slug appended. h2 section headings get their id
+ * from `extractChapterHeadings` instead, the same function the section spine reads, so the two
+ * can never drift apart.
  */
 export function headingAnchorId(index: number, text: string): string {
   const slug = text
@@ -66,62 +64,29 @@ const VIDEO_RIGHTS_LABEL = {
   fair_use: 'Used under fair use',
 } as const;
 
-function SourceLine({ numbers }: { readonly numbers: readonly number[] }) {
-  if (numbers.length === 0) return null;
-  return (
-    <p className="ds-reading-source-line">
-      Source
-      <StoryCitationMarks numbers={numbers} />
-    </p>
-  );
+/** The year span of a timeline, for its caption: "1790 to 2013". */
+function timelineSpan(events: readonly { readonly date: string }[]): string | undefined {
+  const years = events
+    .map((event) => Number.parseInt(/^-?\d{1,4}/.exec(event.date.trim())?.[0] ?? '', 10))
+    .filter((year) => Number.isFinite(year));
+  if (years.length === 0) return undefined;
+  const first = Math.min(...years);
+  const last = Math.max(...years);
+  return first === last ? String(first) : `${first} to ${last}`;
 }
 
-/**
- * A collapsed-by-default evidence disclosure. The native `<details>` element
- * keeps the open/closed state without JavaScript and stays keyboard- and
- * screen-reader-accessible. `kind` labels the drawer ("Primary document",
- * "Timeline", …); `lead` is the one-line teaser the reader sees while closed.
- */
-function ArtifactDrawer({
-  kind,
-  lead,
-  children,
-  open = false,
-}: {
-  readonly kind: string;
-  readonly lead: string;
-  readonly children: React.ReactNode;
-  readonly open?: boolean;
-}) {
+/** A run of consecutive stat blocks: figure callouts in one row on the wide track. */
+function FigureCallouts({ stats }: { readonly stats: readonly HydratedStoryStat[] }) {
   return (
-    <details className="ds-reading__drawer" open={open}>
-      <summary className="ds-reading__drawer-summary">
-        <span className="ds-reading__drawer-kind ds-mono">
-          <DestinationIcon id="artifact" /> {kind}
-        </span>
-        <span className="ds-reading__drawer-lead">{lead}</span>
-        <span className="ds-reading__drawer-cue" aria-hidden="true" />
-      </summary>
-      <div className="ds-reading__drawer-body">{children}</div>
-    </details>
-  );
-}
-
-/** A run of consecutive stat blocks, laid out as a compact comparison rail. */
-function StatRail({ stats }: { readonly stats: readonly HydratedStoryStat[] }) {
-  return (
-    <div
-      className="ds-reading__statrail"
-      data-count={stats.length}
-      role="group"
-      aria-label="Key figures"
-    >
+    <div className="ds-story-wide ds-story-figures" data-count={stats.length}>
       {stats.map((stat, index) => (
-        <div className="ds-reading__statcell" key={index}>
-          <span className="ds-reading__statfigure">{stat.figure.replace(/_/g, ' ')}</span>
-          <span className="ds-reading__statlabel">{stat.caption ?? stat.claim}</span>
-          <SourceLine numbers={stat.sourceNumbers} />
-        </div>
+        <figure className="ds-story-figures__item" key={index}>
+          <span className="ds-story-figures__number">{stat.figure.replace(/_/g, ' ')}</span>
+          <figcaption className="ds-story-figures__label">
+            {stat.caption ?? stat.claim}
+            <StoryCitationMarks numbers={stat.sourceNumbers} />
+          </figcaption>
+        </figure>
       ))}
     </div>
   );
@@ -136,127 +101,111 @@ function Block({
   readonly block: HydratedStoryBlock;
   readonly index: number;
   readonly refNumberById: ReadonlyMap<string, number>;
-  /** DOM anchor id for an h2 section heading, so the rail's "In this chapter" nav can jump to it. */
+  /** DOM anchor id for an h2 section heading, so the section spine can jump to it. */
   readonly headingId?: string;
 }) {
   switch (block.type) {
-    case 'heading': {
-      const id = headingAnchorId(index, block.text);
+    case 'heading':
       return block.level === 2 ? (
-        <h2 id={headingId} className="ds-reading__heading ds-reading__heading--2">
+        <h2 id={headingId} className="ds-section-heading ds-story-h2">
           {block.text}
         </h2>
       ) : (
-        <h3 id={id} className="ds-reading__heading ds-reading__heading--3">
+        <h3 id={headingAnchorId(index, block.text)} className="ds-story-h3">
           {block.text}
         </h3>
       );
-    }
     case 'paragraph':
-      return (
-        <StoryProse className="ds-reading__p" text={block.text} refNumberById={refNumberById} />
-      );
-    case 'list':
-      // Call-outs. Each item is its own cited assertion, so the citation marks render
-      // per item rather than once for the list — a bullet quoted on its own still
-      // arrives with its receipt.
+      return <StoryProse className="ds-story-p" text={block.text} refNumberById={refNumberById} />;
+    case 'list': {
+      // Call-outs. Each item is its own cited assertion, so the citation marks render per item
+      // rather than once for the list: a line quoted on its own still arrives with its receipt.
+      const items = block.items.map((item, itemIndex) => (
+        <li className="ds-story-list__item" key={itemIndex}>
+          <StoryProse as="span" text={item} refNumberById={refNumberById} />
+        </li>
+      ));
       return block.style === 'number' ? (
-        <ol className="ds-reading__list ds-reading__list--number">
-          {block.items.map((item, index) => (
-            <li className="ds-reading__list-item" key={index}>
-              <StoryProse as="span" text={item} refNumberById={refNumberById} />
-            </li>
-          ))}
-        </ol>
+        <ol className="ds-story-list ds-story-list--number">{items}</ol>
       ) : (
-        <ul className="ds-reading__list">
-          {block.items.map((item, index) => (
-            <li className="ds-reading__list-item" key={index}>
-              <StoryProse as="span" text={item} refNumberById={refNumberById} />
-            </li>
-          ))}
-        </ul>
+        <ul className="ds-story-list">{items}</ul>
       );
+    }
     case 'pullquote':
       return (
-        <blockquote className="ds-reading__pullquote">
+        <blockquote className="ds-story-quote">
           <StoryProse text={block.text} refNumberById={refNumberById} />
-          {block.attribution ? (
-            <cite className="ds-reading__pullquote-cite">{block.attribution}</cite>
-          ) : null}
+          {block.attribution ? <cite>{block.attribution}</cite> : null}
         </blockquote>
       );
     case 'figure':
       return (
-        <figure className="ds-reading__figure">
+        <figure className="ds-story-wide ds-story-chart">
           <ThemeImpactMetricChart observations={block.observations} />
-          <figcaption className="ds-reading__figcaption">
+          <figcaption className="ds-story-caption">
             {block.caption}
             <StoryCitationMarks numbers={block.sourceNumbers} />
           </figcaption>
         </figure>
       );
     case 'stat':
-      // Stats never render standalone here; StoryBody coalesces consecutive
-      // stat blocks into a single StatRail. This case is unreachable but kept
-      // exhaustive for the switch.
+      // Stats never render standalone; StoryBody coalesces runs into FigureCallouts.
       return null;
     case 'primaryDocument':
       return (
-        <ArtifactDrawer
-          open
-          kind={block.dateLabel ? `Primary document · ${block.dateLabel}` : 'Primary document'}
-          lead={block.title}
-        >
-          <figure className="ds-reading__document">
+        <figure className="ds-story-wide ds-story-doc">
+          <div className="ds-story-doc__head">
+            {block.dateLabel ? <p className="ds-story-doc__date">{block.dateLabel}</p> : null}
+            <p className="ds-story-doc__title">{block.title}</p>
+          </div>
+          <div className="ds-story-doc__text">
             {block.quote ? (
-              <blockquote className="ds-reading__document-quote">{block.quote}</blockquote>
+              <blockquote className="ds-story-doc__quote">{block.quote}</blockquote>
             ) : null}
-            <figcaption className="ds-reading__document-summary">
+            <figcaption className="ds-story-doc__summary">
               {block.summary}
               <StoryCitationMarks numbers={block.sourceNumbers} />
             </figcaption>
-          </figure>
-        </ArtifactDrawer>
-      );
-    case 'timeline':
-      return (
-        <ArtifactDrawer kind="Timeline" lead={`${block.events.length} dated documents, in order`}>
-          <div className="ds-reading__timeline">
-            <EraTimeline events={block.events} policyEras={block.policyEras} />
           </div>
-        </ArtifactDrawer>
+        </figure>
       );
+    case 'timeline': {
+      const events = timelinePoints(block.events);
+      if (events.length === 0) return null;
+      const span = timelineSpan(events);
+      return (
+        <div className="ds-story-wide ds-story-timeline">
+          {span ? <p className="ds-story-timeline__span">Dated documents, {span}</p> : null}
+          <EraTimeline events={events} policyEras={block.policyEras} />
+        </div>
+      );
+    }
     case 'mapInset':
       return (
-        <ArtifactDrawer kind="Map" lead={block.label}>
-          <div className="ds-reading__map">
-            <MapInsetMoment
-              entityId={block.entityId}
-              label={block.label}
-              lat={block.lat}
-              lng={block.lng}
-              precision={block.precision}
-            />
-          </div>
-        </ArtifactDrawer>
+        <div className="ds-story-wide ds-story-map">
+          <MapInsetMoment
+            entityId={block.entityId}
+            label={block.label}
+            lat={block.lat}
+            lng={block.lng}
+            precision={block.precision}
+          />
+        </div>
       );
     case 'dispute':
       return (
-        <ArtifactDrawer kind="Two sources disagree" lead={block.label}>
-          <div className="ds-reading__dispute">
-            <DisputeBlock
-              label={block.label}
-              sideA={block.sideA}
-              sideB={block.sideB}
-              standingLine="Both sources are in the archive. We show them side by side and let the contradiction stand."
-            />
-          </div>
-        </ArtifactDrawer>
+        <DisputeBlock
+          className="ds-story-wide"
+          label={block.label}
+          sideA={block.sideA}
+          sideB={block.sideB}
+          standingLine="Both sources are in the archive. They stand side by side, unresolved."
+        />
       );
     case 'image':
       return (
-        <ArchiveFigure
+        <StoryFigure
+          className="ds-story-wide"
           image={block.image}
           {...(block.caption
             ? { caption: <StoryInline text={block.caption} refNumberById={refNumberById} /> }
@@ -270,7 +219,7 @@ function Block({
         <StoryProse as="span" text={text} refNumberById={refNumberById} />
       );
       return (
-        <figure className="ds-reading-table">
+        <figure className="ds-story-wide ds-reading-table">
           <div
             className="ds-reading-table__scroll"
             tabIndex={0}
@@ -300,7 +249,7 @@ function Block({
               </tbody>
             </table>
           </div>
-          <figcaption className="ds-reading__figcaption">
+          <figcaption className="ds-story-caption">
             <StoryProse as="span" text={block.caption} refNumberById={refNumberById} />
           </figcaption>
         </figure>
@@ -308,24 +257,26 @@ function Block({
     }
     case 'video':
       return (
-        <StoryVideo
-          title={block.title}
-          providerLabel={VIDEO_PROVIDER_LABEL[block.provider]}
-          credit={block.credit}
-          rights={VIDEO_RIGHTS_LABEL[block.rightsStatus]}
-          watchUrl={storyVideoWatchUrl(block)}
-          source={storyVideoSource(block)}
-          {...(block.caption
-            ? {
-                caption: (
-                  <StoryProse as="span" text={block.caption} refNumberById={refNumberById} />
-                ),
-              }
-            : {})}
-        />
+        <div className="ds-story-wide">
+          <StoryVideo
+            title={block.title}
+            providerLabel={VIDEO_PROVIDER_LABEL[block.provider]}
+            credit={block.credit}
+            rights={VIDEO_RIGHTS_LABEL[block.rightsStatus]}
+            watchUrl={storyVideoWatchUrl(block)}
+            source={storyVideoSource(block)}
+            {...(block.caption
+              ? {
+                  caption: (
+                    <StoryProse as="span" text={block.caption} refNumberById={refNumberById} />
+                  ),
+                }
+              : {})}
+          />
+        </div>
       );
     case 'divider':
-      return <hr className="ds-reading-divider" />;
+      return <hr className="ds-story-divider" />;
     default:
       return null;
   }
@@ -340,14 +291,13 @@ export function StoryBody({ story }: StoryBodyProps) {
   for (let i = 0; i < blocks.length; i += 1) {
     const block = blocks[i]!;
     if (block.type === 'stat') {
-      // Absorb the whole run of consecutive stats into one comparison rail.
       const run: HydratedStoryStat[] = [];
       let j = i;
       while (j < blocks.length && blocks[j]!.type === 'stat') {
         run.push(blocks[j] as HydratedStoryStat);
         j += 1;
       }
-      rendered.push(<StatRail key={i} stats={run} />);
+      rendered.push(<FigureCallouts key={i} stats={run} />);
       i = j - 1;
       continue;
     }
@@ -362,5 +312,5 @@ export function StoryBody({ story }: StoryBodyProps) {
       />,
     );
   }
-  return <div className="ds-reading__body ds-prose">{rendered}</div>;
+  return <div className="ds-reading__body ds-story-body">{rendered}</div>;
 }

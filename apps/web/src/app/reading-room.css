@@ -150,45 +150,6 @@ a.ds-errata__row-id {
   line-height: 1.5;
 }
 
-/* —— /chapters pager (SP-atlas-v9 chapters package) ————————————————————————————
-   Fifty-plus chapters windows the same way `/records` does: a fixed page size, real
-   anchors, prev/next link relations. Naming is kept separate from `.ds-records-pager`
-   (which lives in the /records route stylesheet) so this reading room adds no
-   per-route stylesheet of its own, per design law. */
-.ds-chapters-pager {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  margin-top: var(--ds-space-6);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-chapters-pager__link {
-  font-size: var(--ds-text-caption);
-  font-weight: 550;
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-chapters-pager__link:hover {
-  color: var(--ds-accent);
-}
-
-.ds-chapters-pager__at {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
-}
-
-.ds-chapters-pager__spacer {
-  flex: 0 0 1px;
-}
-/* —— end /chapters pager —————————————————————————————————————————————————————— */
-
 /* —— /law detail sections ————————————————————————————————————————————————————
    Hairline-divided blocks, not route-owned Surface-card panels — the same vocabulary
    `.ds-room-prose h2` and `GroupHeading` use everywhere else on a reading room. */
@@ -770,55 +731,6 @@ a.ds-errata__row-id {
   font-size: var(--ds-text-caption);
 }
 /* —— end /books detail —————————————————————————————————————————————————————— */
-
-/* —— /stories/[slug] rail — "Records cited" stays in view while the reader scrolls the
-   chapter, the same way a printed margin note tracks the page it annotates. —————————— */
-@media (min-width: 68rem) {
-  .ds-reading-rail {
-    position: sticky;
-    top: 24px;
-  }
-}
-
-/* "Next in this collection" — panel ground behind a copper left rule, per Ink spec §4:
-   the one rail block that reaches forward rather than describing the current chapter. */
-.ds-reading-rail__next {
-  margin-top: var(--ds-space-7);
-  padding: var(--ds-space-4);
-  background: var(--room-note-wash);
-  border-left: var(--ds-border-width-strong) solid var(--ds-accent-graphic);
-  border-radius: var(--ds-radius-sm);
-}
-
-.ds-reading-rail__next-link {
-  display: block;
-  margin-top: var(--ds-space-2);
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-reading-rail__next-link:hover {
-  color: var(--ds-accent);
-}
-
-.ds-reading-rail__next-position {
-  display: block;
-  font-size: var(--ds-text-caption);
-  letter-spacing: 0.06em;
-  color: var(--room-ink-4);
-}
-
-.ds-reading-rail__next-title {
-  display: block;
-  margin-top: 2px;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: var(--ds-text-body-sm);
-  letter-spacing: -0.015em;
-  line-height: 1.3;
-}
-/* —— end /stories/[slug] rail —————————————————————————————————————————————— */
-/* —— end /chapters pager —————————————————————————————————————————————————————— */
 
 /* —— /books catalog rows —————————————————————————————————————————————————————
    Kit rows are a 16px glyph plus clipped 13.5px name. A challenged title is a book: the

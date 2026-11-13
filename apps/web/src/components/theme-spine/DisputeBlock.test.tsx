@@ -1,9 +1,8 @@
 /**
  * Unit coverage for the theme-spine dispute artifact: aria-label presence, both sides render,
- * default vs. overridden label, and typographic parity (no divergent per-side styling that
- * would visually favor one source over the other). Theming here is pure CSS custom properties
- * (`var(--ds-*)`) with no JS branching, so the same markup is correct in both `light` and
- * `dark` — verified by asserting no hardcoded color literal ever appears in the rendered style.
+ * default vs. overridden label, and parity (both sides share one markup shape and one class, so
+ * nothing can favor one source over the other). Styling lives in theme-spine.css on --ds-* tokens,
+ * so the same markup is correct in both themes.
  */
 
 import assert from 'node:assert/strict';
@@ -16,8 +15,7 @@ void React;
 
 const sideA = { sourceLabel: '1948 county deed', claim: 'The parcel was platted in 1948.' };
 const sideB = { sourceLabel: '1951 city survey', claim: 'The parcel was platted in 1951.' };
-const standingLine =
-  'Both documents are in the archive. We show them side by side and let the contradiction stand.';
+const standingLine = 'Both sources are in the archive. They stand side by side, unresolved.';
 
 describe('DisputeBlock', () => {
   it('renders an aside with an aria-label summarizing the contested record', () => {
@@ -61,28 +59,35 @@ describe('DisputeBlock', () => {
     assert.doesNotMatch(html, /The record disagrees with itself/);
   });
 
-  it('gives both sides identical typography — no divergent per-side styling', () => {
+  it('gives both sides identical markup and class: nothing can style one over the other', () => {
     const html = renderToStaticMarkup(
       <DisputeBlock sideA={sideA} sideB={sideB} standingLine={standingLine} />,
     );
-    const paragraphStyles = [...html.matchAll(/<p class="ds-sans" style="([^"]*)"/g)].map(
-      (match) => match[1],
+    const sides = [...html.matchAll(/<div class="ds-dispute__side">(.*?)<\/div>/g)].map((m) =>
+      m[1]!.replace(/>[^<]*</g, '><'),
     );
-    // Two side paragraphs share one style string; a third (standing line) paragraph differs
-    // only by omitting italic, so isolate the two side paragraphs and diff them directly.
-    const sideStyles = paragraphStyles.filter((style) => style?.includes('font-style:italic'));
-    assert.equal(sideStyles.length, 2);
-    assert.equal(sideStyles[0], sideStyles[1]);
+    assert.equal(sides.length, 2);
+    assert.equal(sides[0], sides[1]);
   });
 
-  it('theme-independent: all colors come from --ds-* custom properties, never a hardcoded hex/rgb', () => {
+  it('theme-independent: no inline style or color literal, only stylesheet classes', () => {
     const html = renderToStaticMarkup(
       <DisputeBlock sideA={sideA} sideB={sideB} standingLine={standingLine} />,
     );
+    assert.doesNotMatch(html, /style="/);
     assert.doesNotMatch(html, /#[0-9a-fA-F]{3,8}\b/);
     assert.doesNotMatch(html, /rgb\(/);
-    assert.match(html, /var\(--ds-accent\)/);
-    assert.match(html, /var\(--ds-ink\)/);
-    assert.match(html, /var\(--ds-rule\)/);
+  });
+
+  it('passes a placement class through without touching either side', () => {
+    const html = renderToStaticMarkup(
+      <DisputeBlock
+        className="ds-story-wide"
+        sideA={sideA}
+        sideB={sideB}
+        standingLine={standingLine}
+      />,
+    );
+    assert.match(html, /<aside class="ds-dispute ds-story-wide"/);
   });
 });

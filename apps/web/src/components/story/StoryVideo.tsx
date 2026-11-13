@@ -77,7 +77,7 @@ export function StoryVideo({
           </div>
         </div>
       )}
-      {caption ? <figcaption className="ds-reading__figcaption">{caption}</figcaption> : null}
+      {caption ? <figcaption className="ds-story-caption">{caption}</figcaption> : null}
     </figure>
   );
 }

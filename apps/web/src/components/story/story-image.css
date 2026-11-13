@@ -1,0 +1,51 @@
+/*
+ * StoryImage: the reserved frame every story image sits in. The ground shows while the file is on
+ * its way and stays behind a transparent or letterboxed scan; a failed file says so in the frame.
+ */
+.ds-story-img {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--ds-surface-raised);
+}
+
+.ds-story-img > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* No stored size and nothing painted yet, or a failed file: hold a frame open instead of
+   collapsing to zero. */
+.ds-story-img[data-state='loading']:not([style]),
+.ds-story-img[data-state='failed'] {
+  min-height: 12rem;
+}
+
+.ds-story-img[data-state='failed'] > img {
+  visibility: hidden;
+  position: absolute;
+}
+
+.ds-story-img__failed {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  text-align: center;
+}
+
+.ds-story-img__failed a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  text-underline-offset: 0.2em;
+}

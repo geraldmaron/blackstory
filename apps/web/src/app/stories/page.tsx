@@ -1,50 +1,36 @@
 /**
- * Stories index at `/stories`: the single long-form publication surface. A story is one
- * published piece, and `format` says under which editorial contract — `chapter` for the
- * era-immersion long-forms, `entry` for short entries (a paragraph of context plus
- * individually cited call-outs, published in ordered collections).
+ * Stories index at `/stories`: the long-form publication surface. A story is one published piece,
+ * and `format` says under which editorial contract: `chapter` for the era-immersion long-forms,
+ * `entry` for short cited entries published in ordered collections.
  *
- * Both formats share this index on purpose. A reader looking for what the archive says
- * about a subject should not have to know which contract the answer was written under.
- * Bare `/stories` shows every published Story.
- *
- * Every control here is a link or a form GET, so narrowing is bookmarkable, shareable and
- * crawlable, and the page works with JavaScript off. Windowing reuses the Results rail law
- * from `/records` (`apps/web/src/lib/records/build-records-index.ts`): a fixed page size,
- * real `?page=` anchors, and prev/next link relations.
+ * Bare `/stories` is an editorial front: the newest chapter as a full-width cover, the other
+ * chapters as a row of covers, then everything else as a ruled list under one toolbar. Any choice
+ * in the toolbar (format, sort) or a narrowing that arrives by link (collection, era, tag, place,
+ * an old `q`) turns the page into the flat list of what matches. Every control is a link, so a
+ * view is bookmarkable and works with JavaScript off.
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { listPublicStoryListItems } from '../../lib/stories/source';
-import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
-import { Notice, PageHeader } from '@repo/ui';
+import { Chip, Notice, buttonClassName } from '@repo/ui';
 import {
-  CardGrid,
-  DocumentColophon,
-  FindBar,
-  GroupHeading,
-  Room,
-  RoomCard,
-} from '../../components/room';
-import {
-  buildCollectionShelves,
   buildKindChips,
-  computeStoriesFacts,
+  buildStoriesFront,
   filterItems,
+  hasActiveNarrowing,
   paginateStories,
   parseStoriesQuery,
-  pickLeadStory,
-  showsShelves,
+  showsFront,
   sortItems,
   storiesHref,
   storiesNotice,
-  uncollectedItems,
   STORY_SORT_KEYS,
   STORY_SORT_LABELS,
 } from './stories-index';
-import '../reading-room.css';
+import { Room } from '../../components/room';
+import { ChapterCover, LeadCover, StoriesToolbar, StoryRow } from './StoriesIndexParts';
+import '../../components/story/story-image.css';
 import './stories.css';
-import { formatResultSummary } from '../../lib/discovery/result-summary';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/stories',
@@ -57,258 +43,125 @@ type StoriesPageProps = {
   readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-/** Not "Record": `/records` is the unrelated whole-archive entity index. See stories-index.ts. */
-const FORMAT_LABELS: Record<string, string> = { chapter: 'Chapter', entry: 'Entry' };
-
-/**
- * The lead only renders in the default browse state — `showsShelves` requires the collection
- * sort — so the flag is always "Start here" and never "newest" or "title", since those sorts
- * do not show the lead.
- */
-const LEAD_FLAG = 'Start here';
-
 export default async function StoriesIndexPage({ searchParams }: StoriesPageProps) {
   const query = parseStoriesQuery(await searchParams);
   const { items, source } = await listPublicStoryListItems();
-  const { publishedCount, eraSpanLabel, placeLabel } = computeStoriesFacts(items);
   const filtered = sortItems(filterItems(items, query), query.sort);
   const notice = storiesNotice(source, items.length, filtered.length);
-  const formatChips = buildKindChips(items, query);
-  // Kind shows as the current chip. Everything else that narrows the list gets a removable chip,
-  // because a collection or era arrives from the rail or a shared link and was invisible here.
-  const readable = (value: string) => value.replace(/[-_]+/g, ' ');
-  const activeConstraints = (
+
+  const front = source === 'live' && showsFront(query) ? buildStoriesFront(filtered) : undefined;
+  const pager = paginateStories(front ? front.rest : filtered, query);
+
+  // A collection arrives from a story's masthead by its id; echo it by the label readers saw.
+  const collectionLabel =
+    items.find((item) => item.collection?.id === query.collection)?.collection?.label ??
+    query.collection.replace(/[-_]+/g, ' ');
+  const echoes = (
     [
-      ['q', query.q, `Search: ${query.q}`],
-      ['collection', query.collection, `Collection: ${readable(query.collection)}`],
-      ['tag', query.tag, `Tag: ${readable(query.tag)}`],
-      ['era', query.era, `Period: ${query.era}`],
-      ['place', query.place, `Place: ${readable(query.place)}`],
+      ['q', query.q, `“${query.q}”`],
+      ['collection', query.collection, collectionLabel],
+      ['tag', query.tag, query.tag],
+      ['era', query.era, query.era],
+      ['place', query.place, query.place],
     ] as const
   )
     .filter(([, value]) => value.length > 0)
     .map(([key, , label]) => ({ key, label, href: storiesHref({ ...query, [key]: '', page: 1 }) }));
 
-  // The shelves layout only ever renders in the page's default, unnarrowed browse state (see
-  // `showsShelves`); everything else — a search, a filter, a non-default sort — falls back to
-  // the flat, paginated index above. No new reads: shelves are built from `filtered`, the same
-  // sorted-and-filtered set the flat index already computed.
-  const shelfMode = source === 'live' && items.length > 0 && showsShelves(query);
-  const lead = shelfMode ? pickLeadStory(filtered) : undefined;
-  const shelves = shelfMode ? buildCollectionShelves(filtered) : [];
-  const uncollected = shelfMode ? uncollectedItems(filtered) : [];
-  // Pagination is scoped to the "Everything else" list only — the lead and the shelves above
-  // it stay put across its pages, which is what "applies to the Everything else list only"
-  // means in practice. Outside shelf mode there is no lead or shelf to hold in place, so the
-  // whole filtered set paginates directly.
-  const pager = paginateStories(shelfMode ? uncollected : filtered, query);
+  const formats = buildKindChips(items, query).map((chip) => ({
+    value: chip.label === 'All' ? '' : chip.label === 'Chapters' ? 'chapter' : 'entry',
+    label: `${chip.label} ${chip.count.toLocaleString('en-US')}`,
+    href: chip.href,
+  }));
+  const sort = STORY_SORT_KEYS.map((key) => ({
+    key,
+    label: STORY_SORT_LABELS[key],
+    href: storiesHref({ ...query, sort: key, page: 1 }),
+    current: query.sort === key,
+  }));
 
-  const meta = [
-    `${publishedCount.toLocaleString('en-US')} published`,
-    ...(eraSpanLabel === undefined ? [] : [eraSpanLabel]),
-    placeLabel,
-  ];
+  const toolbar =
+    source === 'live' && items.length > 0 ? (
+      <StoriesToolbar formats={formats} format={query.format} sort={sort} />
+    ) : null;
 
   return (
-    <Room width="wide">
-      <PageHeader
-        title="Start with a year and a place"
-        dek="Long-form chapters that walk from a named year and place through the rules in force, and shorter entries that set out what a given administration actually did. Every story names the records it stands on."
-      />
-      <DocumentColophon facts={meta} />
+    <Room width="wide" className="ds-stories">
+      {/* The covers (or the toolbar) lead in every state; the title is for the outline only, so
+          the toolbar never moves when the reader narrows the list. */}
+      <h1 className="ds-visually-hidden">Stories</h1>
 
-      {source === 'live' && items.length > 0 ? (
-        <FindBar
-          id="stories"
-          action="/stories"
-          queryLabel="Search stories"
-          placeholder="Search by title, subject or collection"
-          query={query.q}
-          /* Narrowing already in the URL rides along, so submitting the search box refines the
-             current view instead of silently resetting it. Defaults stay out of the URL. */
-          preserved={{
-            format: query.format,
-            collection: query.collection,
-            tag: query.tag,
-            era: query.era,
-            place: query.place,
-            sort: query.sort !== 'collection' ? query.sort : undefined,
-          }}
-          active={activeConstraints}
-          clearHref="/stories"
-          rows={[
-            {
-              label: 'Filter by format',
-              chips: formatChips.map((chip) => ({
-                label: chip.label,
-                href: chip.href,
-                active: chip.active,
-                count: chip.count,
-              })),
-            },
-          ]}
-          sort={STORY_SORT_KEYS.map((key) => ({
-            label: STORY_SORT_LABELS[key],
-            href: storiesHref({ ...query, sort: key, page: 1 }),
-            active: query.sort === key,
-          }))}
-          summary={formatResultSummary({
-            matched: filtered.length,
-            total: items.length,
-            singular: 'story',
-            plural: 'stories',
-          })}
-        />
+      {front?.lead ? <LeadCover item={front.lead} /> : null}
+      {front && front.covers.length > 0 ? (
+        <section className="ds-stories-covers" aria-label="More chapters">
+          {front.covers.map((item) => (
+            <ChapterCover key={item.slug} item={item} />
+          ))}
+        </section>
       ) : null}
 
-      {notice.body.length > 0 ? (
-        <Notice tone={source === 'unavailable' ? 'warning' : 'note'} title={notice.title}>
-          {notice.body}
-        </Notice>
-      ) : shelfMode ? (
-        <>
-          {lead ? (
-            <article className="ds-stories-lead">
-              <div className="ds-stories-lead__copy">
-                {/* The lead is the current view's top item, so what makes it the lead is the
-                    sort in force, not an editor's flag. The pill says which. */}
-                <p className="ds-stories-lead__flag">{LEAD_FLAG}</p>
-                <p className="ds-stories-lead__meta">
-                  {/* The collection leads, because it is the thing a reader can follow from
-                      here; the kind and the era are what the row already is. */}
-                  {[
-                    lead.collection?.label,
-                    lead.collection?.positionLabel,
-                    FORMAT_LABELS[lead.format ?? 'chapter'] ?? 'Story',
-                    lead.eraLabel,
-                  ]
-                    .filter((fact): fact is string => Boolean(fact))
-                    .join(' · ')}
-                </p>
-                <h2 className="ds-stories-lead__title">
-                  <a href={`/stories/${lead.slug}`}>{lead.title}</a>
-                </h2>
-                <p className="ds-stories-lead__summary">{lead.summary}</p>
-                <a className="ds-cta ds-cta--copper" href={`/stories/${lead.slug}`}>
-                  {lead.format === 'entry' ? 'Read the entry' : 'Read the chapter'}
-                </a>
-              </div>
-              {lead.heroImage ? (
-                <a
-                  className="ds-stories-lead__plate"
-                  href={`/stories/${lead.slug}`}
-                  aria-hidden="true"
-                  tabIndex={-1}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={lead.heroImage.url} alt="" loading="lazy" />
+      {front && pager.rows.length === 0 ? null : (
+        <section
+          className="ds-stories-browse"
+          data-first={front ? undefined : 'true'}
+          aria-label="All stories"
+        >
+          {toolbar}
+          {echoes.length > 0 ? (
+            <div className="ds-stories-echoes">
+              {echoes.map((echo) => (
+                <Chip key={echo.key} href={echo.href} removable label={echo.label}>
+                  {echo.label}
+                </Chip>
+              ))}
+              {hasActiveNarrowing(query) ? (
+                <a className="ds-stories-echoes__clear" href="/stories">
+                  Clear all
                 </a>
               ) : null}
-            </article>
+            </div>
           ) : null}
 
-          {shelves.map((shelf) => (
-            <section key={shelf.id} className="ds-stories-shelf">
-              <div className="ds-stories-shelf__head">
-                <h2 className="ds-stories-shelf__title">
-                  {shelf.label} <span className="ds-room-num">{shelf.count}</span>
-                </h2>
-                {/* Say how many. "See all" beside a shelf of four is an offer with no size on
-                    it, and the count is the reason to follow it. */}
-                <a className="ds-stories-shelf__all" href={shelf.href}>
-                  See all {shelf.count}
+          {notice.body.length > 0 ? (
+            <div className="ds-stories-notice">
+              <Notice tone={source === 'unavailable' ? 'warning' : 'note'} title={notice.title}>
+                {notice.body}
+              </Notice>
+              {source === 'live' && items.length > 0 ? (
+                <a className={buttonClassName('secondary')} href="/stories">
+                  Show all stories
                 </a>
-              </div>
-              <div className="ds-stories-shelf__grid">
-                {shelf.members.slice(0, 4).map((item, index) => (
-                  <a
-                    key={item.slug}
-                    className="ds-stories-shelf__entry"
-                    href={`/stories/${item.slug}`}
-                  >
-                    {item.heroImage ? (
-                      <span className="ds-stories-shelf__plate">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
-                      </span>
-                    ) : null}
-                    {/* The entry's own number, not its position in this row: a shelf shows
-                        four of nine, and a row index is a fraction of the row rather than of the
-                        collection the reader is being offered. */}
-                    <span className="ds-stories-shelf__index">
-                      {item.collection?.positionLabel ??
-                        `${FORMAT_LABELS[item.format ?? 'chapter'] ?? 'Entry'} ${index + 1}`}
-                    </span>
-                    <span className="ds-stories-shelf__entry-title">{item.title}</span>
-                    <span className="ds-stories-shelf__entry-summary">{item.summary}</span>
-                  </a>
-                ))}
-              </div>
-            </section>
-          ))}
+              ) : null}
+            </div>
+          ) : (
+            <ul className="ds-stories-list">
+              {pager.rows.map((item) => (
+                <StoryRow key={item.slug} item={item} />
+              ))}
+            </ul>
+          )}
 
-          {uncollected.length > 0 ? (
-            <>
-              <GroupHeading>Everything else</GroupHeading>
-              <CardGrid>
-                {pager.rows.map((item) => (
-                  <RoomCard
-                    key={item.slug}
-                    href={`/stories/${item.slug}`}
-                    kind={FORMAT_LABELS[item.format ?? 'chapter'] ?? 'Story'}
-                    icon="stories"
-                    {...(item.heroImage
-                      ? { media: { ...item.heroImage, fit: 'contain' as const } }
-                      : {})}
-                    title={item.title}
-                    description={item.summary}
-                    meta={`${item.eraLabel} · ${item.placeLabel}`}
-                  />
-                ))}
-              </CardGrid>
-            </>
+          {pager.pageCount > 1 ? (
+            <nav className="ds-stories-pager" aria-label="Stories pages">
+              {pager.previousHref === undefined ? (
+                <span />
+              ) : (
+                <a className={buttonClassName('quiet')} href={pager.previousHref} rel="prev">
+                  Previous
+                </a>
+              )}
+              <span className="ds-stories-pager__at">{`Page ${pager.page} of ${pager.pageCount}`}</span>
+              {pager.nextHref === undefined ? (
+                <span />
+              ) : (
+                <a className={buttonClassName('quiet')} href={pager.nextHref} rel="next">
+                  Next
+                </a>
+              )}
+            </nav>
           ) : null}
-        </>
-      ) : (
-        // Outside shelf mode (a search, a kind chip, a non-default sort applied) there is no
-        // lead and no collection grouping to hold in place — just the current query's matches,
-        // as one flat, directly comparable list. Same CardGrid/RoomCard the "Everything else"
-        // list above uses, so narrowed results and the shelf remainder read as one visual system.
-        <CardGrid>
-          {pager.rows.map((item) => (
-            <RoomCard
-              key={item.slug}
-              href={`/stories/${item.slug}`}
-              kind={FORMAT_LABELS[item.format ?? 'chapter'] ?? 'Story'}
-              icon="stories"
-              {...(item.heroImage ? { media: { ...item.heroImage, fit: 'contain' as const } } : {})}
-              title={item.title}
-              description={item.summary}
-              meta={`${item.eraLabel} · ${item.placeLabel}`}
-            />
-          ))}
-        </CardGrid>
+        </section>
       )}
-
-      {pager.pageCount > 1 ? (
-        <nav className="ds-chapters-pager" aria-label="Stories pages">
-          {pager.previousHref === undefined ? (
-            <span className="ds-chapters-pager__spacer" />
-          ) : (
-            <a className="ds-chapters-pager__link" href={pager.previousHref} rel="prev">
-              ← Previous {RECORDS_PAGE_SIZE}
-            </a>
-          )}
-          <span className="ds-chapters-pager__at">{`Page ${pager.page} of ${pager.pageCount}`}</span>
-          {pager.nextHref === undefined ? (
-            <span className="ds-chapters-pager__spacer" />
-          ) : (
-            <a className="ds-chapters-pager__link" href={pager.nextHref} rel="next">
-              Next {RECORDS_PAGE_SIZE} →
-            </a>
-          )}
-        </nav>
-      ) : null}
     </Room>
   );
 }

@@ -1,885 +1,1088 @@
-/**
- * Article publication layout: header, hero, editorial body with inline
- * citations, evidence blocks, and the numbered references section. Shares the
- * design-system tokens with the theme-spine and theme-impact surfaces.
+/*
+ * The story frame: /stories/[slug] (chapters and entries), and the body StoryBody renders
+ * wherever it appears (/lives, the admin preview).
+ *
+ * Tracks: prose on the 680px reading measure; every artifact on the 964px wide track; on wide
+ * screens a 156px section spine to the left, so spine, gap and wide track fill the 1152px page
+ * container and line up with the header.
  */
 
-/*
- * One measure governs the whole chapter column: header, hero, body prose,
- * evidence blocks, and references all share `--ds-content-max` so every left
- * and right edge lines up down the page. The body carries `.ds-prose`, which
- * caps at the same token — keep these in step rather than reintroducing a
- * wider shell around a narrower reading column.
- */
-/*
- * One measure, declared once.
- *
- * The chapter's body measure is the read container's width (680px). The room itself sits on the
- * wide container so the rail fits beside the column; the article caps itself at the measure.
- */
-.ds-room:has(.ds-reading) {
-  --ds-chapter-measure: var(--ds-width-read);
+/* The spine and the Contents bar carry the reader's place; the global hairline would be a second
+   gauge for the same thing. */
+:root:has(.ds-story) .ds-reading-progress {
+  display: none;
 }
 
-.ds-reading {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-8);
-  max-width: var(--ds-chapter-measure, var(--ds-content-max));
+.ds-story {
+  --story-prose: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
+}
+
+.ds-story .ds-room__doc {
+  padding-block: var(--ds-space-12) var(--ds-space-18);
+}
+
+.ds-story__frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ds-story-mast,
+.ds-story__main {
+  width: 100%;
+  max-width: var(--ds-width-record);
   margin-inline: auto;
 }
 
-/*
- * The chapter's own header, hero and byline are gone: it opens on `.ds-reading-mast`, which
- * carries all three over the image. What is left in this block is the inline figure vocabulary
- * `StoryBody` still renders inside the prose.
- */
-.ds-reading__image,
-.ds-reading__figure,
-.ds-reading__document {
+.ds-story-mast {
+  grid-row: 1;
+}
+
+.ds-story-bar {
+  grid-row: 2;
+}
+
+.ds-story__main {
+  grid-row: 3;
+  margin-top: var(--ds-space-8);
+}
+
+/* The three tracks, shared by the masthead and the body so their left edges agree. */
+.ds-story-mast,
+.ds-story-body {
+  display: grid;
+  grid-template-columns:
+    [wide-start] minmax(0, 1fr)
+    [body-start] minmax(0, var(--ds-width-read))
+    [body-end] minmax(0, 1fr)
+    [wide-end];
+}
+
+.ds-story-mast > *,
+.ds-story-body > * {
+  grid-column: body;
+  min-width: 0;
+}
+
+.ds-story-body > .ds-story-wide,
+.ds-story-mast > .ds-story-mast__hero {
+  grid-column: wide;
+}
+
+/* —— Masthead ———————————————————————————————————————————————————————————————— */
+.ds-story-mast__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) 0;
   margin: 0;
-}
-
-/*
- * An inline figure is never cropped. This used to force `aspect-ratio: 3/2` with
- * `object-fit: cover` so a grid of mixed-aspect images shared one footprint, but these are not
- * in a grid: each is one image in one column, and the cover crop cut the head off every
- * full-length portrait in the presidential series (the subject of the picture, removed to keep
- * a ratio nothing depended on).
- *
- * Natural aspect with a height cap instead, in `rem` rather than `vh` so a short window does
- * not shrink the image to a strip.
- */
-.ds-reading__image img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 34rem;
-  object-fit: contain;
-  object-position: center;
-  border-radius: var(--ds-radius-md);
-  border: var(--ds-border-width) solid var(--ds-border);
-  background: var(--ds-surface-raised);
-}
-
-.ds-reading__figcaption {
-  margin-top: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-story-mast__facts > :not(:last-child)::after {
+  content: '·';
+  display: inline-block; /* keeps a link's underline off the separator */
+  padding-inline: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+}
+
+/* A 44px hit area; the negative margin keeps the facts line at its visual height. */
+.ds-story-mast__series {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-block: calc((2.75rem - 1lh) / -2);
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-story-mast__years {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-story-mast__title {
+  margin: var(--ds-space-3) 0 var(--ds-space-6);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-1);
+  font-weight: 650;
+  line-height: var(--ds-leading-display);
+  letter-spacing: var(--ds-tracking-display);
+  text-wrap: balance;
+}
+
+.ds-story-mast__dek {
+  margin: 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.ds-story-mast__rest {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--story-prose);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.ds-story-mast__byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) 0;
+  margin: var(--ds-space-6) 0 0;
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   line-height: 1.5;
 }
 
-.ds-reading__credit {
-  color: var(--ds-ink-subtle);
-  font-style: italic;
+.ds-story-mast__byline > :not(:last-child)::after {
+  content: '·';
+  display: inline-block;
+  padding-inline: var(--ds-space-2);
 }
 
-/* Editorial body — same centered column as the header */
-.ds-reading__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-5);
-  width: 100%;
-}
-
-/* Clears the fixed 64px command bar on an anchor jump — from a reference link, or from the
-   sticky rail's "In this chapter" list. */
-.ds-reading__heading {
-  scroll-margin-top: 88px;
-}
-
-.ds-reading__heading--2 {
-  font-family: var(--ds-font-display);
-  font-size: 30px;
-  line-height: 1.15;
-  margin: var(--ds-space-6) 0 0;
-  padding-top: 24px;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+.ds-story-mast__byline a {
   color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
-.ds-reading__heading--3 {
-  font-family: var(--ds-font-display);
-  font-size: 1.3rem;
-  margin: var(--ds-space-4) 0 0;
-  color: var(--ds-ink);
+.ds-story-mast__hero {
+  margin-top: var(--ds-space-12);
 }
 
-.ds-reading__p {
-  font-family: var(--ds-font-editorial);
-  font-size: 19.5px;
-  line-height: 1.68;
-  color: var(--ds-ink);
+/* An entry's short masthead: the portrait beside the title block, hanging into the margin. */
+.ds-story--entry .ds-story-mast[data-media='photo'] {
+  /* The left track resolves to the body's own left gutter (964 - 590 - 32 - 200 = 142). */
+  grid-template-columns:
+    [wide-start] minmax(0, 1fr)
+    [body-start] minmax(0, calc(var(--ds-width-read) - 5.625rem))
+    [body-end] var(--ds-space-8)
+    [portrait-start] 12.5rem
+    [wide-end];
+}
+
+.ds-story--entry .ds-story-mast__title {
+  font-size: var(--ds-text-display-2);
+}
+
+.ds-story-mast__portrait {
+  grid-column: portrait-start / wide-end;
+  grid-row: 1;
+  align-self: start;
   margin: 0;
 }
 
-/* Inline citation superscript */
+.ds-story-mast__portrait .ds-story-img {
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-story-mast__portrait .ds-story-caption {
+  margin-top: var(--ds-space-2);
+}
+
+/* —— Section spine (wide screens) and Contents bar (everything narrower) ————————————— */
+.ds-story-spine {
+  display: none;
+}
+
+.ds-story-spine__label {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+}
+
+.ds-story-sections {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-sections__link {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-height: 2.75rem;
+  padding: var(--ds-space-1) 0 var(--ds-space-1) var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.ds-story-sections__link:hover {
+  color: var(--ds-ink);
+}
+
+.ds-story-sections__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-story-sections__item[data-state='read'] .ds-story-sections__link {
+  color: var(--ds-ink);
+}
+
+/* The current section: weight and a copper mark on the rule, never color alone. */
+.ds-story-sections__link[aria-current='location'] {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-story-sections__link[aria-current='location']::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: -1.5px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--ds-accent-graphic);
+}
+
+.ds-story-sections__year {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.ds-story-sections__item--sources {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-story-bar {
+  position: sticky;
+  top: var(--ds-island-clearance);
+  z-index: var(--ds-z-content);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  width: 100%;
+  max-width: var(--ds-width-record);
+  min-height: 3.5rem;
+  margin: var(--ds-space-12) auto 0;
+  border-block: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-canvas);
+}
+
+.ds-story-bar__here {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-story-bar__year {
+  flex: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-story-bar__title {
+  overflow: hidden;
+  color: var(--ds-ink);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-story-bar__open,
+.ds-story-sheet__close {
+  flex: none;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ds-story-sheet__close {
+  border-color: transparent;
+}
+
+.ds-story-bar__open:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-story-bar__open:focus-visible,
+.ds-story-sheet__close:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-story-sheet {
+  inset: auto 0 0 0;
+  width: min(100%, 36rem);
+  max-height: 80vh;
+  margin: 0 auto;
+  padding: var(--ds-space-2) var(--ds-space-4)
+    calc(var(--ds-space-6) + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-bottom: 0;
+  border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+}
+
+.ds-story-sheet::backdrop {
+  background: var(--ds-overlay);
+}
+
+.ds-story-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--ds-space-3);
+}
+
+.ds-story-sheet__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 650;
+}
+
+.ds-story-sheet .ds-story-sections__link {
+  min-height: 2.75rem;
+  align-content: center;
+  padding-block: var(--ds-space-2);
+  font-size: var(--ds-text-body-sm);
+}
+
+@media (min-width: 75rem) {
+  .ds-story__frame {
+    grid-template-columns: 9.75rem minmax(0, var(--ds-width-record));
+    column-gap: var(--ds-space-8);
+  }
+
+  .ds-story-mast,
+  .ds-story__main {
+    grid-column: 2;
+  }
+
+  .ds-story-bar {
+    display: none;
+  }
+
+  .ds-story__main {
+    margin-top: var(--ds-space-18);
+  }
+
+  .ds-story-spine {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: start;
+    position: sticky;
+    top: calc(var(--ds-island-clearance) + var(--ds-space-8));
+    display: block;
+    max-height: calc(100vh - var(--ds-island-clearance) - var(--ds-space-12));
+    margin-top: var(--ds-space-18);
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+}
+
+/* —— Body ————————————————————————————————————————————————————————————————————— */
+.ds-story-body > * {
+  margin: 0;
+}
+
+.ds-story-body > * + * {
+  margin-top: var(--ds-space-6);
+}
+
+.ds-story-body > .ds-story-wide,
+.ds-story-body > .ds-story-wide + *,
+.ds-story-body > .ds-story-quote,
+.ds-story-body > .ds-story-quote + *,
+.ds-story-body > .ds-story-divider,
+.ds-story-body > .ds-story-divider + * {
+  margin-top: var(--ds-space-12);
+}
+
+.ds-story-p,
+.ds-story-list {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--story-prose);
+  line-height: 1.62;
+  text-wrap: pretty;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+
+.ds-story-p a:not(.ds-reading__extlink),
+.ds-story-list a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+/* Section h2s are the shared SectionHeading (ds-section-heading, 24/28); the body only sets
+   their spacing, 48px above and 16px below, because its own flow margins win over the primitive. */
+.ds-story-h2,
+.ds-story-h3 {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  text-wrap: balance;
+  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-18));
+}
+
+.ds-story-h3 {
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.ds-story-body > .ds-story-h2:not(:first-child) {
+  margin-top: var(--ds-space-12);
+}
+
+.ds-story-body > .ds-story-h3:not(:first-child) {
+  margin-top: var(--ds-space-12);
+}
+
+.ds-story-body > .ds-story-h2 + *,
+.ds-story-body > .ds-story-h3 + * {
+  margin-top: var(--ds-space-4);
+}
+
+/* Cited call-outs: a ledger in the body face, one fact per ruled row. */
+.ds-story-list {
+  padding: 0;
+  list-style: none;
+}
+
+.ds-story-list__item {
+  padding-block: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-list__item:last-child {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-list--number {
+  counter-reset: story-list;
+}
+
+.ds-story-list--number .ds-story-list__item {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  counter-increment: story-list;
+}
+
+.ds-story-list--number .ds-story-list__item::before {
+  content: counter(story-list);
+  padding-top: 0.3em;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-story-quote {
+  position: relative;
+  padding-top: var(--ds-space-6);
+}
+
+.ds-story-quote::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ds-space-12);
+  height: 2px;
+  background: var(--ds-ink);
+}
+
+.ds-story-quote p {
+  margin: 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-display-3);
+  font-style: italic;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+.ds-story-quote cite {
+  display: block;
+  margin-top: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-style: normal;
+}
+
+.ds-story-divider {
+  width: var(--ds-space-12);
+  height: 1px;
+  margin-inline: auto;
+  border: 0;
+  background: var(--ds-border-strong);
+}
+
+/* Captions: the caption in ink, its credit after it in muted ink, one sans style. */
+.ds-story-caption {
+  margin-top: var(--ds-space-3);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+}
+
+.ds-story-caption__credit {
+  color: var(--ds-ink-muted);
+}
+
+/* Inline citation numbers: copper like every link in prose, with a hit area wider than the
+   glyph so a thumb can land on one. */
 .ds-reading-cite {
+  margin-left: 0.1em;
   font-family: var(--ds-font-sans);
   font-size: 0.65em;
+  font-variant-numeric: lining-nums;
   line-height: 0;
-  margin-left: 0.1em;
   white-space: nowrap;
 }
 
 .ds-reading-cite a {
+  position: relative;
+  padding: 0 0.12em;
   color: var(--ds-accent);
-  text-decoration: none;
   font-weight: 600;
-  padding: 0 0.08em;
+  text-decoration: none;
 }
 
+.ds-reading-cite a::after {
+  content: '';
+  position: absolute;
+  inset: -0.9em -0.2em;
+}
+
+.ds-story-body .ds-reading-cite a {
+  text-decoration: none;
+}
+
+.ds-story-body .ds-reading-cite a:hover,
+.ds-story-body .ds-reading-cite a:focus-visible,
 .ds-reading-cite a:hover,
 .ds-reading-cite a:focus-visible {
   text-decoration: underline;
 }
 
-.ds-reading__pullquote {
-  margin: var(--ds-space-2) 0;
-  padding-left: var(--ds-space-5);
-  border-left: var(--ds-border-width-strong) solid var(--ds-accent);
-}
+/* —— Artifacts on the wide track ————————————————————————————————————————————————— */
 
-.ds-reading__pullquote p {
-  font-family: var(--ds-font-editorial);
-  font-style: italic;
-  font-size: 24px;
-  line-height: 1.3;
-  color: var(--ds-ink);
-  margin: 0;
-}
-
-.ds-reading__pullquote-cite {
-  display: block;
-  margin-top: var(--ds-space-2);
-  font-family: var(--ds-font-sans);
-  font-size: 0.85rem;
-  font-style: normal;
-  color: var(--ds-ink-muted);
-}
-
-/* Evidence blocks sit slightly wider than the prose measure */
-.ds-reading__figure,
-.ds-reading__document,
-.ds-reading__timeline,
-.ds-reading__map,
-.ds-reading__dispute,
-.ds-reading__image {
-  margin-block: var(--ds-space-2);
-}
-
-/* ----------------------------------------------------------------------------
- * Evidence drawers. Primary documents begin open; other context remains collapsible.
- * Native <details>; charts are never wrapped here.
- * ------------------------------------------------------------------------- */
-/* Ink direction: a drawer is a hairline row, not a box — the border/radius/background come
-   off, same move RoomCard makes. A live map moment inside still needs a transparent ground
-   to show the borrowed plate through; that rule below no longer has anything to override. */
-.ds-reading__drawer {
-  margin-block: var(--ds-space-3);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-reading__drawer + .ds-reading__drawer {
-  margin-top: calc(-1 * var(--ds-space-3));
-  border-top: 0;
-}
-
-.ds-reading__drawer-summary {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
-  transition: background 120ms ease;
-}
-
-.ds-reading__drawer-summary::-webkit-details-marker {
-  display: none;
-}
-
-.ds-reading__drawer-summary:hover {
-  background: color-mix(in srgb, var(--ds-accent) 6%, transparent);
-}
-
-.ds-reading__drawer-summary:focus-visible {
-  outline: 2px solid var(--ds-accent);
-  outline-offset: -2px;
-}
-
-.ds-reading__drawer-kind {
-  flex: none;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.ds-reading__drawer-lead {
-  flex: 1 1 auto;
-  font-family: var(--ds-font-editorial);
-  font-size: 0.95rem;
-  color: var(--ds-ink);
-}
-
-/* `+` / `–` text cue, not a rotating chevron — same disclosure idiom room-kit.css's
-   .ds-room-draw__summary uses. */
-.ds-reading__drawer-cue {
-  flex: none;
-  align-self: center;
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
-  color: var(--ds-accent);
-}
-
-.ds-reading__drawer-cue::before {
-  content: '+';
-}
-
-.ds-reading__drawer[open] .ds-reading__drawer-cue::before {
-  content: '\2013'; /* – */
-}
-
-/*
- * Narrow widths: the label takes its own line and the title takes the full measure.
- *
- * The summary is a flex row in which `__drawer-kind` is `flex: none` and `__drawer-lead` is
- * `flex: 1 1 auto`, so every pixel the row is short comes out of the title and none out of the
- * label. A kind label like "PRIMARY DOCUMENT · 2001-02-28" is around 250px of mono caps that
- * will not shrink, which on a 375px screen left the title roughly 90px and set a document name
- * one or two words per line down a dozen lines. The label is the shorter, more compressible
- * string and the title is the thing being named, so the title gets the width.
- */
-@media (max-width: 40rem) {
-  .ds-reading__drawer-summary {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    row-gap: var(--ds-space-1);
-  }
-
-  .ds-reading__drawer-kind {
-    grid-area: 1 / 1;
-  }
-
-  /* Stays on the first row beside the label: a disclosure cue belongs next to the thing that
-     opens, not stranded below a title it does not describe. */
-  .ds-reading__drawer-cue {
-    grid-area: 1 / 2;
-    align-self: start;
-  }
-
-  .ds-reading__drawer-lead {
-    grid-area: 2 / 1 / 3 / -1;
-  }
-}
-
-.ds-reading__drawer-body {
-  padding: 0 var(--ds-space-4) var(--ds-space-4);
-}
-
-/* The wrapped artifact loses its own outer card chrome inside the drawer. The drawer itself
-   carries no background any more (see .ds-reading__drawer above), so a live map moment's
-   borrowed plate — position: fixed below the document's stacking context — already shows
-   through without a transparency override; this only strips the document figure's own box. */
-.ds-reading__drawer-body .ds-reading__document {
-  border: 0;
-  background: transparent;
-  padding: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-reading__drawer-cue,
-  .ds-reading__drawer-summary {
-    transition: none;
-  }
-}
-
-/* ----------------------------------------------------------------------------
- * Stat rail — consecutive figures as one compact comparison strip, not a wall
- * of stacked cards. Two-up when the run is a pair; auto-fit otherwise.
- * ------------------------------------------------------------------------- */
-/* Three-up, 1px-gap grid on panel ground — same technique as the kit's TrustBlock/Anatomy:
-   the gap is the background color showing through as hairlines between cells. */
-.ds-reading__statrail {
-  margin-block: var(--ds-space-4);
+/* Figure callouts: the chapter's own numbers, set as numbers. */
+.ds-story-figures {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 1px;
-  background: var(--ds-rule);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--ds-space-8);
 }
 
-.ds-reading__statrail[data-count='2'] {
-  grid-template-columns: repeat(2, 1fr);
+.ds-story-figures__item {
+  margin: 0;
+  padding-top: var(--ds-space-4);
+  border-top: 2px solid var(--ds-ink);
 }
 
-.ds-reading__statcell {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-1);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-}
-
-.ds-reading__statfigure {
+.ds-story-figures__number {
+  display: block;
+  color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-size: 38px;
-  line-height: 1.05;
-  color: var(--ds-accent);
-  font-variant-numeric: tabular-nums;
+  font-size: var(--ds-text-display-2);
+  font-weight: 650;
+  font-variant-numeric: lining-nums proportional-nums;
+  line-height: 1;
+  letter-spacing: var(--ds-tracking-display);
 }
 
-.ds-reading__statlabel {
-  font-family: var(--ds-font-editorial);
-  font-size: 15.5px;
-  line-height: 1.4;
+.ds-story-figures__label {
+  margin-top: var(--ds-space-3);
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
 }
 
-.ds-reading__statcell .ds-reading-source-line {
-  margin-top: auto;
-}
-
-@media (max-width: 30rem) {
-  .ds-reading__statrail,
-  .ds-reading__statrail[data-count='2'] {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Matches the className StoryBody.tsx actually renders (`ds-reading-source-line`, no
-   double underscore) — this rule previously used the BEM spelling and never matched. */
-.ds-reading-source-line {
-  margin: var(--ds-space-1) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  color: var(--ds-ink-subtle);
-}
-
-.ds-reading__document {
+/* A primary document: the one bordered plate in the body, date and title beside its words. */
+.ds-story-doc {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  gap: var(--ds-space-8);
+  margin: 0;
+  padding: var(--ds-space-8);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface-raised);
-  padding: var(--ds-space-4);
 }
 
-.ds-reading__document-quote {
-  margin: var(--ds-space-3) 0 0;
-  font-family: var(--ds-font-editorial);
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--ds-ink);
-  font-style: italic;
-}
-
-.ds-reading__document-summary {
-  margin-top: var(--ds-space-3);
-  font-family: var(--ds-font-sans);
-  font-size: 0.9rem;
+.ds-story-doc__date {
+  margin: 0 0 var(--ds-space-2);
   color: var(--ds-ink-muted);
-}
-
-/* References — the reader-column heading class stays defined for other article surfaces
-   that still render an inline references section; this route's own list now lives in the
-   sticky rail (see `.ds-reading-rail` in reading-room.css) and no longer wraps in this. */
-
-.ds-reading-references {
-  list-style: none;
-  margin: var(--ds-space-4) 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-  counter-reset: none;
-}
-
-.ds-reading-references__item {
-  display: grid;
-  grid-template-columns: 2.25rem 1fr;
-  gap: var(--ds-space-2);
-  padding-bottom: var(--ds-space-3);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  font-family: var(--ds-font-sans);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  scroll-margin-top: var(--ds-space-8);
-}
-
-.ds-reading-references__item:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.ds-reading-references__item:target {
-  background: var(--ds-surface-raised);
-  border-radius: var(--ds-radius-sm);
-  outline: 2px solid var(--ds-accent);
-  outline-offset: 2px;
-}
-
-.ds-reading-references__num {
-  color: var(--ds-ink-subtle);
-  text-align: right;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
 }
 
-.ds-reading-references__body a {
-  color: var(--ds-accent);
-}
-
-.ds-reading-references__locator {
-  color: var(--ds-ink-subtle);
-}
-
-.ds-reading__footer {
-  margin-top: var(--ds-space-6);
-  font-family: var(--ds-font-sans);
-  font-size: 0.9rem;
-}
-
-.ds-reading__footer a {
-  color: var(--ds-accent);
-}
-
-/* —— the chapter masthead ————————————————————————————————————————————————————
-   The same block the record page opens on, for the same reason: a chapter that leads with its
-   image is a piece of writing, and a chapter that leads with a text header and then shows the
-   image underneath the summary is a document with a picture attached. */
-.ds-reading-mast {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+.ds-story-doc__title {
   margin: 0;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-/*
- * The hero photograph has its own band, centred, and the headline reads below it — at every
- * width, as on a record page (record-room.css has the full reasoning). Written over the photo, a
- * picture shown whole had to be pushed to the right edge to make room for the type, and sat
- * off-centre beside an empty field.
- */
-.ds-reading-mast[data-media='photo'] {
-  display: block;
-  min-height: 0;
-  background: var(--ds-canvas);
-}
-
-.ds-reading-mast__photo {
-  position: relative;
-  height: clamp(260px, 36vw, 500px);
-  max-height: 62svh;
-  background: var(--ds-surface-raised);
-}
-
-.ds-reading-mast img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.ds-reading-mast .ds-fit-photo[data-fit='contain'] .ds-fit-photo__main {
-  position: absolute;
-  object-position: center;
-}
-
-/* Phones and short screens: a 4:3 window rather than a fixed-height band. */
-@media (max-width: 47.9375rem), (max-height: 34.9375rem) {
-  .ds-reading-mast__photo {
-    height: auto;
-    aspect-ratio: 4 / 3;
-  }
-}
-
-/* The scrim is sized to the type, not to the plate: over the whole band the opaque end of the
-   ramp lands under the middle of the picture and the picture never arrives. */
-.ds-reading-mast__over {
-  position: relative;
-  z-index: 1; /* local: over the hero image, inside the masthead figure. */
-  display: flex;
-  flex-direction: column;
-  /* The inline padding was `--ds-gutter` (16px), which put a 44px display title sixteen pixels
-     from the edge of the screen and made the whole masthead read as though the text had fallen
-     off the layout. The masthead is deliberately full-bleed and does not share the body's left
-     edge, so the margin has to do the work of framing it; the comps set 56px. Clamped so the
-     same rule still gives a phone a sane 20px. */
-  padding: var(--ds-space-16) clamp(20px, 4.5vw, 56px) var(--ds-space-10);
-}
-
-/* Below its own photo band, the headline needs no clearance for a picture above it. */
-.ds-reading-mast[data-media='photo'] .ds-reading-mast__over {
-  padding-top: var(--ds-space-8);
-}
-
-.ds-reading-mast__facts {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2) var(--ds-space-3);
-  margin: 0 0 var(--ds-space-4);
-  font-size: 12.5px;
-  color: var(--ds-ink-muted);
-}
-
-/* The collection is the one thing in this row a reader can act on, so it is the one thing drawn
-   as a control. */
-.ds-reading-mast__series {
-  display: inline-flex;
-  align-items: center;
-  height: 26px;
-  padding: 0 11px;
-  border: var(--ds-border-width) solid color-mix(in oklab, var(--ds-accent) 55%, transparent);
-  border-radius: var(--ds-radius-full);
-  background: color-mix(in oklab, var(--ds-accent) 14%, transparent);
-  color: var(--ds-accent);
-  font-size: 12px;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.ds-reading-mast__title {
-  margin: 0;
-  max-width: 22ch;
+  color: var(--ds-ink);
   font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
-  font-size: clamp(36px, 5vw, 64px);
-  line-height: 1;
-  letter-spacing: -0.038em;
+  line-height: 1.3;
+  text-wrap: balance;
 }
 
-.ds-reading-mast__lede {
-  margin: var(--ds-space-5) 0 0;
-  max-width: 56ch;
+.ds-story-doc__quote {
+  margin: 0 0 var(--ds-space-4);
+  color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
-  font-size: clamp(17px, 1.5vw, 21px);
-  line-height: 1.5;
-  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.45;
+  text-wrap: pretty;
 }
 
-.ds-reading-mast__byline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-5) 0 0;
-  font-size: 12.5px;
+.ds-story-doc__summary {
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.55;
 }
 
-/* The credit runs in flow, under the byline.
- *
- * It was absolutely positioned — first bottom-right, where a four-line source note sat directly
- * beside the lede and won on contrast because it landed on the brightest part of the picture;
- * then top-left, which collided with the title outright once the plate was shorter than its own
- * text. Both failures are the same mistake: this figure's height is driven by a title and lede
- * of unknown length, so anything taken out of flow inside it is positioned against a box whose
- * size is not known in advance. In flow it cannot overlap anything, at any measure, ever. */
-.ds-reading-mast__credit {
-  margin-top: var(--ds-space-4);
-  max-width: 66ch;
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.1em;
-  line-height: 1.5;
-  text-transform: uppercase;
-  color: var(--ds-ink-subtle);
+.ds-story-doc__text > :only-child {
+  color: var(--ds-ink);
+  font-size: var(--ds-text-body);
 }
 
-/* —— the chapter's apparatus band ——————————————————————————————————————————— */
-.ds-reading-appx {
-  width: min(100%, 1180px);
+.ds-story-timeline {
+  padding-block: var(--ds-space-6);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-timeline__span {
+  margin: 0 0 var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-story-chart {
+  margin: 0;
+}
+
+/* An archival image keeps its whole frame; the caption runs to the image's own width. */
+.ds-story-figure {
+  display: table;
   margin-inline: auto;
 }
 
-.ds-reading-appx__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin-bottom: var(--ds-space-7);
+.ds-story-figure .ds-story-caption {
+  display: table-caption;
+  caption-side: bottom;
 }
 
-.ds-reading-appx__head h2 {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
+.ds-story-figure__frame {
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
 }
 
-.ds-reading-appx__head span {
-  font-size: 13px;
-  color: var(--ds-ink-muted);
+.ds-story-figure__frame > img {
+  width: auto;
+  max-width: min(calc(100vw - var(--ds-gutter) * 2), var(--ds-width-record));
+  max-height: min(75vh, 44rem);
 }
 
-.ds-reading-appx__cols {
+.ds-story-figure__frame[data-state='loading']:not([style]),
+.ds-story-figure__frame[data-state='failed'] {
+  width: min(calc(100vw - var(--ds-gutter) * 2), var(--ds-width-read));
+}
+
+/* —— End of the piece ——————————————————————————————————————————————————————————— */
+.ds-story-body > .ds-story-end {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  column-gap: var(--ds-space-12);
-  row-gap: var(--ds-space-7);
-  align-items: start;
+  gap: var(--ds-space-12);
+  margin-top: var(--ds-space-18);
+  padding-top: var(--ds-space-12);
+  border-top: var(--ds-border-width) solid var(--ds-border-strong);
 }
 
-@media (max-width: 60rem) {
-  .ds-reading-appx__cols {
-    grid-template-columns: 1fr;
-  }
+/* The end block's h2s are SectionHeadings too; inside the block the gap above is the block's. */
+.ds-section-heading.ds-story-end__heading {
+  margin-top: 0;
 }
 
-.ds-reading-appx__notes {
+.ds-story-end__headrow {
   display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-5);
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
 }
 
-.ds-reading-appx__notes h3 {
-  margin: 0 0 var(--ds-space-2);
-  font-size: 13px;
-  font-weight: 600;
+.ds-story-end__count {
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.ds-reading-appx__notes p {
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
-}
-/* ----------------------------------------------------------------------------
- * "The records behind this chapter" — the story side of the story-cites-record
- * edge, rendered in the apparatus under the numbered sources.
- * Matches the notes column's type scale: this is apparatus, not body prose.
- * ------------------------------------------------------------------------- */
-.ds-reading-appx__records {
-  margin-top: var(--ds-space-5);
+.ds-story-next__card {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: var(--ds-space-6);
+  padding: var(--ds-space-6);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink);
+  text-decoration: none;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-reading-appx__records h3 {
-  margin: 0 0 var(--ds-space-2);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ds-ink-muted);
+.ds-story-next__card:not(:has(.ds-story-next__thumb)) {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.ds-reading-appx__records p {
-  margin: 0 0 var(--ds-space-3);
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+.ds-story-next__card:hover {
+  border-color: var(--ds-border-strong);
 }
 
-/* Names, one per line. A record is a destination, not a chip in a row: the list
-   reads as the chapter's evidence rather than as a filter bar. */
-.ds-reading-appx__record-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
+.ds-story-next__card:focus-visible,
+.ds-story-chapters__card:focus-visible,
+.ds-story-records__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-story-next__thumb {
+  align-self: start;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-story-next__thumb .ds-story-img,
+.ds-story-chapters__media .ds-story-img {
+  height: 100%;
+  min-height: 0;
+}
+
+.ds-story-next__thumb img,
+.ds-story-chapters__media img {
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Chapter images are archive scans; crop inside the paper border, as the /stories covers do. */
+.ds-story-chapters__media img {
+  object-position: 50% 6%;
+  transform: scale(1.06);
+}
+
+.ds-story-next__thumb .ds-story-img__failed,
+.ds-story-chapters__media .ds-story-img__failed {
+  display: none;
+}
+
+.ds-story-next__text {
+  display: grid;
+  align-content: start;
   gap: var(--ds-space-2);
 }
 
-.ds-reading-appx__record-list a {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--ds-ink);
-  text-decoration-color: color-mix(in srgb, var(--ds-ink) 35%, transparent);
-  text-underline-offset: 3px;
-}
-
-.ds-reading-appx__record-list a:hover {
-  text-decoration-color: currentColor;
-}
-
-/* Each record is a 44px row: the link on the left, how the chapter links it beneath. */
-.ds-reading-appx__record-list li {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: var(--ds-reading-target);
-}
-
-.ds-reading-appx__record-relation {
+.ds-story-next__meta {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
 }
 
-.ds-reading-appx__records-note {
-  color: var(--ds-ink-muted);
+.ds-story-next__row {
+  display: grid;
+  gap: var(--ds-space-4);
 }
 
-.ds-reading-appx__record-list a:focus-visible,
-.ds-reading-toc__link:focus-visible {
-  outline: 2px solid var(--ds-accent);
-  outline-offset: 2px;
+@media (min-width: 48rem) {
+  .ds-story-next__row:has(.ds-story-next__card--previous + .ds-story-next__card) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
 }
 
-/* ----------------------------------------------------------------------------
- * "In this chapter" contents. One component, two placements (story-contents.tsx):
- * the inline details above the prose below the room's 68rem rail breakpoint, the sticky rail
- * group from 68rem up. Exactly one is displayed per viewport; the other is display:none so it
- * is neither visible nor announced. 44px is the minimum standalone target.
- * ------------------------------------------------------------------------- */
-.ds-room:has(.ds-reading) {
-  --ds-reading-target: 2.75rem;
+.ds-story-next__card--previous {
+  align-content: center;
 }
 
-.ds-reading-toc {
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-reading-toc__summary {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  min-height: var(--ds-reading-target);
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
-}
-
-.ds-reading-toc__summary::-webkit-details-marker {
-  display: none;
-}
-
-.ds-reading-toc__summary:focus-visible {
-  outline: 2px solid var(--ds-accent);
-  outline-offset: -2px;
-}
-
-.ds-reading-toc__title {
-  flex: 1 1 auto;
+/* The next card's title sits at section-heading size, never above the page's own headings. */
+.ds-story-next__title {
   font-family: var(--ds-font-display);
-  font-weight: 600;
-  color: var(--ds-ink);
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
 }
 
-.ds-reading-toc__count {
-  flex: none;
-  font-size: var(--ds-text-caption);
+.ds-story-next__card:hover .ds-story-next__title,
+.ds-story-chapters__card:hover .ds-story-chapters__title,
+.ds-story-records__link:hover .ds-story-records__name {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.ds-story-next__summary {
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-/* Same `+` / `–` text cue the evidence drawers use. */
-.ds-reading-toc__cue {
-  flex: none;
-  color: var(--ds-accent);
-}
-
-.ds-reading-toc__cue::before {
-  content: '+';
-}
-
-.ds-reading-toc[open] .ds-reading-toc__cue::before {
-  content: '\2013'; /* – */
-}
-
-.ds-reading-toc__list {
+.ds-story-chapters__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--ds-space-8);
   margin: 0;
-  padding: 0 0 var(--ds-space-2);
+  padding: 0;
   list-style: none;
 }
 
-.ds-reading-toc__link {
-  display: flex;
-  align-items: center;
-  min-height: var(--ds-reading-target);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.35;
+.ds-story-chapters__card {
+  display: grid;
+  gap: var(--ds-space-1);
   color: var(--ds-ink);
   text-decoration: none;
+}
+
+.ds-story-chapters__media {
+  aspect-ratio: 3 / 2;
+  margin-bottom: var(--ds-space-3);
+  overflow: hidden;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-sunken);
+}
+
+.ds-story-chapters__title {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.ds-story-chapters__years {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-story-records__note {
+  margin: 0 0 var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-story-records__list {
+  margin: 0 0 var(--ds-space-4);
+  padding: 0;
+  list-style: none;
+}
+
+/* Two columns read row by row, in the story's own order. */
+@media (min-width: 48rem) {
+  .ds-story-records__list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--ds-space-12);
+  }
+}
+
+.ds-story-records__list > li {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story-records__link {
+  display: grid;
+  gap: 2px;
+  padding-block: var(--ds-space-3);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-story-records__name {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ds-story-records__meta {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-story-records__map {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
+
+/* —— Sources ————————————————————————————————————————————————————————————————————— */
+.ds-story-body > .ds-story-sources-block {
+  margin-top: var(--ds-space-18);
+  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-18));
+}
+
+.ds-story-sources {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-story-sources__item {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  padding: var(--ds-space-2) var(--ds-space-2) var(--ds-space-2) 0;
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-18));
+}
+
+.ds-story-sources__item:target {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-story-sources__num {
+  padding-right: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.75;
+  text-align: right;
+}
+
+.ds-story-sources__body {
+  min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.ds-reading-toc__link:hover {
-  color: var(--ds-accent);
-}
-
-.ds-reading-toc {
-  display: none;
-}
-
-/* The rail stacks under the column below 68rem (room-kit.css), so its list would be read after
-   the chapter; the inline contents above replaces it there. Its "Next in this collection"
-   sibling stays. */
-
-/* ----------------------------------------------------------------------------
- * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
- * RailGroup, styled by room-kit.css; only the wrapper's stickiness and the one-off
- * "Next in this collection" block belong to this sheet.
- * ------------------------------------------------------------------------- */
-.ds-reading-rail {
-  position: sticky;
-  top: 24px;
-}
-
-.ds-reading-rail__next {
-  margin-top: var(--ds-space-7);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border-left: var(--ds-border-width-strong) solid var(--ds-accent);
-}
-
-/* The heading above this block is the kit's rail-group title; the link itself carried no rule at
-   all, so it took the global prose underline across both of its lines. */
-.ds-reading-rail__next-link {
-  display: block;
-  text-decoration: none;
-}
-
-.ds-reading-rail__next-position {
-  margin: var(--ds-space-1) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  color: var(--ds-accent);
-}
-
-.ds-reading-rail__next-title {
-  display: block;
-  margin-top: 4px;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: 15.5px;
-  letter-spacing: -0.015em;
+/* Each entry is wholly a link, so the underline is a hairline, not a wall of rules. */
+.ds-story-sources__body a {
   color: var(--ds-ink);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
-.ds-reading-rail__next-title:hover {
-  color: var(--ds-accent);
+.ds-story-sources__body a:hover {
+  text-decoration-color: currentColor;
 }
 
-@media (max-width: 68rem) {
-  .ds-reading-toc {
-    display: block;
+.ds-story-sources__locator {
+  color: var(--ds-ink-muted);
+}
+
+/* —— Phone ——————————————————————————————————————————————————————————————————————— */
+@media (max-width: 47.9375rem) {
+  .ds-story .ds-room__doc {
+    padding-top: var(--ds-space-6);
   }
 
-  .ds-room-rail-group.ds-reading-toc-rail {
-    display: none;
+  .ds-story-mast__hero {
+    margin-top: var(--ds-space-8);
   }
 
-  /* Below .ds-room__body--railed's breakpoint the rail stacks under the column (Room.tsx),
-     where sticky positioning has no meaningful ground to stick to. */
-  .ds-reading-rail {
-    position: static;
+  /* The sticky bar runs edge to edge under the in-flow header. */
+  .ds-story-bar {
+    width: auto;
+    margin-inline: calc(var(--ds-gutter) * -1);
+    padding-inline: var(--ds-gutter);
+    border-top: 0;
+  }
+
+  .ds-story--entry .ds-story-mast[data-media='photo'] {
+    grid-template-columns: [wide-start body-start] minmax(0, 1fr) [body-end wide-end];
+  }
+
+  .ds-story-mast__portrait {
+    grid-column: body;
+    grid-row: auto;
+    order: -1;
+    width: 8rem;
+    margin-bottom: var(--ds-space-6);
+  }
+
+  .ds-story-doc {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-4);
+    padding: var(--ds-space-6) var(--ds-space-4);
+  }
+
+  .ds-story-figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-space-6) var(--ds-space-4);
+  }
+
+  .ds-story-next__card {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: var(--ds-space-4);
+    padding: var(--ds-space-4);
   }
 }
 
-/* ----------------------------------------------------------------------------
- * Inline marks, tables, video plates and section dividers (story-inline grammar).
- * ------------------------------------------------------------------------- */
+@media (max-width: 30rem) {
+  .ds-story-figures {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* —— Inline marks, tables and video (story-inline grammar) ———————————————————————— */
 .ds-reading__extlink {
   color: var(--ds-accent);
   text-decoration: underline;
@@ -902,17 +1105,6 @@
 .ds-reading__extlink-icon {
   margin-left: var(--ds-space-1);
   font-size: var(--ds-text-micro);
-}
-
-.ds-reading-divider {
-  width: 100%;
-  margin: var(--ds-space-6) 0;
-  border: 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-reading-table {
-  margin: var(--ds-space-2) 0;
 }
 
 /* Scrolls sideways inside the figure only; the page never gains a horizontal scrollbar. */
@@ -957,10 +1149,6 @@
     left: 0;
     background: var(--ds-canvas);
   }
-}
-
-.ds-reading-video {
-  margin: var(--ds-space-2) 0;
 }
 
 .ds-reading-video__plate,
@@ -1024,13 +1212,13 @@
   color: var(--ds-canvas);
   background: var(--ds-ink);
   border: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-sm);
   cursor: pointer;
   transition: background var(--ds-duration-fast) var(--ds-ease-standard);
 }
 
 .ds-reading-video__play:hover {
-  background: var(--ds-accent);
+  background: var(--ds-ink-muted);
 }
 
 .ds-reading-video__watch {
@@ -1039,7 +1227,37 @@
   min-height: 44px;
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
-  color: var(--ds-accent);
+  color: var(--ds-ink);
   text-decoration: underline;
   text-underline-offset: 0.18em;
+}
+
+/* —— Loading: the masthead's shape on the reading measure ————————————————————————— */
+.ds-story-wait {
+  display: grid;
+  gap: var(--ds-space-4);
+  max-width: var(--ds-width-read);
+  margin-inline: auto;
+}
+
+.ds-story-wait__line {
+  display: block;
+  height: 1.25rem;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+}
+
+.ds-story-wait__line--facts {
+  width: 12rem;
+  height: 0.875rem;
+}
+
+.ds-story-wait__line--title {
+  width: 70%;
+  height: 4rem;
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-story-wait__line--short {
+  width: 55%;
 }

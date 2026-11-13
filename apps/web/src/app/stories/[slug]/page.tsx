@@ -1,17 +1,29 @@
 /**
- * Story detail page at `/stories/[slug]` (chapters and short entries alike). The publication
- * layout: title → hero image → summary → body (prose with inline citations, figures, stat
- * callouts, primary documents, timelines, map insets, disputes) → numbered
- * references → explicitly linked records. Emits schema.org Story JSON-LD only.
+ * Story page at `/stories/[slug]`, chapters and entries alike, on one frame:
+ *
+ *   masthead (on the reading measure) → hero image (chapters, wide track)
+ *   section spine (sticky, left of the column on wide screens; a Contents bar and sheet below)
+ *   body: prose on the 680px measure, every artifact open on the 964px track
+ *   end block: where to read next, then the records the story links to
+ *   sources: a plain numbered list
+ *
+ * Entries use the same frame with a short masthead: the portrait beside the title, no hero band.
+ * Emits schema.org Article JSON-LD only.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
+import { Notice } from '@repo/ui';
+import { Room } from '../../../components/room';
 import { StoryBody } from '../../../components/story/StoryBody';
-import { StoryHeroPhoto } from '../../../components/story/StoryHeroPhoto';
+import { StoryEnd } from '../../../components/story/StoryEnd';
+import { StoryFigure } from '../../../components/story/StoryFigure';
+import { StoryImage } from '../../../components/story/StoryImage';
 import { StoryReferences } from '../../../components/story/StoryReferences';
-import { StoryContents } from '../../../components/story/story-contents';
 import { StoryRecords } from '../../../components/story/story-records';
+import { StorySpine } from '../../../components/story/StorySpine';
+import { storyImageSrc } from '../../../components/story/story-image';
+import { splitLede } from '../../../components/story/story-text';
 import type { HydratedStory } from '../../../lib/stories/hydrate';
 import { extractChapterHeadings } from '../../../lib/stories/heading-anchors';
 import {
@@ -19,17 +31,11 @@ import {
   listPublishedStorySlugs,
   listPublicStoryListItems,
 } from '../../../lib/stories/source';
-import { nextInCollection, prevInCollection } from '../stories-index';
-import { Notice } from '@repo/ui';
-import { RecordNav, Room } from '../../../components/room';
-import type { RecordNavTarget } from '../../../components/room';
+import { nextInCollection, prevInCollection, sortItems } from '../stories-index';
 import { storyCitedEntities } from '../../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
 import { IMPLICIT_AUTHOR_NAME, storyBylineLines } from '../../../lib/stories/byline';
-import '../../reading-room.css';
 import '../../../components/story/story.css';
-import '../../../components/theme-spine/theme-spine.css';
-import '../../../components/theme-impact/theme-impact.css';
 
 type StoryPageProps = {
   readonly params: Promise<{ readonly slug: string }>;
@@ -73,16 +79,29 @@ function buildStoryJsonLd(story: HydratedStory) {
   return jsonLd;
 }
 
+/** "2026-08-07" as "August 7, 2026". Anything unparseable is shown as stored. */
+function formatDate(iso: string): string {
+  const date = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
+  return Number.isNaN(date.getTime())
+    ? iso
+    : date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+      });
+}
+
 export default async function StoryDetailPage({ params }: StoryPageProps) {
   const { slug } = await params;
   const result = await resolveStory(slug);
 
   if (result.source === 'unavailable') {
     return (
-      <Room width="read">
-        <Notice tone="warning" title="Unavailable">
-          This story is temporarily unavailable while we reconnect to the live record.{' '}
-          <Link href="/stories">Back to all stories</Link>.
+      <Room width="read" className="ds-story">
+        <Notice tone="warning" title="This story is unavailable">
+          The live record could not be reached, so this story cannot be shown right now. Reload to
+          try again, or <Link href="/stories">go back to all stories</Link>.
         </Notice>
       </Room>
     );
@@ -92,46 +111,40 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const story = result.story;
   const { doc } = story;
   const jsonLd = buildStoryJsonLd(story);
-  // No nonce on JSON-LD: CSP script-src governs script EXECUTION, and a <script> with a
-  // non-JavaScript type is never executed, so it is not a script block the policy applies to.
-  // These tags must carry the request nonce to render under the nonce-gated CSP.
-  // no nonce, full content, and zero CSP violations. Passing one here also broke hydration —
-  // React does not send the nonce to the client, so the server rendered nonce="..." against a
-  // client nonce="" and reported a mismatch it "won't patch up" on every trust surface.
+  // No nonce on JSON-LD: CSP script-src governs script execution, and a non-JavaScript <script>
+  // is never executed. Passing one also broke hydration (React does not send the nonce to the
+  // client, so the server's nonce="..." mismatched the client's nonce="").
 
-  // The word this page uses for itself in its own copy: a long-form piece is a "chapter", a
-  // short one is an "entry" — never "record" (that collides with the unrelated `/records`
-  // archive index) and never "chapter" for both (that collides with `/stories`' own kind
-  // filter, which uses "Chapter" to mean this kind specifically). See stories-index.ts.
+  // A long-form piece is a "chapter", a short one an "entry"; never "record", which is the
+  // unrelated `/records` archive index.
   const noun = doc.format === 'entry' ? 'entry' : 'chapter';
+  const isEntry = noun === 'entry';
+  const headings = extractChapterHeadings(story.blocks);
 
-  const chapterHeadings = extractChapterHeadings(story.blocks);
-
-  // "Next in this collection" only needs the rest of the release's list items — the same
-  // read `/stories` already does, cached per request, not a new query.
-  // One read of the release's list items serves both directions; `/stories` already does it and
-  // it is cached per request.
-  const collectionItems = doc.collection ? (await listPublicStoryListItems()).items : [];
-  const next = doc.collection
-    ? nextInCollection(collectionItems, doc.collection.id, doc.collection.position)
+  // One cached read of the release's list items serves next, previous and the other chapters.
+  const items = (await listPublicStoryListItems()).items;
+  const collection = doc.collection;
+  const next = collection ? nextInCollection(items, collection.id, collection.position) : undefined;
+  const previous = collection
+    ? prevInCollection(items, collection.id, collection.position)
     : undefined;
-  const previous = doc.collection
-    ? prevInCollection(collectionItems, doc.collection.id, doc.collection.position)
-    : undefined;
+  const members = collection
+    ? sortItems(
+        items.filter((item) => item.collection?.id === collection.id),
+        'collection',
+      )
+    : [];
+  const nextIndex = next ? members.findIndex((item) => item.slug === next.slug) : -1;
+  const chapters = sortItems(
+    items.filter((item) => (item.format ?? 'chapter') === 'chapter' && item.slug !== doc.slug),
+    'newest',
+  ).slice(0, 2);
 
   /*
-   * "The records behind this <noun>" — the story side of the story-cites-record edge (SP-20).
-   *
-   * The ids come from `storyCitedEntities`, the same derivation the record side reads in
-   * reverse, so a record that lists this story and a story that lists this record can never
-   * disagree. Names are resolved through `listPublicEntityViewsByIds`, which fetches exactly
-   * these ids rather than loading the catalog to read a handful of display names.
-   *
-   * Rendered as real links to each record rather than as one deep link into the Atlas. The
-   * design law calls this "handing a named collection to the Atlas", but `EXPLORE_URL_PARAM_KEYS`
-   * has no multi-id or collection param — `selected` carries one id — so a named collection is
-   * not representable in an Explore URL today. A list of real record links is the same handoff
-   * the reader needs and states nothing the URL vocabulary cannot back.
+   * "Records in this <noun>": the story side of the story-cites-record edge (SP-20). The
+   * ids come from `storyCitedEntities`, the same derivation the record side reads in reverse, so
+   * a record that lists this story and a story that lists this record never disagree. Names are
+   * resolved through `listPublicEntityViewsByIds`, which fetches exactly these ids.
    */
   const linkedRecords = storyCitedEntities(doc);
   const citedRead =
@@ -142,161 +155,117 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
         }))
       : { data: [], source: 'none' as const };
 
-  // Ink spec §4 (/stories/[slug]): the sticky right rail carries "In this chapter/entry", the
-  // reference list and "Next in this collection". The references list itself, its numbering and
-  // its `#ref-N` anchor ids are unchanged (StoryProse's citation superscripts link to those ids
-  // regardless of where in the document the list renders) — only its position moves.
-  const hasRailContent = chapterHeadings.length > 0 || next;
-  const rail = hasRailContent ? (
-    <div className="ds-reading-rail">
-      <StoryContents headings={chapterHeadings} noun={noun} variant="rail" />
-      {next ? (
-        <div className="ds-reading-rail__next">
-          <p className="ds-room-rail-group__title">Next in this collection</p>
-          <a className="ds-reading-rail__next-link" href={`/stories/${next.slug}`}>
-            {next.collection?.positionLabel ? (
-              <span className="ds-mono ds-reading-rail__next-position">
-                {next.collection.positionLabel}
-              </span>
-            ) : null}
-            <span className="ds-reading-rail__next-title">{next.title}</span>
-          </a>
-        </div>
-      ) : null}
-    </div>
-  ) : undefined;
+  const lede = splitLede(doc.summary);
+  const hero = doc.heroImage;
+  const hasSources = story.references.length > 0;
 
-  /*
-   * The piece opens on its image, in its own centred band with the title below it, on the same
-   * masthead the record page uses. A piece with no hero keeps the same block on the canvas: the
-   * type is the masthead in that case.
-   */
-  const masthead = (
-    <figure className="ds-reading-mast" data-media={doc.heroImage ? 'photo' : 'none'}>
-      {doc.heroImage ? <StoryHeroPhoto url={doc.heroImage.url} alt={doc.heroImage.alt} /> : null}
-      <figcaption className="ds-reading-mast__over">
-        <p className="ds-reading-mast__facts">
-          {doc.collection?.label ? (
-            <Link
-              className="ds-reading-mast__series"
-              href={`/stories?collection=${encodeURIComponent(doc.collection.id)}`}
-            >
-              {doc.collection.label}
-            </Link>
-          ) : null}
-          {doc.collection?.positionLabel ? (
-            <span className="ds-mono">{doc.collection.positionLabel}</span>
-          ) : null}
-          <span className="ds-mono">{doc.eraLabel}</span>
-          <span>{doc.placeLabel}</span>
-        </p>
-        <h1 className="ds-reading-mast__title">{doc.title}</h1>
-        <p className="ds-reading-mast__lede">{doc.summary}</p>
-        <p className="ds-reading-mast__byline">
-          {storyBylineLines(doc.contributors).map((line) => (
-            <span key={line}>{line}</span>
-          ))}
-          <span>
-            Published <span className="ds-mono">{doc.publishedAt}</span>
-          </span>
-          {doc.updatedAt ? (
-            <span>
-              Updated <span className="ds-mono">{doc.updatedAt}</span>
-            </span>
-          ) : null}
-          {story.references.length > 0 ? (
-            <span>
-              <a href="#about-this-chapter">References ({story.references.length})</a>
-            </span>
-          ) : null}
-        </p>
-        {/* Inside the overlay, not beside it. The overlay is the element carrying the scrim, so
-            a credit rendered as its sibling sat on bare photograph: subtle-ink text on a bright
-            parchment scan, and a strip of un-dimmed image below the byline. It is hero text like
-            the rest and belongs on the same ground. */}
-        {doc.heroImage?.credit ? (
-          <span className="ds-reading-mast__credit ds-mono">{doc.heroImage.credit}</span>
-        ) : null}
-      </figcaption>
-    </figure>
-  );
-
-  /*
-   * The apparatus band. Every numbered mark in the text resolves here, under the piece rather
-   * than beside its third paragraph: a reader checking a citation has finished the sentence, and
-   * a reader who is not checking one should not be reading past a column of them.
-   */
-  const navPrevious: RecordNavTarget | undefined = previous
-    ? { href: `/stories/${previous.slug}`, label: previous.title }
-    : undefined;
-  const navNext: RecordNavTarget | undefined = next
-    ? { href: `/stories/${next.slug}`, label: next.title }
-    : undefined;
-
-  const recordsBehind = (
-    <StoryRecords
-      noun={noun}
-      slug={doc.slug}
-      linked={linkedRecords}
-      records={citedRead.data}
-      source={citedRead.source}
-    />
-  );
-
-  const apparatus =
-    story.references.length > 0 || linkedRecords.size > 0 || navPrevious || navNext ? (
-      <div className="ds-reading-appx" id="about-this-chapter">
-        <div className="ds-reading-appx__head">
-          <h2>About this {noun}</h2>
-          <span>Every numbered mark in the text resolves here.</span>
-        </div>
-        <div className="ds-reading-appx__cols">
-          <div>
-            {story.references.length > 0 ? (
-              <StoryReferences references={story.references} headingId="about-this-chapter" />
-            ) : null}
-            {recordsBehind}
-          </div>
-          <div className="ds-reading-appx__notes">
-            <section>
-              <h3>How this {noun} was made</h3>
-              <p>
-                Written from released records only. Where two sources disagree the contradiction is
-                shown rather than resolved.
-              </p>
-            </section>
-            <section>
-              <h3>Found a problem?</h3>
-              <p>
-                <Link href="/corrections">Submit a correction</Link> against any record cited above.
-              </p>
-            </section>
-          </div>
-        </div>
-        {/* Prev and next close the foot, after the apparatus: a reader who has finished the
-            piece is choosing where to go, and that choice belongs under the sources rather
-            than beside the third paragraph. The rail's "Next in this collection" is the
-            reading cue mid-scroll; this is the pair. */}
-        <RecordNav
-          {...(navPrevious ? { previous: navPrevious } : {})}
-          {...(navNext ? { next: navNext } : {})}
-        />
-      </div>
-    ) : undefined;
+  const facts = [
+    collection ? (
+      <Link
+        key="collection"
+        className="ds-story-mast__series"
+        href={`/stories?collection=${encodeURIComponent(collection.id)}`}
+      >
+        {collection.label}
+      </Link>
+    ) : null,
+    collection?.positionLabel ? <span key="position">{collection.positionLabel}</span> : null,
+    <span key="era" className="ds-story-mast__years">
+      {doc.eraLabel}
+    </span>,
+    isEntry ? null : <span key="place">{doc.placeLabel}</span>,
+  ].filter(Boolean);
 
   return (
-    <Room width="wide" rail={rail} masthead={masthead} {...(apparatus ? { foot: apparatus } : {})}>
+    <Room width="wide" className={`ds-story ds-story--${noun}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
-      <article className="ds-reading">
-        <StoryContents headings={chapterHeadings} noun={noun} variant="inline" />
-        <StoryBody story={story} />
+      <article className="ds-story__frame">
+        <header className="ds-story-mast" data-media={hero ? 'photo' : 'none'}>
+          <div className="ds-story-mast__text">
+            <p className="ds-story-mast__facts">{facts}</p>
+            <h1 className="ds-story-mast__title">{doc.title}</h1>
+            <p className="ds-story-mast__dek">{lede.dek}</p>
+            {lede.rest ? <p className="ds-story-mast__rest">{lede.rest}</p> : null}
+            <p className="ds-story-mast__byline">
+              {storyBylineLines(doc.contributors).map((line) => (
+                <span key={line}>{line}</span>
+              ))}
+              <span>
+                <time dateTime={doc.publishedAt}>{formatDate(doc.publishedAt)}</time>
+              </span>
+              {doc.updatedAt ? (
+                <span>
+                  Updated <time dateTime={doc.updatedAt}>{formatDate(doc.updatedAt)}</time>
+                </span>
+              ) : null}
+              {hasSources ? (
+                <span>
+                  <a href="#sources">
+                    {story.references.length} {story.references.length === 1 ? 'source' : 'sources'}
+                  </a>
+                </span>
+              ) : null}
+              <span>
+                <Link href="/corrections">Report an error</Link>
+              </span>
+            </p>
+          </div>
+          {hero && isEntry ? (
+            <figure className="ds-story-mast__portrait">
+              <StoryImage
+                src={storyImageSrc(hero.url, 200, hero.width)}
+                fallbackSrc={hero.url}
+                alt={hero.alt}
+                {...(hero.width ? { width: hero.width } : {})}
+                {...(hero.height ? { height: hero.height } : {})}
+                eager
+              />
+              <figcaption className="ds-story-caption">
+                <span className="ds-story-caption__credit">{hero.credit}</span>
+              </figcaption>
+            </figure>
+          ) : null}
+          {hero && !isEntry ? (
+            <StoryFigure className="ds-story-mast__hero" image={hero} eager />
+          ) : null}
+        </header>
 
-        <p className="ds-reading__footer">
-          <Link href="/stories">All stories</Link>
-        </p>
+        <StorySpine headings={headings} {...(hasSources ? { sourcesHref: '#sources' } : {})} />
+
+        <div className="ds-story__main">
+          <StoryBody story={story} />
+
+          <div className="ds-story-body">
+            <StoryEnd
+              next={next}
+              previous={previous}
+              collectionLabel={collection?.label}
+              nextPosition={nextIndex >= 0 ? `${nextIndex + 1} of ${members.length}` : undefined}
+              chapters={chapters}
+              records={
+                <StoryRecords
+                  noun={noun}
+                  slug={doc.slug}
+                  linked={linkedRecords}
+                  records={citedRead.data}
+                  source={citedRead.source}
+                />
+              }
+            />
+
+            {hasSources ? (
+              <section className="ds-story-sources-block" id="sources">
+                <h2 className="ds-section-heading ds-story-end__heading" id="sources-heading">
+                  Sources
+                </h2>
+                <StoryReferences references={story.references} headingId="sources-heading" />
+              </section>
+            ) : null}
+          </div>
+        </div>
       </article>
     </Room>
   );
