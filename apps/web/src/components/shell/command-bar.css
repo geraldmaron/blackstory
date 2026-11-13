@@ -1,10 +1,10 @@
 /*
- * The header (CommandBar.tsx). From 48rem up: a flush, full-bleed 52px bar fixed to the top on an
- * ink ground in both themes (`data-ground="ink"`), its content on the wide container. Lockup, then
- * the tabs as plain text links (the current one heavier, with the copper pin under it), then at
- * the right a compact search that opens in place to a paper field, and the theme icon. Nothing is
- * boxed or filled at rest. Below 48rem: an in-flow 48px bar (lockup, search button, theme), and
- * the search opens full screen.
+ * The header (CommandBar.tsx). From 48rem up: a flush, full-bleed 52px bar fixed to the top on the
+ * table's ground (`data-ground="ink"`: ink in the dark theme, paper in the light one), its content
+ * on the wide container. Lockup, then the tabs as plain text links (the current one heavier, with
+ * the copper pin under it), then at the right a compact search that opens in place to a paper
+ * field, and the theme icon. Nothing is boxed or filled at rest. Below 48rem: an in-flow 48px bar
+ * (lockup, search button, theme), and the search opens full screen.
  *
  * `--ds-header-h` and `--ds-island-clearance` live in @repo/ui shell-header.css.
  */
@@ -17,8 +17,14 @@
   z-index: var(--ds-z-command-bar);
   padding-top: env(safe-area-inset-top, 0px);
   background: var(--ds-canvas);
-  /* One hairline: it separates the bar from an ink page and disappears into a color block. */
+  /* One hairline: it separates the bar from the page and disappears into a color block. */
   box-shadow: inset 0 calc(-1 * var(--ds-border-width)) 0 var(--ds-border);
+  /* The bar's own roles, resolved here and handed down to the search field: the field sits on a
+     paper ground of its own, and at rest it is drawn in the bar's colors, not the paper's. */
+  --ds-bar-ink: var(--ds-ink);
+  --ds-bar-ink-muted: var(--ds-ink-muted);
+  --ds-bar-edge: var(--ds-border-control);
+  --ds-bar-accent: var(--ds-accent);
 }
 
 .ds-bar__inner {
@@ -37,7 +43,7 @@
 
 /* ---- search ------------------------------------------------------------- */
 
-/* At rest a compact control with a hairline edge on the ink; focused, or holding a query, the
+/* At rest a compact control with a hairline edge on the bar; focused, or holding a query, the
    same field widens in place to the paper search. One input at every state. */
 .ds-bar__search-region {
   display: flex;
@@ -66,10 +72,10 @@
   align-items: center;
   min-width: 0;
   height: 36px;
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 40%, transparent);
+  border: var(--ds-border-width) solid var(--ds-bar-edge);
   border-radius: var(--ds-radius-sm);
   background: transparent;
-  color: var(--ds-fixed-paper);
+  color: var(--ds-bar-ink);
   cursor: text;
   transition:
     border-color var(--ds-duration-fast) var(--ds-easing),
@@ -99,16 +105,16 @@
   min-width: 20px;
   height: 20px;
   margin-right: var(--ds-space-2);
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-fixed-paper) 32%, transparent);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-bar-ink) 32%, transparent);
   border-radius: calc(var(--ds-radius-sm) / 2);
-  color: var(--ds-fixed-stone);
+  color: var(--ds-bar-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
   line-height: 1;
 }
 
 .ds-bar__search:hover {
-  border-color: var(--ds-fixed-stone);
+  border-color: var(--ds-bar-ink-muted);
 }
 
 .ds-bar__search:focus-within,
@@ -123,10 +129,10 @@
   display: none;
 }
 
-/* The ring sits on the field, not on the bare input inside it. The field is paper on the ink
-   bar, so its ring is copper (6.1:1 on ink), not the paper ground's ink ring. */
+/* The ring sits on the field, not on the bare input inside it. The field is paper on the bar, so
+   its ring is the bar's copper (6.1:1 on ink, 5.6:1 on paper), not the paper ground's ink ring. */
 .ds-bar__search:focus-within {
-  outline: var(--ds-focus-width) solid var(--ds-fixed-accent);
+  outline: var(--ds-focus-width) solid var(--ds-bar-accent);
   outline-offset: var(--ds-focus-offset);
 }
 
@@ -145,7 +151,7 @@
 }
 
 .ds-bar__search-input::placeholder {
-  color: var(--ds-fixed-stone);
+  color: var(--ds-bar-ink-muted);
   opacity: 1;
 }
 

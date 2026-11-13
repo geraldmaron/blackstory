@@ -51,7 +51,7 @@
   margin-top: calc(var(--ds-space-24) * -1);
 }
 
-/* Ink in both themes: on the light table it is the page's contrast block. The numeral sits at the
+/* The table's ground: ink in the dark theme, paper in the light one. The numeral sits at the
    panel's far edge and is cropped by its foot. */
 .ds-stories-lead__panel {
   position: relative;

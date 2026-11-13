@@ -1,7 +1,9 @@
 /**
  * A full-bleed color band that breaks a page into chapters: copper, sand, paper or ink, used at
  * full strength. It sets `data-ground`, so type and controls inside it take that ground's colors
- * (ink on copper and sand, ink on paper, paper on ink). Put a `.ds-wrap` inside for the measure.
+ * (ink on copper and sand, ink on paper, paper on ink). The ink tone is the table's ground: ink in
+ * the dark theme, a paper step in the light one (tokens.css). Put a `.ds-wrap` inside for the
+ * measure.
  *
  * `wipe` lets the band wipe in once as it scrolls into view (scroll-linked, skipped under
  * reduced motion and where the browser cannot tie animation to scroll).

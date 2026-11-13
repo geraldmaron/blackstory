@@ -1,5 +1,5 @@
 /**
- * The theme switch repaints everything, live. Three ways it has failed, each guarded here:
+ * The theme switch repaints everything, live. Four ways it has failed, each guarded here:
  *
  * 1. A role token set by one theme and not the other keeps the old theme's value after a switch.
  * 2. A `[data-theme='dark'] .thing` rule also reaches a paper sheet or a sand block inside the dark
@@ -8,6 +8,7 @@
  *    table itself, never inside a ground, may key on the theme.
  * 3. A map whose style is built once keeps the old plate (MapStage and RecordMap rebuild on a
  *    `data-theme` change).
+ * 4. See the light-table test below.
  */
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -40,6 +41,29 @@ test('the light and dark role blocks define exactly the same tokens', () => {
     [],
     'set in dark only',
   );
+});
+
+/*
+ * 4. An ink ground that stays black on the light table (the header and the ink blocks did). On the
+ *    light table it takes the light roles on a paper step, by one selector in tokens.css; the two
+ *    small plates that carry meaning as ink opt out with `data-ground-fixed`.
+ */
+test('on the light table an ink ground is paper, unless it is fixed', () => {
+  const flip = ":root:not([data-theme='dark']) [data-ground='ink']:not([data-ground-fixed])";
+  assert.ok(tokens.includes(`[data-ground='sand'],\n${flip} {\n  color-scheme: light;`), 'roles');
+  assert.ok(
+    tokens.includes(`[data-ground='sand'],\n${flip} {\n  --ds-lockup-on-light: block;`),
+    'lockup artwork',
+  );
+  const own = block(`${flip} {\n  --ds-canvas`);
+  assert.match(own, /--ds-canvas: var\(--ds-material-table\);/);
+  // Small type in the soft numeral color steps to copper text there; copper pin is 3.5:1.
+  assert.match(own, /--ds-numeral-soft-text: var\(--ds-accent\);/);
+  // Archive Paper: the paper step contrast.test.ts measures ink, stone and copper text on.
+  assert.match(tokens, /--ds-material-table: #f4efe5;/);
+  for (const file of ['app/errata/ErrataSections.tsx', 'components/lives/LivesEraScrubber.tsx']) {
+    assert.match(readFileSync(join(src, file), 'utf8'), /data-ground-fixed=/, file);
+  }
 });
 
 const SURFACE_LAYERS = /^\.ds-(map-stage|edition-atmosphere|map-names-wall)/;

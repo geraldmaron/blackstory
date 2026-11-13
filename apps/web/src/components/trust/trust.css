@@ -307,7 +307,7 @@
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   font-weight: 600;
-  color: var(--ds-numeral-soft);
+  color: var(--ds-numeral-soft-text);
 }
 
 .ds-trust-flow__steps {

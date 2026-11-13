@@ -19,7 +19,7 @@ const css = readFileSync(new URL('../styles/tokens.css', import.meta.url), 'utf8
 
 const themeSelectors: Record<ThemeName, string> = {
   light:
-    ":root,\n[data-theme='light'],\n[data-ground='paper'],\n[data-ground='copper'],\n[data-ground='sand'] {",
+    ":root,\n[data-theme='light'],\n[data-ground='paper'],\n[data-ground='copper'],\n[data-ground='sand'],\n:root:not([data-theme='dark']) [data-ground='ink']:not([data-ground-fixed]) {",
   dark: "[data-theme='dark'],\n[data-ground='ink'] {",
 };
 

@@ -56,8 +56,8 @@ test('the header has one search field and no floating island, pill track or Room
   assert.match(source, /<Tabs\b/);
   // Home is the lockup, never a tab.
   assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
-  // Flush and full bleed: fixed to the top edge on an ink ground in both themes, no inset or
-  // radius; the search is a paper field on it.
+  // Flush and full bleed: fixed to the top edge on the ink ground (ink in the dark theme, paper in
+  // the light one, by tokens.css), no inset or radius; the search is a paper field on it.
   assert.match(css, /\.ds-bar \{[^}]*top:\s*0;[^}]*left:\s*0;/s);
   assert.match(source, /className=\{cx\('ds-bar', className\)\}\s*data-ground="ink"/);
   assert.match(read('CommandBarSearch.tsx'), /data-ground="paper"/);

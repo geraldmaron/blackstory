@@ -184,6 +184,8 @@ body:has(.ds-law) .ds-reading-progress {
 
 .ds-law-era__span > .ds-law-era__to {
   margin-block: var(--ds-space-2);
+  /* Below display size, so the text-safe step of the numeral's color. */
+  color: var(--ds-numeral-soft-text);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-title);
   font-style: italic;

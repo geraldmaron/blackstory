@@ -45,8 +45,8 @@ export function CoverImage({
 
 /**
  * The newest chapter, edge to edge under the header: the cover unfiltered, and the title at display
- * scale on a solid ink panel that overlaps the picture's foot. The panel is ink in both themes, so
- * the type never sits on the picture and needs no scrim.
+ * scale on a solid panel that overlaps the picture's foot. The panel is the table's ground (ink in
+ * the dark theme, paper in the light one), so the type never sits on the picture and needs no scrim.
  */
 export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
   const year = firstYear(item.eraLabel);

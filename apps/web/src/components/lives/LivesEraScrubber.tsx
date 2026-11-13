@@ -139,8 +139,10 @@ export function LivesEraScrubber({
                 tabIndex={isSelected ? 0 : -1}
                 className="lives-scrub__era"
                 data-empty={era.marks ? undefined : 'true'}
-                // The chosen era turns into an ink block (shape and weight, not color alone).
+                // The chosen era turns into an ink plate (shape and weight, not color alone), ink
+                // in both themes: on the light table an unfixed ink ground is paper.
                 data-ground={isSelected ? 'ink' : undefined}
+                data-ground-fixed={isSelected ? '' : undefined}
                 onClick={() => choose(index, false)}
                 onKeyDown={onKeyDown}
               >

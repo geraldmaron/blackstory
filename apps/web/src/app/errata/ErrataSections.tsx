@@ -71,10 +71,12 @@ function ErrataRow({
         ) : (
           <span className="ds-errata__name">{name}</span>
         )}
-        {/* A correction changed a fact, so it reads heaviest: an ink tag. The rest are sand. */}
+        {/* A correction changed a fact, so it reads heaviest: an ink tag, ink in both themes. The
+            rest are sand. */}
         <span
           className="ds-errata__type"
           data-ground={entry.changeType === 'correction' ? 'ink' : 'sand'}
+          data-ground-fixed={entry.changeType === 'correction' ? '' : undefined}
         >
           {ERRATA_CHANGE_TYPE_LABELS[entry.changeType]}
         </span>

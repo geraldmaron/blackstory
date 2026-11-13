@@ -9,7 +9,8 @@
 [data-theme='light'],
 [data-ground='paper'],
 [data-ground='copper'],
-[data-ground='sand'] {
+[data-ground='sand'],
+:root:not([data-theme='dark']) [data-ground='ink']:not([data-ground-fixed]) {
   color-scheme: light;
 
   /*
@@ -206,7 +207,8 @@
 [data-theme='light'],
 [data-ground='paper'],
 [data-ground='copper'],
-[data-ground='sand'] {
+[data-ground='sand'],
+:root:not([data-theme='dark']) [data-ground='ink']:not([data-ground-fixed]) {
   --ds-lockup-on-light: block;
   --ds-lockup-on-dark: none;
 }
@@ -221,7 +223,8 @@
  * Materials: the archive table and what lies on it (art direction v2). Three materials at full
  * strength, independent of the theme the way a printed sheet is:
  *
- *   ink    the table. Header, map surround, prev/next blocks.
+ *   ink    the table. Header, map surround, prev/next blocks. Ink on the dark table; on the
+ *          light table it is paper (see the light-table rule below).
  *   paper  documents. Anything read is a paper sheet with ink on it.
  *   copper / sand  pins, numerals, bands, the primary action, whole color-blocked sections.
  *
@@ -244,6 +247,8 @@
 :root {
   --ds-material-paper: #fffdf8;
   --ds-material-ink: #0a0a0a;
+  /* What an ink block is made of on the light table: Archive Paper. */
+  --ds-material-table: #f4efe5;
   --ds-material-copper: #b86b2a;
   /* The step between copper and ink on a density ramp (state tile maps). Paper text reads on it. */
   --ds-material-copper-deep: #8e4f2a;
@@ -266,9 +271,14 @@
   /* The primary action: copper with ink type, except on copper and sand, where it is ink. */
   --ds-primary-bg: var(--ds-accent-graphic);
   --ds-primary-ink: #0a0a0a;
-  /* Display numerals: `accent` carries meaning (3:1 large), `soft` is the quieter step. */
+  /* Display numerals: `accent` carries meaning (3:1 large), `soft` is the quieter step, and
+     `soft-text` is that step where it sets type below display size (4.5:1). */
   --ds-numeral-accent: var(--ds-accent-graphic);
   --ds-numeral-soft: var(--ds-accent-muted);
+  --ds-numeral-soft-text: var(--ds-accent);
+  /* The outline of a card or panel that would otherwise sink into its table. None on the four
+     materials; a hairline where the ink ground turns to paper on the light table (below). */
+  --ds-ground-edge: transparent;
 }
 
 :root {
@@ -276,10 +286,12 @@
   --ds-primary-ink: #0a0a0a;
   --ds-numeral-accent: var(--ds-accent-graphic);
   --ds-numeral-soft: var(--ds-accent-graphic);
+  --ds-numeral-soft-text: var(--ds-accent);
 }
 
 [data-theme='dark'] {
   --ds-numeral-soft: #d8a178;
+  --ds-numeral-soft-text: #d8a178;
 }
 
 [data-ground='paper'] {
@@ -292,6 +304,23 @@
 [data-ground='ink'] {
   --ds-canvas: var(--ds-material-ink);
   --ds-numeral-soft: #d8a178;
+  --ds-numeral-soft-text: #d8a178;
+}
+
+/*
+ * On the light table the ink ground is paper (owner decision 2026-11-13): the header, the tab bar
+ * and every ink block take the light roles on Archive Paper, one step under the table the way ink
+ * sits one step under the dark table. The selector joins the light role list at the top of this
+ * file, so nothing under such a block needs a theme rule of its own. A card or panel that stood
+ * out as ink draws --ds-ground-edge so it still reads as one. `data-ground-fixed` keeps a small
+ * plate ink in both themes: a selected tab, a tag on a sheet. Marks drawn in --ds-material-ink
+ * (data bars, media wells) are ink in both themes too.
+ */
+:root:not([data-theme='dark']) [data-ground='ink']:not([data-ground-fixed]) {
+  --ds-canvas: var(--ds-material-table);
+  --ds-numeral-soft: var(--ds-accent-graphic);
+  --ds-numeral-soft-text: var(--ds-accent);
+  --ds-ground-edge: var(--ds-rule);
 }
 
 [data-ground='copper'],

@@ -205,14 +205,16 @@
 }
 
 /* —— The histogram on the map's bottom edge ————————————————————————————————— */
-/* An ink strip in both themes (`data-ground="ink"` on the dock): sand bars, copper brushed range. */
+/* A strip on the table's ground (`data-ground="ink"` on the dock): ink in the dark theme, paper in
+   the light one. Its bars and brushed range take their colors from that ground. */
 .ds-xdock {
   position: fixed;
   right: 0;
   bottom: 0;
   left: var(--ds-xcol-w);
   z-index: var(--ds-z-atlas-instruments);
-  background: var(--ds-material-ink);
+  background: var(--ds-canvas);
+  box-shadow: inset 0 var(--ds-border-width) 0 var(--ds-ground-edge);
   pointer-events: auto;
 }
 

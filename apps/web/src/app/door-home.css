@@ -101,13 +101,15 @@
   pointer-events: auto;
 }
 
-/* The opening: a solid ink block on the chart, hard-edged, with the headline at display scale. */
+/* The opening: a solid block on the chart in the table's ground (ink in the dark theme, outlined
+   paper in the light one), hard-edged, with the headline at display scale. */
 .ds-door-open {
   display: grid;
   gap: var(--ds-space-4);
   min-width: 0;
   padding: var(--ds-space-8) var(--ds-space-8) var(--ds-space-8);
   border-radius: var(--ds-radius-md);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge);
   color: var(--ds-ink);
   animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
