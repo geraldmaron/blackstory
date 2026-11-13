@@ -59,7 +59,12 @@ for (const route of [...VISUAL_ROUTES, ...RULE_ONLY_ROUTES]) {
       return {
         spill,
         overflow: document.documentElement.scrollWidth - window.innerWidth,
-        h1: document.querySelectorAll('h1').length,
+        // Headings a reader can reach. The map page keeps the home journey mounted under
+        // `visibility: hidden` for the morph back to it; that heading is outside the
+        // accessibility tree and is not a second <h1>.
+        h1: [...document.querySelectorAll('h1')].filter(
+          (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden',
+        ).length,
         title: document.title,
         canonical: document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href ?? '',
         ogTitle:
