@@ -20,6 +20,7 @@ import {
   storyCollectionSlug,
 } from '../lib/discovery/story-collection';
 import { loadRecordsCatalog } from '../lib/records/records-catalog';
+import { loadDrawnRecordHrefs } from '../lib/map-experience/door-catalog';
 
 /** The public families a released record can address. */
 export type RecordFamily = 'place' | 'invention';
@@ -29,7 +30,7 @@ export function familyForKind(kind: string | undefined): RecordFamily {
   return kind === 'invention' ? 'invention' : 'place';
 }
 
-type ListNeighbors = Parameters<typeof placeDiscoveryReturn>[3];
+type ListNeighbors = Parameters<typeof placeDiscoveryReturn>[2];
 
 /**
  * Previous/next within the list the reader came from, for any record family. Only a list origin
@@ -41,7 +42,10 @@ async function loadRecordListNeighbors(
   entityId: string,
 ): Promise<ListNeighbors> {
   if (arrival.view !== 'list') return undefined;
-  const { data: catalog } = await loadRecordsCatalog();
+  const [{ data: catalog }, drawnHrefs] = await Promise.all([
+    loadRecordsCatalog(),
+    loadDrawnRecordHrefs(),
+  ]);
   const query = recordsQueryFromDiscovery(arrival);
   // A named collection steps through its own released members. When it cannot be resolved
   // (unknown story, failed read, malformed token) there is no list to step through; the arrival
@@ -64,6 +68,7 @@ async function loadRecordListNeighbors(
     entityId,
     placeArrivalQuery(arrival, 'list'),
     members,
+    drawnHrefs,
   );
   if (!found) return undefined;
   return {
@@ -80,9 +85,8 @@ async function loadRecordListNeighbors(
 export async function recordDiscoveryReturn(
   entityId: string,
   arrival: DiscoveryState,
-  geo: { readonly lat: number; readonly lng: number } | undefined,
   mapped = true,
 ): Promise<PlaceDiscoveryReturn> {
   const neighbors = await loadRecordListNeighbors(arrival, entityId);
-  return placeDiscoveryReturn(entityId, arrival, geo, neighbors, mapped);
+  return placeDiscoveryReturn(entityId, arrival, neighbors, mapped);
 }

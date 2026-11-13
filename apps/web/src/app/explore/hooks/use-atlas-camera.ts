@@ -128,10 +128,8 @@ export function useAtlasCamera(
 
   /**
    * The establishing shot. Start wide, then go deep (§4.2 rule 2) — once the plate has been
-   * revealed, not once the canvas has size. The first-paint board is drawn at the plate's opening
-   * frame (explore-map-underlay.css), so the handoff is two identical pictures crossfading; a
-   * shot that started before the reveal was seen mid-flight through that fade, and on a cold load
-   * a mount-timed shot can fire before MapLibre exists and never run. `ready` replays for a plate
+   * revealed, not once the canvas has size. On a cold load a mount-timed shot can fire before
+   * MapLibre exists and never run. `ready` replays for a plate
    * revealed on an earlier page, so arriving from the
    * Door still gets the shot. Under reduced motion the shot is a cut and takes no beat.
    */

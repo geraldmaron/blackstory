@@ -7,10 +7,7 @@
  * when it is on first paint and the record it opens holds.
  */
 import assert from 'node:assert/strict';
-import { createElement } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { FirstPaintPinPlate } from '../../app/first-paint-pin-plate';
 import { listPublicEntities } from '../../data/public-seed';
 import { atlasWalkHref, isHoldingPlaceHref } from '../place/public-place-path';
 import { buildExploreMapSource } from './build-explore-map-source';
@@ -25,7 +22,6 @@ import {
   toFirstPaintPins,
   toFirstPaintShell,
 } from './first-paint-pins';
-import { conusPinPercent } from './conus-mercator';
 import type { ExploreMapFeature } from './build-explore-map-source';
 
 function leakyFeature(
@@ -77,12 +73,8 @@ function leakyShell() {
 function firstPaintDocument(
   pins: ReturnType<typeof toFirstPaintPins>,
   shell: ReturnType<typeof leakyShell> | ReturnType<typeof toFirstPaintShell>,
-): { readonly document: string; readonly plate: string } {
-  const plate = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins }));
-  return {
-    plate,
-    document: `${JSON.stringify(shell)}${JSON.stringify(pins)}${plate}`,
-  };
+): string {
+  return `${JSON.stringify(shell)}${JSON.stringify(pins)}`;
 }
 
 test('thinDoorNationalPins caps dense metros and balances regions', () => {
@@ -154,14 +146,12 @@ test('fail 1: shop tokens are gone from the first document, and a holding walk s
     }),
   ]);
   const shell = toFirstPaintShell(leakyShell());
-  const { document, plate } = firstPaintDocument(pins, shell);
+  const document = firstPaintDocument(pins, shell);
   assert.doesNotMatch(document, /42Cb1758/);
   assert.doesNotMatch(document, /Grade A/);
   assert.doesNotMatch(document, /ent_/);
   assert.doesNotMatch(document, /\/entity\//);
-  assert.match(plate, /href="\/place\/dillard-high-school-old"/);
-  assert.match(plate, /ds-first-paint-pin--walk/);
-  assert.doesNotMatch(plate, /ds-map-entity-marker/);
+  assert.equal(isFirstPaintWalk(pins.features[1]!), true);
   assert.equal(pins.features[0]!.properties.displayName, '');
   assert.equal(pins.features[0]!.properties.href, '');
   assert.equal(pins.features[1]!.properties.displayName, 'Dillard High School, Old');
@@ -210,25 +200,16 @@ test('fail 2: only holding /place/ pins are links; the rest of the plate is not 
     }),
   ]);
   const holding = pins.features.filter((feature) => isFirstPaintWalk(feature));
-  const plate = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins }));
-  const walkHrefs = [...plate.matchAll(/href="(\/place\/[^"]+)"/g)].map((match) => match[1]);
-  const pinDiscs = plate.match(/ds-first-paint-pin(?!-)/g) ?? [];
-  const anchors = plate.match(/<a\b/g) ?? [];
-  assert.ok(pinDiscs.length > 0);
-  assert.ok(pinDiscs.length <= pins.features.length);
-  assert.doesNotMatch(plate, /ds-map-entity-marker/);
+  const walkHrefs = pins.features
+    .map((feature) => feature.properties.href)
+    .filter((href) => href.startsWith('/place/'));
   assert.ok(pins.features.length > holding.length);
   assert.equal(walkHrefs.length, holding.length);
-  assert.equal(anchors.length, holding.length);
   for (const href of walkHrefs) {
-    assert.equal(isHoldingPlaceHref(href ?? ''), true);
-    assert.doesNotMatch(href ?? '', /dillard-university|dillard-house|42Cb1758/);
+    assert.equal(isHoldingPlaceHref(href), true);
+    assert.doesNotMatch(href, /dillard-university|dillard-house|42Cb1758/);
   }
-  assert.doesNotMatch(plate, /<ul\b/);
-  assert.doesNotMatch(plate, /<noscript\b/);
-  assert.doesNotMatch(plate, /42Cb1758|Grade A|ent_/);
-  assert.match(plate, /data-lng="/);
-  assert.match(plate, /data-lat="/);
+  assert.doesNotMatch(JSON.stringify(pins), /42Cb1758|Grade A|ent_/);
 });
 
 test('the seed plate stays a plate of pins; only holding slugs walk', () => {
@@ -270,40 +251,4 @@ test('the first-paint shell drops shop tokens, including leftover facet labels',
   assert.doesNotMatch(document, /Grade A/);
   assert.equal(cleaned.viewState.selected, undefined);
   assert.equal(cleaned.totalMatched, 4101);
-});
-
-test('the first-paint projection keeps a Florida pin on the board and inside the plate frame', () => {
-  // Web Mercator over the CONUS bounds box (conus-mercator.ts): the plate's own projection.
-  const keys = conusPinPercent(-81.8, 24.55);
-  assert.ok(keys);
-  assert.ok(keys.x > 70 && keys.x < 80, String(keys.x));
-  assert.ok(keys.y > 95 && keys.y <= 100, String(keys.y));
-  // Alaska is off the plate's opening frame, so it is off the board — not pinned to an edge.
-  assert.equal(conusPinPercent(-149.9, 61.2), null);
-});
-
-test('first-paint plate projects pins with Albers locator percents, not CONUS clamp', () => {
-  const pins = toFirstPaintPins([
-    leakyFeature({
-      displayName: 'Dillard High School, Old',
-      href: '/place/dillard-high-school-old',
-      entityId: 'nrhp-black-heritage-91000107',
-    }),
-  ]);
-  const plate = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins }));
-  assert.match(plate, /left:\s*[\d.]+%/);
-  assert.match(plate, /top:\s*[\d.]+%/);
-
-  // Liberia is outside Albers USA — must not clamp onto the board edge.
-  const offshoreFeature = leakyFeature(
-    {
-      displayName: '',
-      href: '',
-      entityId: 'pin-offshore',
-    },
-    [-9.4, 6.3],
-  );
-  const offshore = toFirstPaintPins([offshoreFeature]);
-  const empty = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins: offshore }));
-  assert.doesNotMatch(empty, /ds-first-paint-pin/);
 });

@@ -385,7 +385,6 @@ function placeScopeFields(
 export function placeDiscoveryReturn(
   entityId: string,
   arrival: DiscoveryState,
-  geo?: { readonly lat: number; readonly lng: number },
   neighbors?: {
     readonly previous?: { readonly href: string; readonly name: string };
     readonly next?: { readonly href: string; readonly name: string };
@@ -401,10 +400,10 @@ export function placeDiscoveryReturn(
     view: arrival.view ?? 'map',
   };
   const exploreBase = exploreViewFromDiscovery(withSelection);
+  // No viewport: the selection frames the record at its own precision (`frameRecord`).
   const mapHref = buildExploreHref({
     ...exploreBase,
     ...(mapped ? { selected: entityId } : {}),
-    ...(geo && mapped ? { viewport: { lat: geo.lat, lng: geo.lng, zoom: 11 } } : {}),
   });
   const hasListNarrowing =
     Boolean(arrival.query) ||

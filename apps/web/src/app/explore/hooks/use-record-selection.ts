@@ -6,6 +6,7 @@ import type { ChromeInset } from '../../../lib/map-experience/chrome-padding';
 import { evidenceLabel } from '../../../lib/map-experience/evidence-grade';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
+import { renderedAnchorFor } from '../../../lib/map-experience/record-marks';
 import { withQuery } from '../../../lib/discovery/discovery-arrival';
 import {
   resolveExplorePinEntityId,
@@ -49,7 +50,7 @@ export function useRecordSelection(
 
   const frame = useCallback(
     (feature: ExploreMapFeature) => {
-      const [lng, lat] = feature.geometry.coordinates;
+      const [lng, lat] = renderedAnchorFor(feature);
       camera.frameRecord(
         {
           center: [lng, lat],

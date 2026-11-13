@@ -383,6 +383,28 @@ describe('/records · place hrefs and map continuity', () => {
     assert.match(neighbors?.next?.href ?? '', /state=DC/);
   });
 
+  it('findRecordsNeighbors links the address the plate resolved, never a guessed /place', () => {
+    const entities = [
+      entity({ id: 'ent_a', kind: 'place', displayName: 'Alpha Place', summary: 'First.' }),
+      entity({ id: 'ent_b', kind: 'place', displayName: 'Beta Place', summary: 'Second.' }),
+      entity({ id: 'ent_c', kind: 'place', displayName: 'Gamma Place', summary: 'Third.' }),
+    ];
+    const drawn = new Map([['ent_b', '/place/beta-place--2']]);
+    const neighbors = findRecordsNeighbors(
+      entities,
+      EMPTY_RECORDS_QUERY,
+      'ent_b',
+      'from=list',
+      undefined,
+      drawn,
+    );
+    const hrefs = [neighbors?.previous?.href, neighbors?.next?.href];
+    // Off the plate, `/entity/{id}` always resolves and forwards to the record's own address.
+    assert.ok(hrefs.every((href) => href?.startsWith('/entity/ent_')));
+    const back = findRecordsNeighbors(entities, EMPTY_RECORDS_QUERY, 'ent_a', '', undefined, drawn);
+    assert.equal(back?.next?.href, '/place/beta-place--2');
+  });
+
   it('builds from search_index docs when evidenceInputs is projected', () => {
     const docs = [
       {

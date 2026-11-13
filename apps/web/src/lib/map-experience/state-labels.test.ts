@@ -1,6 +1,6 @@
 /**
  * Confirms the state-label data: all 51 states + D.C. get a label point, the documented
- * AK/HI/FL/MI overrides are actually applied (not silently ignored), and the zoom band matches
+ * AK/HI/FL/MI/MD overrides are actually applied (not silently ignored), and the zoom band matches
  * design-direction-v3.md (visible from the national floor, gone by 6.2). How the labels draw is
  * covered in `app/map/explore-style.test.ts`.
  */
@@ -29,9 +29,9 @@ test('every one of the 51 states/D.C. gets exactly one label point', () => {
 test('every label point falls within its own state bbox (bbox centroid by default)', () => {
   const points = new Map(stateLabelPoints().map((point) => [point.postalCode, point] as const));
   for (const state of US_STATES) {
-    // AK/HI/FL/MI use a documented override that may sit outside the coarse bbox (that's the
+    // AK/HI/FL/MI/MD use a documented override that may sit outside the coarse bbox (that's the
     // point of overriding them); every other state's point must be the literal bbox centroid.
-    if (['AK', 'HI', 'FL', 'MI'].includes(state.postalCode)) continue;
+    if (['AK', 'HI', 'FL', 'MI', 'MD'].includes(state.postalCode)) continue;
     const [west, south, east, north] = state.bbox;
     const point = points.get(state.postalCode)!;
     assert.equal(point.lng, (west + east) / 2);
@@ -39,9 +39,9 @@ test('every label point falls within its own state bbox (bbox centroid by defaul
   }
 });
 
-test('the documented AK/HI/FL/MI overrides are actually applied, not the raw bbox centroid', () => {
+test('the documented AK/HI/FL/MI/MD overrides are actually applied, not the raw bbox centroid', () => {
   const points = new Map(stateLabelPoints().map((point) => [point.postalCode, point] as const));
-  for (const postalCode of ['AK', 'HI', 'FL', 'MI'] as const) {
+  for (const postalCode of ['AK', 'HI', 'FL', 'MI', 'MD'] as const) {
     const state = US_STATES.find((s) => s.postalCode === postalCode)!;
     const [west, south, east, north] = state.bbox;
     const rawCentroid = [(west + east) / 2, (south + north) / 2];

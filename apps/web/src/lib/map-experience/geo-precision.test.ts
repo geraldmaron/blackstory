@@ -20,10 +20,12 @@ test('institution/site/address precisions map to the finest geo tier; campus to 
   assert.equal(geoPrecisionTierForPublicPrecision('campus'), 'block');
 });
 
-test('zoomForLocationPrecision: exact 14, neighborhood 12, city 10, county 8, state 6', () => {
-  for (const exact of ['address', 'site', 'institution', 'campus']) {
+test('zoomForLocationPrecision: exact 14, campus 13, neighborhood 12, city 10, county 8, state 6', () => {
+  for (const exact of ['address', 'site', 'institution']) {
     assert.equal(zoomForLocationPrecision(exact), 14);
   }
+  // A campus is an area: framed short of the site zoom.
+  assert.equal(zoomForLocationPrecision('campus'), 13);
   assert.equal(zoomForLocationPrecision('neighborhood'), 12);
   assert.equal(zoomForLocationPrecision('city'), 10);
   assert.equal(zoomForLocationPrecision('county'), 8);
@@ -32,10 +34,12 @@ test('zoomForLocationPrecision: exact 14, neighborhood 12, city 10, county 8, st
   assert.equal(zoomForLocationPrecision('unknown_future_value'), 10);
 });
 
-test('recordMarkFor: dot for exact or site, ring for neighborhood or city, none for county or state', () => {
-  for (const exact of ['address', 'site', 'institution', 'campus']) {
+test('recordMarkFor: dot for exact or site, ring for campus, neighborhood or city, none for county or state', () => {
+  for (const exact of ['address', 'site', 'institution']) {
     assert.equal(recordMarkFor(exact), 'dot');
   }
+  // Block precision is never drawn as a site.
+  assert.equal(recordMarkFor('campus'), 'ring');
   assert.equal(recordMarkFor('neighborhood'), 'ring');
   assert.equal(recordMarkFor('city'), 'ring');
   assert.equal(recordMarkFor('county'), 'none');
@@ -48,6 +52,8 @@ test('recordMarkFor: dot for exact or site, ring for neighborhood or city, none 
 
 test('precisionInWords names where the archive can place a record', () => {
   assert.equal(precisionInWords('site'), 'Exact site');
+  assert.equal(precisionInWords('campus'), 'Campus-level location, not an exact address');
+  assert.doesNotMatch(precisionInWords('campus'), /^Exact/);
   assert.equal(precisionInWords('city'), 'City-level location');
   assert.equal(precisionInWords('neighborhood'), 'Neighborhood-level location');
   assert.equal(precisionInWords('county'), 'County-level location');

@@ -141,9 +141,7 @@ export const MAP_MAX_ZOOM = 14;
 
 /**
  * The frame a plate opens on before any surface has asked for one: CONUS fitted to the canvas
- * with this much clearance (`MapStage`'s constructor). Explore's first-paint board is drawn at
- * the same fit (explore-map-underlay.css, pinned by explore-map-underlay.test.ts), which is why
- * the number lives here and not in either of them.
+ * with this much clearance (`MapStage`'s constructor).
  */
 export const PLATE_OPENING_PADDING_PX = 32;
 

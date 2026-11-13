@@ -40,7 +40,6 @@ test('every theme ships a complete map palette', () => {
   const roles: ReadonlyArray<keyof MapPalette> = [
     'land',
     'water',
-    'green',
     'line',
     'line2',
     'road',

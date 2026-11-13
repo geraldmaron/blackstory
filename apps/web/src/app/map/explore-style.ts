@@ -286,6 +286,8 @@ export function stateLabelFilters(postalCode: string | undefined): {
 const DOT_RADIUS_PX = 4;
 const RING_RADIUS_PX = 7;
 const SELECTED_HALO_PX = 2;
+/** A selected ring's copper stroke: twice the resting ring's weight. */
+const SELECTED_RING_PX = 3;
 
 function markIs(mark: RecordMark): ExpressionSpecification {
   return [
@@ -584,7 +586,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
          OpenFreeMap vector source and read at the continental resting frame, which is where a
          reader spends most of their time; the archive overlays below them are the data.
 
-         Until they existed, `MapPalette`'s `green`, `line2`, `label`, `labelHi` and `halo`
+         Until they existed, `MapPalette`'s `line2`, `label`, `labelHi` and `halo`
          roles were declared, contrast-tested and consumed by nothing, and the plate rendered
          as state polygons floating on a flat field: no coastline, no Great Lakes, no Canada or
          Mexico, and no place names between the state abbreviations and street labels at z11.
@@ -1130,8 +1132,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        // Selected: copper fill and a paper halo, at the mark's own size. Copper on the map
-        // means the current thing and nothing else.
+        // Selected, in its own shape: a site dot turns copper with a paper halo; a ring stays a
+        // hollow ring, drawn in copper and heavier, so selection never sharpens a city record
+        // into a site. Copper on the map means the current thing and nothing else.
         id: EXPLORE_SELECTED_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
@@ -1139,10 +1142,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           // Larger than the mark it replaces, so selection never reads by color alone.
           'circle-radius': byMark(DOT_RADIUS_PX + 2, RING_RADIUS_PX + 1),
-          'circle-color': DIGNITY_PALETTE.point,
+          'circle-color': byMark(DIGNITY_PALETTE.point, 'rgba(0,0,0,0)'),
           'circle-opacity': 1,
-          'circle-stroke-width': SELECTED_HALO_PX,
-          'circle-stroke-color': plate.selectedHalo,
+          'circle-stroke-width': byMark(SELECTED_HALO_PX, SELECTED_RING_PX),
+          'circle-stroke-color': byMark(plate.selectedHalo, DIGNITY_PALETTE.point),
           'circle-stroke-opacity': 1,
         },
       },

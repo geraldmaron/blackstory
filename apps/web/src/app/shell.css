@@ -86,8 +86,6 @@ body {
 :root {
   --ds-first-paint-ground: var(--ds-map-land);
   --ds-first-paint-ground-ink: var(--ds-map-line-2);
-  --ds-first-paint-cluster-ink: var(--ds-accent-graphic);
-  --ds-first-paint-cluster-text: var(--ds-map-halo);
 }
 
 [data-theme='dark'] {
@@ -480,10 +478,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   line-height: 1.65;
 }
 
-.ds-page--status__body {
-  margin-top: var(--ds-space-6);
-}
-
 /* —— Sections — hairline-ruled rooms with an index numeral ——  */
 .ds-section {
   position: relative;
@@ -493,10 +487,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 
 .ds-section:last-child {
   border-bottom: 0;
-}
-
-.ds-section--flush {
-  padding-top: 0;
 }
 
 .ds-section__kicker {
@@ -700,11 +690,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
    bordered, centered panel still drawn over it reads as a window onto the map rather than a
    transition into it (the "the rest of the page is still there" defect). */
 
-@media (max-width: 47.9375rem) {
-  /* Stacked layout: copy sits above the map row, so the legibility ramp turns
-     vertical — opaque behind the copy, fading down into the map. No border seam. */
-}
-
 /* Legibility scrim: bottom fades to canvas so theme ink clears WCAG on top
    of whatever the camera shows. Decorative only — never captures input. */
 
@@ -727,75 +712,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 /* Each decade is one tick: a hairline that grows and burns copper as the
    archive reaches it. The whole column is the touch target. */
 
-@media (max-width: 47.9375rem) {
-  /* Dense scrim: pins and state labels must not punch through ink on small screens. */
-
-  /* Mobile rail: labels off (the readout carries the decade), ticks stay
-     44px-tall touch targets. */
-}
-
 /* —— Home About —— product thesis + quiet place orientation —— */
 
 /* —— Home data pulse —— archive strip + /data charts —— */
-
-/* —— State start (quiet orientation under About) —— */
-.ds-state-start {
-  display: grid;
-  gap: var(--ds-space-5);
-  margin-top: var(--ds-space-2);
-}
-
-.ds-state-start__form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: var(--ds-space-3);
-}
-
-.ds-state-start__select {
-  flex: 1 1 14rem;
-  max-width: 22rem;
-  min-height: 2.75rem;
-  padding: var(--ds-space-2) var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
-  color: var(--ds-ink);
-  font-family: var(--ds-font-sans);
-  /* ≥16px avoids iOS zoom-on-focus. */
-  font-size: 1rem;
-}
-
-.ds-state-start__select:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
-  outline-offset: 2px;
-}
-
-.ds-state-start__submit {
-  border-radius: var(--ds-radius-md);
-}
-
-.ds-state-start__coverage {
-  display: grid;
-  gap: var(--ds-space-3);
-}
-
-.ds-state-start__coverage-label {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
-}
-
-.ds-state-start__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 
 .ds-state-chip {
   display: inline-flex;
@@ -825,35 +744,11 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   outline-offset: 2px;
 }
 
-.ds-state-chip__name {
-  color: inherit;
-}
-
 .ds-state-chip__count {
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
-}
-
-.ds-state-start__locate {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.ds-state-start__locate a {
-  color: var(--ds-accent);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
-}
-
-.ds-state-start__locate a:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
-  outline-offset: 2px;
 }
 
 /* —— Home “How this works” — theme-aware section with methodology sketch —— */
@@ -1017,96 +912,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   }
 }
 
-/* —— Editorial point list — numbered, serif, hairline-separated ——  */
-.ds-qualify-list {
-  display: grid;
-  gap: 0;
-  margin: var(--ds-space-5) 0 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: ds-qualify;
-}
-
-.ds-qualify-list li {
-  position: relative;
-  counter-increment: ds-qualify;
-  padding: var(--ds-space-5) 0 var(--ds-space-5) var(--ds-space-12);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
-  line-height: 1.6;
-}
-
-.ds-qualify-list li::before {
-  content: counter(ds-qualify, decimal-leading-zero);
-  position: absolute;
-  left: 0;
-  top: var(--ds-space-4);
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 1.125rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-
-.ds-band .ds-qualify-list li {
-  border-top-color: var(--ds-fixed-rule);
-  color: var(--ds-fixed-paper);
-}
-
-.ds-band .ds-qualify-list li::before {
-  color: var(--ds-fixed-accent);
-}
-
-/* —— Search mast — the query IS the headline. No filter card: a display-
-   scale input over a heavy rule, refine pills beneath. ——  */
-.ds-search-mast {
-  margin-top: var(--ds-space-8);
-}
-
-.ds-search-mast__field {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--ds-space-4);
-  padding-bottom: var(--ds-space-3);
-  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-search-mast__field:focus-within {
-  border-bottom-color: var(--ds-accent);
-}
-
-.ds-search-mast__input {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 3.5rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: clamp(1.25rem, 1.1rem + 1.2vw, 2rem);
-  letter-spacing: -0.03em;
-}
-
-.ds-search-mast__input::placeholder {
-  color: var(--ds-ink-subtle);
-}
-
-.ds-search-mast__input:focus-visible {
-  outline: none;
-}
-
-.ds-search-mast__refine {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
-  margin-top: var(--ds-space-4);
-}
-
 /* —— Pill select — a native select wearing the island language. Used by
    the search refine row and the history facet row. ——  */
 .ds-pill-select {
@@ -1220,154 +1025,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-weight: 400;
 }
 
-/* —— At a glance — summary before story (cognitive-accessibility law).
-   Every record page opens with the whole picture as labeled facts: a reader
-   who never scrolls still leaves knowing what/where/when/how-solid. A framed
-   box is deliberate here — this IS a discrete object. ——  */
-.ds-at-a-glance {
-  margin-top: var(--ds-space-8);
-  padding: var(--ds-space-5) var(--ds-space-6);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
-}
-
-.ds-at-a-glance__title {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  margin: 0 0 var(--ds-space-2);
-  color: var(--ds-accent);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
-}
-
-.ds-at-a-glance__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0 var(--ds-space-10);
-  margin: 0;
-}
-
-.ds-at-a-glance__row {
-  display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: var(--ds-space-3);
-  align-items: baseline;
-  padding: var(--ds-space-2) 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-at-a-glance__row dt {
-  font-family: var(--ds-font-sans);
-  font-weight: 500;
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink-muted);
-}
-
-.ds-at-a-glance__row dd {
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
-}
-
-@media (min-width: 48rem) {
-  .ds-at-a-glance__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* —— Record sections — chunked rooms with an automatic index numeral.
-   The counter lives on the container so conditional sections never leave
-   gaps in the numbering. ——  */
-.ds-entity-sections {
-  counter-reset: ds-rec;
-}
-
-.ds-entity-sections > .ds-record-section {
-  counter-increment: ds-rec;
-  padding-top: var(--ds-space-8);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-kicker-index::before {
-  content: counter(ds-rec, decimal-leading-zero);
-  margin-right: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--ds-ink-subtle);
-}
-
-/* —— Feature grid (topics) ——  */
-.ds-feature-grid {
-  display: grid;
-  gap: var(--ds-space-4);
-  margin-top: var(--ds-space-2);
-}
-
-/* —— Entity record layout ——  */
-.ds-entity-layout {
-  display: grid;
-  gap: var(--ds-space-8);
-  margin-top: var(--ds-space-2);
-}
-
-.ds-entity-aside {
-  display: grid;
-  gap: var(--ds-space-4);
-  align-content: start;
-}
-
-.ds-entity-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  margin-top: var(--ds-space-4);
-}
-
 /* Hairline mono chips — editorial discovery links, not SaaS filter pills. */
-.ds-entity-tag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0.2rem 0.55rem;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-ink);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  line-height: 1.3;
-  text-decoration: none;
-  background: transparent;
-  transition:
-    background-color var(--ds-duration-fast) var(--ds-easing),
-    color var(--ds-duration-fast) var(--ds-easing),
-    border-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-entity-tag:hover,
-.ds-entity-tag:focus-visible {
-  border-color: var(--ds-ink);
-  background: var(--ds-ink);
-  color: var(--ds-canvas);
-}
-
-.ds-entity-tag--era {
-  border-style: dashed;
-}
-
-.ds-entity-tag--note {
-  max-width: 28rem;
-  color: var(--ds-ink-muted);
-  cursor: default;
-}
-
-.ds-entity-tag--note:hover {
-  background: transparent;
-  color: var(--ds-ink-muted);
-}
 
 .ds-entity-photo {
   margin: 0;
@@ -1469,49 +1127,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   letter-spacing: 0.04em;
 }
 
-.ds-explore-narrative-card__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  margin: 0 0 var(--ds-space-3);
-}
-
-/* —— Loading skeleton ——  */
-.ds-loading {
-  display: grid;
-  gap: var(--ds-space-3);
-  padding-block: var(--ds-space-12);
-}
-
-.ds-loading__bar {
-  height: 0.75rem;
-  width: min(100%, 24rem);
-  border-radius: var(--ds-radius-sm);
-  background: color-mix(in srgb, var(--ds-ink) 12%, var(--ds-canvas));
-  animation: ds-pulse 1.2s var(--ds-easing) infinite;
-}
-
-.ds-loading__bar--wide {
-  width: min(100%, 40rem);
-  height: 1.25rem;
-}
-
 /* —— Shared text utilities ——  */
-.ds-count-label {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: var(--ds-ink-muted);
-}
-
-.ds-subheading {
-  font-size: 1.125rem;
-}
-
-.ds-dt {
-  font-weight: 600;
-}
 
 @keyframes ds-rise {
   from {
@@ -1531,30 +1147,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   }
   50% {
     opacity: 0.9;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* The page-root wrapper has no animation to suppress any more — it was deleted outright
-     because its fill-mode left a transform that trapped the fixed plate. */
-
-  .ds-loading__bar {
-    animation: none;
-  }
-}
-
-@media (min-width: 48rem) {
-  .ds-feature-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--ds-space-5);
-  }
-}
-
-@media (min-width: 64rem) {
-  .ds-entity-layout {
-    grid-template-columns: minmax(0, 1.55fr) minmax(15rem, 0.7fr);
-    gap: var(--ds-space-12);
-    align-items: start;
   }
 }
 
@@ -1668,18 +1260,14 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 /* External maps deep links — inherit meta/link styling; underline on hover/focus.
- * When also a `.ds-cta`, leave color to the CTA recipe (copper/ink). When also a
- * `.ds-record-visit__link`, leave color and underline to that recipe (record-visit.css) instead:
- * the visit block's maps row is styled as quiet links from the outset, not on hover, and this
- * reset was winning on specificity and silently stripping that styling down to plain inherited
- * text for four of its five links. */
-.ds-maps-external-link:not(.ds-cta):not(.ds-record-visit__link) {
+ * When also a `.ds-cta`, leave color to the CTA recipe (copper/ink). */
+.ds-maps-external-link:not(.ds-cta) {
   color: inherit;
   text-decoration: none;
 }
 
-.ds-maps-external-link:not(.ds-cta):not(.ds-record-visit__link):hover,
-.ds-maps-external-link:not(.ds-cta):not(.ds-record-visit__link):focus-visible {
+.ds-maps-external-link:not(.ds-cta):hover,
+.ds-maps-external-link:not(.ds-cta):focus-visible {
   color: var(--ds-accent);
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -1723,33 +1311,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   color: var(--ds-ink-muted);
 }
 
-.ds-legend-glyph {
-  flex: 0 0 auto;
-  display: inline-block;
-  width: 0.75rem;
-  height: 0.75rem;
-  border: var(--ds-border-width) solid var(--ds-border);
-}
-
-.ds-legend-glyph--circle {
-  border-radius: 50%;
-}
-
-.ds-legend-glyph--square {
-  border-radius: 2px;
-}
-
-.ds-legend-glyph--diamond {
-  border-radius: 2px;
-  transform: rotate(45deg);
-}
-
-.ds-legend-glyph--ring {
-  border-radius: 50%;
-  border-width: 2px;
-  background: transparent;
-}
-
 /* —— Data charts — flat matte SVG figures ——  */
 .ds-data-chart {
   margin: var(--ds-space-6) 0 0;
@@ -1767,21 +1328,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   stroke: var(--ds-rule);
   stroke-width: 1;
   fill: none;
-}
-
-.ds-data-chart__svg rect.ds-data-chart__bar,
-.ds-data-chart__svg path.ds-data-chart__bar {
-  fill: var(--ds-accent-graphic);
-}
-
-.ds-data-chart__caption {
-  margin: var(--ds-space-2) 0 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  line-height: 1.45;
 }
 
 /* —— The persistent map plate ——————————————————————————————————————————————————————
@@ -2184,19 +1730,6 @@ body:has(.ds-explore-stage[data-results='open']) {
   }
 }
 
-/* Spotlight card as a bottom sheet must not cover zoom +/-. */
-@media (max-width: 64rem) {
-  body:has(.ds-explore-stage__spotlight[open]) {
-    --ds-explore-zoom-right: var(--ds-explore-edge);
-    --ds-explore-zoom-bottom: calc(
-      min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
-    );
-    --ds-map-attrib-bottom: calc(
-      min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
-    );
-  }
-}
-
 /* Place-search orientation pin — copper head + stem; not an entity hit target. */
 .ds-map-search-center-marker {
   display: flex;
@@ -2224,14 +1757,6 @@ body:has(.ds-explore-stage[data-results='open']) {
 
 /* The reader's own position: a haloed dot with a slow breathing ring. Deliberately not a pin, so it
    never reads as a record. Sits above entity markers so it is never buried in a cluster. */
-.ds-map-search-center-marker--user {
-  position: relative;
-  width: 1.375rem;
-  height: 1.375rem;
-  z-index: 3; /* local: above sibling entity markers inside the marker pane */
-  display: grid;
-  place-items: center;
-}
 
 .ds-map-search-center-marker__dot {
   position: relative;
@@ -2301,11 +1826,7 @@ body:has(.ds-explore-stage[data-results='open']) {
  */
 @media (pointer: coarse) {
   :where(dd, li, .ds-citation, .ds-room-src__t, .ds-room-anat__v, .ds-empty__body)
-    > a:not([class*='ds-cta']):not(.ds-button),
-  .ds-books-edition__rip-link,
-  .ds-books-edition__rip-fact-link,
-  .ds-books-edition__evidence-cite,
-  .ds-rec-file__correct {
+    > a:not([class*='ds-cta']):not(.ds-button) {
     padding-block: 6px;
   }
 }

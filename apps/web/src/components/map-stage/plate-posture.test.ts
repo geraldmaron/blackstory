@@ -8,12 +8,7 @@ import {
   surfaceClassFor,
   type SurfaceClass,
 } from '../../lib/nav/surface-classes';
-import {
-  AMBIENT_CLUSTER_MIN_ZOOM,
-  clusterMarkersVisible,
-  defaultPostureFor,
-  framedClaimAllowed,
-} from './plate-posture';
+import { defaultPostureFor, framedClaimAllowed } from './plate-posture';
 
 const ALL_SURFACES: readonly SurfaceClass[] = [
   'door',
@@ -22,21 +17,6 @@ const ALL_SURFACES: readonly SurfaceClass[] = [
   'record',
   'utility',
 ];
-
-test('the ambient Door holds clusters off the plate at national scale and returns them at state scale', () => {
-  // A phone's national frame sits near zoom 1.7; a tablet's near 2.5.
-  assert.equal(clusterMarkersVisible('ambient', 1.7), false);
-  assert.equal(clusterMarkersVisible('ambient', 2.5), false);
-  assert.equal(clusterMarkersVisible('ambient', AMBIENT_CLUSTER_MIN_ZOOM), true);
-  assert.equal(clusterMarkersVisible('ambient', 6), true);
-});
-
-test('every other posture keeps clusters at every zoom', () => {
-  for (const posture of ['live', 'framed', 'parked'] as const) {
-    assert.equal(clusterMarkersVisible(posture, 1.7), true);
-    assert.equal(clusterMarkersVisible(posture, 8), true);
-  }
-});
 
 test('every surface class resolves to a posture', () => {
   for (const surface of ALL_SURFACES) {

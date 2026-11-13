@@ -498,6 +498,9 @@ export function createCamera(deps: CameraDeps): CameraApi {
   }
 
   function frameRecord(record: RecordFrameTarget, options?: FrameRecordOptions): void {
+    // A selection ends any move already running (an establishing shot), even when the mark is
+    // already framed and the camera then stays put.
+    cancel();
     const inset = options?.padding ?? padding();
     const plan = planRecordFrame({
       precision: record.precision,
@@ -506,7 +509,6 @@ export function createCamera(deps: CameraDeps): CameraApi {
       reducedMotion: reducedMotion(),
     });
     if (!plan) return;
-    cancel();
     // Pitch and bearing are left out on purpose: the reader's tilt and turn survive a selection.
     map.easeTo({
       center: record.center,

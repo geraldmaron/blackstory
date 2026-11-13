@@ -243,8 +243,11 @@ test('the Door and Explore rest on one national-field patch', () => {
     'utf8',
   );
   assert.match(field, /clusteringEnabled: true,/);
+  // The Door hands the plate the patch directly; Explore through its one map-sync hook.
+  assert.match(immersive, /nationalFieldPatch\(/);
   assert.match(mapSync, /nationalFieldPatch\(/);
-  assert.match(atlas, /nationalFieldPatch\(/);
+  assert.match(atlas, /useMapSync\(/);
+  assert.doesNotMatch(atlas, /patchData\(/);
 });
 
 test('door CSS keeps one fixed full-bleed plate under a fixed dock, with no page scroll', () => {
@@ -265,9 +268,10 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock, with no page
     scrimFree.replace(/box-shadow:\s*var\(--ds-contact-[a-z]+\);/g, ''),
     /radial-gradient|linear-gradient|box-shadow:\s*0 0 [1-9]|backdrop-filter/,
   );
+  // The scrim is opaque under the text, so no group ghosts through the headline.
   assert.match(
     css,
-    /\.ds-door-journey::before\s*\{[^}]*color-mix\(in srgb, var\(--ds-canvas\) 85%, transparent\)/,
+    /\.ds-door-journey::before\s*\{[^}]*linear-gradient\(to right, var\(--ds-canvas\) 55%, transparent\)/,
   );
   // Radii are 8 / 14 only here: no pills, and uppercase mono stays on data.
   assert.doesNotMatch(css, /--ds-radius-full|999px|text-transform:\s*uppercase(?![^}]*ds-hero)/);
@@ -303,9 +307,8 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock, with no page
   assert.doesNotMatch(css, /--ds-map-attrib-left:|--ds-map-attrib-bottom:/);
   assert.match(css, /\.maplibregl-ctrl-bottom-left\s*\{[^}]*right:\s*var\(--ds-space-4\)/);
   assert.match(css, /\.maplibregl-ctrl-attrib-button\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px/);
-  // The plate's DOM state codes stand down while the Door draws its own in one collision pass.
-  assert.match(css, /\.ds-map-stage \.ds-state-label\s*\{\s*visibility:\s*hidden/);
-  assert.match(immersive, /mountDoorPlateLabels\(map, sweptPinsRef\.current\)/);
+  // Labels, tags and groups come from the shared style only: no private label layer set.
+  assert.doesNotMatch(immersive, /door-plate-labels|addLayer\(/);
 });
 
 test('door-home CSS steps the headline down on a phone', () => {

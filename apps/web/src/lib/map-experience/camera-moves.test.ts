@@ -369,8 +369,10 @@ test('frameRecord does not move when the mark is already visible at or above tar
     reducedMotion: () => false,
     announce: () => {},
   });
+  const stopsBefore = h.stopped();
   camera.frameRecord({ center: [-90, 35], precision: 'city', place: 'Jackson' });
   assert.equal(h.calls.length, 0, 'already framed: the camera stays put');
+  assert.equal(h.stopped(), stopsBefore + 1, 'and a move already running (a wide shot) is stopped');
 
   // Same zoom, but the mark sits under the inspector column: pan at the reader's zoom.
   const hidden = createCamera({

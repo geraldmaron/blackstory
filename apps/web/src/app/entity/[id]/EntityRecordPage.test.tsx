@@ -15,6 +15,7 @@ import {
   type PublicEntityView,
 } from '../../../data/public-seed';
 import { placeDiscoveryReturn } from '../../../lib/discovery/discovery-state';
+import { precisionInWords } from '../../../lib/map-experience/geo-precision';
 import { EntityRecordView, typedConnections } from './EntityRecordPage';
 
 void React;
@@ -94,11 +95,15 @@ test('Open in maps appears only for a visitable site at site precision', () => {
 });
 
 test('the citation line states where, when and evidence once, with precision in words', () => {
-  const html = render(seed('ent_dunbar_school_001'), { point: POINT });
+  const school = seed('ent_dunbar_school_001');
+  const html = render(school, { point: POINT });
   for (const label of ['Where', 'When', 'Evidence']) {
     assert.equal(html.split(`<dt class="ds-recpage__fact-label">${label}</dt>`).length, 2);
   }
-  assert.match(html, /Placed (at the site|to the (neighborhood|city|county|state))/);
+  // The one wording set every surface prints (geo-precision.ts).
+  assert.ok(html.includes(precisionInWords(school.locationPrecision)));
+  const atCampus = render({ ...school, locationPrecision: 'campus' }, { point: POINT });
+  assert.match(atCampus, /Campus-level location, not an exact address/);
 });
 
 test('no release id, pipeline token or placeholder plate reaches the page', () => {
@@ -129,14 +134,14 @@ test('the pager appears only when the reader arrived from a list', () => {
   const fromList = render(school, {
     point: POINT,
     arrival: { view: 'list' },
-    returns: placeDiscoveryReturn(school.id, { view: 'list' }, POINT, neighbors),
+    returns: placeDiscoveryReturn(school.id, { view: 'list' }, neighbors),
   });
   assert.match(fromList, /rel="prev"[^>]*>[^]*Record A/);
   assert.match(fromList, /Back to the list/);
 
   const direct = render(school, {
     point: POINT,
-    returns: placeDiscoveryReturn(school.id, {}, POINT),
+    returns: placeDiscoveryReturn(school.id, {}),
   });
   assert.doesNotMatch(direct, /rel="prev"|rel="next"|Back to the list/);
   assert.match(direct, />Records<\/a>/);

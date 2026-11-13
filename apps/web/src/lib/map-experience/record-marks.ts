@@ -36,6 +36,23 @@ function isDrawn(feature: ExploreMapFeature): boolean {
   return recordMarkFor(feature.properties.precision) !== 'none';
 }
 
+let labelPointByState: ReadonlyMap<string, readonly [number, number]> | undefined;
+
+/**
+ * Where the map actually draws a record: its own point when it gets a mark, else its state's
+ * jurisdiction tag (the label point). Framing and the "already visible" test use this, so a
+ * county record is never framed at a coordinate where nothing is drawn.
+ */
+export function renderedAnchorFor(feature: ExploreMapFeature): readonly [number, number] {
+  const [lng, lat] = feature.geometry.coordinates;
+  const postalCode = feature.properties.statePostalCode;
+  if (isDrawn(feature) || !postalCode) return [lng, lat];
+  labelPointByState ??= new Map(
+    stateLabelPoints().map((point) => [point.postalCode, [point.lng, point.lat] as const]),
+  );
+  return labelPointByState.get(postalCode) ?? [lng, lat];
+}
+
 /** The records that get a point on the map. */
 export function drawnRecordCollection(
   collection: ExploreMapFeatureCollection,

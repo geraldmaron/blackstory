@@ -65,6 +65,7 @@ import {
   MAP_BROWSE_EXIT_EVENT,
 } from '../lib/nav/map-browse';
 import { AtlasPending } from './explore/AtlasPending';
+import { fetchAtlasCatalog } from './explore/atlas-catalog-fetch';
 import type { AtlasShellModel } from './explore/explore-view-model-wire';
 import { resolveDoorFocus, type DoorFocusCamera, type DoorFocusFrame } from './door-focus';
 import {
@@ -75,7 +76,6 @@ import {
 } from './door-field-frame';
 import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { chapterBody, DoorWalkCard } from './door-walk';
-import { mountDoorPlateLabels, type DoorPlateLabels, type DoorPlate } from './door-plate-labels';
 
 void React;
 
@@ -84,6 +84,11 @@ const AtlasLoader = dynamic(() => import('./explore/AtlasLoader').then((mod) => 
   // Without this the chunk's download/compile window renders nothing (see AtlasPending.tsx).
   loading: () => <AtlasPending />,
 });
+
+/** Starts the shared catalog fetch early; `AtlasLoader` joins it and reports any failure. */
+function prefetchAtlasCatalog(): void {
+  fetchAtlasCatalog().catch(() => {});
+}
 
 /** Morph duration before instruments mount; matches `--ds-door-browse-ms` in door-home.css. */
 const DOOR_BROWSE_MORPH_MS = 320;
@@ -279,6 +284,7 @@ export function DoorImmersive({
   useEffect(() => {
     if (!initialBrowse || initialBrowseArmedRef.current) return;
     initialBrowseArmedRef.current = true;
+    prefetchAtlasCatalog();
     stage.setDoorBrowseLive(true);
     announceMapBrowseEntered();
     const state = window.history.state as { doorBrowse?: number } | null;
@@ -352,6 +358,8 @@ export function DoorImmersive({
   const startBrowse = useCallback(
     (push: boolean) => {
       if (browseModeRef.current) return;
+      // The list waits on the catalog: start it now, not after the morph and the Atlas chunk.
+      prefetchAtlasCatalog();
       browseReturnFocusRef.current =
         document.activeElement instanceof HTMLElement ? document.activeElement : null;
       browseFocusPendingRef.current = true;
@@ -675,13 +683,14 @@ export function DoorImmersive({
   /** The current record on the plate: the spotlight on the opening and on its own chapter. */
   const selectedPinId = step === 0 ? spotlightPinId : focusPinId;
   useEffect(() => {
-    if (!plateLive) return;
+    // In browse the selection is Explore's: the spotlight must not overwrite a deep-linked record.
+    if (!plateLive || browseMode) return;
     stage.applyViewState({
       selectedState: undefined,
       selectedEdge: undefined,
       selectedEntity: selectedPinId ?? undefined,
     });
-  }, [selectedPinId, plateLive, stage]);
+  }, [browseMode, selectedPinId, plateLive, stage]);
 
   /** A marker click on the live plate opens the record the pin's href names. */
   const hrefByPinId = useMemo(() => {
@@ -733,30 +742,6 @@ export function DoorImmersive({
       offOverlap();
     };
   }, [enterBrowse, hrefByPinId, pins.features, stage]);
-
-  /*
-   * The Door's own labels (state codes, one tag per state, low-zoom groups) in one collision pass
-   * with the record marks, and the attribution collapsed to its "i". Mounted only while the Door
-   * owns the plate: browse hands it to Explore, which brings its own.
-   */
-  const labelsRef = useRef<DoorPlateLabels | null>(null);
-  const sweptPinsRef = useRef(sweptPins);
-  sweptPinsRef.current = sweptPins;
-  useEffect(() => {
-    if (!plateLive || browseMode) return;
-    // The stage's camera handle is the MapLibre map itself (MapStage.tsx, `getMap`).
-    const map = stage.getMap() as unknown as DoorPlate | null;
-    if (!map) return;
-    const labels = mountDoorPlateLabels(map, sweptPinsRef.current);
-    labelsRef.current = labels;
-    return () => {
-      labelsRef.current = null;
-      labels.remove();
-    };
-  }, [browseMode, plateLive, stage]);
-  useEffect(() => {
-    labelsRef.current?.setPins(sweptPins);
-  }, [sweptPins]);
 
   /** Pin photos rise from live markers. */
   const [pinPhotoTarget, setPinPhotoTarget] = useState<PinPhotoHoverTarget | null>(null);

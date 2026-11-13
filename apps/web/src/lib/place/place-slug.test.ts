@@ -127,7 +127,7 @@ describe('place slug addresses', () => {
         kind: 'law',
         summary: 'A statute.',
       }),
-      '/law',
+      '/entity/law_1',
     );
   });
 

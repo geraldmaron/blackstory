@@ -11,12 +11,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import {
-  faCalendar,
-  faCircleHalfStroke,
-  faLandmark,
-  faScaleBalanced,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCircleHalfStroke, faLandmark, faScaleBalanced } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   formatRecordDate,
@@ -84,9 +79,6 @@ export function LawRecordView({ snapshot, explainer, previous, next }: LawView) 
   const meta: RecordMetaItem[] = [
     { label: humanizeLegalKind(snapshot.kind), icon: faScaleBalanced },
     { label: jurisdiction, icon: faLandmark },
-    ...(snapshot.effectiveYear
-      ? [{ label: String(snapshot.effectiveYear), icon: faCalendar }]
-      : []),
     { label: legalStatusDisplay(snapshot.lawStatus), icon: faCircleHalfStroke },
   ];
 

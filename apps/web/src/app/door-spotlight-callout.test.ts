@@ -58,3 +58,16 @@ test('on a phone the card docks under the country, at the window foot, never bes
   // A pin already near the foot takes the card above it instead.
   assert.equal(placeCallout({ x: 60, y: 520 }, card, phone, true)?.side, 'above');
 });
+
+test('the card takes the side of its pin with the most free map, not the first that fits', () => {
+  // Groups crowd the right of the pin; the left is open water.
+  const groups = [
+    { left: 1030, top: 360, right: 1070, bottom: 400 },
+    { left: 1100, top: 420, right: 1140, bottom: 460 },
+    { left: 1180, top: 380, right: 1220, bottom: 420 },
+  ];
+  const placed = placeCallout({ x: 1000, y: 400 }, CARD, WINDOW, false, groups);
+  assert.equal(placed?.side, 'left');
+  // With nothing in the way, reading order still puts it on the right.
+  assert.equal(placeCallout({ x: 1000, y: 400 }, CARD, WINDOW, false, [])?.side, 'right');
+});

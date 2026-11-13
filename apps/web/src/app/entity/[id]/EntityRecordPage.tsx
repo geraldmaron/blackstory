@@ -17,12 +17,7 @@ import Link from 'next/link';
 import { Timeline } from '@repo/ui';
 import { containsInternalId, stripInternalIds } from '@repo/public-contracts/narrative-text';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCalendar,
-  faCircleHalfStroke,
-  faLandmark,
-  faLocationDot,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCircleHalfStroke, faLandmark, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import type { PublicEntityView, RelatedNeighborView } from '../../../data/public-seed';
 import {
   formatRecordDate,
@@ -55,6 +50,7 @@ import { confidenceTierPhrase } from '../../../lib/evidence/confidence-language'
 import { confidenceIconFor } from '../../../lib/map-experience/confidence-icons';
 import { buildExploreMapSource } from '../../../lib/map-experience/build-explore-map-source';
 import { ERA_NOT_DOCUMENTED_LABEL } from '../../../lib/map-experience/entity-era-facts';
+import { findUsStateFromJurisdictionLabel } from '@repo/domain/map/geography';
 import { precisionInWords } from '../../../lib/map-experience/geo-precision';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { kindIconFor } from '../../../lib/map-experience/kind-icons';
@@ -247,7 +243,6 @@ export function EntityRecordView({
     ...(place && place.toLowerCase() !== entity.displayName.toLowerCase()
       ? [{ label: place, icon: faLocationDot }]
       : []),
-    ...(eraKnown ? [{ label: anatomy.eraLabel, icon: faCalendar }] : []),
     ...(status ? [{ label: status, icon: faCircleHalfStroke }] : []),
   ];
 
@@ -333,6 +328,7 @@ export function EntityRecordView({
     point && shouldShowVisitBlock(visitInput)
       ? buildExternalMapsSearchUrl({ ...point, query: anatomy.whereLabel })
       : undefined;
+  const statePostalCode = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)?.postalCode;
   const media =
     entity.primaryImage || point ? (
       <>
@@ -349,6 +345,7 @@ export function EntityRecordView({
             lng={point.lng}
             label={String(entity.kind) === 'person' ? (place ?? whereValue) : entity.displayName}
             precision={entity.locationPrecision}
+            {...(statePostalCode ? { statePostalCode } : {})}
             maxZoom={RAIL_MAP_MAX_ZOOM}
             caption={false}
           />
@@ -585,7 +582,7 @@ export async function EntityRecordPage({
     ? { lng: feature.geometry.coordinates[0], lat: feature.geometry.coordinates[1] }
     : undefined;
   const [returns, crossReferences, cites] = await Promise.all([
-    recordDiscoveryReturn(entity.id, arrival, point, feature !== undefined),
+    recordDiscoveryReturn(entity.id, arrival, feature !== undefined),
     resolveEntityCrossReferences(entity.id),
     resolveCitesEdgeIndex(),
   ]);

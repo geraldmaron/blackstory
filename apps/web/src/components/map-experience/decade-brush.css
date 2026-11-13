@@ -105,13 +105,14 @@
   pointer-events: none;
 }
 
-/* Handles: a 2px rule with a grip. The visible mark is narrow; the hit area is 44px wide and the
-   strip's own height. Neutral at rest, copper once a range is set. */
+/* Handles: a 2px rule with a grip. The visible mark is narrow and spans the track; the hit area
+   is 44px wide and reaches into the strip's padding and the axis row, so it is at least 44px tall
+   (the track alone is about 28px). Neutral at rest, copper once a range is set. */
 .ds-xbrush__handle {
   position: absolute;
   z-index: 2; /* local: handles above the bars */
-  top: calc(var(--ds-space-1) * -1);
-  bottom: 0;
+  top: calc(var(--ds-space-2) * -1);
+  bottom: calc(var(--ds-space-4) * -1);
   width: 44px;
   margin-left: -22px;
   padding: 0;
@@ -131,13 +132,14 @@
 }
 
 .ds-xbrush__handle::before {
-  top: 0;
-  bottom: 0;
+  top: var(--ds-space-2);
+  bottom: var(--ds-space-4);
   width: 2px;
 }
 
 .ds-xbrush__handle::after {
-  top: 50%;
+  /* Centered on the track, not on the taller hit box. */
+  top: calc(50% - var(--ds-space-1));
   width: 8px;
   height: 16px;
   border-radius: var(--ds-radius-sm);

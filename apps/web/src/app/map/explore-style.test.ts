@@ -119,7 +119,7 @@ test('selected-entity layer exists and starts with an empty filter', () => {
   };
   assert.ok(selected, 'expected selected point layer');
   assert.deepEqual(selected.filter, ['==', ['get', 'entityId'], '']);
-  assert.equal(selected.paint?.['circle-color'], DIGNITY_PALETTE.point);
+  assert.equal((selected.paint?.['circle-color'] as unknown[])[2], DIGNITY_PALETTE.point);
 });
 
 test('selectedPointFilterExpression matches only the selected feature, never all/none ambiguously', () => {
@@ -712,12 +712,8 @@ test('the mark is a dot for site precision and a hollow ring for neighborhood or
   const match = radius[1] as unknown[];
   assert.equal(match[0], 'match');
   assert.deepEqual(match[1], ['get', 'precision']);
-  assert.deepEqual([...(match[2] as string[])].sort(), [
-    'address',
-    'campus',
-    'institution',
-    'site',
-  ]);
+  // Campus is block precision: a ring, never a site dot.
+  assert.deepEqual([...(match[2] as string[])].sort(), ['address', 'institution', 'site']);
   assert.equal(radius[2], 4, '8px dot');
   assert.equal(radius[3], 7, '14px ring');
   const fill = point.paint?.['circle-color'] as unknown[];
@@ -746,12 +742,19 @@ test('groups are paper circles in three sizes with a count, never copper', () =>
   }
 });
 
-test('the selected mark is copper with a paper halo; the selected tag is copper', () => {
+test('a selected dot is copper with a paper halo, a selected ring stays hollow; the tag is copper', () => {
   const style = buildStyleFixture('off');
   const selected = layerById(style, EXPLORE_SELECTED_POINT_LAYER_ID);
-  assert.equal(selected.paint?.['circle-color'], DIGNITY_PALETTE.point);
-  assert.equal(selected.paint?.['circle-stroke-width'], 2);
-  assert.equal(selected.paint?.['circle-stroke-color'], plateForScheme('dark').selectedHalo);
+  // `['case', <is dot>, dot value, ring value]`: selection never fills a ring into a site.
+  const [op, , dotColor, ringColor] = selected.paint?.['circle-color'] as unknown[];
+  assert.equal(op, 'case');
+  assert.equal(dotColor, DIGNITY_PALETTE.point);
+  assert.equal(ringColor, 'rgba(0,0,0,0)');
+  const stroke = selected.paint?.['circle-stroke-color'] as unknown[];
+  assert.equal(stroke[2], plateForScheme('dark').selectedHalo);
+  assert.equal(stroke[3], DIGNITY_PALETTE.point);
+  const width = selected.paint?.['circle-stroke-width'] as unknown[];
+  assert.deepEqual([width[2], width[3]], [2, 3]);
   const tag = layerById(style, EXPLORE_SELECTED_TAG_LAYER_ID);
   assert.equal(tag.paint?.['text-color'], DIGNITY_PALETTE.point);
   assert.deepEqual(selectedTagFilterExpression('ent_a'), ['in', '|ent_a|', ['get', 'ids']]);

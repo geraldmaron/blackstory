@@ -19,8 +19,7 @@
 .ds-shell:has(.ds-atlas),
 .ds-shell:has(.ds-atlas) .ds-shell-body,
 .ds-shell-page-transition:has(.ds-atlas),
-.ds-shell-page-transition:has(.ds-atlas) .ds-shell-page-transition__content,
-.ds-map-surface:has(.ds-atlas) {
+.ds-shell-page-transition:has(.ds-atlas) .ds-shell-page-transition__content {
   pointer-events: none;
 }
 

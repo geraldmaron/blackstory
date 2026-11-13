@@ -54,7 +54,8 @@ const PRECISION_MARKS: Readonly<Record<string, RecordMark>> = {
   address: 'dot',
   site: 'dot',
   institution: 'dot',
-  campus: 'dot',
+  // A campus is block precision (the tier table above): an area, never one site.
+  campus: 'ring',
   neighborhood: 'ring',
   city: 'ring',
   county: 'none',
@@ -73,10 +74,14 @@ export function precisionsWithMark(mark: RecordMark): string[] {
     .map(([precision]) => precision);
 }
 
-/** The precision as a reader reads it: where the archive can place this record. */
+/**
+ * The precision as a reader reads it: where the archive can place this record. The one wording
+ * set every surface prints (record pages, the inspector, RecordMap).
+ */
 export function precisionInWords(precision: string): string {
   const mark = recordMarkFor(precision);
   if (mark === 'dot') return 'Exact site';
+  if (precision === 'campus') return 'Campus-level location, not an exact address';
   if (precision === 'neighborhood') return 'Neighborhood-level location';
   if (precision === 'county') return 'County-level location';
   if (precision === 'state' || precision === 'country') return 'State-level location';
@@ -85,13 +90,14 @@ export function precisionInWords(precision: string): string {
 
 /**
  * Camera zoom matched to a record's public precision: the zoom `frameRecord` lands on and the
- * zoom every embedded RecordMap opens at. Exact 14 (the map's ceiling), neighborhood 12, city 10,
- * county 8, state 6. A county-precision record framed at z13 would show a street corner the
+ * zoom every embedded RecordMap opens at. Exact 14 (the map's ceiling), campus 13, neighborhood 12,
+ * city 10, county 8, state 6. A county-precision record framed at z13 would show a street corner the
  * archive never claimed.
  */
 export function zoomForLocationPrecision(precision: string): number {
   const mark = recordMarkFor(precision);
   if (mark === 'dot') return 14;
+  if (precision === 'campus') return 13;
   if (precision === 'neighborhood') return 12;
   if (precision === 'county') return 8;
   if (precision === 'state' || precision === 'country') return 6;

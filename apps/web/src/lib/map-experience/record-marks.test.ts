@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
-import { drawnRecordCollection, jurisdictionTagCollection } from './record-marks';
+import {
+  drawnRecordCollection,
+  jurisdictionTagCollection,
+  renderedAnchorFor,
+} from './record-marks';
 
 function feature(entityId: string, precision: string, statePostalCode = 'MD'): ExploreMapFeature {
   return {
@@ -41,4 +45,15 @@ test('county and state records are counted in one tag per state, at its label po
   assert.equal(md?.properties.ids, '|state-1|state-2|county|');
   assert.equal(va?.properties.label, '1 by county');
   assert.equal(tags.length, 2);
+});
+
+test('a record is framed where it is drawn: its point, or its state tag when coarse', () => {
+  const md = jurisdictionTagCollection(collection).features.find(
+    (tag) => tag.properties.postalCode === 'MD',
+  );
+  assert.deepEqual(renderedAnchorFor(feature('site', 'site')), [-76.8, 39.27]);
+  assert.deepEqual(renderedAnchorFor(feature('city', 'city')), [-76.8, 39.27]);
+  // A county record has no point; its mark is the tag at the state's label point.
+  assert.deepEqual(renderedAnchorFor(feature('county', 'county')), md?.geometry.coordinates);
+  assert.deepEqual(renderedAnchorFor(feature('state-1', 'state')), md?.geometry.coordinates);
 });

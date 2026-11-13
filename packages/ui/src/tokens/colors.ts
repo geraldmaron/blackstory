@@ -109,8 +109,6 @@ export const darkTheme: ThemePalette = {
 export type MapPalette = {
   readonly land: string;
   readonly water: string;
-  /** Parks and wood. Subtle against land by design. */
-  readonly green: string;
   /** State boundary. Dashed. */
   readonly line: string;
   /** Country boundary. Solid and heavier than `line`. */
@@ -126,7 +124,6 @@ export type MapPalette = {
 export const lightMap: MapPalette = {
   land: '#f6f2e9',
   water: '#c7bdaa',
-  green: '#ebe5d1',
   line: '#bdb19a',
   line2: '#a2957c',
   road: '#e6dcc6',
@@ -138,7 +135,6 @@ export const lightMap: MapPalette = {
 export const darkMap: MapPalette = {
   land: '#38332b',
   water: '#0a0a0c',
-  green: '#3e3728',
   line: '#665e4f',
   line2: '#776c5a',
   road: '#474034',

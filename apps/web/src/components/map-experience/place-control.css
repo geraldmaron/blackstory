@@ -9,6 +9,8 @@
   position: relative;
   display: flex;
   align-items: center;
+  /* The 44px is inside the border, so the input and the locate button each get the full height. */
+  box-sizing: content-box;
   height: 44px;
   margin: 0;
   border: var(--ds-border-width) solid var(--ds-border-control);
@@ -64,7 +66,7 @@
   flex: none;
   place-items: center;
   width: 44px;
-  height: 42px;
+  height: 44px;
   border: 0;
   border-left: var(--ds-border-width) solid var(--ds-rule);
   border-radius: 0 var(--ds-radius-sm) var(--ds-radius-sm) 0;

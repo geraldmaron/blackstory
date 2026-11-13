@@ -88,7 +88,7 @@ import { CAMERA_EASING_SLOW_OUT } from '../../lib/map-experience/camera-presets'
 import { useRecordSelection } from './hooks/use-record-selection';
 import {
   emitExplorePinSelect,
-  resolveExplorePinEntityId,
+  resolveExplorePinEntityIds,
 } from '../../lib/map-experience/explore-pin-select';
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
@@ -443,9 +443,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     continuityRestoredRef.current = true;
     clearPinContinuity();
     if (saved.overlap && saved.overlap.length > 0) {
-      const ids = saved.overlap
-        .map((pin) => resolveExplorePinEntityId(pin, view.allFeatures))
-        .filter((id): id is string => id !== undefined);
+      const ids = resolveExplorePinEntityIds(saved.overlap, view.allFeatures);
       if (ids.length > 0) {
         setOverlapIds(ids);
         if (phoneRef.current) setDetent('half');

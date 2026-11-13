@@ -41,6 +41,9 @@ const LABEL_POINT_OVERRIDES: Readonly<Record<string, readonly [lng: number, lat:
   // Michigan's two peninsulas straddle Lake Michigan/Huron; the bbox centroid lands in open
   // water between them. Pin to the Lower Peninsula (the state's population center).
   MI: [-84.5, 43.3],
+  // Maryland's bbox centroid (~-77.3, 38.8) lands in Fairfax County, Virginia: the western
+  // panhandle and the Eastern Shore pull the box around the Potomac. Pin to central Maryland.
+  MD: [-76.8, 39.2],
 };
 
 function bboxCentroid(bbox: UsStateInfo['bbox']): readonly [lng: number, lat: number] {

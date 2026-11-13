@@ -861,11 +861,13 @@ export function findRecordsNeighbors(
   arrivalQuery = '',
   /** Resolved member ids of `query.collection`; without them a named collection has no records. */
   members?: ReadonlySet<string>,
+  /** The plate's resolved addresses (`loadDrawnRecordHrefs`), the same ones the register links. */
+  drawnHrefs?: ReadonlyMap<string, string>,
 ): RecordsNeighbors | undefined {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
   const inCollection = entries
-    .map((entry) => toFacts(entry, collisions))
+    .map((entry) => toFacts(entry, collisions, drawnHrefs))
     .filter((record) => matchesExcept(record, query, 'none', members))
     .sort(recordsComparator(query));
   // Stepping follows the displayed order: decade groups for chronology, the sort otherwise.

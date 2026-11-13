@@ -19,6 +19,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { AtlasCameraTarget } from '../components/map-stage/MapStage';
 import { useMapStage } from '../components/map-stage/MapStage';
 import type { RecordMark } from '../lib/map-experience/geo-precision';
+import { CLUSTER_RADIUS_BY_COUNT } from '../lib/map-experience/dignity-style';
+import {
+  EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+} from './map/explore-layer-ids';
 import { DoorRecordLink } from './door-record-link';
 
 void React;
@@ -46,6 +51,8 @@ export type CalloutPlacement = {
 };
 
 const INSET = 16;
+/** A single record's mark (a ring, the larger of the two) with its halo. */
+const SINGLE_MARK_RADIUS_PX = 8;
 const GAP = 24;
 /** The attribution's 44px "i" plus a gap, in the window's bottom-right corner. */
 const ATTRIBUTION_CLEARANCE = 44 + 8;
@@ -57,9 +64,18 @@ function clamp(value: number, min: number, max: number): number {
 /** The Door's stacked layout (door-home.css): a phone, or any portrait screen. */
 const STACKED_QUERY = '(max-width: 47.9375rem), (max-aspect-ratio: 1/1)';
 
+/** Area two boxes share. */
+function overlapArea(a: Box, b: Box): number {
+  const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return w > 0 && h > 0 ? w * h : 0;
+}
+
 /**
  * Where the card goes for a pin at (x, y) inside `frame`, or null when it cannot be shown without
- * leaving the frame. Right of the pin first (reading order), then left, above, below.
+ * leaving the frame. Of the sides that fit, the one covering the least of `obstacles` (the group
+ * circles and record marks on screen) wins: the side of the pin with the most free map. Ties keep
+ * reading order: right of the pin first, then left, above, below.
  *
  * `stacked` (a phone's short, wide window, where a card beside the pin spans the country): the
  * card docks along the window's bottom edge, under the country and above the headline, with a
@@ -70,6 +86,7 @@ export function placeCallout(
   card: { readonly width: number; readonly height: number },
   frame: Box,
   stacked = false,
+  obstacles: readonly Box[] = [],
 ): CalloutPlacement | null {
   const { x, y } = pin;
   const { width: w, height: h } = card;
@@ -79,36 +96,41 @@ export function placeCallout(
     left + w <= frame.right - INSET &&
     top >= frame.top + INSET &&
     top + h <= frame.bottom - INSET;
-  const sideTop = clamp(y - h / 2, frame.top + INSET, frame.bottom - INSET - h);
-  const stackLeft = clamp(x - w / 2, frame.left + INSET, frame.right - INSET - w);
-  const sides: CalloutPlacement[] = [
+  const clampTop = (top: number) => clamp(top, frame.top + INSET, frame.bottom - INSET - h);
+  const clampLeft = (left: number) => clamp(left, frame.left + INSET, frame.right - INSET - w);
+  // Beside the pin the card may sit centered on it, mostly above it or mostly below it; above or
+  // below it, centered, toward the left or toward the right. More room to find open map.
+  const sideTops = [y - h / 2, y - h + 16, y - 16].map(clampTop);
+  const stackLefts = [x - w / 2, x - w + 16, x - 16].map(clampLeft);
+  const sides: CalloutPlacement[] = sideTops.flatMap((top) => [
     {
-      side: 'right',
+      side: 'right' as const,
       left: x + GAP,
-      top: sideTop,
+      top,
       leader: { left: x, top: y, width: GAP, height: 1 },
     },
     {
-      side: 'left',
+      side: 'left' as const,
       left: x - GAP - w,
-      top: sideTop,
+      top,
       leader: { left: x - GAP, top: y, width: GAP, height: 1 },
     },
-  ];
-  const stacks: CalloutPlacement[] = [
+  ]);
+  const stacks: CalloutPlacement[] = stackLefts.flatMap((left) => [
     {
-      side: 'above',
-      left: stackLeft,
+      side: 'above' as const,
+      left,
       top: y - GAP - h,
       leader: { left: x, top: y - GAP, width: 1, height: GAP },
     },
     {
-      side: 'below',
-      left: stackLeft,
+      side: 'below' as const,
+      left,
       top: y + GAP,
       leader: { left: x, top: y, width: 1, height: GAP },
     },
-  ];
+  ]);
+  const stackLeft = stackLefts[0]!;
   const docked: CalloutPlacement = {
     side: 'below',
     left: stackLeft,
@@ -118,26 +140,63 @@ export function placeCallout(
   const candidates = stacked
     ? [...(docked.top >= y + GAP ? [docked] : []), ...stacks, ...sides]
     : [...sides, ...stacks];
-  return (
-    candidates.find((candidate) => {
-      if (!fits(candidate.left, candidate.top)) return false;
-      // A side leader has to land on the card's edge, not past a corner of it.
-      if (candidate.side === 'right' || candidate.side === 'left') {
-        return y >= candidate.top + 8 && y <= candidate.top + h - 8;
-      }
-      return x >= candidate.left + 8 && x <= candidate.left + w - 8;
-    }) ?? null
-  );
+  let best: CalloutPlacement | null = null;
+  let bestCover = Infinity;
+  for (const candidate of candidates) {
+    if (!fits(candidate.left, candidate.top)) continue;
+    // A side leader has to land on the card's edge, not past a corner of it.
+    const onEdge =
+      candidate.side === 'right' || candidate.side === 'left'
+        ? y >= candidate.top + 8 && y <= candidate.top + h - 8
+        : x >= candidate.left + 8 && x <= candidate.left + w - 8;
+    if (!onEdge) continue;
+    const box = {
+      left: candidate.left,
+      top: candidate.top,
+      right: candidate.left + w,
+      bottom: candidate.top + h,
+    };
+    const cover = obstacles.reduce((sum, obstacle) => sum + overlapArea(box, obstacle), 0);
+    if (cover < bestCover) {
+      best = candidate;
+      bestCover = cover;
+    }
+  }
+  return best;
+}
+
+/** The plate's group circles and record marks on screen, as boxes the card should not cover. */
+function markObstacles(map: EventedMap, plate: DOMRect): Box[] {
+  const features = map.queryRenderedFeatures(undefined, {
+    layers: [EXPLORE_CLUSTER_LAYER_ID, EXPLORE_UNCLUSTERED_POINT_LAYER_ID],
+  });
+  return features.map((feature) => {
+    const count = Number((feature.properties as { point_count?: number }).point_count ?? 0);
+    const radius =
+      count > 0
+        ? ([...CLUSTER_RADIUS_BY_COUNT].reverse().find(([min]) => count >= min)?.[1] ?? 12)
+        : SINGLE_MARK_RADIUS_PX;
+    const point = map.project(
+      (feature.geometry as { coordinates: [number, number] }).coordinates as never,
+    );
+    const x = plate.left + point.x;
+    const y = plate.top + point.y;
+    return { left: x - radius, top: y - radius, right: x + radius, bottom: y + radius };
+  });
 }
 
 function rectBox(rect: DOMRect): Box {
   return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom };
 }
 
-/** MapLibre's own event API, which the stage's camera handle does not name. */
+/** MapLibre's own event and query API, which the stage's camera handle does not name. */
 type EventedMap = AtlasCameraTarget & {
-  on(type: 'move' | 'resize', listener: () => void): unknown;
-  off(type: 'move' | 'resize', listener: () => void): unknown;
+  on(type: 'move' | 'resize' | 'idle', listener: () => void): unknown;
+  off(type: 'move' | 'resize' | 'idle', listener: () => void): unknown;
+  queryRenderedFeatures(
+    geometry: undefined,
+    options: { layers: string[] },
+  ): { geometry: unknown; properties: unknown }[];
 };
 
 export type DoorSpotlightCalloutProps = {
@@ -206,6 +265,7 @@ export function DoorSpotlightCallout({
         // the right corner (door-home.css); the card docks one row above it.
         stacked ? { ...rectBox(win), bottom: win.bottom - ATTRIBUTION_CLEARANCE } : win,
         stacked,
+        markObstacles(map, plate),
       );
       if (!placement) {
         show(null);
@@ -230,11 +290,15 @@ export function DoorSpotlightCallout({
     };
     map.on('move', schedule);
     map.on('resize', schedule);
+    // The groups the card avoids may still be loading when the camera stops: place it again once
+    // the plate has drawn them.
+    map.on('idle', schedule);
     window.addEventListener('resize', schedule);
     schedule();
     return () => {
       map.off('move', schedule);
       map.off('resize', schedule);
+      map.off('idle', schedule);
       window.removeEventListener('resize', schedule);
       if (frame !== null) window.cancelAnimationFrame(frame);
     };

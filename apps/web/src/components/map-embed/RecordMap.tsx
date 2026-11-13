@@ -4,10 +4,12 @@
  * The one embedded map: a record's place on a record page, a place page or a story inset.
  *
  * Framed at the zoom its stored precision allows (`zoomForLocationPrecision`, capped by `maxZoom`
- * where a small frame needs context) and marked the way the atlas marks a selected record
- * (`recordMarkFor`): a copper dot at a site, a copper ring at a neighborhood or city, no mark at
- * all for a county or state. A site dot carries the label beside it, so the frame still says what
- * is there when the tiles around it are empty (a swamp, a field). MapLibre's cooperative gestures keep
+ * where a small frame needs context) and marked by the atlas's own style, as the atlas marks a
+ * selected record (`recordMarkFor`): a copper dot at a site, a copper ring at a campus,
+ * neighborhood or city, and for a county or state no point at all, only the copper jurisdiction
+ * tag at the state's label point, which is also where the frame is centered (`renderedAnchorFor`).
+ * A site dot carries the label beside it, so the frame still says what is there when the tiles
+ * around it are empty (a swamp, a field). MapLibre's cooperative gestures keep
  * one finger (and a plain wheel) scrolling the page. "Open on the map" hands off to /explore with
  * the record selected, where the same `frameRecord` contract frames it.
  *
@@ -18,10 +20,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { buildExploreMapStyle } from '../../app/map/explore-style';
+import type {
+  ExploreMapFeature,
+  ExploreMapFeatureCollection,
+} from '../../lib/map-experience/build-explore-map-source';
+import { renderedAnchorFor } from '../../lib/map-experience/record-marks';
 import { readDocumentColorScheme } from '../map-stage/color-scheme';
+import { setSelectedEntityFilter } from '../map-stage/selection-sync';
 import { attachSafariPageZoomGuard } from '../map-stage/custom-rotate-gestures';
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM } from '../../lib/map-experience/camera-presets';
-import { DIGNITY_PALETTE, plateForScheme } from '../../lib/map-experience/dignity-style';
+import { plateForScheme } from '../../lib/map-experience/dignity-style';
 import {
   precisionInWords,
   recordMarkFor,
@@ -39,6 +47,8 @@ import './record-map.css';
 void React;
 
 const MARK_SOURCE = 'record-map-mark';
+/** The one record on this map, as the atlas style's sources know it. */
+const RECORD_ID = 'record';
 
 export type RecordMapProps = {
   readonly lat: number;
@@ -47,6 +57,8 @@ export type RecordMapProps = {
   readonly label: string;
   /** Stored public precision; decides the zoom and the mark. */
   readonly precision: string;
+  /** The record's state: where a county- or state-precision record's tag is drawn. */
+  readonly statePostalCode?: string;
   /** A closest zoom for a small frame; never frames closer than the precision allows either way. */
   readonly maxZoom?: number;
   /** False where the page states the place itself (a record page's citation line). */
@@ -58,9 +70,32 @@ export type RecordMapProps = {
 
 type Status = 'idle' | 'loading' | 'ready' | 'failed';
 
-function styleFor(scheme: ReturnType<typeof readDocumentColorScheme>) {
+/** The record as a one-feature atlas source, so the atlas style draws its mark or its tag. */
+function recordCollection(
+  lng: number,
+  lat: number,
+  precision: string,
+  statePostalCode: string | undefined,
+): ExploreMapFeatureCollection {
+  const feature = {
+    type: 'Feature',
+    id: RECORD_ID,
+    geometry: { type: 'Point', coordinates: [lng, lat] },
+    properties: {
+      entityId: RECORD_ID,
+      precision,
+      ...(statePostalCode ? { statePostalCode } : {}),
+    },
+  } as unknown as ExploreMapFeature;
+  return { type: 'FeatureCollection', features: [feature] };
+}
+
+function styleFor(
+  scheme: ReturnType<typeof readDocumentColorScheme>,
+  record: ExploreMapFeatureCollection,
+) {
   return buildExploreMapStyle({
-    featureCollection: { type: 'FeatureCollection', features: [] },
+    featureCollection: record,
     jurisdictionAreaFeatures: [],
     layerMode: 'off',
     clusteringEnabled: false,
@@ -68,15 +103,13 @@ function styleFor(scheme: ReturnType<typeof readDocumentColorScheme>) {
   });
 }
 
-function addMark(
-  map: MapLibreMap,
-  lng: number,
-  lat: number,
-  precision: string,
-  label: string,
-): void {
-  const mark = recordMarkFor(precision);
-  if (mark === 'none' || map.getSource(MARK_SOURCE)) return;
+/** Selects the record in the atlas style, and names a site dot beside it. */
+function markRecord(map: MapLibreMap, lng: number, lat: number, precision: string, label: string) {
+  setSelectedEntityFilter(map, RECORD_ID);
+  // A ring sits on a named neighborhood or city the plate already labels; a site dot does not.
+  if (recordMarkFor(precision) !== 'dot' || label.length === 0 || map.getSource(MARK_SOURCE)) {
+    return;
+  }
   const plate = plateForScheme(readDocumentColorScheme());
   map.addSource(MARK_SOURCE, {
     type: 'geojson',
@@ -86,20 +119,6 @@ function addMark(
       geometry: { type: 'Point', coordinates: [lng, lat] },
     },
   });
-  // The atlas's selected mark: copper with a paper halo, at the mark's own size.
-  map.addLayer({
-    id: `${MARK_SOURCE}-point`,
-    type: 'circle',
-    source: MARK_SOURCE,
-    paint: {
-      'circle-radius': mark === 'dot' ? 5 : 7,
-      'circle-color': DIGNITY_PALETTE.point,
-      'circle-stroke-width': 2,
-      'circle-stroke-color': plate.selectedHalo,
-    },
-  });
-  // A ring sits on a named neighborhood or city the plate already labels; a site dot does not.
-  if (mark !== 'dot' || label.length === 0) return;
   map.addLayer({
     id: `${MARK_SOURCE}-label`,
     type: 'symbol',
@@ -128,6 +147,7 @@ export function RecordMap({
   lng,
   label,
   precision,
+  statePostalCode,
   maxZoom = MAP_MAX_ZOOM,
   caption = true,
   exploreHref,
@@ -180,10 +200,12 @@ export function RecordMap({
         await waitForContainerLayout(container);
         const maplibregl = (await import('maplibre-gl')).default;
         if (cancelled) return;
+        const record = recordCollection(lng, lat, precision, statePostalCode);
+        const center = renderedAnchorFor(record.features[0]!);
         map = new maplibregl.Map({
           container,
-          style: styleFor(readDocumentColorScheme()),
-          center: [lng, lat],
+          style: styleFor(readDocumentColorScheme(), record),
+          center: [center[0], center[1]],
           zoom: Math.min(zoomForLocationPrecision(precision), maxZoom, MAP_MAX_ZOOM),
           minZoom: MAP_MIN_ZOOM,
           maxZoom: MAP_MAX_ZOOM,
@@ -217,13 +239,13 @@ export function RecordMap({
             if (!cancelled) resizeMapInPlace(active);
           },
         );
-        active.on('style.load', () => addMark(active, lng, lat, precision, label.trim()));
+        active.on('style.load', () => markRecord(active, lng, lat, precision, label.trim()));
         active.once('load', () => {
           if (!cancelled) setStatus('ready');
         });
         active.on('error', (event) => console.error('[RecordMap]', event.error));
         themeObserver = new MutationObserver(() => {
-          active.setStyle(styleFor(readDocumentColorScheme()));
+          active.setStyle(styleFor(readDocumentColorScheme(), record));
         });
         themeObserver.observe(document.documentElement, {
           attributes: true,
@@ -242,7 +264,7 @@ export function RecordMap({
       guard?.detach();
       map?.remove();
     };
-  }, [wanted, lat, lng, precision, maxZoom, label]);
+  }, [wanted, lat, lng, precision, statePostalCode, maxZoom, label]);
 
   const place = label.trim();
 

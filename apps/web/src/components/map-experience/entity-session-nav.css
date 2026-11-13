@@ -1,5 +1,5 @@
 /**
- * Flat session navigation for NarrativeCard and entity detail chrome. Copper signals the
+ * Flat session navigation for entity detail chrome. Copper signals the
  * active random toggle as a border/text accent only — never a copper plate under body-size
  * label text. Compact toolbar sizing stays ≥24px (WCAG 2.2 AA target size).
  */
@@ -44,11 +44,6 @@
   border-color: var(--ds-accent);
   color: var(--ds-accent);
   opacity: 0.92;
-}
-
-.ds-nc__session-nav {
-  padding-top: var(--ds-space-2);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-entity-page__session-nav {

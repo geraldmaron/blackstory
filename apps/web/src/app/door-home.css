@@ -83,11 +83,9 @@
   bottom: 0;
   left: 0;
   width: calc(var(--ds-door-edge) + var(--ds-door-dock-w) + var(--ds-space-18));
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--ds-canvas) 85%, transparent) 55%,
-    transparent
-  );
+  /* Opaque under the text: a group drawn there (Hawaii, at the national frame) would otherwise
+     ghost through the headline. The map shows again past the column and above it. */
+  background: linear-gradient(to right, var(--ds-canvas) 55%, transparent);
   mask-image: linear-gradient(to bottom, transparent, #000 45%);
   pointer-events: none;
 }
@@ -642,15 +640,9 @@
 }
 
 /*
- * The shared plate's furniture while the Door owns it. State codes are drawn by the Door as GL
- * labels in one collision pass with the marks (door-plate-labels.ts), so the plate's DOM codes
- * stand down. The attribution is one collapsed 44px "i" in the bottom-right corner of the map
- * window; opened, its links read leftward from it.
+ * The shared plate's furniture while the Door owns it. The attribution is one collapsed 44px "i"
+ * in the bottom-right corner of the map window; opened, its links read leftward from it.
  */
-body:has(.ds-door-journey:not(.ds-door-journey--browse)) .ds-map-stage .ds-state-label {
-  visibility: hidden;
-}
-
 body:has(.ds-door-journey:not(.ds-door-journey--browse))
   .ds-map-stage
   .maplibregl-ctrl-bottom-left {
@@ -754,7 +746,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     );
     background: linear-gradient(
       to top,
-      color-mix(in srgb, var(--ds-canvas) 85%, transparent) calc(100% - var(--ds-space-18)),
+      var(--ds-canvas) calc(100% - var(--ds-space-18)),
       transparent
     );
     mask-image: none;
