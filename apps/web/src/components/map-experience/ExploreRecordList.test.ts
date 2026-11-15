@@ -6,7 +6,7 @@ import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-m
 import {
   ExploreRecordList,
   RESULTS_ROW_HEIGHT,
-  gradeWithSources,
+  confidenceLevelFor,
   resultsWindow,
 } from './ExploreRecordList';
 
@@ -39,10 +39,14 @@ test('the window renders only the rows in view plus overscan', () => {
   assert.deepEqual(resultsWindow(3, 0, 600), { first: 0, last: 3 });
 });
 
-test('the grade reads as a letter with its source count', () => {
-  assert.equal(gradeWithSources('high', 3), 'A · 3 sources');
-  assert.equal(gradeWithSources('high', 1), 'A · 1 source');
-  assert.equal(gradeWithSources('high', 0), 'A');
+test('the grade tag level follows the stored tier, unknown tiers read as ungraded', () => {
+  assert.deepEqual(['high', 'medium', 'low', 'unrated', 'bogus'].map(confidenceLevelFor), [
+    'high',
+    'medium',
+    'low',
+    'unrated',
+    'unrated',
+  ]);
 });
 
 test('a row is two lines: name and decade, then kind as a word, place and grade', () => {
@@ -51,7 +55,12 @@ test('a row is two lines: name and decade, then kind as a word, place and grade'
   );
   assert.match(html, /role="listbox"/);
   assert.match(html, /aria-setsize="1"/);
-  const order = ['Benjamin Banneker', '1750s', 'Person · Ellicott City, Maryland', 'A · 4 sources'];
+  const order = [
+    'Benjamin Banneker',
+    '1750s',
+    'Person · Ellicott City, Maryland',
+    'Well evidenced',
+  ];
   const at = order.map((text) => html.indexOf(text));
   for (const index of at) assert.ok(index >= 0);
   assert.deepEqual(

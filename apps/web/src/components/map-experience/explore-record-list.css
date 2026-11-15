@@ -26,7 +26,7 @@
   position: absolute;
   inset: 0 0 auto;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto;
   align-content: center;
   column-gap: var(--ds-space-3);
@@ -70,23 +70,16 @@
   background: var(--ds-material-paper);
 }
 
-/* A record's image at tile size, or a sand tile with its kind glyph. */
-.ds-xlist__thumb {
-  grid-row: 1 / span 2;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  overflow: hidden;
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-material-sand);
-  color: var(--ds-material-ink);
+/* A record's own photograph, toned as a plate (`.ds-plate__tone`); no stand-in without one. */
+.ds-xlist__row[data-photo='true'] {
+  grid-template-columns: 56px minmax(0, 1fr);
 }
 
-.ds-xlist__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.ds-xlist__thumb.ds-plate__tone {
+  grid-row: 1 / span 2;
+  width: 56px;
+  aspect-ratio: 1;
+  border-radius: var(--ds-radius-sm);
 }
 
 .ds-xlist__line {
@@ -121,6 +114,11 @@
   line-height: 1.4;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.ds-xlist__grade .ds-grade-tag {
+  gap: var(--ds-space-1);
+  letter-spacing: 0;
 }
 
 .ds-xlist__decade,

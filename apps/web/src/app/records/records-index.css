@@ -80,11 +80,11 @@ body:has(.ds-records) .ds-reading-progress {
 
 .ds-record__link {
   display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    'thumb name data'
-    'thumb meta data'
-    'thumb summary data';
+    'name data'
+    'meta data'
+    'summary data';
   align-items: start;
   gap: var(--ds-space-1) var(--ds-space-6);
   padding: var(--ds-space-4) var(--ds-space-2);
@@ -103,28 +103,21 @@ body:has(.ds-records) .ds-reading-progress {
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* The record's image at tile size, or a sand tile with the kind's glyph in ink (a paper tile on
-   a sand band, where sand would vanish). */
-.ds-record__thumb {
+/* A record with its own photograph leads with it as a plate (`.ds-plate__tone` tones it); a
+   record without one gets no stand-in, and the column is not drawn. */
+.ds-record__link[data-photo='true'] {
+  grid-template-columns: 6rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'thumb name data'
+    'thumb meta data'
+    'thumb summary data';
+}
+
+.ds-record__thumb.ds-plate__tone {
   grid-area: thumb;
-  display: grid;
-  place-items: center;
-  width: 4.5rem;
-  aspect-ratio: 1;
-  overflow: hidden;
+  width: 6rem;
+  aspect-ratio: 4 / 3;
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-material-sand);
-  color: var(--ds-material-ink);
-}
-
-[data-ground='sand'] .ds-record__thumb {
-  background: var(--ds-material-paper);
-}
-
-.ds-record__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .ds-record__name {
@@ -183,13 +176,13 @@ body:has(.ds-records) .ds-reading-progress {
   -webkit-line-clamp: 2;
 }
 
-/* Right column: the decade as a bold mono numeral, the grade as a boxed letter under it. */
+/* Right column: the decade as a bold mono numeral, the grade tag and source count under it. */
 .ds-record__data {
   grid-area: data;
   display: grid;
   justify-items: end;
   align-content: start;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-1);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
@@ -206,34 +199,20 @@ body:has(.ds-records) .ds-reading-progress {
 }
 
 .ds-record__evidence {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-}
-
-.ds-record__ungraded {
-  font-family: var(--ds-font-sans);
-}
-
-.ds-record__letter {
-  display: inline-grid;
-  place-items: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: var(--ds-border-width-strong) solid var(--ds-ink);
-  border-radius: 4px;
-  color: var(--ds-ink);
-  font-weight: 700;
+  display: grid;
+  justify-items: end;
+  gap: var(--ds-space-1);
 }
 
 /* The timeline's row: the band states the decade, so the row is a small tile, the name with its
    kind and place under it, and the grade. Two lines fit the tile's height, and the place gets the
    name's full width at every column width (one line squeezed it against the grade). */
-.ds-record__link--compact {
-  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+.ds-record__link--compact,
+.ds-record__link--compact[data-photo='true'] {
+  grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    'thumb name data'
-    'thumb meta data';
+    'name data'
+    'meta data';
   align-items: center;
   gap: 0 var(--ds-space-4);
   padding-block: var(--ds-space-2);
@@ -243,8 +222,15 @@ body:has(.ds-records) .ds-reading-progress {
   align-content: center;
 }
 
-.ds-record__link--compact .ds-record__thumb {
-  width: 2.75rem;
+.ds-record__link--compact[data-photo='true'] {
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'thumb name data'
+    'thumb meta data';
+}
+
+.ds-record__link--compact .ds-record__thumb.ds-plate__tone {
+  width: 3.5rem;
 }
 
 .ds-record__link--compact .ds-record__name {
@@ -348,18 +334,30 @@ body:has(.ds-records) .ds-reading-progress {
     margin-inline: calc(var(--ds-gutter) * -1);
   }
 
+  /* The name gets the width beside the decade; kind and place, the summary and the grade each
+     take a full line under it, so nothing is squeezed against the grade tag. */
   .ds-record__link {
-    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      'thumb name decade'
-      'thumb meta evidence'
-      'summary summary summary';
+      'name decade'
+      'meta meta'
+      'summary summary'
+      'evidence evidence';
     gap: var(--ds-space-1) var(--ds-space-3);
     padding-block: var(--ds-space-3);
   }
 
-  .ds-record__thumb {
-    width: 3.5rem;
+  .ds-record__link[data-photo='true'] {
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      'thumb name decade'
+      'thumb meta meta'
+      'summary summary summary'
+      'evidence evidence evidence';
+  }
+
+  .ds-record__thumb.ds-plate__tone {
+    width: 4rem;
   }
 
   .ds-record__data {
@@ -380,14 +378,32 @@ body:has(.ds-records) .ds-reading-progress {
 
   .ds-record__evidence {
     grid-area: evidence;
-    justify-self: end;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-self: start;
+    gap: var(--ds-space-1) var(--ds-space-3);
+    margin-top: var(--ds-space-1);
   }
 
   .ds-record__link--compact {
-    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      'thumb name evidence'
-      'thumb meta evidence';
+      'name'
+      'meta'
+      'evidence';
+  }
+
+  .ds-record__link--compact[data-photo='true'] {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    grid-template-areas:
+      'thumb name'
+      'thumb meta'
+      'thumb evidence';
+  }
+
+  .ds-record__link--compact .ds-record__thumb.ds-plate__tone {
+    width: 3rem;
   }
 
   /* Under the chips, flush to the gutter. */

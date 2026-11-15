@@ -3,7 +3,7 @@
  * and up), so an index thumbnail or a cover would otherwise ship the full scan, and Commons
  * rate-limits hotlinked originals far sooner than its thumbnails.
  */
-import { pinThumbnailUrl } from '../../lib/map-experience/entity-photo-index';
+import { pinThumbnailUrl } from '../../lib/map-experience/pin-thumbnail-url';
 
 /**
  * The widths Commons renders thumbnails at. Any other width answers 400 (checked 2026-11-12:

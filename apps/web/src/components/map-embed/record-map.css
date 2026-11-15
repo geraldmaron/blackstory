@@ -73,7 +73,7 @@
 .ds-record-map__ground-note {
   color: var(--ds-map-label);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
+  font-size: var(--ds-text-caption);
   letter-spacing: 0.04em;
 }
 

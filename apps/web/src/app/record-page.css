@@ -556,6 +556,7 @@
   display: inline-flex;
   align-items: center;
   justify-self: start;
+  min-height: 44px;
   gap: var(--ds-space-2);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);

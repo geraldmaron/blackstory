@@ -42,8 +42,11 @@ export type EvidenceItem = {
   readonly retraction?: EvidenceRetractionNotice;
 };
 
-/** The quiet grade tag: glyph plus word, colored by tier but never only by color. */
-function GradeTag({ level }: { readonly level: ConfidenceLevel }) {
+/**
+ * The quiet grade tag: glyph plus word, colored by tier but never only by color. The one evidence
+ * vocabulary: the claims block, the register's rows and the Explore list all print it.
+ */
+export function GradeTag({ level }: { readonly level: ConfidenceLevel | 'unrated' }) {
   return (
     <span className={`ds-grade-tag ds-grade-tag--${level}`}>
       <FontAwesomeIcon

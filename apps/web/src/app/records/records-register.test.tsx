@@ -125,12 +125,12 @@ describe('Records register', () => {
     assert.match(markup, /aria-label="Remove “church”"/);
     assert.match(markup, /First <b>Church<\/b>/);
     assert.match(markup, /oldest <b>church<\/b> of its kind/);
-    // The row is one link, kind is a word, the grade is a letter with the source count.
+    // The row is one link, kind is a word, the grade is the claims block's tag with the count.
     assert.match(markup, /<a class="ds-record__link" href="\/place\/first-church--r1\?from=list">/);
     assert.match(markup, />Place<span class="ds-record__sep"/);
     assert.match(
       markup,
-      /ds-record__letter">A<\/span><span class="ds-record__sources"><span aria-hidden="true">· <\/span>3 sources/,
+      /ds-grade-tag ds-grade-tag--high">.*?Well evidenced<\/span><span class="ds-record__sources">3 sources/,
     );
   });
 

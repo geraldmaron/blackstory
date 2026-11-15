@@ -2452,26 +2452,45 @@ a.ds-room-chip {
 }
 
 /* —— outcomes: empty, no match, unreadable ————————————————————————————————————— */
+/* An outcome (nothing matched, nothing to show) is its own sand band, never a bare line of grey
+   text: a headline, what was asked for, and the ways out. */
 .ds-records-outcome {
   display: grid;
   justify-items: start;
   gap: var(--ds-space-3);
   max-width: var(--ds-width-read);
-  padding-block: var(--ds-space-12) var(--ds-space-8);
+  margin-block: var(--ds-space-8);
+  padding: var(--ds-space-8) var(--ds-space-8) var(--ds-space-6);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
 }
 
 .ds-records-outcome__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: 650;
-  line-height: 1.75rem;
+  font-size: var(--ds-text-headline);
+  font-weight: 700;
+  line-height: 1.1;
   letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
+}
+
+.ds-records-outcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-records-outcome {
+    padding: var(--ds-space-6) var(--ds-space-4) var(--ds-space-4);
+  }
 }
 
 .ds-records-outcome__body {
   margin: 0 0 var(--ds-space-3);
-  color: var(--ds-ink-muted);
+  color: inherit;
   font-size: var(--ds-text-body);
   line-height: var(--ds-leading-body);
   overflow-wrap: anywhere;

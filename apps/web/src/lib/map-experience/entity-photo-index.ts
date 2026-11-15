@@ -13,8 +13,14 @@
  * fast as the enrichment/pin pipelines populate that field, with no second definition to keep in
  * sync here.
  */
-import { commonsUploadThumbnailUrl } from '@repo/domain/adapters/wikimedia/commons-media';
+import { pinThumbnailUrl } from './pin-thumbnail-url';
 import type { PublicEntityView } from '../../data/public-seed';
+import { isRenderedImage } from '../../components/entity/rendered-image';
+// Server only from here on: the record page's quiet rule reaches @repo/domain. Client code takes
+// this module's types, and `pinThumbnailUrl` from its own module.
+import { isQuietRecord } from '../../app/entity/[id]/adapters';
+
+export { pinThumbnailUrl };
 
 /** 480px matches the pin card's rendered width at 2x DPR without shipping the source scan. */
 export const PIN_PHOTO_THUMBNAIL_WIDTH = 480;
@@ -35,19 +41,6 @@ function toPinPhotoView(image: NonNullable<PublicEntityView['primaryImage']>): P
     alt: image.alt,
     credit: image.credit,
   };
-}
-
-/** Entity id → pin photo, for every entity in `entities` that carries a `primaryImage`. */
-/**
- * A pinned Commons file is stored as a `Special:FilePath/<title>?width=960` URL (the mast
- * size); a pin card wants a narrower render, so rewrite the width there. An original
- * `upload.wikimedia.org` file goes through the /thumb/ rewrite; anything else passes through.
- */
-export function pinThumbnailUrl(url: string, width: number): string {
-  if (url.includes('/Special:FilePath/')) {
-    return url.replace(/([?&])width=\d+/, `$1width=${width}`);
-  }
-  return commonsUploadThumbnailUrl(url, width);
 }
 
 /** The most ids one `?ids=` request may name; more is a caller bug, not a bigger answer. */
@@ -71,12 +64,17 @@ export function pickPhotoIds(
   return picked;
 }
 
+/** Entity id → pin photo, for every entity in `entities` that carries a showable `primaryImage`. */
 export function buildEntityPhotoIndex(
   entities: readonly PublicEntityView[],
 ): Readonly<Record<string, PinPhotoView>> {
   const index: Record<string, PinPhotoView> = {};
   for (const entity of entities) {
-    if (!entity.primaryImage) continue;
+    // A quiet record keeps its photograph on its own page only, and a rendering is never shown
+    // as a photograph (docs/ui/patterns-living-archive.md, Plates).
+    if (!entity.primaryImage || isQuietRecord(entity) || isRenderedImage(entity.primaryImage)) {
+      continue;
+    }
     index[entity.id] = toPinPhotoView(entity.primaryImage);
   }
   return index;

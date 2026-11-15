@@ -144,18 +144,28 @@ export function Outcome({
   title,
   children,
   action,
+  also,
 }: {
   readonly title: string;
   readonly children: React.ReactNode;
   readonly action: { readonly href: string; readonly label: string };
+  /** A second way out, quieter than the first. */
+  readonly also?: { readonly href: string; readonly label: string } | undefined;
 }) {
   return (
-    <div className="ds-records-outcome" role="status">
+    <div className="ds-records-outcome" role="status" data-ground="sand">
       <h2 className="ds-records-outcome__title">{title}</h2>
       <p className="ds-records-outcome__body">{children}</p>
-      <a className={buttonClassName('secondary')} href={action.href}>
-        {action.label}
-      </a>
+      <div className="ds-records-outcome__actions">
+        <a className={buttonClassName('primary')} href={action.href}>
+          {action.label}
+        </a>
+        {also ? (
+          <a className={buttonClassName('quiet')} href={also.href}>
+            {also.label}
+          </a>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -185,7 +195,8 @@ function NoMatch({ model }: { readonly model: RecordsIndexModel }) {
   if (constraints.length === 0) {
     return (
       <Outcome title="The release is empty" action={{ href: '/', label: 'Go to the map' }}>
-        This is a fault on our side, not an absence of history.
+        The archive failed to load its records. That is a fault in the site, not an absence of
+        history.
       </Outcome>
     );
   }
@@ -200,10 +211,24 @@ function NoMatch({ model }: { readonly model: RecordsIndexModel }) {
         }
       : { href: clearAllHref, label: narrowed ? 'Clear filters' : 'Clear search' };
   return (
-    <Outcome title="No records match" action={action}>
+    <Outcome
+      title="No records match"
+      action={action}
+      also={{ href: '/explore', label: 'Browse the map' }}
+    >
       Nothing in the archive matches {searchedPhrase(model)}.
     </Outcome>
   );
+}
+
+/** "From the 1530s to the 2020s.", the decades the register's Era facet spans, or nothing. */
+export function eraSpanPhrase(era: readonly { readonly id: string; readonly count: number }[]) {
+  const decades = era
+    .filter((facet) => facet.count > 0)
+    .map((facet) => Number.parseInt(facet.id, 10))
+    .filter(Number.isFinite);
+  if (decades.length < 2) return undefined;
+  return `From the ${Math.min(...decades)}s to the ${Math.max(...decades)}s.`;
 }
 
 function countPhrase(count: number): string {
@@ -236,6 +261,7 @@ export function RecordsIndexRoom({ model, photos = {} }: RecordsIndexProps) {
     chronology,
   } = model;
   const timeline = query.layout === 'chronology';
+  const span = eraSpanPhrase(model.facets.era);
   const filters = filterMenus(model);
   const filterCount = constraints.filter((constraint) => constraint.key !== 'q').length;
 
@@ -326,14 +352,27 @@ export function RecordsIndexRoom({ model, photos = {} }: RecordsIndexProps) {
 
   return (
     <Room width="wide" className="ds-records">
-      {/* The title at display scale with the count beside it as a giant copper numeral. The dek
-          says the count in words (and how it is narrowed), so the numeral is not read twice. */}
+      {/* The title at display scale with the count beside it as a giant copper numeral. The
+          numeral is decorative, so the dek always carries the count for a screen reader; on
+          screen it says what the numeral cannot: how the set is narrowed, or the span it covers.
+          An empty result prints no numeral (a giant zero reads as a joke). */}
       <header className="ds-records-head">
         <PageTitle className="ds-records-head__title">Records</PageTitle>
-        <DisplayNumeral className="ds-records-head__count" decorative>
-          {model.totalMatched.toLocaleString('en-US')}
-        </DisplayNumeral>
-        <p className="ds-records-head__dek">{countLabel}</p>
+        {model.totalMatched > 0 ? (
+          <DisplayNumeral className="ds-records-head__count" decorative>
+            {model.totalMatched.toLocaleString('en-US')}
+          </DisplayNumeral>
+        ) : null}
+        <p className="ds-records-head__dek">
+          {constraints.length > 0 || !span ? (
+            countLabel
+          ) : (
+            <>
+              <span className="ds-visually-hidden">{countLabel}, </span>
+              {span}
+            </>
+          )}
+        </p>
       </header>
       {toolbar}
 

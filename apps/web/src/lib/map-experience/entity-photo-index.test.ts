@@ -66,6 +66,21 @@ test('the photo index contains only entities carrying a primaryImage', () => {
   assert.deepEqual(Object.keys(index).sort(), ['ent_imaged_commons', 'ent_imaged_gcs']);
 });
 
+test("a quiet record and an artist's rendering never reach the photo index", () => {
+  const quiet = entity({
+    id: 'ent_quiet',
+    sensitivity: 'high' as never,
+    primaryImage: IMAGED_COMMONS.primaryImage!,
+  });
+  const rendering = entity({
+    id: 'ent_rendering',
+    primaryImage: { ...IMAGED_COMMONS.primaryImage!, alt: "An artist's rendering of the memorial" },
+  });
+  assert.deepEqual(Object.keys(buildEntityPhotoIndex([quiet, rendering, IMAGED_COMMONS])), [
+    'ent_imaged_commons',
+  ]);
+});
+
 test('each entry carries only url, alt, credit (and optional license/sourcePageUrl) — no rightsStatus, objectPath, width, or height', () => {
   const index = buildEntityPhotoIndex([IMAGED_COMMONS, IMAGED_NON_COMMONS]);
   const allowedKeys = new Set(['url', 'alt', 'credit', 'license', 'sourcePageUrl']);

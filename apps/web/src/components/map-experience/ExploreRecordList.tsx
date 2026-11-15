@@ -8,20 +8,17 @@
  *
  * Row anatomy follows the Records register (two lines, 1px rules between rows). Line one: the
  * name, and its documented decade in mono at the right (the earliest, or under a brushed range the
- * first one inside it). Line two: the kind as a word and the place, and the grade letter with its
- * source count at the right. Every row is the same height, which is what the windowing depends on.
+ * first one inside it). Line two: the kind as a word and the place, and the grade tag (glyph and
+ * word, the claims block's vocabulary) at the right. A record's own photograph leads the row as a
+ * toned plate; a record without one gets no stand-in tile. Every row is the same height, which is what the windowing depends on.
  */
 'use client';
 
-import { KindGlyph } from './KindGlyph';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
-import {
-  gradeDescription,
-  gradeForConfidence,
-  gradeLabel,
-} from '../../lib/map-experience/evidence-grade';
+import { gradeDescription, gradeForConfidence } from '../../lib/map-experience/evidence-grade';
+import { GradeTag } from '../evidence/EvidenceList';
 import { placeDetail, placeLabelFor } from '../../lib/map-experience/place-label';
 import { rowDecadeLabel } from '../../lib/map-experience/explore-rows';
 import type { CollectionPeriod } from '../../lib/discovery/collection-period';
@@ -49,14 +46,9 @@ export function resultsWindow(
   return { first, last: Math.min(count, first + visible) };
 }
 
-/** "A · 3 sources". The letter alone when the record carries no counted source. */
-export function gradeWithSources(
-  confidenceTier: Parameters<typeof gradeForConfidence>[0],
-  evidenceCount: number,
-): string {
-  const letter = gradeLabel(gradeForConfidence(confidenceTier));
-  if (!(evidenceCount > 0)) return letter;
-  return `${letter} · ${evidenceCount.toLocaleString('en-US')} ${evidenceCount === 1 ? 'source' : 'sources'}`;
+/** The stored tier as the grade tag's level; anything unknown is honestly ungraded. */
+export function confidenceLevelFor(tier: string): 'high' | 'medium' | 'low' | 'unrated' {
+  return tier === 'high' || tier === 'medium' || tier === 'low' ? tier : 'unrated';
 }
 
 export type ExploreRecordListProps = {
@@ -175,6 +167,7 @@ export function ExploreRecordList({
           const kind = kindLabelForMark(properties.kind) ?? 'Record';
           const place = placeDetail(properties.displayName, placeLabelFor(feature));
           const grade = gradeForConfidence(properties.confidenceTier);
+          const hasPhoto = Boolean(photos[id]?.url);
 
           return (
             <div
@@ -185,6 +178,7 @@ export function ExploreRecordList({
               aria-setsize={features.length}
               tabIndex={index === focusIndex ? 0 : -1}
               className={cx('ds-xlist__row', selected && 'ds-xlist__row--selected')}
+              data-photo={hasPhoto ? 'true' : undefined}
               style={{
                 height: RESULTS_ROW_HEIGHT,
                 transform: `translateY(${index * RESULTS_ROW_HEIGHT}px)`,
@@ -197,14 +191,18 @@ export function ExploreRecordList({
                 }
               }}
             >
-              <span className="ds-xlist__thumb" aria-hidden="true">
-                {photos[id]?.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- remote Commons thumbnail
-                  <img src={photos[id]!.url} alt="" loading="lazy" decoding="async" />
-                ) : (
-                  <KindGlyph kind={properties.kind} size={18} />
-                )}
-              </span>
+              {photos[id]?.url ? (
+                <span className="ds-xlist__thumb ds-plate__tone" aria-hidden="true">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- remote Commons thumbnail */}
+                  <img
+                    className="ds-plate__img"
+                    src={photos[id]!.url}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+              ) : null}
               <span className="ds-xlist__line">
                 <span className="ds-xlist__name">{properties.displayName}</span>
                 <span className="ds-xlist__decade">
@@ -218,7 +216,7 @@ export function ExploreRecordList({
                   {place ? ` · ${place}` : ''}
                 </span>
                 <span className="ds-xlist__grade" title={gradeDescription(grade)}>
-                  {gradeWithSources(properties.confidenceTier, properties.evidenceCount)}
+                  <GradeTag level={confidenceLevelFor(properties.confidenceTier)} />
                 </span>
               </span>
             </div>
