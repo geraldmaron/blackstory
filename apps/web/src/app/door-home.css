@@ -602,7 +602,8 @@ body:has(.ds-door-callout[data-shown='true']) .ds-pin-flag {
 
 /*
  * The shared plate's furniture while the Door owns it. The attribution is one collapsed 44px "i"
- * in the bottom-right corner of the map window; opened, its links read leftward from it.
+ * (the shared chip, shell.css) in the bottom-right corner of the map window; opened, its links
+ * read leftward from it.
  */
 body:has(.ds-door-journey:not(.ds-door-journey--browse))
   .ds-map-stage
@@ -610,50 +611,6 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   right: var(--ds-space-4);
   bottom: var(--ds-space-4);
   left: auto;
-}
-
-body:has(.ds-door-journey:not(.ds-door-journey--browse))
-  .ds-map-stage
-  .maplibregl-ctrl-attrib.maplibregl-compact {
-  min-width: 44px;
-  min-height: 44px;
-  margin: 0;
-  padding: 0;
-  border-radius: var(--ds-radius-sm);
-}
-
-body:has(.ds-door-journey:not(.ds-door-journey--browse))
-  .ds-map-stage
-  .maplibregl-ctrl-attrib.maplibregl-compact-show {
-  padding-right: 44px;
-}
-
-body:has(.ds-door-journey:not(.ds-door-journey--browse))
-  .ds-map-stage
-  .maplibregl-ctrl-attrib.maplibregl-compact
-  .maplibregl-ctrl-attrib-button {
-  right: 0;
-  left: auto;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--ds-radius-sm);
-}
-
-/* The plate's own rule clears the library's glyph with its background; draw the "i" as type. */
-body:has(.ds-door-journey:not(.ds-door-journey--browse))
-  .ds-map-stage
-  .maplibregl-ctrl-attrib.maplibregl-compact
-  .maplibregl-ctrl-attrib-button::before {
-  content: 'i';
-  display: grid;
-  place-items: center;
-  height: 100%;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-subtitle);
-  font-style: italic;
-  font-weight: 600;
-  line-height: 1;
-  color: var(--ds-ink);
 }
 
 body:has(.ds-door-journey:not(.ds-door-journey--browse))

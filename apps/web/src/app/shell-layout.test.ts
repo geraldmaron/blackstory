@@ -159,7 +159,7 @@ describe('horizontal overflow guards', () => {
     assert.doesNotMatch(commandBarCss, /box-shadow:\s*0\s+\d+px/, 'command-bar must not elevate');
   });
 
-  it('Explore chrome is matte surface, not shop blur or elevation', () => {
+  it('Explore chrome blurs only on the float plane: the column and dock, nothing inside them', () => {
     const mapCss = (file: string) =>
       readFileSync(join(here, '../components/map-experience', file), 'utf8');
     const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
@@ -170,7 +170,13 @@ describe('horizontal overflow guards', () => {
       ['histogram', mapCss('decade-brush.css')],
       ['atlas', atlasCss],
     ] as const) {
-      assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
+      // Glass lives on the float surfaces (column, dock, controls); parts inside stay unblurred.
+      if (name === 'column') {
+        assert.match(source, /backdrop-filter:\s*blur\(18px\)/, 'column is glass');
+        assert.match(source, /prefers-reduced-transparency/, 'column has a solid fallback');
+      } else {
+        assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
+      }
       assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);
       assert.doesNotMatch(
         source,
@@ -320,5 +326,27 @@ describe('the plate is styled globally, not from the route group', () => {
       shellCss,
       /\.ds-map-stage\[data-plate-slot\]\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
     );
+  });
+});
+
+/*
+ * The CSS build (Lightning CSS) keeps only the LAST of `backdrop-filter` and
+ * `-webkit-backdrop-filter` in a rule. With the standard one first it shipped only the prefix,
+ * which current Chrome ignores, so every glass surface rendered unblurred.
+ */
+describe('glass survives the CSS build', () => {
+  it('declares -webkit-backdrop-filter before backdrop-filter, never after', () => {
+    const files = [
+      join(here, 'shell.css'),
+      join(here, '../components/shell/command-bar.css'),
+      join(here, '../components/map-embed/record-map.css'),
+      join(here, '../components/map-experience/map-controls.css'),
+      join(here, '../components/map-experience/explore-column.css'),
+      join(here, '../../../../packages/ui/src/styles/components.css'),
+    ];
+    for (const file of files) {
+      const css = readFileSync(file, 'utf8');
+      assert.doesNotMatch(css, /^\s*backdrop-filter:[^;]*;\s*-webkit-backdrop-filter:/m, file);
+    }
   });
 });

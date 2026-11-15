@@ -14,20 +14,21 @@
 
 .ds-inspector__photo {
   flex: none;
-  margin: 0;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  background: var(--ds-surface-sunken);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  gap: var(--ds-space-2);
 }
 
-.ds-inspector__photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* The plate leads the column, cover-fit at 16:9; its credit sits under it, never on it. */
+.ds-inspector__photo .ds-plate__tone {
+  aspect-ratio: 16 / 9;
+}
+
+.ds-inspector__photo .ds-plate__img {
   /* Most record photos are portraits and buildings: keep the head and the roofline. */
   object-position: center 22%;
+}
+
+.ds-inspector__photo .ds-plate__credit {
+  padding-inline: var(--ds-space-6);
 }
 
 .ds-inspector__body {
@@ -35,15 +36,6 @@
   flex-direction: column;
   gap: var(--ds-space-3);
   padding: var(--ds-space-6) var(--ds-space-6) 0;
-}
-
-/* The record's decade as a display numeral; it overlaps the image's lower edge when there is one. */
-.ds-inspector__numeral {
-  font-size: var(--ds-text-display-1);
-}
-
-.ds-inspector__photo + .ds-inspector__body .ds-inspector__numeral {
-  margin-top: calc(var(--ds-space-6) * -1 - var(--ds-space-8));
 }
 
 .ds-inspector__meta {
@@ -67,7 +59,7 @@
 
 .ds-inspector__decade {
   flex: none;
-  color: var(--ds-ink);
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
@@ -89,9 +81,10 @@
   outline: none;
 }
 
+/* The heading takes focus when a record opens so a screen reader lands on it. It is not in the
+   tab order and not operable, so the landing draws nothing over the title (it read as a link). */
 .ds-inspector__name:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
+  outline: none;
 }
 
 .ds-inspector__summary {
@@ -158,7 +151,8 @@
   margin: var(--ds-space-3) calc(var(--ds-space-6) * -1) 0;
   padding: var(--ds-space-3) var(--ds-space-6);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  background: var(--ds-canvas);
+  /* The column's own glass again, so rows scrolling under the pinned actions never read through. */
+  background: color-mix(in srgb, var(--ds-canvas) var(--ds-xcol-float-alpha, 94%), transparent);
 }
 
 .ds-inspector__pager {

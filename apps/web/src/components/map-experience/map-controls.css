@@ -24,15 +24,43 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-canvas);
 }
 
+/* The float plane (the `.ds-float` recipe): the stack is one sheet of glass, a loose button its own. */
+.ds-map-controls__stack,
+.ds-map-controls__btn {
+  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ds-map-controls__stack,
+  .ds-map-controls__btn {
+    background: var(--ds-canvas);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-map-controls__stack,
+  .ds-map-controls__btn {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Inside the stack the buttons are bare: the stack's glass is the only plane. */
 .ds-map-controls__stack .ds-map-controls__btn {
-  border: 0;
   border-radius: 0;
+  background: transparent;
   box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .ds-map-controls__stack .ds-map-controls__btn + .ds-map-controls__btn {
@@ -45,9 +73,8 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: 0;
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-canvas);
   color: var(--ds-ink);
   cursor: pointer;
   transition: background-color var(--ds-duration-fast) var(--ds-easing);

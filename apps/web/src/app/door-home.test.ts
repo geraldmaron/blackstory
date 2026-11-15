@@ -21,6 +21,7 @@ const immersive = readFileSync(
   'utf8',
 );
 const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
+const shellCss = readFileSync(fileURLToPath(new URL('./shell.css', import.meta.url)), 'utf8');
 const walk = readFileSync(fileURLToPath(new URL('./door-walk.tsx', import.meta.url)), 'utf8');
 const records = readFileSync(
   fileURLToPath(new URL('./door-decade-walk.ts', import.meta.url)),
@@ -309,7 +310,11 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
   // bottom-right corner, not a box of links on the map.
   assert.doesNotMatch(css, /--ds-map-attrib-left:|--ds-map-attrib-bottom:/);
   assert.match(css, /\.maplibregl-ctrl-bottom-left\s*\{[^}]*right:\s*var\(--ds-space-4\)/);
-  assert.match(css, /\.maplibregl-ctrl-attrib-button\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px/);
+  // The 44px "i" is the shared chip's rule (shell.css), not a Door override.
+  assert.match(
+    shellCss,
+    /\.maplibregl-ctrl-attrib-button\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px/,
+  );
   // Labels, tags and groups come from the shared style only: no private label layer set.
   assert.doesNotMatch(immersive, /door-plate-labels|addLayer\(/);
 });

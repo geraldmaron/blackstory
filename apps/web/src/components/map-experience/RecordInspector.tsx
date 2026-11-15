@@ -14,19 +14,14 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { Button, cx, DisplayNumeral } from '@repo/ui';
+import { Button, cx } from '@repo/ui';
 import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icons';
-import {
-  evidenceCountPhrase,
-  evidenceGradeWord,
-  gradeDescription,
-  gradeForConfidence,
-  meterLevelForTier,
-} from '../../lib/map-experience/evidence-grade';
+import { evidenceCountPhrase } from '../../lib/map-experience/evidence-grade';
 import { precisionInWords } from '../../lib/map-experience/geo-precision';
 import { placeDetail } from '../../lib/map-experience/place-label';
 import { kindLabelForMark } from '../entity/record-mark';
-import { RecordMeter } from '../entity/RecordChrome';
+import { GradeTag } from '../evidence/EvidenceList';
+import { confidenceLevelFor } from './ExploreRecordList';
 import './record-inspector.css';
 
 void React;
@@ -46,6 +41,10 @@ export type InspectorRecord = {
   readonly href?: string;
   /** The record's own photo, when the archive holds one. Never a placeholder. */
   readonly photoUrl?: string;
+  /** The photo's credit line, printed under the plate (never on it). */
+  readonly photoCredit?: string;
+  /** The photo's alt text; empty when the archive has none. */
+  readonly photoAlt?: string;
 };
 
 export type RecordInspectorProps = {
@@ -85,18 +84,21 @@ export function RecordInspector({ record, position, onStep, className }: RecordI
   return (
     <article className={cx('ds-inspector', className)} aria-labelledby="ds-inspector-name">
       {record.photoUrl ? (
-        <figure className="ds-inspector__photo">
-          {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
-          <img src={record.photoUrl} alt="" decoding="async" />
+        <figure className="ds-plate ds-inspector__photo">
+          <span className="ds-plate__tone">
+            {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
+            <img
+              className="ds-plate__img"
+              src={record.photoUrl}
+              alt={record.photoAlt ?? ''}
+              decoding="async"
+            />
+          </span>
+          {record.photoCredit ? <p className="ds-plate__credit">{record.photoCredit}</p> : null}
         </figure>
       ) : null}
 
       <div className="ds-inspector__body">
-        {record.decade ? (
-          <DisplayNumeral className="ds-inspector__numeral" decorative>
-            {record.decade}
-          </DisplayNumeral>
-        ) : null}
         <p className="ds-inspector__meta">
           {/* One line, like the list row: a long place never pushes the record below the fold. */}
           <span className="ds-inspector__where" title={place ? `${kind} · ${place}` : undefined}>
@@ -118,12 +120,7 @@ export function RecordInspector({ record, position, onStep, className }: RecordI
           <div className="ds-inspector__fact">
             <dt>Evidence</dt>
             <dd className="ds-inspector__evidence">
-              <RecordMeter
-                level={meterLevelForTier(record.confidenceTier)}
-                tone={record.confidenceTier}
-                label={gradeDescription(gradeForConfidence(record.confidenceTier))}
-              />
-              <span>{evidenceGradeWord(record.evidenceLabel)}</span>
+              <GradeTag level={confidenceLevelFor(record.confidenceTier)} />
               {count ? <span className="ds-inspector__count">{count}</span> : null}
             </dd>
           </div>

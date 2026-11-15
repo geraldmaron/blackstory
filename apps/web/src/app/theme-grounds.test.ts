@@ -66,7 +66,8 @@ test('on the light table an ink ground is paper, unless it is fixed', () => {
   }
 });
 
-const SURFACE_LAYERS = /^\.ds-(map-stage|edition-atmosphere|map-names-wall)/;
+// The record embeds draw the same plate as the map stage, so they key on the theme the same way.
+const SURFACE_LAYERS = /^\.ds-(map-stage|record-map|edition-atmosphere|map-names-wall)/;
 
 function cssFiles(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {

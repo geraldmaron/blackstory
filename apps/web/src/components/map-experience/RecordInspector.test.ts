@@ -41,7 +41,7 @@ test('reads in order: kind and place, name, summary, precision, evidence, Open r
     'A.G. Gaston Motel',
     'Built in 1954',
     'City-level location',
-    'Grade A',
+    'ds-grade-tag',
     '6 sources',
     'Open record',
   ].map((text) => html.indexOf(text));
@@ -77,14 +77,33 @@ test('previous/next are quiet, labelled, and show the position in the list', () 
   assert.doesNotMatch(render(), /Previous record/);
 });
 
-test('the evidence signal is a meter plus words, never color alone', () => {
+test('the evidence signal is the grade tag (glyph plus word) and the count, never color alone', () => {
   const html = render();
-  assert.match(html, /class="ds-rec-meter[^"]*"[^>]*role="img"[^>]*aria-label="[^"]+"/);
-  assert.match(html, /Grade A/);
+  assert.match(html, /class="ds-grade-tag ds-grade-tag--high"/);
+  assert.match(html, /6 sources/);
+});
+
+test('the decade prints once, in the meta line', () => {
+  const html = render({ record: { ...RECORD, decade: '1950s' } });
+  assert.equal(html.split('1950s').length - 1, 1);
 });
 
 test('a photo shows only when the archive holds one; never a placeholder box', () => {
   assert.doesNotMatch(render(), /ds-inspector__photo/);
   const html = render({ record: { ...RECORD, photoUrl: 'https://cdn.example/gaston.jpg' } });
-  assert.match(html, /<img src="https:\/\/cdn.example\/gaston.jpg" alt=""/);
+  assert.match(html, /<img class="ds-plate__img" src="https:\/\/cdn.example\/gaston.jpg" alt=""/);
+  assert.doesNotMatch(html, /ds-plate__credit/);
+});
+
+test('the photo is a plate with its alt, and the credit sits under it', () => {
+  const html = render({
+    record: {
+      ...RECORD,
+      photoUrl: 'https://cdn.example/gaston.jpg',
+      photoAlt: 'The motel in 1963',
+      photoCredit: 'Library of Congress',
+    },
+  });
+  assert.match(html, /alt="The motel in 1963"/);
+  assert.ok(html.indexOf('</span><p class="ds-plate__credit">Library of Congress') > 0);
 });

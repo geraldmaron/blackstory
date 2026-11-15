@@ -734,7 +734,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     ? {
         ...inspectorRecord,
         ...(inspectorPhotos[inspectorRecord.id]?.url
-          ? { photoUrl: inspectorPhotos[inspectorRecord.id]!.url }
+          ? {
+              photoUrl: inspectorPhotos[inspectorRecord.id]!.url,
+              photoAlt: inspectorPhotos[inspectorRecord.id]!.alt,
+              photoCredit: inspectorPhotos[inspectorRecord.id]!.credit,
+            }
           : {}),
       }
     : null;

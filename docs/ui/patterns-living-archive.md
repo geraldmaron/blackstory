@@ -126,7 +126,7 @@ The map says where; the plate shows what it looks like. They always refer to the
   AI-help disclosure, no slogan, no card.
 - **Record page.** The plate leads the masthead field beside the name; the map in the rail shows
   the same place, and its place token links into `/explore?place=`.
-- **Explore.** Not part of this pass.
+- **Explore.** The chrome (column, histogram strip, controls, attribution chip), the record inspector, the selection flag and the record embeds are on the float plane and use the plate language (the inspector photo is a plate with its credit beneath); the map marks, grouping and precision are unchanged.
 
 ## Motion
 

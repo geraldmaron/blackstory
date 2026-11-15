@@ -1527,8 +1527,8 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
   border-top: var(--ds-border-width) solid var(--ds-border);
 }
 
-/* Compact OSM / OpenFreeMap attribution — bottom-left safe zone; flat matte island
-   matching zoom chrome. Links use theme ink on a raised surface for WCAG contrast. */
+/* Compact OSM / OpenFreeMap attribution — bottom-left safe zone; a float-plane chip (see below).
+   Links use theme ink on the ground for WCAG contrast. */
 .ds-map-stage .maplibregl-ctrl-bottom-left {
   bottom: var(--ds-map-attrib-bottom);
   left: var(--ds-map-attrib-left);
@@ -1536,12 +1536,19 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
   z-index: var(--ds-z-content);
 }
 
-.ds-map-stage .maplibregl-ctrl-attrib {
+/* The one attribution treatment, on the plate and in every record embed (`.ds-record-map`): a
+   float-recipe chip (glass of the ground, keyline, float shadow) that is exactly the 44px "i"
+   when collapsed and opens leftward into its links. */
+:is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib {
   max-width: 16rem;
+  border: 0;
   border-radius: var(--ds-radius-sm);
-  border: var(--ds-border-width) solid var(--ds-border);
-  background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
-  box-shadow: none;
+  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-micro);
   line-height: 1.35;
@@ -1550,50 +1557,69 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
 
 /*
  * MapLibre's own stylesheet hardcodes `.maplibregl-ctrl-attrib.maplibregl-compact` to a fixed
- * white pill (`background-color:#fff`), at the same specificity (two chained classes) as the
- * theme override above (two classes, but a descendant selector). Same specificity means whichever
- * rule is later in the built stylesheet wins — a coin flip this app does not control — so in dark
- * mode the control could paint an opaque white bar with illegible near-white text on it. Chaining
- * `.maplibregl-compact` here raises this rule to three classes, guaranteeing it wins over the
- * library's default regardless of load order.
+ * white pill (`background-color:#fff`), at the same specificity as the theme override above. Same
+ * specificity means whichever rule is later in the built stylesheet wins, so in dark mode the
+ * control could paint an opaque white bar with illegible near-white text on it. Chaining
+ * `.maplibregl-compact` here raises this rule above the library's default regardless of load order.
  */
-.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact {
+:is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib.maplibregl-compact {
   box-sizing: border-box;
-  min-width: 1.75rem;
-  min-height: 1.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
   /* Room for the info button, which MapLibre pins to the right edge. Collapsed, the control is
      exactly that button. */
-  padding: 0 1.75rem 0 0;
-  background-color: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+  padding: 0;
+  background-color: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
   color: var(--ds-ink);
 }
 
-.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
+:is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib.maplibregl-compact-show {
+  padding-right: 44px;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib.maplibregl-compact {
+    background-color: var(--ds-canvas);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib.maplibregl-compact {
+    background-color: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+:is(.ds-map-stage, .ds-record-map)
+  .maplibregl-ctrl-attrib.maplibregl-compact
+  .maplibregl-ctrl-attrib-button {
   /* `background-color`, not the `background` shorthand: the shorthand also cleared the button's
      icon, which left the collapsed attribution as an empty box with nothing to press. The glyph is
-     drawn in the muted ink of each theme (a data URI cannot read a custom property). */
+     drawn in the muted ink of each theme (a data URI cannot read a custom property). The button is
+     itself the 44px target. */
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
   background-color: transparent;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7.25' fill='none' stroke='%236D675F' stroke-width='1.5'/%3E%3Cpath d='M10 9v5' stroke='%236D675F' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='6.5' r='1' fill='%236D675F'/%3E%3C/svg%3E");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 18px;
   color: var(--ds-ink-muted);
-  width: 1.75rem;
-  height: 1.75rem;
 }
 
 [data-theme='dark']
   .ds-map-stage
   .maplibregl-ctrl-attrib.maplibregl-compact
+  .maplibregl-ctrl-attrib-button,
+[data-theme='dark']
+  .ds-record-map
+  .maplibregl-ctrl-attrib.maplibregl-compact
   .maplibregl-ctrl-attrib-button {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7.25' fill='none' stroke='%23A39B8F' stroke-width='1.5'/%3E%3Cpath d='M10 9v5' stroke='%23A39B8F' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='6.5' r='1' fill='%23A39B8F'/%3E%3C/svg%3E");
-}
-
-/* The 28px info mark takes a 44px hit area (the embeds do the same in record-map.css). */
-.ds-map-stage .maplibregl-ctrl-attrib-button::after {
-  content: '';
-  position: absolute;
-  inset: calc(var(--ds-space-2) * -1);
 }
 
 /* MapLibre's attribution toggle is a <summary> that ships with no focus style; every map (the
@@ -1603,24 +1629,28 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
   outline-offset: var(--ds-focus-offset);
 }
 
-.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner,
-.ds-map-stage .maplibregl-ctrl-attrib:not(.maplibregl-compact) .maplibregl-ctrl-attrib-inner {
+:is(.ds-map-stage, .ds-record-map)
+  .maplibregl-ctrl-attrib.maplibregl-compact-show
+  .maplibregl-ctrl-attrib-inner,
+:is(.ds-map-stage, .ds-record-map)
+  .maplibregl-ctrl-attrib:not(.maplibregl-compact)
+  .maplibregl-ctrl-attrib-inner {
   padding: var(--ds-space-1) var(--ds-space-2);
   color: var(--ds-ink);
 }
 
-.ds-map-stage .maplibregl-ctrl-attrib a {
+:is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib a {
   color: var(--ds-ink);
   text-decoration: underline;
   text-underline-offset: 0.12em;
 }
 
-.ds-map-stage .maplibregl-ctrl-attrib a:hover,
-.ds-map-stage .maplibregl-ctrl-attrib a:focus-visible {
+:is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib a:hover,
+:is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib a:focus-visible {
   color: var(--ds-accent);
 }
 
-.ds-map-stage .maplibregl-ctrl-attrib a:focus-visible {
+:is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib a:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
 }
@@ -1871,8 +1901,10 @@ main[tabindex='-1']:focus-visible {
   max-width: 16rem;
   padding: var(--ds-space-1) var(--ds-space-3);
   overflow: hidden;
+  /* The home callout card's material (door-home.css): ink keyline, float shadow. */
   border: var(--ds-border-width) solid var(--ds-fixed-ink);
   border-radius: var(--ds-radius-sm);
+  box-shadow: var(--ds-shadow-float);
   background: var(--ds-fixed-paper);
   color: var(--ds-fixed-ink);
   font-family: var(--ds-font-display);

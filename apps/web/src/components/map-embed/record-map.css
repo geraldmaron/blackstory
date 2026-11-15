@@ -2,7 +2,8 @@
  * The one embedded map (RecordMap.tsx): the /explore plate holding one record
  * (docs/ui/patterns-place-map.md, "Embeds"). A framed canvas on the plate's own ground, the
  * record's place as a token on the plate, then the place in words and the hand-off to the full
- * map. One hairline frame, no shadow, no blur.
+ * map. The frame is a plate with an `--ds-float-edge` keyline; the place token on it is glass on
+ * the float plane (the `.ds-float` recipe, copied below); the attribution is the shared chip.
  */
 
 .ds-record-map {
@@ -19,8 +20,8 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-md);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-float-edge);
   /* The plate's own land, so the frame reads as the map before the first tile paints. */
   background: var(--ds-map-land);
   -webkit-user-select: none;
@@ -131,7 +132,7 @@
 }
 
 /* The record's place as the plate prints a place: a copper count tab and the name in the display
-   face, on a plate of the table's own ground (the explore column's recipe, data-ground="ink").
+   face, on glass of the table's own ground (the explore column's float recipe, data-ground="ink").
    Visually 28px tall; the 44px hit area is the pseudo-element. */
 .ds-record-map__token {
   position: absolute;
@@ -144,11 +145,29 @@
   max-width: calc(100% - var(--ds-space-3) * 2 - 44px);
   min-height: 28px;
   padding: 3px var(--ds-space-3) 3px 3px;
-  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-canvas);
+  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink);
   text-decoration: none;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ds-record-map__token {
+    background: var(--ds-canvas);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-record-map__token {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .ds-record-map__token::after {
@@ -246,46 +265,7 @@
   outline-offset: var(--ds-focus-offset);
 }
 
-.ds-record-map .maplibregl-ctrl-attrib {
-  font-size: var(--ds-text-micro);
-}
-
-/* The attribution toggle (a <summary>) is itself a 44px target, not a 24px mark with a padded
-   pseudo-element: assistive tech and target-size checks measure the element. The glyph keeps
-   its size in the middle of it. */
-.ds-record-map .maplibregl-ctrl-attrib.maplibregl-compact {
-  min-width: 44px;
-  min-height: 44px;
-  margin: 0;
-}
-
-/* Collapsed, only the round mark shows: the 44px box around it is clear. */
-.ds-record-map .maplibregl-ctrl-attrib.maplibregl-compact:not(.maplibregl-compact-show) {
-  background-color: transparent;
-}
-
-.ds-record-map .maplibregl-ctrl-attrib.maplibregl-compact-show {
-  padding-right: 44px;
-}
-
-.ds-record-map .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
-  top: 0;
-  right: 0;
-  width: 44px;
-  height: 44px;
-  background-color: transparent;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.ds-record-map .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button::before {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  z-index: -1; /* local: the mark's round chip, under its glyph, inside the control layer */
-  border-radius: 50%;
-  background: rgb(255 253 248 / 92%);
-}
+/* The attribution is the shared chip (shell.css, `:is(.ds-map-stage, .ds-record-map)`). */
 
 @media (prefers-reduced-motion: reduce) {
   .ds-record-map__canvas,

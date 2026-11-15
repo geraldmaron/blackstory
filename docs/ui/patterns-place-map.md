@@ -115,7 +115,7 @@ Values live in `mapPalettes` (`packages/ui/src/tokens/colors.ts`, mirrored as `-
 - **Waterlines** are the plate's signature: two hairlines inside every sea coast, offset 2 and 5px, the outer one lighter, the engraved coast of a nineteenth-century atlas. They show in the national frame only, fading in from zoom 3.4 (where the whole continent and its arctic coast are in frame) and gone past zoom 5.5, where the vector coast becomes marsh and inlet detail and the lines clump. Lakes carry none, because the northern lake country would read as static. Offsets stay under the tiles' 8px render buffer so no line surfaces on a tile seam.
 - **County names** under the tokens are spaced capitals in the plate's quiet label color, the atlas convention, and yield to every token.
 - **Area precision** is a flat copper wash at 16% over a county (or state) that holds records known only by county (or state). It says "somewhere in here", never a point.
-- No gradients, glows, bevels, glass or 3D. The only shadow is the flat contact shadow under a site pin.
+- The marks on the plate stay flat: no gradients, glows, bevels or 3D on a pin, ring, outline or label. The only shadow on the plate itself is the flat contact shadow under a site pin. Chrome that floats over the plate is glass (the float plane, below).
 
 ### Marks
 
@@ -129,7 +129,7 @@ Map glyphs cannot set Schibsted or Geist Mono, so the names are DOM (`components
 
 ### The chrome floats on the plate
 
-The map runs full bleed under the whole viewport; the header stays a solid bar for legibility, since the brand bans the blur that would let the plate show through it. Every other piece of chrome is a plate of the table's own ground (`data-ground="ink"`): ink on the night atlas, the paper table on the day one. The 380px column sits one 12px gutter (`--ds-xfloat`) in from the left, top and bottom; the decade histogram floats along the bottom beside it; the zoom and locate stack sits above the histogram. Each is separated from the map by the gutter, a 14px radius and one hairline, never by a cast shadow. The attribution sits on the map just inside the column and above the histogram. On a phone the column is the same ground as a bottom sheet with a 28px top radius. `chromePadding` mirrors this geometry so a framed place lands in the map the reader can see.
+The map runs full bleed under the whole viewport; the header is the same glass as the rest of the chrome. Every piece of chrome is on the float plane (the `.ds-float` recipe: the table's own ground at `--ds-float-alpha`, blurred, with a `--ds-float-edge` keyline and `--ds-shadow-float`; solid under reduced transparency) on the ground of `data-ground="ink"`: ink on the night atlas, the paper table on the day one. The 380px column sits one 12px gutter (`--ds-xfloat`) in from the left, top and bottom; the decade histogram floats along the bottom beside it; the zoom and locate stack sits above the histogram. Each is lifted off the map by the gutter, a 14px radius, the keyline and the float shadow. The attribution is one shared float-plane chip, the 44px "i", on the map just inside the column and above the histogram; record embeds use the same chip. The selection flag takes the home callout card's material (ink keyline, float shadow), and the record inspector leads with its photo as a plate. On a phone the column is the same ground as a bottom sheet with a 28px top radius. `chromePadding` mirrors this geometry so a framed place lands in the map the reader can see.
 
 ### Motion
 
@@ -155,7 +155,7 @@ Every map on the site is this map. The embeds draw the same plate (`buildExplore
 - **Neighbors** are not drawn. The token is the context. A neighbor dot would have to follow the grouping bands, and an embed's closest frame never reaches the zoom where sites that share a square draw.
 - **Before the map paints** the frame is the plate's ground (`data-ground="ink"` on the frame, so it follows the site theme even inside a paper sheet) carrying the record's name and its precision in words, with the place token on it. It is page HTML: with scripting off, without WebGL, or while tiles load, the record page still says where the record is and how closely. When the map cannot paint at all the frame collapses to that plate.
 - **Reading-room slot.** `MapMoment` borrows the persistent plate, so its map is already this world. Its slot is the same ground while idle, and its tag and Explore control are the same plate chips with a 44px target.
-- **Unchanged:** precision wording (`precisionInWords`), the privacy rules above, cooperative gestures, and no gradient, glow, blur or shadow.
+- **Unchanged:** precision wording (`precisionInWords`), the privacy rules above, cooperative gestures, and the embed is on the float plane like the explore chrome: its place token is glass, its frame a plate with a keyline, with no gradient or glow on the marks.
 
 ---
 

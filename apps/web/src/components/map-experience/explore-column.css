@@ -3,8 +3,9 @@
  * whole viewport, and the chrome floats on it as plates of the table's own ground
  * (`data-ground="ink"`: the night atlas's ink in the dark theme, the paper table in the light one).
  * A 380px column inset from the left edge, the decade histogram inset along the bottom, and the
- * zoom and locate stack bottom-right, each separated from the map by the gutter and one hairline,
- * never by blur or a cast shadow. Below 768px the column is a bottom sheet of the same ground.
+ * zoom and locate stack bottom-right, each on the float plane: glass of the ground with a keyline
+ * and the float shadow (the `.ds-float` recipe in @repo/ui, copied below), solid under reduced
+ * transparency. Below 768px the column is a bottom sheet of the same glass.
  *
  * `--ds-xcol-detent-h` (set on `.ds-atlas` by AtlasExperience) is the sheet's resting height, so
  * the controls and the attribution can sit on top of it. `--ds-xcol-sheet-h` is the live height
@@ -12,6 +13,9 @@
  */
 .ds-atlas {
   --ds-xcol-w: 380px;
+  /* The column and strip carry reading text over a busy plate: glass at the edge, near solid
+     under the words, so legibility never depends on the blur rendering. */
+  --ds-xcol-float-alpha: 94%;
   /* The gutter every floating plate keeps from the viewport edge and from its neighbors. */
   --ds-xfloat: var(--ds-space-3);
 }
@@ -27,11 +31,36 @@
   flex-direction: column;
   width: var(--ds-xcol-w);
   overflow: hidden;
-  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-canvas);
   color: var(--ds-ink);
   pointer-events: auto;
+}
+
+/* The float plane (the `.ds-float` recipe): glass of the ground, a keyline, the float shadow. */
+.ds-xcol,
+.ds-xdock {
+  background: color-mix(in srgb, var(--ds-canvas) var(--ds-xcol-float-alpha), transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ds-xcol,
+  .ds-xdock {
+    background: var(--ds-canvas);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-xcol,
+  .ds-xdock {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .ds-xcol__top {
@@ -320,8 +349,8 @@
 }
 
 /* —— The histogram on the map's bottom edge ————————————————————————————————— */
-/* A strip on the table's ground (`data-ground="ink"` on the dock): ink in the dark theme, paper in
-   the light one. Its bars and brushed range take their colors from that ground. */
+/* A strip of glass on the table's ground (`data-ground="ink"` on the dock): ink in the dark theme,
+   paper in the light one (float recipe above). Its bars and brushed range take their colors from that ground. */
 .ds-xdock {
   position: fixed;
   right: var(--ds-xfloat);
@@ -329,9 +358,7 @@
   left: calc(var(--ds-xcol-w) + var(--ds-xfloat) * 2);
   z-index: var(--ds-z-atlas-instruments);
   overflow: hidden;
-  border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-canvas);
   pointer-events: auto;
 }
 
@@ -350,7 +377,6 @@ body:has(.ds-atlas .ds-xcol) {
     width: auto;
     left: 0;
     height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 176px));
-    border-width: var(--ds-border-width) 0 0;
     border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
     transition: height var(--ds-duration-base) var(--ds-ease-entrance);
   }
@@ -447,7 +473,6 @@ body:has(.ds-atlas .ds-xcol) {
     height: 176px;
     overflow: hidden;
     left: 0;
-    border-width: var(--ds-border-width) 0 0;
     border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
   }
 }
