@@ -118,27 +118,24 @@
   scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
 }
 
-/* The section opener is a block of color on the sheet: sand for the census, copper for the door
-   into Lives, ink for the measured gaps. Its ground sets the type colors. */
-.ds-data-section + .ds-data-section {
-  margin-top: var(--ds-space-18);
-}
-
+/* Inside a sheet a section opens on type: a heavy ink rule, then the headline. Depth comes from
+   type and rules there, never a colored card on the paper. */
 .ds-data-section__head {
   display: grid;
   gap: var(--ds-space-3);
   margin-bottom: var(--ds-space-10);
-  padding: var(--ds-space-8) var(--ds-space-6) var(--ds-space-6);
-  border-radius: var(--ds-radius-md);
+  padding-top: var(--ds-space-6);
+  border-top: calc(var(--ds-border-width-strong) * 2) solid var(--ds-ink);
 }
 
 .ds-data-section__head > .ds-section-heading {
   max-width: 18ch;
   margin: 0;
-  font-size: var(--ds-text-display-2);
-  font-weight: 600;
-  line-height: 0.95;
+  font-size: var(--ds-text-headline);
+  font-weight: 700;
+  line-height: 1;
   letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 .ds-data-section__lede {
@@ -151,18 +148,31 @@
   color: var(--ds-ink);
 }
 
-/* The Lives section is only its door, so the whole section is the copper block. */
-.ds-data-section[data-ground] {
-  padding: var(--ds-space-8) var(--ds-space-6);
-  border-radius: var(--ds-radius-md);
+/* Between the sheets: the door into Lives on copper and the reading rules on sand, full bleed. */
+.ds-data-band {
+  margin-block: var(--ds-space-16);
+  margin-inline: calc(50% - 50vw);
+  padding-block: var(--ds-space-16);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
 }
 
-.ds-data-section[data-ground] > .ds-data-section__head {
-  margin-bottom: var(--ds-space-6);
-  padding: 0;
+.ds-data-band:last-child {
+  margin-bottom: 0;
 }
 
-.ds-data-section[data-ground] .ds-data-door {
+.ds-data-band .ds-data-section__head {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ds-data-band .ds-data-section__head > .ds-section-heading {
+  font-size: var(--ds-text-display);
+  font-weight: 800;
+  line-height: 0.95;
+}
+
+.ds-data-band .ds-data-door {
   margin: 0;
 }
 

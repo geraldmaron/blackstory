@@ -775,7 +775,8 @@ span.ds-tabs__tab {
   padding-top: 0.04em;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-title);
-  font-weight: 600;
+  /* The display role: Schibsted at 800, the record page's name weight (patterns-living-archive). */
+  font-weight: var(--ds-weight-display);
   line-height: 0.92;
   letter-spacing: -0.035em;
   text-wrap: balance;

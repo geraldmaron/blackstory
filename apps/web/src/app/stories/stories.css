@@ -19,6 +19,67 @@
   background: var(--ds-material-ink);
 }
 
+/* Covers and row thumbnails are plates: the same duotone as `.ds-plate` (shadows in
+   --ds-plate-lo, lights in --ds-plate-hi), so one photo language runs from home to the stories.
+   Each cover prints its credit in its caption. Forced colors show the image as it is. */
+.ds-stories-lead__media,
+.ds-stories-cover__media,
+.ds-stories-row__thumb[data-media='photo'] {
+  position: relative;
+  isolation: isolate;
+  background: var(--ds-plate-hi);
+}
+
+.ds-stories-lead__media .ds-story-img,
+.ds-stories-cover__media .ds-story-img,
+.ds-stories-row__thumb .ds-story-img {
+  background: transparent;
+}
+
+.ds-stories-lead__media img,
+.ds-stories-cover__media img,
+.ds-stories-row__thumb img {
+  filter: grayscale(1) contrast(1.12);
+  mix-blend-mode: multiply;
+}
+
+.ds-stories-lead__media::after,
+.ds-stories-cover__media::after,
+.ds-stories-row__thumb[data-media='photo']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ds-plate-lo);
+  mix-blend-mode: lighten;
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  .ds-stories-lead__media img,
+  .ds-stories-cover__media img,
+  .ds-stories-row__thumb img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  .ds-stories-lead__media::after,
+  .ds-stories-cover__media::after,
+  .ds-stories-row__thumb[data-media='photo']::after {
+    content: none;
+  }
+}
+
+.ds-stories-lead__credit {
+  grid-area: credit;
+}
+
+.ds-stories-cover__credit,
+.ds-stories-lead__credit {
+  margin: var(--ds-space-3) 0 0;
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
 /* The chapter images are archive scans with paper borders; a cover crops inside the document, at
    its head, never on its edge. --crop is the inset zoom, and hover adds to it. */
 .ds-stories-lead__media,
@@ -29,7 +90,6 @@
 .ds-stories-lead__media .ds-story-img,
 .ds-stories-cover__media .ds-story-img {
   height: 100%;
-  background: var(--ds-material-paper);
 }
 
 .ds-stories-lead__media img,
@@ -51,30 +111,28 @@
   margin-top: calc(var(--ds-space-24) * -1);
 }
 
-/* The table's ground: ink in the dark theme, paper in the light one. The numeral sits at the
-   panel's far edge and is cropped by its foot. */
+/* The table's ground: ink in the dark theme, paper in the light one. The years line carries the
+   date, so the panel prints no numeral. */
 .ds-stories-lead__panel {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    'years numeral'
-    'title numeral'
-    'dek numeral'
-    'cta numeral';
+    'years'
+    'title'
+    'dek'
+    'cta'
+    'credit';
   justify-items: start;
   column-gap: var(--ds-space-12);
   row-gap: var(--ds-space-4);
   overflow: hidden;
   padding: var(--ds-space-10) var(--ds-space-12);
   border-radius: var(--ds-radius-md);
+  /* A sheet's lift: in the light theme the table's ground is paper, and the shadow is what keeps
+     the panel from dissolving into the page. */
+  box-shadow: var(--ds-shadow-sheet);
   animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
-}
-
-.ds-stories-lead__numeral {
-  grid-area: numeral;
-  align-self: end;
-  margin-bottom: calc(var(--ds-space-10) * -1 - 0.14em);
 }
 
 .ds-stories-lead__years {
@@ -94,7 +152,8 @@
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-title);
-  font-weight: 600;
+  /* Headline weight: the page's h1 holds the display role, once per surface. */
+  font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.035em;
   text-wrap: balance;
@@ -179,7 +238,6 @@
 .ds-stories-cover__media {
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  background: var(--ds-material-paper);
 }
 
 .ds-stories-cover__blank {
@@ -578,18 +636,13 @@
   .ds-stories-lead__panel {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      'numeral'
       'years'
       'title'
       'dek'
-      'cta';
+      'cta'
+      'credit';
     padding: var(--ds-space-6) var(--ds-gutter) var(--ds-space-8);
     border-radius: 0;
-  }
-
-  .ds-stories-lead__numeral {
-    align-self: start;
-    margin: 0 0 var(--ds-space-2);
   }
 
   .ds-stories-cover__caption {

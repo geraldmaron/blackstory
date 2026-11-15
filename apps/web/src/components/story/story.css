@@ -488,6 +488,8 @@
 
 .ds-story-p,
 .ds-story-list {
+  /* A reading measure: the column is wider than a comfortable line of serif. */
+  max-width: 68ch;
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
   font-size: var(--story-prose);

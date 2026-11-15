@@ -19,6 +19,7 @@ import type {
   DataPageRacePairSeries,
 } from '@repo/domain/statistics/data-page-series';
 import { DisplayNumeral, SectionHeading, buttonClassName, cx } from '@repo/ui';
+import { TrustSheet } from '../../components/trust';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
 import { DataContents, type ContentsGroup } from '../../components/data/DataContents';
@@ -294,11 +295,13 @@ function groupedKey(series: DataPageGroupedBarSeries): string | undefined {
 
 type FigureEntry = { readonly id: string; readonly node: ReactNode };
 
-/** Each section opens on a block of its own color: the chapters of the page. */
-const SECTION_TONE: Readonly<Record<DataPageSectionId, 'sand' | 'copper' | 'ink'>> = {
-  counted: 'sand',
+/**
+ * The page changes ground between chapters (never more than about two screens on one plane): the
+ * census and the measured gaps are reading sheets, and between them the door into Lives (copper) and the
+ * reading rules are full-bleed bands. Inside a sheet a section opens on type and a heavy rule.
+ */
+const SECTION_BAND: Partial<Record<DataPageSectionId, 'sand' | 'copper'>> = {
   lives: 'copper',
-  gaps: 'ink',
   reading: 'sand',
 };
 
@@ -312,22 +315,29 @@ function Section({
   readonly children: ReactNode;
 }) {
   const copy = DATA_SECTION_COPY[id];
-  return (
-    <section
-      className="ds-data-section"
-      id={id}
-      aria-labelledby={`${id}-heading`}
-      {...(id === 'lives' ? { 'data-ground': SECTION_TONE[id] } : {})}
-    >
-      <header
-        className="ds-data-section__head"
-        {...(id === 'lives' ? {} : { 'data-ground': SECTION_TONE[id] })}
-      >
+  const band = SECTION_BAND[id];
+  const body = (
+    <>
+      <header className="ds-data-section__head">
         <SectionHeading id={`${id}-heading`}>{copy.title}</SectionHeading>
         <p className="ds-data-section__lede">{copy.lede}</p>
         {meta ? <p className="ds-data-section__meta">{meta}</p> : null}
       </header>
       {children}
+    </>
+  );
+  return band ? (
+    <section
+      className="ds-data-section ds-data-band"
+      id={id}
+      aria-labelledby={`${id}-heading`}
+      data-ground={band}
+    >
+      <div className="ds-wrap ds-data-band__inner">{body}</div>
+    </section>
+  ) : (
+    <section className="ds-data-section" id={id} aria-labelledby={`${id}-heading`}>
+      {body}
     </section>
   );
 }
@@ -700,34 +710,40 @@ export function DataSections({
   }));
 
   return (
-    <div className="ds-data-layout">
-      <div className="ds-data-layout__rail">
-        <DataContents
-          groups={contents}
-          notes={[`Census as of ${populationAsOf}`, `Indicators as of ${indicatorsAsOf}`]}
-        />
-      </div>
+    <>
+      <TrustSheet>
+        <div className="ds-data-layout">
+          <div className="ds-data-layout__rail">
+            <DataContents
+              groups={contents}
+              notes={[`Census as of ${populationAsOf}`, `Indicators as of ${indicatorsAsOf}`]}
+            />
+          </div>
 
-      <div className="ds-data-layout__main">
-        <Section id="counted" meta={`Census figures as of ${populationAsOf}`}>
-          {hasPopulation ? (
-            <Figures entries={population} />
-          ) : (
-            <p className="ds-data-empty">
-              Census population figures are not available in this release. The figures below are
-              unaffected.
-            </p>
-          )}
-        </Section>
+          <div className="ds-data-layout__main">
+            <Section id="counted" meta={`Census figures as of ${populationAsOf}`}>
+              {hasPopulation ? (
+                <Figures entries={population} />
+              ) : (
+                <p className="ds-data-empty">
+                  Census population figures are not available in this release. The figures below are
+                  unaffected.
+                </p>
+              )}
+            </Section>
+          </div>
+        </div>
+      </TrustSheet>
 
-        <Section id="lives">
-          <p className="ds-data-door">
-            <Link className={buttonClassName('secondary')} href="/lives">
-              Open Lives
-            </Link>
-          </p>
-        </Section>
+      <Section id="lives">
+        <p className="ds-data-door">
+          <Link className={buttonClassName('secondary')} href="/lives">
+            Open Lives
+          </Link>
+        </p>
+      </Section>
 
+      <TrustSheet>
         <Section id="gaps" meta={`Indicators as of ${indicatorsAsOf}`}>
           {DATA_GAP_GROUPS.map((group) => (
             <section
@@ -743,28 +759,28 @@ export function DataSections({
             </section>
           ))}
         </Section>
+      </TrustSheet>
 
-        <Section id="reading">
-          <ul className="ds-data-rules">
-            {DATA_READING_RULES.map((rule) => (
-              <li key={rule.title} className="ds-data-rule">
-                <h3 className="ds-data-rule__title">{rule.title}</h3>
-                <p className="ds-data-rule__body">{rule.body}</p>
-              </li>
-            ))}
-          </ul>
-          <p className={cx('ds-data-reading__links')}>
-            <Link className={buttonClassName('secondary')} href={DATA_SOURCE_LIBRARY_HANDOFF.href}>
-              {DATA_SOURCE_LIBRARY_HANDOFF.label}
+      <Section id="reading">
+        <ul className="ds-data-rules">
+          {DATA_READING_RULES.map((rule) => (
+            <li key={rule.title} className="ds-data-rule">
+              <h3 className="ds-data-rule__title">{rule.title}</h3>
+              <p className="ds-data-rule__body">{rule.body}</p>
+            </li>
+          ))}
+        </ul>
+        <p className={cx('ds-data-reading__links')}>
+          <Link className={buttonClassName('secondary')} href={DATA_SOURCE_LIBRARY_HANDOFF.href}>
+            {DATA_SOURCE_LIBRARY_HANDOFF.label}
+          </Link>
+          {DATA_READING_LINKS.map((link) => (
+            <Link key={link.href} className={buttonClassName('quiet')} href={link.href}>
+              {link.label}
             </Link>
-            {DATA_READING_LINKS.map((link) => (
-              <Link key={link.href} className={buttonClassName('quiet')} href={link.href}>
-                {link.label}
-              </Link>
-            ))}
-          </p>
-        </Section>
-      </div>
-    </div>
+          ))}
+        </p>
+      </Section>
+    </>
   );
 }

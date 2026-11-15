@@ -135,7 +135,6 @@ export function LivesEraScrubber({
                 id={`era-tab-${era.id}`}
                 aria-selected={isSelected}
                 aria-controls={`era-panel-${era.id}`}
-                aria-label={`${era.label}: ${values}`}
                 tabIndex={isSelected ? 0 : -1}
                 className="lives-scrub__era"
                 data-empty={era.marks ? undefined : 'true'}
@@ -146,6 +145,9 @@ export function LivesEraScrubber({
                 onClick={() => choose(index, false)}
                 onKeyDown={onKeyDown}
               >
+                {/* The tab's name is its own text, era first, so it matches what a voice-control
+                    user reads off the tab; the plotted copies below are pictures of it. */}
+                <span className="ds-visually-hidden">{`${era.label}: ${values}`}</span>
                 <span className="lives-scrub__plot" aria-hidden="true">
                   {era.marks ? (
                     <>

@@ -187,16 +187,8 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
         <header className="ds-story-mast" data-media={hero ? 'photo' : 'none'}>
           <div className="ds-story-mast__text">
             {facts.length > 0 ? <p className="ds-story-mast__facts">{facts}</p> : null}
-            {year && isEntry ? (
-              <DisplayNumeral
-                className="ds-story-mast__numeral"
-                tone="soft"
-                size="title"
-                decorative
-              >
-                {year}
-              </DisplayNumeral>
-            ) : null}
+            {/* An entry's year is its term in the copper band below; a numeral is never set beside
+                a record's name (patterns-living-archive, Type roles). */}
             <PageTitle className="ds-story-mast__title">{doc.title}</PageTitle>
             <p className="ds-story-mast__dek">{lede.dek}</p>
             {lede.rest ? <p className="ds-story-mast__rest">{lede.rest}</p> : null}

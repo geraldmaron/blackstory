@@ -115,7 +115,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     rights: LOC_RIGHTS,
     paragraphs: [
       'W. E. B. Du Bois chose land ownership as one way to show economic life after emancipation. The historical object keeps the act of making that case visible: lettering, color, and the decision to compare years on one sheet.',
-      'The value of land and the share of households owning a home answer different questions. A total value can grow while ownership remains uneven. Neither measure, on its own, tells us about a tenant’s rent, an owner’s debt, or who could inherit the property.',
+      'The value of land and the share of households owning a home answer different questions. A total value can grow while ownership remains uneven. Neither measure, on its own, says anything about a tenant’s rent, an owner’s debt, or who could inherit the property.',
     ],
     transcription:
       'The heading reads “Value of land owned by Georgia Negroes.” Labels on the six money bags: 1875, $1,263,902; 1880, $1,522,173; 1885, $2,362,889; 1890, $3,425,176; 1895, $4,158,960; 1899, $4,220,120. These are the exhibit’s historical dollar figures, not inflation-adjusted values or household ownership rates.',

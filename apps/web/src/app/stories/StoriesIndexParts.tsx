@@ -7,10 +7,10 @@
  */
 import React from 'react';
 import type { PublicStoryListItemDoc } from '@repo/schemas';
-import { DisplayNumeral, FilterButton, Segmented, buttonClassName } from '@repo/ui';
+import { FilterButton, Segmented, buttonClassName } from '@repo/ui';
 import { StoryImage } from '../../components/story/StoryImage';
 import { storyImageSrc } from '../../components/story/story-image';
-import { coverDek, firstYear } from '../../components/story/story-text';
+import { coverDek } from '../../components/story/story-text';
 
 void React;
 
@@ -49,7 +49,6 @@ export function CoverImage({
  * the dark theme, paper in the light one), so the type never sits on the picture and needs no scrim.
  */
 export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
-  const year = firstYear(item.eraLabel);
   return (
     <article className="ds-stories-lead" data-media={item.heroImage ? 'photo' : 'none'}>
       <div className="ds-stories-lead__media">
@@ -57,11 +56,6 @@ export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
       </div>
       <div className="ds-wrap ds-stories-lead__wrap">
         <div className="ds-stories-lead__panel" data-ground="ink">
-          {year ? (
-            <DisplayNumeral className="ds-stories-lead__numeral" tone="soft" decorative>
-              {year}
-            </DisplayNumeral>
-          ) : null}
           <p className="ds-stories-lead__years">{item.eraLabel}</p>
           <h2 className="ds-stories-lead__title">
             <a className="ds-stories-lead__link" href={href(item)}>
@@ -72,6 +66,9 @@ export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
           <a className={buttonClassName('primary', 'ds-stories-lead__cta')} href={href(item)}>
             {readLabel(item)}
           </a>
+          {item.heroImage ? (
+            <p className="ds-stories-lead__credit">Cover: {item.heroImage.credit}</p>
+          ) : null}
         </div>
       </div>
     </article>
@@ -102,6 +99,9 @@ export function ChapterCover({
           </a>
         </h2>
         <p className="ds-stories-cover__dek">{coverDek(item.summary)}</p>
+        {item.heroImage ? (
+          <p className="ds-stories-cover__credit">{item.heroImage.credit}</p>
+        ) : null}
       </div>
     </article>
   );

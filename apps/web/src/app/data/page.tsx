@@ -12,7 +12,7 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
-import { TrustMast, TrustSheet } from '../../components/trust';
+import { TrustMast } from '../../components/trust';
 import {
   buildLivesHref,
   parseLivesAreaSlug,
@@ -81,9 +81,7 @@ export default async function DataPage({
         </TrustMast>
       }
     >
-      <TrustSheet>
-        <DataSections {...dataModel.sections} />
-      </TrustSheet>
+      <DataSections {...dataModel.sections} />
     </Room>
   );
 }
