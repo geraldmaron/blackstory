@@ -8,6 +8,25 @@
  * bring their own geodata. Every coordinate read here is the record's already-redacted public
  * point; nothing in this module sharpens a location.
  */
+import { US_STATES } from './us-geography.js';
+
+const STATE_FIPS_BY_POSTAL: ReadonlyMap<string, string> = new Map(
+  US_STATES.map((state) => [state.postalCode, state.fips]),
+);
+
+/**
+ * The county holding a record's point, accepted only when the county lies in the record's own
+ * state. The 1:20m outlines can put a point near a state line (Manhattan beside the Hudson) in the
+ * neighboring state's county; such a record stays at state level, coarser and never wrong.
+ */
+function countyInRecordState(
+  record: PlaceRecordInput,
+  lookups: PlaceLookups,
+): CountyRef | undefined {
+  const county = lookups.countyAt?.(record.lng, record.lat);
+  const stateFips = record.statePostalCode && STATE_FIPS_BY_POSTAL.get(record.statePostalCode);
+  return county && stateFips && county.fips.startsWith(stateFips) ? county : undefined;
+}
 
 /**
  * The five levels a reader moves through as the camera closes in. `square` is a fixed geographic
@@ -209,7 +228,7 @@ export function placePathFor(record: PlaceRecordInput, lookups: PlaceLookups): P
   const band = precisionBandFor(record.precision);
   const postal = record.statePostalCode;
   if (!postal) return { band };
-  const county = band === 'state' ? undefined : lookups.countyAt?.(record.lng, record.lat);
+  const county = band === 'state' ? undefined : countyInRecordState(record, lookups);
   const city =
     band === 'site' || band === 'area'
       ? cityFromJurisdictionLabel(record.jurisdictionLabel, postal)
@@ -343,7 +362,7 @@ export function buildPlaceGroups(
       }
     }
     if (path.county && !places.has(path.county)) {
-      const county = lookups.countyAt?.(record.lng, record.lat);
+      const county = countyInRecordState(record, lookups);
       if (county) {
         places.set(path.county, {
           key: path.county,

@@ -1602,8 +1602,9 @@ a.ds-room-chip {
   overflow: hidden;
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  /* The idle ground the kit already reserved for this component. */
-  background: var(--room-sunk);
+  /* The plate's own ground (the slot is `data-ground="ink"`, so this follows the site theme, not
+     the paper sheet around it): idle, the slot is the map before it paints. */
+  background: var(--ds-map-land);
   transition: border-color var(--ds-duration-base) ease;
 }
 
@@ -1640,7 +1641,7 @@ a.ds-room-chip {
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   text-align: center;
-  color: var(--room-ink-4);
+  color: var(--ds-map-label-hi);
   transition: opacity var(--ds-duration-base) ease;
   /* Decorative text that covers the whole slot. Left interactive it swallowed clicks meant for
      the Explore control beneath it, including once it had faded to nothing on a live moment. */
@@ -1660,9 +1661,9 @@ a.ds-room-chip {
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   color: var(--ds-accent);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-pill);
+  background: var(--ds-canvas);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
   opacity: 0;
   transition: opacity var(--ds-duration-base) ease;
 }
@@ -1680,14 +1681,17 @@ a.ds-room-chip {
   right: var(--ds-space-3);
   bottom: var(--ds-space-3);
   z-index: 2; /* local: same as the tag, above the borrowed plate within this figure only */
-  padding: var(--ds-space-2) var(--ds-space-3);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--ds-space-4);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   color: var(--ds-ink);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-pill);
+  background: var(--ds-canvas);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
   text-decoration: none;
   opacity: 0;
   visibility: hidden;

@@ -46,6 +46,12 @@ const nextConfig = {
   outputFileTracingIncludes: {
     // Globs resolve relative to the app dir (apps/web), so monorepo files need ../../.
     '/*': ['./packages/schemas/constitution/**/*', '../../packages/schemas/constitution/**/*'],
+    // Record maps name a county from this outline at render time (`record-place.ts`).
+    '/entity/*': ['./public/geo/us-counties-20m.geojson'],
+    '/stories/*': ['./public/geo/us-counties-20m.geojson'],
+    '/place/*': ['./public/geo/us-counties-20m.geojson'],
+    '/invention/*': ['./public/geo/us-counties-20m.geojson'],
+    '/admin/stories/*': ['./public/geo/us-counties-20m.geojson'],
   },
   turbopack: {
     root: monorepoRoot,

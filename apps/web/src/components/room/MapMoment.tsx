@@ -470,7 +470,7 @@ export function MapMoment({
       data-live={live ? '1' : '0'}
       data-plain={stillMoment ? '1' : undefined}
     >
-      <div className="ds-mapmoment__plate" ref={slotRef}>
+      <div className="ds-mapmoment__plate" data-ground="ink" ref={slotRef}>
         <span className="ds-mapmoment__tag" aria-hidden="true">
           {stillMoment ? 'Plate · Still' : 'Plate · Live'}
         </span>

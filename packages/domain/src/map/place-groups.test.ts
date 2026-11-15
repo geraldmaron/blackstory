@@ -216,3 +216,23 @@ test('a dense city groups its sites into fixed grid squares, a lone site draws o
   assert.deepEqual(inSquare.sort(), ['a-site', 'b-site']);
   assert.equal(groups.pathById.get('c-city')!.square, undefined);
 });
+
+test('a county across the state line is refused; the record stays in its own state', () => {
+  // A New York county-precision point the 1:20m outline puts in Hudson County, NJ (fips 34017).
+  const hudson: CountyRef = { fips: '34017', name: 'Hudson County', anchor: [-74.07, 40.73] };
+  const record: PlaceRecordInput = {
+    id: 'ny-county',
+    lng: -73.97,
+    lat: 40.78,
+    precision: 'county',
+    statePostalCode: 'NY',
+    stateName: 'New York',
+  };
+  const groups = buildPlaceGroups([record], {
+    countyAt: () => hudson,
+    stateAnchor: () => [-75.5, 42.9],
+  });
+  const path = groups.pathById.get('ny-county')!;
+  assert.equal(path.county, undefined);
+  assert.equal(path.state, 'state-ny');
+});

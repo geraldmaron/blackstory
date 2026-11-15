@@ -1,6 +1,6 @@
 # Place map (Explore)
 
-**Status:** binding for how `/explore` groups records on the map, and for the home Door, which paints the same plate. Supersedes the pixel clustering the older `patterns-map-entity-encoding.md` described. That doc now covers point marks by precision only.
+**Status:** binding for how `/explore` groups records on the map, for the home Door, which paints the same plate, and for the record embeds (`## Embeds`). Supersedes the pixel clustering the older `patterns-map-entity-encoding.md` described. That doc now covers point marks by precision only.
 **Code:** `packages/domain/src/map/place-groups.ts` (the rules, shared by web and mobile), `apps/web/src/lib/map-experience/place-map.ts` (the web adapter), `apps/web/src/app/map/explore-style.ts` (layers), `apps/web/src/components/map-stage/place-labels.ts` (the names in the house type), `apps/web/src/components/map-stage/MapStage.tsx` (token tap), `apps/web/src/app/explore/hooks/use-place-scope.ts` (list scoping and Back/Forward), `apps/web/src/app/explore/hooks/use-place-focus.ts` (the entered place's outline and veil), `apps/web/src/components/map-experience/explore-column.css` (the floating chrome).
 
 ---
@@ -93,7 +93,7 @@ The precision mix is always words, never color alone. Copper and ink only. No re
 
 ## Visual
 
-**Status:** the visual world of the plate, binding for `/explore` and the home Door (both paint the one `MapStage` plate). Record embeds and story insets share the plate's colors and labels but have not had their own pass. Replaces the flat paper-on-ink plate with copper count discs, solid and hollow dots, the sand county hatch and grey county names.
+**Status:** the visual world of the plate, binding for `/explore`, the home Door (both paint the one `MapStage` plate) and the record embeds (`## Embeds`). Replaces the flat paper-on-ink plate with copper count discs, solid and hollow dots, the sand county hatch and grey county names.
 
 ### Thesis
 
@@ -140,6 +140,22 @@ The map runs full bleed under the whole viewport; the header stays a solid bar f
 
 - A name that would touch a neighbor's count tab is not printed at that zoom. Dense metros name their largest places first and the rest on zoom.
 - Over satellite imagery the DOM labels keep the flat plate's halo; they have not had the imagery pass the GL labels have (`plateOverImagery`).
+
+---
+
+## Embeds
+
+**Code:** `apps/web/src/components/map-embed/RecordMap.tsx` and `record-map.css`, `apps/web/src/lib/map-experience/record-place.ts` (the place token, server-side), `components/theme-spine/MapInsetMoment.tsx` (story chapters), `components/room/MapMoment.tsx` and `room-kit.css` (the reading-room slot).
+
+Every map on the site is this map. The embeds draw the same plate (`buildExploreMapStyle` with `clusteringEnabled: false`), so the night and day atlas, the waterlines and the street ink are the same style, not a lookalike. Embeds add no styling of their own beyond the frame and the token.
+
+- **The record's mark** is the one /explore draws at its stored precision: a copper pin at a site, with its name in the house type beside it (`bindRecordName`, the `ds-site-name` label, drawn at any zoom because an embed frames closer than the plate's own name layer places); one open copper ring at a campus, neighborhood or city. A county or state record has no point. It shows its place as an entered place shows on /explore: a flat copper wash at 16% under the water, and a 2px copper outline, from the same polygons (`placeOutline`). Where the county polygon cannot be found for the stored point, the frame shows no area, never a guessed one. Frames never go closer than `zoomForLocationPrecision` or `EMBED_CONTEXT_MAX_ZOOM`, and the embed never moves its own camera.
+- **The record in its place** is a token on the plate, bottom left, in the column's own recipe: a copper count tab and the place name in the display face, on a plate of the site theme's ground. It names the deepest place the record is counted in (city, else county, else state; `recordPlaceFor`) with the same count /explore shows when that place is entered, and links to `/explore?place=<key>&selected=<id>`, which enters the place and selects the record inside it. The token is server HTML, so it works without script. Where the server cannot read the county polygons it names the state, which is coarser, never sharper.
+- **"Open on the map"** carries the place too (`mapHrefInPlace`): the record page's button keeps the reader's narrowing and adds `place=`; a story inset links straight to the place and record.
+- **Neighbors** are not drawn. The token is the context. A neighbor dot would have to follow the grouping bands, and an embed's closest frame never reaches the zoom where sites that share a square draw.
+- **Before the map paints** the frame is the plate's ground (`data-ground="ink"` on the frame, so it follows the site theme even inside a paper sheet) carrying the record's name and its precision in words, with the place token on it. It is page HTML: with scripting off, without WebGL, or while tiles load, the record page still says where the record is and how closely. When the map cannot paint at all the frame collapses to that plate.
+- **Reading-room slot.** `MapMoment` borrows the persistent plate, so its map is already this world. Its slot is the same ground while idle, and its tag and Explore control are the same plate chips with a 44px target.
+- **Unchanged:** precision wording (`precisionInWords`), the privacy rules above, cooperative gestures, and no gradient, glow, blur or shadow.
 
 ---
 
@@ -193,7 +209,7 @@ Color is never the only signal. Token counts and names are text, the precision m
 1. **Period gazetteer.** Places are modern jurisdictions. County lines moved, towns were absorbed or renamed, and some Black towns and neighborhoods were erased on purpose. Grouping a 1910 record under its 2010 county can hide the place it was about. A period-aware gazetteer (historical county boundaries, named historical places with their own anchors) is the fix; until then the token names a modern place and the record page names the historical one.
 2. **Canvas keyboard path.** The list is the keyboard path today. Tokens are not focusable on the canvas.
 3. **Mobile.** `apps/mobile` still uses its own clustering (`features/explore/clustering.ts`). The rules live in `@repo/domain/map/place-groups` so mobile can adopt them with its own county lookup.
-4. **Record embeds.** `RecordMap` still shows one record with no neighbors (it runs ungrouped).
+4. **Embed neighbors.** An embed shows its one record and its place token, never its neighbors (see Embeds). Drawing them muted would have to follow the grouping zoom bands, which an embed's closest frame (11) never reaches for sites that share a square.
 5. **Spread-site flag.** The selection flag on a spread site sits at the stored point, not at the spread dot.
 6. **Square names.** A square is named by its city, not its neighborhood. Records carry no neighborhood field (the jurisdiction label names a city at most), so a period neighborhood name would have to come from the gazetteer above.
 7. **Square at small widths.** A square fits the free map at zoom 14 on a laptop; on a tablet in portrait or a phone the camera still lands at 14 and the square's outline runs past the frame.

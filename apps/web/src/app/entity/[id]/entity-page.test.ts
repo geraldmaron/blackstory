@@ -59,11 +59,15 @@ test('a record photo fails closed to nothing, never a placeholder plate', () => 
 });
 
 test('entity map fail-closed: the place block still makes its point with no plate', () => {
-  // The caption (place and precision in words) is HTML outside the canvas, and the canvas is
-  // dropped entirely when WebGL fails.
+  // The place and its precision in words are HTML outside the canvas (the plate ground, and the
+  // caption where a page asks for one); when WebGL fails the canvas is hidden and the ground stays.
   assert.match(placeSource, /<figcaption className="ds-record-map__caption">/);
   assert.match(placeSource, /precisionInWords\(precision\)/);
-  assert.match(placeSource, /status === 'failed' \? null/);
+  assert.match(placeSource, /<p className="ds-record-map__ground">/);
+  assert.match(
+    readFileSync(join(here, '../../../components/map-embed/record-map.css'), 'utf8'),
+    /\[data-status='failed'\] \.ds-record-map__canvas \{\s*display: none;/,
+  );
   assert.doesNotMatch(placeSource, /idle=/);
   assert.doesNotMatch(placeSource, /^import .*MapsExternalLink/m);
   assert.doesNotMatch(placeSource, /<MapsExternalLink/);

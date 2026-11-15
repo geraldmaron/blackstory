@@ -107,7 +107,7 @@ export function placeGroupsFor(
   return groups;
 }
 
-function abbreviate(count: number): string {
+export function abbreviate(count: number): string {
   return count >= 1000 ? `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k` : String(count);
 }
 

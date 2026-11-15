@@ -1,22 +1,25 @@
 'use client';
 
 /**
- * The one embedded map: a record's place on a record page, a place page or a story inset.
+ * The one embedded map: a record's place on a record page, a place page or a story inset. It is
+ * the `/explore` plate (`docs/ui/patterns-place-map.md`, "Embeds"), holding one record.
  *
- * Framed no closer than its stored precision allows (`zoomForLocationPrecision`) and never closer
- * than `EMBED_CONTEXT_MAX_ZOOM`, so a small frame always reaches the nearest towns, and marked by
- * the atlas's own resting style (`recordMarkFor`): a copper dot at a site, one open copper ring at
- * a campus, neighborhood or city, and for a county or state no point at all, only the
- * jurisdiction tag at the state's label point, which is also where the frame is centered
- * (`renderedAnchorFor`). The atlas style's state and county lines come from GeoJSON the
- * persistent plate loads; this map draws them from the vector tiles instead (`addContextLayers`),
- * with village and neighborhood names, so a frame over a swamp or a field still says where it is.
- * A site dot carries the label beside it. MapLibre's cooperative gestures keep
- * one finger (and a plain wheel) scrolling the page. "Open on the map" hands off to /explore with
- * the record selected, where the same `frameRecord` contract frames it.
+ * The plate is the same style (`buildExploreMapStyle`): night or day atlas, waterlines, the record's
+ * own mark at its stored precision (`recordMarkFor`: a copper pin at a site, one open copper ring at
+ * a campus, neighborhood or city) and its name in the house type (`bindRecordName`). A county or
+ * state record has no point; it shows its place as /explore's entered place does, a flat copper
+ * wash under the water and a copper outline. Framed no closer than the stored precision allows
+ * (`zoomForLocationPrecision`) and never closer than `EMBED_CONTEXT_MAX_ZOOM`, so a small frame
+ * always reaches the nearest towns. MapLibre's cooperative gestures keep one finger (and a plain
+ * wheel) scrolling the page.
  *
- * The figure, caption and link are ordinary server-rendered HTML; the canvas mounts lazily once
- * the slot nears the viewport, and is simply absent where WebGL is unavailable.
+ * The record sits in its place: a token on the plate ("Washington, DC", 352 records) links to
+ * /explore with that place entered and the record selected. Neighbors are not drawn: the
+ * place token is the context, and no dot is ever sharper than /explore would draw it.
+ *
+ * The figure, ground, token and caption are ordinary server-rendered HTML. Until the canvas is
+ * framed (or with scripting off, or without WebGL) the frame is the plate's ground carrying the
+ * place and its precision in words, never an empty box.
  */
 import React, { useEffect, useRef, useState } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
@@ -26,7 +29,17 @@ import type {
   ExploreMapFeature,
   ExploreMapFeatureCollection,
 } from '../../lib/map-experience/build-explore-map-source';
+import { EXPLORE_JURISDICTION_HATCH_LAYER_ID } from '../../app/map/explore-layer-ids';
+import { placeOutline } from '../../app/explore/hooks/use-place-focus';
+import {
+  countyLookupFor,
+  type CountyGeometryCollection,
+} from '../../lib/map-experience/county-hatch';
 import { renderedAnchorFor } from '../../lib/map-experience/record-marks';
+import { abbreviate } from '../../lib/map-experience/place-map';
+import type { RecordPlace } from '../../lib/map-experience/record-place';
+import { bindRecordName } from '../map-stage/place-labels';
+import { fetchCountyPolygons, fetchStatePolygons } from '../map-stage/geo-source-loaders';
 import { readDocumentColorScheme } from '../map-stage/color-scheme';
 import { attachSafariPageZoomGuard } from '../map-stage/custom-rotate-gestures';
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM } from '../../lib/map-experience/camera-presets';
@@ -47,7 +60,9 @@ import './record-map.css';
 
 void React;
 
-const MARK_SOURCE = 'record-map-mark';
+const AREA_SOURCE = 'record-map-area';
+/** Same wash as /explore's held areas (`AREA_TINT_OPACITY` in explore-style.ts). */
+const AREA_WASH_OPACITY = 0.16;
 /**
  * The closest an embed frames. At z11 a frame shows the nearest towns, the major roads and the
  * county lines around the mark; closer than that, a frame over open ground shows nothing at all.
@@ -56,6 +71,8 @@ export const EMBED_CONTEXT_MAX_ZOOM = 11;
 /** The widest an embed steps out to while looking for a named place (`widenUntilNamed`). */
 const EMBED_CONTEXT_MIN_ZOOM = 8;
 const NAMED_PLACE_LAYERS = ['plate-place-city', 'record-map-place-local'];
+
+type Ring = readonly (readonly [number, number])[];
 
 /**
  * A frame over open ground (a swamp, a forest, a reservation) can hold no named place at all at
@@ -82,14 +99,16 @@ export type RecordMapProps = {
   readonly label: string;
   /** Stored public precision; decides the zoom and the mark. */
   readonly precision: string;
-  /** The record's state: where a county- or state-precision record's tag is drawn. */
+  /** The record's state, for a statewide record's outline; read from `place` when omitted. */
   readonly statePostalCode?: string;
   /** A closest zoom for a small frame; never frames closer than the precision allows either way. */
   readonly maxZoom?: number;
   /** False where the page states the place itself (a record page's citation line). */
   readonly caption?: boolean;
-  /** `/explore?selected=…` (`exploreRecordHref`). Omit where the page already links to the map. */
+  /** `/explore?selected=…` (`exploreRecordHref`), or the record inside its place (`RecordPlace.href`). */
   readonly exploreHref?: string;
+  /** The place the record belongs to, with its record count (`loadRecordPlace`). */
+  readonly place?: Pick<RecordPlace, 'key' | 'name' | 'count' | 'href'>;
   readonly className?: string;
 };
 
@@ -114,6 +133,9 @@ function recordCollection(
   } as unknown as ExploreMapFeature;
   return { type: 'FeatureCollection', features: [feature] };
 }
+
+/** A county or state record has no point and no tag here: its place is drawn as an area. */
+const NO_MARKS: ExploreMapFeatureCollection = { type: 'FeatureCollection', features: [] };
 
 function styleFor(
   scheme: ReturnType<typeof readDocumentColorScheme>,
@@ -189,43 +211,75 @@ function addContextLayers(map: MapLibreMap): void {
   );
 }
 
-/** Context for the frame, and a site dot's name beside it. */
-function markRecord(map: MapLibreMap, lng: number, lat: number, precision: string, label: string) {
-  addContextLayers(map);
-  // A ring sits on a named neighborhood or city the plate already labels; a site dot does not.
-  if (recordMarkFor(precision) !== 'dot' || label.length === 0 || map.getSource(MARK_SOURCE)) {
-    return;
+/**
+ * The ring set of a county or state record's own place, from the published outlines. Nothing
+ * when the geometry cannot be had: the frame then shows the plate and the place token alone.
+ */
+async function loadAreaRings(
+  lng: number,
+  lat: number,
+  precision: string,
+  statePostalCode: string | undefined,
+): Promise<{ rings: Ring[]; counties?: CountyGeometryCollection }> {
+  try {
+    if (precision === 'county') {
+      const counties = await fetchCountyPolygons();
+      const county = countyLookupFor(counties)(lng, lat);
+      return {
+        rings: county ? placeOutline(`county-${county.fips}`, undefined, undefined, counties) : [],
+        counties,
+      };
+    }
+    if (!statePostalCode) return { rings: [] };
+    const states = await fetchStatePolygons();
+    return {
+      rings: placeOutline(`state-${statePostalCode.toLowerCase()}`, undefined, states, undefined),
+    };
+  } catch {
+    return { rings: [] };
   }
+}
+
+/** The place as /explore's entered place draws it: a copper wash under the water, a copper edge. */
+function drawArea(map: MapLibreMap, rings: readonly Ring[]): void {
+  if (rings.length === 0 || map.getSource(AREA_SOURCE)) return;
   const plate = plateForScheme(readDocumentColorScheme());
-  map.addSource(MARK_SOURCE, {
+  const edge =
+    getComputedStyle(document.documentElement).getPropertyValue('--ds-accent-graphic').trim() ||
+    plate.areaTint;
+  map.addSource(AREA_SOURCE, {
     type: 'geojson',
     data: {
-      type: 'Feature',
-      properties: { label },
-      geometry: { type: 'Point', coordinates: [lng, lat] },
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'MultiPolygon', coordinates: rings.map((ring) => [ring]) },
+        },
+      ],
     },
   });
-  map.addLayer({
-    id: `${MARK_SOURCE}-label`,
-    type: 'symbol',
-    source: MARK_SOURCE,
-    layout: {
-      'text-field': ['get', 'label'],
-      'text-font': ['Noto Sans Regular'],
-      'text-size': 12,
-      'text-max-width': 10,
-      'text-anchor': 'left',
-      'text-justify': 'left',
-      'text-offset': [0.9, 0],
-      'text-allow-overlap': true,
-      'text-ignore-placement': true,
+  const before = (id: string) => (map.getLayer(id) ? id : undefined);
+  map.addLayer(
+    {
+      id: `${AREA_SOURCE}-wash`,
+      type: 'fill',
+      source: AREA_SOURCE,
+      paint: { 'fill-color': plate.areaTint, 'fill-opacity': AREA_WASH_OPACITY },
     },
-    paint: {
-      'text-color': plate.placeLabelHi,
-      'text-halo-color': plate.placeLabelHalo,
-      'text-halo-width': 1.4,
+    before(EXPLORE_JURISDICTION_HATCH_LAYER_ID),
+  );
+  map.addLayer(
+    {
+      id: `${AREA_SOURCE}-edge`,
+      type: 'line',
+      source: AREA_SOURCE,
+      layout: { 'line-join': 'round' },
+      paint: { 'line-color': edge, 'line-width': 2 },
     },
-  });
+    before(CONTEXT_BEFORE_LAYER),
+  );
 }
 
 export function RecordMap({
@@ -237,8 +291,12 @@ export function RecordMap({
   maxZoom = MAP_MAX_ZOOM,
   caption = true,
   exploreHref,
+  place,
   className,
 }: RecordMapProps) {
+  // A statewide record's place is its state (`state-ga`): the outline comes from the place.
+  const statePostal =
+    statePostalCode ?? /^state-([a-z]{2})$/.exec(place?.key ?? '')?.[1]?.toUpperCase();
   const slotRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<Status>('idle');
@@ -275,6 +333,7 @@ export function RecordMap({
     let themeObserver: MutationObserver | null = null;
     let resizeLifecycle: { disconnect(): void } | null = null;
     let contextRecovery: { disconnect(): void } | null = null;
+    let unbindName: (() => void) | null = null;
 
     void (async () => {
       try {
@@ -283,14 +342,21 @@ export function RecordMap({
           return;
         }
         setStatus('loading');
-        await waitForContainerLayout(container);
+        const marked = recordMarkFor(precision) !== 'none';
+        const [area] = await Promise.all([
+          marked
+            ? Promise.resolve<Awaited<ReturnType<typeof loadAreaRings>>>({ rings: [] })
+            : loadAreaRings(lng, lat, precision, statePostal),
+          waitForContainerLayout(container),
+        ]);
         const maplibregl = (await import('maplibre-gl')).default;
         if (cancelled) return;
-        const record = recordCollection(lng, lat, precision, statePostalCode);
-        const center = renderedAnchorFor(record.features[0]!);
+        const record = recordCollection(lng, lat, precision, statePostal);
+        const marks = marked ? record : NO_MARKS;
+        const center = renderedAnchorFor(record.features[0]!, area.counties);
         map = new maplibregl.Map({
           container,
-          style: styleFor(readDocumentColorScheme(), record),
+          style: styleFor(readDocumentColorScheme(), marks),
           center: [center[0], center[1]],
           zoom: Math.min(zoomForLocationPrecision(precision), maxZoom, EMBED_CONTEXT_MAX_ZOOM),
           minZoom: MAP_MIN_ZOOM,
@@ -325,7 +391,15 @@ export function RecordMap({
             if (!cancelled) resizeMapInPlace(active);
           },
         );
-        active.on('style.load', () => markRecord(active, lng, lat, precision, label.trim()));
+        // A site's name, in the house type beside its pin; a ring sits on a place the plate names.
+        const name = label.trim();
+        if (recordMarkFor(precision) === 'dot' && name.length > 0) {
+          unbindName = bindRecordName(active, [lng, lat], name);
+        }
+        active.on('style.load', () => {
+          addContextLayers(active);
+          drawArea(active, area.rings);
+        });
         // Shown once framed: a frame that has to step out does it before the reader sees it.
         active.once('idle', () =>
           widenUntilNamed(active, () => {
@@ -334,7 +408,7 @@ export function RecordMap({
         );
         active.on('error', (event) => console.error('[RecordMap]', event.error));
         themeObserver = new MutationObserver(() => {
-          active.setStyle(styleFor(readDocumentColorScheme(), record));
+          active.setStyle(styleFor(readDocumentColorScheme(), marks));
         });
         themeObserver.observe(document.documentElement, {
           attributes: true,
@@ -347,32 +421,51 @@ export function RecordMap({
 
     return () => {
       cancelled = true;
+      unbindName?.();
       themeObserver?.disconnect();
       resizeLifecycle?.disconnect();
       contextRecovery?.disconnect();
       guard?.detach();
       map?.remove();
     };
-  }, [wanted, lat, lng, precision, statePostalCode, maxZoom, label]);
+  }, [wanted, lat, lng, precision, statePostal, maxZoom, label]);
 
-  const place = label.trim();
+  const named = label.trim();
+  const precisionWords = precisionInWords(precision);
 
   return (
     <figure className={className ? `ds-record-map ${className}` : 'ds-record-map'}>
-      {status === 'failed' ? null : (
-        <div ref={slotRef} className="ds-record-map__frame" data-status={status}>
-          <div
-            ref={canvasRef}
-            className="ds-record-map__canvas"
-            role="region"
-            aria-label={`Map of ${place}. Use two fingers, or Control and scroll, to move it.`}
-          />
-        </div>
-      )}
+      <div ref={slotRef} className="ds-record-map__frame" data-ground="ink" data-status={status}>
+        <div
+          ref={canvasRef}
+          className="ds-record-map__canvas"
+          role="region"
+          aria-label={`Map of ${named}. Use two fingers, or Control and scroll, to move it.`}
+        />
+        {/* The plate before the canvas paints, and the whole map where it never does. */}
+        <p className="ds-record-map__ground">
+          <span className="ds-record-map__ground-name">{named}</span>
+          <span className="ds-record-map__ground-note">{precisionWords}</span>
+        </p>
+        {place ? (
+          <a
+            className="ds-record-map__token"
+            href={place.href}
+            aria-label={`${place.name}, ${place.count} ${place.count === 1 ? 'record' : 'records'}. Open this place on the map.`}
+          >
+            <span className="ds-record-map__count" aria-hidden="true">
+              {abbreviate(place.count)}
+            </span>
+            <span className="ds-record-map__name" aria-hidden="true">
+              {place.name}
+            </span>
+          </a>
+        ) : null}
+      </div>
       {caption ? (
         <figcaption className="ds-record-map__caption">
-          <span className="ds-record-map__place">{place}</span>
-          <span className="ds-record-map__precision">{precisionInWords(precision)}</span>
+          <span className="ds-record-map__place">{named}</span>
+          <span className="ds-record-map__precision">{precisionWords}</span>
           {exploreHref ? (
             <a className="ds-record-map__open" href={exploreHref}>
               Open on the map

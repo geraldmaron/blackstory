@@ -199,3 +199,31 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
     },
   };
 }
+
+/**
+ * One record's name beside its pin, for a map that holds a single record (the `RecordMap` embed).
+ * The same DOM label the plate prints from street scale (`ds-site-name`), but at any zoom: an embed
+ * frames closer than the plate's own name layer places. Returns its disposer.
+ */
+export function bindRecordName(
+  map: MapLibreMap,
+  at: readonly [number, number],
+  name: string,
+): () => void {
+  const layer = document.createElement('div');
+  layer.className = 'ds-place-labels';
+  layer.setAttribute('aria-hidden', 'true');
+  const label = buildSite(name);
+  layer.append(label);
+  map.getCanvasContainer().appendChild(layer);
+  const place = () => {
+    const { x, y } = map.project([at[0], at[1]]);
+    label.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+  };
+  place();
+  map.on('render', place);
+  return () => {
+    map.off('render', place);
+    layer.remove();
+  };
+}

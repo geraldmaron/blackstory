@@ -45,6 +45,11 @@ import {
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
 import { RecordMap } from '../../../components/map-embed/RecordMap';
+import {
+  loadRecordPlace,
+  mapHrefInPlace,
+  type RecordPlace,
+} from '../../../lib/map-experience/record-place';
 import { buildEvidenceCards } from '../../../lib/evidence';
 import { confidenceTierPhrase } from '../../../lib/evidence/confidence-language';
 import {
@@ -216,6 +221,8 @@ export type EntityRecordViewProps = {
   readonly arrival?: DiscoveryState;
   /** The public point the map draws, when the record has one. */
   readonly point?: Point;
+  /** The place the record is counted in on the place map (`loadRecordPlace`). */
+  readonly place?: RecordPlace;
   readonly returns?: PlaceDiscoveryReturn;
   readonly citing?: readonly StoryCitation[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
@@ -225,6 +232,7 @@ export function EntityRecordView({
   entity,
   arrival = EMPTY_DISCOVERY_STATE,
   point,
+  place: recordPlace,
   returns,
   citing = [],
   crossReferences = [],
@@ -345,6 +353,7 @@ export function EntityRecordView({
             precision={entity.locationPrecision}
             {...(statePostalCode ? { statePostalCode } : {})}
             maxZoom={RAIL_MAP_MAX_ZOOM}
+            {...(recordPlace ? { place: recordPlace } : {})}
             caption={false}
           />
         ) : null}
@@ -501,7 +510,15 @@ export function EntityRecordView({
       facts={facts}
       media={media}
       actions={{
-        ...(point && returns ? { map: { href: returns.mapHref } } : {}),
+        ...(point && returns
+          ? {
+              map: {
+                href: recordPlace
+                  ? mapHrefInPlace(returns.mapHref, recordPlace.key)
+                  : returns.mapHref,
+              },
+            }
+          : {}),
         ...(externalMapsHref ? { externalMapsHref } : {}),
         correctionHref: `/corrections?target=${encodeURIComponent(entity.id)}`,
       }}
@@ -579,16 +596,18 @@ export async function EntityRecordPage({
   const point = feature
     ? { lng: feature.geometry.coordinates[0], lat: feature.geometry.coordinates[1] }
     : undefined;
-  const [returns, crossReferences, cites] = await Promise.all([
+  const [returns, crossReferences, cites, place] = await Promise.all([
     recordDiscoveryReturn(entity.id, arrival, feature !== undefined),
     resolveEntityCrossReferences(entity.id),
     resolveCitesEdgeIndex(),
+    feature ? loadRecordPlace(entity.id) : undefined,
   ]);
   return (
     <EntityRecordView
       entity={entity}
       arrival={arrival}
       {...(point ? { point } : {})}
+      {...(place ? { place } : {})}
       returns={returns}
       citing={storiesCiting(cites, entity.id)}
       crossReferences={crossReferences}

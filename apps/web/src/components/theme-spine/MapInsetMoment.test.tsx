@@ -22,15 +22,23 @@ const baseProps = {
 };
 
 describe('MapInsetMoment', () => {
-  it('renders the place and its precision in words as server HTML', () => {
-    const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
+  it('renders the place and its precision in words as server HTML', async () => {
+    const html = renderToStaticMarkup(await MapInsetMoment(baseProps));
     assert.match(html, /<figure class="ds-record-map">/);
     assert.match(html, /Fifteenth Street Presbyterian Church/);
     assert.match(html, /Neighborhood-level location/);
   });
 
-  it('links into /explore with the entity pre-selected via the shared selected= convention', () => {
-    const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
+  it('prints the plate ground with the place and precision in the HTML, so no script means no blank box', async () => {
+    const html = renderToStaticMarkup(await MapInsetMoment(baseProps));
+    assert.match(
+      html,
+      /class="ds-record-map__frame"[^>]*data-ground="ink"[^>]*data-status="idle"[\s\S]*ds-record-map__ground-name">Fifteenth Street Presbyterian Church</,
+    );
+  });
+
+  it('links into /explore with the entity pre-selected via the shared selected= convention', async () => {
+    const html = renderToStaticMarkup(await MapInsetMoment(baseProps));
     assert.match(
       html,
       /href="\/explore\?[^"]*selected=ent_15th_st_church_001[^"]*">Open on the map</,
