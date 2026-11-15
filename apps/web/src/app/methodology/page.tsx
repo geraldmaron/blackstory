@@ -8,7 +8,6 @@ import { PageHeader } from '@repo/ui';
 import {
   PublishingPrinciplesJsonLdScript,
   TrustMast,
-  TrustSheet,
   TrustSiteJsonLdScript,
 } from '../../components/trust/index';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
@@ -59,9 +58,7 @@ export default function MethodologyPage() {
         pagePath={TRUST_PATHS.methodology}
         pageTitle="Methodology"
       />
-      <TrustSheet>
-        <MethodologySections />
-      </TrustSheet>
+      <MethodologySections />
     </Room>
   );
 }

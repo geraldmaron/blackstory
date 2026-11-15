@@ -726,6 +726,34 @@
   line-height: 1.45;
 }
 
+/* On the story page the copper figures and sand documents are not boxes inside the sheet: each
+   runs as a full-bleed band, so a long story changes ground every few screens instead of running
+   one sheet top to bottom (patterns-living-archive, Depth planes). The band's color is painted
+   past the sheet with a spread shadow and clipped to its own height, so the content keeps the
+   wide track and nothing scrolls sideways. */
+.ds-story .ds-story-body > :is(.ds-story-figures, .ds-story-doc)[data-ground] {
+  margin-block: var(--ds-space-16);
+  padding-inline: 0;
+  padding-block: var(--ds-space-12);
+  border-radius: 0;
+  box-shadow: 0 0 0 100vmax var(--ds-canvas);
+  clip-path: inset(0 -100vmax);
+}
+
+/* Beside the contents rail the band stops at the sheet's color stripes, so the rail stays on the
+   page ground and the stripes run unbroken from sheet to sheet. */
+@media (min-width: 75rem) {
+  .ds-story .ds-story-body > :is(.ds-story-figures, .ds-story-doc)[data-ground] {
+    clip-path: inset(0 -100vmax 0 calc(var(--ds-sheet-pad) * -1));
+  }
+}
+
+/* Two documents in a row share one band. */
+.ds-story .ds-story-body > .ds-story-doc[data-ground] + .ds-story-doc[data-ground] {
+  margin-top: calc(var(--ds-space-16) * -1);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
 /* A primary document: a sand block, date and title beside its words. */
 .ds-story-doc {
   display: grid;
