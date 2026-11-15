@@ -1,10 +1,9 @@
 'use client';
 
 /**
- * Door cold-open headline subject morph: History splits into His Story (gap +
- * uppercase S), then the prefix crossfades through Her / Their / Your / Black
- * Story before holding. The prefix slot width interpolates so Story slides
- * instead of jumping. Trailer stays "happened *here*." Letter spans are
+ * Door cold-open headline subject morph, once: History splits (gap + uppercase
+ * S) as its prefix crossfades to Black, then holds on Black Story. The prefix
+ * slot width interpolates so Story slides instead of jumping. Trailer stays "happened *here*." Letter spans are
  * aria-hidden; the heading's accessible name is the settled line throughout.
  *
  * Paced by one timer per phase boundary, not a per-frame loop, and only while the heading is on
@@ -176,7 +175,9 @@ export function HeroHeadlineMorph({
   }, []);
 
   useEffect(() => {
-    if (reducedMotion) return undefined;
+    // Read the preference here too: on the first pass this effect still sees the initial `false`,
+    // and its first step would put the heading back on History after the layout effect settled it.
+    if (reducedMotion || readClientMotionPreference().reduced) return undefined;
 
     if (morphSequenceStartedAt === null) {
       morphSequenceStartedAt = performance.now();
@@ -221,7 +222,7 @@ export function HeroHeadlineMorph({
   const phase = HERO_HEADLINE_PHASES[phaseIndex] ?? FINAL_PHASE;
   const split = phase.storySplit || reducedMotion;
   const prefix = subjectPrefix(phase);
-  const animatePrefix = !reducedMotion && !settled && phase.storySplit && phase.id !== 'his-story';
+  const animatePrefix = !reducedMotion && !settled && phase.storySplit;
   const splitMs = HERO_HEADLINE_PHASES[1]?.transitionMs ?? 1500;
   const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 

@@ -1099,36 +1099,51 @@ span.ds-tabs__tab {
   }
 }
 
-/* —— Sheet: a paper document on the table ———————————————————————————————————— */
-/* Paper with a hard 1px edge (no blur), radius 14, and three page bands (sand, copper, ink, 4px
-   each) along one edge: a pattern echoing the logo's page bands, never the book or pin shape.
-   The bands are inset fills, so they follow the radius without clipping the sheet's popovers. */
+/* —— Sheet: reading paper on the table (the sheet plane) ——————————————————————— */
+/* Paper with a 1px edge, radius 14, a real layered shadow under it (--ds-shadow-sheet), and three
+   page bands (sand, copper, ink, 4px each) along one edge: a pattern echoing the logo's page
+   bands, never the book or pin shape. The bands are inset fills, so they follow the radius
+   without clipping the sheet's popovers. A sheet that is one link (`.ds-sheet--lift`) rises on
+   hover. */
 .ds-sheet {
   --ds-sheet-pad: var(--ds-space-8);
+  --ds-sheet-bands:
+    inset var(--ds-band-w) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
   position: relative;
   padding: var(--ds-sheet-pad);
   padding-left: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  box-shadow:
-    inset var(--ds-band-w) 0 0 var(--ds-band-1),
-    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
-    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
+  box-shadow: var(--ds-sheet-bands), var(--ds-shadow-sheet);
   animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
+.ds-sheet--lift {
+  transition:
+    transform var(--ds-duration-base) var(--ds-ease-entrance),
+    box-shadow var(--ds-duration-base) var(--ds-ease-entrance);
+}
+
+.ds-sheet--lift:hover,
+.ds-sheet--lift:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--ds-sheet-bands), var(--ds-shadow-lift);
+}
+
 .ds-sheet--bands-end {
-  padding-left: var(--ds-sheet-pad);
-  padding-right: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
-  box-shadow:
+  --ds-sheet-bands:
     inset calc(var(--ds-band-w) * -1) 0 0 var(--ds-band-1),
     inset calc(var(--ds-band-w) * -2) 0 0 var(--ds-band-2),
     inset calc(var(--ds-band-w) * -3) 0 0 var(--ds-band-3);
+  padding-left: var(--ds-sheet-pad);
+  padding-right: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
 }
 
 .ds-sheet--bands-none {
+  --ds-sheet-bands: 0 0 0 transparent;
   padding-left: var(--ds-sheet-pad);
-  box-shadow: none;
 }
 
 /* Sheets slide up onto the table from where they already are: no fade, so nothing is ever
@@ -1178,8 +1193,8 @@ span.ds-tabs__tab {
   display: block;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-numeral);
-  font-weight: 600;
+  font-size: var(--ds-text-numeral);
+  font-weight: var(--ds-weight-numeral);
   font-variant-numeric: lining-nums;
   font-kerning: normal;
   line-height: var(--ds-leading-numeral);
@@ -1204,5 +1219,124 @@ span.ds-tabs__tab {
 @keyframes ds-numeral-settle {
   from {
     transform: translateY(0.08em);
+  }
+}
+
+/* —— Field: the ground a masthead's plate stands in ————————————————————————————— */
+/* A plain ground with its own stacking context, so a plate can sit under the head. No lamplight,
+   vignette or grain: a glow that carries no information is decoration (owner, 2026-11-15). */
+.ds-field {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--ds-canvas);
+}
+
+/* —— Float: glass chrome over the map ———————————————————————————————————————— */
+.ds-float {
+  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ds-float {
+    background: var(--ds-canvas);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-float {
+    background: var(--ds-canvas);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* —— Reveal: one entrance primitive ———————————————————————————————————————————— */
+/* Content is visible by default. Where the browser can tie motion to scroll, a revealed element
+   slides up into place once as it enters. A whole band slides in with `<Block wipe>`. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ds-reveal {
+      animation: ds-reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@keyframes ds-reveal-rise {
+  from {
+    transform: translateY(2rem);
+  }
+}
+
+/* —— Plate: a real photograph toned to the page ————————————————————————————————— */
+/* A record's own sourced photograph shown large, toned in two inks so it belongs to the page:
+   the shadows in --ds-plate-lo, the lights in --ds-plate-hi (a duotone by blend modes; no new
+   file, no server processing). It still reads as a photograph. The credit line (`.ds-plate__credit`)
+   is never on the photograph and never altered. Only real, sourced photographs; never generated
+   imagery, never the memorial or a sensitive record. Forced colors show the photograph as it is. */
+.ds-plate {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  margin: 0;
+}
+
+.ds-plate__tone {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  overflow: hidden;
+  width: 100%; /* explicit, so a max-height trims the box's height and never its width */
+  aspect-ratio: 3 / 2; /* a default box; each placement sets its own */
+  background: var(--ds-plate-hi);
+}
+
+.ds-plate__img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.12);
+  mix-blend-mode: multiply;
+}
+
+/* A portrait keeps the face in a cover crop: the crop favors the top of the frame. */
+.ds-plate--upper .ds-plate__img {
+  object-position: 50% 18%;
+}
+
+.ds-plate__tone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ds-plate-lo);
+  mix-blend-mode: lighten;
+  pointer-events: none;
+}
+
+.ds-plate__credit {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
+@media (forced-colors: active) {
+  .ds-plate__img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  .ds-plate__tone::after {
+    content: none;
   }
 }

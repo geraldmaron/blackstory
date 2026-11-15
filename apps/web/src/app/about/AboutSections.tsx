@@ -121,6 +121,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
             <p key={paragraph.slice(0, 40)}>{paragraph}</p>
           ))}
           <p>{ABOUT_NEO.hand}</p>
+          <p>{ABOUT_NEO.photographs}</p>
         </Prose>
       </RoomSection>
 

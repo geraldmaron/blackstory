@@ -1,16 +1,17 @@
 /**
- * Public site footer: a full-bleed copper block closing on a sand band.
+ * Public site footer: plain, useful navigation on the table's ground (paper in the light theme,
+ * ink in the dark one), closing on a hairline rule over the legal row.
  *
- * The copper block carries the core line at display scale, a paper sheet holding the lockup and
- * one sentence (the site's AI disclosure), and the destination links in columns under
- * sentence-case headings. The lockup sits on paper because its copper pin would vanish on copper.
- * The sand band carries copyright, the policy pages, the maker credit and staff sign-in.
+ * The lockup and one sentence (the site's AI disclosure) on the left, the destination links in
+ * columns under sentence-case headings beside them. No slogan and no card: the page's own display
+ * line is the last big thing a reader sees. The legal row carries copyright, the policy pages, the
+ * maker credit and staff sign-in.
  */
 
 import Link from 'next/link';
 import React from 'react';
 import { BRAND_ASSETS, PRODUCT_NAME } from '@repo/config';
-import { Sheet, ShellWordmark } from '@repo/ui';
+import { ShellWordmark } from '@repo/ui';
 import { footerColumns, policyLinks } from '../lib/nav/destination-registry';
 import { MakerCredit } from './MakerCredit';
 
@@ -24,11 +25,10 @@ export function SiteFooter() {
   const columns = footerColumns();
 
   return (
-    <footer className="ds-shell-footer" data-ground="copper">
+    <footer className="ds-shell-footer" data-ground="ink">
       <div className="ds-shell-footer__inner">
-        <p className="ds-shell-footer__line">History, pinned to place.</p>
         <div className="ds-shell-footer__top">
-          <Sheet className="ds-shell-footer__mast">
+          <div className="ds-shell-footer__mast">
             <Link
               className="ds-shell-footer__brand ds-shell-wordmark"
               href="/"
@@ -47,7 +47,7 @@ export function SiteFooter() {
                 How a record gets in
               </Link>
             </p>
-          </Sheet>
+          </div>
 
           <nav aria-label="Footer" className="ds-shell-footer__columns">
             {columns.map((column) => (
@@ -70,7 +70,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="ds-shell-footer__legal" data-ground="sand">
+      <div className="ds-shell-footer__legal">
         <div className="ds-shell-footer__meta-row">
           <p className="ds-shell-footer__meta">
             © {year} {PRODUCT_NAME}

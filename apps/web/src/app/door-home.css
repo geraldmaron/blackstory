@@ -14,10 +14,12 @@
  * into four color-blocked chapters (`door-chapters.tsx`) that slide up over the fixed map, then
  * the footer. Browse has neither.
  *
- * Material (art direction v2): the map is a paper chart on the ink table. The opening is a solid
- * INK block on the chart's lower left, the headline at display scale; the chapter card and the
- * spotlight callout are small PAPER sheets with page bands, pinned to the chart. No scrim: the
- * blocks are opaque, flat, and hard-edged. The column shares the header's left edge.
+ * Living archive (docs/ui/patterns-living-archive.md): the map is the field. On a wide screen the
+ * opening is a solid column down the left edge, beside the map rather than over it, led by the
+ * spotlight record's own photograph as a plate with its name and receipts under it, then the
+ * headline at headline scale. The map window is everything right of the column, so the country
+ * is framed clear of it. The plate is always the record the map is pointing at. The chapter card
+ * and spotlight callout are paper sheets on the chart. The column shares the header's left edge.
  */
 
 .ds-door {
@@ -25,7 +27,7 @@
      command-bar.css computes it) and the window is everything right of it. */
   --ds-door-edge: max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2));
   --ds-door-bottom: var(--ds-space-12);
-  --ds-door-dock-w: min(42rem, 44vw);
+  --ds-door-dock-w: min(27rem, 34vw);
   position: relative;
   box-sizing: border-box;
   /* Everything on the opening is fixed to the viewport, so the page holds no height of its own
@@ -101,17 +103,50 @@
   pointer-events: auto;
 }
 
-/* The opening: a solid block on the chart in the table's ground (ink in the dark theme, outlined
-   paper in the light one), hard-edged, with the headline at display scale. */
+/*
+ * The column: the opening, then the walk, in the same place. A solid block in the table's ground
+ * (ink in the dark theme, paper in the light one). On a wide screen it runs the full height from
+ * the bar to the foot, its content set to the foot; stacked, it is a block under the map. No
+ * glass: it sits beside the map, not on it.
+ */
+.ds-door-open,
+.ds-door-walk {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--ds-space-6);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+}
+
+/* `safe`: a column taller than the screen scrolls from its top instead of losing it. */
 .ds-door-open {
   display: grid;
+  align-content: safe end;
   gap: var(--ds-space-4);
-  min-width: 0;
-  padding: var(--ds-space-8) var(--ds-space-8) var(--ds-space-8);
-  border-radius: var(--ds-radius-md);
-  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge);
-  color: var(--ds-ink);
-  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
+}
+
+/* Wide: the column runs from the bar to the foot, from the screen's left edge to the map window,
+   with its content on the header's left edge. */
+@media (min-width: 48rem) and (min-aspect-ratio: 1001/1000) {
+  .ds-door__dock {
+    top: var(--ds-island-clearance);
+    bottom: 0;
+    left: 0;
+    width: calc(var(--ds-door-edge) + var(--ds-door-dock-w) + var(--ds-space-6));
+    max-height: none;
+  }
+
+  .ds-door__dock > :is(.ds-door-open, .ds-door-walk) {
+    height: 100%;
+    padding: var(--ds-space-8) var(--ds-space-8) var(--ds-door-bottom) var(--ds-door-edge);
+    border-radius: 0;
+    box-shadow: inset calc(var(--ds-border-width) * -1) 0 0 var(--ds-rule);
+  }
+
+  .ds-door__dock > .ds-door-open {
+    overflow-y: auto;
+  }
 }
 
 /* Without JavaScript there is no walk to start; the records link and the notice remain. */
@@ -121,32 +156,101 @@
   }
 }
 
+/* —— One record, as its record page shows it: name, plate, one claim ———————————————— */
+.ds-door-record {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-door-record__name {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: var(--ds-weight-headline);
+  letter-spacing: var(--ds-tracking-title);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.ds-door-record__name a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-door-record__name a:hover {
+  color: var(--ds-accent);
+  text-decoration-color: currentColor;
+}
+
+.ds-door-record__place {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.4;
+}
+
+.ds-door-record__plate {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-door-record__plate .ds-plate__tone {
+  aspect-ratio: 16 / 10;
+  max-height: 24dvh;
+  border-radius: var(--ds-radius-sm);
+}
+
+/* The claims block at the column's measure: the same numeral, rule and serif, a step smaller. */
+.ds-door-record .ds-evidence {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-door-record .ds-evidence__item {
+  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-12);
+}
+
+.ds-door-record .ds-evidence__item::before {
+  top: var(--ds-space-3);
+  width: var(--ds-space-8);
+}
+
+.ds-door-record .ds-evidence__statement {
+  font-size: var(--ds-text-subtitle);
+  line-height: 1.45;
+}
+
+.ds-door-open__record {
+  margin-bottom: var(--ds-space-2);
+}
+
 .ds-door-open__headline {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: 600;
-  /* Sized so the longest phase of the morph ("Their Story") fits the dock: 96px at 1440. */
-  font-size: clamp(4.5rem, min(6.7vw, 15vh), 12.5rem);
-  letter-spacing: -0.045em;
-  line-height: 0.84;
+  font-weight: var(--ds-weight-display);
+  /* The display role, held to the dock: the longer phase of the morph ("Black Story") fits. */
+  font-size: clamp(2.25rem, min(3.4vw, 6vh), 3.5rem);
+  letter-spacing: -0.04em;
+  line-height: 0.86;
   color: var(--ds-ink);
   text-wrap: nowrap;
 }
 
-/* Second tier: the place, in Newsreader italic and sand, set close under the subject. */
+/* Second tier: the same face a step lighter, copper, set close under the subject. */
 .ds-door-open__headline .ds-hero-headline-morph__trailer {
   display: block;
-  margin-top: var(--ds-space-2);
-  color: var(--ds-numeral-soft);
-  font-family: var(--ds-font-editorial);
-  font-size: 0.42em;
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.05;
+  margin-top: var(--ds-space-1);
+  color: var(--ds-accent);
+  font-size: 0.6em;
+  font-weight: var(--ds-weight-headline);
+  letter-spacing: var(--ds-tracking-title);
+  line-height: 1;
 }
 
 .ds-door-open__headline em {
@@ -157,7 +261,7 @@
   max-width: 30rem;
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-subtitle);
+  font-size: var(--ds-text-body);
   line-height: 1.5;
   color: var(--ds-ink);
   text-wrap: pretty;
@@ -168,84 +272,26 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-3) var(--ds-space-4);
-  margin-top: var(--ds-space-2);
 }
 
-/* —— The walk card: a paper sheet with page bands, pinned to the chart ————————————————— */
+/* —— The walk: the decade histogram, its record, and its controls ————————————————————— */
 .ds-door-walk {
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  justify-content: safe flex-end;
   min-height: 0;
-  max-width: 32rem;
   max-height: 100%;
-  padding: var(--ds-space-6);
-  padding-left: calc(var(--ds-space-6) + var(--ds-band-w) * 3);
-  border: var(--ds-border-width) solid var(--ds-material-ink);
-  border-radius: var(--ds-radius-md);
-  box-shadow:
-    inset var(--ds-band-w) 0 0 var(--ds-band-1),
-    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
-    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
-  color: var(--ds-ink);
-  animation: ds-door-walk-in var(--ds-duration-base) var(--ds-ease-entrance) both;
-}
-
-@keyframes ds-door-walk-in {
-  from {
-    opacity: 0.4;
-    transform: translateY(var(--ds-space-2));
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
 }
 
 .ds-door-walk__top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--ds-space-4);
-  margin: calc(var(--ds-space-3) * -1) 0 var(--ds-space-3);
-}
-
-.ds-door-walk__progress {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: var(--ds-space-3);
-  min-width: 0;
-}
-
-.ds-door-walk__steps {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: var(--ds-space-1);
-  min-width: 0;
-}
-
-/* Done steps are muted ink, the current one ink and taller (never color alone), the rest rules.
-   Copper stays for Next and the selected mark. */
-.ds-door-walk__step {
-  flex: 1 1 0;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--ds-rule);
-}
-
-.ds-door-walk__step[data-state='done'] {
-  background: var(--ds-ink-muted);
-}
-
-.ds-door-walk__step[data-state='current'] {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--ds-ink);
+  margin: calc(var(--ds-space-3) * -1) 0 0;
 }
 
 .ds-door-walk__count {
-  flex: 0 0 auto;
   margin: 0;
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
@@ -254,7 +300,6 @@
 }
 
 .ds-door-walk__skip {
-  flex: 0 0 auto;
   min-height: 44px;
   padding: 0;
   border: 0;
@@ -274,10 +319,128 @@
   text-decoration-color: currentColor;
 }
 
-/* The part of the card that scrolls when a chapter is taller than the dock; progress and
+/*
+ * The histogram: every decade on a true time scale, each bar as tall as the register's records in
+ * it. Walked decades are ink, the current one copper and full ink-ruled (never color alone: it is
+ * also the slider's position and the heading), the decades ahead a rule. A range input laid over
+ * the bars, its thumb centered on each bar, is the control.
+ */
+.ds-door-walk__axis {
+  --bar-h: 3.5rem;
+  position: relative;
+  flex: none;
+  margin: var(--ds-space-3) 0 var(--ds-space-4);
+}
+
+.ds-door-walk__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: var(--bar-h);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.ds-door-walk__bar {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: calc(var(--bar) * 100%);
+  min-height: 2px;
+  background: var(--ds-rule);
+}
+
+.ds-door-walk__bar[data-empty] {
+  min-height: 0;
+}
+
+.ds-door-walk__bar[data-state='walked'] {
+  background: var(--ds-ink-muted);
+}
+
+.ds-door-walk__bar[data-state='current'] {
+  min-height: 100%;
+  background: var(--ds-accent-graphic);
+}
+
+/* The century under its bar, in the data face. */
+.ds-door-walk__bar-year {
+  position: absolute;
+  top: calc(100% + var(--ds-space-1));
+  left: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The slider spans bar center to bar center, so its thumb sits on the current decade's bar. */
+.ds-door-walk__scrub {
+  --thumb: 0.75rem;
+  position: absolute;
+  bottom: 0;
+  left: calc(50% / var(--n) - var(--thumb) / 2);
+  width: calc(100% * (var(--n) - 1) / var(--n) + var(--thumb));
+  height: max(44px, var(--bar-h));
+  margin: 0;
+  background: transparent;
+  cursor: ew-resize;
+  appearance: none;
+}
+
+.ds-door-walk__scrub::-webkit-slider-runnable-track {
+  height: 100%;
+  background: transparent;
+}
+
+.ds-door-walk__scrub::-moz-range-track {
+  height: 100%;
+  background: transparent;
+}
+
+.ds-door-walk__scrub::-webkit-slider-thumb {
+  width: var(--thumb);
+  height: 100%;
+  border: 0;
+  background: transparent;
+  appearance: none;
+}
+
+.ds-door-walk__scrub::-moz-range-thumb {
+  width: var(--thumb);
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.ds-door-walk__scrub:focus {
+  outline: none;
+}
+
+.ds-door-walk__scrub:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-door-walk__caption {
+  margin: var(--ds-space-5) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* The part of the card that scrolls when a record is taller than the dock; the histogram and the
    controls stay put. */
 .ds-door-walk__body {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -287,15 +450,16 @@
   mask-image: linear-gradient(to bottom, black calc(100% - var(--ds-space-8)), transparent);
 }
 
+/* The decade, in the numeral role: the one copper display figure on the card. */
 .ds-door-walk__heading {
-  margin: 0 0 var(--ds-space-2);
+  margin: 0;
+  color: var(--ds-numeral-accent);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-3);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.12;
-  text-wrap: balance;
-  color: var(--ds-ink);
+  font-weight: var(--ds-weight-numeral);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
 
 .ds-door-walk__heading:focus {
@@ -308,200 +472,17 @@
   border-radius: var(--ds-radius-sm);
 }
 
-.ds-door-walk__prose {
-  margin: 0;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-subtitle);
-  line-height: 1.5;
-  color: var(--ds-ink);
-  text-wrap: pretty;
+/* In the walk the histogram shares the column, so the plate steps down to keep the claim in view. */
+.ds-door-walk .ds-door-record__plate .ds-plate__tone {
+  max-height: 19dvh;
 }
 
-.ds-door-walk__mono {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  font-variant-numeric: tabular-nums;
-}
-
-/* The drawn record: one ruled block, not a box in the card. */
-.ds-door-walk__record {
-  display: grid;
-  gap: var(--ds-space-1);
-  margin-top: var(--ds-space-4);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-door-walk__record-name {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.ds-door-walk__record-meta,
-.ds-door-walk__record-line {
-  margin: 0;
+.ds-door-walk__tally {
+  margin: var(--ds-space-2) 0 var(--ds-space-5);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   line-height: 1.45;
-}
-
-.ds-door-walk__record-meta {
-  color: var(--ds-ink-muted);
-}
-
-.ds-door-walk__record-line {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-}
-
-.ds-door-walk__record-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  margin: 0;
-  color: var(--ds-ink-muted);
-}
-
-.ds-door-walk__link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  font-weight: 600;
-  color: var(--ds-accent-text);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-/* The decade sweep, made legible: the decade in mono over a track of the whole range. */
-.ds-door-walk__sweep {
-  display: grid;
-  gap: var(--ds-space-2);
-  margin-top: var(--ds-space-4);
-}
-
-.ds-door-walk__sweep-decade {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums lining-nums;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
-  color: var(--ds-numeral-accent);
-}
-
-.ds-door-walk__sweep-track {
-  display: block;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--ds-rule);
-  overflow: hidden;
-}
-
-.ds-door-walk__sweep-fill {
-  display: block;
-  height: 100%;
-  background: var(--ds-accent-graphic);
-  transition: inline-size var(--ds-duration-fast) linear;
-}
-
-.ds-door-walk__figures {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
-  gap: var(--ds-space-3) var(--ds-space-4);
-  margin: var(--ds-space-4) 0 0;
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-door-walk__figure {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: var(--ds-space-1);
-  min-width: 0;
-}
-
-.ds-door-walk__figure-value {
-  margin: 0;
-  color: var(--ds-numeral-accent);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  overflow-wrap: anywhere;
-}
-
-.ds-door-walk__figure-label {
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.3;
-  color: var(--ds-ink-muted);
-}
-
-/* The closing block: three destinations as a ruled list. */
-.ds-door-walk__dest {
-  margin: var(--ds-space-4) 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-door-walk__dest li {
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-door-walk__dest-link {
-  display: grid;
-  gap: 2px;
-  min-height: 44px;
-  padding: var(--ds-space-3) 0;
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-door-walk__dest-name {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.ds-door-walk__dest-line {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.4;
-  color: var(--ds-ink-muted);
-}
-
-.ds-door-walk__dest-link:hover .ds-door-walk__dest-name,
-.ds-door-walk__dest-link:focus-visible .ds-door-walk__dest-name {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.ds-door-walk__dest-link:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-door-walk__cite {
-  margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
 }
 
 .ds-door-walk__controls {
@@ -509,12 +490,7 @@
   flex: none;
   justify-content: space-between;
   gap: var(--ds-space-3);
-  margin-top: var(--ds-space-6);
-}
-
-/* Next alone (the first step) sits where it sits on every other step. */
-.ds-door-walk__controls > :last-child {
-  margin-left: auto;
+  margin-top: var(--ds-space-5);
 }
 
 /* —— The spotlight callout: a mark on the record, a 1px leader, a small card —————————————— */
@@ -571,17 +547,14 @@
   background: var(--ds-fixed-ink);
 }
 
-/* A small paper sheet with page bands, hard-edged in ink, pinned to the chart by the leader. */
+/* A label pinned to the chart by the leader: hard-edged in ink, with a real offset shadow. */
 .ds-door-callout__card {
   box-sizing: border-box;
-  width: 17.5rem;
-  padding-left: calc(var(--ds-band-w) * 3);
+  width: max-content;
+  max-width: 16rem;
   border: var(--ds-border-width) solid var(--ds-fixed-ink);
   border-radius: var(--ds-radius-sm);
-  box-shadow:
-    inset var(--ds-band-w) 0 0 var(--ds-band-1),
-    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
-    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
+  box-shadow: var(--ds-shadow-float);
 }
 
 /* The callout already names its pin; the map's own name flag would say it twice. */
@@ -620,26 +593,6 @@ body:has(.ds-door-callout[data-shown='true']) .ds-pin-flag {
   font-size: var(--ds-text-caption);
   line-height: 1.35;
   color: var(--ds-ink-muted);
-}
-
-.ds-door-callout__line {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.4;
-}
-
-.ds-door-callout__open {
-  margin-top: var(--ds-space-1);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 600;
-  color: var(--ds-accent-text);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
 }
 
 .ds-door-callout__link:hover .ds-door-callout__name {
@@ -757,47 +710,64 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     );
   }
 
-  .ds-door-open {
-    gap: var(--ds-space-3);
+  /* Stacked, the column scrolls inside its block so the map above keeps its height. */
+  .ds-door-open,
+  .ds-door-walk {
+    max-height: calc(58dvh - var(--ds-tabbar-h));
+    padding: var(--ds-space-4) var(--ds-space-5);
   }
 
   .ds-door-open {
-    padding: var(--ds-space-6);
+    gap: var(--ds-space-3);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .ds-door-open__headline {
-    font-size: clamp(3.5rem, 19vw, 5.5rem);
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
   }
 
-  .ds-door-open__line {
-    font-size: var(--ds-text-body);
+  .ds-door-open__line,
+  .ds-door-open .ds-door-record__place {
+    display: none;
   }
 
-  .ds-door-walk {
-    padding: var(--ds-space-4);
+  /* The block scrolls under its actions; the way into the walk never scrolls out of reach. */
+  .ds-door-open__actions {
+    position: sticky;
+    bottom: calc(var(--ds-space-4) * -1);
+    margin: 0 calc(var(--ds-space-5) * -1) calc(var(--ds-space-4) * -1);
+    padding: var(--ds-space-3) var(--ds-space-5) var(--ds-space-4);
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+    background: var(--ds-canvas);
   }
 
-  .ds-door-walk__top {
-    margin-top: calc(var(--ds-space-2) * -1);
-    margin-bottom: var(--ds-space-2);
+  .ds-door-record__name {
+    font-size: 1.25rem;
   }
 
-  .ds-door-walk__heading {
-    font-size: 1.375rem;
+  /* Stacked, the plate is a band across the block, so the claim stays in view. */
+  .ds-door-record__plate .ds-plate__tone {
+    aspect-ratio: 3 / 1;
+    max-height: 14dvh;
   }
 
-  .ds-door-walk__prose {
-    font-size: var(--ds-text-body-sm);
+  .ds-door-walk__axis {
+    --bar-h: 2.5rem;
+    margin-block: var(--ds-space-2) var(--ds-space-6);
   }
 
-  .ds-door-walk__record,
-  .ds-door-walk__figures {
-    margin-top: var(--ds-space-3);
-    padding-top: var(--ds-space-3);
+  .ds-door-walk__caption {
+    display: none;
   }
 
-  .ds-door-walk__cite {
-    margin-top: var(--ds-space-3);
+  /* In the walk the histogram shares the column, so the plate steps down to keep the claim in view. */
+  .ds-door-walk .ds-door-record__plate .ds-plate__tone {
+    max-height: 19dvh;
+  }
+
+  .ds-door-walk__tally {
+    margin-bottom: var(--ds-space-3);
   }
 
   .ds-door-walk__controls {
@@ -818,34 +788,16 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     padding: 0 var(--ds-space-3);
   }
 
+  /* Stacked, this is the one place the record's name shows, so a long name wraps to a second
+     line rather than losing its end. */
   .ds-door-callout__name {
     min-width: 0;
-    overflow: hidden;
     font-size: var(--ds-text-body-sm);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow-wrap: normal;
+    text-wrap: balance;
   }
 
-  .ds-door-callout__place,
-  .ds-door-callout__line {
+  .ds-door-callout__place {
     display: none;
-  }
-
-  .ds-door-callout__open {
-    flex: none;
-    margin-top: 0;
-  }
-}
-
-/* A short phone: the walk card drops its secondary lines so a step fits without scrolling. */
-@media (max-width: 47.9375rem) and (max-height: 45rem) {
-  .ds-door-walk__dest-line {
-    display: none;
-  }
-
-  .ds-door-walk__record-line {
-    -webkit-line-clamp: 2;
   }
 }
 
@@ -902,8 +854,6 @@ html[data-door-browse='1'] .ds-door {
   .ds-door-journey,
   .ds-door-journey--browse,
   .ds-door__browse,
-  .ds-door-walk,
-  .ds-door-walk__sweep-fill,
   .ds-door-callout__mark,
   .ds-door-callout__leader,
   .ds-door-callout__card {
@@ -924,7 +874,7 @@ html[data-door-browse='1'] .ds-door {
   border: 0;
 }
 
-/* Cold-open subject morph: History, His Story, then Her / Their / Your / Black Story.
+/* Cold-open subject morph: History becomes Black Story, once.
    Flat matte only: opacity, width and a short vertical roll. No scale on the S (keeps the
    baseline stable). The outgoing prefix rolls up and out while the incoming one rolls in from
    below, inside a clipped slot, so the two words never sit on top of each other mid-change. */
@@ -1162,7 +1112,7 @@ body:has(.ds-door) .ds-door-journey {
   z-index: 2; /* local: dock over the pin field; gaps pass clicks through */
 }
 
-/* —— Below the fold: four color-blocked chapters over the fixed map ———————————————————— */
+/* —— Below the fold: two chapters, each on its own ground, over the fixed map —————————————— */
 .ds-door-chapters {
   position: relative;
   z-index: 3; /* local: above the fixed field, dock and callout */
@@ -1177,40 +1127,36 @@ body:has(.ds-door) .ds-door-journey {
 .ds-door-ch {
   display: grid;
   align-items: center;
-  min-height: min(100dvh, 60rem);
   overflow: hidden;
 }
 
+/* The first chapter rises over the map with a rounded leading edge and a shadow onto the plate.
+   It stands on the table's ground, so the dark map never hands off to a bright sheet. */
+.ds-door-ch:first-child {
+  border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
+  box-shadow: var(--ds-shadow-float);
+}
+
 .ds-door-ch__inner {
+  position: relative;
   display: grid;
   justify-items: start;
   gap: var(--ds-space-6);
 }
 
+.ds-door-ch--evidence .ds-door-ch__inner {
+  padding-block: var(--ds-space-18);
+}
+
 .ds-door-ch__title {
-  display: grid;
-  gap: var(--ds-space-4);
+  max-width: 18ch;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: 600;
-}
-
-.ds-door-ch__title--plain {
-  max-width: 18ch;
-  font-size: var(--ds-text-display-title);
-  line-height: 0.92;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
-}
-
-.ds-door-ch__numeral {
-  font-size: clamp(5rem, 1rem + 15vw, 15rem);
-}
-
-.ds-door-ch__title-line {
-  font-size: var(--ds-text-display-2);
+  font-size: var(--ds-text-headline);
+  font-weight: var(--ds-weight-headline);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--ds-tracking-display);
+  text-wrap: balance;
 }
 
 .ds-door-ch__line {
@@ -1221,90 +1167,69 @@ body:has(.ds-door) .ds-door-journey {
   line-height: 1.45;
 }
 
-/* Paper: three whole record sheets in one even row, with the block's own foot under them. */
-
-.ds-door-ch__sheets {
+/* The grades as one ruled row in the claims block's language: a heavy ink rule over it, hairline
+   rules between, each grade its glyph and word with the count in the data face. */
+.ds-door-ch__grades {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ds-space-6);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   width: 100%;
-  margin: var(--ds-space-8) 0 0;
+  margin: var(--ds-space-4) 0 0;
   padding: 0;
   list-style: none;
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-/* The sheets sit on paper, so they take the raised paper step and an ink edge. */
-.ds-door-ch__sheet {
-  --ds-sheet-pad: var(--ds-space-6);
+.ds-door-ch__grade {
   display: grid;
-  gap: var(--ds-space-2);
-  min-height: 22rem;
-  border-color: var(--ds-material-ink);
-  background: var(--ds-surface-raised);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  padding: var(--ds-space-5) var(--ds-space-6) var(--ds-space-5) 0;
 }
 
-.ds-door-ch__sheet-media {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 16 / 10;
-  margin-bottom: var(--ds-space-2);
-  overflow: hidden;
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-material-sand);
-  color: var(--ds-material-ink);
+.ds-door-ch__grade + .ds-door-ch__grade {
+  padding-left: var(--ds-space-6);
+  border-left: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-door-ch__sheet-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.ds-door-ch__grade .ds-grade-tag__glyph {
+  width: 1em;
+  height: 1em;
 }
 
-.ds-door-ch__sheet-decade {
-  font-size: var(--ds-text-display-2);
+.ds-door-ch__grade-label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  font-weight: 600;
 }
 
-.ds-door-ch__sheet-name {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: 650;
-  line-height: 1.15;
-}
-
-.ds-door-ch__sheet-name a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-door-ch__sheet-name a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-}
-
-/* The whole sheet is the target; the name is the link. */
-.ds-door-ch__sheet-name a::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-}
-
-.ds-door-ch__sheet-place {
-  margin: 0;
+.ds-door-ch__grade-count {
+  grid-column: 2;
   color: var(--ds-ink-muted);
-  font-size: var(--ds-text-body-sm);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Copper: the lead chapter's cover runs edge to edge across the top of the block. */
 .ds-door-ch--story {
   align-items: start;
-  padding-top: 0;
+  padding: 0 0 var(--ds-space-18);
 }
 
 .ds-door-ch__cover {
+  position: relative;
   height: min(56dvh, 34rem);
   overflow: hidden;
   background: var(--ds-material-ink);
+}
+
+/* The cover sinks into the copper below it instead of stopping at a hard line. */
+.ds-door-ch__cover::after {
+  content: '';
+  position: absolute;
+  inset: 40% 0 0;
+  background: linear-gradient(to bottom, transparent, var(--ds-material-copper));
 }
 
 .ds-door-ch__cover img,
@@ -1320,12 +1245,14 @@ body:has(.ds-door) .ds-door-journey {
 }
 
 .ds-door-ch--story .ds-door-ch__inner {
-  padding-top: var(--ds-space-12);
+  margin-top: calc(var(--ds-space-12) * -1);
+  padding-top: 0;
 }
 
 .ds-door-ch__years {
   margin: 0;
   padding: var(--ds-space-2) var(--ds-space-4);
+  border-radius: var(--ds-radius-sm);
   background: var(--ds-material-ink);
   color: var(--ds-material-sand);
   font-family: var(--ds-font-mono);
@@ -1334,25 +1261,27 @@ body:has(.ds-door) .ds-door-journey {
 }
 
 .ds-door-ch__story-title {
-  max-width: 16ch;
+  max-width: 18ch;
   margin: 0;
   overflow-wrap: anywhere;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-title);
-  font-weight: 600;
-  line-height: 0.92;
-  letter-spacing: -0.035em;
+  font-size: var(--ds-text-headline);
+  font-weight: var(--ds-weight-display);
+  line-height: 0.98;
+  letter-spacing: var(--ds-tracking-display);
   text-wrap: balance;
 }
 
+/* Inline padding grows the hit area to 44px on a phone without moving the line. */
 .ds-door-ch__story-title a {
+  padding-block: var(--ds-space-1);
   color: inherit;
   text-decoration: none;
 }
 
 .ds-door-ch__story-title a:hover {
   text-decoration: underline;
-  text-decoration-thickness: 4px;
+  text-decoration-thickness: 3px;
   text-underline-offset: 0.08em;
 }
 
@@ -1371,130 +1300,19 @@ body:has(.ds-door) .ds-door-journey {
   gap: var(--ds-space-4);
 }
 
-/* Sand: the decade axis, drawn large in ink. */
-.ds-door-ch__axis {
-  width: 100%;
-  margin: var(--ds-space-6) 0 0;
-}
-
-.ds-door-ch__bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: clamp(14rem, 40dvh, 26rem);
-  margin: 0;
-  padding: 0 0 var(--ds-space-8);
-  list-style: none;
-  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
-}
-
-.ds-door-ch__bar {
-  position: relative;
-  display: flex;
-  flex: 1 1 0;
-  align-items: flex-end;
-  height: 100%;
-  min-width: 0;
-}
-
-.ds-door-ch__bar-fill {
-  display: block;
-  width: 100%;
-  /* A decade with one record still shows a sliver, never nothing. */
-  height: max(2px, calc(var(--bar) * 100%));
-  background: var(--ds-ink);
-  transform-origin: bottom;
-}
-
-/* A decade with no records is a gap on the time scale, not a sliver. */
-.ds-door-ch__bar[data-empty] .ds-door-ch__bar-fill {
-  height: 0;
-}
-
-.ds-door-ch__bar-year {
-  position: absolute;
-  bottom: calc(var(--ds-space-8) * -1 - var(--ds-space-2));
-  left: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-/* Ink: the grade marks drawn large. */
-.ds-door-ch__grades {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ds-space-6);
-  width: 100%;
-  margin: var(--ds-space-6) 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ds-door-ch__grade a {
-  display: grid;
-  justify-items: start;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-6);
-  border: var(--ds-border-width-strong) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-door-ch__grade a:hover {
-  border-color: var(--ds-accent-graphic);
-}
-
-.ds-door-ch__grade-mark {
-  display: grid;
-  place-items: center;
-  width: 7rem;
-  height: 7rem;
-  border: 6px solid var(--ds-numeral-soft);
-  border-radius: var(--ds-radius-md);
-  color: var(--ds-numeral-soft);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
-  font-weight: 600;
-  line-height: 1;
-}
-
-.ds-door-ch__grade-label {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: 650;
-}
-
-.ds-door-ch__grade-count {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-body-sm);
-}
-
+/* A phone: the grades stack, each under a hairline rule. */
 @media (max-width: 47.9375rem) {
-  .ds-door-ch {
-    min-height: 0;
+  .ds-door-ch--evidence .ds-door-ch__inner {
+    padding-block: var(--ds-space-12);
   }
 
-  .ds-door-ch__sheets,
   .ds-door-ch__grades {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ds-door-ch__sheet {
-    min-height: 0;
-  }
-
-  .ds-door-ch__bar-year {
-    font-size: var(--ds-text-caption);
-  }
-
-  .ds-door-ch__grade-mark {
-    width: 4.5rem;
-    height: 4.5rem;
-    font-size: var(--ds-text-display-2);
+  .ds-door-ch__grade + .ds-door-ch__grade {
+    padding-left: 0;
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+    border-left: 0;
   }
 }

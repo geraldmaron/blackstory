@@ -46,15 +46,18 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
 
 1. **Radii.** Flat/zero-radius language is superseded by 8px / 14px / 28px
    (`--ds-radius-sm` / `-md` / `-lg`), the same on web and mobile. The middle
-   step was 16px in the pack and moved to 14px with the Ink direction. No
-   bevels, gradients, glows, 3D, or ornamental motion; shadows only as the
-   contact shadow under Shape.
+   step was 16px in the pack and moved to 14px with the Ink direction. The
+   old ban on gradients, glows, glass, shadow and grain was lifted by the
+   owner for the living-archive redesign (2026-11-15); see Shape and depth.
+   Bevels, 3D and ornamental motion stay out.
 2. **Canvas.** White `#FFFFFF` canvas is superseded by the paper family. The
    Archive Paper swatch `#F4EFE5` is the brand color; the web theme canvas is
    one value step lighter so a sunken well and a raised plate both have room
    (see Theme roles).
-3. **Display type.** Kit headlines use Schibsted Grotesk SemiBold; UI Geist; editorial
-   Newsreader; data Geist Mono (see `apps/web/src/app/layout.tsx`).
+3. **Display type.** Headlines use Schibsted Grotesk on its variable weight axis
+   (800 display, 700 headline, 650 title); SemiBold-everywhere is retired because it
+   left size as the only contrast axis. UI Geist; editorial Newsreader; data Geist
+   Mono (see `apps/web/src/app/layout.tsx`).
 4. **Lockup rendering.** Official artwork PNGs at `apps/web/public/brand/` —
    never type the wordmark next to a bare symbol in React.
 5. **Copper text.** Use `#8E4F2A` on light / `#D07A32` on dark
@@ -181,20 +184,30 @@ Rules that follow from the numbers:
 
 ## Type
 
-Schibsted Grotesk SemiBold for headlines; Geist for UI/body; Newsreader for
-editorial/longform; Geist Mono for data, citations, dates, confidence,
-and technical labels. All open-source; no licensed fonts.
+Schibsted Grotesk for headlines, with weight as a real axis; Geist for UI/body;
+Newsreader for editorial/longform; Geist Mono for data, citations, dates,
+confidence and technical labels. All open-source; no licensed fonts, and no new
+family: boldness comes from weight and scale inside these four.
 
-Sizes come from the scale in `tokens.css`, not from a pixel value chosen per
-surface. A surface picks which step a thing is, not what the step measures.
+Sizes come from seven roles in `tokens.css` (living archive, 2026-11-15), not
+from a pixel value chosen per surface. A surface picks which role a thing is,
+not what the role measures.
 
-| Step | Token | Use |
-|---|---|---|
-| Display | `--ds-text-display-hero`, `-display-1`, `-display-2`, `-display-3` | Headlines. One `display-1` (or one hero) per surface |
-| Title, subtitle | `--ds-text-title`, `--ds-text-subtitle` | Section and card heads |
-| Body | `--ds-text-body`, `--ds-text-body-sm` | UI and running text |
-| Editorial | `--ds-text-editorial-lede`, `--ds-text-editorial` | Newsreader longform |
-| Caption, micro | `--ds-text-caption`, `--ds-text-micro` | Meta and mono labels |
+| Role | Size token | Weight | Use |
+|---|---|---|---|
+| Display | `--ds-text-display` (48 to 104px) | `--ds-weight-display` 800, tracking -0.03em | Once per surface: the home opening, a record's name, a page title |
+| Headline | `--ds-text-headline` (32 to 56px) | `--ds-weight-headline` 700 | Section and chapter titles |
+| Title | `--ds-text-title` (20 to 24px) | `--ds-weight-title` 650 | Cards, rows, sub-sections |
+| Body | `--ds-text-body`, `--ds-text-body-sm` | Geist 400 | UI and running text |
+| Editorial | `--ds-text-editorial` (17 to 19px), `--ds-text-editorial-lede` | Newsreader 400; italic optical size for pull statements | Ledes and prose |
+| Meta | `--ds-text-meta` (13px), `--ds-tracking-meta` | Geist Mono, caps | Dates, counts, citations |
+| Numeral | `--ds-text-numeral` (48 to 88px) | `--ds-weight-numeral` 800 | Dates, decades and counts as graphics |
+
+The older names (`--ds-text-display-title`, `-display-hero`, `-display-1`,
+`-display-numeral`) are aliases onto these roles, so untouched surfaces shrink
+with the system; do not use them in new work. Nothing on the site sets type
+above the display ceiling: the old 111px page titles, 184px numerals and the
+111px footer line are gone.
 
 Line height and tracking have their own tokens (`--ds-leading-*`,
 `--ds-tracking-*`). Longform measure is `--ds-content-max` (38rem, about 65
@@ -232,21 +245,37 @@ Every interactive element has all of these, in both themes:
 | Disabled | Reduced opacity and `not-allowed`, on a real `disabled` attribute. Say why nearby when it is not obvious |
 | Loading, empty, error | Skeleton, `EmptyState`, `Notice` from `@repo/ui`. Wording in [`story.md`](./story.md) |
 
-## Shape
+## Shape and depth
 
-Radii 8/14/28px (sm/md/lg). The archive is material, not glass: depth comes from
-stacking, occlusion, crop and value (four surface steps per theme), never from
-synthetic light. Decorative gradients, glows, neon, bevels, glass and 3D stay
-banned. One low-opacity contact shadow (`--ds-contact-*`) is allowed only where
-a layer genuinely overlaps another.
+Radii 8/14/28px (sm/md/lg). The owner lifted the bans on gradients, glow,
+glass, backdrop blur, shadows and grain for the living-archive redesign
+(2026-11-15). Depth now comes from four planes, defined in
+[`patterns-living-archive.md`](./patterns-living-archive.md): the masthead
+**field** a plate stands in (plain since the 2026-11-15 critique pass: a glow,
+vignette or grain that carries no information is decoration), **grounds** (ink,
+paper, sand, copper bands), **sheets** (paper with a real layered shadow,
+`--ds-shadow-sheet` / `--ds-shadow-lift`) and **floats** (glass with a backdrop
+blur over the map, `.ds-float`). Shadows carry an offset and a soft blur; a
+zero-offset colored halo is still out, as are neon, bevels and 3D. The memorial
+and sensitive or violence-adjacent records stand on a quiet ground: no plate,
+no motion, and never lifted onto the home page.
 
 ## Imagery and people
 
 Place first; evidence visible; people with context — a person is always
 identified (PERSON / ROLE / PLACE / YEAR), never anonymous decoration.
-Avoid generic “Black history” stock imagery, automatic sepia filters, AI
-images presented as documentary material, and maps without source/precision
-context.
+Avoid generic “Black history” stock imagery, sepia filters dropped on any
+image to make it look old, and maps without source/precision context. No
+AI-generated image ships anywhere on the site (owner decision 2026-11-15;
+`/about` promises it publicly).
+
+**Plates.** The one large image treatment is the plate: a record's own sourced
+`primary_image` shown large and toned ink and copper (`.ds-plate`, see
+[`patterns-living-archive.md`](./patterns-living-archive.md#plates)). Real
+sourced photographs only, never generated or stock; the credit line always
+visible beside it and never altered; never on the memorial or a sensitive or
+violence-adjacent record, which show the photograph plain or not at all; and
+the map and the plate always show the same place. No type is set on a plate.
 
 ## Map dignity
 

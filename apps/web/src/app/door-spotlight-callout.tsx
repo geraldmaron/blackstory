@@ -1,11 +1,12 @@
 /**
- * The visit's spotlight record, shown where it is: a mark on its coordinate, a 1px leader and a
+ * The record the column shows, shown where it is: a mark on its coordinate, a 1px leader and a
  * small card beside it. It follows the pin on every camera frame and only ever sits inside the
  * Door's map window (`.ds-door__window`), which on every layout excludes the headline column, so
  * the callout can never cover the headline. When no side of the pin has room inside the window,
  * or the pin is outside it, the callout hides rather than overlapping anything.
  *
- * On a phone (the stacked layout) the card is one line, the name and "Open the record", stacked
+ * The card is a label, the name and the locality; the column beside the map carries the record. On
+ * a phone (the stacked layout) the card is one line, stacked
  * above or below the pin so it never spreads across the country.
  *
  * The mark is drawn here, not by the plate, because at national zoom the record usually sits
@@ -205,13 +206,12 @@ type EventedMap = AtlasCameraTarget & {
 };
 
 export type DoorSpotlightCalloutProps = {
-  /** Shown only on the opening, once this mount has framed the plate. */
+  /** Shown once this mount has framed the plate, on the opening and every decade of the walk. */
   readonly active: boolean;
   readonly lngLat: readonly [number, number];
   readonly mark: RecordMark;
   readonly name: string;
   readonly locality: string | null;
-  readonly line: string;
   readonly href: string;
   /** The uncovered map window the callout must stay inside. */
   readonly frameRef: React.RefObject<HTMLElement | null>;
@@ -223,7 +223,6 @@ export function DoorSpotlightCallout({
   mark,
   name,
   locality,
-  line,
   href,
   frameRef,
 }: DoorSpotlightCalloutProps) {
@@ -323,8 +322,6 @@ export function DoorSpotlightCallout({
         <DoorRecordLink className="ds-door-callout__link" href={href}>
           <span className="ds-door-callout__name">{name}</span>
           {locality ? <span className="ds-door-callout__place">{locality}</span> : null}
-          <span className="ds-door-callout__line">{line}</span>
-          <span className="ds-door-callout__open">Open the record</span>
         </DoorRecordLink>
       </div>
     </div>

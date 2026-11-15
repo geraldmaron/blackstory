@@ -37,6 +37,7 @@ import {
 } from '../../../components/entity/EntitySensitivityNote';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { RecordImage } from '../../../components/entity/RecordImage';
+import { isRenderedImage } from '../../../components/entity/rendered-image';
 import {
   RECORD_GAP_COPY,
   SINGLE_SOURCE_COPY,
@@ -84,6 +85,9 @@ import { resolveCitesEdgeIndex } from '../../../lib/stories/source';
 import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { recordDiscoveryReturn } from '../../record-family';
 import {
+  isQuietRecord,
+  publisherOf,
+  statementFor,
   toEvidenceClaimInputs,
   traumaContentDisclaimerFor,
   withoutSummaryEchoClaims,
@@ -187,22 +191,6 @@ function shortPlace(entity: PublicEntityView): string | undefined {
   return readable(location) ? location : undefined;
 }
 
-function publisherOf(claim: PublicEntityView['claims'][number]): string {
-  return claim.citationSource
-    .trim()
-    .replace(/^https?:\/\//i, '')
-    .replace(/^www\./i, '')
-    .replace(/\/$/, '');
-}
-
-/** A short claim whose object is a bare name reads as nothing; prefix the predicate in words. */
-function statementFor(predicate: string, object: string): string {
-  const text = object.trim();
-  const isSentence = /[.!?]["')\]]?$/.test(text) || text.split(/\s+/).length > 8;
-  if (isSentence || predicate.trim().length === 0) return text;
-  return `${humanizeToken(predicate)}: ${text}`;
-}
-
 function gapsFor(entity: PublicEntityView, shownClaims: number): readonly string[] {
   const gaps: RecordGapKind[] = [];
   if (entity.historicalContext.trim().length === 0) gaps.push('context');
@@ -244,6 +232,21 @@ export function EntityRecordView({
   const status = metaStatus(entity);
   /* A sensitivity flag's note already carries the sensitive-content disclaimer; never print it twice. */
   const trauma = entity.sensitivity ? undefined : traumaContentDisclaimerFor(entity);
+  /* Violence-adjacent and sensitive records stand on a quiet ground: no plate. */
+  const quiet = isQuietRecord(entity);
+  /* The record's own photograph leads the masthead as a plate; a quiet record keeps it plain in
+     the rail. Never a stand-in image. */
+  const plate =
+    !quiet && entity.primaryImage && !isRenderedImage(entity.primaryImage) ? (
+      <RecordImage
+        entityId={entity.id}
+        entityName={entity.displayName}
+        image={entity.primaryImage}
+        plate
+        width={704}
+        {...(String(entity.kind) === 'person' ? { className: 'ds-plate--upper' } : {})}
+      />
+    ) : undefined;
 
   /* The place glyph belongs to the place; a place-kind record's kind word takes a landmark. */
   const kindIcon = kindIconFor(entity.kind, tone);
@@ -320,7 +323,7 @@ export function EntityRecordView({
     },
   ];
 
-  /* The rail: a real photograph when one exists, the map at its stored precision. */
+  /* The rail: the map at its stored precision, and the photograph plain when it is not a plate. */
   const visitInput = {
     displayName: entity.displayName,
     locationLabel: entity.locationLabel,
@@ -336,13 +339,14 @@ export function EntityRecordView({
       : undefined;
   const statePostalCode = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)?.postalCode;
   const media =
-    entity.primaryImage || point ? (
+    (entity.primaryImage && !plate) || point ? (
       <>
-        {entity.primaryImage ? (
+        {entity.primaryImage && !plate ? (
           <RecordImage
             entityId={entity.id}
             entityName={entity.displayName}
             image={entity.primaryImage}
+            width={300}
           />
         ) : null}
         {point ? (
@@ -489,6 +493,8 @@ export function EntityRecordView({
     <RecordPage
       crumb={crumb}
       title={entity.displayName}
+      quiet={quiet}
+      {...(plate ? { plate } : {})}
       meta={meta}
       ledeText={entity.summary}
       lede={

@@ -448,16 +448,12 @@ export function RecordMap({
           <span className="ds-record-map__ground-note">{precisionWords}</span>
         </p>
         {place ? (
-          <a
-            className="ds-record-map__token"
-            href={place.href}
-            aria-label={`${place.name}, ${place.count} ${place.count === 1 ? 'record' : 'records'}. Open this place on the map.`}
-          >
-            <span className="ds-record-map__count" aria-hidden="true">
-              {abbreviate(place.count)}
-            </span>
-            <span className="ds-record-map__name" aria-hidden="true">
-              {place.name}
+          /* The link's name starts with the words it shows (WCAG 2.5.3), then says the rest. */
+          <a className="ds-record-map__token" href={place.href}>
+            <span className="ds-record-map__count">{abbreviate(place.count)}</span>{' '}
+            <span className="ds-record-map__name">{place.name}</span>
+            <span className="ds-visually-hidden">
+              {`, ${place.count.toLocaleString('en-US')} ${place.count === 1 ? 'record' : 'records'}. Open this place on the map.`}
             </span>
           </a>
         ) : null}

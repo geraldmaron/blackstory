@@ -32,3 +32,33 @@ test('the phone header shows the lockup artwork, sized down, never hidden', () =
   assert.match(phone, /\.ds-bar__brand \{\s*--ds-lockup-size:\s*3\.5rem/);
   assert.doesNotMatch(commandBarCss, /ds-shell-wordmark__img[^{]*\{\s*display:\s*none/);
 });
+
+test('a record photograph leads the masthead as a plate beside the name, never under it', () => {
+  const page = read('./EntityRecordPage.tsx');
+  // Only a record that is not quiet gets a plate; a quiet one keeps its photograph plain in the rail.
+  assert.match(
+    page,
+    /!quiet && entity\.primaryImage && !isRenderedImage\(entity\.primaryImage\) \? \(\s*<RecordImage[\s\S]*?\n\s*plate\n/,
+  );
+  assert.match(page, /entity\.primaryImage && !plate \? \(\s*<RecordImage/);
+  assert.match(page, /const quiet = isQuietRecord\(entity\)/);
+  // The plate holds the right of the field and the head stops short of it: no type on the photo.
+  assert.match(recordCss, /\.ds-recpage__plate \{[^}]*position:\s*absolute/s);
+  assert.match(
+    recordCss,
+    /\.ds-recpage__mast\[data-plate\] \.ds-recpage__head \{[^}]*padding-right:/s,
+  );
+});
+
+test('the sticky rail stops where the body ends, above the record file', () => {
+  const pattern = read('../../../components/patterns/RecordPage.tsx');
+  // The rail and the body share an inner box; the record file sits after it, outside.
+  assert.match(
+    pattern,
+    /<div className="ds-recpage__main">[\s\S]*ds-recpage__rail[\s\S]*ds-recpage__body[\s\S]*<\/div>\s*<\/div>\s*<footer\s+className="ds-recpage__file"/,
+  );
+  const desktop = recordCss.slice(recordCss.indexOf('@media (min-width: 64rem)'));
+  assert.match(desktop, /\.ds-recpage__grid \{\s*grid-template-areas:\s*'main'\s*'file';/);
+  assert.match(desktop, /\.ds-recpage__main \{[^}]*display: grid;[^}]*'body  rail';/s);
+  assert.doesNotMatch(desktop, /'file\s+file'/);
+});

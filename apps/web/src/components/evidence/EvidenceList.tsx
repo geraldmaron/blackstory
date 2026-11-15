@@ -15,7 +15,8 @@ import type { ConfidenceLevel } from '@repo/ui';
 import { confidenceTierPhrase } from '../../lib/evidence/confidence-language';
 import { confidenceIconFor } from '../../lib/map-experience/confidence-icons';
 import type { EvidenceDisputeView, EvidenceRetractionNotice } from '../../lib/evidence';
-import { formatRecordDate } from '../patterns/RecordPage';
+import { formatRecordDate } from '../patterns/format-record-date';
+import './evidence-list.css';
 
 void React;
 

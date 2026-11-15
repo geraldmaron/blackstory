@@ -2,22 +2,91 @@
  * The record page (components/patterns/RecordPage.tsx): one anatomy for entity, place, invention,
  * law and book. The only stylesheet a record route loads besides the shared kit.
  *
- * Material (art direction v2): the whole record is one paper sheet (`Sheet`, page bands on its left
- * edge) on the ink table. The year or decade sits beside the title as a display numeral; the
- * citation line is a copper block cut in from the sheet's banded edge; the map is an ink inset
- * with its copper pin; the sources are numbered in large copper numerals; the record file is a
- * sand block across the sheet's foot; prev/next are two ink blocks under the sheet.
+ * Living archive (docs/ui/patterns-living-archive.md). The page changes ground as it goes down:
  *
- * Desktop: the sheet on the wide container, a main column beside a 300px sticky rail. Phone and
- * tablet: the sheet runs full-bleed, one column in the contract's order (title, meta, media, lede,
- * citation line, body), with the rail's actions pinned as a bottom row above the tab bar.
+ *   field   the masthead, a plain ground: the record's name at display weight, the era numeral
+ *           secondary beside the meta line. With the record's own photograph (`data-plate`) the
+ *           photograph leads the field as a toned plate beside the name, credit under it.
+ *   sheet   one paper sheet laid over the field's foot (page bands on its left edge); the
+ *           citation line is ruled type between two ink rules, not a box
+ *   sources "What the sources say" is set off by a heavy rule and its copper numerals, not a card
+ *   sand    the record file across the sheet's foot; prev/next stand on the table under it
+ *
+ * A quiet record (violence-adjacent or sensitive, `data-quiet`) keeps the anatomy with no plate.
+ *
+ * Desktop: the sheet on the wide container, a main column beside a 300px sticky rail, both inside
+ * `.ds-recpage__main` so the rail's sticky run ends above the record file. Tablet: one column
+ * (media, lede, citation line, body). Phone: the summary first, then media. The rail's actions pin
+ * as a bottom row above the tab bar.
  */
 
 @import '../components/room/room-kit.css';
 
 .ds-recpage {
-  padding-block: var(--ds-space-6) var(--ds-space-18);
+  padding-block: 0 var(--ds-space-18);
   color: var(--ds-ink);
+}
+
+/* —— the masthead field ——————————————————————————————————————————————————— */
+.ds-recpage__mast {
+  --ds-mast-fade: linear-gradient(to bottom, black 55%, transparent);
+  /* The sheet laid over the field's foot overlaps it by this much. */
+  --ds-recpage-overlap: var(--ds-space-12);
+  padding-block: var(--ds-space-12) calc(var(--ds-recpage-overlap) + var(--ds-space-12));
+}
+
+/*
+ * The plate: the record's own photograph leading the field. Phone and tablet: a full-bleed band
+ * at the top of the field, the name under it. Desktop: the right of the field, bled off the edge,
+ * beside the name and never under it, so no type ever sits on the photograph. Its credit line is
+ * under it in both.
+ */
+.ds-recpage__mast[data-plate] {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+.ds-recpage__plate {
+  order: -1;
+  margin-bottom: var(--ds-space-6);
+}
+
+.ds-recpage__plate .ds-plate__tone {
+  aspect-ratio: 3 / 2;
+  max-height: 56svh;
+}
+
+@media (min-width: 30rem) {
+  .ds-recpage__plate .ds-plate__tone {
+    aspect-ratio: 2 / 1;
+    max-height: 48svh;
+  }
+}
+
+.ds-recpage__plate .ds-plate__credit {
+  padding-inline: var(--ds-gutter);
+}
+
+/* The grain fades out before the field's foot, so the field meets the table without a seam. */
+.ds-recpage__mast::before {
+  mask-image: var(--ds-mast-fade);
+}
+
+.ds-recpage__desk {
+  position: relative;
+}
+
+/* The sheet is laid over the masthead's foot. */
+.ds-recpage__record .ds-recpage__desk {
+  --ds-recpage-overlap: var(--ds-space-12);
+  margin-top: calc(var(--ds-recpage-overlap) * -1);
+}
+
+/* The record sheet keeps its page bands and edge but casts no drop shadow: on this page depth
+   comes from the plate, the change of ground and the type. */
+.ds-recpage__grid.ds-sheet {
+  box-shadow: var(--ds-sheet-bands);
 }
 
 .ds-recpage__grid {
@@ -25,7 +94,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    'head'
     'media'
     'extra'
     'lede'
@@ -33,9 +101,13 @@
     'facts'
     'body'
     'file'
-    'pager'
     'actions';
   align-items: start;
+}
+
+/* Lede to body. A grid of its own only on a desktop, where it bounds the sticky rail. */
+.ds-recpage__main {
+  display: contents;
 }
 
 .ds-recpage__icon {
@@ -44,18 +116,23 @@
   flex: none;
 }
 
-/* —— 1. crumb, title, meta, and the year as a display numeral beside them ———————— */
+/* —— 1. crumb, the name leading, then the era numeral beside the meta line —————————— */
 .ds-recpage__head {
-  grid-area: head;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   grid-template-areas:
     'crumb crumb'
-    'title numeral'
-    'meta numeral';
+    'title title'
+    'numeral meta';
   align-items: end;
-  gap: var(--ds-space-3) var(--ds-space-8);
+  gap: var(--ds-space-4) var(--ds-space-6);
   min-width: 0;
+}
+
+.ds-recpage__head--loading {
+  display: grid;
+  grid-template-areas: none;
+  gap: var(--ds-space-3);
 }
 
 .ds-recpage__head > .ds-recpage__crumb {
@@ -72,20 +149,20 @@
   align-self: last baseline;
 }
 
+/* The era is secondary: a numeral at headline size, soft, on the meta line's baseline. */
 .ds-recpage__numeral {
   grid-area: numeral;
-  /* The numeral (or the caption under it) stands on the meta line's baseline. */
   align-self: last baseline;
-  font-size: clamp(4.5rem, 1rem + 9vw, 10rem);
+  font-size: var(--ds-text-headline);
 }
 
 /* A numeral that needs naming: the caption under it, in mono, on the meta line's floor. */
 .ds-recpage__numeral--captioned {
   display: grid;
-  justify-items: end;
+  justify-items: start;
   gap: var(--ds-space-1);
   margin-bottom: 0;
-  font-size: var(--ds-text-display-title);
+  font-size: var(--ds-text-headline);
   line-height: 1;
 }
 
@@ -97,9 +174,10 @@
 .ds-recpage__numeral-caption {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
+  font-size: var(--ds-text-meta);
   font-weight: 600;
-  letter-spacing: 0;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-recpage__crumb {
@@ -128,13 +206,15 @@
   transform: translateX(-3px);
 }
 
+/* The name leads: display weight, held under the display ceiling so a long name stays legible. */
 .ds-recpage__title {
+  max-width: 20ch;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(2.5rem, 1.6rem + 3.4vw, 4.75rem);
-  font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.25rem, 1rem + 5.5vw, 5.5rem);
+  font-weight: var(--ds-weight-display);
+  line-height: 0.96;
+  letter-spacing: var(--ds-tracking-display);
   text-wrap: balance;
   overflow-wrap: break-word;
 }
@@ -165,7 +245,6 @@
 .ds-recpage__lede {
   grid-area: lede;
   min-width: 0;
-  margin-top: var(--ds-space-6);
 }
 
 .ds-recpage__lede-text {
@@ -270,14 +349,14 @@
   margin: 0 0 var(--ds-space-2);
 }
 
-/* —— 3. the citation line: a copper block cut in from the sheet's banded edge —————— */
+/* —— 3. the citation line: ruled type between two ink rules ——————————————————— */
 .ds-recpage__facts {
   grid-area: facts;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: var(--ds-space-8) 0 0 calc(var(--ds-sheet-pad) * -1);
-  padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-6) var(--ds-sheet-pad);
-  border-radius: 0 var(--ds-radius-md) var(--ds-radius-md) 0;
+  margin: var(--ds-space-8) 0 0;
+  padding-block: var(--ds-space-4);
+  border-block: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-recpage__fact {
@@ -290,18 +369,17 @@
 
 .ds-recpage__fact + .ds-recpage__fact {
   padding-left: var(--ds-space-4);
-  border-left: var(--ds-border-width-strong) solid var(--ds-ink);
+  border-left: var(--ds-border-width) solid var(--ds-rule);
 }
 
+/* The label is the meta role (mono, small caps-tracked); the value carries the weight. */
 .ds-recpage__fact-label {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-  font-weight: 650;
-}
-
-/* On copper the grade glyph is ink: its shape and the word carry the tier there. */
-.ds-recpage__facts .ds-recpage__grade .ds-recpage__icon {
-  color: var(--ds-ink);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-recpage__fact-value,
@@ -311,10 +389,10 @@
 }
 
 .ds-recpage__fact-value {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body);
-  font-weight: 600;
-  line-height: 1.35;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 650;
+  line-height: 1.3;
 }
 
 .ds-recpage__fact-detail {
@@ -324,36 +402,17 @@
   line-height: 1.4;
 }
 
+/* The grade link is itself a 44px target; the row absorbs the extra height. */
 .ds-recpage__grade {
-  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-2);
+  min-height: 44px;
 }
 
-/* A 44px hit area around a 20px line, without moving the cell's text. */
-.ds-recpage__grade::after {
-  content: '';
-  position: absolute;
-  inset: -12px -4px;
-}
-
-/* The glyph carries the tier's hue; the word carries the meaning. */
-.ds-recpage__grade .ds-recpage__icon,
-.ds-grade-tag__glyph {
+/* The glyph carries the tier's hue (evidence-list.css); the word carries the meaning. */
+.ds-recpage__grade .ds-recpage__icon {
   color: var(--grade-hue, var(--ds-ink-muted));
-}
-
-.ds-grade-tag--high {
-  --grade-hue: var(--ds-confidence-high-fg);
-}
-
-.ds-grade-tag--medium {
-  --grade-hue: var(--ds-confidence-medium-fg);
-}
-
-.ds-grade-tag--low {
-  --grade-hue: var(--ds-confidence-low-fg);
 }
 
 /* —— 4. the rail: media and actions —————————————————————————————————————— */
@@ -385,7 +444,7 @@
   background: var(--ds-surface-sunken);
 }
 
-/* The map is a paper chart laid on the sheet: one hard ink edge, the sheet's radius, no mat. */
+/* The map sits in the sheet with an ink edge at the sheet's radius; no shadow. */
 .ds-recpage__media .ds-record-map__frame {
   border-color: var(--ds-border-strong);
   border-radius: var(--ds-radius-md);
@@ -447,6 +506,17 @@
 
 .ds-recpage__beat .ds-section-heading {
   scroll-margin-top: calc(56px + var(--ds-space-6));
+}
+
+/* The receipts are set off by a heavy ink rule over the beat and their copper numerals. */
+.ds-recpage__beat:has(> .ds-evidence) {
+  margin-block: var(--ds-space-12) var(--ds-space-8);
+  padding-top: var(--ds-space-2);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+}
+
+.ds-recpage__beat:has(> .ds-evidence) > .ds-evidence {
+  border-top: 0;
 }
 
 .ds-recpage__prose {
@@ -530,8 +600,6 @@
  * grade, table cells, record-file values, quiet asides. Ink with a 1px control underline; copper
  * only on hover. Copper at rest is for links inside prose paragraphs (the lede and body beats).
  */
-a.ds-evidence__title,
-.ds-evidence__archive,
 .ds-recpage__grade,
 .ds-recpage__table a,
 .ds-recpage__file a,
@@ -544,8 +612,6 @@ a.ds-evidence__title,
   text-underline-offset: 0.2em;
 }
 
-a.ds-evidence__title:hover,
-.ds-evidence__archive:hover,
 .ds-recpage__grade:hover,
 .ds-recpage__table a:hover,
 .ds-recpage__file a:hover,
@@ -698,128 +764,6 @@ a.ds-evidence__title:hover,
   gap: var(--ds-space-1);
 }
 
-/* —— "What the sources say": the numbered evidence list ————————————————— */
-.ds-evidence {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: evidence;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-evidence__item {
-  position: relative;
-  display: grid;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-6) 0 var(--ds-space-6) var(--ds-space-18);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  counter-increment: evidence;
-  scroll-margin-top: calc(56px + var(--ds-space-6));
-}
-
-/* Each statement's number in a large copper numeral (3.5:1 at this size on paper). */
-.ds-evidence__item::before {
-  content: counter(evidence);
-  position: absolute;
-  top: var(--ds-space-4);
-  left: 0;
-  width: var(--ds-space-12);
-  color: var(--ds-numeral-accent);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  text-align: right;
-  font-variant-numeric: lining-nums;
-}
-
-.ds-evidence__item:target {
-  background: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
-}
-
-.ds-evidence__statement {
-  margin: 0;
-  max-width: 62ch;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  line-height: 1.45;
-}
-
-.ds-evidence__source {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--ds-space-1) var(--ds-space-3);
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.45;
-}
-
-.ds-evidence__publisher {
-  color: var(--ds-ink-muted);
-}
-
-.ds-evidence__title {
-  color: var(--ds-ink);
-  font-weight: 500;
-}
-
-/* A source link is one line of type; padding paid back in margin makes it a 44px target without
-   moving the row. */
-a.ds-evidence__title {
-  display: inline-block;
-  margin-block: calc(var(--ds-space-3) * -1);
-  padding-block: var(--ds-space-3);
-}
-
-.ds-evidence__archive {
-  color: var(--ds-ink-muted);
-}
-
-.ds-evidence__date,
-.ds-evidence__note {
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-caption);
-}
-
-.ds-evidence__date {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-}
-
-.ds-grade-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-self: start;
-  gap: var(--ds-space-2);
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-}
-
-.ds-evidence__flag {
-  max-width: 62ch;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-dispute-bg);
-  color: var(--ds-dispute-fg);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.5;
-}
-
-.ds-evidence__flag--retracted {
-  background: var(--ds-error-bg);
-  color: var(--ds-error-fg);
-}
-
-.ds-evidence__alternates {
-  margin: var(--ds-space-2) 0 0;
-  padding-left: var(--ds-space-4);
-}
-
 /* —— 6. the record file: a sand block across the sheet's foot ———————————————————— */
 .ds-recpage__file {
   grid-area: file;
@@ -832,7 +776,7 @@ a.ds-evidence__title {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-3);
-  font-weight: 650;
+  font-weight: var(--ds-weight-headline);
   letter-spacing: var(--ds-tracking-title);
 }
 
@@ -946,16 +890,13 @@ a.ds-evidence__title {
     --ds-sheet-pad: var(--ds-space-6);
   }
 
-  .ds-recpage__numeral {
-    font-size: clamp(3.5rem, 2rem + 7vw, 6rem);
-  }
-
   .ds-recpage__media:has(.ds-recpage__photo) .ds-record-map {
     display: none;
   }
 
   .ds-recpage__media {
     max-width: 40rem;
+    margin-bottom: var(--ds-space-6);
   }
 
   .ds-recpage__actions {
@@ -1022,25 +963,42 @@ a.ds-evidence__title {
     width: 100%;
   }
 
+  /* A phone reads the summary first; the map and photo follow it rather than pushing it below
+     the fold. */
   .ds-recpage__grid {
     --ds-sheet-pad: var(--ds-space-4);
+    grid-template-areas:
+      'lede'
+      'note'
+      'media'
+      'extra'
+      'facts'
+      'body'
+      'file'
+      'actions';
+  }
+
+  .ds-recpage__mast {
+    --ds-recpage-overlap: var(--ds-space-6);
+    padding-block: var(--ds-space-6) calc(var(--ds-recpage-overlap) + var(--ds-space-8));
+  }
+
+  .ds-recpage__record .ds-recpage__desk {
+    --ds-recpage-overlap: var(--ds-space-6);
   }
 
   .ds-recpage__head {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       'crumb'
-      'numeral'
       'title'
+      'numeral'
       'meta';
+    gap: var(--ds-space-3);
   }
 
   .ds-recpage__numeral {
     margin: 0;
-  }
-
-  .ds-recpage__numeral--captioned {
-    justify-items: start;
   }
 
   .ds-recpage__pager {
@@ -1062,7 +1020,7 @@ a.ds-evidence__title {
   .ds-recpage__fact + .ds-recpage__fact {
     padding-left: 0;
     border-left: 0;
-    border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+    border-top: var(--ds-border-width) solid var(--ds-rule);
   }
 
   .ds-recpage__fact-label {
@@ -1099,20 +1057,75 @@ a.ds-evidence__title {
 
 /* —— desktop: column plus sticky rail ———————————————————————————————— */
 @media (min-width: 64rem) {
-  .ds-recpage {
-    padding-top: var(--ds-space-8);
+  .ds-recpage__mast {
+    padding-top: var(--ds-space-16);
+  }
+
+  /* Desktop: the name keeps the left of the field; the plate takes the right, bled off the edge
+     and fading into the field along its inner edge. */
+  .ds-recpage__mast[data-plate] {
+    display: block;
+    min-height: min(30rem, 56svh);
+    padding-top: var(--ds-space-16);
+  }
+
+  /* The head stops a gap short of the plate: plate width less the wrap's own right margin. */
+  .ds-recpage__mast[data-plate] .ds-recpage__head {
+    padding-right: max(
+      0px,
+      min(46vw, 44rem) - max(var(--ds-gutter), (100vw - var(--ds-width-wide)) / 2) +
+        var(--ds-space-8)
+    );
+  }
+
+  .ds-recpage__mast[data-plate] .ds-recpage__title {
+    font-size: clamp(2.25rem, 1rem + 3.6vw, 4.25rem);
+  }
+
+  .ds-recpage__plate {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: var(--ds-recpage-overlap);
+    z-index: -1; /* local: inside the field's own stacking context, under the head */
+    width: min(46vw, 44rem);
+    margin: 0;
+  }
+
+  .ds-recpage__plate .ds-plate {
+    height: 100%;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .ds-recpage__plate .ds-plate__tone {
+    aspect-ratio: auto;
+    max-height: none;
+    mask-image: linear-gradient(to right, transparent, black 22%);
+  }
+
+  .ds-recpage__plate .ds-plate__credit {
+    padding-inline: 22% var(--ds-gutter);
+    text-align: right;
   }
 
   .ds-recpage__grid {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    grid-template-rows: auto auto auto auto 1fr auto;
     grid-template-areas:
-      'head  head'
+      'main'
+      'file';
+  }
+
+  /* The rail sticks inside this box, so its run ends with the body, above the record file. */
+  .ds-recpage__main {
+    grid-area: main;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
       'lede  rail'
       'note  rail'
       'facts rail'
-      'body  rail'
-      'file  file';
+      'body  rail';
+    align-items: start;
     column-gap: var(--ds-space-12);
   }
 
@@ -1122,7 +1135,6 @@ a.ds-evidence__title {
     top: calc(56px + var(--ds-space-6));
     display: grid;
     gap: var(--ds-space-6);
-    padding-top: var(--ds-space-6);
   }
 
   .ds-recpage__rail > * {

@@ -1,9 +1,10 @@
 /**
- * `/` is the Door: the national map uncovered, a headline column, the visit's spotlight record
- * as a callout on its pin, and a guided walk whose chapters fly the same plate.
+ * `/` is the Door: the national map uncovered and a column beside it that leads with one real
+ * record, shown the way its record page shows it (name, plate with credit, one claim with its
+ * source and grade), while the map points at the same record. The walk is the decade histogram:
+ * decade by decade it fills the map and brings up one record from that decade.
  *
- * Chapter order, rotating facts, and the spotlight are rolled once per request so visits vary
- * without loading MapLibre. Pins with public hrefs are clickable. Browse morphs in place onto the
+ * The records are rolled once per request so visits vary without loading MapLibre. Pins with public hrefs are clickable. Browse morphs in place onto the
  * same plate; `/explore` is the same Door already armed (deep link / share / cold load).
  */
 import React from 'react';
@@ -11,8 +12,6 @@ import { loadDoorPinPlate } from '../lib/map-experience/door-catalog';
 import { resolveDoorFocusPinId } from '../lib/map-experience/first-paint-pins';
 import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
 import { loadRecordsCatalog } from '../lib/records/records-catalog';
-import { pickStoryChapters } from '../lib/story/pick-story-chapters';
-import { pickStoryRecord } from '../lib/story/pick-story-record';
 import { redirect } from 'next/navigation';
 import { buildExploreHref, parseExploreSearchParams } from '../lib/map-experience/url-state';
 import { resolveStoryCollectionSource } from '../lib/stories/source';
@@ -30,8 +29,16 @@ import { DoorChapters } from './door-chapters';
 import { loadRecordsIndex, recordsQueryCacheKey } from './records/load-records-index';
 import { listPublicStoryListItems } from '../lib/stories/source';
 import { buildStoriesFront } from './stories/stories-index';
-import { buildEntityPhotoIndex } from '../lib/map-experience/entity-photo-index';
 import { DoorNoscript } from './door-noscript';
+import {
+  decadeBars,
+  decadeCaption,
+  doorRecords,
+  pickDecadeStops,
+  pickDoorOpening,
+  type DoorJourneyRecord,
+  type DoorRecord,
+} from './door-decade-walk';
 import './door-home.css';
 import './explore/explore.css';
 
@@ -85,24 +92,10 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
     collection,
   );
 
-  const orderRoll = Math.random();
-  const recordRoll = Math.random();
-  const { chapters, factByChapterId } = pickStoryChapters(orderRoll);
-  const spotlight = pickStoryRecord(features, recordRoll);
-  const spotlightFeature = spotlight
-    ? features.find((feature) => feature.properties.entityId === spotlight.entityId)
-    : undefined;
-  const spotlightLngLat = spotlightFeature
-    ? ([
-        spotlightFeature.geometry.coordinates[0],
-        spotlightFeature.geometry.coordinates[1],
-      ] as const)
-    : null;
-  const spotlightPinId = resolveDoorFocusPinId(spotlight?.entityId ?? null, features);
-
-  // Below the fold on the journey only; cold `/explore` is the map and nothing under it.
-  const chapters_ = initialBrowse ? null : await loadDoorChapters(entities);
-
+  // One roll per visit: which record the opening leads with and which record each decade shows.
+  // A record shown here is never a quiet one (door-decade-walk.ts).
+  const roll = Math.random();
+  const journey = initialBrowse ? null : await loadDoorJourney(features, entities, pins, roll);
   const noscriptView = initialBrowse
     ? { ...shell, filteredFeatures: noscriptFeatures.slice(0, NOSCRIPT_ROW_CAP) }
     : null;
@@ -117,36 +110,55 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
         pins={pins}
         densityLevels={densityLevels}
         browseShell={shell}
-        chapters={chapters}
-        factByChapterId={factByChapterId}
-        spotlight={spotlight}
-        spotlightLngLat={spotlightLngLat}
-        spotlightPinId={spotlightPinId}
+        opening={journey?.opening ?? null}
+        stops={journey?.stops ?? []}
+        bars={journey?.bars ?? []}
+        barsCaption={journey?.barsCaption ?? ''}
         initialBrowse={initialBrowse}
       />
-      {chapters_ ? <DoorChapters {...chapters_} /> : null}
+      {journey ? <DoorChapters lead={journey.lead} grades={journey.grades} /> : null}
     </main>
   );
 }
 
-/** The figures under the Door: the register's own index, its first records and the lead story. */
-async function loadDoorChapters(entities: Parameters<typeof buildEntityPhotoIndex>[0]) {
+/**
+ * The journey under the opening: the record it leads with, one record per decade for the walk,
+ * the register's decade histogram and grades, and the lead story. Every count comes from the
+ * same records index `/records` builds, so the Door and the register cannot disagree.
+ */
+async function loadDoorJourney(
+  features: Parameters<typeof doorRecords>[0],
+  entities: Parameters<typeof doorRecords>[1],
+  pins: {
+    readonly features: readonly {
+      readonly properties: { readonly entityId: string; readonly href: string };
+    }[];
+  },
+  roll: number,
+) {
   const [{ model }, stories] = await Promise.all([
     loadRecordsIndex(recordsQueryCacheKey({})),
     listPublicStoryListItems().catch(() => ({ items: [] as const })),
   ]);
-  const photos = buildEntityPhotoIndex(entities);
-  // The earliest records on the register, preferring ones with an image.
-  const withPhoto = model.rows.filter((row) => photos[row.id]);
-  const picks = [...withPhoto, ...model.rows.filter((row) => !photos[row.id])].slice(0, 3);
+  const records = doorRecords(features, entities);
+  // The plate's pins are opaque `pin-N` ids on the client (the catalog stays off `/`); each record
+  // rides with its pin id in place of its catalog id, and the pin's own public href.
+  const hrefByPin = new Map(
+    pins.features.map((pin) => [pin.properties.entityId, pin.properties.href] as const),
+  );
+  const withPin = ({ entityId, ...record }: DoorRecord): DoorJourneyRecord => {
+    const pinId = resolveDoorFocusPinId(entityId, features);
+    const href = (pinId ? hrefByPin.get(pinId) : undefined) || record.href;
+    return { ...record, href, pinId };
+  };
+  const opening = pickDoorOpening(records, roll);
+  const bars = decadeBars(model.facets.era);
   return {
-    total: model.totalMatched,
-    records: picks.map((row) => ({
-      row,
-      ...(photos[row.id] ? { photoUrl: photos[row.id]!.url } : {}),
-    })),
+    opening: opening ? withPin(opening) : null,
+    stops: pickDecadeStops(records, roll).map(withPin),
+    bars,
+    barsCaption: decadeCaption(bars),
     lead: stories.items.length > 0 ? buildStoriesFront(stories.items).lead : undefined,
-    decades: model.facets.era,
     grades: model.facets.evidence,
   };
 }

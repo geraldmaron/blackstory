@@ -1,13 +1,13 @@
 /**
- * Pure timing and copy model for the Door cold-open headline subject morph:
- * History → His Story → Her Story → Their Story → Your Story → Black Story.
+ * Pure timing and copy model for the Door cold-open headline subject morph, which changes once:
+ * History → Black Story. One change reads as the argument; five read as a slot machine (owner,
+ * 2026-11-15).
  * Letter-slot animation hints and phase resolution live here; HeroHeadlineMorph
  * renders the visual morph and trailer (" happened here.").
  */
 
-/** Phases of the cold-open subject morph (History → … → Black Story). */
-export type HeroHeadlinePhaseId =
-  'history' | 'his-story' | 'her-story' | 'their-story' | 'your-story' | 'black-story';
+/** Phases of the cold-open subject morph (History → Black Story). */
+export type HeroHeadlinePhaseId = 'history' | 'black-story';
 
 export type HeroHeadlinePhase = {
   readonly id: HeroHeadlinePhaseId;
@@ -47,54 +47,18 @@ export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
     dwellMs: 2800,
   },
   {
-    id: 'his-story',
-    subjectLabel: 'His Story',
-    accessibleLabel: buildAccessibleLabel('His Story'),
-    prefix: 'His',
-    storySplit: true,
-    /** Gap + capital-S reveal — slower than prefix crossfades so the split reads. */
-    transitionMs: 1500,
-    dwellMs: 2000,
-  },
-  {
-    id: 'her-story',
-    subjectLabel: 'Her Story',
-    accessibleLabel: buildAccessibleLabel('Her Story'),
-    prefix: 'Her',
-    storySplit: true,
-    transitionMs: 1100,
-    dwellMs: 1400,
-  },
-  {
-    id: 'their-story',
-    subjectLabel: 'Their Story',
-    accessibleLabel: buildAccessibleLabel('Their Story'),
-    prefix: 'Their',
-    storySplit: true,
-    transitionMs: 1100,
-    dwellMs: 1400,
-  },
-  {
-    id: 'your-story',
-    subjectLabel: 'Your Story',
-    accessibleLabel: buildAccessibleLabel('Your Story'),
-    prefix: 'Your',
-    storySplit: true,
-    transitionMs: 1100,
-    dwellMs: 1400,
-  },
-  {
     id: 'black-story',
     subjectLabel: 'Black Story',
     accessibleLabel: buildAccessibleLabel('Black Story'),
     prefix: 'Black',
     storySplit: true,
-    transitionMs: 1200,
+    /** Gap + capital-S reveal, paced with the prefix roll so "Black" never sits on "tory". */
+    transitionMs: 600,
     dwellMs: Number.POSITIVE_INFINITY,
   },
 ] as const;
 
-/** For History→His Story: describe the special split so UI can animate gap + S case morph. */
+/** For History → Black Story: "His" + "tory" in the unsplit word, so UI can animate gap + S. */
 export type HistorySplitHint = {
   readonly before: string;
   readonly after: string;
@@ -138,7 +102,7 @@ function finalPhaseIndex(): number {
 }
 
 /**
- * Total loop: play once through all phases, then hold on Black Story indefinitely.
+ * Play once, then hold on Black Story indefinitely.
  * Each non-final phase occupies transitionMs + dwellMs before advancing.
  */
 export function resolveHeroHeadlinePhaseIndex(elapsedMs: number, reducedMotion: boolean): number {

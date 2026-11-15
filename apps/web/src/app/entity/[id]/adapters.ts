@@ -9,6 +9,8 @@ import {
 } from '@repo/domain';
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import type { PublicClaimView, PublicEntityView } from '../../../data/public-seed';
+import { humanizeToken } from '../../../components/entity/format';
+import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 
 /**
  * The sensitive-content disclaimer when the record's own accepted prose documents harm, else
@@ -89,4 +91,33 @@ export function toEvidenceClaimInputs(
       ...(sourceLineage !== undefined ? { sourceLineage } : {}),
     };
   });
+}
+
+/**
+ * A sensitive or violence-adjacent record: a sensitivity flag, a trauma content note, or a
+ * massacre or plantation tone. It stands on a quiet ground (no plate, no lamplight, no motion) on
+ * its own page and is never lifted onto the home page.
+ */
+export function isQuietRecord(entity: PublicEntityView): boolean {
+  if (entity.sensitivity) return true;
+  if (traumaContentDisclaimerFor(entity) !== undefined) return true;
+  const tone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
+  return tone === 'massacre' || tone === 'plantation';
+}
+
+/** A citation's publisher as a reader names it: the bare host, no scheme or `www.`. */
+export function publisherOf(claim: PublicClaimView): string {
+  return claim.citationSource
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/$/, '');
+}
+
+/** A short claim whose object is a bare name reads as nothing; prefix the predicate in words. */
+export function statementFor(predicate: string, object: string): string {
+  const text = object.trim();
+  const isSentence = /[.!?]["')\]]?$/.test(text) || text.split(/\s+/).length > 8;
+  if (isSentence || predicate.trim().length === 0) return text;
+  return `${humanizeToken(predicate)}: ${text}`;
 }

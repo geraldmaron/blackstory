@@ -142,6 +142,8 @@ export const ABOUT_NEO = {
     { title: 'Released', body: 'A person activates the release.' },
   ],
   hand: 'One part of this is made with a pen and stays that way. The cover plate on an article is a scan of a real drawing: dry felt-tip on cream paper, one weight of line, hatch fills, a sliver of burnt ochre. It is not a generated image and not a stock photo, and that is enforced rather than promised. A plate whose file, link or caption points at a stock library or an image generator cannot publish.',
+  photographs:
+    "A photograph shown large, at the top of a record or beside the map on the front page, is that record's own sourced image, toned to match the page. Its credit and license sit right beside it.",
 } as const;
 
 /**

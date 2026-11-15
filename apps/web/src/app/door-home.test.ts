@@ -1,6 +1,7 @@
 /**
- * The Door: the map uncovered, a headline column, the spotlight as a callout on its pin, and a
- * guided walk whose chapters are one docked card that flies the shared map plate.
+ * The Door: the map uncovered, a column that leads with one real record (name, plate, one claim),
+ * a callout on its pin, and a walk that is the decade histogram, one docked card over the shared
+ * map plate.
  * It is not the Explore instrument (no lens, no rail, no sheet) and it has one map, not two:
  * the plate it drives is the one `MapStage`, handed the same national-field patch Explore rests on.
  */
@@ -21,6 +22,18 @@ const immersive = readFileSync(
 );
 const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
 const walk = readFileSync(fileURLToPath(new URL('./door-walk.tsx', import.meta.url)), 'utf8');
+const records = readFileSync(
+  fileURLToPath(new URL('./door-decade-walk.ts', import.meta.url)),
+  'utf8',
+);
+const block = readFileSync(
+  fileURLToPath(new URL('./door-record-block.tsx', import.meta.url)),
+  'utf8',
+);
+const chaptersTsx = readFileSync(
+  fileURLToPath(new URL('./door-chapters.tsx', import.meta.url)),
+  'utf8',
+);
 
 test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument', () => {
   assert.match(page, /DoorHome/);
@@ -28,10 +41,10 @@ test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument
   assert.match(door, /DoorImmersive/);
   assert.match(door, /loadDoorPinPlate/);
   assert.match(door, /resolveDoorFocusPinId/);
-  assert.match(door, /spotlightPinId/);
   assert.doesNotMatch(door, /catalogFeatures/);
-  assert.match(door, /pickStoryChapters/);
-  assert.match(door, /pickStoryRecord/);
+  assert.match(door, /doorRecords\(features, entities\)/);
+  assert.match(door, /pickDoorOpening/);
+  assert.match(door, /pickDecadeStops/);
   assert.doesNotMatch(door, /toDoorLinkPins/);
   assert.doesNotMatch(door, /LivingAtmosphereMosaic|useStoryRunner|AtlasExperience/);
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
@@ -40,7 +53,7 @@ test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument
 test('the opening is the map, one headline column, one primary action and one quiet link', () => {
   assert.match(immersive, /'use client'/);
   assert.match(immersive, /HeroHeadlineMorph/);
-  assert.match(immersive, />\s*Start the walk\s*</);
+  assert.match(immersive, />\s*Walk the decades\s*</);
   assert.match(immersive, /buttonClassName\('primary', 'ds-door-open__start'\)/);
   assert.match(immersive, /buttonClassName\('quiet'\)\}\s*href="\/records"/);
   assert.match(immersive, />\s*Browse all records\s*</);
@@ -57,41 +70,39 @@ test('the opening is the map, one headline column, one primary action and one qu
     immersive,
     /stage\.patchData\(\s*nationalFieldPatch\(sweptPins, \{ densityLevels \}\)/,
   );
-  assert.match(immersive, /focus\.camera/);
   assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
   assert.match(immersive, /AtlasLoader/);
   assert.match(immersive, /browseShell/);
 });
 
-test('the walk is one docked card with progress, Back, Next and a way to the map', () => {
+test('the walk is the decade histogram: one docked card with Back, Next and a way to the map', () => {
   // A stepper, not a scroll story: no observer, no viewport-height chapters, no snap.
   assert.doesNotMatch(immersive, /IntersectionObserver|useChapterObserver|scrollIntoView/);
   assert.match(immersive, /const goToStep = useCallback/);
-  assert.match(immersive, /showChapter\(chapters\[clamped\]!\)/);
   assert.match(immersive, /<DoorWalkCard/);
   assert.match(immersive, /onSkip=\{enterBrowse\}/);
   assert.match(walk, /Skip to the map/);
-  assert.match(walk, />\s*Next\s*</);
+  assert.match(walk, />\s*Next decade\s*</);
   assert.match(walk, />\s*Back\s*</);
-  // Step 1 has nothing to go back to: Next stands alone and "Skip to the map" is the one exit.
-  assert.match(walk, /\{position > 1 \? \(\s*<Button variant="secondary"/);
-  // The cite slot carries real citations only, never a note about the interface.
-  assert.doesNotMatch(walk, /Drawn from the active release|precision its sources support/);
   assert.match(walk, /\{position\} of \{total\}/);
-  assert.match(walk, /aria-current|data-state=\{state\}/);
-  // Keyboard: arrows step, Escape returns to the opening.
+  // The histogram is the progress: walked decades, the current one, the ones ahead.
+  assert.match(walk, /'current'\s*: bar\.year < record\.decade\s*\? 'walked'\s*: 'ahead'/);
+  // ...and the control: a native range input over the bars, named, with the decade as its value.
+  assert.match(
+    walk,
+    /type="range"[\s\S]*step=\{10\}[\s\S]*aria-label="Decade"[\s\S]*aria-valuetext=/,
+  );
+  assert.match(css, /\.ds-door-walk__scrub\s*\{[^}]*height:\s*max\(44px/);
+  // The histogram keeps its prose caption.
+  assert.match(walk, /<figcaption className="ds-door-walk__caption">\{caption\}<\/figcaption>/);
+  // Each decade shows one record the way its record page does.
+  assert.match(walk, /<DoorRecordBlock record=\{record\}/);
+  // Keyboard: arrows step, Escape returns to the opening; the slider keeps its own arrows.
   assert.match(walk, /ArrowRight[\s\S]*ArrowLeft[\s\S]*Escape/);
-  // The closing block links Records, Stories and Data, and hands over the map once.
-  assert.match(walk, /href: '\/records'[\s\S]*href: '\/stories'[\s\S]*href: '\/data'/);
+  assert.match(walk, /event\.target instanceof HTMLInputElement/);
   assert.match(walk, /Explore the map/);
   // No kickers, no 01-04 numerals, no copper accent word in the heading.
   assert.doesNotMatch(walk, /kicker|padStart|<em>/);
-  // The record chapter shows the record, not a 200-word summary in the prose.
-  assert.doesNotMatch(walk, /recordSpotlight\.summary\} It is one pin/);
-  assert.match(walk, /ds-door-walk__record-line/);
-  assert.match(css, /\.ds-door-walk__record-line\s*\{[^}]*-webkit-line-clamp:\s*3/);
-  // The UI never tells the reader to scrub a control the card does not have.
-  assert.doesNotMatch(walk, /Scrub/);
   // Focus follows the step the reader chose.
   assert.match(immersive, /walkHeadingRef\.current\)\?\.focus/);
 });
@@ -99,9 +110,11 @@ test('the walk is one docked card with progress, Back, Next and a way to the map
 test('the spotlight is a callout on its pin, kept inside the uncovered map window', () => {
   assert.match(immersive, /<DoorSpotlightCallout/);
   assert.match(immersive, /frameRef=\{windowRef\}/);
-  assert.match(immersive, /active=\{step === 0 && plateState === 'live' && !browseMode\}/);
+  // The callout follows the record on screen: the opening's, then each decade's.
+  assert.match(immersive, /active=\{plateState === 'live' && !browseMode\}/);
+  assert.match(immersive, /lngLat=\{current\.lngLat\}/);
   // The mark follows the record's stored precision, never sharper (P-03).
-  assert.match(immersive, /mark=\{recordMarkFor\(spotlight\.precision\)\}/);
+  assert.match(immersive, /mark=\{recordMarkFor\(current\.precision\)\}/);
   // The window excludes the dock on every layout, so the callout cannot cover the headline.
   assert.match(
     css,
@@ -166,17 +179,16 @@ test('the Door has one map: no static board, no layout zoom, no pin plate', () =
 test('the plate is framed against the Door window and re-framed on resize', () => {
   assert.match(immersive, /ds-door__window/);
   assert.match(immersive, /doorFramePadding\(windowBox, plateBox\)/);
-  assert.match(immersive, /doorFrameOffset\(windowBox, plateBox\)/);
   // The introduction overlays the map, rather than shrinking it into a strip above the copy.
   assert.doesNotMatch(immersive, /bottomChrome|openSheetRef/);
   // The canvas box comes from MapLibre's own container through the stage handle, never from a
   // class-name query into another component's DOM.
   assert.match(immersive, /boxOf\(map\.getContainer\(\)\)/);
   assert.doesNotMatch(immersive, /querySelector[^\n]*ds-map-stage/);
-  // A national chapter is the Atlas's own national preset, fitted inside the window.
+  // The walk holds the country: the Atlas's own national preset, fitted inside the window.
   assert.match(immersive, /stage\.flyPreset\(\s*'national',\s*\{ bounds: US_CONUS_BOUNDS \}/);
   assert.match(immersive, /mode: cut \? 'cut' : 'ease'/);
-  assert.match(immersive, /pitch: camera\.pitch,\s*bearing: camera\.bearing/);
+  assert.match(immersive, /pitch: 0,\s*bearing: 0/);
   // The phone strip is shorter than the country at the Instrument's floor; the fit may sink it.
   assert.match(immersive, /zoomFloor: 'fit'/);
   // The first frame after mount is a cut, so a warm plate is never seen arriving from elsewhere.
@@ -195,8 +207,6 @@ test('the plate is framed against the Door window and re-framed on resize', () =
     /stage\.resize\(\);(?:\s*\/\/[^\n]*\n)*\s*applyCamera\(!map\.isMoving\(\)\)/,
   );
   assert.match(immersive, /sameDoorFrameBox/);
-  // Re-showing the chapter already on the plate must not restart its flight.
-  assert.match(immersive, /if \(chapter\.id === lastChapterIdRef\.current\) return;/);
 });
 
 test('the reveal waits for both the plate and this mount, and never gates on a stale attribute', () => {
@@ -214,19 +224,12 @@ test('the reveal waits for both the plate and this mount, and never gates on a s
   );
 });
 
-test('the sweep chapter clears the plate first, then fills it cumulatively', () => {
-  // Chapter 5 is "watch the record fill": an empty country, held, then four centuries arriving
-  // on it. A sweep that opened on the first decade with every other pin still up would be a
-  // histogram scrub, not a fill.
-  assert.match(immersive, /onClear: \(\) => setSweepDecade\(decadeRange\.from - 10\)/);
-  assert.match(immersive, /clearHoldMs:/);
-  assert.match(immersive, /onDecade: setSweepDecade/);
-  // Cumulative, not a one-decade window: a record enters at its earliest decade and stays.
-  assert.match(immersive, /decade !== null && decade <= sweepDecade/);
-  // The whole archive comes back when the sweep lands, undated records included.
-  assert.match(immersive, /onDone: \(\) => setSweepDecade\(null\)/);
-  // The clearing frame crossdissolves; removing pins from the source is otherwise instant.
-  assert.match(immersive, /clearingPlateRef\.current \? \{ fade: true \} : undefined/);
+test('the walk fills the map cumulatively, decade by decade', () => {
+  // A record enters at its earliest decade and stays; the opening shows the whole archive.
+  assert.match(immersive, /const shownDecade = step === 0 \? null/);
+  assert.match(immersive, /decade !== null && decade <= shownDecade/);
+  // The map never flies between decades: it fills.
+  assert.doesNotMatch(immersive, /map\.flyTo|CHAPTER_FLIGHT_MS|sweep\(/);
 });
 
 test('the Door and Explore rest on one national-field patch', () => {
@@ -259,17 +262,20 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
   // No viewport-height chapters: the dead space between cards is gone.
   assert.doesNotMatch(css, /ds-door-journey__chapter|ds-door-journey__card/);
   assert.doesNotMatch(css, /mix-blend-mode:\s*multiply/);
-  // Flat material: no glass or glow, and no scrim. The only gradient is the mask that fades a walk
-  // body with more below.
-  const scrimFree = css.replace(/\.ds-door-walk__body\[data-more='true'\]\s*\{[^}]*\}/g, '');
-  assert.doesNotMatch(
-    scrimFree.replace(/box-shadow:\s*var\(--ds-contact-[a-z]+\);/g, ''),
-    /radial-gradient|linear-gradient|box-shadow:\s*0 0 [1-9]|backdrop-filter/,
-  );
-  // The opening is a solid block under the text (no fading scrim), so no group ghosts through
-  // the headline.
+  // Living archive (owner lifted the flat-material bans, 2026-11-15): depth comes from offset
+  // shadows and lamplight, never a zero-offset halo.
+  assert.doesNotMatch(css, /box-shadow:\s*0 0 [1-9]/);
+  // No generated imagery anywhere (owner decision 2026-11-15): the drawn street and its scene
+  // layer are gone, and the only image on the opening is a record's own photograph as a plate.
+  assert.doesNotMatch(css + immersive, /ds-door__scene|hero-places|components\/art/);
+  // The opening is a solid column in the table's ground beside the map, not glass over it, so
+  // nothing ghosts through the headline.
   assert.doesNotMatch(css, /\.ds-door-journey::before/);
-  assert.match(css, /\.ds-door-open \{[^}]*padding:[^}]*border-radius: var\(--ds-radius-md\)/);
+  assert.doesNotMatch(immersive, /ds-door-open ds-float/);
+  assert.match(
+    css,
+    /\.ds-door-open,\s*\.ds-door-walk \{[^}]*padding:[^}]*border-radius: var\(--ds-radius-md\);[^}]*background: var\(--ds-canvas\)/,
+  );
   // Radii are 8 / 14 only here: no pills, and uppercase mono stays on data.
   assert.doesNotMatch(css, /--ds-radius-full|999px|text-transform:\s*uppercase(?![^}]*ds-hero)/);
   // The column shares the header's left edge (the wide container) and sits 48px off the bottom.
@@ -308,6 +314,31 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
   assert.doesNotMatch(immersive, /door-plate-labels|addLayer\(/);
 });
 
+test('the opening leads with one record the way its record page shows it', () => {
+  // Name, plate with its credit, one claim in the claims block's language.
+  assert.match(immersive, /opening \? \(\s*<DoorRecordBlock record=\{opening\}/);
+  assert.match(block, /<RecordImage[\s\S]*image=\{record\.plate\}[\s\S]*plate/);
+  assert.match(block, /<EvidenceList items=\{\[record\.claim\]\} \/>/);
+  // Quiet records never come up on home, and a rendering is never shown as a plate.
+  assert.match(records, /if \(!entity \|\| isQuietRecord\(entity\)\) continue;/);
+  assert.match(records, /!isRenderedImage\(entity\.primaryImage\)/);
+  // A disputed or retracted claim stays on the record page, beside its note.
+  assert.match(records, /!card\.dispute\?\.hasDispute && !card\.retraction/);
+});
+
+test('below the fold: no count-up, no card rows, no grade letters in boxes, no lamplight', () => {
+  assert.doesNotMatch(chaptersTsx + door, /CountUp|ds-sheet--lift|ds-door-ch__sheets|ds-field/);
+  assert.doesNotMatch(css, /ds-door-ch__grade-mark|ds-door-ch__sheet|ds-door-ch__bar/);
+  // The grades are one ruled row: glyph and word, as the claims block prints a grade.
+  assert.match(chaptersTsx, /confidenceTierPhrase\(level\)/);
+  assert.match(
+    css,
+    /\.ds-door-ch__grades \{[^}]*border-top: var\(--ds-border-width-strong\) solid/,
+  );
+  // The first band after the map is the table's ground: dark in the dark theme, never paper.
+  assert.match(chaptersTsx, /tone="ink"\s+className="ds-door-ch ds-door-ch--evidence"/);
+});
+
 test('door-home CSS steps the headline down on a phone', () => {
   assert.match(css, /ds-door-open__headline[\s\S]*clamp\(/);
   assert.match(
@@ -317,7 +348,7 @@ test('door-home CSS steps the headline down on a phone', () => {
 });
 
 test('DoorImmersive hands every record to the plate', () => {
-  assert.match(immersive, /spotlightPinId/);
+  assert.match(immersive, /const selectedPinId = current\?\.pinId \?\? null/);
   assert.doesNotMatch(immersive, /catalogFeatures/);
   assert.doesNotMatch(immersive, /resolveDoorFocusPinId/);
   assert.doesNotMatch(immersive, /thinDoorNationalPins/);

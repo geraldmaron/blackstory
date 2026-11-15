@@ -419,30 +419,53 @@
    * display-1 is reserved for the one dominant element on a surface (principle 02, one idea per
    * surface at full scale). A room with two display-1s has no hierarchy again.
    */
-  /* The ledger room masthead (docs/ui/design-direction-v10-rooms.md). One per surface, and only
-     where the headline is a sentence; display-1 stays the ceiling everywhere else. */
-  /* Art direction v2: page titles at 56-120px and display numerals at 72-200px. */
-  --ds-text-display-numeral: clamp(4.5rem, 1.6rem + 11vw, 12.5rem);
-  --ds-text-display-title: clamp(3.5rem, 1.9rem + 5.6vw, 7.5rem);
+  /*
+   * Type roles (living archive, owner direction 2026-11-15). Size was the only contrast axis
+   * when every headline sat at weight 600; weight is an axis now, so each role owns a size AND a
+   * weight. Seven roles, and a surface picks which role a thing is, never what it measures:
+   *
+   *   display    Schibsted 800, once per surface (the home opening, a page title)
+   *   headline   Schibsted 700, a section or chapter title
+   *   title      Schibsted 650, a card, a row, a sub-section
+   *   body       Geist 400, 16-17px
+   *   editorial  Newsreader 400, ledes and prose, 17-20px
+   *   meta       Geist Mono caps, dates, counts, citations
+   *   numeral    Schibsted 800 figures
+   *
+   * The older display-title / display-hero / display-1 names stay as aliases onto these roles so
+   * untouched surfaces shrink with the system instead of keeping 111px headings.
+   */
+  --ds-text-display: clamp(3rem, 1rem + 7vw, 6.5rem);
+  --ds-text-headline: clamp(2rem, 1.2rem + 3vw, 3.5rem);
+  --ds-text-meta: 0.8125rem;
+  --ds-text-numeral: clamp(3rem, 1.5rem + 4.5vw, 5.5rem);
+  --ds-weight-display: 800;
+  --ds-weight-headline: 700;
+  --ds-weight-title: 650;
+  --ds-weight-numeral: 800;
+  --ds-tracking-meta: 0.04em;
+
+  --ds-text-display-numeral: var(--ds-text-numeral);
+  --ds-text-display-title: var(--ds-text-display);
   --ds-tracking-numeral: -0.04em;
   /* Tall enough that the line box holds the digits and a count's comma: a rule or a line set
      under a numeral meets the glyphs' edge, never cuts them. */
   --ds-leading-numeral: 0.92;
-  --ds-text-display-hero: clamp(2.75rem, 1.3rem + 6vw, 6rem);
-  --ds-text-display-1: clamp(2.5rem, 1.4rem + 4.6vw, 5rem);
-  --ds-text-display-2: clamp(2rem, 1.35rem + 2.7vw, 3.25rem);
+  --ds-text-display-hero: var(--ds-text-display);
+  --ds-text-display-1: var(--ds-text-headline);
+  --ds-text-display-2: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
   --ds-text-display-3: clamp(1.5rem, 1.22rem + 1.2vw, 2.125rem);
-  --ds-text-title: clamp(1.1875rem, 1.08rem + 0.45vw, 1.4375rem);
+  --ds-text-title: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
   --ds-text-subtitle: 1.0625rem;
   --ds-text-body: 1rem;
   --ds-text-body-sm: 0.9375rem;
   --ds-text-caption: 0.8125rem;
   --ds-text-micro: 0.6875rem;
   --ds-text-editorial-lede: clamp(1.125rem, 1rem + 0.55vw, 1.4375rem);
-  --ds-text-editorial: 1.0625rem;
+  --ds-text-editorial: clamp(1.0625rem, 1rem + 0.15vw, 1.1875rem);
 
   /* Tracking tightens as size grows; mono and caption open up so data stays scannable. */
-  --ds-tracking-display: -0.024em;
+  --ds-tracking-display: -0.03em;
   --ds-tracking-title: -0.016em;
   --ds-tracking-body: 0;
   --ds-tracking-caption: 0.01em;
@@ -537,6 +560,14 @@
   --ds-duration-chapter: 1200ms;
   --ds-stagger-beat: 90ms;
 
+  /*
+   * Living-archive motion: each move played once. A line drawing draws itself in (a mask wipe), a
+   * ground slides in (`<Block wipe>`). Content is visible before either runs, and both collapse to
+   * instant under reduced motion (below). No count-up: a number is printed at its value.
+   */
+  --ds-duration-draw: 1600ms;
+  --ds-ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+
   --ds-grid-max: 72rem;
   --ds-content-max: 38rem;
   --ds-gutter: var(--ds-space-4);
@@ -592,6 +623,52 @@
                         shortcut sheet or collections drawer is open) */
   --ds-z-nav-drawer: 100;
   --ds-z-a11y-escape: 1000; /* skip-link and visually-hidden focus escape hatches */
+}
+
+/*
+ * Depth planes (living archive, owner direction 2026-11-15; the owner lifted the old bans on
+ * gradients, glow, glass, shadow and grain for this redesign). Four planes, deepest first:
+ *
+ *   field   the masthead ground (.ds-field), plain: a real sourced photograph leading a page
+ *           stands in it as a toned plate (.ds-plate). No lamplight, vignette or grain.
+ *   ground  the section band: ink, paper, sand or copper (`data-ground`, `<Block wipe>`)
+ *   sheet   reading paper with a real layered shadow; a linked sheet lifts on hover (.ds-sheet)
+ *   float   header, map chrome, dialogs: glass with a backdrop blur over the map (.ds-float)
+ *
+ * Rule: never more than about two screens on one plane before the ground changes.
+ * The memorial is exempt from plates and motion; so is a violence-adjacent record.
+ */
+:root {
+  --ds-shadow-sheet:
+    0 1px 1px rgb(10 10 10 / 6%), 0 4px 12px -2px rgb(10 10 10 / 7%),
+    0 22px 48px -18px rgb(10 10 10 / 18%);
+  --ds-shadow-lift:
+    0 2px 2px rgb(10 10 10 / 6%), 0 10px 22px -6px rgb(10 10 10 / 12%),
+    0 36px 70px -24px rgb(10 10 10 / 26%);
+  --ds-shadow-float:
+    0 1px 2px rgb(10 10 10 / 8%), 0 12px 32px -8px rgb(10 10 10 / 16%),
+    0 40px 80px -30px rgb(10 10 10 / 22%);
+  --ds-float-edge: rgb(10 10 10 / 10%);
+  --ds-float-alpha: 76%;
+  /* A plate tones a real photograph in two inks: the shadows in ink, the lights in warm paper
+     (light theme) or copper (dark theme). Never applied to a generated image; there are none. */
+  --ds-plate-lo: #1b130d;
+  --ds-plate-hi: #ecd8bf;
+}
+
+[data-theme='dark'] {
+  --ds-shadow-sheet:
+    0 1px 1px rgb(0 0 0 / 40%), 0 6px 14px -2px rgb(0 0 0 / 38%), 0 26px 56px -18px rgb(0 0 0 / 60%);
+  --ds-shadow-lift:
+    0 2px 2px rgb(0 0 0 / 40%), 0 14px 26px -6px rgb(0 0 0 / 46%),
+    0 44px 80px -24px rgb(0 0 0 / 70%);
+  --ds-shadow-float:
+    0 1px 2px rgb(0 0 0 / 50%), 0 14px 36px -8px rgb(0 0 0 / 50%),
+    0 44px 90px -30px rgb(0 0 0 / 70%);
+  --ds-float-edge: rgb(244 239 229 / 10%);
+  --ds-float-alpha: 70%;
+  --ds-plate-lo: #0a0a0a;
+  --ds-plate-hi: #d8a178;
 }
 
 /*
@@ -665,5 +742,6 @@
     --ds-duration-cinematic: 0.01ms;
     --ds-duration-chapter: 0.01ms;
     --ds-stagger-beat: 0ms;
+    --ds-duration-draw: 0.01ms;
   }
 }

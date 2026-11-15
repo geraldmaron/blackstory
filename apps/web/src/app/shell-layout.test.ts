@@ -148,13 +148,22 @@ describe('horizontal overflow guards', () => {
     );
   });
 
-  it('Explore chrome is matte surface, not shop blur or elevation', () => {
+  it('the header is glass over the map, solid when the reader asks for less transparency', () => {
+    // Living archive float plane (owner lifted the glass ban, 2026-11-15).
     const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
+    assert.match(commandBarCss, /\.ds-bar\s*\{[^}]*backdrop-filter:\s*blur/s);
+    assert.match(
+      commandBarCss,
+      /prefers-reduced-transparency: reduce\)\s*\{\s*\.ds-bar\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+    );
+    assert.doesNotMatch(commandBarCss, /box-shadow:\s*0\s+\d+px/, 'command-bar must not elevate');
+  });
+
+  it('Explore chrome is matte surface, not shop blur or elevation', () => {
     const mapCss = (file: string) =>
       readFileSync(join(here, '../components/map-experience', file), 'utf8');
     const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
     for (const [name, source] of [
-      ['command-bar', commandBarCss],
       ['column', mapCss('explore-column.css')],
       ['list', mapCss('explore-record-list.css')],
       ['inspector', mapCss('record-inspector.css')],
@@ -173,17 +182,18 @@ describe('horizontal overflow guards', () => {
 });
 
 describe('shell footer theme tokens', () => {
-  // The footer sits on the page ground above a hairline: no card, no fixed charcoal, and copper
-  // nowhere (copper is for the current thing and the one primary action).
-  it('styles the footer as a copper block closing on a sand band, its type from the ground', () => {
-    assert.doesNotMatch(shellCss, /\.ds-shell-footer__card/);
-    // The grounds set every color: ink type on copper and on sand, never a hardcoded hex.
+  // The footer is plain navigation on the table's ground: no slogan, no card, no copper block,
+  // and every color from the ground.
+  it('styles the footer as plain navigation on the table ground, its type from the ground', () => {
+    assert.doesNotMatch(shellCss, /\.ds-shell-footer__card|\.ds-shell-footer__line/);
     const footer = readFileSync(join(here, '../components/SiteFooter.tsx'), 'utf8');
-    assert.match(footer, /className="ds-shell-footer" data-ground="copper"/);
-    assert.match(footer, /className="ds-shell-footer__legal" data-ground="sand"/);
+    assert.match(footer, /className="ds-shell-footer" data-ground="ink"/);
+    assert.doesNotMatch(footer, /<Sheet|History, pinned to place|data-ground="(copper|sand)"/);
+    // The AI-help disclosure stays.
+    assert.match(footer, /AI helps with the research and drafting here/);
     assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     const footerRules = shellCss.slice(
-      shellCss.indexOf('/* —— Footer: a copper block'),
+      shellCss.indexOf('/* —— Footer: plain navigation'),
       shellCss.indexOf('/* Maker credit'),
     );
     assert.doesNotMatch(footerRules, /#[0-9a-f]{3,6}\b/i);

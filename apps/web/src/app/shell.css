@@ -160,10 +160,11 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   margin-inline: auto;
 }
 
-/* —— Footer: a copper block closing on a sand band ———————————————————————————— */
+/* —— Footer: plain navigation on the table's ground, a rule over the legal row ———————————— */
 .ds-shell-footer {
   margin-top: auto;
   scroll-margin-top: var(--ds-island-clearance);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-shell-footer__inner {
@@ -171,19 +172,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   gap: var(--ds-space-12);
   width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
   margin-inline: auto;
-  padding-block: var(--ds-space-18) var(--ds-space-12);
-}
-
-/* The core line at display scale, ink on copper. It may run two lines and bleed to the edge. */
-.ds-shell-footer__line {
-  max-width: 14ch;
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-title);
-  font-weight: 600;
-  line-height: 0.9;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
+  padding-block: var(--ds-space-12) var(--ds-space-8);
 }
 
 .ds-shell-footer__top {
@@ -199,7 +188,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 .ds-shell-footer__brand {
-  --ds-lockup-size: 4.5rem;
+  --ds-lockup-size: 3.5rem;
 }
 
 .ds-shell-footer__note {
@@ -253,6 +242,10 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   text-underline-offset: 0.2em;
 }
 
+.ds-shell-footer__legal {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
 .ds-shell-footer__meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -266,6 +259,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 
 .ds-shell-footer__meta {
   margin: 0;
+  color: var(--ds-ink-muted);
 }
 
 .ds-shell-footer__policy {
@@ -1094,6 +1088,22 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
+}
+
+/* A rendering says what it is before its credit, so it is never read as a photograph. */
+.ds-entity-photo__caption {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-entity-photo__caption .ds-entity-photo__credit {
+  margin-top: var(--ds-space-1);
+}
+
+.ds-entity-photo__kind {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
 }
 
 .ds-entity-photo--mark .ds-entity-mark {
