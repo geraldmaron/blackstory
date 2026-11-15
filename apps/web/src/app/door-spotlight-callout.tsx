@@ -26,6 +26,7 @@ import {
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './map/explore-layer-ids';
 import { DoorRecordLink } from './door-record-link';
+import { queryRenderedLayers } from '../components/map-stage/query-rendered';
 
 void React;
 
@@ -168,13 +169,11 @@ export function placeCallout(
 
 /** The plate's group circles and record marks on screen, as boxes the card should not cover. */
 function markObstacles(map: EventedMap, plate: DOMRect): Box[] {
-  // Before the entity layers mount (a cold load, a style rebuild) there is nothing to avoid, and
-  // querying a missing layer throws.
-  const layers = [EXPLORE_CLUSTER_LAYER_ID, EXPLORE_UNCLUSTERED_POINT_LAYER_ID].filter((id) =>
-    map.getLayer(id),
-  );
-  if (layers.length === 0) return [];
-  const features = map.queryRenderedFeatures(undefined, { layers });
+  // Before the entity layers mount (a cold load, a style rebuild) there is nothing to avoid.
+  const features = queryRenderedLayers<{ geometry: unknown; properties: unknown }>(map, undefined, [
+    EXPLORE_CLUSTER_LAYER_ID,
+    EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  ]);
   return features.map((feature) => {
     const count = Number((feature.properties as { point_count?: number }).point_count ?? 0);
     const radius =

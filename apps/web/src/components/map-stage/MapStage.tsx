@@ -42,6 +42,7 @@ import type {
 } from 'maplibre-gl';
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { queryRenderedLayers } from './query-rendered';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
@@ -1452,9 +1453,12 @@ export function MapStageProvider({
        * the record sheet instead of selecting the state fill underneath.
        */
       function pointerHitAt(point: { x: number; y: number }) {
-        const layers = ENTITY_POINTER_HIT_LAYER_IDS.filter((id) => activeMap.getLayer(id));
-        if (layers.length === 0) return undefined;
-        const features = activeMap.queryRenderedFeatures(pointerHitBox(point), { layers });
+        if (!ENTITY_POINTER_HIT_LAYER_IDS.some((id) => activeMap.getLayer(id))) return undefined;
+        const features = queryRenderedLayers<MapLibreNamespace.MapGeoJSONFeature>(
+          activeMap,
+          pointerHitBox(point),
+          ENTITY_POINTER_HIT_LAYER_IDS,
+        );
         return resolveEntityPointerHit(
           features.map((feature) => ({
             layerId: feature.layer.id,

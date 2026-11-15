@@ -22,6 +22,7 @@ import {
 import type { EntityPointerHit } from '../../lib/map-experience/entity-pointer-hit';
 import type { ExploreViewportFrame } from '../../lib/map-experience/url-state';
 import { readViewport } from './viewport-geometry';
+import { queryRenderedLayers } from './query-rendered';
 
 /**
  * The padded entity/cluster hit test. A defined result means the pin path owns this pointer, so
@@ -93,13 +94,10 @@ export function bindPlateClickListeners(map: MapLibreMap, wiring: PlateClickWiri
     if (wiring.pointerHitAt(event.point)) return;
     // State fills are the ground, not a target: they cover every inch of U.S. land, so counting
     // them made a tap on "empty" map anywhere in the country never read as empty.
-    const hitLayers = [
+    const hits = queryRenderedLayers(map, event.point, [
       EXPLORE_HISTORY_EDGES_LAYER_ID,
       EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-    ].filter((id) => map.getLayer(id));
-    const hits = hitLayers.length
-      ? map.queryRenderedFeatures(event.point, { layers: hitLayers })
-      : [];
+    ]);
     if (hits.length > 0) return;
     wiring.onActivate(readViewport(map));
   }

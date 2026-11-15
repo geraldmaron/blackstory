@@ -39,6 +39,7 @@ import { renderedAnchorFor } from '../../lib/map-experience/record-marks';
 import { abbreviate } from '../../lib/map-experience/place-map';
 import type { RecordPlace } from '../../lib/map-experience/record-place';
 import { bindRecordName } from '../map-stage/place-labels';
+import { queryRenderedLayers } from '../map-stage/query-rendered';
 import { fetchCountyPolygons, fetchStatePolygons } from '../map-stage/geo-source-loaders';
 import { readDocumentColorScheme } from '../map-stage/color-scheme';
 import { attachSafariPageZoomGuard } from '../map-stage/custom-rotate-gestures';
@@ -80,8 +81,7 @@ type Ring = readonly (readonly [number, number])[];
  * can always tell where the mark is. Widening only ever shows less precision, never more.
  */
 function widenUntilNamed(map: MapLibreMap, done: () => void): void {
-  const layers = NAMED_PLACE_LAYERS.filter((id) => map.getLayer(id));
-  const named = layers.length > 0 && map.queryRenderedFeatures({ layers }).length > 0;
+  const named = queryRenderedLayers(map, undefined, NAMED_PLACE_LAYERS).length > 0;
   if (named || map.getZoom() <= EMBED_CONTEXT_MIN_ZOOM) {
     done();
     return;

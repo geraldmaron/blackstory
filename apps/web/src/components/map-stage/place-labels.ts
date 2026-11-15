@@ -7,6 +7,7 @@
  * on the map layers too, so the labels never take a pointer event.
  */
 import type { Map as MapLibreMap, MapGeoJSONFeature } from 'maplibre-gl';
+import { queryRenderedLayers } from './query-rendered';
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_PLACE_NAME_LAYER_ID,
@@ -85,7 +86,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
   let frame = 0;
 
   const query = (layerId: string) =>
-    map.getLayer(layerId) ? map.queryRenderedFeatures({ layers: [layerId] }) : [];
+    queryRenderedLayers<MapGeoJSONFeature>(map, undefined, [layerId]);
 
   function update(): void {
     frame = 0;
