@@ -109,10 +109,6 @@ type Point = { readonly lat: number; readonly lng: number };
 
 /* Small pure helpers. */
 
-function plural(count: number, noun: string): string {
-  return `${count.toLocaleString('en-US')} ${noun}${count === 1 ? '' : 's'}`;
-}
-
 function paragraphs(text: string | undefined): readonly string[] {
   return (text ?? '')
     .split(/\n\s*\n/)

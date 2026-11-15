@@ -59,6 +59,6 @@ test('the sticky rail stops where the body ends, above the record file', () => {
   );
   const desktop = recordCss.slice(recordCss.indexOf('@media (min-width: 64rem)'));
   assert.match(desktop, /\.ds-recpage__grid \{\s*grid-template-areas:\s*'main'\s*'file';/);
-  assert.match(desktop, /\.ds-recpage__main \{[^}]*display: grid;[^}]*'body  rail';/s);
+  assert.match(desktop, /\.ds-recpage__main \{[^}]*display: grid;[^}]*'body {2}rail';/s);
   assert.doesNotMatch(desktop, /'file\s+file'/);
 });
