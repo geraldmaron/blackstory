@@ -20,7 +20,7 @@ import {
 } from './about-copy';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { Prose, RoomFactList, RoomJump, RoomSection } from '../../components/room';
-import { TrustFlow, TrustLinks } from '../../components/trust';
+import { TrustBand, TrustFlow, TrustLinks, TrustSheet } from '../../components/trust';
 import { RecordsByState, type StateCount } from './RecordsByState';
 
 void React;
@@ -62,130 +62,140 @@ export function AboutSections({ states }: AboutSectionsProps) {
 
   return (
     <>
-      <RoomJump sections={ABOUT_JUMP} />
+      <TrustSheet>
+        <RoomJump sections={ABOUT_JUMP} />
 
-      <RoomSection id="origin" title="Why this exists">
-        <LeadThenProse paragraphs={ABOUT_ORIGIN} />
-      </RoomSection>
+        <RoomSection id="origin" title="Why this exists">
+          <LeadThenProse paragraphs={ABOUT_ORIGIN} />
+        </RoomSection>
 
-      <RoomSection id="stance" title={ABOUT_STANCE.heading}>
-        <LeadThenProse paragraphs={ABOUT_STANCE.paragraphs} />
-        <Prose>
-          <p>
-            {ABOUT_STANCE.maker.lead}{' '}
-            <a href={ABOUT_STANCE.maker.href} rel="noopener noreferrer">
-              {ABOUT_STANCE.maker.label}
-            </a>
-            .
+        <RoomSection id="stance" title={ABOUT_STANCE.heading}>
+          <LeadThenProse paragraphs={ABOUT_STANCE.paragraphs} />
+          <Prose>
+            <p>
+              {ABOUT_STANCE.maker.lead}{' '}
+              <a href={ABOUT_STANCE.maker.href} rel="noopener noreferrer">
+                {ABOUT_STANCE.maker.label}
+              </a>
+              .
+            </p>
+          </Prose>
+        </RoomSection>
+
+        <RoomSection id="pillars" title="What every record stands on">
+          <p className="ds-trust-lead">
+            Four rules travel with every record, enforced where the record is built, so you can
+            check each one on any record page instead of taking it on faith.
           </p>
-        </Prose>
-      </RoomSection>
+          {states === undefined || states.counts.length === 0 ? null : (
+            <RecordsByState states={states.counts} totalRecords={states.total} />
+          )}
+          <RoomFactList items={ABOUT_PILLARS} />
+          <TrustLinks
+            links={[
+              {
+                href: ABOUT_SOURCE_LIBRARY_HANDOFF.href,
+                title: ABOUT_SOURCE_LIBRARY_HANDOFF.label,
+                line: 'Every publisher the archive cites, and how many records cite it.',
+              },
+              {
+                href: '/methodology#evidence-grades',
+                title: 'What the grades mean',
+                line: 'The one rule that sets a record’s grade, and what moves it.',
+              },
+            ]}
+          />
+        </RoomSection>
+      </TrustSheet>
 
-      <RoomSection id="pillars" title="What every record stands on">
-        <p className="ds-trust-lead">
-          Four rules travel with every record, enforced where the record is built, so you can check
-          each one on any record page instead of taking it on faith.
-        </p>
-        {states === undefined || states.counts.length === 0 ? null : (
-          <RecordsByState states={states.counts} totalRecords={states.total} />
-        )}
-        <RoomFactList items={ABOUT_PILLARS} />
-        <TrustLinks
-          links={[
-            {
-              href: ABOUT_SOURCE_LIBRARY_HANDOFF.href,
-              title: ABOUT_SOURCE_LIBRARY_HANDOFF.label,
-              line: 'Every publisher the archive cites, and how many records cite it.',
-            },
-            {
-              href: '/methodology#evidence-grades',
-              title: 'What the grades mean',
-              line: 'The one rule that sets a record’s grade, and what moves it.',
-            },
-          ]}
-        />
-      </RoomSection>
+      {/* How the writing is made stands on its own ink band, and what the archive will not do on
+          sand: the page changes ground between chapters instead of running one sheet. */}
+      <TrustBand tone="ink" fixed>
+        <RoomSection id="neo" title={ABOUT_NEO.heading}>
+          <Prose>
+            {ABOUT_NEO.rules.slice(0, 2).map((paragraph) => (
+              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+            ))}
+          </Prose>
+          <TrustFlow caption="What every piece of writing goes through" steps={ABOUT_NEO.steps} />
+          <Prose>
+            {ABOUT_NEO.rules.slice(2).map((paragraph) => (
+              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+            ))}
+            {ABOUT_NEO.human.map((paragraph) => (
+              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+            ))}
+            <p>{ABOUT_NEO.hand}</p>
+            <p>{ABOUT_NEO.photographs}</p>
+          </Prose>
+        </RoomSection>
+      </TrustBand>
 
-      <RoomSection id="neo" title={ABOUT_NEO.heading}>
-        <Prose>
-          {ABOUT_NEO.rules.slice(0, 2).map((paragraph) => (
-            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-          ))}
-        </Prose>
-        <TrustFlow caption="What every piece of writing goes through" steps={ABOUT_NEO.steps} />
-        <Prose>
-          {ABOUT_NEO.rules.slice(2).map((paragraph) => (
-            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-          ))}
-          {ABOUT_NEO.human.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-          ))}
-          <p>{ABOUT_NEO.hand}</p>
-          <p>{ABOUT_NEO.photographs}</p>
-        </Prose>
-      </RoomSection>
+      <TrustBand tone="sand">
+        <RoomSection id="refusals" title="What it will not do">
+          <ul className="ds-trust-list" aria-label="What it will not do">
+            {ABOUT_REFUSALS.map((refusal) => {
+              const stop = refusal.indexOf('. ');
+              return (
+                <li key={refusal.slice(0, 40)}>
+                  <strong>{stop > 0 ? refusal.slice(0, stop + 1) : refusal}</strong>
+                  {stop > 0 ? ` ${refusal.slice(stop + 2)}` : null}
+                </li>
+              );
+            })}
+          </ul>
+          <TrustLinks
+            links={[
+              {
+                href: '/methodology',
+                title: 'Methodology',
+                line: 'How each of those is decided.',
+              },
+              {
+                href: '/errata',
+                title: 'Errata',
+                line: 'Everything the archive has already gotten wrong and fixed.',
+              },
+            ]}
+          />
+        </RoomSection>
+      </TrustBand>
 
-      <RoomSection id="refusals" title="What it will not do">
-        <ul className="ds-trust-list" aria-label="What it will not do">
-          {ABOUT_REFUSALS.map((refusal) => {
-            const stop = refusal.indexOf('. ');
-            return (
-              <li key={refusal.slice(0, 40)}>
-                <strong>{stop > 0 ? refusal.slice(0, stop + 1) : refusal}</strong>
-                {stop > 0 ? ` ${refusal.slice(stop + 2)}` : null}
-              </li>
-            );
-          })}
-        </ul>
-        <TrustLinks
-          links={[
-            {
-              href: '/methodology',
-              title: 'Methodology',
-              line: 'How each of those is decided.',
-            },
-            {
-              href: '/errata',
-              title: 'Errata',
-              line: 'Everything the archive has already gotten wrong and fixed.',
-            },
-          ]}
-        />
-      </RoomSection>
+      <TrustSheet>
+        <RoomSection id="contribute" title={ABOUT_CONTRIBUTE.heading}>
+          <LeadThenProse paragraphs={[ABOUT_CONTRIBUTE.lede, ABOUT_CONTRIBUTE.terms]} />
+          <Prose>
+            <p>
+              {ABOUT_CONTRIBUTE.direct} <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>
+            </p>
+          </Prose>
+          <TrustLinks
+            label="Ways to add to it"
+            links={takePartRooms.map((destination) => ({
+              href: destination.path,
+              title: cardTitleFor(destination),
+              ...(destination.description === undefined ? {} : { line: destination.description }),
+            }))}
+          />
+        </RoomSection>
 
-      <RoomSection id="contribute" title={ABOUT_CONTRIBUTE.heading}>
-        <LeadThenProse paragraphs={[ABOUT_CONTRIBUTE.lede, ABOUT_CONTRIBUTE.terms]} />
-        <Prose>
-          <p>
-            {ABOUT_CONTRIBUTE.direct} <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>
-          </p>
-        </Prose>
-        <TrustLinks
-          label="Ways to add to it"
-          links={takePartRooms.map((destination) => ({
-            href: destination.path,
-            title: cardTitleFor(destination),
-            ...(destination.description === undefined ? {} : { line: destination.description }),
-          }))}
-        />
-      </RoomSection>
+        <RoomSection id="begin" title="Where to begin">
+          <p className="ds-trust-lead">{ABOUT_ROOMS_HANDOFF.lede}</p>
+          <TrustLinks
+            links={[
+              {
+                href: ABOUT_ROOMS_HANDOFF.href,
+                title: ABOUT_ROOMS_HANDOFF.label,
+                line: ABOUT_ROOMS_HANDOFF.line,
+              },
+            ]}
+          />
+        </RoomSection>
 
-      <RoomSection id="begin" title="Where to begin">
-        <p className="ds-trust-lead">{ABOUT_ROOMS_HANDOFF.lede}</p>
-        <TrustLinks
-          links={[
-            {
-              href: ABOUT_ROOMS_HANDOFF.href,
-              title: ABOUT_ROOMS_HANDOFF.label,
-              line: ABOUT_ROOMS_HANDOFF.line,
-            },
-          ]}
-        />
-      </RoomSection>
-
-      <div className="ds-about-page__foot">
-        <MakerCredit variant="inline" />
-      </div>
+        <div className="ds-about-page__foot">
+          <MakerCredit variant="inline" />
+        </div>
+      </TrustSheet>
     </>
   );
 }

@@ -74,7 +74,8 @@ export default async function ErrataPage({ searchParams }: ErrataPageProps) {
   const dek =
     latest === undefined
       ? 'Every change to a published record lands here, with its date. Nothing on this site is edited quietly.'
-      : `${all.length} published changes, the latest on ${MONTH.format(new Date(errataDate(latest.timestamp)))}. Nothing on this site is edited quietly.`;
+      : // The count is the mast numeral's (read aloud with its label); the dek gives the date.
+        `The latest landed on ${MONTH.format(new Date(errataDate(latest.timestamp)))}. Nothing on this site is edited quietly.`;
 
   const present = ERRATA_CHANGE_TYPES.filter((kind) =>
     all.some((entry) => entry.changeType === kind),
@@ -93,7 +94,6 @@ export default async function ErrataPage({ searchParams }: ErrataPageProps) {
               : {
                   value: all.length.toLocaleString('en-US'),
                   label: 'published changes, none of them quiet',
-                  decorative: true,
                 }
           }
         >

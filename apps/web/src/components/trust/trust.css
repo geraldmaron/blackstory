@@ -108,8 +108,27 @@
   padding-top: 0;
 }
 
-.ds-trust-sheet {
+/* The numbering runs across a page's sheets and the bands between them. */
+.ds-trust-room {
   counter-reset: trust-section;
+}
+
+/* —— a band between sheets: full bleed, the section on the wide container —————————— */
+.ds-trust-band {
+  margin-inline: calc(50% - 50vw);
+  margin-block: var(--ds-space-16);
+  padding-block: var(--ds-space-4) var(--ds-space-16);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+}
+
+.ds-trust-band__inner {
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
+  margin-inline: auto;
+}
+
+.ds-trust-band .ds-room-section > .ds-section-heading {
+  border-top-color: var(--ds-ink);
 }
 
 /* On a phone the sheet runs edge to edge, so it steps out of the page gutter, and the mast
@@ -177,11 +196,13 @@
 /* —— section numerals ——————————————————————————————————————————————————————————
    Each section on a sheet opens on a hard rule and its number set large in copper. The number
    is drawn, not read: the alt text after the slash is empty. */
-.ds-trust-sheet .ds-room-section {
+.ds-trust-sheet .ds-room-section,
+.ds-trust-band .ds-room-section {
   counter-increment: trust-section;
 }
 
-.ds-trust-sheet .ds-room-section > .ds-section-heading {
+.ds-trust-sheet .ds-room-section > .ds-section-heading,
+.ds-trust-band .ds-room-section > .ds-section-heading {
   display: grid;
   gap: var(--ds-space-3);
   margin-top: var(--ds-space-16);
@@ -192,7 +213,8 @@
   letter-spacing: -0.02em;
 }
 
-.ds-trust-sheet .ds-room-section > .ds-section-heading::before {
+.ds-trust-sheet .ds-room-section > .ds-section-heading::before,
+.ds-trust-band .ds-room-section > .ds-section-heading::before {
   content: counter(trust-section, decimal-leading-zero) / '';
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-1);
@@ -216,7 +238,7 @@
    One step under the h2 (24) and one over the serif body (17): the subtitle step in ink, so the
    order reads heading, answer, detail and the answer never competes with its heading. */
 .ds-trust-lead {
-  max-width: 62ch;
+  max-width: 56ch;
   margin: 0;
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-subtitle);

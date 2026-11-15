@@ -8,7 +8,7 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../components/room';
-import { TrustMast, TrustSheet } from '../../components/trust';
+import { TrustMast } from '../../components/trust';
 import { loadRecordsIndex, recordsQueryCacheKey } from '../records/load-records-index';
 import { ABOUT_LEDE } from './about-copy';
 import { AboutSections, type AboutSectionsProps } from './AboutSections';
@@ -72,9 +72,7 @@ export default async function AboutPage() {
         </TrustMast>
       }
     >
-      <TrustSheet>
-        <AboutSections {...(states === undefined ? {} : { states })} />
-      </TrustSheet>
+      <AboutSections {...(states === undefined ? {} : { states })} />
     </Room>
   );
 }

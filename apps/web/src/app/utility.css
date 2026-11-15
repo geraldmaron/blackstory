@@ -8,3 +8,31 @@
  */
 
 @import '../components/room/room-kit.css';
+
+/* —— the 404's exits, on the table's ground under the sand mast ——————————————————— */
+.ds-utility-exits {
+  display: grid;
+  gap: var(--ds-space-6);
+  padding-block: var(--ds-space-12) var(--ds-space-16);
+}
+
+.ds-utility-exits__search {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--ds-ink-muted);
+}
+
+/* A phone has no ⌘K; it has the search button in the bar. */
+.ds-utility-exits__touch {
+  display: none;
+}
+
+@media (max-width: 47.9375rem), (pointer: coarse) {
+  .ds-utility-exits__keys {
+    display: none;
+  }
+
+  .ds-utility-exits__touch {
+    display: inline;
+  }
+}

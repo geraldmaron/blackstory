@@ -55,7 +55,7 @@ export const DISCLAIMER_REGISTRY: Readonly<Record<DisclaimerClass, DisclaimerRec
     body:
       'BlackStory presents documented Black history for educational and journalistic purposes. ' +
       'It is not legal advice, not travel advice, and not a real-time safety service. Accuracy ' +
-      'reflects the sources cited on each record as of their retrieval date — verify ' +
+      'reflects the sources cited on each record as of their retrieval date. Verify ' +
       'independently before relying on any record for legal, financial, or travel decisions.',
     reviewDate: '2026-07-17',
   },
@@ -64,7 +64,7 @@ export const DISCLAIMER_REGISTRY: Readonly<Record<DisclaimerClass, DisclaimerRec
     class: 'visiting_historic_sites',
     title: 'Visiting historic sites',
     body:
-      'Historic sites change over time — ownership, public access, and physical condition are ' +
+      'Historic sites change over time. Ownership, public access, and physical condition are ' +
       'not guaranteed to match this record. Confirm current access and any visiting ' +
       'requirements directly with the site or its current owner before traveling.',
     reviewDate: '2026-07-17',
@@ -97,7 +97,7 @@ export const DISCLAIMER_REGISTRY: Readonly<Record<DisclaimerClass, DisclaimerRec
       'BlackStory documents historical figures for their verifiable role in the historical ' +
       "record, including figures whose documented conduct is contested or harmful. A figure's " +
       "inclusion in this index is never an endorsement of that individual's actions, views, or " +
-      'legacy — it is a record of a documented role in history, shown with evidence and context.',
+      'legacy. It is a record of a documented role in history, shown with evidence and context.',
     reviewDate: '2026-07-17',
   },
   safety_advisory: {
@@ -106,7 +106,7 @@ export const DISCLAIMER_REGISTRY: Readonly<Record<DisclaimerClass, DisclaimerRec
     title: 'Present-day advisory',
     body:
       'Present-day advisories on this record are dated, sourced claims about property status, ' +
-      'access, or official travel guidance — not a real-time safety assessment. Conditions can ' +
+      'access, or official travel guidance, not a real-time safety assessment. Conditions can ' +
       'change after the stated date; verify current conditions with the cited source or local ' +
       'authorities before traveling.',
     reviewDate: '2026-07-17',

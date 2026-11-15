@@ -73,3 +73,29 @@ export function TrustSheet({
     </div>
   );
 }
+
+/**
+ * A full-bleed ground between two sheets: the page changes plane instead of running one sheet for
+ * screen after screen (patterns-living-archive, Depth planes). Its sections keep the sheet's
+ * running numerals. `fixed` keeps an ink band ink in the light theme too.
+ */
+export function TrustBand({
+  tone,
+  fixed = false,
+  children,
+}: {
+  readonly tone: BlockTone;
+  readonly fixed?: boolean;
+  readonly children: ReactNode;
+}) {
+  return (
+    <Block
+      tone={tone}
+      as="div"
+      className="ds-trust-band"
+      {...(fixed ? { 'data-ground-fixed': '' } : {})}
+    >
+      <div className="ds-trust-band__inner">{children}</div>
+    </Block>
+  );
+}

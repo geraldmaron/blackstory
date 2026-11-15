@@ -30,6 +30,13 @@
   --ds-bar-accent: var(--ds-accent);
 }
 
+/* Over a reading sheet the backdrop is bright paper, and in the dark theme 70% ink glass lets it
+   lift the muted links under AA. Pages that carry a sheet take the glass near solid; the map keeps
+   its see-through bar. */
+body:has(.ds-sheet) .ds-bar {
+  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+}
+
 /* Glass needs a backdrop the reader can read through; asked for less transparency, it is solid. */
 @media (prefers-reduced-transparency: reduce) {
   .ds-bar {
