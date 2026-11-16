@@ -32,6 +32,9 @@ export function DoorTour({ records }: DoorTourProps) {
     lngLat: record.lngLat,
     precision: record.precision,
     label: record.locality ?? record.name,
+    name: record.name,
+    person: record.person,
+    ...(record.plate ? { plate: record.plate } : {}),
   }));
   return (
     <section className="ds-door-tour" aria-labelledby="door-tour-heading">

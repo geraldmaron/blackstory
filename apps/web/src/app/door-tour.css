@@ -127,6 +127,64 @@
   pointer-events: none;
 }
 
+/* —— The map's ground is the step's photograph ——————————————————————————————————————————
+   Inside the Door's map window (door-immersive.tsx), under the page: the record's plate covers the
+   window, clear over the record's own blocks at the middle (where the camera centers it) and
+   deepening toward the edges, so the map reads through it everywhere and plainly at the target.
+   A new step fades its photograph in; the credit is the card's. */
+.ds-door__echo {
+  /* The clear circle over the record's blocks; the photograph deepens beyond it. */
+  --ds-echo-clear: min(32vw, 26vh);
+  position: absolute;
+  /* Out past the window on every side by the same amount, so the middle stays the camera's
+     center and no window edge shows as a hard line. */
+  inset: -100vmax;
+  overflow: hidden;
+  opacity: 0.82;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 var(--ds-echo-clear),
+    rgb(0 0 0 / 0.6) calc(var(--ds-echo-clear) * 1.7),
+    #000 calc(var(--ds-echo-clear) * 2.8)
+  );
+  mask-image: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 var(--ds-echo-clear),
+    rgb(0 0 0 / 0.6) calc(var(--ds-echo-clear) * 1.7),
+    #000 calc(var(--ds-echo-clear) * 2.8)
+  );
+  animation: ds-door-echo-in 700ms var(--ds-ease-cinematic) both;
+}
+
+/* The photograph itself fills the screen, not the oversized box. */
+.ds-door__echo .ds-plate {
+  position: fixed;
+  inset: 0;
+}
+
+.ds-door__echo .ds-plate,
+.ds-door__echo .ds-plate__tone {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.ds-door__echo .ds-plate__credit {
+  display: none;
+}
+
+@keyframes ds-door-echo-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-door__echo {
+    animation: none;
+  }
+}
+
 /* —— The tour's own words ———————————————————————————————————————————————————————————— */
 .ds-door-tour__body {
   display: grid;

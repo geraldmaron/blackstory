@@ -13,6 +13,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import type { PublicEntityPrimaryImageView } from '../data/public-seed';
 
 void React;
 
@@ -23,6 +24,10 @@ export type DoorTourTarget = {
   readonly pinId: string | null;
   readonly lngLat: readonly [number, number];
   readonly precision: string;
+  /** The record's name and photograph, which the map lays over everything but the record's blocks. */
+  readonly name: string;
+  readonly plate?: PublicEntityPrimaryImageView;
+  readonly person: boolean;
 };
 
 export type DoorTourStep = DoorTourTarget & {

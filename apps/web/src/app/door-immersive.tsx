@@ -40,6 +40,7 @@ import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { nationalFieldPatch } from '../lib/map-experience/national-field';
 import { earliestDecadeFor } from '../lib/map-experience/decade-transition';
 import { HeroHeadlineMorph } from '../components/story/HeroHeadlineMorph';
+import { RecordImage } from '../components/entity/RecordImage';
 import { DoorRecordBlock } from './door-record-block';
 import type { DecadeBar, DoorJourneyRecord } from './door-decade-walk';
 import {
@@ -498,6 +499,8 @@ export function DoorImmersive({
    */
   /** The tour step in front of the reader (door-tour-scroll.tsx), or null off the tour. */
   const tourRef = useRef<DoorTourTarget | null>(null);
+  /** The tour step on screen, for its photograph over the map's non-target area. */
+  const [tourStep, setTourStep] = useState<DoorTourTarget | null>(null);
   const applyCamera = useCallback(
     (cut: boolean): boolean => {
       if (browseModeRef.current) return false;
@@ -631,6 +634,7 @@ export function DoorImmersive({
     const onTour = (event: Event) => {
       const target = (event as CustomEvent<DoorTourTarget | null>).detail;
       tourRef.current = target;
+      setTourStep(target);
       if (browseModeRef.current) return;
       applyCamera(false);
       stage.applyViewState({
@@ -744,7 +748,22 @@ export function DoorImmersive({
       >
         {/* The map window: the uncovered part of the plate. Measured for the camera frame
             (door-field-frame.ts) and the callout's bounds; nothing is drawn in it. */}
-        <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
+        <div className="ds-door__window" ref={windowRef} aria-hidden="true">
+          {/* A tour step's photograph is the map's ground around the record: clear over its
+              blocks, deepening toward the window's edges (door-tour.css). */}
+          {tourStep?.plate && !browseMode ? (
+            <div className="ds-door__echo" key={tourStep.pinId ?? tourStep.name}>
+              <RecordImage
+                entityId={tourStep.pinId ?? tourStep.name}
+                entityName={tourStep.name}
+                image={tourStep.plate}
+                plate
+                width={440}
+                className={tourStep.person ? 'ds-plate--upper' : ''}
+              />
+            </div>
+          ) : null}
+        </div>
         {plateUnavailable ? (
           /* No WebGL: say so where the map would be, and point at the index that needs none. */
           <p className="ds-door__field-note" role="status">
