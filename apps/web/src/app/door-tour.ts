@@ -72,6 +72,8 @@ export function isTourEligible(record: DoorRecord): boolean {
     record.cameraSafe === true &&
     recordMarkFor(record.precision) !== 'none' &&
     regionOf(record.statePostal) !== null &&
+    // A tour step names its place; a record without a locality would print only its precision.
+    Boolean(record.locality?.trim()) &&
     // The claim must read as a sentence with a linked source (doorClaimFor's own rule), kept here
     // so a record built elsewhere cannot slip a fragment into the tour.
     typeof record.claim.statement === 'string' &&

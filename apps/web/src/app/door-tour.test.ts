@@ -60,6 +60,8 @@ test('a record is out when it is unphotographed, county-level, or unsafe for a c
   const { cameraSafe: _safe, ...unmarked } = make('x', 'GA', 1900);
   assert.equal(isTourEligible(unmarked as DoorRecord), false);
   assert.equal(isTourEligible(make('x', 'ZZ', 1900)), false);
+  assert.equal(isTourEligible(make('x', 'GA', 1900, { locality: undefined })), false);
+  assert.equal(isTourEligible(make('x', 'GA', 1900, { locality: '  ' })), false);
   const fragment = { ...make('x', 'GA', 1900).claim, statement: 'on the Register' };
   assert.equal(isTourEligible(make('x', 'GA', 1900, { claim: fragment })), false);
 });
