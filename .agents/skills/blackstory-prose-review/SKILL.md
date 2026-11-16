@@ -33,6 +33,10 @@ Do not assume upstream fact review covers words introduced during drafting.
   encyclopedia entry or a documentary script. Check the never-list item by item, quoting
   each hit. Read three neighboring records or sections for a shared opening, move or
   ending; a pattern across them is a finding even when each instance is fine alone.
+  Uniformity is a finding too: paragraphs that all weigh the same, no sentence ever
+  opening with "But" or "So," no question anywhere, or every ear move from the contract
+  used in one piece. Compare with the "Natural variance" ranges; they're a reference,
+  not a quota, and a short record is exempt.
   Performed Blackness (dialect, slang, "we," signals in place of attention) is a
   dignity blocker, not a craft note.
 - **Reading:** read aloud for natural cadence. Check links, quotations, headings,

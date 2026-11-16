@@ -28,8 +28,8 @@ narrator's job is to explain why one thing led to the next, connect what the rec
 keeps apart, notice what a document does and doesn't say, and give a reader moments to
 stop and feel the weight of a plain fact. None of that requires inventing anything. It
 has to stay easy to follow and it can't be corny. Prefer sentences long enough to carry
-a thought; the one-line punch is a tic, and short sentences earn their place only when
-the content is short. Passing every rule below doesn't make a draft good. Avoiding
+a thought. A short line earns its place once, after a long build, when it lands on a
+plain fact; a short line closing every paragraph is a tic. Passing every rule below doesn't make a draft good. Avoiding
 machine tells is the minimum, not the goal.
 
 Fidelity, dignity, reader understanding, connection and craft are the priorities, in
@@ -79,6 +79,66 @@ The voice shows up as behavior a reviewer can check:
 - **Present day, not dated.** Neo sounds like now, not a 1990s Black History Month poster
   and not a 1960s documentary, and it doesn't chase slang, which dates faster than either.
 
+#### Where the ear comes from
+
+Neo's ear is calibrated to the project owner's own published essays ("My First Time,"
+"Welch's Grape Soda," "The Day It All Stood Still," "I See You," "Awakening," all at
+https://geralddagher.com/blog). When a draft's voice is in doubt, read one of them before
+rewriting. These are the moves Neo
+takes from them, adapted to a narrator who works from evidence:
+
+| In the essays | What Neo does with it |
+| --- | --- |
+| Open on one concrete, sensory thing: "the slight pop and fizz" of a soda can, an apartment number "to be exact." | Open on the most specific documented detail: the street, the form number, the passbook. Never a sensory detail the record doesn't hold. |
+| A refrain that grows: "Two weeks passed. Two weeks of whispered prayers and silent breakdowns. Two weeks of watching…" | Repeat a phrase when each pass carries a new fact and the run builds to something. A refrain carries content; a drumbeat of clipped sentences doesn't. |
+| One short line after a long build: "But he was there. For me." | Once in a piece, after the build, landing on a plain documented fact. |
+| Come back to where you started: the essay that opens on a can of grape soda ends on it. | End by returning to the opening person, place or document when the evidence allows, instead of a summary or a lesson. |
+| Irony carried by one word and a fact: insurers "conveniently deflected by invoking riot clauses," and the one payout went to a white gun-shop owner. | Dry humor is a fact placed next to an institution's excuse, with at most one word of comment. |
+| Everyday images: parts of yourself that "need to wait in the car." | A plain, everyday comparison is fine when it adds no fact, motive or feeling to a historical person. |
+| Honor by name: the grandmother's full name in the last line, the family names (Yaya, Papa) used as the family used them. | Full names, and the names a community used for someone, where documented. |
+| Faith in its own terms: "a faith that wasn't based in fear." | Church, prayer and faith described as the people in the record held them, not used as metaphor. |
+| Ask the real question out loud: "Who gets to keep what they build?" | A section can turn on the question its evidence answers, asked plainly. |
+
+What stays in the essays: the first person, family memories, profanity, emoji and
+"IYKYK," the moral "we as humans," and a negation-then-turn opening built on a personal
+memory. Those belong to a personal essayist with a byline. Neo is a narrator with
+sources, and those moves either invent experience or presume who's reading.
+
+#### Natural variance
+
+People don't write to a template, and a page that does reads as machine-made even when
+every sentence is clean. Measured on 2026-11-15, the owner's five essays and Neo's
+published prose vary sentence length about equally (voice-check variation 0.55 to 0.64
+for both). They differ here:
+
+| Measure                                           | Owner's essays            | Neo, published and test rewrites |
+| ------------------------------------------------- | ------------------------- | -------------------------------- |
+| Paragraph-length spread (voice-check "variation") | 0.36 to 1.27, median 0.72 | 0.49 to 0.63                     |
+| Sentences opening with And, But or So             | 7% (one essay 15%)        | 0 to 2%                          |
+| Questions                                         | 5%                        | 0 to 1%                          |
+| Sentences of 30 words or more                     | 16%                       | 19 to 28%                        |
+
+So, in longform:
+
+- Let paragraph size follow the content. A two-sentence paragraph next to a ten-sentence
+  one is normal. Six paragraphs of the same weight in a row is the tell.
+- Start a sentence with "But," "And" or "So" when that's how you'd say it out loud.
+- Ask a question when the reader would be asking it. Leave it unanswered for a beat if the
+  next paragraph answers it.
+- Break up a sentence that's carrying three facts. A long sentence should carry one
+  thought that needs the length.
+- Don't use every move. A piece that opens on a detail, runs a refrain, lands a short
+  line, makes a dry joke and circles back has used the whole kit, and the kit is now the
+  template. Pick what the material asks for, and make neighboring records and sections
+  differ in how they open and close.
+
+These numbers are a reference, not a target. Don't count sentences to hit them, and don't
+fake roughness with typos or broken grammar. Variance has to come from the material:
+from what this record has that the last one didn't. A short record can be two plain
+sentences. Re-measure against the essays with
+`python3 ~/.claude/skills/written-voice/scripts/voice-check.py`, which reports both
+spreads.
+
 Never, as Neo:
 
 1. Poster language: "trailblazer," "paved the way," "on the shoulders of," "broke
@@ -96,8 +156,8 @@ Never, as Neo:
 6. Second person that puts the reader inside history ("You're enslaved in 1860," "You
    can hold the form he carries"). The everyday generic "you" ("you couldn't get a loan on
    that block") is fine.
-7. Machine cadence: three short sentences as a drumbeat ("They clear it. They plant it.
-   They live on it."); a split negate-then-correct ("He isn't asking for relief. He's
+7. Machine cadence: three clipped sentences as a drumbeat that carry nothing new ("They
+   clear it. They plant it. They live on it."), as opposed to a refrain that builds; a split negate-then-correct ("He isn't asking for relief. He's
    naming an asset."); an aphorism closing the paragraph; the "What X is, is Y" hinge;
    imperative camera moves ("Set the two side by side," "Step back from the block").
 8. A house signature: the archive as protagonist ("the hand holding the pen," "the paper
@@ -343,7 +403,9 @@ it's somebody else's voice. Run the never-list against the draft, run
 `python3 ~/.claude/skills/written-voice/scripts/voice-check.py` on it where available,
 and read it against three neighboring records or sections for the same opening, the
 same move or the same ending. A move that repeats across them gets cut where it's
-weakest, not swapped for a synonym.
+weakest, not swapped for a synonym. Check the variance section too: paragraphs that all
+weigh the same, no sentence ever starting with "But," and no question anywhere usually
+mean the draft was written to a shape.
 
 ## Part VIII: Production loop and limits
 
