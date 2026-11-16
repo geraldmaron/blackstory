@@ -353,7 +353,7 @@ export function DoorImmersive({
    * already shows `/explore`, so it re-enters without pushing another.
    */
   const startBrowse = useCallback(
-    (push: boolean) => {
+    (push: boolean, place?: string) => {
       if (browseModeRef.current) return;
       // The list waits on the catalog: start it now, not after the morph and the Atlas chunk.
       prefetchAtlasCatalog();
@@ -366,7 +366,12 @@ export function DoorImmersive({
       announceMapBrowseEntered();
       // Either way the page's `/` entry sits directly behind this one, so leaving steps back.
       enteredByPushRef.current = true;
-      if (push) window.history.pushState({ doorBrowse: 1 }, '', '/explore');
+      if (push)
+        window.history.pushState(
+          { doorBrowse: 1 },
+          '',
+          place ? `/explore?place=${encodeURIComponent(place)}` : '/explore',
+        );
       const delay = prefersReducedMotion() ? 0 : DOOR_BROWSE_MORPH_MS;
       if (browseMorphTimerRef.current !== null) {
         window.clearTimeout(browseMorphTimerRef.current);
@@ -547,9 +552,14 @@ export function DoorImmersive({
    */
   useEffect(
     () =>
-      stage.subscribe('placeSelect', (_placeKey, frame) => {
+      stage.subscribe('placeSelect', (placeKey, frame) => {
         const map = stage.getMap();
         if (browseModeRef.current || !frame || !map) return;
+        // Nothing finer to zoom to: the place's records are only known to the place, so open them.
+        if (frame.openZoom === undefined) {
+          startBrowse(true, placeKey);
+          return;
+        }
         const { window: windowBox, plate: plateBox } = measureFrameBoxes(map);
         const padding = windowBox && plateBox ? doorFramePadding(windowBox, plateBox) : null;
         const [west, south, east, north] = frame.bounds;
@@ -569,7 +579,7 @@ export function DoorImmersive({
           { mode: 'ease', pitch: 0, bearing: 0, ...(padding ? { padding } : {}) },
         );
       }),
-    [measureFrameBoxes, stage],
+    [measureFrameBoxes, stage, startBrowse],
   );
 
   /** The national frame, landed once the plate is live (and re-landed on a resize, below). */

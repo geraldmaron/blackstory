@@ -48,7 +48,9 @@ export function usePlaceScope(
   allFeatures: readonly ExploreMapFeature[],
   initialPlace: string | undefined,
 ) {
-  const [placeKey, setPlaceKey] = useState<string | undefined>(initialPlace);
+  const [placeKey, setPlaceKey] = useState<string | undefined>(
+    () => initialPlace ?? (typeof window === 'undefined' ? undefined : placeInAddress()),
+  );
   const [counties, setCounties] = useState<CountyGeometryCollection | undefined>(() =>
     loadedCountyPolygons(),
   );

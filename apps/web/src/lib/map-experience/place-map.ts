@@ -200,7 +200,7 @@ export type PlaceTokenProperties = {
   readonly minZoom: number;
   readonly maxZoom: number;
   /** The first zoom this place's records draw as something finer (`placeOpenZooms`). */
-  readonly openZoom: number;
+  readonly openZoom?: number;
   readonly west: number;
   readonly south: number;
   readonly east: number;
@@ -256,7 +256,13 @@ export function placeMapCollection(
         point_count_abbreviated: abbreviate(count),
         minZoom: token.minZoom,
         maxZoom: token.maxZoom,
-        openZoom: openZooms.get(token.placeKey) ?? NEXT_LEVEL_MIN_ZOOM[token.level],
+        // Absent when nothing finer exists (a county known only by county): a tap has nowhere
+        // deeper to go, so the surface opens the place's records instead. A state opens at counties.
+        ...(openZooms.get(token.placeKey) !== undefined
+          ? { openZoom: openZooms.get(token.placeKey)! }
+          : token.level === 'state'
+            ? { openZoom: NEXT_LEVEL_MIN_ZOOM.state }
+            : {}),
         west: token.bounds[0],
         south: token.bounds[1],
         east: token.bounds[2],
