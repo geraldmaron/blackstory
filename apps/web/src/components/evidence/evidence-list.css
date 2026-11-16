@@ -73,7 +73,8 @@
 
 /* A source link is one line of type; padding paid back in margin makes it a 44px target without
    moving the row. */
-a.ds-evidence__title {
+a.ds-evidence__title,
+.ds-evidence__archive {
   display: inline-block;
   margin-block: calc(var(--ds-space-3) * -1);
   padding-block: var(--ds-space-3);

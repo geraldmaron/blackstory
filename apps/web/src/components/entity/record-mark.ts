@@ -3,6 +3,7 @@
  * Shapes are book, pin, or arch only — never presented as a likeness of the entity.
  * Accessible names and captions stay honest about why a mark is shown.
  */
+import { SOURCE_LABELS } from '../../lib/evidence/source-label';
 import { sanitizePrimaryImageCreditForDisplay } from '@repo/domain/adapters/wikimedia/commons-media';
 
 export const RECORD_MARK_SHAPES = ['book', 'pin', 'arch'] as const;
@@ -183,13 +184,6 @@ function decodeStoredEntities(text: string): string {
   });
 }
 
-const PIN_SOURCE_SYSTEM_LABELS: Readonly<Record<string, string>> = {
-  wikimedia_commons: 'Wikimedia Commons',
-  nps: 'National Park Service',
-  loc: 'Library of Congress',
-  public_media: 'BlackStory public media',
-};
-
 /**
  * Source-link line for a pin-and-serve photo: "Source: <system>"
  * plus a short license id, shown only when the mast has both a source page and a
@@ -203,7 +197,7 @@ export function primaryImageSourceLine(input: {
   readonly creditText?: string;
 }): { readonly label: string; readonly url: string } | undefined {
   const url = input.sourcePageUrl?.trim();
-  const systemLabel = input.sourceSystem ? PIN_SOURCE_SYSTEM_LABELS[input.sourceSystem] : undefined;
+  const systemLabel = input.sourceSystem ? SOURCE_LABELS[input.sourceSystem] : undefined;
   if (!url || !systemLabel) return undefined;
   if (input.creditText?.toLowerCase().includes(systemLabel.toLowerCase())) {
     return { label: 'Source page', url };

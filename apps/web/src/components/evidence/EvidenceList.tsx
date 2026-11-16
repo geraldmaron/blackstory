@@ -15,6 +15,7 @@ import type { ConfidenceLevel } from '@repo/ui';
 import { confidenceTierPhrase } from '../../lib/evidence/confidence-language';
 import { confidenceIconFor } from '../../lib/map-experience/confidence-icons';
 import type { EvidenceDisputeView, EvidenceRetractionNotice } from '../../lib/evidence';
+import { sourceDisplayName } from '../../lib/evidence/source-label';
 import { formatRecordDate } from '../patterns/format-record-date';
 import './evidence-list.css';
 
@@ -60,17 +61,18 @@ export function GradeTag({ level }: { readonly level: ConfidenceLevel | 'unrated
 }
 
 function SourceLine({ source }: { readonly source: EvidenceSource }) {
-  const publisher = source.publisher?.trim();
-  const showPublisher = publisher && publisher.toLowerCase() !== source.title.toLowerCase();
+  const publisher = source.publisher && sourceDisplayName(source.publisher, source.href);
+  const title = sourceDisplayName(source.title, source.href);
+  const showPublisher = publisher && publisher.toLowerCase() !== title.toLowerCase();
   return (
     <p className="ds-evidence__source">
       {showPublisher ? <span className="ds-evidence__publisher">{publisher}</span> : null}
       {source.href ? (
         <a className="ds-evidence__title" href={source.href} rel="noopener noreferrer">
-          {source.title}
+          {title}
         </a>
       ) : (
-        <span className="ds-evidence__title">{source.title}</span>
+        <span className="ds-evidence__title">{title}</span>
       )}
       {source.date ? <span className="ds-evidence__date">{source.date}</span> : null}
       {source.archivedUrl ? (

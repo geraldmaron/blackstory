@@ -94,6 +94,7 @@ import {
 } from './adapters';
 import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
 import { deriveRecordStanding, isSingleSourceRecord, isThinRecord } from './entity-view-model';
+import { sourceDisplayName } from '../../../lib/evidence/source-label';
 
 void React;
 
@@ -461,10 +462,13 @@ export function EntityRecordView({
                   <li key={sourceKey(claim)}>
                     {claim.citationHref ? (
                       <a href={claim.citationHref} rel="noopener noreferrer">
-                        {claim.citationLabel || publisherOf(claim)}
+                        {sourceDisplayName(
+                          claim.citationLabel || publisherOf(claim),
+                          claim.citationHref,
+                        )}
                       </a>
                     ) : (
-                      claim.citationLabel || publisherOf(claim)
+                      sourceDisplayName(claim.citationLabel || publisherOf(claim))
                     )}
                   </li>
                 ))}
