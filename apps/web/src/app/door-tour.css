@@ -88,7 +88,7 @@
    body sets the cards' tokens in both themes; its own fill is cleared. */
 .ds-door-tour__body {
   position: relative;
-  z-index: 1;
+  z-index: 1; /* local: the words above the sticky progress band */
   background: transparent;
 }
 
@@ -103,7 +103,7 @@
 .ds-door-tour__card .ds-door-record__plate .ds-plate__tone {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: -2; /* local: photograph at the back of the isolated card */
   width: auto;
   max-height: none;
   aspect-ratio: auto;
@@ -116,7 +116,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: -1; /* local: dim between the photograph and the words */
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--ds-surface-sunken) 18%, transparent) 0%,
@@ -407,7 +407,7 @@
 
   /* The progress mark rides at the top of the open map band, under the cards as they pass. */
   .ds-door-tour__band {
-    z-index: 0;
+    z-index: 0; /* local: phone band under the scrolling cards */
     top: calc(50dvh - var(--ds-tour-band-h) / 2);
     align-items: flex-start;
     justify-content: flex-start;
