@@ -1,0 +1,258 @@
+/**
+ * The tour (door-tour-section.tsx), between the opening and the grade band.
+ *
+ * The map is the fixed plate; the tour is page content that scrolls over it, as the bands do.
+ * Wide: the steps are glass cards in the opening card's own column (the header grid edge), so the
+ * map frames each record to the right of them and no band of empty ground sits on either side.
+ * Phone and portrait tablet: while the tour is in view the map window shrinks to a band under the
+ * header (`--ds-tour-band-h`) and the steps scroll on the page's ground beneath it. Where the
+ * browser has scroll-driven animations, the ground is clipped as it passes the band's lower edge,
+ * so nothing slides over the map; elsewhere it slides over the map the way the bands do.
+ *
+ * The opening column and its callout step aside while the tour is in view (`data-active`, set by
+ * door-tour-scroll.tsx); the pin the tour has selected is the only mark. Without JavaScript
+ * `data-active` never appears: the steps are a stacked list of records.
+ */
+
+.ds-door-tour {
+  --ds-tour-band-h: var(--ds-space-12);
+  position: relative;
+  pointer-events: none;
+}
+
+.ds-door-tour__card {
+  box-sizing: border-box;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+/* The opening column makes way for the tour; the shared browse fade, so nothing pops. */
+.ds-door:has(.ds-door-tour[data-active='true']) .ds-door-journey {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-door-browse-ms) var(--ds-ease-exit),
+    visibility 0s linear var(--ds-door-browse-ms);
+}
+
+/* The visible echo of the step: "2 of 5 · Atlanta, Georgia". Fixed to the map window's corner
+   and shown only while a step is in front of the reader. aria-hidden; the headings are the real
+   structure. */
+.ds-door-tour__band {
+  position: fixed;
+  top: var(--ds-island-clearance);
+  right: 0;
+  left: 0;
+  z-index: 4; /* local: above the bands, under the header */
+  display: none;
+  height: var(--ds-tour-band-h);
+  box-sizing: border-box;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  align-items: flex-start;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.ds-door-tour[data-active='true'] .ds-door-tour__band {
+  display: flex;
+}
+
+@media (scripting: none) {
+  .ds-door-tour__band {
+    display: none !important;
+  }
+}
+
+.ds-door-tour__progress {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1.3;
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+}
+
+.ds-door-tour__progress[hidden] {
+  display: none;
+}
+
+/* —— The tour's own words ———————————————————————————————————————————————————————————— */
+.ds-door-tour__body {
+  display: grid;
+  gap: var(--ds-space-6);
+  padding-block: var(--ds-space-8);
+}
+
+.ds-door-tour__intro {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-3);
+}
+
+.ds-door-tour__title {
+  max-width: 18ch;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-headline);
+  font-weight: var(--ds-weight-headline);
+  line-height: 1;
+  letter-spacing: var(--ds-tracking-display);
+  text-wrap: balance;
+}
+
+.ds-door-tour__prompt {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: 1.4;
+}
+
+/* Underlined text links, 44px tall without moving the line. */
+.ds-door-tour__skip,
+.ds-door-tour__open {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  font-family: var(--ds-font-sans);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ds-door-tour__skip:hover,
+.ds-door-tour__open:hover {
+  color: var(--ds-accent);
+}
+
+.ds-door-tour__steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The step is the tall box the scroll probe reads; its card sits at the top of it. */
+.ds-door-tour__step {
+  min-height: 78dvh;
+}
+
+/* The copper step number, in the numeral role, carries the step. */
+.ds-door-tour__num {
+  margin: 0;
+  color: var(--ds-numeral-accent);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-numeral);
+  font-weight: var(--ds-weight-numeral);
+  font-variant-numeric: lining-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.ds-door-tour__open {
+  justify-self: start;
+}
+
+.ds-door-tour__end {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.45;
+}
+
+/* —— Wide: glass cards in the opening card's column, the map free to their right ——————————— */
+@media (min-width: 64rem), (min-width: 48rem) and (min-aspect-ratio: 1001/1000) {
+  /* The empty map beside the cards stays reachable: only the cards take hits. */
+  .ds-door-chapters {
+    pointer-events: none;
+  }
+
+  .ds-door-chapters > :not(.ds-door-tour) {
+    pointer-events: auto;
+  }
+
+  .ds-door-tour__card {
+    width: var(--ds-door-card-w);
+    margin-left: var(--ds-door-edge);
+    padding: var(--ds-space-6);
+    border-radius: var(--ds-radius-md);
+    background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+    color: var(--ds-ink);
+    box-shadow:
+      inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+      var(--ds-shadow-float);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    backdrop-filter: blur(18px) saturate(1.35);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .ds-door-tour__card {
+      background: var(--ds-canvas);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+}
+
+/* —— Phone and portrait tablet: the map is a band under the header, the steps on the ground —— */
+@media (max-width: 47.9375rem), (max-width: 63.9375rem) and (max-aspect-ratio: 1/1) {
+  .ds-door-tour {
+    --ds-tour-band-h: 38dvh;
+    /* The band's lower edge, where the ground meets the map. */
+    --ds-tour-line: calc(var(--ds-island-clearance) + var(--ds-tour-band-h));
+  }
+
+  /* While the tour is in view the map window is that band. */
+  /* While the tour is in view the camera frames the screen's middle band, where each step's
+     open map passes the probe line as that step becomes current. */
+  body:has(.ds-door-tour[data-active='true']) .ds-door__field .ds-door__window {
+    inset: calc(50dvh - var(--ds-tour-band-h, 38dvh) / 2) 0 auto 0;
+    height: var(--ds-tour-band-h, 38dvh);
+  }
+
+  /* The page itself stays clear over the map: each step opens with a band of open map (the
+     camera has flown to that record by the time the band reaches the top), then its card on the
+     page's ground. Native scroll throughout; nothing is pinned over the reading. */
+  .ds-door-tour__body {
+    padding-inline: var(--ds-gutter);
+    padding-bottom: var(--ds-space-12);
+  }
+
+  /* The progress mark rides at the top of the open map band, not over a card's text. */
+  .ds-door-tour__band {
+    top: calc(50dvh - var(--ds-tour-band-h) / 2);
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .ds-door-tour__step::before {
+    content: '';
+    display: block;
+    height: var(--ds-tour-band-h);
+  }
+
+  .ds-door-tour__card {
+    max-width: none;
+    padding: var(--ds-space-5);
+    border-radius: var(--ds-radius-md);
+    background: var(--ds-canvas);
+    color: var(--ds-ink);
+    box-shadow:
+      inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+      var(--ds-shadow-float);
+  }
+}
+
+/* Without scripting the map never moves, so the steps are a plain stacked list: no open bands. */
+@media (scripting: none) {
+  .ds-door-tour__step::before {
+    display: none;
+  }
+}

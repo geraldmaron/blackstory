@@ -6,6 +6,7 @@
  *           never hands off to a bright sheet in the dark theme
  *   copper  the lead chapter's cover, edge to edge, as a toned plate beside its title when it has one
  *
+ * The tour (door-tour-section.tsx) comes first: a few records the map follows as the page scrolls.
  * The decade histogram is not here: it is the walk itself, in the dock beside the map.
  * Every number comes from the same records index `/records` builds (`loadRecordsIndex`), so the
  * Door and the register cannot disagree. Server-rendered; no client code.
@@ -20,6 +21,8 @@ import { coverDek } from '../components/story/story-text';
 import { confidenceIconFor } from '../lib/map-experience/confidence-icons';
 import { confidenceTierPhrase } from '../lib/evidence/confidence-language';
 import { CoverImage } from './stories/StoriesIndexParts';
+import type { DoorJourneyRecord } from './door-decade-walk';
+import { DoorTour } from './door-tour-section';
 
 void React;
 
@@ -27,6 +30,8 @@ export type DoorChaptersProps = {
   readonly lead: PublicStoryListItemDoc | undefined;
   /** Records per evidence grade (the register's Evidence facet). */
   readonly grades: readonly RecordsFacet[];
+  /** The tour's records, oldest first (door-tour.ts); none, no tour. */
+  readonly tour?: readonly DoorJourneyRecord[];
 };
 
 /** The register's floors (A only, B and up, C and up) read back as one count per grade. */
@@ -55,9 +60,10 @@ export function gradeCounts(floors: readonly RecordsFacet[]): readonly DoorGrade
   return counts;
 }
 
-export function DoorChapters({ lead, grades }: DoorChaptersProps) {
+export function DoorChapters({ lead, grades, tour = [] }: DoorChaptersProps) {
   return (
     <div className="ds-door-chapters">
+      <DoorTour records={tour} />
       <Block
         tone="ink"
         className="ds-door-ch ds-door-ch--evidence"

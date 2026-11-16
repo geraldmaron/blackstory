@@ -43,7 +43,7 @@ before the map and photo, and the map frame is a short plate with the place in w
 tiles paint.
 
 **Dark theme:** paper is for reading sheets only. A band that follows the dark map (the home's
-first band below the fold) stands on the table's ground (`data-ground="ink"`: ink in the dark
+first band after the tour) stands on the table's ground (`data-ground="ink"`: ink in the dark
 theme, Archive Paper in the light one), never a bright sheet. Inside the sheet, depth comes from type and rules, not boxes: the citation line
 is ruled type between two ink rules and the sources beat sits under a heavy ink rule with its
 copper numerals. No card shadows inside a sheet.
@@ -127,7 +127,33 @@ The map says where; the plate shows what it looks like. They always refer to the
   shows its name, plate and claim. The histogram is the progress (walked bars ink, the current one
   copper, the rest a rule) and the control (a native range input over the bars, thumb on the
   current bar). Back / Next and the arrow keys step; Escape returns to the opening.
-- **Below the fold.** Two bands over the fixed map: how evidence is graded, as one ruled row in
+- **Tour.** Between the opening and the first band, three to six real records (five when the
+  catalog allows) walk the reader across the country while the map follows. Chosen by rule, on
+  the server (`door-tour.ts`): the door's own eligibility (never quiet, never a rendering,
+  photographed, a claim with a linked source that reads as a sentence), safe to put a camera on
+  (a person only with a recorded death, no sensitivity class), a stored precision finer than a
+  county, and never the opening's records or the lead story's subject. The pick is greedy and
+  deterministic: a stable hash order, each pick adding a new state, then a new region
+  (Northeast, Southeast, Midwest, Southwest, West), then the most distance in time, with at least
+  one record outside the Southeast when one exists. Steps read oldest first. With fewer than
+  three eligible records there is no tour.
+  Each step is a `<section>` with a copper numeral, the record's name as an h3, its place in words
+  with the precision word, its photograph as a plate with credit, one sourced claim in the claims
+  block's language and an "Open the record" link. A visible heading ("Five records, five
+  places"), "Scroll, and the map follows." and a "Skip the tour" link to the grade band come
+  first. It is complete without JavaScript, a plain list of records.
+  With JavaScript, IntersectionObserver (a thin probe line across the screen, no scroll
+  listener, no scroll hijack) names the step in front of the reader. One flight per step change
+  (an in-flight move is stopped first) to the record at its precision's zoom, never tighter than
+  z12, and the plate's own selection (copper pin, 1.6x) marks it. Leaving the tour returns the
+  camera to the national frame the opening uses; reduced motion jumps instead of flying. Focus
+  never moves, and the map and the "2 of 5 · Atlanta, Georgia" echo are aria-hidden.
+  Wide: the steps are glass cards in the opening card's column, the opening card steps aside, and
+  the map frames each record in the window to their right. Phone and portrait tablet: the map
+  window becomes a band under the header (38dvh) and the steps scroll on the page's ground
+  beneath it; where scroll-driven animations exist the ground is clipped at the band's edge,
+  elsewhere it slides over the map like the bands.
+- **Below the tour.** Two bands over the fixed map: how evidence is graded, as one ruled row in
   the claims block's language (glyph, word, exact count as a copper numeral) on the table's
   ground with an underlined link to the method, then the lead story on copper: its years are the
   cover (numeral role, ink), and a toned plate with credit stands beside the text only when the
@@ -161,6 +187,6 @@ Few moves, each played once, from an already-visible default; all collapse under
 | Home records: the opening, one per decade, the histogram | `apps/web/src/app/door-decade-walk.ts`, `door-record-block.tsx`, `door-walk.tsx` |
 | Plate tones `--ds-plate-lo` / `--ds-plate-hi` | `packages/ui/src/styles/tokens.css` |
 | A record's photograph, plain or as a plate, with its credit | `apps/web/src/components/entity/RecordImage.tsx` |
-| Home | `apps/web/src/app/door-home.tsx`, `door-immersive.tsx`, `door-chapters.tsx`, `door-home.css` |
+| Home | `apps/web/src/app/door-home.tsx`, `door-immersive.tsx`, `door-chapters.tsx`, `door-home.css`, `door-tour.ts`, `door-tour-section.tsx`, `door-tour-scroll.tsx`, `door-tour.css` |
 | Record page | `apps/web/src/components/patterns/RecordPage.tsx`, `apps/web/src/app/record-page.css` |
 | Glass header | `apps/web/src/components/shell/command-bar.css` |

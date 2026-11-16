@@ -59,6 +59,8 @@ import type { AtlasShellModel } from './explore/explore-view-model-wire';
 import { doorFramePadding, sameDoorFrameBox, type DoorFrameBox } from './door-field-frame';
 import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { DoorWalkCard } from './door-walk';
+import { DOOR_TOUR_EVENT, type DoorTourTarget } from './door-tour-scroll';
+import { tourZoom } from './door-tour';
 
 void React;
 
@@ -494,6 +496,8 @@ export function DoorImmersive({
    * `cut` lands the frame in one step: the first frame after mount, and every refit after a
    * resize, where the plate has to keep step with a layout that does not animate its own reflow.
    */
+  /** The tour step in front of the reader (door-tour-scroll.tsx), or null off the tour. */
+  const tourRef = useRef<DoorTourTarget | null>(null);
   const applyCamera = useCallback(
     (cut: boolean): boolean => {
       if (browseModeRef.current) return false;
@@ -504,6 +508,17 @@ export function DoorImmersive({
       const { window: windowBox, plate: plateBox } = boxes;
       map.stop();
       const padding = windowBox && plateBox ? doorFramePadding(windowBox, plateBox) : null;
+      // A tour step in front of the reader: its record, no tighter than its precision allows,
+      // framed in the same window. One flight per step change (the tour listener below).
+      const tour = tourRef.current;
+      if (tour) {
+        stage.flyPreset(
+          'point',
+          { center: [tour.lngLat[0], tour.lngLat[1]], zoom: tourZoom(tour.precision) },
+          { mode: cut ? 'cut' : 'fly', pitch: 0, bearing: 0, ...(padding ? { padding } : {}) },
+        );
+        return true;
+      }
       stage.flyPreset(
         'national',
         { bounds: US_CONUS_BOUNDS },
@@ -605,6 +620,28 @@ export function DoorImmersive({
       selectedEntity: selectedPinId ?? undefined,
     });
   }, [browseMode, selectedPinId, plateLive, stage]);
+
+  /**
+   * The tour hands over its step: fly to that record and mark it selected, or (null, the tour is
+   * out of view) go back to the national frame and the opening's own selection.
+   */
+  const selectedPinIdRef = useRef(selectedPinId);
+  selectedPinIdRef.current = selectedPinId;
+  useEffect(() => {
+    const onTour = (event: Event) => {
+      const target = (event as CustomEvent<DoorTourTarget | null>).detail;
+      tourRef.current = target;
+      if (browseModeRef.current) return;
+      applyCamera(false);
+      stage.applyViewState({
+        selectedState: undefined,
+        selectedEdge: undefined,
+        selectedEntity: (target ? target.pinId : selectedPinIdRef.current) ?? undefined,
+      });
+    };
+    window.addEventListener(DOOR_TOUR_EVENT, onTour);
+    return () => window.removeEventListener(DOOR_TOUR_EVENT, onTour);
+  }, [applyCamera, stage]);
 
   /** A marker click on the live plate opens the record the pin's href names. */
   const hrefByPinId = useMemo(() => {

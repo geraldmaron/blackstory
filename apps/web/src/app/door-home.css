@@ -262,14 +262,9 @@
   max-height: 24dvh;
   border-radius: var(--ds-radius-sm);
   /* The box is reserved by its aspect ratio; until the photograph arrives it is the plate's own
-     ground with a faint ruled texture, not a flat block. Static, so reduced motion has nothing
-     to turn off. The photograph multiplies over it, and the rules are too light to read there. */
+     ground. A ruled texture here showed through every photograph (the photo multiplies over its
+     ground), so the waiting plate is the plain toned ground. Static: nothing to reduce. */
   background-color: var(--ds-plate-hi);
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent 0 0.6rem,
-    color-mix(in srgb, var(--ds-plate-lo) 12%, transparent) 0.6rem calc(0.6rem + 1px)
-  );
 }
 
 /* A portrait keeps its face: the crop holds the top third, a step lower than the shared plate's

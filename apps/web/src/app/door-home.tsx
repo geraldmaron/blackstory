@@ -40,7 +40,9 @@ import {
   type DoorJourneyRecord,
   type DoorRecord,
 } from './door-decade-walk';
+import { pickTourRecords } from './door-tour';
 import './door-home.css';
+import './door-tour.css';
 import './explore/explore.css';
 
 void React;
@@ -122,7 +124,9 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
         barsCaption={journey?.barsCaption ?? ''}
         initialBrowse={initialBrowse}
       />
-      {journey ? <DoorChapters lead={journey.lead} grades={journey.grades} /> : null}
+      {journey ? (
+        <DoorChapters lead={journey.lead} grades={journey.grades} tour={journey.tour} />
+      ) : null}
     </main>
   );
 }
@@ -158,11 +162,18 @@ async function loadDoorJourney(
     return { ...record, href, pinId };
   };
   const opening = pickDoorOpening(records, roll);
-  const bars = decadeBars(model.facets.era);
+  const openingChoices = pickDoorOpeningCandidates(records, roll, OPENING_CHOICES);
   const lead = stories.items.length > 0 ? buildStoriesFront(stories.items).lead : undefined;
+  // The tour never repeats the front door's records or the lead story's subject.
+  const tour = pickTourRecords(records, {
+    excludeIds: new Set(openingChoices.map((choice) => choice.entityId)),
+    ...(lead ? { leadStoryText: `${lead.title} ${lead.summary}` } : {}),
+  });
+  const bars = decadeBars(model.facets.era);
   return {
     opening: opening ? withPin(opening) : null,
-    openingChoices: pickDoorOpeningCandidates(records, roll, OPENING_CHOICES).map(withPin),
+    openingChoices: openingChoices.map(withPin),
+    tour: tour.map(withPin),
     story: lead ? { title: lead.title, slug: lead.slug } : null,
     stops: pickDecadeStops(records, roll).map(withPin),
     bars,

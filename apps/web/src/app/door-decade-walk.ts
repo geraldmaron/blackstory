@@ -47,6 +47,13 @@ export type DoorRecord = {
   readonly person: boolean;
   /** The one claim, already in the evidence list's shape (a string statement, a linked source). */
   readonly claim: EvidenceItem;
+  /** The record's state (postal code), for the tour's spread across regions. */
+  readonly statePostal?: string;
+  /**
+   * True only when the record is safe to put a camera on: not a person, or a person the archive
+   * marks deceased; and carrying no sensitivity class. Absent means not safe (the tour's gate).
+   */
+  readonly cameraSafe?: boolean;
 };
 
 /** The walk: one record per decade that has one, oldest first. */
@@ -120,6 +127,10 @@ export function doorRecords(
       precision: feature.properties.precision,
       decade,
       person: String(entity.kind) === 'person',
+      ...(feature.properties.statePostalCode
+        ? { statePostal: feature.properties.statePostalCode }
+        : {}),
+      cameraSafe: isCameraSafe(entity),
       ...(entity.primaryImage && !isRenderedImage(entity.primaryImage)
         ? { plate: entity.primaryImage }
         : {}),
@@ -127,6 +138,17 @@ export function doorRecords(
     });
   }
   return records;
+}
+
+/**
+ * The living-person gate for any surface that flies a camera to a record. A person record needs a
+ * recorded death (`livingStatus: 'deceased'`; unknown is treated as living, as the redaction policy
+ * does), and any sensitivity class (a living residence, a restricted site, a withheld place) keeps
+ * the record off.
+ */
+export function isCameraSafe(entity: PublicEntityView): boolean {
+  if (entity.sensitivityClass) return false;
+  return String(entity.kind) !== 'person' || entity.livingStatus === 'deceased';
 }
 
 function isSentence(statement: string): boolean {
