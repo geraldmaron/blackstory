@@ -13,7 +13,15 @@
 
 export type ProseVoiceFinding = {
   /** Stable id for the rule, for tests and reports. */
-  readonly rule: 'em-dash' | 'expanded-contraction' | 'self-reference' | 'page-pointer';
+  readonly rule:
+    | 'em-dash'
+    | 'expanded-contraction'
+    | 'self-reference'
+    | 'page-pointer'
+    | 'stock-phrase'
+    | 'source-term'
+    | 'negate-correct'
+    | 'staccato-run';
   readonly label: string;
   /** The offending text with a little context on each side. */
   readonly excerpt: string;
@@ -27,10 +35,16 @@ export const SELF_REFERENCE_PATTERNS: readonly {
   readonly label: string;
   readonly pattern: RegExp;
 }[] = [
-  { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },
   {
     label: 'names the publishing surface',
-    pattern: /\b(?:on|across|throughout) (?:the|our) site\b/i,
+    pattern:
+      /\bthis (?:site\b(?! (?:of|since|where|in|at|was|that|when|for)\b)|website|project|page)\b/i,
+  },
+  {
+    label: 'names the publishing surface',
+    // "on the site of Chambers Hill" and "on the site since 1860" are geography, not the website.
+    pattern:
+      /\b(?:on|across|throughout) (?:the|our) site\b(?! (?:of|since|where|in|at|was|that|when|for)\b)/i,
   },
   {
     label: 'cross-references a sibling chapter',
@@ -66,9 +80,82 @@ const EXPANDED_CONTRACTION =
 
 const EM_DASH = /—/;
 
-/** Removes quoted spans so testimony is never held to the narrator's rules. */
+/**
+ * Neo's never-list items 1 and 2 (docs/content/neo-voice.md, "Who's telling it"): poster and
+ * nomination-form language. Each pattern is narrow on purpose; "served as mayor" is plain English,
+ * "served as the heart of" is a placard.
+ */
+const STOCK_PHRASES: readonly RegExp[] = [
+  /\btrail-?blaz(?:er|ers|ing)\b/i,
+  /\bpaved the way\b/i,
+  /\bon the shoulders of\b/i,
+  /\bbr(?:oke|eaking|eaks) (?:down )?barriers\b/i,
+  /\brich (?:history|heritage|legacy|tapestry)\b/i,
+  /\blegacy (?:lives|lived) on\b/i,
+  /\bindelible\b/i,
+  /\btestament to\b/i,
+  /\bunsung heroe?s?\b/i,
+  /\btapestry\b/i,
+  /\bpivotal role\b/i,
+  /\bthe (?:beating |commercial |cultural |social |spiritual )?heart of (?:the |a )?(?:Black\b|African American\b|community|neighborhood|city|town|district|movement|life)/i,
+  /\b(?:serves|served|serving|stands|stood) as (?:a |an |the )?(?:headquarters|hub|center|centre|anchor|cornerstone|focal point|gathering place|symbol|reminder|beacon|testament)\b/i,
+];
+
+/**
+ * Never-list item 5: the record keeper's vocabulary used as the narrator's own. Proper names and
+ * official titles ("Negro Leagues", "Director of Negro Education") are allowed, so a following
+ * capitalized word exempts the match.
+ */
+const SOURCE_TERMS: readonly RegExp[] = [
+  /\b[Nn]egro(?:es)?\b(?!\s+(?:[A-Z]|leagues?\b))/,
+  /\bcolored (?:people|persons|man|woman|men|women|children|families|residents|voters|citizens|doctors|teachers|students)\b/,
+];
+
+/** Never-list item 7: "He isn't asking for relief. He's naming an asset." */
+const NEGATE_CORRECT =
+  /\b(?:isn['’]t|wasn['’]t|aren['’]t|weren['’]t)\b[^.!?]{1,80}[.!?]\s+(?:It|He|She|They|That|This)(?:['’]s|['’]re| is| was| are| were)\b/;
+
+/**
+ * Never-list item 7: three or more consecutive sentences of two to four words, as a drumbeat.
+ * One-word "sentences" are abbreviations and initials ("Dr.", "W. H."), so they break a run.
+ */
+function findStaccatoRun(text: string): { index: number; length: number } | null {
+  // Initials and titles end in a period but don't end a sentence. Same length keeps indexes true.
+  const unabbreviated = text.replace(
+    /\b(?:[A-Z]|Dr|Mr|Mrs|Ms|Jr|Sr|St|Rev|Gen|Col|Capt|Lt|Sgt|No|Co|Inc|Ave|Mt|Ft|Bros|Vol)\./g,
+    (match) => `${match.slice(0, -1)}_`,
+  );
+  const sentences = [...unabbreviated.matchAll(/[^.!?]+[.!?]+/g)];
+  let runStart = -1;
+  let runLength = 0;
+  for (const [i, sentence] of sentences.entries()) {
+    const words = sentence[0].trim().split(/\s+/).filter(Boolean).length;
+    if (words >= 2 && words <= 4) {
+      if (runLength === 0) runStart = i;
+      runLength += 1;
+      if (runLength >= 3) {
+        const first = sentences[runStart]!;
+        const last = sentences[i]!;
+        return {
+          index: first.index ?? 0,
+          length: (last.index ?? 0) + last[0].length - (first.index ?? 0),
+        };
+      }
+    } else {
+      runLength = 0;
+    }
+  }
+  return null;
+}
+
+/**
+ * Removes quoted spans so testimony is never held to the narrator's rules. Single quotes count only
+ * when they open after a space or bracket, so an apostrophe inside a word never starts a span.
+ */
 export function stripQuotedSpans(text: string): string {
-  return stripCurlyQuotedSpans(text).replace(/"[^"]*"/g, ' ');
+  return stripCurlyQuotedSpans(text)
+    .replace(/"[^"]*"/g, ' ')
+    .replace(/(^|[\s(])['‘][^'‘’\n]{2,240}['’](?=[\s.,;:!?)]|$)/g, '$1 ');
 }
 
 /**
@@ -140,6 +227,46 @@ export function findProseVoiceIssues(text: string): readonly ProseVoiceFinding[]
       excerpt: excerptAround(narrated, match.index, match[0].length),
     });
     break;
+  }
+
+  for (const pattern of STOCK_PHRASES) {
+    const match = pattern.exec(narrated);
+    if (!match) continue;
+    findings.push({
+      rule: 'stock-phrase',
+      label: 'uses poster or nomination-form language instead of saying what happened',
+      excerpt: excerptAround(narrated, match.index, match[0].length),
+    });
+    break;
+  }
+
+  for (const pattern of SOURCE_TERMS) {
+    const match = pattern.exec(narrated);
+    if (!match) continue;
+    findings.push({
+      rule: 'source-term',
+      label: "uses the record keeper's term as the narrator's own; quote it or name the people",
+      excerpt: excerptAround(narrated, match.index, match[0].length),
+    });
+    break;
+  }
+
+  const negate = NEGATE_CORRECT.exec(narrated);
+  if (negate) {
+    findings.push({
+      rule: 'negate-correct',
+      label: 'negates one claim only to assert another; say the second one plainly',
+      excerpt: excerptAround(narrated, negate.index, negate[0].length),
+    });
+  }
+
+  const staccato = findStaccatoRun(narrated);
+  if (staccato) {
+    findings.push({
+      rule: 'staccato-run',
+      label: 'runs three very short sentences together as a drumbeat',
+      excerpt: excerptAround(narrated, staccato.index, staccato.length),
+    });
   }
 
   return findings;
