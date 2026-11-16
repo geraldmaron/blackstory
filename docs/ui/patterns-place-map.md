@@ -77,29 +77,41 @@ Until the county geometry loads (it is fetched from zoom 4), the county level fa
 
 ---
 
-## Token anatomy
+## The map in the living archive (spec, 2026-11-15)
 
-| Part | Encodes | Notes |
+**Binding** for `/explore`, the home map and every embed (record rail, story inset, reading-room slot). Replaces the copper count tabs, the paper name flag and the flat-marks rule of the first plate.
+
+### Point of view
+
+The map is the archive's register laid on an atlas. A place is an entry in that register, so it is set the way the rest of the site sets an entry: a copper numeral (the count, in the numeral role) beside a name in mono capitals (the meta role). There are no badges, pills or bubbles anywhere on the plate. A record is a pin, and the one record the reader is looking at is named the way home names its record: a paper callout card tied to its pin by an ink leader, with the record's name and one meta line. The chrome around the plate is glass, and everything read at length inside it (the column, the inspector) uses the same type roles as a record page. The reader should never meet a map idiom that exists nowhere else on the site.
+
+### Token anatomy: a register entry
+
+| Part | Encodes | Spec |
 |---|---|---|
-| Count tab | Record count | A copper tab at the place's anchor, Geist Mono, ink on copper with a keyline in the plate's type color. Abbreviated past 999 ("1.2k"). Always drawn, so every record stays counted at every zoom |
-| Name | The place | Beside the tab, in Schibsted. States and counties in spaced capitals (a state prints its postal code below zoom 4.6, its name above), cities as written. Drawn when it fits; it yields to every count and to other names, and returns as the reader zooms in |
-| Size | Count step | Three type steps by count (12, 13.5 and 16px names; `placeTier`), the same steps as the hit circle (`CLUSTER_RADIUS_BY_COUNT`). Never color by count |
-| Hit circle | Where a tap opens the place | An invisible circle layer in three radii. The tab and name take no pointer events |
-| Summary | Count and precision mix in words | "Washington, DC, 352 records. Of these, 272 sit at exact sites and 80 are placed within a city." Carried on the token; the scoped list header reads the mix |
+| Count | Record count | Copper numeral, Schibsted 800, tabular figures, centered on the place's anchor. Abbreviated past 999 ("1.2k"). Always drawn, so every record stays counted at every zoom. No box behind it: a 3px halo in the plate's land color keeps it legible, the way the plate's own type is haloed |
+| Name | The place | Geist Mono capitals with meta tracking, in the plate's type color, set beside the numeral on its baseline side. States print their postal code below zoom 4.6 and their name above. Cities print in capitals too: on the plate every place name is meta, and Schibsted is kept for records. Drawn when it fits; it yields to every count and to other names |
+| Size | Count step | Three steps by count (`placeTier`), tokenized: `--ds-map-count-1/2/3` for the numeral and `--ds-map-name-1/2/3` for the name. The invisible symbol layers that place them use the same values (`MAP_TYPE` in `explore-style.ts`). Never color by count |
+| Hit circle | Where a tap opens the place | Invisible circle layer in three radii (`CLUSTER_RADIUS_BY_COUNT`), at least 44px across. The numeral and name take no pointer events |
+| Hover / focus | Interactive answer | The numeral turns the plate's type color and the name takes a 2px copper underline; press settles the numeral to 92% |
+| Summary | Count and precision mix in words | Unchanged: carried on the token, read by the scoped list header |
 
 The precision mix is always words, never color alone. Copper and ink only. No red or alarm hues.
 
----
+### Pins and areas (precision is the encoding)
 
-## Visual
+- **Site** (address, site, institution): a solid copper disc with a 2px keyline in the plate's type color. No contact shadow. From zoom 12 the record's name sits beside it in Schibsted 650, the record page's name on the street.
+- **Area** (campus, neighborhood, city): an open copper ring, never named as a spot.
+- **County or state**: no point. A flat copper wash at 16% over the polygon, outlined only when the place is entered.
+- Sizes are tokens (`--ds-map-pin`, `--ds-map-ring`), shared by the plate, the home callout's mark and the embeds.
 
-**Status:** the visual world of the plate, binding for `/explore`, the home Door (both paint the one `MapStage` plate) and the record embeds (`## Embeds`). Replaces the flat paper-on-ink plate with copper count discs, solid and hollow dots, the sand county hatch and grey county names.
+### Selection: one callout everywhere
 
-### Thesis
+The selected record's pin grows 1.6x in its own shape, and a callout names it: a paper card (`data-ground="paper"`), 1px ink keyline, `--ds-shadow-float`, the record's name in Schibsted 650 and one mono-caps meta line (kind and decade, or its locality on home), tied to the pin by a 1px ink leader. Home's walk callout and the explore selection are the same component and the same CSS (`.ds-map-callout` in `shell.css`). The plate's own name for that pin steps aside so the name prints once.
 
-The map is an atlas plate set in the app's own type. Named places are the marks, not anonymous counts: a reader sees "JEFFERSON 58" and "Washington 80" in the faces the record page uses, at sizes that rank places the way an atlas does. It refuses the category default of colored count bubbles on a generic basemap.
+### The plate (basemap)
 
-### The plate
+The plate is printed, not rendered: one land tone, water one step deeper, hairline borders, the engraved waterlines in the national frame, and street ink only from city zoom. The palettes below are unchanged; what changed is everything drawn on them.
 
 | Role | Dark (night atlas) | Light (day atlas) |
 |---|---|---|
@@ -112,29 +124,34 @@ The map is an atlas plate set in the app's own type. Named places are the marks,
 
 Values live in `mapPalettes` (`packages/ui/src/tokens/colors.ts`, mirrored as `--ds-map-*` in `tokens.css`) and `plateForScheme` (`dignity-style.ts`). The ΔL* contract in `map-contrast.test.ts` holds for both.
 
-- **Waterlines** are the plate's signature: two hairlines inside every sea coast, offset 2 and 5px, the outer one lighter, the engraved coast of a nineteenth-century atlas. They show in the national frame only, fading in from zoom 3.4 (where the whole continent and its arctic coast are in frame) and gone past zoom 5.5, where the vector coast becomes marsh and inlet detail and the lines clump. Lakes carry none, because the northern lake country would read as static. Offsets stay under the tiles' 8px render buffer so no line surfaces on a tile seam.
-- **County names** under the tokens are spaced capitals in the plate's quiet label color, the atlas convention, and yield to every token.
-- **Area precision** is a flat copper wash at 16% over a county (or state) that holds records known only by county (or state). It says "somewhere in here", never a point.
-- The marks on the plate stay flat: no gradients, glows, bevels or 3D on a pin, ring, outline or label. The only shadow on the plate itself is the flat contact shadow under a site pin. Chrome that floats over the plate is glass (the float plane, below).
-
-### Marks
-
-- **Place token:** the copper count tab and the name (anatomy above). Hover inverts the tab (the plate's type color behind the land color) and underlines the name in copper; press settles the tab to 92%.
-- **Site pin:** a copper pin head with a ring opposite the plate (paper on charcoal, ink on paper), a flat contact shadow, and, from zoom 12, the record's name beside it in Schibsted: the record page's pin and name, on the street. A city-precision record stays an open copper ring and is never named as a spot.
-- **Selection:** the pin grows 1.6x in its own shape and the paper name flag (`selection-flag.ts`) names it; its plate name steps aside so the name prints once.
+- **Waterlines** show in the national frame only, fading in from zoom 3.4 and gone past 5.5. Lakes carry none.
+- **County names** under the tokens are spaced mono-style capitals in the plate's quiet label color and yield to every token.
+- **Entered place**: a 2px copper outline and a flat veil of the water color at 55% outside it. The outline is drawn only while a place is entered and at the zooms that frame it; it never survives into street zoom after the reader leaves or zooms past it.
+- Marks have no gradients, glows or bevels: their information is shape and copper. Depth belongs to the chrome.
 
 ### How the type gets onto a WebGL map
 
-Map glyphs cannot set Schibsted or Geist Mono, so the names are DOM (`components/map-stage/place-labels.ts`). MapLibre still does the cartography: the count, name and site-name symbol layers are invisible and only place their text. Every frame the DOM layer prints exactly the symbols MapLibre placed, at the same anchor. Collision, the always-drawn count, hit testing and the place tap all stay on the map layers, so the labels take no pointer event and the canvas behaves as before. Counts sit above names in the style, so in MapLibre's top-down placement every count claims its tab before any name is placed.
+Map glyphs cannot set Schibsted or Geist Mono, so the names are DOM (`components/map-stage/place-labels.ts`). MapLibre still does the cartography: the count, name and site-name symbol layers are invisible and only place their text, sized from the same `MAP_TYPE` values as the DOM. Every frame the DOM layer prints exactly the symbols MapLibre placed. Collision, hit testing and the place tap stay on the map layers.
 
-### The chrome floats on the plate
+### The chrome
 
-The map runs full bleed under the whole viewport; the header is the same glass as the rest of the chrome. Every piece of chrome is on the float plane (the `.ds-float` recipe: the table's own ground at `--ds-float-alpha`, blurred, with a `--ds-float-edge` keyline and `--ds-shadow-float`; solid under reduced transparency) on the ground of `data-ground="ink"`: ink on the night atlas, the paper table on the day one. The 380px column sits one 12px gutter (`--ds-xfloat`) in from the left, top and bottom; the decade histogram floats along the bottom beside it; the zoom and locate stack sits above the histogram. Each is lifted off the map by the gutter, a 14px radius, the keyline and the float shadow. The attribution is one shared float-plane chip, the 44px "i", on the map just inside the column and above the histogram; record embeds use the same chip. The selection flag takes the home callout card's material (ink keyline, float shadow), and the record inspector leads with its photo as a plate. On a phone the column is the same ground as a bottom sheet with a 28px top radius. `chromePadding` mirrors this geometry so a framed place lands in the map the reader can see.
+Every piece of chrome is on the float plane (the `.ds-float` recipe; solid under reduced transparency) on the table's ground. The column and the strip run nearer solid (94%) because they carry reading text.
+
+- **Column = the register.** Its head is the count as a copper numeral (`--ds-text-numeral` scale stepped down) with "records" in mono capitals, and the Filters control. Rows are the `/records` row: name in Schibsted, kind and place in meta, decade as a copper mono numeral, the grade as `GradeTag`. An entered place heads the list with its trail, its level as a mono-caps word (no copper pill), its name in the display face and the precision mix in the Newsreader serif.
+- **Inspector = a record masthead in miniature.** Plate with its credit beside or under it (capped at 3:2 on wide screens and at 160px tall in the phone sheet), the name in the display face, the decade once as a copper numeral, the summary in the Newsreader serif, then the record page's facts as ruled type rows (WHERE, EVIDENCE in mono-caps labels between ink rules), then the actions.
+- **Strip = the home histogram.** Records per decade on a true time scale, in the home walk's idiom: bars in a rule tone, bars inside the chosen range in the plate's type color, the range edges and handles copper, decade labels in mono capitals.
+- **Legend.** A one-line key in the strip's leading cell on wide screens and in the Filters view on a phone: the disc ("exact site"), the ring ("within a city or area"), the wash ("county or state"), each mark drawn beside its words.
+- **Controls.** One glass stack, 44px buttons, 1.5px stroked icons in the plate's type color.
+- **Geometry.** The 380px column sits one 12px gutter in from the edges; the strip floats beside it; the controls sit above the strip. On a phone the column is a bottom sheet with a 28px top radius. `chromePadding` mirrors this geometry at every width the column floats (768px and up), so an entered place frames in the map the reader can see.
+
+### Embeds
+
+Embeds draw the same plate and the same marks. The place token on an embed is the register entry on glass (copper numeral, mono-caps name), the record's name sits beside its pin, and the attribution is the shared chip.
 
 ### Motion
 
-- Entering a place is the one authored move (above).
-- Labels fade in on the duration tokens as places regroup by zoom; reduced motion collapses them to a cut.
+- Entering a place is the one authored move.
+- The callout and labels fade on the duration tokens; reduced motion cuts.
 
 ### Known limits
 
