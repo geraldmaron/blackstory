@@ -118,6 +118,12 @@ export type RecordPageProps = {
   readonly plate?: ReactNode;
   /** A violence-adjacent or sensitive record: plain ground, no plate, no lamplight. */
   readonly quiet?: boolean;
+  /**
+   * The record's map (`<RecordMap>`), set in the masthead under the plate: the photograph becomes
+   * the map's ground, clear over the record's point and deepening outward. Only used with a plate;
+   * a family that passes one keeps the map out of `media`.
+   */
+  readonly plateMap?: ReactNode;
 };
 
 export { formatRecordDate } from './format-record-date';
@@ -311,9 +317,11 @@ export function RecordPage({
   pager,
   plate,
   quiet = false,
+  plateMap,
 }: RecordPageProps) {
   const numeral = numeralOverride ?? recordNumeral(facts);
   const plated = Boolean(plate) && !quiet;
+  const grounded = plated && Boolean(plateMap);
   return (
     <main className="ds-room ds-recpage" id="main" data-quiet={quiet ? '' : undefined}>
       <article className="ds-recpage__record" aria-labelledby="record-title">
@@ -321,6 +329,7 @@ export function RecordPage({
           className="ds-recpage__mast ds-field"
           data-quiet={quiet ? '' : undefined}
           data-plate={plated ? '' : undefined}
+          data-grounded={grounded ? '' : undefined}
         >
           <div className="ds-recpage__head ds-wrap">
             {numeral?.caption ? (
@@ -354,7 +363,9 @@ export function RecordPage({
               </ul>
             ) : null}
           </div>
+          {grounded ? <div className="ds-recpage__ground-map">{plateMap}</div> : null}
           {plated ? <div className="ds-recpage__plate">{plate}</div> : null}
+          {grounded ? <div className="ds-recpage__wash" aria-hidden="true" /> : null}
         </header>
 
         <div className="ds-recpage__desk ds-wrap">

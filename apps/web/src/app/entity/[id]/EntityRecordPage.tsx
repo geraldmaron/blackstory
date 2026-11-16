@@ -335,8 +335,22 @@ export function EntityRecordView({
       ? buildExternalMapsSearchUrl({ ...point, query: anatomy.whereLabel })
       : undefined;
   const statePostalCode = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)?.postalCode;
+  const recordMap = point ? (
+    <RecordMap
+      lat={point.lat}
+      lng={point.lng}
+      label={String(entity.kind) === 'person' ? (place ?? whereValue) : entity.displayName}
+      precision={entity.locationPrecision}
+      {...(statePostalCode ? { statePostalCode } : {})}
+      maxZoom={RAIL_MAP_MAX_ZOOM}
+      {...(recordPlace ? { place: recordPlace } : {})}
+      caption={false}
+    />
+  ) : null;
+  /* With a plate, the map moves into the masthead and the photograph becomes its ground. */
+  const plateMap = plate ? recordMap : null;
   const media =
-    (entity.primaryImage && !plate) || point ? (
+    (entity.primaryImage && !plate) || (point && !plateMap) ? (
       <>
         {entity.primaryImage && !plate ? (
           <RecordImage
@@ -346,18 +360,7 @@ export function EntityRecordView({
             width={300}
           />
         ) : null}
-        {point ? (
-          <RecordMap
-            lat={point.lat}
-            lng={point.lng}
-            label={String(entity.kind) === 'person' ? (place ?? whereValue) : entity.displayName}
-            precision={entity.locationPrecision}
-            {...(statePostalCode ? { statePostalCode } : {})}
-            maxZoom={RAIL_MAP_MAX_ZOOM}
-            {...(recordPlace ? { place: recordPlace } : {})}
-            caption={false}
-          />
-        ) : null}
+        {plateMap ? null : recordMap}
       </>
     ) : undefined;
 
@@ -495,6 +498,7 @@ export function EntityRecordView({
       title={entity.displayName}
       quiet={quiet}
       {...(plate ? { plate } : {})}
+      {...(plateMap ? { plateMap } : {})}
       meta={meta}
       ledeText={entity.summary}
       lede={

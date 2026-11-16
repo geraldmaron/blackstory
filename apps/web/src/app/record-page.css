@@ -1153,3 +1153,151 @@
     transition: none;
   }
 }
+
+/* —— the plate as the map's ground (`data-grounded`) ———————————————————————————————————————
+   The home tour's treatment (door-tour.css, `.ds-door__echo`) on the record's own masthead. The
+   record's map sits where the plate stood (a band at the top on a phone and tablet, the right of
+   the field on a desktop); the photograph covers the whole field over it, clear over the record's
+   point at the map's center and deepening outward, so the map reads through it everywhere and
+   plainly at the record. The name and meta sit on the photograph over a soft wash, not a box.
+   The map keeps its cooperative gestures (one finger scrolls the page) and its place token; the
+   photograph takes no pointer events. A quiet record never gets here: it has no plate. */
+.ds-recpage__mast[data-grounded] {
+  /* Phone and tablet: the map band's height, and the record's point at its middle. */
+  --ds-recpage-band: clamp(15rem, 46svh, 26rem);
+  --ds-recpage-clear: min(22vw, 7.5rem);
+  --ds-recpage-hole-x: 50%;
+  --ds-recpage-hole-y: calc(var(--ds-recpage-band) / 2);
+}
+
+.ds-recpage__ground-map {
+  position: relative;
+  order: -2;
+  height: var(--ds-recpage-band);
+}
+
+/* Only the map's drawing goes under the photograph. Its place token and attribution stay above
+   it, so they read at full strength and keep their hit areas; nothing between here and the field
+   may form a stacking context (no z-index, no fading opacity), or they would sink with it. */
+.ds-recpage__ground-map .ds-record-map__frame[data-ground] {
+  background: transparent;
+}
+
+.ds-recpage__ground-map .ds-record-map__canvas {
+  transition: none;
+}
+
+.ds-recpage__ground-map .maplibregl-canvas {
+  z-index: -2; /* local: under the photograph, inside the field's own stacking context */
+}
+
+.ds-recpage__ground-map .ds-record-map,
+.ds-recpage__ground-map .ds-record-map__frame[data-ground],
+.ds-recpage__ground-map .ds-record-map__frame[data-ground]:not([data-status='ready']) {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* The plate stays in flow for its credit (under the band); its photograph covers the field. */
+.ds-recpage__mast[data-grounded] .ds-recpage__plate {
+  margin-bottom: var(--ds-space-6);
+  pointer-events: none;
+}
+
+.ds-recpage__mast[data-grounded] .ds-recpage__plate .ds-plate__tone {
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* local: over the map, under the words */
+  aspect-ratio: auto;
+  max-height: none;
+  opacity: 0.66;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--ds-recpage-hole-x) var(--ds-recpage-hole-y),
+    transparent 0 var(--ds-recpage-clear),
+    rgb(0 0 0 / 0.6) calc(var(--ds-recpage-clear) * 1.7),
+    #000 calc(var(--ds-recpage-clear) * 2.8)
+  );
+  mask-image: radial-gradient(
+    circle at var(--ds-recpage-hole-x) var(--ds-recpage-hole-y),
+    transparent 0 var(--ds-recpage-clear),
+    rgb(0 0 0 / 0.6) calc(var(--ds-recpage-clear) * 1.7),
+    #000 calc(var(--ds-recpage-clear) * 2.8)
+  );
+}
+
+/* On paper the plate's lights are the paper itself; only its shadows carry the photograph. */
+:root:not([data-theme='dark']) .ds-recpage__mast[data-grounded] .ds-plate__tone {
+  opacity: 0.92;
+}
+
+.ds-recpage__mast[data-grounded] .ds-plate__credit {
+  pointer-events: auto;
+}
+
+/* The wash under the words: from the band's foot down on a phone, from the left on a desktop. */
+.ds-recpage__wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* local: over the photograph, under the words */
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent calc(var(--ds-recpage-band) - var(--ds-space-8)),
+    color-mix(in srgb, var(--ds-canvas) 86%, transparent)
+      calc(var(--ds-recpage-band) + var(--ds-space-10)),
+    color-mix(in srgb, var(--ds-canvas) 90%, transparent)
+  );
+}
+
+@media (min-width: 64rem) {
+  .ds-recpage__mast[data-grounded] {
+    --ds-recpage-map-w: min(46vw, 44rem);
+    --ds-recpage-map-foot: calc(var(--ds-recpage-overlap) + var(--ds-space-10));
+    --ds-recpage-clear: min(10vw, 18svh);
+    --ds-recpage-hole-x: calc(100% - var(--ds-recpage-map-w) / 2);
+    --ds-recpage-hole-y: calc((100% - var(--ds-recpage-map-foot)) / 2);
+    min-height: min(34rem, 64svh);
+  }
+
+  .ds-recpage__ground-map {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: var(--ds-recpage-map-foot);
+    width: var(--ds-recpage-map-w);
+    height: auto;
+  }
+
+  /* No longer a box at the right: the photograph spans the field, its credit under the map. */
+  .ds-recpage__mast[data-grounded] .ds-recpage__plate {
+    position: static;
+    width: auto;
+  }
+
+  /* The credit sits on the photograph here, so it carries a little of the field's ground to
+     stay readable over light and dark passages alike. */
+  .ds-recpage__mast[data-grounded] .ds-plate__credit {
+    position: absolute;
+    right: var(--ds-gutter);
+    bottom: calc(var(--ds-recpage-overlap) + var(--ds-space-3));
+    max-width: calc(var(--ds-recpage-map-w) - var(--ds-space-6));
+    padding: var(--ds-space-1) var(--ds-space-2);
+    border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, var(--ds-canvas) 86%, transparent);
+    color: var(--ds-ink);
+    text-align: right;
+  }
+
+  .ds-recpage__wash {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ds-canvas) 92%, transparent) 0,
+      color-mix(in srgb, var(--ds-canvas) 86%, transparent) calc(100% - var(--ds-recpage-map-w)),
+      transparent calc(100% - var(--ds-recpage-map-w) + 10rem)
+    );
+  }
+}
