@@ -173,3 +173,16 @@ test('a record whose accepted prose documents harm carries the content note in i
   };
   assert.doesNotMatch(render(calm, { point: POINT }), /ds-recpage__note|Sensitive content/);
 });
+
+test('registry topics become pills linking to the records list; a quiet record shows none', () => {
+  const church = seed('ent_15th_st_church_001');
+  const html = render({ ...church, topicIds: ['banking', 'not-a-topic'] });
+  assert.match(html, /href="\/records\?topic=banking"[^>]*>Banking</);
+  assert.doesNotMatch(html, /not-a-topic/);
+  const quiet = render({
+    ...church,
+    topicIds: ['banking'],
+    sensitivity: { kind: 'violence' } as never,
+  });
+  assert.doesNotMatch(quiet, /aria-label="Topics"/);
+});

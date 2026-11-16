@@ -62,6 +62,7 @@ import { confidenceIconFor } from '../../../lib/map-experience/confidence-icons'
 import { buildExploreMapSource } from '../../../lib/map-experience/build-explore-map-source';
 import { ERA_NOT_DOCUMENTED_LABEL } from '../../../lib/map-experience/entity-era-facts';
 import { findUsStateFromJurisdictionLabel } from '@repo/domain/map/geography';
+import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
 import { precisionInWords } from '../../../lib/map-experience/geo-precision';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { kindIconFor } from '../../../lib/map-experience/kind-icons';
@@ -255,6 +256,17 @@ export function EntityRecordView({
     ...(status ? [{ label: status, icon: faCircleHalfStroke }] : []),
   ];
 
+  /* Topic pills: registry topics only (never a free-text tag), at most four, none on a quiet record. */
+  const topicTags = quiet
+    ? []
+    : (entity.topicIds ?? [])
+        .filter(isValidTopicId)
+        .slice(0, 4)
+        .map((id) => ({
+          href: `/records?topic=${encodeURIComponent(id)}`,
+          label: getTopicLabel(id) ?? id,
+        }));
+
   /* Evidence: the claims the page shows (a claim restating the lede is the lede's own source). */
   const shownClaims = withoutSummaryEchoClaims(entity.claims, entity.summary);
   const cards = buildEvidenceCards(toEvidenceClaimInputs(shownClaims));
@@ -296,7 +308,28 @@ export function EntityRecordView({
     },
     {
       label: 'When' as const,
-      value: eraKnown ? anatomy.eraLabel : 'Not dated yet',
+      /* Each decade in the label becomes a pill; the words between them ("to") stay plain. */
+      value: eraKnown ? (
+        <span className="ds-recpage__pills">
+          {anatomy.eraLabel.split(/(\d{4}s)/u).flatMap((part, index) =>
+            part.trim() === ''
+              ? []
+              : /^\d{4}s$/u.test(part)
+                ? [
+                    <span key={index} className="ds-recpage__pill">
+                      {part}
+                    </span>,
+                  ]
+                : [
+                    <span key={index} className="ds-recpage__pill-join">
+                      {part.trim()}
+                    </span>,
+                  ],
+          )}
+        </span>
+      ) : (
+        'Not dated yet'
+      ),
     },
     {
       label: 'Evidence' as const,
@@ -500,6 +533,7 @@ export function EntityRecordView({
       {...(plate ? { plate } : {})}
       {...(plateMap ? { plateMap } : {})}
       meta={meta}
+      {...(topicTags.length > 0 ? { tags: topicTags } : {})}
       ledeText={entity.summary}
       lede={
         <LinkedProse

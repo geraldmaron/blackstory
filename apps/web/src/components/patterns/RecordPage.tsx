@@ -96,6 +96,8 @@ export type RecordPageProps = {
   readonly lede?: ReactNode;
   /** A one-line content note under the lede (sensitivity, legal disclaimer). */
   readonly note?: ReactNode;
+  /** Topic pills under the lede, each a link into the filtered records list. */
+  readonly tags?: readonly RecordLink[];
   readonly facts: readonly RecordFact[];
   /**
    * The display numeral, when the When fact's first year would read as the wrong kind of date
@@ -162,7 +164,15 @@ function Icon({ icon }: { readonly icon: IconDefinition }) {
   return <FontAwesomeIcon icon={icon} className="ds-recpage__icon" aria-hidden="true" />;
 }
 
-function RecordLede({ text, children }: { readonly text: string; readonly children: ReactNode }) {
+function RecordLede({
+  text,
+  children,
+  tags,
+}: {
+  readonly text: string;
+  readonly children: ReactNode;
+  readonly tags?: readonly RecordLink[];
+}) {
   if (text.trim().length === 0) return null;
   const clamp = wordCount(text) > LEDE_CLAMP_WORDS;
   return (
@@ -180,6 +190,21 @@ function RecordLede({ text, children }: { readonly text: string; readonly childr
           <span className="ds-recpage__lede-open">Read full summary</span>
           <span className="ds-recpage__lede-close">Show less</span>
         </label>
+      ) : null}
+      {tags && tags.length > 0 ? (
+        <ul className="ds-recpage__pills ds-recpage__tags" aria-label="Topics">
+          {tags.map((tag) => (
+            <li key={tag.href}>
+              <Link
+                className="ds-recpage__pill ds-recpage__pill--link"
+                href={tag.href}
+                prefetch={false}
+              >
+                {tag.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
       ) : null}
     </div>
   );
@@ -307,6 +332,7 @@ export function RecordPage({
   ledeText,
   lede,
   note,
+  tags,
   facts,
   numeral: numeralOverride,
   media,
@@ -374,7 +400,9 @@ export function RecordPage({
                 containing block, so it never slides into the record file below. Elsewhere it is
                 `display: contents` and its children take the sheet's own grid areas. */}
             <div className="ds-recpage__main">
-              <RecordLede text={ledeText}>{lede ?? ledeText}</RecordLede>
+              <RecordLede text={ledeText} {...(tags ? { tags } : {})}>
+                {lede ?? ledeText}
+              </RecordLede>
               {note ? <div className="ds-recpage__note">{note}</div> : null}
 
               {/* The card and the rail: one column beside the reading on a desktop, so the card's
