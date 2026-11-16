@@ -81,6 +81,52 @@
   display: none;
 }
 
+/* —— The panel is the record's photograph ————————————————————————————————————————————
+   Beside the map, which holds the record's blocks in focus, each step's card is filled with the
+   record's own plate, dimmed, and its words sit on it: the photograph shows clear at the top and
+   deepens under the text. The credit stays in the card where the plate was. The ink ground on the
+   body sets the cards' tokens in both themes; its own fill is cleared. */
+.ds-door-tour__body {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+.ds-door-tour__card.ds-door-record {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: min(36rem, 72dvh);
+  align-content: end;
+}
+
+.ds-door-tour__card .ds-door-record__plate .ds-plate__tone {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: auto;
+  max-height: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* The dim: light over the photograph, dense enough under the words that muted text holds AA over
+   a white photograph. */
+.ds-door-tour__card.ds-door-record:has(.ds-door-record__plate)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ds-surface-sunken) 18%, transparent) 0%,
+    color-mix(in srgb, var(--ds-surface-sunken) 58%, transparent) 14%,
+    color-mix(in srgb, var(--ds-surface-sunken) 86%, transparent) 28%,
+    color-mix(in srgb, var(--ds-surface-sunken) 90%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
 /* —— The tour's own words ———————————————————————————————————————————————————————————— */
 .ds-door-tour__body {
   display: grid;
@@ -183,7 +229,7 @@
     margin-left: var(--ds-door-edge);
     padding: var(--ds-space-6);
     border-radius: var(--ds-radius-md);
-    background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+    background: color-mix(in srgb, var(--ds-canvas) 86%, transparent);
     color: var(--ds-ink);
     box-shadow:
       inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
@@ -225,28 +271,33 @@
     padding-bottom: var(--ds-space-12);
   }
 
-  /* The progress mark rides at the top of the open map band, not over a card's text. */
+  /* The progress mark rides at the top of the open map band, under the cards as they pass. */
   .ds-door-tour__band {
+    z-index: 0;
     top: calc(50dvh - var(--ds-tour-band-h) / 2);
     align-items: flex-start;
     justify-content: flex-start;
   }
 
+  /* The open map band, a little shorter than the band itself, so each card's photograph rises
+     slightly over the map's lower edge as it arrives. */
   .ds-door-tour__step::before {
     content: '';
     display: block;
-    height: var(--ds-tour-band-h);
+    height: calc(var(--ds-tour-band-h) - var(--ds-space-8));
   }
 
   .ds-door-tour__card {
     max-width: none;
     padding: var(--ds-space-5);
     border-radius: var(--ds-radius-md);
-    background: var(--ds-canvas);
+    background: color-mix(in srgb, var(--ds-canvas) 86%, transparent);
     color: var(--ds-ink);
     box-shadow:
       inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
       var(--ds-shadow-float);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
   }
 }
 

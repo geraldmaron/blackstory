@@ -65,6 +65,8 @@ export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourSte
       stepObserver?.disconnect();
       crossing.clear();
       const vh = window.innerHeight;
+      // A hidden or background tab can report no height; a negative line is an invalid margin.
+      if (vh <= 0) return;
       const phone = window.matchMedia(
         '(max-width: 47.9375rem), (max-width: 63.9375rem) and (max-aspect-ratio: 1/1)',
       ).matches;

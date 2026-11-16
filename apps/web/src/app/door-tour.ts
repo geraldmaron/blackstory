@@ -155,8 +155,9 @@ export function tourHeading(records: readonly Pick<DoorRecord, 'statePostal'>[])
     : `${count} records across the country`;
 }
 
-/** The deepest zoom a tour step may use: the record's own precision, never tighter. */
-export const TOUR_MAX_ZOOM = 12;
+/** The deepest zoom a tour step may use: the record's own precision, never tighter. A site
+ * reaches the shared precision ceiling (14), which shows the blocks around it in the lens. */
+export const TOUR_MAX_ZOOM = 14;
 
 export function tourZoom(precision: string): number {
   return Math.min(zoomForLocationPrecision(precision), TOUR_MAX_ZOOM);
