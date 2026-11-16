@@ -38,6 +38,8 @@ import {
 import { CommandBar } from '../../components/shell/CommandBar';
 import { CommandPalette } from '../../components/patterns/command-palette/CommandPalette';
 import { ShortcutSheet } from '../../components/patterns/ShortcutSheet';
+import { SelectionGround } from '../../components/map-experience/SelectionGround';
+import type { Map as MapLibreMap } from 'maplibre-gl';
 import { CollectionsDrawer } from '../../components/patterns/CollectionsDrawer';
 import { EmptyState } from '../../components/patterns/EmptyState';
 import { ToastStack, useToasts } from '../../components/patterns/Toast';
@@ -965,6 +967,17 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             Records.
           </Notice>
         </div>
+      ) : null}
+
+      {/* The selected record's photograph as the map's ground, clear over its pin. */}
+      {inspector?.photoUrl && selectedFeature && mode === 'atlas' && !chromeHidden ? (
+        <SelectionGround
+          key={inspector.id}
+          map={stage.getMap() as unknown as MapLibreMap | null}
+          lngLat={selectedFeature.geometry.coordinates}
+          photoUrl={inspector.photoUrl}
+          person={inspector.kind === 'person'}
+        />
       ) : null}
 
       <AnnotationOverlay
