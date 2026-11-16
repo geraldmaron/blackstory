@@ -103,7 +103,7 @@ export function MethodologySections() {
           <PlainList items={GRADE_RULE_NOTES} label="How the grade rule reads its inputs" />
           <p className="ds-trust-note">
             Every citation on the site is built the same way, including the one the Copy citation
-            command puts on your clipboard:
+            command puts on your clipboard. Here is one.
           </p>
           <Citation label="Example citation" source={EXAMPLE_CITATION} />
         </RoomSection>

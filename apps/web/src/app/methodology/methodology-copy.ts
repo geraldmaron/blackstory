@@ -13,7 +13,7 @@
  * changes, these sentences change with it.
  */
 export const METHODOLOGY_INTRO_LEDE =
-  'The receipt for everything else on the site: how a record gets in, what its grade means, why a point is never drawn sharper than its source, and what happens when a record touches someone still living.';
+  'The receipt for everything else on the site, covering how a record gets in, what its grade means, why a point is never drawn sharper than its source, and what happens when a record touches someone still living.';
 
 export const METHODOLOGY_PAGE_SECTIONS: readonly {
   readonly id: string;
@@ -182,7 +182,7 @@ export const DIGNITY_RULES = [
   'Points render no sharper than stored public precision. A coarsened point is never labeled as an exact address.',
   'No red or alarm hues for violence adjacent records; no crime heat rendering. Color is never the only signal.',
   'Unknown living status is treated as living. Current residential addresses do not appear on public pages or hand offs.',
-  'Hard history is documented wherever the sources support it, and the default lens stays presence: people, institutions and places across time.',
+  'Hard history is documented wherever the sources support it, and the default lens stays presence, meaning people, institutions and places across time.',
 ] as const;
 
 export const LIMITATION_RULES = [

@@ -81,8 +81,8 @@ test('a row names the record, what changed, the note and the kind of change', ()
   assert.match(html, /ds-errata__change">Founding date corrected</);
   assert.match(html, /ds-errata__note">The original entry cited the wrong year/);
   // A correction is the ink tag, held ink on the light table too; the other kinds are sand.
-  assert.match(html, /ds-errata__type" data-ground="ink" data-ground-fixed="">Correction</);
-  assert.match(html, /ds-errata__type" data-ground="sand">Editor&#x27;s note</);
+  assert.match(html, /ds-errata__type" data-kind="correction">Correction</);
+  assert.match(html, /ds-errata__type">Editor&#x27;s note</);
   // An unresolved record is named, not linked; an archive-level entry names its page.
   assert.match(html, /<span class="ds-errata__name">Bethel Church<\/span>/);
   assert.match(html, /<a class="ds-errata__name" href="\/methodology">Methodology<\/a>/);

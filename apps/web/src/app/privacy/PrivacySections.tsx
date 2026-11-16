@@ -58,7 +58,7 @@ const WEB_INVENTORY = [
     id: 'web-analytics',
     term: 'Visit measurement',
     definition:
-      'The public site records pageviews and a coarse traffic class (likely human, automated, search crawler, AI crawler, or tool) so I can tell readers apart from scrapers. The class is one of those five values and nothing more: no user id, no stored fingerprint, no advertising use.',
+      'The public site records pageviews and a coarse traffic class (likely human, automated, search crawler, AI crawler, or tool) so I can tell readers apart from scrapers. The class is one of those five values and nothing more, with no user id, no stored fingerprint, and no advertising use.',
   },
 ] as const;
 

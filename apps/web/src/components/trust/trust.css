@@ -315,13 +315,13 @@
   transform: translateX(2px);
 }
 
-/* —— the step flow: an ink panel on the sheet ————————————————————————————————
-   The process is drawn as a diagram in ink, sand and copper: sand nodes on a sand rail, the step
-   numbers large in sand, and the last step (the one that ends on a public page) a copper node. */
+/* —— the step flow: ruled steps on the sheet ————————————————————————————————
+   The process is drawn as ruled type on the sheet: ink nodes on a ruled rail, the step numbers
+   large in copper, and the last step (the one that ends on a public page) a copper node. */
 .ds-trust-flow {
   margin: var(--ds-space-8) 0 0;
-  padding: var(--ds-space-8) var(--ds-space-6);
-  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-6) 0 0;
+  border-top: 2px solid var(--ds-ink);
 }
 
 .ds-trust-flow__caption {
@@ -329,7 +329,7 @@
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   font-weight: 600;
-  color: var(--ds-numeral-soft-text);
+  color: var(--ds-ink-muted);
 }
 
 .ds-trust-flow__steps {
@@ -358,7 +358,7 @@
   bottom: 2px;
   left: calc(var(--flow-node) / 2 - 1px);
   width: 2px;
-  background: var(--ds-numeral-soft);
+  background: var(--ds-rule);
 }
 
 .ds-trust-flow__node {
@@ -368,7 +368,7 @@
   height: var(--flow-node);
   margin-top: var(--ds-space-1);
   box-sizing: border-box;
-  border: 2px solid var(--ds-numeral-soft);
+  border: 2px solid var(--ds-ink);
   background: var(--ds-canvas);
 }
 
@@ -389,7 +389,7 @@
   font-weight: 600;
   line-height: var(--ds-leading-numeral);
   letter-spacing: var(--ds-tracking-numeral);
-  color: var(--ds-numeral-soft);
+  color: var(--ds-numeral-accent);
   font-variant-numeric: lining-nums;
 }
 

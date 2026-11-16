@@ -737,9 +737,12 @@ export function DataSections({
 
       <Section id="lives">
         <p className="ds-data-door">
-          <Link className={buttonClassName('secondary')} href="/lives">
+          <Link className="ds-data-door__link" href="/lives">
             Open Lives
           </Link>
+          <span className="ds-data-door__line">
+            Every decade and region, with the cited tables.
+          </span>
         </p>
       </Section>
 

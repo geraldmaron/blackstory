@@ -126,6 +126,36 @@ details[open] > summary > .lives-caret {
   display: none;
 }
 
+/* Ruled tabs, the system control idiom: mono caps, the current one underlined in ink. */
+.lives-milestone__picker .ds-segmented,
+.lives-toolbar .ds-segmented {
+  gap: var(--ds-space-1) var(--ds-space-6);
+  padding: 0;
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 0;
+}
+
+.lives-milestone__picker .ds-segmented__option,
+.lives-toolbar .ds-segmented__option {
+  padding: 0 var(--ds-space-1);
+  border-radius: 0;
+  border-bottom: 3px solid transparent;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lives-milestone__picker .ds-segmented__option[aria-current='page'],
+.lives-milestone__picker .ds-segmented__option:has(> .ds-segmented__input:checked),
+.lives-toolbar .ds-segmented__option[aria-current='page'],
+.lives-toolbar .ds-segmented__option:has(> .ds-segmented__input:checked) {
+  background: none;
+  border-bottom-color: var(--ds-accent-graphic);
+  color: var(--ds-ink);
+}
+
 /* —— /lives: the question picker and opening ——————————————————————————————— */
 .lives-milestone__picker {
   margin: 0 0 var(--ds-space-12);
@@ -371,10 +401,10 @@ details[open] > summary > .lives-caret {
   margin-top: var(--ds-space-18);
 }
 
-/* A sand band across the sheet. The selected era becomes an ink block with heavier type. */
+/* A ruled row on the sheet. The selected era is marked by an ink rule above it and heavier type. */
 .lives-scrub {
-  padding: var(--ds-space-6) var(--ds-space-4) var(--ds-space-4);
-  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-6) 0 var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
   container-type: inline-size;
   scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-4));
 }
@@ -411,7 +441,8 @@ details[open] > summary > .lives-caret {
   min-height: 2.75rem;
   padding: var(--ds-space-2) var(--ds-space-2) 0;
   border: 0;
-  border-radius: var(--ds-radius-sm);
+  border-top: 3px solid transparent;
+  border-radius: 0;
   background: none;
   color: var(--ds-ink-muted);
   font: inherit;
@@ -429,11 +460,7 @@ details[open] > summary > .lives-caret {
 }
 
 .lives-scrub__era[aria-selected='true'] {
-  background: var(--ds-canvas);
-}
-
-.lives-scrub__era:not([aria-selected='true']):hover {
-  background: var(--ds-surface-raised);
+  border-top-color: var(--ds-ink);
 }
 
 .lives-scrub__era:focus-visible {
@@ -572,6 +599,7 @@ details[open] > summary > .lives-caret {
   font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
+  color: var(--ds-numeral-accent);
 }
 
 .lives-scrub__era[aria-selected='true'] .lives-scrub__label {
@@ -584,7 +612,7 @@ details[open] > summary > .lives-caret {
   right: 0;
   bottom: 0;
   left: 0;
-  border-bottom: 3px solid var(--ds-accent-graphic);
+  border-bottom: 2px solid var(--ds-ink);
 }
 
 /* Narrow: each era is a row on a horizontal scale, its values on one line under it. Five eras
@@ -603,9 +631,14 @@ details[open] > summary > .lives-caret {
     padding: var(--ds-space-3) var(--ds-space-2);
   }
 
-  .lives-scrub__era + .lives-scrub__era {
+  .lives-scrub__era {
     border-top: var(--ds-border-width) solid var(--ds-rule);
-    border-left: 0;
+    border-left: 3px solid transparent;
+  }
+
+  .lives-scrub__era[aria-selected='true'] {
+    border-top-color: var(--ds-rule);
+    border-left-color: var(--ds-ink);
   }
 
   .lives-scrub__label {

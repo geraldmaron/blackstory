@@ -108,7 +108,7 @@
   padding: var(--ds-space-3) 0 0;
   border-top: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-micro);
+  font-size: var(--ds-text-caption);
   line-height: 1.4;
   color: var(--ds-ink-muted);
 }
@@ -238,7 +238,35 @@
 
 /* —— Lives door, rules, empty ———————————————————————————————————————————————— */
 .ds-data-door {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-8);
   margin: calc(-1 * var(--ds-space-4)) 0 0;
+  padding-block: var(--ds-space-4);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-data-door__link {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 700;
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-accent-graphic);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
+}
+
+.ds-data-door__link::after {
+  content: ' \2192';
+}
+
+.ds-data-door__line {
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body);
+  font-style: italic;
+  color: var(--ds-ink-muted);
 }
 
 .ds-data-rules {

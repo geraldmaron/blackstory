@@ -64,6 +64,10 @@ function SortGlyph({ direction }: { readonly direction: Sort['direction'] | unde
   );
 }
 
+/** The kind filters as ruled tabs (sources.css), the current one underlined. */
+const kindClass = (current: boolean) =>
+  current ? 'ds-sources-table__kind ds-sources-table__kind--current' : 'ds-sources-table__kind';
+
 export function SourcesTable({ rows }: { readonly rows: readonly SourceRow[] }) {
   const [kind, setKind] = useState<SourceKind | 'all'>('all');
   const [sort, setSort] = useState<Sort>({ key: 'records', direction: 'descending' });
@@ -104,12 +108,24 @@ export function SourcesTable({ rows }: { readonly rows: readonly SourceRow[] }) 
         role="group"
         aria-label="Show publishers of one kind"
       >
-        <Chip selected={kind === 'all'} onClick={() => chooseKind('all')}>
+        <Chip
+          selected={kind === 'all'}
+          className={kindClass(kind === 'all')}
+          onClick={() => chooseKind('all')}
+        >
           All
         </Chip>
         {SOURCE_KINDS.filter((entry) => kindCounts.has(entry)).map((entry) => (
-          <Chip key={entry} selected={kind === entry} onClick={() => chooseKind(entry)}>
-            {SOURCE_KIND_LABELS[entry]} {kindCounts.get(entry)!.toLocaleString('en-US')}
+          <Chip
+            key={entry}
+            selected={kind === entry}
+            className={kindClass(kind === entry)}
+            onClick={() => chooseKind(entry)}
+          >
+            {SOURCE_KIND_LABELS[entry]}{' '}
+            <span className="ds-sources-table__kind-n">
+              {kindCounts.get(entry)!.toLocaleString('en-US')}
+            </span>
           </Chip>
         ))}
       </div>

@@ -27,7 +27,7 @@ import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../methodology/methodology-copy
  * Do not retype either. Scribe locked the mast; paint imports it.
  */
 export const ABOUT_LINE =
-  'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.';
+  'BlackStory is a place-connected archive of Black history, covering people, places, and events pinned to where they happened, with the source attached to every claim.';
 
 /** Brand support line. Keep on the door under the product name. */
 export const ABOUT_SUPPORT_LINE = 'People. Places. Evidence. Context.';
@@ -36,14 +36,14 @@ export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records a
 
 /** Origin paragraph the door steals. You walk past the place. Do not retype. */
 export const ABOUT_WALK_PAST =
-  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there: a school, a street, a building, a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogs that don't talk to each other.";
+  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there, whether it's a school, a street, a building, or a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogs that don't talk to each other.";
 
 /** Why this exists, in the maker's own voice. Rendered as consecutive paragraphs. */
 export const ABOUT_ORIGIN = [
   "I'm not an institution. I'm one person with a laptop, a stack of evenings, and access to more public records than any generation before mine could have searched in a lifetime.",
   ABOUT_WALK_PAST,
   "I'm not a historian, and I'm not an expert in the software I use to do this. What I have is the means, and enough command of the tools to put history that other people are working to hide in front of more of the people it belongs to. That is the size of the claim, and I would rather state it that small than dress it up.",
-  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I parse and review this in good faith, and I still get things wrong: there is more of it than one person can hold at once. Those mistakes are in the errata with the earlier wording still readable, because a correction you cannot check is just a second assertion.',
+  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I parse and review this in good faith, and I still get things wrong, because there is more of it than one person can hold at once. Those mistakes are in the errata with the earlier wording still readable, because a correction you cannot check is just a second assertion.',
   "This was never going to be finished by one person, and I was never going to be the authority on any of it. I'll do my part for as long as I can. The rest of the work is making this solid enough that somebody else can add to it and trust what they find.",
 ] as const;
 
@@ -120,7 +120,7 @@ export const ABOUT_ROOMS_HANDOFF = {
 export const ABOUT_NEO = {
   heading: 'How the writing is made',
   rules: [
-    'The long-form writing here, the chapters and the articles, is narrated in a single voice. The voice is called Neo. Neo is not a person, not a byline, and signs nothing. It is a written standard, and whoever, or whatever, is doing the writing has to work under it: how a document gets quoted, which sentences have to carry a citation, and which endings are off limits.',
+    'The long-form writing here, the chapters and the articles, is narrated in a single voice. The voice is called Neo. Neo is not a person, not a byline, and signs nothing. It is a written standard, and whoever, or whatever, is doing the writing has to work under it, which covers how a document gets quoted, which sentences have to carry a citation, and which endings are off limits.',
     'AI drafts that prose. Saying so here is cheaper than letting you find it out. Every piece then goes through the same steps before anything publishes.',
     "None of that can move the evidence bar. Voice never relaxes an evidence gate. Facts are gathered from fetched sources and checked before any prose is written, never from a model's memory, and load-bearing figures need two independent sources. When a detail cannot be sourced, the scene is written without it.",
   ],

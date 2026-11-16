@@ -26,7 +26,7 @@ export type TrustFlowProps = {
 
 export function TrustFlow({ caption, steps, note, className }: TrustFlowProps) {
   return (
-    <figure className={cx('ds-trust-flow', className)} data-ground="ink">
+    <figure className={cx('ds-trust-flow', className)}>
       <figcaption className="ds-trust-flow__caption">{caption}</figcaption>
       <ol
         className="ds-trust-flow__steps"

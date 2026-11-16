@@ -790,7 +790,7 @@ button.ds-mark {
 
 .ds-hbar__label small {
   display: block;
-  font-size: var(--ds-text-micro);
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
@@ -999,7 +999,7 @@ button.ds-mark {
 .ds-diverge__head {
   padding-bottom: var(--ds-space-2);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-micro);
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 

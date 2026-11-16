@@ -6,11 +6,50 @@
   margin-top: var(--ds-space-6);
 }
 
+/* The ruled filter idiom: mono caps labels, counts as copper numerals, the current one underlined. */
+.ds-sources-table__kinds {
+  padding-bottom: var(--ds-space-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind {
+  height: 2.75rem;
+  padding: 0 var(--ds-space-1);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind::before {
+  inset: 0;
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind:hover {
+  color: var(--ds-ink);
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind--current {
+  border-bottom-color: var(--ds-accent-graphic);
+  background: none;
+  color: var(--ds-ink);
+  font-weight: 650;
+}
+
+.ds-sources-table__kind-n {
+  color: var(--ds-numeral-accent);
+  font-variant-numeric: tabular-nums;
+}
+
 /* 12px between rows: each 32px chip keeps its own 44px hit area when the group wraps. */
 .ds-sources-table__kinds {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-3) var(--ds-space-2);
+  gap: var(--ds-space-1) var(--ds-space-5);
   margin-bottom: var(--ds-space-4);
 }
 

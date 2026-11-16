@@ -220,9 +220,9 @@ export function TermsSections() {
       <RoomSection id="affiliate" title="Affiliate links">
         <p className="ds-trust-copy">
           Some book pages link to Bookshop.org through an affiliate program, and a purchase made
-          through one of those links pays BlackStory a commission. Nothing here is paid placement:
-          the affiliate relationship never decides which books appear or what a record says about
-          them.
+          through one of those links pays BlackStory a commission. Nothing here is paid placement,
+          and the affiliate relationship never decides which books appear or what a record says
+          about them.
         </p>
       </RoomSection>
 
