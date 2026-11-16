@@ -140,7 +140,7 @@
      center and no window edge shows as a hard line. */
   inset: -100vmax;
   overflow: hidden;
-  opacity: 0.82;
+  opacity: 0.66;
   pointer-events: none;
   -webkit-mask-image: radial-gradient(
     circle at 50% 50%,
@@ -182,6 +182,76 @@
 @media (prefers-reduced-motion: reduce) {
   .ds-door__echo {
     animation: none;
+  }
+}
+
+/* —— With the map as the photograph, the panel goes: the words sit on the map ——————————————
+   Only while the tour is live (`data-active`); without JavaScript the cards stay photograph
+   panels, since nothing else shows the photograph then. A soft ink wash behind the words keeps
+   them readable over map and photograph alike, never a box. */
+.ds-door-tour[data-active='true'] .ds-door-tour__card {
+  min-height: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.65);
+}
+
+.ds-door-tour[data-active='true'] .ds-door-tour__card::after {
+  content: none;
+}
+
+.ds-door-tour[data-active='true'] .ds-door-record__plate .ds-plate__tone {
+  display: none;
+}
+
+/* Wide: the wash is the left of the screen, where the words run, fading out before the record. */
+@media (min-width: 64rem), (min-width: 48rem) and (min-aspect-ratio: 1001/1000) {
+  .ds-door__echo::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ds-surface-sunken) 92%, transparent) 0,
+      color-mix(in srgb, var(--ds-surface-sunken) 90%, transparent)
+        calc(var(--ds-door-edge) + var(--ds-door-card-w) + 1rem),
+      transparent calc(var(--ds-door-edge) + var(--ds-door-card-w) + 12rem)
+    );
+  }
+
+  /* The echo is translucent; the wash under the words must not be. */
+  .ds-door__echo {
+    opacity: 1;
+  }
+
+  .ds-door__echo .ds-plate {
+    opacity: 0.66;
+  }
+}
+
+/* Phone and portrait tablet: the words scroll across the map band, so the wash travels with
+   them, feathered at top and bottom so it reads as shade, not a card. */
+@media (max-width: 47.9375rem), (max-width: 63.9375rem) and (max-aspect-ratio: 1/1) {
+  .ds-door-tour[data-active='true'] .ds-door-tour__card {
+    background: color-mix(in srgb, var(--ds-surface-sunken) 90%, transparent);
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      transparent,
+      #000 var(--ds-space-8),
+      #000 calc(100% - var(--ds-space-8)),
+      transparent
+    );
+    mask-image: linear-gradient(
+      180deg,
+      transparent,
+      #000 var(--ds-space-8),
+      #000 calc(100% - var(--ds-space-8)),
+      transparent
+    );
+    padding-block: var(--ds-space-10);
   }
 }
 
