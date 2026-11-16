@@ -106,13 +106,20 @@ to the page. `<RecordImage plate>` (`apps/web/src/components/entity/RecordImage.
 
 The map says where; the plate shows what it looks like. They always refer to the same place.
 
-- **Home.** The column beside the map leads with one real record, shown the way its record page
-  shows it (`DoorRecordBlock`): its name, its plate with credit, and one claim in the claims
-  block's language (`EvidenceList`: copper numeral, the statement in the serif, its source as a
-  link, its grade as a glyph and a word). The callout on the map names the same record at its pin.
-  The headline ("History" becomes "Black Story", once) and two actions follow. Records come from
-  `app/door-decade-walk.ts`: never quiet, never a rendering as a plate, a claim with a linked
-  source that reads as a whole sentence, photographed records first.
+- **Home.** The headline leads, then one primary action into the lead story ("Read" and its
+  title), then (desktop only) the record the map points at, shown the way its record page shows it
+  (`DoorRecordBlock`): its name, its plate with credit, and one claim in the claims block's
+  language (`EvidenceList`: copper numeral, the statement in the serif, its source as a link, its
+  grade as a glyph and a word), with an "Another record" control, then "Walk the decades" and
+  "Browse all records". The headline ("History" fades to "Black Story" once, whole words, static
+  under reduced motion) has one accessible name. On a phone the first screen is the headline and
+  the story action and "Walk the decades", the map is the second beat below them, the spotlight record and the
+  browse link are dropped (the Records tab is the same door) and the callout card is not drawn:
+  the record is marked by its copper pin at 1.6x. The record is pinned for the browser session
+  (sessionStorage) so a reload keeps it. A map that has not painted says "Loading the map", and
+  one that never paints is replaced by the plain list of states with record counts. Records come
+  from `app/door-decade-walk.ts`: never quiet, never a rendering as a plate, a claim with a
+  linked source that reads as a whole sentence, photographed records first.
 - **The walk is the decade histogram.** "Walk the decades" turns the same column into the
   histogram (the register's records per decade on a true time scale, its prose caption kept).
   Each step is a decade with a record to show: the map holds every record documented through that

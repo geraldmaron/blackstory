@@ -55,8 +55,11 @@ test('the opening is the map, one headline column, one primary action and one qu
   assert.match(immersive, /'use client'/);
   assert.match(immersive, /HeroHeadlineMorph/);
   assert.match(immersive, />\s*Walk the decades\s*</);
-  assert.match(immersive, /buttonClassName\('primary', 'ds-door-open__start'\)/);
-  assert.match(immersive, /buttonClassName\('quiet'\)\}\s*href="\/records"/);
+  // The one primary action reads the lead story; the walk is the secondary one.
+  assert.match(immersive, /buttonClassName\('primary', 'ds-door-open__story'\)/);
+  assert.match(immersive, /Read \{story\.title\}/);
+  assert.match(immersive, /buttonClassName\('secondary', 'ds-door-open__start'\)/);
+  assert.match(immersive, /buttonClassName\('quiet', 'ds-door-open__browse-link'\)/);
   assert.match(immersive, />\s*Browse all records\s*</);
   // The header carries the one search; the hero form, its button and the extra browse doors go.
   assert.doesNotMatch(immersive, /<form|Search records|Search names/);
@@ -288,6 +291,8 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
   // A long chapter scrolls inside the card's body; progress and controls stay pinned.
   assert.match(css, /\.ds-door-walk__body\s*\{[^}]*min-height:\s*0;[^}]*overflow-y:\s*auto/);
   assert.match(walk, /className="ds-door-walk__body"/);
+  // The headline morph keeps its letter-slot animation (owner, binding): the prefix rolls in a
+  // clipped slot. Reduced motion shows the settled words, and only then.
   assert.match(
     css,
     /\.ds-hero-headline-morph__prefix\s*\{[^}]*overflow:\s*clip;[^}]*padding-inline:\s*var\(--ds-hero-glyph-bleed\);[^}]*margin-inline:\s*calc\(var\(--ds-hero-glyph-bleed\) \* -1\)/s,
@@ -296,7 +301,19 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
     css,
     /\.ds-hero-headline-morph__prefix-out\s*\{[^}]*left:\s*var\(--ds-hero-glyph-bleed\)/s,
   );
+  assert.match(css, /\.ds-hero-headline-morph__static\s*\{\s*display:\s*none/);
+  assert.match(
+    css,
+    /prefers-reduced-motion: reduce\)\s*\{\s*\.ds-hero-headline-morph__static\s*\{\s*display:\s*inline/,
+  );
+  // A phone leads with the headline and one story; the map window is below the column.
+  assert.match(
+    css,
+    /\.ds-door__dock\[data-step='open'\]\s*\{[^}]*top:\s*calc\(var\(--ds-island-clearance\)/,
+  );
+  assert.match(css, /\.ds-door-open__browse-link\s*\{\s*display:\s*none/);
   assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
+  assert.match(css, /\.ds-map-callout__card,[\s\S]*visibility:\s*hidden !important/);
   assert.match(
     css,
     /body:has\(\.ds-door\)\s+\.ds-shell\s*>\s*\.ds-bar[\s\S]*pointer-events:\s*auto/,
@@ -321,7 +338,13 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
 
 test('the opening leads with one record the way its record page shows it', () => {
   // Name, plate with its credit, one claim in the claims block's language.
-  assert.match(immersive, /opening \? \(\s*<DoorRecordBlock record=\{opening\}/);
+  assert.match(immersive, /opening \? \(\s*<div[^>]*>\s*<DoorRecordBlock record=\{opening\}/);
+  // The headline and the story lead the column; the record follows them.
+  assert.ok(immersive.indexOf('<HeroHeadlineMorph') < immersive.indexOf('<DoorRecordBlock'));
+  assert.ok(immersive.indexOf('ds-door-open__story') < immersive.indexOf('<DoorRecordBlock'));
+  // The record is pinned for the browser session, guarded, and "Another record" cycles it.
+  assert.match(immersive, /sessionStorage\.getItem\(OPENING_STORAGE_KEY\)/);
+  assert.match(immersive, />\s*Another record\s*</);
   assert.match(block, /<RecordImage[\s\S]*image=\{record\.plate\}[\s\S]*plate/);
   assert.match(block, /<EvidenceList items=\{\[record\.claim\]\} \/>/);
   // Quiet records never come up on home, and a rendering is never shown as a plate.

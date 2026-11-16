@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { decadeBars, pickDecadeStops, pickDoorOpening, type DoorRecord } from './door-decade-walk';
+import {
+  decadeBars,
+  pickDecadeStops,
+  pickDoorOpening,
+  pickDoorOpeningCandidates,
+  type DoorRecord,
+} from './door-decade-walk';
 
 const facet = (id: string, count: number) => ({
   id,
@@ -77,6 +83,11 @@ test('the walk is one record per decade, oldest first, photographed whenever one
   // The opening leads with a photograph when any record has one.
   assert.equal(pickDoorOpening(records, 0)?.entityId, 'a-1880-photo');
   assert.equal(pickDoorOpening([], 0.5), undefined);
+  // "Another record" cycles the same best pool, starting at the opening, wrapping, never beyond it.
+  const choices = pickDoorOpeningCandidates(records, 0, 5);
+  assert.equal(choices[0]?.entityId, pickDoorOpening(records, 0)?.entityId);
+  assert.ok(choices.every((choice) => choice.plate));
+  assert.deepEqual(pickDoorOpeningCandidates([], 0.5, 5), []);
 });
 
 test('the grade row counts each grade exactly, not by floor', async () => {

@@ -223,6 +223,21 @@
   aspect-ratio: 16 / 10;
   max-height: 24dvh;
   border-radius: var(--ds-radius-sm);
+  /* The box is reserved by its aspect ratio; until the photograph arrives it is the plate's own
+     ground with a faint ruled texture, not a flat block. Static, so reduced motion has nothing
+     to turn off. The photograph multiplies over it, and the rules are too light to read there. */
+  background-color: var(--ds-plate-hi);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 0.6rem,
+    color-mix(in srgb, var(--ds-plate-lo) 12%, transparent) 0.6rem calc(0.6rem + 1px)
+  );
+}
+
+/* A portrait keeps its face: the crop holds the top third, a step lower than the shared plate's
+   18% so a wide band does not cut across the eyes. The image data carries no focal point. */
+.ds-door-record__plate.ds-plate--upper .ds-plate__img {
+  object-position: 50% 25%;
 }
 
 /* The claims block at the column's measure: the same numeral, rule and serif, a step smaller. */
@@ -695,6 +710,11 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     max-height: 14dvh;
   }
 
+  /* A portrait gets a taller band, so the whole face sits inside it. */
+  .ds-door-record__plate.ds-plate--upper .ds-plate__tone {
+    aspect-ratio: 2 / 1;
+  }
+
   .ds-door-walk__axis {
     --bar-h: 2.5rem;
     margin-block: var(--ds-space-2) var(--ds-space-6);
@@ -741,6 +761,97 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
 
   .ds-map-callout--layer .ds-map-callout__meta {
     display: none;
+  }
+}
+
+/* The one way into a story: a full-width primary action whose label is the story's own title, so
+   it wraps instead of clipping. */
+.ds-door-open__story {
+  box-sizing: border-box;
+  justify-content: flex-start;
+  width: 100%;
+  height: auto;
+  min-height: 44px;
+  text-align: left;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.ds-door-open__spotlight {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+
+.ds-door-open__spotlight .ds-door-record {
+  width: 100%;
+}
+
+.ds-door-open__another {
+  min-height: 44px;
+}
+
+/* —— A phone: the headline and the one story lead, the map is the second beat below them ———————
+   The opening's column moves to the top of the screen and the map window is everything between it
+   and the tab bar. The spotlight record, its "Another record" control and the browse link (the
+   Records tab is the same door) are desktop only; the walk's card still docks above the tab bar.
+   The callout card (the record's name again) is not drawn: the record is marked by its copper pin
+   at 1.6x, the callout's own mark, which stays. */
+@media (max-width: 47.9375rem) {
+  .ds-door__dock[data-step='open'] {
+    top: calc(var(--ds-island-clearance) + var(--ds-space-3));
+    bottom: auto;
+    max-height: none;
+    justify-content: flex-start;
+  }
+
+  .ds-door-open {
+    max-height: none;
+    overflow: visible;
+    align-content: start;
+  }
+
+  .ds-door-open__spotlight,
+  .ds-door-open__browse-link {
+    display: none;
+  }
+
+  /* No sticky bar: the actions are the column's last lines, nothing scrolls under them. */
+  .ds-door-open__actions {
+    position: static;
+    margin: 0;
+    padding: 0;
+    border-top: 0;
+    background: none;
+  }
+
+  body:has(.ds-door__dock[data-step='open']) .ds-door__window {
+    inset: calc(var(--ds-door-dock-h, 12rem) + var(--ds-space-6)) 0 var(--ds-tabbar-h) 0;
+  }
+
+  body:has(.ds-door__dock[data-step='open']) .ds-map-stage .maplibregl-ctrl-bottom-left {
+    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-4));
+  }
+
+  .ds-map-callout--layer .ds-map-callout__card,
+  .ds-map-callout--layer .ds-map-callout__leader {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* The last band clears the tab bar and keeps a gutter of its own. */
+  .ds-door-chapters {
+    padding-bottom: calc(var(--ds-tabbar-h) + var(--ds-space-4));
+  }
+
+  /* Notes about the map sit under the headline column, not behind it. */
+  body:has(.ds-door__dock[data-step='open'])
+    :is(.ds-door__field-note, .ds-door__loading, .ds-door__places) {
+    top: calc(var(--ds-door-dock-h, 12rem) + var(--ds-space-8));
+    right: var(--ds-gutter);
+    left: var(--ds-gutter);
+    max-width: none;
   }
 }
 
@@ -946,7 +1057,21 @@ html[data-door-browse='1'] .ds-door {
   }
 }
 
+/* The settled words for reduced motion only (HeroHeadlineMorph): with motion allowed it never
+   shows, so the animated History-to-Black Story change plays exactly as before. */
+.ds-hero-headline-morph__static {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .ds-hero-headline-morph__static {
+    display: inline;
+  }
+
+  .ds-hero-headline-morph {
+    display: none;
+  }
+
   .ds-hero-headline-morph__gap,
   .ds-hero-headline-morph__s-slot,
   .ds-hero-headline-morph__s {
@@ -996,6 +1121,59 @@ body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
   top: var(--ds-space-4);
   right: var(--ds-space-4);
   max-width: 24rem;
+}
+
+/* The plate has not painted yet: one plain line in the map window, gone once it has. */
+.ds-door__loading,
+.ds-door__places {
+  position: absolute;
+  top: var(--ds-space-4);
+  right: var(--ds-space-4);
+  max-width: 24rem;
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.4;
+}
+
+.ds-door__loading:empty,
+.ds-door__field[data-browse='on'] .ds-door__loading {
+  display: none;
+}
+
+/* The map never painted: the same counts the map would have shown, as text. */
+.ds-door__places {
+  top: calc(var(--ds-space-4) + var(--ds-space-12));
+  padding: var(--ds-space-3) var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  pointer-events: auto;
+}
+
+.ds-door__places-title {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-ink-muted);
+}
+
+.ds-door__places-list {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-door__places-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+}
+
+.ds-door__places-count {
+  font-variant-numeric: tabular-nums;
 }
 
 .ds-door__field-note a,

@@ -36,6 +36,7 @@ import {
   doorRecords,
   pickDecadeStops,
   pickDoorOpening,
+  pickDoorOpeningCandidates,
   type DoorJourneyRecord,
   type DoorRecord,
 } from './door-decade-walk';
@@ -46,6 +47,9 @@ void React;
 
 /** Bound both fallback markup and the client-boundary payload; the full index is at /records. */
 const NOSCRIPT_ROW_CAP = 20;
+
+/** How many records "Another record" can cycle through; each rides in the client payload. */
+const OPENING_CHOICES = 8;
 
 export type DoorHomeProps = {
   /** Deep-link / share filters (`?state=DC`, etc.). Empty on the journey `/`. */
@@ -111,6 +115,8 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
         densityLevels={densityLevels}
         browseShell={shell}
         opening={journey?.opening ?? null}
+        openingChoices={journey?.openingChoices ?? []}
+        story={journey?.story ?? null}
         stops={journey?.stops ?? []}
         bars={journey?.bars ?? []}
         barsCaption={journey?.barsCaption ?? ''}
@@ -153,12 +159,15 @@ async function loadDoorJourney(
   };
   const opening = pickDoorOpening(records, roll);
   const bars = decadeBars(model.facets.era);
+  const lead = stories.items.length > 0 ? buildStoriesFront(stories.items).lead : undefined;
   return {
     opening: opening ? withPin(opening) : null,
+    openingChoices: pickDoorOpeningCandidates(records, roll, OPENING_CHOICES).map(withPin),
+    story: lead ? { title: lead.title, slug: lead.slug } : null,
     stops: pickDecadeStops(records, roll).map(withPin),
     bars,
     barsCaption: decadeCaption(bars),
-    lead: stories.items.length > 0 ? buildStoriesFront(stories.items).lead : undefined,
+    lead,
     grades: model.facets.evidence,
   };
 }

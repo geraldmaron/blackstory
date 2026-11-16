@@ -137,7 +137,7 @@ function isSentence(statement: string): boolean {
  * A record drawn by `roll` (0..1) from the best pool that has any: photographed with a claim in a
  * whole sentence, then photographed, then a whole sentence, then any.
  */
-function draw(records: readonly DoorRecord[], roll: number): DoorRecord | undefined {
+function bestPool(records: readonly DoorRecord[]): readonly DoorRecord[] {
   const sentence = (record: DoorRecord) => isSentence(String(record.claim.statement ?? ''));
   const pools = [
     records.filter((record) => record.plate && sentence(record)),
@@ -145,7 +145,11 @@ function draw(records: readonly DoorRecord[], roll: number): DoorRecord | undefi
     records.filter(sentence),
     records,
   ];
-  const pool = pools.find((candidates) => candidates.length > 0) ?? [];
+  return pools.find((candidates) => candidates.length > 0) ?? [];
+}
+
+function draw(records: readonly DoorRecord[], roll: number): DoorRecord | undefined {
+  const pool = bestPool(records);
   return pool[Math.min(pool.length - 1, Math.floor(roll * pool.length))];
 }
 
@@ -155,6 +159,22 @@ export function pickDoorOpening(
   roll: number,
 ): DoorRecord | undefined {
   return draw(records, roll);
+}
+
+/**
+ * The records "Another record" can cycle through: the opening first, then the next of the same
+ * best pool (so the same eligibility, never quiet, never a rendering), `limit` in all.
+ */
+export function pickDoorOpeningCandidates(
+  records: readonly DoorRecord[],
+  roll: number,
+  limit: number,
+): readonly DoorRecord[] {
+  const pool = bestPool(records);
+  if (pool.length === 0) return [];
+  const start = Math.min(pool.length - 1, Math.floor(roll * pool.length));
+  const count = Math.min(limit, pool.length);
+  return Array.from({ length: count }, (_, i) => pool[(start + i) % pool.length]!);
 }
 
 /**

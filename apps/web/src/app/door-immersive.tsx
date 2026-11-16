@@ -105,6 +105,51 @@ function prefersReducedMotion(): boolean {
 /** What the field reports about the plate: nothing yet, this mount's frame landed, or no plate. */
 type DoorPlateState = 'pending' | 'live' | 'unavailable';
 
+/** A plate that has not painted after this long gets the plain list of places instead. */
+const PLATE_STALL_MS = 12_000;
+/** How many states the no-map list names. */
+const FALLBACK_PLACE_COUNT = 8;
+
+/** The record the opening leads with is kept for the browser session, so a reload keeps it. */
+const OPENING_STORAGE_KEY = 'bs:door-opening';
+
+/** A stored record is used only when it is whole and its pin is still on this plate. */
+function restoreOpening(
+  pins: ExploreMapFeatureCollection,
+  choices: readonly DoorJourneyRecord[],
+): DoorJourneyRecord | null {
+  try {
+    const raw = window.sessionStorage.getItem(OPENING_STORAGE_KEY);
+    if (!raw) return null;
+    const record = JSON.parse(raw) as DoorJourneyRecord;
+    const ok =
+      typeof record.name === 'string' &&
+      typeof record.href === 'string' &&
+      record.href.startsWith('/') &&
+      typeof record.pinId === 'string' &&
+      Array.isArray(record.lngLat) &&
+      record.lngLat.length === 2 &&
+      typeof record.claim === 'object' &&
+      record.claim !== null;
+    if (!ok) return null;
+    const here = choices.find((choice) => choice.href === record.href);
+    if (here) return here;
+    const pin = pins.features.find((feature) => feature.properties.entityId === record.pinId);
+    const [lng, lat] = pin?.geometry.coordinates ?? [];
+    return lng === record.lngLat[0] && lat === record.lngLat[1] ? record : null;
+  } catch {
+    return null;
+  }
+}
+
+function pinOpening(record: DoorJourneyRecord): void {
+  try {
+    window.sessionStorage.setItem(OPENING_STORAGE_KEY, JSON.stringify(record));
+  } catch {
+    // Storage is a convenience: without it the opening is simply rolled per visit.
+  }
+}
+
 export type DoorImmersiveProps = {
   readonly pins: ExploreMapFeatureCollection;
   /** Per-state presence tiers, so the plate opens on the same tint Explore does. */
@@ -113,6 +158,10 @@ export type DoorImmersiveProps = {
   readonly browseShell: AtlasShellModel;
   /** The record the opening leads with (door-decade-walk.ts), or nothing on an empty release. */
   readonly opening: DoorJourneyRecord | null;
+  /** What "Another record" cycles through: the opening first, all of one eligibility. */
+  readonly openingChoices: readonly DoorJourneyRecord[];
+  /** The lead story the opening's one primary action reads, or nothing without a story. */
+  readonly story: { readonly title: string; readonly slug: string } | null;
   /** The walk: one record per decade, oldest first. */
   readonly stops: readonly DoorJourneyRecord[];
   /** The register's decade histogram on a true time scale, and its prose caption. */
@@ -129,12 +178,31 @@ export function DoorImmersive({
   pins,
   densityLevels,
   browseShell,
-  opening,
+  opening: serverOpening,
+  openingChoices,
+  story,
   stops,
   bars,
   barsCaption,
   initialBrowse = false,
 }: DoorImmersiveProps) {
+  // The server's roll first (so hydration matches); a record pinned for this session replaces it
+  // right after mount, and the first visit pins the one it was shown.
+  const [opening, setOpening] = useState(serverOpening);
+  useEffect(() => {
+    const kept = restoreOpening(pins, openingChoices);
+    if (kept) setOpening(kept);
+    else if (serverOpening) pinOpening(serverOpening);
+    // Mount only: later changes come from the reader's own "Another record".
+  }, []);
+  const anotherOpening = useCallback(() => {
+    setOpening((now) => {
+      const at = openingChoices.findIndex((choice) => choice.href === now?.href);
+      const next = openingChoices[(at + 1) % openingChoices.length] ?? now;
+      if (next && next !== now) pinOpening(next);
+      return next;
+    });
+  }, [openingChoices]);
   const journeyRef = useRef<HTMLDivElement | null>(null);
   const dockRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<HTMLButtonElement | null>(null);
@@ -603,6 +671,26 @@ export function DoorImmersive({
 
   const plateState: DoorPlateState = plateUnavailable ? 'unavailable' : framed ? 'live' : 'pending';
 
+  /** The plate never painted: say so with the plain list of places, from data the page holds. */
+  const [stalled, setStalled] = useState(false);
+  useEffect(() => {
+    if (plateState !== 'pending') {
+      setStalled(false);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setStalled(true), PLATE_STALL_MS);
+    return () => window.clearTimeout(timer);
+  }, [plateState]);
+  const topPlaces = useMemo(
+    () =>
+      [...densityLevels]
+        .filter((level) => level.count > 0)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, FALLBACK_PLACE_COUNT),
+    [densityLevels],
+  );
+  const showPlaces = (plateState === 'unavailable' || stalled) && topPlaces.length > 0;
+
   const liveLabel = browseMode
     ? 'Browsing the map'
     : step === 0 || !current
@@ -626,6 +714,25 @@ export function DoorImmersive({
             The map could not start in this browser. <Link href="/records">Browse the records</Link>{' '}
             instead.
           </p>
+        ) : null}
+        {/* Said once, in plain meta type, and gone when the plate has painted. */}
+        <p className="ds-door__loading" aria-live="polite">
+          {plateState === 'pending' ? 'Loading the map' : ''}
+        </p>
+        {showPlaces ? (
+          <div className="ds-door__places">
+            <p className="ds-door__places-title">Records by state</p>
+            <ul className="ds-door__places-list">
+              {topPlaces.map((level) => (
+                <li key={level.stateFips}>
+                  {level.stateName}
+                  <span className="ds-door__places-count">
+                    {level.count.toLocaleString('en-US')}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : null}
         <p className="ds-door__live" aria-live="polite">
           {liveLabel}
@@ -655,26 +762,51 @@ export function DoorImmersive({
         <div className="ds-door__dock" ref={dockRef} data-step={step === 0 ? 'open' : 'walk'}>
           {step === 0 ? (
             <section className="ds-door-open" aria-labelledby="door-open-heading" data-ground="ink">
+              {/* The headline and the one way into a story lead; the record the map points at
+                  follows (desktop only: a phone's column is the headline and the story, and the
+                  map is the second beat). */}
+              <HeroHeadlineMorph className="ds-door-open__headline" id="door-open-heading" />
+              <p className="ds-door-open__line">{DOOR_OPEN_LINE}</p>
+              {story ? (
+                <Link
+                  className={buttonClassName('primary', 'ds-door-open__story')}
+                  href={`/stories/${story.slug}`}
+                >
+                  Read {story.title}
+                </Link>
+              ) : null}
               {/* The record the map is pointing at, the way its record page shows it: name, plate
                   and one claim with its source and grade. Off the map window, so it never covers
                   a live pin. */}
               {opening ? (
-                <DoorRecordBlock record={opening} className="ds-door-open__record" />
+                <div className="ds-door-open__spotlight" key={opening.href}>
+                  <DoorRecordBlock record={opening} className="ds-door-open__record" />
+                  {openingChoices.length > 1 ? (
+                    <button
+                      type="button"
+                      className={buttonClassName('quiet', 'ds-door-open__another')}
+                      onClick={anotherOpening}
+                    >
+                      Another record
+                    </button>
+                  ) : null}
+                </div>
               ) : null}
-              <HeroHeadlineMorph className="ds-door-open__headline" id="door-open-heading" />
-              <p className="ds-door-open__line">{DOOR_OPEN_LINE}</p>
               <div className="ds-door-open__actions">
                 {stops.length > 0 ? (
                   <button
                     ref={startRef}
                     type="button"
-                    className={buttonClassName('primary', 'ds-door-open__start')}
+                    className={buttonClassName('secondary', 'ds-door-open__start')}
                     onClick={() => goToStep(1)}
                   >
                     Walk the decades
                   </button>
                 ) : null}
-                <Link className={buttonClassName('quiet')} href="/records">
+                <Link
+                  className={buttonClassName('quiet', 'ds-door-open__browse-link')}
+                  href="/records"
+                >
                   Browse all records
                 </Link>
               </div>

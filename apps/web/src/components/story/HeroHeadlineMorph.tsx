@@ -247,7 +247,14 @@ export function HeroHeadlineMorph({
   return (
     // The name is the settled line, not the frame on screen: a heading that renames itself every
     // few hundred milliseconds reads to a screen reader (and in a shared screenshot) as a typo.
-    <h1 ref={headingRef} className={className} id={id} aria-label={FINAL_PHASE.accessibleLabel}>
+    // It is real text, read once; every animated fragment below is aria-hidden.
+    <h1 ref={headingRef} className={className} id={id}>
+      <span className="ds-visually-hidden">{FINAL_PHASE.accessibleLabel}</span>
+      {/* Reduced motion, before hydration too: the settled words from the first paint. Hidden
+          by CSS whenever motion is allowed, so the animated sequence is unchanged. */}
+      <span className="ds-hero-headline-morph__static" aria-hidden="true">
+        {FINAL_PHASE.subjectLabel}
+      </span>
       <span
         className="ds-hero-headline-morph"
         aria-hidden="true"
