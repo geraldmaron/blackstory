@@ -38,6 +38,9 @@ function inlinePaddingWidth(element: HTMLElement): number {
 /** Survives React Strict Mode remount so the morph clock does not restart mid-sequence in dev. */
 let morphSequenceStartedAt: number | null = null;
 
+/** The longest the morph waits for the display face before it plays anyway. */
+const FONT_WAIT_CAP_MS = 1500;
+
 function readClientMotionPreference(): { readonly reduced: boolean; readonly phaseIndex: number } {
   if (typeof window === 'undefined') {
     return { reduced: false, phaseIndex: 0 };
@@ -179,12 +182,10 @@ export function HeroHeadlineMorph({
     // and its first step would put the heading back on History after the layout effect settled it.
     if (reducedMotion || readClientMotionPreference().reduced) return undefined;
 
-    if (morphSequenceStartedAt === null) {
-      morphSequenceStartedAt = performance.now();
-    }
-    const startedAt = morphSequenceStartedAt;
     let timer = 0;
     let done = false;
+    let cancelled = false;
+    let startedAt = 0;
 
     const step = () => {
       const elapsed = performance.now() - startedAt;
@@ -197,7 +198,23 @@ export function HeroHeadlineMorph({
       const nextStartMs = heroHeadlinePhaseStartMs(next + 1);
       timer = window.setTimeout(step, Math.max(0, nextStartMs - elapsed) + 1);
     };
-    step();
+    // The words change in the brand's display face, never in a fallback: the sequence waits for
+    // the page's fonts (capped, so a font that never arrives cannot hold the heading on History).
+    const begin = () => {
+      // Left the screen while waiting: the observer already settled it on Black Story.
+      if (cancelled || done) return;
+      if (morphSequenceStartedAt === null) morphSequenceStartedAt = performance.now();
+      startedAt = morphSequenceStartedAt;
+      step();
+    };
+    if (morphSequenceStartedAt !== null || typeof document === 'undefined' || !document.fonts) {
+      begin();
+    } else {
+      void Promise.race([
+        document.fonts.ready,
+        new Promise((resolve) => window.setTimeout(resolve, FONT_WAIT_CAP_MS)),
+      ]).then(begin);
+    }
 
     const heading = headingRef.current;
     let observer: IntersectionObserver | undefined;
@@ -214,6 +231,7 @@ export function HeroHeadlineMorph({
     }
 
     return () => {
+      cancelled = true;
       window.clearTimeout(timer);
       observer?.disconnect();
     };
