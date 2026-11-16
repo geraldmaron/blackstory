@@ -138,9 +138,7 @@ body:has(.ds-sheet) .ds-bar {
 
 .ds-bar__search:focus-within,
 .ds-bar__search:has(.ds-bar__search-input:not(:placeholder-shown)) {
-  border-color: var(--ds-canvas);
-  background: var(--ds-canvas);
-  color: var(--ds-ink-muted);
+  color: var(--ds-bar-ink);
 }
 
 .ds-bar__search:focus-within::after,
@@ -148,8 +146,8 @@ body:has(.ds-sheet) .ds-bar {
   display: none;
 }
 
-/* The ring sits on the field, not on the bare input inside it. The field is paper on the bar, so
-   its ring is the bar's copper (6.1:1 on ink, 5.6:1 on paper), not the paper ground's ink ring. */
+/* The ring sits on the field, not on the bare input inside it. The field keeps the bar's ground
+   focused, open or holding a query; the copper ring is the only change. */
 .ds-bar__search:focus-within {
   outline: var(--ds-focus-width) solid var(--ds-bar-accent);
   outline-offset: var(--ds-focus-offset);
@@ -176,11 +174,7 @@ body:has(.ds-sheet) .ds-bar {
 
 .ds-bar__search:focus-within .ds-bar__search-input,
 .ds-bar__search-input:not(:placeholder-shown) {
-  color: var(--ds-ink);
-}
-
-.ds-bar__search:focus-within .ds-bar__search-input::placeholder {
-  color: var(--ds-ink-muted);
+  color: var(--ds-bar-ink);
 }
 
 /* Suggestions float over the page rather than pushing the bar taller. */
@@ -192,12 +186,17 @@ body:has(.ds-sheet) .ds-bar {
   z-index: var(--ds-z-command-overlay);
   max-height: min(60vh, 26rem);
   margin: 0;
-  padding: var(--ds-space-1);
+  padding: 0;
   overflow-y: auto;
   list-style: none;
-  border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-canvas);
+  /* The float plane, 94% so the names read over any page behind it. */
+  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
 }
 
 .ds-bar__search-list .ds-typeahead__option {
@@ -206,13 +205,15 @@ body:has(.ds-sheet) .ds-bar {
   gap: var(--ds-space-3);
   width: 100%;
   min-height: 44px;
-  padding: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
   border: 0;
-  border-radius: var(--ds-radius-sm);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 0;
   background: none;
   color: var(--ds-ink);
-  font: inherit;
-  font-size: 0.875rem;
+  font-family: var(--ds-font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
   text-align: left;
   cursor: pointer;
 }
@@ -220,6 +221,11 @@ body:has(.ds-sheet) .ds-bar {
 .ds-bar__search-list .ds-typeahead__option--active,
 .ds-bar__search-list .ds-typeahead__option:hover {
   background: var(--ds-surface-sunken);
+}
+
+/* Ruled rows: the first has no rule above it, the list's own edge is its top. */
+.ds-bar__search-list li:first-child .ds-typeahead__option {
+  border-top: 0;
 }
 
 .ds-bar__search-list .ds-typeahead__primary {
@@ -230,14 +236,15 @@ body:has(.ds-sheet) .ds-bar {
   white-space: nowrap;
 }
 
-/* The record kind, as a plain word: a label, not data, so sentence case in Geist. */
+/* Kind and place, as mono caps meta. */
 .ds-bar__search-list .ds-typeahead__secondary {
   flex: none;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  letter-spacing: normal;
-  text-transform: capitalize;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-weight: 400;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 /*
@@ -251,12 +258,25 @@ body:has(.ds-sheet) .ds-bar {
   left: 0;
   z-index: var(--ds-z-command-overlay);
   margin: 0;
-  padding: var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  padding: var(--ds-space-3) var(--ds-space-4);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
+  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink-muted);
   font-size: var(--ds-text-caption);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-bar__search-list,
+  .ds-bar__search .ds-typeahead__note {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Phone-only controls. */

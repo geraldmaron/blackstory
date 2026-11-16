@@ -9,16 +9,47 @@
 
 @import '../components/room/room-kit.css';
 
-/* —— the 404's exits, on the table's ground under the sand mast ——————————————————— */
+/* —— the 404's exits: a short ruled list on the paper sheet under the sand mast ——————— */
 .ds-utility-exits {
   display: grid;
-  gap: var(--ds-space-6);
-  padding-block: var(--ds-space-12) var(--ds-space-16);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-utility-exits:not(:first-child) {
+  margin-top: var(--ds-space-6);
+}
+
+.ds-utility-exits__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  min-height: 44px;
+  padding-block: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-utility-exits__link {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ds-utility-exits__line {
+  flex: 1 1 14rem;
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
 }
 
 .ds-utility-exits__search {
   max-width: 52ch;
-  margin: 0;
+  margin: var(--ds-space-6) 0 0;
   color: var(--ds-ink-muted);
 }
 

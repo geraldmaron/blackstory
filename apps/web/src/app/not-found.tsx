@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
 import { Room } from '../components/room';
-import { TrustMast } from '../components/trust';
+import { TrustMast, TrustSheet } from '../components/trust';
 import { loadWalkBackPlace, MAP_BACK } from './walk-back-place';
 import './utility.css';
 
@@ -41,6 +41,7 @@ export default async function NotFound() {
   return (
     <Room
       width="read"
+      className="ds-trust-room"
       masthead={
         // No crumb: the reader is standing on an address that failed, and `/not-found` is not a
         // place in the archive they could go back up from.
@@ -54,18 +55,27 @@ export default async function NotFound() {
       }
     >
       <PaletteSeed />
-      <div className="ds-utility-exits">
-        <div className="ds-row">
-          <Link className="ds-button ds-button--primary" href="/">
-            {backLabel}
-          </Link>
-          <Link className="ds-button ds-button--secondary" href="/records">
-            Find in the archive
-          </Link>
-          <Link className="ds-button ds-button--secondary" href="/stories">
-            Read the chapters
-          </Link>
-        </div>
+      <TrustSheet>
+        <ul className="ds-utility-exits" aria-label="Where to go next">
+          <li className="ds-utility-exits__row ds-utility-exits__row--primary">
+            <Link className="ds-button ds-button--primary" href="/">
+              {backLabel}
+            </Link>
+            <p className="ds-utility-exits__line">The map is where the archive starts.</p>
+          </li>
+          <li className="ds-utility-exits__row">
+            <Link className="ds-utility-exits__link" href="/records">
+              Find in the archive
+            </Link>
+            <p className="ds-utility-exits__line">Every published record, searchable.</p>
+          </li>
+          <li className="ds-utility-exits__row">
+            <Link className="ds-utility-exits__link" href="/stories">
+              Read the chapters
+            </Link>
+            <p className="ds-utility-exits__line">Long reads built from the records.</p>
+          </li>
+        </ul>
         <p className="ds-utility-exits__search">
           <span className="ds-utility-exits__keys">
             Press <kbd className="ds-kbd">⌘K</kbd> to search.
@@ -73,7 +83,7 @@ export default async function NotFound() {
           <span className="ds-utility-exits__touch">Tap search at the top to look it up.</span> It
           opens holding what this address was trying to say.
         </p>
-      </div>
+      </TrustSheet>
     </Room>
   );
 }

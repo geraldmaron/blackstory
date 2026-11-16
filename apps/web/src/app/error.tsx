@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Notice, PageHeader } from '@repo/ui';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
 import { Room } from '../components/room';
-import { TrustMast } from '../components/trust/TrustFrame';
+import { TrustMast, TrustSheet } from '../components/trust/TrustFrame';
 import './utility.css';
 
 void React;
@@ -31,6 +31,7 @@ export default function Error({
   return (
     <Room
       width="read"
+      className="ds-trust-room"
       masthead={
         <TrustMast tone="sand">
           <PageHeader
@@ -41,19 +42,25 @@ export default function Error({
         </TrustMast>
       }
     >
-      <div className="ds-utility-exits">
+      <TrustSheet>
         <Notice tone="error" title={display.title}>
           {display.detail}
         </Notice>
-        <div className="ds-row">
-          <button type="button" className="ds-button ds-button--primary" onClick={reset}>
-            Try again
-          </button>
-          <Link className="ds-button ds-button--secondary" href="/">
-            Back to the map
-          </Link>
-        </div>
-      </div>
+        <ul className="ds-utility-exits" aria-label="Where to go next">
+          <li className="ds-utility-exits__row ds-utility-exits__row--primary">
+            <button type="button" className="ds-button ds-button--primary" onClick={reset}>
+              Try again
+            </button>
+            <p className="ds-utility-exits__line">Loads this page once more.</p>
+          </li>
+          <li className="ds-utility-exits__row">
+            <Link className="ds-utility-exits__link" href="/">
+              Back to the map
+            </Link>
+            <p className="ds-utility-exits__line">The map is where the archive starts.</p>
+          </li>
+        </ul>
+      </TrustSheet>
     </Room>
   );
 }
