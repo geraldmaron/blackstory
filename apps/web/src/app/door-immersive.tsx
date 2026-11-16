@@ -710,6 +710,10 @@ export function DoorImmersive({
     [stage],
   );
 
+  /** Whose photograph is the map's ground: the tour step's, else the opening's; none in browse or
+   * on the decade walk. */
+  const echo = browseMode ? null : (tourStep ?? (step === 0 ? opening : null));
+
   const plateState: DoorPlateState = plateUnavailable ? 'unavailable' : framed ? 'live' : 'pending';
 
   /** The plate never painted: say so with the plain list of places, from data the page holds. */
@@ -749,18 +753,21 @@ export function DoorImmersive({
         {/* The map window: the uncovered part of the plate. Measured for the camera frame
             (door-field-frame.ts) and the callout's bounds; nothing is drawn in it. */}
         <div className="ds-door__window" ref={windowRef} aria-hidden="true">
-          {/* A tour step's photograph is the map's ground around the record: clear over its
-              blocks, deepening toward the window's edges (door-tour.css). */}
-          {tourStep?.plate && !browseMode ? (
-            <div className="ds-door__echo" key={tourStep.pinId ?? tourStep.name}>
-              <RecordImage
-                entityId={tourStep.pinId ?? tourStep.name}
-                entityName={tourStep.name}
-                image={tourStep.plate}
-                plate
-                width={440}
-                className={tourStep.person ? 'ds-plate--upper' : ''}
-              />
+          {/* The record in front of the reader (a tour step's, or the opening's) is the map's
+              ground around it: clear over the record, deepening outward, with an ink wash under
+              the words on a wide screen (door-tour.css). */}
+          {echo ? (
+            <div className="ds-door__echo" key={echo.pinId ?? echo.name}>
+              {echo.plate ? (
+                <RecordImage
+                  entityId={echo.pinId ?? echo.name}
+                  entityName={echo.name}
+                  image={echo.plate}
+                  plate
+                  width={440}
+                  className={echo.person ? 'ds-plate--upper' : ''}
+                />
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -817,7 +824,12 @@ export function DoorImmersive({
         ) : null}
         <div className="ds-door__dock" ref={dockRef} data-step={step === 0 ? 'open' : 'walk'}>
           {step === 0 ? (
-            <section className="ds-door-open" aria-labelledby="door-open-heading" data-ground="ink">
+            <section
+              className="ds-door-open"
+              aria-labelledby="door-open-heading"
+              data-ground="ink"
+              data-ground-fixed=""
+            >
               {/* The headline and the one way into a story lead; the record the map points at
                   follows (desktop only: a phone's column is the headline and the story, and the
                   map is the second beat). */}

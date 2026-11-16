@@ -1560,3 +1560,40 @@ body:has(.ds-door) .ds-door-journey {
     border-left: 0;
   }
 }
+
+/* —— The opening sits on the map, not in a box ——————————————————————————————————————————
+   The opening record's photograph is the map's ground (`.ds-door__echo`, door-tour.css), so the
+   column's panel would only repeat it: the box, fill and edge go and the words sit on the map over
+   the ink wash. The record's own plate leaves the column (its credit stays). Without JavaScript
+   there is no ground to sit on, so the panel stays. */
+@media (scripting: enabled) {
+  .ds-door__dock > .ds-door-open {
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    text-shadow: 0 1px 2px rgb(0 0 0 / 0.65);
+  }
+
+  /* Buttons carry their own ground; a shadow only blurs their label. */
+  .ds-door-open :is(a, button)[class*='button'],
+  .ds-door-open__cta :is(a, button) {
+    text-shadow: none;
+  }
+
+  .ds-door-open .ds-door-record__plate .ds-plate__tone {
+    display: none;
+  }
+
+  /* Stacked: the column is at the top of the screen over the map; the wash is its own shade,
+     feathered at the foot so it fades into the map rather than ending in an edge. */
+  @media (max-width: 47.9375rem), (max-width: 63.9375rem) and (max-aspect-ratio: 1/1) {
+    .ds-door__dock > .ds-door-open {
+      border-radius: 0;
+      background: color-mix(in srgb, var(--ds-surface-sunken) 88%, transparent);
+      -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - var(--ds-space-8)), transparent);
+      mask-image: linear-gradient(180deg, #000 calc(100% - var(--ds-space-8)), transparent);
+      padding-bottom: var(--ds-space-10);
+    }
+  }
+}
