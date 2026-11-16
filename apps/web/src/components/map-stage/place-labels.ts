@@ -194,6 +194,21 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
       }
     }
 
+    // The callout naming the selected record (home's spotlight or explore's flag) is a card on
+    // the plate; numerals step around it rather than hide under it.
+    const box = map.getContainer().getBoundingClientRect();
+    for (const card of document.querySelectorAll<HTMLElement>('.ds-map-callout__card')) {
+      const r = card.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0 || getComputedStyle(card).visibility === 'hidden')
+        continue;
+      obstacles.push({
+        x0: r.left - box.left,
+        y0: r.top - box.top,
+        x1: r.right - box.left,
+        y1: r.bottom - box.top,
+      });
+    }
+
     // 3. Lay out, then print.
     const layout = layoutTokens(
       [...placed.values()].map((p) => p.input),
