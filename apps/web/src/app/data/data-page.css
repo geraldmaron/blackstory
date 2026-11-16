@@ -248,6 +248,10 @@
 }
 
 .ds-data-door__link {
+  /* A 44px target without moving the line. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-title);
   font-weight: 700;
