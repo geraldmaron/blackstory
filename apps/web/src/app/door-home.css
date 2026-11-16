@@ -27,7 +27,9 @@
      command-bar.css computes it) and the window is everything right of it. */
   --ds-door-edge: max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2));
   --ds-door-bottom: var(--ds-space-12);
-  --ds-door-dock-w: min(27rem, 34vw);
+  /* Wide enough to read as a surface beside the map, not a strip: about two fifths of a wide
+     screen, capped so the headline column keeps its measure. */
+  --ds-door-dock-w: min(36rem, 38vw);
   position: relative;
   box-sizing: border-box;
   /* Everything on the opening is fixed to the viewport, so the page holds no height of its own
@@ -904,7 +906,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
         var(--ds-space-3)
     );
     --ds-door-map-h: min(
-      62vw,
+      80vw,
       calc(100dvh - var(--ds-door-map-top) - var(--ds-tabbar-h) - var(--ds-space-16))
     );
     /* The map's own furniture (attribution, the count legend) sits at the window's lower edge. */
@@ -1388,8 +1390,8 @@ body:has(.ds-door) .ds-door-journey {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: baseline;
-  gap: var(--ds-space-1) var(--ds-space-3);
-  padding: var(--ds-space-4) var(--ds-space-6) var(--ds-space-4) 0;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  padding: var(--ds-space-8) var(--ds-space-6) var(--ds-space-8) 0;
 }
 
 .ds-door-ch__grade + .ds-door-ch__grade {
@@ -1408,7 +1410,10 @@ body:has(.ds-door) .ds-door-journey {
   font-weight: 600;
 }
 
+/* The count leads each cell at the numeral's full size; the grade's glyph and word sit under
+   it, so the row reads as three figures with body rather than three thin lines. */
 .ds-door-ch__grade-count {
+  grid-row: 1;
   grid-column: 1 / -1;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
@@ -1418,7 +1423,7 @@ body:has(.ds-door) .ds-door-journey {
 .ds-door-ch__grade-numeral {
   color: var(--ds-numeral-accent);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
+  font-size: var(--ds-text-display-1);
   font-weight: var(--ds-weight-numeral);
   font-variant-numeric: lining-nums;
   letter-spacing: -0.04em;
@@ -1525,6 +1530,21 @@ body:has(.ds-door) .ds-door-journey {
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
     align-items: center;
     gap: var(--ds-space-12);
+  }
+}
+
+/* Wide: the band's title and its line sit side by side, so the line is not a narrow column in a
+   wide band; the grades and the link run the full width under them. */
+@media (min-width: 64rem) {
+  .ds-door-ch--evidence .ds-door-ch__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+    column-gap: var(--ds-space-12);
+  }
+
+  .ds-door-ch--evidence .ds-door-ch__grades,
+  .ds-door-ch--evidence .ds-door-ch__link {
+    grid-column: 1 / -1;
   }
 }
 
