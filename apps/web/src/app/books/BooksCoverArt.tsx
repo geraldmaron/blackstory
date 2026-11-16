@@ -4,6 +4,9 @@
  * a paper mat. With no ISBN, or when the request fails, the typeset cover stays: never a monogram,
  * an empty box, or a blank frame while a lazy image waits to be scrolled to.
  *
+ * With `bare`, real art or nothing: no ISBN or a failed request renders no cover at all, so a
+ * list never carries a blank stand-in (the row beside it holds the title).
+ *
  * Decorative by default, because the link around it already carries the title; the detail page
  * labels it.
  */
@@ -22,6 +25,8 @@ export type BooksCoverArtProps = {
   readonly isbn?: string;
   readonly size?: 'S' | 'M' | 'L';
   readonly decorative?: boolean;
+  /** Real art or nothing: no typeset stand-in. */
+  readonly bare?: boolean;
   readonly className?: string;
 };
 
@@ -31,6 +36,7 @@ export function BooksCoverArt({
   isbn,
   size = 'M',
   decorative = true,
+  bare = false,
   className,
 }: BooksCoverArtProps) {
   const [art, setArt] = useState<'pending' | 'loaded' | 'failed'>('pending');
@@ -44,7 +50,9 @@ export function BooksCoverArt({
     if (img?.complete) setArt(img.naturalWidth > 0 ? 'loaded' : 'failed');
   }, [isbn]);
 
-  const typeset = (
+  if (bare && (!hasIsbn || art === 'failed')) return null;
+
+  const typeset = bare ? null : (
     <>
       <span className="ds-book-cover__title">{title}</span>
       {author ? <span className="ds-book-cover__author">{author}</span> : null}
@@ -67,8 +75,14 @@ export function BooksCoverArt({
   const loaded = art === 'loaded';
   return (
     <figure
-      className={loaded ? rootClass : `${rootClass} ds-book-cover--typeset`}
-      {...(loaded ? {} : { 'data-ground': 'sand' })}
+      className={
+        loaded
+          ? rootClass
+          : bare
+            ? `${rootClass} ds-book-cover--waiting`
+            : `${rootClass} ds-book-cover--typeset`
+      }
+      {...(loaded || bare ? {} : { 'data-ground': 'sand' })}
       data-art={art}
       aria-hidden={decorative ? true : undefined}
     >

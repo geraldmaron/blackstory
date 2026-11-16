@@ -1,7 +1,7 @@
 /**
  * The `/books` index body: the register's toolbar (State, Author, Sort, and a Covers | States
- * switch), the active narrowing as removable chips, then either the cover wall (large covers on
- * a full-bleed ink block, each with a copper tab naming its states) or the states by challenge
+ * switch), the active narrowing as removable chips, then either ruled bands that change ground
+ * (each title a row, its challenge count a copper numeral, a cover only where real art exists) or the states by challenge
  * count (a sand block: the tile map in copper steps beside a paper sheet of ranked states).
  *
  * Server-rendered and JavaScript-free apart from the cover's image fallback: menus are the
@@ -22,7 +22,7 @@ import {
 } from './books-view-model';
 import { BooksCoverArt } from './BooksCoverArt';
 import { STATE_TILES } from './state-tiles';
-import { BOOKS_INDEX_NOTE } from './books-copy';
+import { BOOKS_COVER_CREDIT, BOOKS_INDEX_NOTE } from './books-copy';
 
 void React;
 
@@ -41,11 +41,6 @@ function currentParams(view: BooksBrowseViewModel): Params {
     dir: view.dir,
     view: view.view,
   };
-}
-
-function statesPhrase(count: number): string {
-  if (count === 0) return 'State not recorded';
-  return `Challenged in ${count} ${count === 1 ? 'state' : 'states'}`;
 }
 
 function titlesPhrase(count: number): string {
@@ -137,7 +132,8 @@ function activeFilters(view: BooksBrowseViewModel): ActiveFilter[] {
 function BooksNote() {
   return (
     <p className="ds-books-note">
-      {BOOKS_INDEX_NOTE} <Link href="/methodology">How this list is built</Link>
+      {BOOKS_INDEX_NOTE} {BOOKS_COVER_CREDIT}{' '}
+      <Link href="/methodology">How this list is built</Link>
     </p>
   );
 }
@@ -180,39 +176,151 @@ function StatesLead({ view }: { readonly view: BooksBrowseViewModel }) {
   );
 }
 
-function CoverWall({ items }: { readonly items: readonly BooksBrowseItem[] }) {
+/** A band holds about two screens of rows at 1440, then the ground changes. */
+const BAND_ROWS = 18;
+
+export type BookGroup = { readonly label: string; readonly items: readonly BooksBrowseItem[] };
+
+/** The label an ordered title falls under, read off the same field the order sorts by. */
+function groupLabel(item: BooksBrowseItem, sort: BooksBrowseViewModel['sort']): string {
+  const initial = (text: string) => {
+    const first = text.trim().charAt(0).toLocaleUpperCase('en-US');
+    return /[A-Z]/.test(first) ? first : '#';
+  };
+  switch (sort) {
+    case 'author':
+      return initial(item.authorNames);
+    case 'year': {
+      const year = Number(/^\d{4}/.exec(item.publishedDate)?.[0]);
+      return year ? `${Math.floor(year / 10) * 10}s` : 'Undated';
+    }
+    case 'states':
+      return item.states.length === 0
+        ? 'No state on file'
+        : `${item.states.length} ${item.states.length === 1 ? 'state' : 'states'}`;
+    case 'citations':
+      return `${item.citationCount} ${item.citationCount === 1 ? 'source' : 'sources'}`;
+    case 'title':
+    default:
+      return initial(item.title);
+  }
+}
+
+/**
+ * Consecutive titles under one label, then the groups packed into bands of about `BAND_ROWS`
+ * rows. A group is never split, so a long one is a band of its own.
+ */
+export function bandBooks(
+  items: readonly BooksBrowseItem[],
+  sort: BooksBrowseViewModel['sort'],
+): BookGroup[][] {
+  const groups: { label: string; items: BooksBrowseItem[] }[] = [];
+  for (const item of items) {
+    const label = groupLabel(item, sort);
+    const last = groups.at(-1);
+    if (last?.label === label) last.items.push(item);
+    else groups.push({ label, items: [item] });
+  }
+  const bands: BookGroup[][] = [];
+  let rows = 0;
+  for (const group of groups) {
+    if (bands.length === 0 || rows + group.items.length > BAND_ROWS) {
+      bands.push([]);
+      rows = 0;
+    }
+    bands.at(-1)!.push(group);
+    rows += group.items.length;
+  }
+  return bands;
+}
+
+function bandName(band: readonly BookGroup[]): string {
+  const first = band[0]!.label;
+  const last = band.at(-1)!.label;
+  return first === last ? first : `${first} to ${last}`;
+}
+
+function BookRow({ item }: { readonly item: BooksBrowseItem }) {
+  const count = item.states.length;
   return (
-    <Block tone="ink" className="ds-books-band">
-      <div className="ds-wrap">
-        <ul className="ds-books-wall" aria-label="Challenged titles">
-          {items.map((item) => (
-            <li key={item.id}>
-              <Link className="ds-books-wall__link" href={`/books/${item.slug}`}>
-                <span className="ds-books-wall__frame">
-                  <BooksCoverArt
-                    className="ds-books-wall__cover"
-                    title={item.title}
-                    author={item.authorNames}
-                    // The wall draws a cover about 220px wide; the medium file is 145px and blurred.
-                    size="L"
-                    {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
-                  />
-                  {/* A copper tab pinned to the cover's foot; sand when no report names a state. */}
-                  <span
-                    className="ds-books-wall__states"
-                    data-ground={item.states.length > 0 ? 'copper' : 'sand'}
-                  >
-                    {statesPhrase(item.states.length)}
-                  </span>
-                </span>
-                <span className="ds-books-wall__title">{item.title}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <BooksNote />
-      </div>
-    </Block>
+    <li>
+      <Link className="ds-books-row" href={`/books/${item.slug}`}>
+        <span className="ds-books-row__text">
+          <span className="ds-books-row__title">{item.title}</span>
+          {item.authorNames ? (
+            <span className="ds-books-row__author">{item.authorNames}</span>
+          ) : null}
+        </span>
+        {count > 0 ? (
+          <span className="ds-books-row__count">
+            <span className="ds-visually-hidden">Challenged in </span>
+            <span className="ds-books-row__n">{count}</span>
+            <span className="ds-books-row__word">{count === 1 ? 'state' : 'states'}</span>
+          </span>
+        ) : (
+          <span className="ds-books-row__count ds-books-row__count--none">State not recorded</span>
+        )}
+        {/* Real art or nothing: a title with no cover is a row, never a stand-in card. */}
+        <span className="ds-books-row__cover">
+          <BooksCoverArt
+            bare
+            className="ds-books-row__art"
+            title={item.title}
+            size="M"
+            {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
+          />
+        </span>
+      </Link>
+    </li>
+  );
+}
+
+/**
+ * The titles as bands that change ground every couple of screens, grouped by the field the order
+ * sorts on. Each band names its range and counts its titles in a copper numeral; the titles are
+ * ruled rows, a restrained cover at the row's end where real art exists.
+ */
+function BookBands({ view }: { readonly view: BooksBrowseViewModel }) {
+  const bands = bandBooks(view.items, view.sort);
+  return (
+    <>
+      {bands.map((band, index) => {
+        const total = band.reduce((sum, group) => sum + group.items.length, 0);
+        const last = index === bands.length - 1;
+        return (
+          <Block
+            key={bandName(band)}
+            tone={index % 2 === 0 ? 'ink' : 'sand'}
+            className="ds-books-band"
+          >
+            <div className="ds-wrap ds-books-bandgrid">
+              <div className="ds-books-mark">
+                <DisplayNumeral decorative className="ds-books-mark__numeral">
+                  {total.toLocaleString('en-US')}
+                </DisplayNumeral>
+                <h2 className="ds-books-mark__name">{bandName(band)}</h2>
+                <p className="ds-books-mark__meta">{titlesPhrase(total)}</p>
+              </div>
+              <div className="ds-books-groups">
+                {band.map((group) => (
+                  <section key={group.label} aria-label={group.label}>
+                    {band.length > 1 ? (
+                      <h3 className="ds-books-group__label">{group.label}</h3>
+                    ) : null}
+                    <ul className="ds-books-list">
+                      {group.items.map((item) => (
+                        <BookRow key={item.id} item={item} />
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+              {last ? <BooksNote /> : null}
+            </div>
+          </Block>
+        );
+      })}
+    </>
   );
 }
 
@@ -336,7 +444,7 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
       ) : (
         <>
           <StatesLead view={view} />
-          <CoverWall items={view.items} />
+          <BookBands view={view} />
         </>
       );
   }
@@ -350,7 +458,7 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
           label: 'Show books as',
           value: view.view,
           options: [
-            { value: 'covers', label: 'Covers', href: viewHref('covers') },
+            { value: 'covers', label: 'Titles', href: viewHref('covers') },
             { value: 'states', label: 'States', href: viewHref('states') },
           ],
         }}

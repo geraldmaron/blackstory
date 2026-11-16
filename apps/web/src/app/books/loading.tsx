@@ -1,17 +1,16 @@
 /**
- * The books index's wait: its own header and toolbar over blank 2:3 cover frames on the wall's ink block, the
- * wall's real geometry, so nothing jumps when the covers arrive. No count is invented.
+ * The books index's wait: its own header and toolbar over ruled placeholder rows on the first ink band, so nothing
+ * jumps when the titles arrive. No count is invented.
  */
 import React from 'react';
 import { Block, PageHeader } from '@repo/ui';
 import { Room } from '../../components/room';
 import '../reading-room.css';
-import './book-cover.css';
 import './books.css';
 
 void React;
 
-const COVERS = 12;
+const ROWS = 8;
 
 export default function Loading() {
   return (
@@ -32,13 +31,10 @@ export default function Loading() {
         </div>
         <Block tone="ink" className="ds-books-band" aria-hidden="true">
           <div className="ds-wrap">
-            <ul className="ds-books-wall">
-              {Array.from({ length: COVERS }, (_, index) => (
+            <ul className="ds-books-list">
+              {Array.from({ length: ROWS }, (_, index) => (
                 <li key={index}>
-                  <span className="ds-books-wall__link">
-                    <span className="ds-books-wall__frame">
-                      <span className="ds-book-cover ds-books-wall__cover ds-records-wait" />
-                    </span>
+                  <span className="ds-books-row">
                     <span
                       className="ds-records-wait"
                       style={{ width: `${50 + ((index * 13) % 40)}%` }}

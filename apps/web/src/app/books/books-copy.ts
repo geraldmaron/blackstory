@@ -10,10 +10,14 @@ export const BOOKS_PAGE_DESCRIPTION =
 export const BOOKS_INDEX_NOTE =
   'A state here follows a cited report of a challenge that is still reported, banned or restricted. It is not a claim that the book left every school in that state, and this is not a complete national census.';
 
+/** Where cover art comes from, printed once with the list's closing note. */
+export const BOOKS_COVER_CREDIT =
+  'Covers are publisher artwork, shown as published, from Open Library.';
+
 export const BOOKS_DETAIL = {
   challengesLede:
     'Challenges still reported, banned, restricted or of unstated outcome. Rescinded and retained challenges are left out. A state here follows a cited report; it is not a claim that the book left every school in that state.',
-  /** One sentence, printed directly under the Bookshop link it discloses. */
+  /** One meta line, printed directly under the Bookshop link it discloses. */
   affiliateNotice:
-    'BlackStory earns a commission on a purchase through this link, and that never decides which titles appear.',
+    'Affiliate link. BlackStory earns a commission, which never decides which titles appear.',
 } as const;

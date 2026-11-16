@@ -8,11 +8,21 @@
   aspect-ratio: 2 / 3;
   margin: 0;
   overflow: hidden;
-  border-radius: var(--ds-radius-sm);
+  /* Publisher artwork is framed square, untoned: a hairline keyline, no rounded card. */
+  border-radius: 0;
   /* A paper mat in both themes: an off-ratio cover sits on it with a visible edge, not in a hole. */
   background: var(--ds-material-paper);
   /* An inner hairline, so a pale cover still has an edge on the paper theme. */
   box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-rule);
+  /* The keyline sits outside the art, since an inset shadow would sit under the image. */
+  outline: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* A bare cover still loading holds its 2:3 slot and shows nothing, not a stand-in. */
+.ds-book-cover--waiting {
+  background: transparent;
+  box-shadow: none;
+  outline: none;
 }
 
 .ds-book-cover__img {
@@ -35,6 +45,7 @@
   /* Sand with ink type (data-ground="sand" points the text tokens at ink). */
   background: var(--ds-material-sand);
   box-shadow: none;
+  outline: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -77,4 +88,12 @@
     inset 0 0 0 var(--ds-border-width) var(--ds-rule),
     var(--ds-space-2) var(--ds-space-2) 0 var(--ds-material-copper);
   overflow: visible;
+}
+
+/* The rail's affiliate disclosure is one meta line under its link, not a paragraph. */
+.ds-recpage .ds-recpage__extra-note {
+  max-width: none;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.02em;
 }

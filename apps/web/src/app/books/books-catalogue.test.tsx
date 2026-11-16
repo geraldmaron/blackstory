@@ -1,5 +1,5 @@
 /**
- * The /books catalog as rendered: a cover wall of links whose accessible name is the title, the
+ * The /books catalog as rendered: ruled rows of links whose accessible name is the title, the
  * states view as a decorative tile grid beside a ranked list of links, designed empty states,
  * and the census limit on the page.
  */
@@ -9,7 +9,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { getBannedBooksListingSnapshot } from '../../data/banned-books-seed';
 import { BooksCoverArt } from './BooksCoverArt';
-import { BooksBrowseSections, tileLegend, tileStep } from './BooksBrowseSections';
+import { BooksBrowseSections, bandBooks, tileLegend, tileStep } from './BooksBrowseSections';
 import { buildBooksBrowseViewModel } from './books-view-model';
 
 void React;
@@ -34,13 +34,32 @@ test('with no ISBN the cover is typeset with the title and author, never initial
   assert.doesNotMatch(html, />BE</);
 });
 
-test('the wall shows every title as one link: cover, title, and the states it is challenged in', () => {
+test('every title is one ruled row; the count is a numeral and a word, with no text over a cover', () => {
   const html = render({});
-  const links = html.match(/class="ds-books-wall__link"/g) ?? [];
-  assert.equal(links.length, SNAPSHOT.books.length);
+  const rows = html.match(/class="ds-books-row"/g) ?? [];
+  assert.equal(rows.length, SNAPSHOT.books.length);
   assert.match(html, /href="\/books\/the-bluest-eye"/);
-  assert.match(html, /Challenged in \d+ states?/);
-  assert.doesNotMatch(html, /Page \d+ of/);
+  assert.match(html, /Challenged in <\/span><span class="ds-books-row__n">\d+<\/span>/);
+  assert.doesNotMatch(html, /ds-books-wall|ds-book-cover--typeset|Page \d+ of/);
+});
+
+test('bands pack whole groups to about two screens and never split a group', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, {});
+  const bands = bandBooks(view.items, 'title');
+  assert.equal(
+    bands.flat().reduce((sum, group) => sum + group.items.length, 0),
+    view.items.length,
+  );
+  for (const band of bands) {
+    const rows = band.reduce((sum, group) => sum + group.items.length, 0);
+    assert.ok(rows <= 18 || band.length === 1);
+  }
+  const labels = bands.flat().map((group) => group.label);
+  assert.equal(new Set(labels).size, labels.length);
+});
+
+test('a bare cover with no ISBN renders nothing, never a typeset stand-in', () => {
+  assert.equal(renderToStaticMarkup(<BooksCoverArt bare title="Beloved" />), '');
 });
 
 test('the toolbar carries State, Author, Sort and Covers | States, all as links', () => {
@@ -77,7 +96,7 @@ test('the tile legend reads its ranges off the step formula, with no gaps or ove
   assert.deepEqual(tileLegend(1), [{ step: 4, from: 1, to: 1 }]);
 });
 
-test('the covers view leads with the busiest state on sand, every entry opening the states view', () => {
+test('the titles view leads with the busiest state on sand, every entry opening the states view', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {});
   const html = render({});
   const [top] = view.stateCounts;

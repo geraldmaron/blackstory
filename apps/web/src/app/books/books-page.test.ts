@@ -45,7 +45,7 @@ test('books detail page renders the shared record anatomy with the cover as its 
 });
 
 test('the affiliate link is one quiet action, disclosed directly under it, never copper', () => {
-  assert.match(detailViewSource, /Buy on Bookshop \(affiliate\)/);
+  assert.match(detailViewSource, /label: 'Buy on Bookshop'/);
   assert.match(detailViewSource, /sponsored/);
   // The disclosure travels with the link (RecordPage prints `note` under it), not in the file.
   assert.match(detailViewSource, /note: BOOKS_DETAIL\.affiliateNotice/);
@@ -53,10 +53,11 @@ test('the affiliate link is one quiet action, disclosed directly under it, never
   assert.doesNotMatch(detailViewSource, /ds-cta--copper|buttonClassName\('primary'/);
 });
 
-test('books browse is the register toolbar over a cover wall, not kit rows or a search form', () => {
+test('books browse is the register toolbar over ruled bands, not kit rows or a search form', () => {
   assert.match(browseSectionsSource, /<RecordsToolbar/);
   assert.match(browseSectionsSource, /<BooksCoverArt/);
-  assert.match(browseSectionsSource, /ds-books-wall/);
+  assert.match(browseSectionsSource, /ds-books-row/);
+  assert.doesNotMatch(browseSectionsSource, /ds-books-wall/);
   for (const gone of [
     'FindBar',
     'RoomSection',

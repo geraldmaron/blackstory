@@ -1,6 +1,6 @@
 /**
- * `/books`: the display header, the cover wall on ink, the states view on sand and the closing
- * note. The toolbar, menus, active
+ * `/books`: the display header, the titles as ruled rows in bands that change ground, the states
+ * view on sand and the closing note. The toolbar, menus, active
  * chips and outcome states are the register's (records-index.css); the cover is
  * book-cover.css. Spacing uses the shared scale only (4, 8, 12, 16, 24, 32, 48, 72).
  */
@@ -38,7 +38,7 @@ body:has(.ds-books) .ds-reading-progress {
   line-height: 1.3;
 }
 
-/* —— full-bleed bands: ink under the wall, sand under the states ———————————————— */
+/* —— full-bleed bands: ink and sand in turn ———————————————————————————————————— */
 .ds-books-band {
   margin-inline: calc(50% - 50vw);
   padding-block: var(--ds-space-12) var(--ds-space-16);
@@ -125,62 +125,95 @@ body:has(.ds-books) .ds-reading-progress {
   text-decoration: none;
 }
 
-/* —— cover wall ——————————————————————————————————————————————————————————————— */
-.ds-books-wall {
+/* —— bands: a mark column (numeral, range) beside ruled rows ———————————————————— */
+.ds-books-bandgrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--ds-space-12) var(--ds-space-8);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-6) var(--ds-space-12);
+}
+
+.ds-books-mark {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-2);
+}
+
+.ds-books-mark__numeral {
+  font-size: var(--ds-text-display-title);
+}
+
+.ds-books-mark__name {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: var(--ds-tracking-display);
+}
+
+.ds-books-mark__meta {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ds-books-group__label {
+  margin: 0 0 var(--ds-space-2);
+  padding-top: var(--ds-space-6);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ds-books-groups > section:first-child .ds-books-group__label {
+  padding-top: 0;
+}
+
+/* —— ruled rows ————————————————————————————————————————————————————————————— */
+.ds-books-list {
   margin: 0;
   padding: 0;
   list-style: none;
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
-.ds-books-wall__link {
+.ds-books-list > li + li {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books-row {
   display: grid;
-  align-content: start;
-  gap: var(--ds-space-3);
+  grid-template-columns: minmax(0, 1fr) 7.5rem 3.5rem;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  min-height: 2.75rem;
+  margin-inline: calc(var(--ds-space-3) * -1);
+  padding: var(--ds-space-4) var(--ds-space-3);
   color: var(--ds-ink);
   text-decoration: none;
-  border-radius: var(--ds-radius-sm);
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-books-wall__link:focus-visible {
+.ds-books-row:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-books-row:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-space-1);
+  outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* The cover and its tab move together. */
-.ds-books-wall__frame {
-  position: relative;
-  display: block;
-  padding-bottom: var(--ds-space-4);
-  transition: transform var(--ds-duration-fast) var(--ds-easing);
+.ds-books-row__text {
+  display: grid;
+  gap: var(--ds-space-1);
 }
 
-.ds-books-wall__link:hover .ds-books-wall__frame {
-  transform: translateY(calc(var(--ds-space-2) * -1));
-}
-
-/* The copper tab, stuck over the cover's foot like an index tab on a file. */
-.ds-books-wall__states {
-  position: absolute;
-  bottom: 0;
-  left: calc(var(--ds-space-2) * -1);
-  max-width: calc(100% + var(--ds-space-2));
-  padding: var(--ds-space-1) var(--ds-space-3);
-  border-radius: 0 var(--ds-radius-sm) var(--ds-radius-sm) 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 700;
-  line-height: 1.25rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ds-books-wall__title {
-  display: -webkit-box;
-  overflow: hidden;
+.ds-books-row__title {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-title);
   font-weight: 650;
@@ -188,14 +221,54 @@ body:has(.ds-books) .ds-reading-progress {
   letter-spacing: var(--ds-tracking-title);
   overflow-wrap: break-word;
   text-wrap: balance;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }
 
-.ds-books-wall__link:hover .ds-books-wall__title {
+.ds-books-row:hover .ds-books-row__title {
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.18em;
+}
+
+.ds-books-row__author {
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.35;
+}
+
+/* The challenge count: a copper numeral and its word. */
+.ds-books-row__count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ds-books-row__n {
+  color: var(--ds-numeral-accent);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: var(--ds-weight-numeral);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-books-row__count--none {
+  text-transform: none;
+  font-weight: 500;
+}
+
+/* The cover slot is fixed, so titles and counts align whether or not a row has art. */
+.ds-books-row__cover {
+  display: block;
+  width: 3.5rem;
+}
+
+.ds-books-row__art {
+  width: 100%;
 }
 
 /* —— states view: the tile map on sand beside a paper sheet of ranks —————————————— */
@@ -397,17 +470,24 @@ body:has(.ds-books) .ds-reading-progress {
 }
 
 /* —— narrower ————————————————————————————————————————————————————————————————— */
-@media (max-width: 79.9375rem) {
-  .ds-books-wall {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+@media (min-width: 64rem) {
+  .ds-books-bandgrid {
+    grid-template-columns: 18rem minmax(0, 1fr);
+  }
+
+  .ds-books-mark {
+    position: sticky;
+    top: calc(var(--ds-island-clearance) + var(--records-bar-h) + var(--ds-space-6));
+    align-self: start;
+  }
+
+  .ds-books-bandgrid > .ds-books-note {
+    grid-column: 2;
+    margin-top: 0;
   }
 }
 
 @media (max-width: 63.9375rem) {
-  .ds-books-wall {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .ds-books-states {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--ds-space-8);
@@ -435,13 +515,33 @@ body:has(.ds-books) .ds-reading-progress {
     padding-block: var(--ds-space-8) var(--ds-space-12);
   }
 
-  .ds-books-wall {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--ds-space-8) var(--ds-space-4);
+  .ds-books-mark__numeral {
+    font-size: var(--ds-text-display-3);
   }
 
-  .ds-books-wall__title {
-    font-size: var(--ds-text-subtitle);
+  .ds-books-row {
+    grid-template-columns: minmax(0, 1fr) 3rem;
+    grid-template-areas:
+      'text cover'
+      'count cover';
+    gap: var(--ds-space-2) var(--ds-space-4);
+  }
+
+  .ds-books-row__text {
+    grid-area: text;
+  }
+
+  .ds-books-row__count {
+    grid-area: count;
+  }
+
+  .ds-books-row__cover {
+    grid-area: cover;
+    width: 3rem;
+  }
+
+  .ds-books-row__n {
+    font-size: var(--ds-text-title);
   }
 
   /* The ranked sheet runs full-bleed on a phone. */
@@ -483,18 +583,7 @@ body:has(.ds-books) .ds-reading-progress {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-books-wall__frame {
+  .ds-books-row {
     transition: none;
   }
-
-  .ds-books-wall__link:hover .ds-books-wall__frame {
-    transform: none;
-  }
-}
-
-/* The wait: a blank cover frame keeps its 2:3 under the register's placeholder pulse. */
-.ds-books-wall__cover.ds-records-wait {
-  display: block;
-  height: auto;
-  width: 100%;
 }

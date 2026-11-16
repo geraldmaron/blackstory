@@ -265,7 +265,7 @@ export function BookRecordView({
           ? {
               extra: {
                 href: bookshop.href,
-                label: 'Buy on Bookshop (affiliate)',
+                label: 'Buy on Bookshop',
                 rel: 'noopener noreferrer sponsored',
                 note: BOOKS_DETAIL.affiliateNotice,
               },
