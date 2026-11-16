@@ -287,17 +287,16 @@ body:has(.ds-law) .ds-reading-progress {
   text-underline-offset: 0.18em;
 }
 
-/* Jurisdiction as a small ink tag: a reach, not a place, so no pin. */
+/* Jurisdiction as a mono-caps word: a reach, not a place, so no pin and no outline. */
 .ds-law-row__where {
   grid-area: where;
   justify-self: end;
-  padding: 2px var(--ds-space-2);
-  border: var(--ds-border-width-strong) solid var(--ds-ink);
-  border-radius: 4px;
-  color: var(--ds-ink);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
