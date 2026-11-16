@@ -59,6 +59,12 @@ test('the sticky rail stops where the body ends, above the record file', () => {
   );
   const desktop = recordCss.slice(recordCss.indexOf('@media (min-width: 64rem)'));
   assert.match(desktop, /\.ds-recpage__grid \{\s*grid-template-areas:\s*'main'\s*'file';/);
-  assert.match(desktop, /\.ds-recpage__main \{[^}]*display: grid;[^}]*'body {2}rail';/s);
+  assert.match(desktop, /\.ds-recpage__main \{[^}]*display: grid;[^}]*'body side';/s);
+  // The at-a-glance card stands beside the lede, above the sticky run, not inside the aside.
+  assert.match(desktop, /'lede side'\s*'note side'/);
+  assert.match(
+    pattern,
+    /<dl className="ds-recpage__facts"[^>]*data-ground="ink"[\s\S]*<aside className="ds-recpage__rail"/,
+  );
   assert.doesNotMatch(desktop, /'file\s+file'/);
 });

@@ -7,15 +7,18 @@
  *   field   the masthead, a plain ground: the record's name at display weight, the era numeral
  *           secondary beside the meta line. With the record's own photograph (`data-plate`) the
  *           photograph leads the field as a toned plate beside the name, credit under it.
- *   sheet   one paper sheet laid over the field's foot (page bands on its left edge); the
- *           citation line is ruled type between two ink rules, not a box
- *   sources "What the sources say" is set off by a heavy rule and its copper numerals, not a card
+ *   sheet   one paper sheet laid over the field's foot (page bands on its left edge), the field
+ *           dissolving into the table beside it; the citation line is an ink card (the record
+ *           at a glance) that carries the masthead's ground onto the paper
+ *   beats   numbered chapters: copper mono number, copper tab over a hairline, display heading;
+ *           the sources sit in a sunken well under their copper numerals
  *   sand    the record file across the sheet's foot; prev/next stand on the table under it
  *
  * A quiet record (violence-adjacent or sensitive, `data-quiet`) keeps the anatomy with no plate.
  *
- * Desktop: the sheet on the wide container, a main column beside a 300px sticky rail, both inside
- * `.ds-recpage__main` so the rail's sticky run ends above the record file. Tablet: one column
+ * Desktop: the sheet on the wide container, the reading column beside a 300px side column (the
+ * card, then the sticky rail), both inside `.ds-recpage__main` so the rail's sticky run ends above
+ * the record file. Tablet: one column
  * (media, lede, citation line, body). Phone: the summary first, then media. The rail's actions pin
  * as a bottom row above the tab bar.
  */
@@ -106,7 +109,8 @@
 }
 
 /* Lede to body. A grid of its own only on a desktop, where it bounds the sticky rail. */
-.ds-recpage__main {
+.ds-recpage__main,
+.ds-recpage__side {
   display: contents;
 }
 
@@ -349,14 +353,23 @@
   margin: 0 0 var(--ds-space-2);
 }
 
-/* —— 3. the citation line: ruled type between two ink rules ——————————————————— */
+/* —— 3. the record at a glance: an ink card carrying the masthead's ground into the sheet (the
+   table paper with an edge on the light table, tokens.css), a copper tab at its head like the
+   chapters below. On a desktop it stands beside the lede, at the top of the rail's column. —— */
 .ds-recpage__facts {
+  --ds-facts-pad: var(--ds-space-6);
   grid-area: facts;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: var(--ds-space-8) 0 0;
-  padding-block: var(--ds-space-4);
-  border-block: var(--ds-border-width-strong) solid var(--ds-ink);
+  padding: var(--ds-facts-pad);
+  border-radius: var(--ds-radius-md);
+  background:
+    linear-gradient(var(--ds-accent-graphic), var(--ds-accent-graphic)) var(--ds-facts-pad) 0 /
+      3.5rem 4px no-repeat,
+    var(--ds-canvas);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge);
+  color: var(--ds-ink);
 }
 
 .ds-recpage__fact {
@@ -504,19 +517,66 @@
   min-width: 0;
 }
 
+/* Each beat opens as a chapter: its number in copper mono, a copper tab over a hairline, and the
+   heading at display scale. The counter numbers only the beats a record actually has. */
+.ds-recpage__body {
+  counter-reset: beat;
+}
+
+.ds-recpage__beat {
+  counter-increment: beat;
+  margin-top: var(--ds-space-16);
+}
+
+.ds-recpage__beat:first-child {
+  margin-top: var(--ds-space-12);
+}
+
 .ds-recpage__beat .ds-section-heading {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-6);
+  position: relative;
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-size: var(--ds-text-display-3);
+  line-height: 1.1;
   scroll-margin-top: calc(56px + var(--ds-space-6));
 }
 
-/* The receipts are set off by a heavy ink rule over the beat and their copper numerals. */
-.ds-recpage__beat:has(> .ds-evidence) {
-  margin-block: var(--ds-space-12) var(--ds-space-8);
-  padding-top: var(--ds-space-2);
-  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+.ds-recpage__beat .ds-section-heading::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--ds-border-width) * -1);
+  left: 0;
+  width: 3.5rem;
+  height: 4px;
+  background: var(--ds-accent-graphic);
 }
 
-.ds-recpage__beat:has(> .ds-evidence) > .ds-evidence {
+.ds-recpage__beat .ds-section-heading::before {
+  content: counter(beat, decimal-leading-zero);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+}
+
+/* The receipts sit in a well of their own: a sunken ground under the copper numerals. */
+.ds-recpage__beat > .ds-evidence {
+  padding: var(--ds-space-2) var(--ds-space-6);
   border-top: 0;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-sunken);
+}
+
+.ds-recpage__beat > .ds-evidence > .ds-evidence__item:last-child {
+  border-bottom: 0;
+}
+
+.ds-recpage__beat > .ds-evidence .ds-evidence__item::before {
+  font-size: var(--ds-text-display-1);
 }
 
 .ds-recpage__prose {
@@ -797,8 +857,14 @@
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
+/* The same meta role as the fact labels, so the file reads as the record's index card. */
 .ds-recpage__file-row dt {
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-recpage__file-row dd {
@@ -1120,14 +1186,50 @@
     grid-area: main;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto 1fr;
     grid-template-areas:
-      'lede  rail'
-      'note  rail'
-      'facts rail'
-      'body  rail';
+      'lede side'
+      'note side'
+      'body side';
     align-items: start;
     column-gap: var(--ds-space-12);
+  }
+
+  /* In the rail's column the card stacks its facts, each ruled from the next. */
+  .ds-recpage__facts {
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+  }
+
+  .ds-recpage__fact,
+  .ds-recpage__fact + .ds-recpage__fact {
+    padding: var(--ds-space-3) 0;
+    border-left: 0;
+  }
+
+  .ds-recpage__fact + .ds-recpage__fact {
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__fact:first-child {
+    padding-top: var(--ds-space-2);
+  }
+
+  .ds-recpage__fact:last-child {
+    padding-bottom: 0;
+  }
+
+  /* The card, then the rail, which sticks inside this column and so stops where the body ends. */
+  .ds-recpage__side {
+    grid-area: side;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-8);
+  }
+
+  .ds-recpage__beat:first-child {
+    margin-top: var(--ds-space-8);
   }
 
   .ds-recpage__rail {
@@ -1292,12 +1394,16 @@
     text-align: right;
   }
 
+  /* The field dissolves into the table at its foot, so the photograph never ends on a line
+     beside the sheet. */
   .ds-recpage__wash {
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--ds-canvas) 92%, transparent) 0,
-      color-mix(in srgb, var(--ds-canvas) 86%, transparent) calc(100% - var(--ds-recpage-map-w)),
-      transparent calc(100% - var(--ds-recpage-map-w) + 10rem)
-    );
+    background:
+      linear-gradient(180deg, transparent 55%, var(--ds-canvas) 100%),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--ds-canvas) 92%, transparent) 0,
+        color-mix(in srgb, var(--ds-canvas) 86%, transparent) calc(100% - var(--ds-recpage-map-w)),
+        transparent calc(100% - var(--ds-recpage-map-w) + 10rem)
+      );
   }
 }

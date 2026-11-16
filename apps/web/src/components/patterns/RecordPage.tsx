@@ -377,86 +377,90 @@ export function RecordPage({
               <RecordLede text={ledeText}>{lede ?? ledeText}</RecordLede>
               {note ? <div className="ds-recpage__note">{note}</div> : null}
 
-              <dl className="ds-recpage__facts" aria-label="Record at a glance">
-                {facts.map((fact) => (
-                  <div key={fact.label} className="ds-recpage__fact">
-                    <dt className="ds-recpage__fact-label">{fact.label}</dt>
-                    <dd className="ds-recpage__fact-value">{fact.value}</dd>
-                    {fact.detail ? (
-                      <dd className="ds-recpage__fact-detail">{fact.detail}</dd>
-                    ) : null}
-                  </div>
-                ))}
-              </dl>
+              {/* The card and the rail: one column beside the reading on a desktop, so the card's
+                  height never pushes the body down; `display: contents` elsewhere. */}
+              <div className="ds-recpage__side">
+                <dl className="ds-recpage__facts" aria-label="Record at a glance" data-ground="ink">
+                  {facts.map((fact) => (
+                    <div key={fact.label} className="ds-recpage__fact">
+                      <dt className="ds-recpage__fact-label">{fact.label}</dt>
+                      <dd className="ds-recpage__fact-value">{fact.value}</dd>
+                      {fact.detail ? (
+                        <dd className="ds-recpage__fact-detail">{fact.detail}</dd>
+                      ) : null}
+                    </div>
+                  ))}
+                </dl>
 
-              <aside className="ds-recpage__rail" aria-label="Where to go from this record">
-                {media ? <div className="ds-recpage__media">{media}</div> : null}
-                {actions.extra ? (
-                  <div className="ds-recpage__extra">
-                    <a
-                      className={buttonClassName('quiet', 'ds-recpage__action')}
-                      href={actions.extra.href}
-                      target="_blank"
-                      rel={actions.extra.rel ?? 'noopener noreferrer'}
-                    >
-                      {actions.extra.label}
-                      <Icon icon={faArrowUpRightFromSquare} />
-                    </a>
-                    {actions.extra.note ? (
-                      <p className="ds-recpage__extra-note">{actions.extra.note}</p>
+                <aside className="ds-recpage__rail" aria-label="Where to go from this record">
+                  {media ? <div className="ds-recpage__media">{media}</div> : null}
+                  {actions.extra ? (
+                    <div className="ds-recpage__extra">
+                      <a
+                        className={buttonClassName('quiet', 'ds-recpage__action')}
+                        href={actions.extra.href}
+                        target="_blank"
+                        rel={actions.extra.rel ?? 'noopener noreferrer'}
+                      >
+                        {actions.extra.label}
+                        <Icon icon={faArrowUpRightFromSquare} />
+                      </a>
+                      {actions.extra.note ? (
+                        <p className="ds-recpage__extra-note">{actions.extra.note}</p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  <nav className="ds-recpage__actions" aria-label="Record actions">
+                    {actions.map ? (
+                      <Link
+                        className={buttonClassName('secondary', 'ds-recpage__action')}
+                        href={actions.map.href}
+                        prefetch={false}
+                      >
+                        <Icon icon={faMapLocationDot} />
+                        {actions.map.label ?? 'Open on the map'}
+                      </Link>
                     ) : null}
-                  </div>
-                ) : null}
-                <nav className="ds-recpage__actions" aria-label="Record actions">
-                  {actions.map ? (
+                    {sourcesAnchor ? (
+                      <a
+                        className={buttonClassName(
+                          'secondary',
+                          'ds-recpage__action ds-recpage__phone-only',
+                        )}
+                        href={`#${sourcesAnchor}`}
+                      >
+                        <Icon icon={faQuoteLeft} />
+                        Sources
+                      </a>
+                    ) : null}
+                    {actions.externalMapsHref ? (
+                      <a
+                        className={buttonClassName(
+                          'quiet',
+                          'ds-recpage__action ds-recpage__action--icon',
+                        )}
+                        href={actions.externalMapsHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Icon icon={faDiamondTurnRight} />
+                        <span className="ds-recpage__action-label">Open in maps</span>
+                      </a>
+                    ) : null}
                     <Link
-                      className={buttonClassName('secondary', 'ds-recpage__action')}
-                      href={actions.map.href}
-                      prefetch={false}
-                    >
-                      <Icon icon={faMapLocationDot} />
-                      {actions.map.label ?? 'Open on the map'}
-                    </Link>
-                  ) : null}
-                  {sourcesAnchor ? (
-                    <a
-                      className={buttonClassName(
-                        'secondary',
-                        'ds-recpage__action ds-recpage__phone-only',
-                      )}
-                      href={`#${sourcesAnchor}`}
-                    >
-                      <Icon icon={faQuoteLeft} />
-                      Sources
-                    </a>
-                  ) : null}
-                  {actions.externalMapsHref ? (
-                    <a
                       className={buttonClassName(
                         'quiet',
                         'ds-recpage__action ds-recpage__action--icon',
                       )}
-                      href={actions.externalMapsHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={actions.correctionHref}
+                      prefetch={false}
                     >
-                      <Icon icon={faDiamondTurnRight} />
-                      <span className="ds-recpage__action-label">Open in maps</span>
-                    </a>
-                  ) : null}
-                  <Link
-                    className={buttonClassName(
-                      'quiet',
-                      'ds-recpage__action ds-recpage__action--icon',
-                    )}
-                    href={actions.correctionHref}
-                    prefetch={false}
-                  >
-                    <Icon icon={faPenToSquare} />
-                    <span className="ds-recpage__action-label">Suggest a correction</span>
-                  </Link>
-                </nav>
-              </aside>
+                      <Icon icon={faPenToSquare} />
+                      <span className="ds-recpage__action-label">Suggest a correction</span>
+                    </Link>
+                  </nav>
+                </aside>
+              </div>
 
               <div className="ds-recpage__body">{children}</div>
             </div>
