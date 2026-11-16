@@ -1,24 +1,29 @@
 /**
- * Pure timing and copy model for the Door cold-open headline subject morph, which changes once:
- * History → Black Story. One change reads as the argument; five read as a slot machine (owner,
- * 2026-11-15).
+ * Pure timing and copy model for the Door cold-open headline subject morph:
+ * History → His story → Her story → Your story → Their story → BlackStory. The last step closes
+ * the gap and sets the subject in the wordmark's type (owner, 2026-11-16).
  * Letter-slot animation hints and phase resolution live here; HeroHeadlineMorph
  * renders the visual morph and trailer (" happened here.").
  */
 
-/** Phases of the cold-open subject morph (History → Black Story). */
-export type HeroHeadlinePhaseId = 'history' | 'black-story';
+/** Phases of the cold-open subject morph (History → … → BlackStory). */
+export type HeroHeadlinePhaseId =
+  'history' | 'his-story' | 'her-story' | 'your-story' | 'their-story' | 'black-story';
 
 export type HeroHeadlinePhase = {
   readonly id: HeroHeadlinePhaseId;
-  /** Accessible / aria text for the subject alone, e.g. "His Story" */
+  /** Subject text alone, e.g. "His story" */
   readonly subjectLabel: string;
-  /** Full accessible headline: subject + " happened here." */
+  /** Full headline: subject + " happened here." */
   readonly accessibleLabel: string;
-  /** Prefix before the stable "Story" suffix. Empty only for History (no Story split yet). */
+  /** Prefix before the "story" suffix. Empty only for History (no split yet). */
   readonly prefix: string;
-  /** Whether Story is shown as a separate word (false only for History). */
+  /** Whether "story" is shown as its own part (false only for History). */
   readonly storySplit: boolean;
+  /** First letter of the suffix: lowercase as a word, capital inside the BlackStory name. */
+  readonly storyInitial: 's' | 'S';
+  /** One word in the wordmark's type (the final BlackStory only). */
+  readonly wordmark: boolean;
   /** Dwell ms after transition settles before advancing. */
   readonly dwellMs: number;
   /** Transition duration into this phase (ms). */
@@ -32,33 +37,39 @@ export const HERO_HEADLINE_FINAL_PHASE_ID: HeroHeadlinePhaseId = 'black-story';
 
 const STORY_SUFFIX = 'Story' as const;
 
-function buildAccessibleLabel(subjectLabel: string): string {
-  return `${subjectLabel}${HERO_HEADLINE_TRAILER}`;
+function phase(
+  id: HeroHeadlinePhaseId,
+  prefix: string,
+  transitionMs: number,
+  dwellMs: number,
+): HeroHeadlinePhase {
+  const wordmark = id === HERO_HEADLINE_FINAL_PHASE_ID;
+  const storySplit = prefix !== '';
+  const subjectLabel = !storySplit ? 'History' : wordmark ? `${prefix}Story` : `${prefix} story`;
+  return {
+    id,
+    subjectLabel,
+    accessibleLabel: `${subjectLabel}${HERO_HEADLINE_TRAILER}`,
+    prefix,
+    storySplit,
+    storyInitial: wordmark ? 'S' : 's',
+    wordmark,
+    transitionMs,
+    dwellMs,
+  };
 }
 
 export const HERO_HEADLINE_PHASES: readonly HeroHeadlinePhase[] = [
-  {
-    id: 'history',
-    subjectLabel: 'History',
-    accessibleLabel: buildAccessibleLabel('History'),
-    prefix: '',
-    storySplit: false,
-    transitionMs: 0,
-    dwellMs: 2800,
-  },
-  {
-    id: 'black-story',
-    subjectLabel: 'Black Story',
-    accessibleLabel: buildAccessibleLabel('Black Story'),
-    prefix: 'Black',
-    storySplit: true,
-    /** Gap + capital-S reveal, paced with the prefix roll so "Black" never sits on "tory". */
-    transitionMs: 600,
-    dwellMs: Number.POSITIVE_INFINITY,
-  },
-] as const;
+  phase('history', '', 0, 2800),
+  /** The split (gap + s reveal) is slower than the prefix crossfades so it reads. */
+  phase('his-story', 'His', 1500, 2000),
+  phase('her-story', 'Her', 1100, 1400),
+  phase('your-story', 'Your', 1100, 1400),
+  phase('their-story', 'Their', 1100, 1400),
+  phase('black-story', 'Black', 1200, Number.POSITIVE_INFINITY),
+];
 
-/** For History → Black Story: "His" + "tory" in the unsplit word, so UI can animate gap + S. */
+/** For History → His story: "His" + "tory" in the unsplit word, so UI can animate gap + s. */
 export type HistorySplitHint = {
   readonly before: string;
   readonly after: string;
@@ -73,7 +84,7 @@ export function historySplitHint(): HistorySplitHint {
   };
 }
 
-/** Prefixed phases after the split share the stable word "Story". */
+/** Prefixed phases after the split share the stable word "story" (its initial is per phase). */
 export function storySuffix(): typeof STORY_SUFFIX {
   return STORY_SUFFIX;
 }
@@ -102,7 +113,7 @@ function finalPhaseIndex(): number {
 }
 
 /**
- * Play once, then hold on Black Story indefinitely.
+ * Play once, then hold on BlackStory indefinitely.
  * Each non-final phase occupies transitionMs + dwellMs before advancing.
  */
 export function resolveHeroHeadlinePhaseIndex(elapsedMs: number, reducedMotion: boolean): number {

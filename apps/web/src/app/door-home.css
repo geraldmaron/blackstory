@@ -305,7 +305,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-display);
-  /* The display role, held to the dock: the longer phase of the morph ("Black Story") fits. */
+  /* The display role, held to the dock: every phase of the morph fits. */
   font-size: clamp(2.25rem, min(3.4vw, 6vh), 3.5rem);
   letter-spacing: -0.04em;
   line-height: 0.86;
@@ -1026,7 +1026,8 @@ html[data-door-browse='1'] .ds-door {
   border: 0;
 }
 
-/* Cold-open subject morph: History becomes Black Story, once.
+/* Cold-open subject morph, once: History, His story, Her story, Your story, Their story, then
+   BlackStory in the wordmark's type.
    Flat matte only: opacity, width and a short vertical roll. No scale on the S (keeps the
    baseline stable). The outgoing prefix rolls up and out while the incoming one rolls in from
    below, inside a clipped slot, so the two words never sit on top of each other mid-change. */
@@ -1109,7 +1110,6 @@ html[data-door-browse='1'] .ds-door {
 .ds-hero-headline-morph__s {
   display: inline-block;
   opacity: 0;
-  text-transform: uppercase;
   line-height: inherit;
   vertical-align: baseline;
   transition: opacity var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
@@ -1155,8 +1155,39 @@ html[data-door-browse='1'] .ds-door {
   }
 }
 
+/* The last step: the gap closes and the subject turns into the wordmark's type (Google Sans Flex
+   stands in for the lockup art's face). It resolves out of a soft blur rather than from nothing,
+   so the change reads as the same word coming into focus. */
+.ds-hero-headline-morph[data-wordmark='true'],
+.ds-hero-headline-morph__wordmark {
+  font-family: var(--ds-font-wordmark), var(--ds-font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.ds-hero-headline-morph[data-wordmark='true']:not([data-settled='true']) {
+  animation: ds-hero-wordmark-in var(--ds-hero-prefix-ms, 1200ms) var(--ds-hero-morph-ease) both;
+}
+
+.ds-hero-headline-morph[data-wordmark='true'] .ds-hero-headline-morph__gap {
+  width: 0;
+  transition-duration: var(--ds-hero-prefix-ms, 1200ms);
+}
+
+@keyframes ds-hero-wordmark-in {
+  from {
+    opacity: 0.4;
+    filter: blur(0.08em);
+  }
+
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
 /* The settled words for reduced motion only (HeroHeadlineMorph): with motion allowed it never
-   shows, so the animated History-to-Black Story change plays exactly as before. */
+   shows, so the animated sequence plays exactly as before. */
 .ds-hero-headline-morph__static {
   display: none;
 }
