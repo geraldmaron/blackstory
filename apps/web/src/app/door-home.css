@@ -1581,7 +1581,7 @@ body:has(.ds-door) .ds-door-journey {
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    text-shadow: 0 1px 2px rgb(0 0 0 / 0.65);
+    text-shadow: 0 0 6px var(--ds-canvas);
   }
 
   /* Buttons carry their own ground; a shadow only blurs their label. */
@@ -1604,5 +1604,42 @@ body:has(.ds-door) .ds-door-journey {
       mask-image: linear-gradient(180deg, #000 calc(100% - var(--ds-space-8)), transparent);
       padding-bottom: var(--ds-space-10);
     }
+  }
+}
+
+/* Wide: the opening column scrolls with the page instead of being fixed in a frame it can outgrow
+   (which pushed the headline up under the bar). It starts a clear step below the bar, and the
+   first band starts below whichever is lower, the column's end or the usual peek. */
+@media (scripting: enabled) and (min-width: 64rem),
+  (scripting: enabled) and (min-width: 48rem) and (min-aspect-ratio: 1001/1000) {
+  /* The page is the column's frame: main starts at the top (flow-root stops the bands' margin
+     collapsing through it) and the journey is not a frame of its own. */
+  .ds-door:has(.ds-door__dock[data-step='open']) {
+    position: relative;
+    display: flow-root;
+  }
+
+  .ds-door:has(.ds-door__dock[data-step='open']) .ds-door-journey {
+    position: static;
+  }
+
+  .ds-door__dock[data-step='open'] {
+    position: absolute;
+    top: calc(var(--ds-island-clearance) + var(--ds-space-10));
+    bottom: auto;
+  }
+
+  .ds-door__dock[data-step='open'] > .ds-door-open {
+    padding-top: 0;
+  }
+
+  body:has(.ds-door__dock[data-step='open']) .ds-door-chapters {
+    margin-top: max(
+      calc(100dvh - var(--ds-door-peek)),
+      calc(
+        var(--ds-island-clearance) + var(--ds-space-10) + var(--ds-door-dock-h, 0px) +
+          var(--ds-space-12)
+      )
+    );
   }
 }

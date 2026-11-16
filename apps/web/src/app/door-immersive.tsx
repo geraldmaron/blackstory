@@ -757,7 +757,7 @@ export function DoorImmersive({
               ground around it: clear over the record, deepening outward, with an ink wash under
               the words on a wide screen (door-tour.css). */}
           {echo ? (
-            <div className="ds-door__echo" key={echo.pinId ?? echo.name}>
+            <div className="ds-door__echo" key={echo.pinId ?? echo.name} data-ground="ink">
               {echo.plate ? (
                 <RecordImage
                   entityId={echo.pinId ?? echo.name}
@@ -824,12 +824,7 @@ export function DoorImmersive({
         ) : null}
         <div className="ds-door__dock" ref={dockRef} data-step={step === 0 ? 'open' : 'walk'}>
           {step === 0 ? (
-            <section
-              className="ds-door-open"
-              aria-labelledby="door-open-heading"
-              data-ground="ink"
-              data-ground-fixed=""
-            >
+            <section className="ds-door-open" aria-labelledby="door-open-heading" data-ground="ink">
               {/* The headline and the one way into a story lead; the record the map points at
                   follows (desktop only: a phone's column is the headline and the story, and the
                   map is the second beat). */}

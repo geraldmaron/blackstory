@@ -140,6 +140,9 @@
      center and no window edge shows as a hard line. */
   inset: -100vmax;
   overflow: hidden;
+  /* The table's ground (ink in the dark theme, paper in the light), so the wash and the plate's
+     toning follow the theme; the ground's own fill would cover the map. */
+  background: transparent;
   opacity: 0.66;
   pointer-events: none;
   -webkit-mask-image: radial-gradient(
@@ -197,10 +200,11 @@
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    text-shadow: 0 1px 2px rgb(0 0 0 / 0.65);
+    text-shadow: 0 0 6px var(--ds-canvas);
   }
 
-  .ds-door-tour .ds-door-tour__card::after {
+  /* Outranks the photograph panel's dim (`:has(...)::after`). */
+  .ds-door-tour .ds-door-tour__card.ds-door-record:has(.ds-door-record__plate)::after {
     content: none;
   }
 
