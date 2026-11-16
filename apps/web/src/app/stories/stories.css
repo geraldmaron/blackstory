@@ -1,6 +1,6 @@
 /*
  * /stories: the lead chapter edge to edge with its title on an ink panel, the other chapters as
- * tiles with sand and copper caption blocks, then one paper sheet of stories under a display head.
+ * ruled lead rows, then one paper sheet of stories under a display head.
  * Type sizes come from the --ds-text-* scale (room-kit.test guards this file).
  */
 
@@ -76,8 +76,10 @@
 .ds-stories-cover__credit,
 .ds-stories-lead__credit {
   margin: var(--ds-space-3) 0 0;
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 /* The chapter images are archive scans with paper borders; a cover crops inside the document, at
@@ -128,7 +130,6 @@
   row-gap: var(--ds-space-4);
   overflow: hidden;
   padding: var(--ds-space-10) var(--ds-space-12);
-  border-radius: var(--ds-radius-md);
   /* A sheet's lift: in the light theme the table's ground is paper, and the shadow is what keeps
      the panel from dissolving into the page. */
   box-shadow: var(--ds-shadow-sheet);
@@ -138,13 +139,15 @@
 .ds-stories-lead__years {
   grid-area: years;
   margin: 0;
-  padding: var(--ds-space-1) var(--ds-space-3);
-  background: var(--ds-material-copper);
-  color: var(--ds-material-ink);
+  /* Meta, not a tag: the years in copper mono capitals over the title, the way home's cover
+     and the record masthead print an era. */
+  color: var(--ds-numeral-soft-text);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-body-sm);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-stories-lead__title {
@@ -215,24 +218,20 @@
   margin-top: var(--ds-space-8);
 }
 
-/* —— Chapter tiles: picture over a sand or copper caption block ———————————————————— */
+/* —— Chapter lead rows: ruled, a plate beside the title block ——————————————————————— */
 .ds-stories-covers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: var(--ds-space-8);
+  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-stories-cover {
   position: relative;
   display: grid;
-  grid-template-rows: auto 1fr;
-  overflow: hidden;
-  border-radius: var(--ds-radius-md);
-  transition: transform var(--ds-duration-fast) var(--ds-ease-standard);
-}
-
-.ds-stories-cover:hover {
-  transform: translateY(-4px);
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--ds-space-8);
+  padding-block: var(--ds-space-8);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-stories-cover__media {
@@ -243,7 +242,7 @@
 .ds-stories-cover__blank {
   display: block;
   height: 100%;
-  background: var(--ds-material-ink);
+  background: var(--ds-plate-hi);
 }
 
 .ds-stories-cover__caption {
@@ -251,11 +250,11 @@
   align-content: start;
   justify-items: start;
   gap: var(--ds-space-3);
-  padding: var(--ds-space-6) var(--ds-space-8) var(--ds-space-8);
 }
 
 .ds-stories-cover__years {
   margin: 0;
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-body-sm);
   font-weight: 700;
@@ -389,10 +388,8 @@
   width: min(100% - var(--ds-space-8), 18rem);
   margin: auto;
   padding: var(--ds-space-2);
-  border: var(--ds-border-width) solid var(--ds-material-ink);
-  border-radius: var(--ds-radius-md);
+  border: 0;
   color: var(--ds-ink);
-  box-shadow: 4px 4px 0 var(--ds-material-copper);
 }
 
 .ds-stories-sort::backdrop {
@@ -430,7 +427,6 @@
   gap: var(--ds-space-2);
   min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
-  border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
@@ -539,7 +535,7 @@
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* A 72px portrait, or a sand tile with the initial in ink. */
+/* A 72px plate, or the plate's ground with the initial in ink; both sit on the one title edge. */
 .ds-stories-row__thumb {
   grid-area: thumb;
   display: grid;
@@ -547,8 +543,7 @@
   width: 4.5rem;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-material-sand);
+  background: var(--ds-plate-hi);
   color: var(--ds-material-ink);
 }
 
@@ -645,8 +640,10 @@
     border-radius: 0;
   }
 
-  .ds-stories-cover__caption {
-    padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-6);
+  .ds-stories-cover {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--ds-space-4);
+    padding-block: var(--ds-space-6);
   }
 
   .ds-stories-browse {
@@ -696,8 +693,6 @@
     margin: 0;
     padding: var(--ds-space-2) var(--ds-space-2)
       calc(var(--ds-space-4) + env(safe-area-inset-bottom, 0px));
-    border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
-    box-shadow: none;
   }
 
   .ds-stories-sort::backdrop {
@@ -707,18 +702,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ds-stories-lead__media img,
-  .ds-stories-cover__media img,
-  .ds-stories-cover {
+  .ds-stories-cover__media img {
     transition: none;
   }
 
   .ds-stories-lead:hover .ds-stories-lead__media img,
   .ds-stories-cover:hover .ds-stories-cover__media img {
     transform: scale(var(--crop));
-  }
-
-  .ds-stories-cover:hover {
-    transform: none;
   }
 }
 
@@ -744,19 +734,13 @@
 
 .ds-stories-wait__covers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: var(--ds-space-8);
 }
 
 .ds-stories-wait__covers > span {
   display: block;
-  aspect-ratio: 16 / 13;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-material-sand);
-}
-
-.ds-stories-wait__covers > span + span {
-  background: var(--ds-material-copper);
+  height: 10rem;
+  background: var(--ds-surface-sunken);
 }
 
 .ds-stories-wait__rows {
@@ -767,6 +751,5 @@
 .ds-stories-wait__rows > span {
   display: block;
   height: 5.5rem;
-  border-radius: var(--ds-radius-sm);
   background: var(--ds-surface-sunken);
 }

@@ -61,53 +61,47 @@ export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
       <TrustSheet>
         <Prose>
           <p>
-            This list records an image address and an associated record for each tile. Open the
-            record to read its current image credit. Separate credits for the copied tiles are not
-            recorded in this list.
+            This list records an associated record for each tile. Open the record to read its
+            current image credit. Separate credits for the copied tiles are not recorded in this
+            list.
           </p>
         </Prose>
         {read.source !== 'live' ? (
           <Notice tone="warning" title="Record information could not be loaded">
-            The tiles and their recorded image links are available below. Reload to try the record
-            information again.
+            The tiles are available below. Reload to try the record information again.
           </Notice>
         ) : null}
-        <div className="ds-mosaic-credits">
+        <ol className="ds-mosaic-credits">
           {tiles.map((tile) => {
             const row = mosaicCreditRow(tile, records.get(tile.entityId));
             return (
-              <article
-                className="ds-mosaic-credit"
-                key={tile.index}
-                aria-labelledby={`mosaic-credit-${tile.index}`}
-              >
+              <li className="ds-mosaic-credit" key={tile.index}>
+                <span className="ds-mosaic-credit__index">{row.index}</span>
                 {/* Local derivatives are the actual decorative assets, not the current record image. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={row.tilePath} width={96} height={96} loading="lazy" alt="" />
-                <div>
-                  <p className="ds-mosaic-credit__index">Tile {row.index}</p>
-                  <h2 id={`mosaic-credit-${tile.index}`}>
-                    {row.recordHref ? (
-                      <Link href={row.recordHref}>{row.name}</Link>
-                    ) : (
-                      'Associated record unavailable'
-                    )}
-                  </h2>
-                  {row.recordedImageHref ? (
-                    <a
-                      className="ds-mosaic-credit__source"
-                      href={row.recordedImageHref}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow"
-                    >
-                      Recorded image
-                    </a>
-                  ) : null}
-                </div>
-              </article>
+                <span className="ds-plate ds-plate--upper ds-mosaic-credit__plate">
+                  <span className="ds-plate__tone">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="ds-plate__img"
+                      src={row.tilePath}
+                      width={96}
+                      height={96}
+                      loading="lazy"
+                      alt=""
+                    />
+                  </span>
+                </span>
+                <span className="ds-mosaic-credit__name">
+                  {row.recordHref ? (
+                    <Link href={row.recordHref}>{row.name}</Link>
+                  ) : (
+                    'Associated record unavailable'
+                  )}
+                </span>
+              </li>
             );
           })}
-        </div>
+        </ol>
         <Pagination
           page={page}
           pageCount={pageCount}

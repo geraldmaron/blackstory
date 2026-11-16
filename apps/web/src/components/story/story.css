@@ -152,17 +152,16 @@
   text-wrap: pretty;
 }
 
-/* The facts band: the record page's Where/When/Evidence line, for a story. Ink on copper in
-   both themes, cells divided by ink rules. */
+/* The facts strip: the record page's facts idiom for a story. Mono-caps labels over display
+   values, set as ruled type between two ink rules, with no box around any of it. */
 .ds-story-mast__band {
   display: flex;
   flex-wrap: wrap;
   align-items: start;
   gap: var(--ds-space-4) 0;
   margin: var(--ds-space-10) 0 0;
-  padding: var(--ds-space-6) var(--ds-space-8);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-sans);
+  padding-block: var(--ds-space-4);
+  border-block: var(--ds-border-width-strong) solid var(--ds-ink);
   animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
@@ -171,7 +170,7 @@
   align-content: start;
   gap: var(--ds-space-1);
   padding-inline: var(--ds-space-6);
-  border-left: 2px solid var(--ds-ink);
+  border-left: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-story-mast__band > div:first-child {
@@ -180,8 +179,12 @@
 }
 
 .ds-story-mast__band dt {
-  font-size: var(--ds-text-caption);
-  font-weight: 700;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-story-mast__band dd {
@@ -189,8 +192,9 @@
   flex-wrap: wrap;
   gap: 0 var(--ds-space-2);
   margin: 0;
+  font-family: var(--ds-font-display);
   font-size: var(--ds-text-body);
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .ds-story-mast__band a {
@@ -217,6 +221,7 @@
 .ds-story-mast__band > .ds-story-mast__report {
   align-self: center;
   margin-left: auto;
+  padding-right: 0;
   border-left: 0;
 }
 
@@ -237,16 +242,31 @@
   margin: 0;
 }
 
-.ds-story-mast__portrait .ds-story-img {
-  border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
-  background: var(--ds-material-paper);
+.ds-story-mast__portrait .ds-plate__tone {
+  aspect-ratio: 4 / 5;
 }
 
-/* The credit hangs under the portrait as a sand plate, the frame's lower edge in color. */
-.ds-story-mast__portrait .ds-story-caption {
-  margin-top: 0;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-radius: 0 0 var(--ds-radius-md) var(--ds-radius-md);
+/* StoryImage's frame is the plate's image: the plate's tone filter lands on it, its photo fills it. */
+.ds-story-mast__portrait .ds-story-img,
+.ds-story-next__plate .ds-story-img {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  background: transparent;
+}
+
+.ds-story-mast__portrait .ds-story-img > img {
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+
+/* The credit sits under the plate in mono caps, the meta role; never on the photograph. */
+.ds-story-mast__portrait .ds-plate__credit {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 /* —— Section spine (wide screens) and Contents bar (everything narrower) ————————————— */
@@ -435,7 +455,7 @@
   font-size: var(--ds-text-body-sm);
 }
 
-@media (min-width: 75rem) {
+@media (min-width: 80rem) {
   .ds-story__frame {
     grid-template-columns: 9.75rem minmax(0, var(--ds-width-record));
     column-gap: var(--ds-space-8);
@@ -742,7 +762,7 @@
 
 /* Beside the contents rail the band stops at the sheet's color stripes, so the rail stays on the
    page ground and the stripes run unbroken from sheet to sheet. */
-@media (min-width: 75rem) {
+@media (min-width: 80rem) {
   .ds-story .ds-story-body > :is(.ds-story-figures, .ds-story-doc)[data-ground] {
     clip-path: inset(0 -100vmax 0 calc(var(--ds-sheet-pad) * -1));
   }
@@ -878,48 +898,46 @@
   white-space: nowrap;
 }
 
-/* Next and previous: ink blocks on the copper band, names large. */
-.ds-story-next__card {
+/* Next and previous: a ruled two-row index on the copper band. The whole row is the link; the
+   portrait is a small toned plate at its right edge, so every row shares one text edge. */
+.ds-story-next__row {
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: var(--ds-space-6);
-  padding: var(--ds-space-6);
-  border-radius: var(--ds-radius-md);
-  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge);
+  border-bottom: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.ds-story-next__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.5rem;
+  column-gap: var(--ds-space-6);
+  align-items: start;
+  padding-block: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-ink);
   color: var(--ds-ink);
   text-decoration: none;
-  transition: transform var(--ds-duration-fast) var(--ds-ease-standard);
 }
 
-.ds-story-next__card:not(:has(.ds-story-next__thumb)) {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.ds-story-next__card:hover {
-  transform: translateY(-2px);
-}
-
-.ds-story-next__card:focus-visible,
+.ds-story-next__item:focus-visible,
 .ds-story-chapters__card:focus-visible,
 .ds-story-records__link:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
 }
 
-.ds-story-next__thumb {
-  align-self: start;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: var(--ds-radius-sm);
+.ds-story-next__plate {
+  grid-column: 2;
+  grid-row: 1;
 }
 
-.ds-story-next__thumb .ds-story-img,
+.ds-story-next__plate .ds-plate__tone {
+  aspect-ratio: 4 / 5;
+}
+
 .ds-story-chapters__media .ds-story-img {
   height: 100%;
   min-height: 0;
 }
 
-.ds-story-next__thumb img,
+.ds-story-next__plate img,
 .ds-story-chapters__media img {
   height: 100%;
   object-fit: cover;
@@ -932,36 +950,32 @@
   transform: scale(1.06);
 }
 
-.ds-story-next__thumb .ds-story-img__failed,
+.ds-story-next__plate .ds-story-img__failed,
 .ds-story-chapters__media .ds-story-img__failed {
   display: none;
 }
 
 .ds-story-next__text {
   display: grid;
+  grid-column: 1;
+  grid-row: 1;
   align-content: start;
   gap: var(--ds-space-2);
 }
 
 .ds-story-next__meta {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
-.ds-story-next__row {
-  display: grid;
-  gap: var(--ds-space-4);
-}
-
-@media (min-width: 48rem) {
-  .ds-story-next__row:has(.ds-story-next__card--previous + .ds-story-next__card) {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  }
-}
-
-.ds-story-next__card--previous {
-  align-content: center;
+.ds-story-next__term {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  font-variant-numeric: tabular-nums;
 }
 
 .ds-story-next__title {
@@ -972,7 +986,7 @@
   letter-spacing: var(--ds-tracking-display);
 }
 
-.ds-story-next__card:hover .ds-story-next__title,
+.ds-story-next__item:hover .ds-story-next__title,
 .ds-story-chapters__card:hover .ds-story-chapters__title,
 .ds-story-records__link:hover .ds-story-records__name {
   text-decoration: underline;
@@ -1011,7 +1025,6 @@
   aspect-ratio: 3 / 2;
   margin-bottom: var(--ds-space-3);
   overflow: hidden;
-  border-radius: var(--ds-radius-md);
   background: var(--ds-material-ink);
 }
 
@@ -1191,29 +1204,16 @@
     font-size: var(--ds-text-display-numeral);
   }
 
-  /* The portrait runs edge to edge at size, the caption under it at full width. */
+  /* The portrait leads the masthead at 4:3, its credit under it. */
   .ds-story-mast__portrait {
     grid-row: auto;
     order: -1;
     width: auto;
-    margin: 0 calc(var(--ds-gutter) * -1) var(--ds-space-4);
+    margin: 0 0 var(--ds-space-4);
   }
 
-  /* !important: StoryImage reserves the stored aspect inline; here the frame crops to 4:3. */
-  .ds-story-mast__portrait .ds-story-img {
-    aspect-ratio: 4 / 3 !important;
-    border-radius: 0;
-  }
-
-  .ds-story-mast__portrait .ds-story-img > img {
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-  }
-
-  .ds-story-mast__portrait .ds-story-caption {
-    padding-inline: var(--ds-gutter);
-    border-radius: 0;
+  .ds-story-mast__portrait .ds-plate__tone {
+    aspect-ratio: 4 / 3;
   }
 
   /* The byline parts stack, so no separator dot is left hanging at a line end. */
@@ -1224,12 +1224,6 @@
 
   .ds-story-mast__byline dd > :not(:last-child)::after {
     content: none;
-  }
-
-  .ds-story-mast__band {
-    margin-inline: calc(var(--ds-gutter) * -1);
-    padding: var(--ds-space-4) var(--ds-gutter);
-    border-radius: 0;
   }
 
   .ds-story-mast__band > div {
@@ -1285,14 +1279,13 @@
     font-size: var(--ds-text-display-2);
   }
 
-  .ds-story-next__card {
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: var(--ds-space-4);
-    padding: var(--ds-space-4);
+  .ds-story-next__item {
+    column-gap: var(--ds-space-4);
+    padding-block: var(--ds-space-4);
   }
 }
 
-@media (max-width: 30rem) {
+@media (max-width: 40rem) {
   .ds-story-figures {
     grid-template-columns: minmax(0, 1fr);
   }

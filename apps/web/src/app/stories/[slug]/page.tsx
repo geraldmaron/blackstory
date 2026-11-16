@@ -199,21 +199,22 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
             </DisplayNumeral>
           ) : null}
           {hero && isEntry ? (
-            <figure className="ds-story-mast__portrait" data-ground="paper">
-              <StoryImage
-                src={storyImageSrc(hero.url, 320, hero.width)}
-                fallbackSrc={hero.url}
-                alt={hero.alt}
-                {...(hero.width ? { width: hero.width } : {})}
-                {...(hero.height ? { height: hero.height } : {})}
-                eager
-              />
-              <figcaption className="ds-story-caption" data-ground="sand">
-                <span className="ds-story-caption__credit">{hero.credit}</span>
-              </figcaption>
+            <figure className="ds-plate ds-plate--upper ds-story-mast__portrait">
+              <span className="ds-plate__tone">
+                <StoryImage
+                  className="ds-plate__img"
+                  src={storyImageSrc(hero.url, 320, hero.width)}
+                  fallbackSrc={hero.url}
+                  alt={hero.alt}
+                  {...(hero.width ? { width: hero.width } : {})}
+                  {...(hero.height ? { height: hero.height } : {})}
+                  eager
+                />
+              </span>
+              <figcaption className="ds-plate__credit">{hero.credit}</figcaption>
             </figure>
           ) : null}
-          <dl className="ds-story-mast__band" data-ground="copper" aria-label={`This ${noun}`}>
+          <dl className="ds-story-mast__band" aria-label={`This ${noun}`}>
             <div>
               <dt>{isEntry ? 'Term' : 'Years'}</dt>
               <dd className="ds-story-mast__years">{doc.eraLabel}</dd>

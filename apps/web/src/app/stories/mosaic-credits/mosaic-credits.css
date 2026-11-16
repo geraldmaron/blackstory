@@ -1,47 +1,43 @@
-/* The credits list on the trust sheet: columns of rows, each a tile, its number, the record it
-   belongs to and the address the image was recorded at. */
+/* The credits list on the trust sheet: ruled rows, each a copper index numeral, the tile as a
+   toned plate and the record it belongs to. */
 .ds-mosaic-credits {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
-  column-gap: var(--ds-space-8);
-  margin-block: var(--ds-space-8) var(--ds-space-6);
+  margin: var(--ds-space-8) 0 var(--ds-space-6);
+  padding: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  list-style: none;
 }
 
 .ds-mosaic-credit {
   display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr);
+  grid-template-columns: 3rem 4.5rem minmax(0, 1fr);
   column-gap: var(--ds-space-4);
   align-items: center;
   padding-block: var(--ds-space-3);
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-/* The stored tiles are portrait; the mosaic crops them square, and so does the list. */
-.ds-mosaic-credit > img {
-  display: block;
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: var(--ds-radius-sm);
-  object-fit: cover;
+.ds-mosaic-credit__index {
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: var(--ds-tracking-meta);
 }
 
-.ds-mosaic-credit h2 {
-  margin: 0;
+/* The stored tiles are portrait; the mosaic crops them square, and so does the list. */
+.ds-mosaic-credit__plate .ds-plate__tone {
+  aspect-ratio: 1;
+}
+
+.ds-mosaic-credit__name {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-subtitle);
   font-weight: 600;
   line-height: 1.2;
 }
 
-.ds-mosaic-credit__index {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-}
-
-.ds-mosaic-credit h2 a,
-.ds-mosaic-credit__source {
+.ds-mosaic-credit__name a {
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
@@ -49,10 +45,6 @@
   text-decoration-thickness: 1px;
   text-decoration-color: var(--ds-border-control);
   text-underline-offset: 0.2em;
-}
-
-.ds-mosaic-credit__source {
-  font-size: var(--ds-text-caption);
 }
 
 .ds-mosaic-credit a:hover {

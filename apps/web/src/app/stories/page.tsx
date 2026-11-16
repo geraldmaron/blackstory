@@ -112,8 +112,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
 
       {front && front.covers.length > 0 ? (
         <section className="ds-stories-covers" aria-label="More chapters">
-          {front.covers.map((item, index) => (
-            <ChapterCover key={item.slug} item={item} tone={index % 2 === 0 ? 'sand' : 'copper'} />
+          {front.covers.map((item) => (
+            <ChapterCover key={item.slug} item={item} />
           ))}
         </section>
       ) : null}

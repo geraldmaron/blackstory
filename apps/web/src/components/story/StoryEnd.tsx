@@ -1,6 +1,6 @@
 /**
  * The one block at the end of a story, after its sources: a copper band across the sheet's foot
- * with where to read next (ink blocks with large names), then the records the story links to. An entry in a collection offers the next entry with the previous one beside
+ * with where to read next (a ruled index of names), then the records the story links to. An entry in a collection offers the next entry with the previous one beside
  * it on one row; a chapter, or an entry at the end of its collection, offers the other chapters.
  */
 import React from 'react';
@@ -13,24 +13,46 @@ void React;
 
 const href = (item: PublicStoryListItemDoc) => `/stories/${item.slug}`;
 
-/** The previous entry: the same card at a quieter weight, no picture or summary. */
-function PreviousCard({ previous }: { readonly previous: PublicStoryListItemDoc }) {
+/** One row of the index: direction, name, term and one line, with the portrait as a small plate. */
+function IndexRow({
+  item,
+  direction,
+}: {
+  readonly item: PublicStoryListItemDoc;
+  readonly direction: ReactNode;
+}) {
+  const image = item.heroImage;
   return (
-    <a
-      className="ds-story-next__card ds-story-next__card--previous"
-      href={href(previous)}
-      data-ground="ink"
-    >
+    <a className="ds-story-next__item" href={href(item)}>
       <span className="ds-story-next__text">
-        <span className="ds-story-next__meta">
-          <span aria-hidden="true">← </span>
-          {['Previous', previous.collection?.positionLabel].filter(Boolean).join(' · ')}
-        </span>
-        <span className="ds-story-next__title">{previous.title}</span>
+        <span className="ds-story-next__meta">{direction}</span>
+        <span className="ds-story-next__title">{item.title}</span>
+        <span className="ds-story-next__term">{item.eraLabel}</span>
+        <span className="ds-story-next__summary">{item.summary}</span>
       </span>
+      {image ? (
+        <span className="ds-plate ds-plate--upper ds-story-next__plate">
+          <span className="ds-plate__tone">
+            <StoryImage
+              className="ds-plate__img"
+              src={storyImageSrc(image.url, 120, image.width)}
+              fallbackSrc={image.url}
+              alt=""
+              inLink
+            />
+          </span>
+        </span>
+      ) : null}
     </a>
   );
 }
+
+const previousDirection = (previous: PublicStoryListItemDoc) => (
+  <>
+    <span aria-hidden="true">← </span>
+    {['Previous', previous.collection?.positionLabel].filter(Boolean).join(' · ')}
+  </>
+);
 
 function NextInCollection({
   next,
@@ -44,7 +66,6 @@ function NextInCollection({
   /** "3 of 45": where the next entry sits in its collection. */
   readonly position: string;
 }) {
-  const image = next.heroImage;
   return (
     <div className="ds-story-next">
       <div className="ds-story-end__headrow">
@@ -52,26 +73,11 @@ function NextInCollection({
         <span className="ds-story-end__count">{position}</span>
       </div>
       <div className="ds-story-next__row">
-        {previous ? <PreviousCard previous={previous} /> : null}
-        <a className="ds-story-next__card" href={href(next)} data-ground="ink">
-          {image ? (
-            <span className="ds-story-next__thumb">
-              <StoryImage
-                src={storyImageSrc(image.url, 120, image.width)}
-                fallbackSrc={image.url}
-                alt=""
-                inLink
-              />
-            </span>
-          ) : null}
-          <span className="ds-story-next__text">
-            <span className="ds-story-next__meta">
-              {[next.collection?.positionLabel, next.eraLabel].filter(Boolean).join(' · ')}
-            </span>
-            <span className="ds-story-next__title">{next.title}</span>
-            <span className="ds-story-next__summary">{next.summary}</span>
-          </span>
-        </a>
+        <IndexRow
+          item={next}
+          direction={['Next', next.collection?.positionLabel].filter(Boolean).join(' · ')}
+        />
+        {previous ? <IndexRow item={previous} direction={previousDirection(previous)} /> : null}
       </div>
     </div>
   );
@@ -146,7 +152,7 @@ export function StoryEnd({
       {/* The last entry of a collection has no next card; its previous entry still gets a way back. */}
       {previous && !(next && collectionLabel && nextPosition) ? (
         <div className="ds-story-next__row">
-          <PreviousCard previous={previous} />
+          <IndexRow item={previous} direction={previousDirection(previous)} />
         </div>
       ) : null}
       {records}
