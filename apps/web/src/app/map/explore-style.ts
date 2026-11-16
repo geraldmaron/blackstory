@@ -87,9 +87,6 @@ import {
   EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-  EXPLORE_POINT_SHADOW_LAYER_ID,
-  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
-  EXPLORE_HOVER_SHADOW_LAYER_ID,
   EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_GHOSTS_SOURCE_ID,
   EXPLORE_GHOST_POINT_LAYER_ID,
@@ -151,9 +148,6 @@ export {
   EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-  EXPLORE_POINT_SHADOW_LAYER_ID,
-  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
-  EXPLORE_HOVER_SHADOW_LAYER_ID,
   EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_GHOSTS_SOURCE_ID,
   EXPLORE_GHOST_POINT_LAYER_ID,
@@ -324,21 +318,40 @@ export function stateLabelFilters(postalCode: string | undefined): {
 }
 
 /**
- * A copper pin head at the site, an open copper ring of the same diameter at the neighborhood or
- * city (`recordMarkFor`): "the town, not the spot" is visible in the shape. About 12px at rest.
+ * A solid copper disc with a keyline at the site, an open copper ring at the neighborhood or city
+ * (`recordMarkFor`): "the town, not the spot" is visible in the shape.
  */
-const PIN_RADIUS_PX = 6;
-/** The city ring is a touch wider than the pin: it marks an area, never a spot. */
-const RING_RADIUS_PX = 7;
-const PIN_RING_PX = 1.25;
+/**
+ * The map's type and marks in px: the same numbers as `--ds-map-count-1..3`, `--ds-map-name-1..3`,
+ * `--ds-map-pin`, `--ds-map-ring` and `--ds-map-keyline` in `packages/ui/src/styles/tokens.css`.
+ * The DOM labels (`place-labels.ts`, `shell.css`) read the tokens; the invisible symbol layers read
+ * these, so MapLibre's collision boxes match what the DOM prints. Change both together.
+ */
+export const MAP_TYPE = {
+  /** A place's numeral by count step (`placeTier`). */
+  count: [15, 17, 20],
+  /** A place's name by count step. */
+  name: [12, 13, 15],
+  /** A site record's name beside its pin (`--ds-map-name-2`). */
+  site: 13,
+  /** Site pin diameter, area ring diameter, and the pin's keyline. */
+  pin: 12,
+  ring: 14,
+  keyline: 2,
+} as const;
+/** A Geist Mono capital is about 0.6em wide; the name's tracking is `--ds-tracking-meta`. */
+const NAME_TRACKING_EM = 0.04;
+/** A Schibsted 800 tabular digit is about 0.62em wide. */
+const COUNT_DIGIT_EM = 0.62;
+const PIN_RADIUS_PX = MAP_TYPE.pin / 2;
+/** The area ring is a touch wider than the pin: it marks an area, never a spot. */
+const RING_RADIUS_PX = MAP_TYPE.ring / 2;
+const PIN_RING_PX = MAP_TYPE.keyline;
 const RING_STROKE_PX = 2.5;
 /** Selection scales the same shape 1.6x; it never turns a ring into a pin. */
 export const SELECTED_SCALE = 1.6;
 const SELECTED_PIN_RING_PX = 2;
 const SELECTED_RING_STROKE_PX = 4;
-/** The flat contact shadow: offset down-right, no blur. Hover widens it and lifts the pin 2px. */
-const SHADOW_OFFSET: [number, number] = [1.5, 2];
-const HOVER_SHADOW_OFFSET: [number, number] = [2.5, 4];
 /** Pins outside the brushed decades fade to a sand ghost at this opacity. */
 export const GHOST_OPACITY = 0.2;
 
@@ -386,57 +399,69 @@ const WATERLINE_MAX_ZOOM = 5.5;
 export const PLACE_STATE_NAME_MIN_ZOOM = 4.6;
 
 /**
- * The text a place token prints, atlas convention: states and counties in capitals, cities as
- * written. The DOM label (`place-labels.ts`) prints the same string in the house face; this one only
- * sizes the collision box.
+ * The text a place token prints: every place name is meta on the plate, so capitals everywhere
+ * (states a postal code below `PLACE_STATE_NAME_MIN_ZOOM`). The DOM label (`place-labels.ts`)
+ * prints the same string in the house face; this one only sizes the collision box.
  */
 const PLACE_NAME_TEXT = [
   'step',
   ['zoom'],
-  [
-    'case',
-    ['==', ['get', 'level'], 'state'],
-    ['get', 'postal'],
-    ['==', ['get', 'level'], 'county'],
-    ['upcase', ['get', 'mapName']],
-    ['get', 'mapName'],
-  ],
+  ['upcase', ['case', ['==', ['get', 'level'], 'state'], ['get', 'postal'], ['get', 'mapName']]],
   PLACE_STATE_NAME_MIN_ZOOM,
-  ['case', ['==', ['get', 'level'], 'city'], ['get', 'mapName'], ['upcase', ['get', 'mapName']]],
+  ['upcase', ['get', 'mapName']],
 ] as unknown as ExpressionSpecification;
 
-/** Name size by count step, in px: bigger places, bigger letters. Mirrors `place-labels.css`. */
-const PLACE_NAME_SIZE = [
-  'match',
-  ['get', 'tier'],
-  2,
-  16,
-  1,
-  13.5,
-  12,
-] as unknown as ExpressionSpecification;
+/** A value by count step (`placeTier`): 0, 1, 2. */
+function byTier(steps: readonly [unknown, unknown, unknown]): ExpressionSpecification {
+  return [
+    'match',
+    ['get', 'tier'],
+    2,
+    steps[2],
+    1,
+    steps[1],
+    steps[0],
+  ] as unknown as ExpressionSpecification;
+}
 
-/** The name starts past the count chip: half the chip (6px pad + 7px per digit) plus a 6px gap. */
+/** Numeral size by count step. */
+const PLACE_COUNT_SIZE = byTier(MAP_TYPE.count);
+/** Name size by count step: bigger places, bigger letters. */
+const PLACE_NAME_SIZE = byTier(MAP_TYPE.name);
+
+/**
+ * The name starts past the numeral: half the numeral's width plus a gap, in ems of the name's own
+ * size. The numeral is about 1.3 times the name at every step (MAP_TYPE), so one table by digit
+ * count serves all three. It must be a single flat `match`: MapLibre silently drops every symbol
+ * whose data-driven text-offset nests one `match` inside another, so no name was placed at all.
+ * The DOM label (`.ds-place-token__name` in shell.css) mirrors this within a pixel.
+ */
+const COUNT_TO_NAME = 1.3;
+const nameOffset = (digits: number) => [
+  Number(((digits * COUNT_DIGIT_EM * COUNT_TO_NAME) / 2 + 0.6).toFixed(2)),
+  0,
+];
 const PLACE_NAME_OFFSET = [
   'match',
   ['length', ['get', 'point_count_abbreviated']],
   1,
-  ['literal', [1.1, 0]],
+  ['literal', nameOffset(1)],
   2,
-  ['literal', [1.35, 0]],
+  ['literal', nameOffset(2)],
   3,
-  ['literal', [1.6, 0]],
-  ['literal', [1.85, 0]],
+  ['literal', nameOffset(3)],
+  ['literal', nameOffset(4)],
 ] as unknown as ExpressionSpecification;
 
 /** Jurisdiction tags draw from regional zoom up, never at national scale. */
 export const JURISDICTION_TAG_MIN_ZOOM = 5.5;
 
 /**
- * Collision padding around a token's count, in pixels: enough to cover its DOM count chip
- * (`place-labels.css`, 22px tall) around a 12px count, so no name prints across a chip.
+ * Collision padding around a token's count, in pixels: the numeral has no box, so a small margin
+ * keeps another token off its digits. It must stay under the count-to-name gap less the name's
+ * own padding, or every name collides with its own numeral and none prints.
  */
-const GROUP_COLLISION_PADDING_PX = 6;
+const GROUP_COLLISION_PADDING_PX = 2;
 
 /**
  * Draws a feature only inside its `[minZoom, maxZoom)` band: place tokens per level, site records
@@ -576,7 +601,7 @@ function hatchOpacityExpression(postalCodes: readonly string[]): ExpressionSpeci
   ] as unknown as ExpressionSpecification;
 }
 
-/** The pin layers for one entities buffer: a site pin and a city ring, shape by precision. */
+/** The pin layers for one entities buffer: a site disc and an area ring, shape by precision. */
 function pinPaint(plate: MapPlate, opacity: number) {
   return {
     'circle-radius': byMark(PIN_RADIUS_PX, RING_RADIUS_PX),
@@ -585,15 +610,6 @@ function pinPaint(plate: MapPlate, opacity: number) {
     'circle-stroke-width': byMark(PIN_RING_PX, RING_STROKE_PX),
     'circle-stroke-color': byMark(plate.markRing, plate.markInk),
     'circle-stroke-opacity': opacity,
-  };
-}
-
-function shadowPaint(plate: MapPlate, opacity: number, offset: [number, number]) {
-  return {
-    'circle-radius': PIN_RADIUS_PX + PIN_RING_PX,
-    'circle-color': plate.markShadow,
-    'circle-opacity': opacity,
-    'circle-translate': offset,
   };
 }
 
@@ -1324,14 +1340,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: { 'line-color': plate.markInk, 'line-width': 1, 'line-opacity': 0.55 },
       },
       {
-        // The site pin's flat contact shadow. A ring has none: it marks an area, not a spot.
-        id: EXPLORE_POINT_SHADOW_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['all', ['!', ['has', 'point_count']], markIs('dot'), IN_ZOOM_BAND],
-        paint: { ...DECADE_TRANSITION_PAINT, ...shadowPaint(plate, 1, SHADOW_OFFSET) },
-      },
-      {
         // One layer, two shapes: a copper pin head where the archive holds the site, an open
         // copper ring where it holds the neighborhood or city. Kind is never encoded here.
         id: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
@@ -1359,13 +1367,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-font': ['Noto Sans Bold'],
           'text-anchor': 'left',
           'text-offset': PLACE_NAME_OFFSET,
-          'text-letter-spacing': [
-            'match',
-            ['get', 'level'],
-            'city',
-            0,
-            0.08,
-          ] as unknown as ExpressionSpecification,
+          'text-letter-spacing': NAME_TRACKING_EM,
           'text-max-width': 40,
           'text-padding': 3,
         },
@@ -1381,10 +1383,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: ['all', ['!', ['has', 'point_count']], markIs('dot'), IN_ZOOM_BAND],
         layout: {
           'text-field': ['get', 'displayName'],
-          'text-size': 12.5,
+          'text-size': MAP_TYPE.site,
           'text-font': ['Noto Sans Bold'],
           'text-anchor': 'left',
-          'text-offset': [0.9, 0],
+          'text-offset': [0.85, 0],
           'text-max-width': 14,
           'text-padding': 2,
         },
@@ -1412,7 +1414,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: ['all', ['has', 'point_count'], IN_ZOOM_BAND],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
-          'text-size': 12,
+          'text-size': PLACE_COUNT_SIZE,
           'text-font': ['Noto Sans Bold'],
           // A count always draws, and claims its chip in the collision index, so no tag or name
           // prints across a token. Invisible: the DOM chip (`place-labels.ts`) is what reads.
@@ -1420,13 +1422,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'text-padding': GROUP_COLLISION_PADDING_PX,
         },
         paint: { 'text-color': plate.markInk, 'text-opacity': 0 },
-      },
-      {
-        id: EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
-        filter: ['all', ['!', ['has', 'point_count']], markIs('dot'), IN_ZOOM_BAND],
-        paint: shadowPaint(plate, 0, SHADOW_OFFSET),
       },
       {
         id: EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
@@ -1454,7 +1449,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         filter: ['all', ['has', 'point_count'], IN_ZOOM_BAND],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
-          'text-size': 12,
+          'text-size': PLACE_COUNT_SIZE,
           'text-font': ['Noto Sans Bold'],
           'text-allow-overlap': true,
         },
@@ -1482,15 +1477,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        // Hover: the pin lifts 2px and its contact shadow widens. Filtered to one record by
-        // `setHoveredEntityFilter`; a ring lifts without a shadow.
-        id: EXPLORE_HOVER_SHADOW_LAYER_ID,
-        type: 'circle',
-        source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['all', selectedPointFilterExpression(undefined), markIs('dot')],
-        paint: shadowPaint(plate, 1, HOVER_SHADOW_OFFSET),
-      },
-      {
+        // Hover: the pin lifts 2px.
         id: EXPLORE_HOVER_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
@@ -1498,9 +1485,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: { ...pinPaint(plate, 1), 'circle-translate': [0, -2] },
       },
       {
-        // Selected, in its own shape, 1.6x: a site pin grows with a heavier ink ring; a ring
+        // Selected, in its own shape, 1.6x: a site pin grows with a heavier keyline; a ring
         // stays an open ring, heavier, so selection never sharpens a city record into a site.
-        // The radius eases up from rest (`setSelectedEntityFilter`); the paper name flag is a DOM
+        // The radius eases up from rest (`setSelectedEntityFilter`); the callout is a DOM
         // marker (`selection-flag.ts`), because map glyphs cannot set Schibsted.
         id: EXPLORE_SELECTED_POINT_LAYER_ID,
         type: 'circle',

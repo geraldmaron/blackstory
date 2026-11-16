@@ -493,17 +493,17 @@
   margin-top: var(--ds-space-5);
 }
 
-/* —— The spotlight callout: a mark on the record, a 1px leader, a small card —————————————— */
-.ds-door-callout {
+/* —— The spotlight callout: the shared `.ds-map-callout` (shell.css) positioned around the record ——
+   A mark on the record, a 1px leader and the paper card, placed on every camera frame by
+   door-spotlight-callout.tsx. The card, name, meta line and leader are explore's callout exactly. */
+.ds-map-callout--layer {
   position: fixed;
   inset: 0;
   z-index: 1; /* local: under the dock */
   pointer-events: none;
 }
 
-.ds-door-callout__mark,
-.ds-door-callout__leader,
-.ds-door-callout__card {
+.ds-map-callout--layer :is(.ds-map-callout__mark, .ds-map-callout__leader, .ds-map-callout__card) {
   position: absolute;
   top: 0;
   left: 0;
@@ -514,88 +514,53 @@
     visibility 0s linear var(--ds-duration-base);
 }
 
-.ds-door-callout[data-shown='true']
-  :is(.ds-door-callout__mark, .ds-door-callout__leader, .ds-door-callout__card) {
+.ds-map-callout--layer[data-shown='true']
+  :is(.ds-map-callout__mark, .ds-map-callout__leader, .ds-map-callout__card) {
   opacity: 1;
   visibility: visible;
   transition: opacity var(--ds-duration-base) var(--ds-easing);
 }
 
-/* The spotlight record, drawn as the map draws a selected record (explore-style.ts): a copper pin
-   at 1.6x with an ink ring for a site, an open copper ring for a city. */
-.ds-door-callout__mark {
+/* The spotlight record, drawn as the map draws a selected record (explore-style.ts): the site disc
+   with its keyline at 1.6x, or the open copper ring. Sizes are the map's own tokens. */
+.ds-map-callout__mark {
   box-sizing: border-box;
   border-radius: 50%;
+  translate: -50% -50%;
 }
 
-.ds-door-callout__mark--dot {
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid var(--ds-fixed-ink);
+.ds-map-callout__mark--dot {
+  width: calc(var(--ds-map-pin) * 1.6 + var(--ds-map-keyline));
+  height: calc(var(--ds-map-pin) * 1.6 + var(--ds-map-keyline));
+  border: var(--ds-map-keyline) solid var(--ds-map-label-hi);
   background: var(--ds-material-copper);
 }
 
-.ds-door-callout__mark--ring {
-  width: 22px;
-  height: 22px;
-  margin: -11px 0 0 -11px;
-  border: 4px solid var(--ds-material-copper);
+.ds-map-callout__mark--ring {
+  width: calc(var(--ds-map-ring) * 1.6);
+  height: calc(var(--ds-map-ring) * 1.6);
+  border: calc(var(--ds-map-keyline) * 2) solid var(--ds-material-copper);
 }
 
-.ds-door-callout__leader {
-  background: var(--ds-fixed-ink);
-}
-
-/* A label pinned to the chart by the leader: hard-edged in ink, with a real offset shadow. */
-.ds-door-callout__card {
-  box-sizing: border-box;
-  width: max-content;
-  max-width: 16rem;
-  border: var(--ds-border-width) solid var(--ds-fixed-ink);
-  border-radius: var(--ds-radius-sm);
-  box-shadow: var(--ds-shadow-float);
-}
-
-/* The callout already names its pin; the map's own name flag would say it twice. */
-body:has(.ds-door-callout[data-shown='true']) .ds-pin-flag {
+/* The callout already names its pin; the map's own callout would say it twice. */
+body:has(.ds-map-callout--layer[data-shown='true']) .ds-map-callout--flag {
   display: none;
 }
 
-.ds-door-callout[data-shown='true'] .ds-door-callout__card {
+.ds-map-callout--layer[data-shown='true'] .ds-map-callout__card {
   pointer-events: auto;
 }
 
-.ds-door-callout__link {
-  display: grid;
-  gap: var(--ds-space-1);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  color: var(--ds-ink);
-  text-decoration: none;
-  border-radius: inherit;
+.ds-map-callout--layer .ds-map-callout__name {
+  font-size: var(--ds-text-body);
 }
 
-.ds-door-callout__link:focus-visible {
+.ds-map-callout__link:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
 }
 
-.ds-door-callout__name {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-body);
-  font-weight: 600;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.ds-door-callout__place {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.35;
-  color: var(--ds-ink-muted);
-}
-
-.ds-door-callout__link:hover .ds-door-callout__name {
+.ds-map-callout__link:hover .ds-map-callout__name {
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -732,12 +697,12 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   }
 
   /* A phone's window is short: the callout is one line, the name and the link, no more. */
-  .ds-door-callout__card {
+  .ds-map-callout--layer .ds-map-callout__card {
     width: max-content;
     max-width: calc(100vw - var(--ds-space-8));
   }
 
-  .ds-door-callout__link {
+  .ds-map-callout--layer .ds-map-callout__link {
     display: flex;
     align-items: center;
     gap: var(--ds-space-3);
@@ -747,13 +712,13 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
 
   /* Stacked, this is the one place the record's name shows, so a long name wraps to a second
      line rather than losing its end. */
-  .ds-door-callout__name {
+  .ds-map-callout--layer .ds-map-callout__name {
     min-width: 0;
     font-size: var(--ds-text-body-sm);
     text-wrap: balance;
   }
 
-  .ds-door-callout__place {
+  .ds-map-callout--layer .ds-map-callout__meta {
     display: none;
   }
 }
@@ -811,9 +776,9 @@ html[data-door-browse='1'] .ds-door {
   .ds-door-journey,
   .ds-door-journey--browse,
   .ds-door__browse,
-  .ds-door-callout__mark,
-  .ds-door-callout__leader,
-  .ds-door-callout__card {
+  .ds-map-callout__mark,
+  .ds-map-callout__leader,
+  .ds-map-callout__card {
     transition: none;
     animation: none;
   }

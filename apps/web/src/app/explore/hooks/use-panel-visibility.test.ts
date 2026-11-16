@@ -6,6 +6,6 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { EXPLORE_PHONE_MEDIA_QUERY } from './use-panel-visibility';
 
-test('the phone sheet starts below 768px, where the header tab bar gives way to the phone one', () => {
-  assert.equal(EXPLORE_PHONE_MEDIA_QUERY, '(max-width: 767px)');
+test('the bottom sheet runs through portrait tablets; the column floats from 1024px', () => {
+  assert.equal(EXPLORE_PHONE_MEDIA_QUERY, '(max-width: 1023px)');
 });

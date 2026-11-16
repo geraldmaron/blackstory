@@ -1,6 +1,9 @@
 /*
- * The record inspector, in the Explore column (and the phone sheet). No box of its own: it sits
- * flush in the column, so the column is the one container.
+ * The record inspector, in the Explore column (and the phone sheet): a record masthead in
+ * miniature, set in the record page's own roles. The plate, the name in the display face, the
+ * decade once as a copper numeral, the summary in the editorial serif, the facts as ruled type
+ * between two ink rules, then the actions. No box of its own: it sits flush in the column, so the
+ * column is the one container.
  */
 .ds-inspector {
   display: flex;
@@ -17,9 +20,17 @@
   gap: var(--ds-space-2);
 }
 
-/* The plate leads the column, cover-fit at 16:9; its credit sits under it, never on it. */
+/* The plate leads the column, cover-fit at 3:2; its credit sits under it, never on it. On a phone
+   the sheet is short, so the plate stops at 120px tall and the record's name stays in view at the
+   sheet's middle height. */
 .ds-inspector__photo .ds-plate__tone {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 3 / 2;
+}
+
+@media (max-width: 63.9375rem) {
+  .ds-inspector__photo .ds-plate__tone {
+    max-height: 120px;
+  }
 }
 
 .ds-inspector__photo .ds-plate__img {
@@ -59,10 +70,13 @@
 
 .ds-inspector__decade {
   flex: none;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
+  color: var(--ds-numeral-soft-text);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
   font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  line-height: 1;
 }
 
 .ds-inspector__name {
@@ -70,9 +84,9 @@
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-3);
-  font-weight: 600;
+  font-weight: var(--ds-weight-title);
   line-height: 1.12;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--ds-tracking-display);
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
@@ -92,18 +106,19 @@
   margin: 0;
   overflow: hidden;
   color: var(--ds-ink);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body);
+  line-height: 1.5;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
+/* The record page's citation line: ruled rows between two ink rules, labels in the meta role. */
 .ds-inspector__facts {
   display: grid;
   margin: var(--ds-space-2) 0 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-block: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-inspector__fact {
@@ -112,13 +127,19 @@
   align-items: baseline;
   gap: var(--ds-space-3);
   padding: var(--ds-space-3) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-inspector__fact + .ds-inspector__fact {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-inspector__fact dt {
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-inspector__fact dd {

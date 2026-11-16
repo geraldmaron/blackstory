@@ -1,7 +1,9 @@
 /*
  * The decade histogram strip. 56px tall. Where it sits is the caller's (explore-column.css docks
  * it on the map's bottom edge on a wide screen, and sets it inside the filter state on a phone).
- * Bars are neutral; the brushed range is ink; copper is only the two handles of a set range.
+ * The home walk's histogram idiom (door-home.css): bars in a rule tone on an ink baseline, the
+ * bars inside the brushed range in the plate's type color, the range's edges copper, decade
+ * labels in mono capitals. The map's key sits in the leading cell on a wide screen.
  */
 .ds-xbrush {
   display: grid;
@@ -13,6 +15,13 @@
   color: var(--ds-ink);
 }
 
+.ds-xbrush__lead {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
 .ds-xbrush__label {
   display: flex;
   align-items: center;
@@ -20,11 +29,38 @@
   min-width: 0;
 }
 
+/* The key needs a line of its own and room for all three marks: only the dock on a wide screen
+   has it. On a narrower screen the Filters view carries the key (explore-refine.css). */
+.ds-xbrush__key {
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .ds-xdock .ds-xbrush {
+    grid-template-columns: 22rem minmax(0, 1fr);
+  }
+
+  .ds-xdock .ds-xbrush__key {
+    display: flex;
+  }
+
+  /* One 20px line for the range, so the key fits under it inside the strip's 56px; the clear
+     button keeps its 44px target by reaching into the strip's padding. */
+  .ds-xdock .ds-xbrush__label {
+    height: 20px;
+  }
+
+  .ds-xdock .ds-xbrush__clear {
+    margin-block: calc(var(--ds-space-3) * -1);
+  }
+}
+
 .ds-xbrush__range {
   overflow: hidden;
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ds-tracking-meta);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -71,6 +107,7 @@
   gap: 1px;
   min-height: 0;
   isolation: isolate;
+  border-bottom: var(--ds-border-width) solid var(--ds-ink);
   cursor: crosshair;
   touch-action: none;
   user-select: none;
@@ -81,29 +118,30 @@
   z-index: 1; /* local: bars above the brushed wash */
   flex: 1 1 0;
   min-width: 0;
-  border-radius: 1px 1px 0 0;
-  /* Sand bars on the ink strip (copper on paper, where sand fails 3:1). */
-  background: var(--ds-numeral-soft);
+  min-height: 2px;
+  /* With no range every decade is on the plate: bars in the muted ink, as the walk's walked
+     decades. A set range sends the rest back to the rule tone. */
+  background: var(--ds-ink-muted);
   pointer-events: none;
   transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-xbrush--active .ds-xbrush__bar {
-  background: color-mix(in srgb, var(--ds-numeral-soft) 30%, transparent);
+  background: var(--ds-rule);
 }
 
-/* The brushed range: copper and at full height; outside it the bars fade (never color alone). */
+/* The brushed range: the plate's type color (never color alone: the handles and the range label
+   say it too). */
 .ds-xbrush--active .ds-xbrush__bar--in {
-  background: var(--ds-accent-graphic);
+  background: var(--ds-map-label-hi);
 }
 
-/* The brushed span: a faint wash behind the in-range bars so a sparse range still reads. */
+/* The brushed span only positions the range; its edges are the copper handles. */
 .ds-xbrush__span {
   position: absolute;
   top: 0;
   bottom: 0;
-  z-index: 0; /* local: the wash sits under the bars */
-  background: color-mix(in srgb, var(--ds-accent-graphic) 14%, transparent);
+  z-index: 0; /* local: under the bars */
   pointer-events: none;
 }
 
@@ -171,9 +209,11 @@
 .ds-xbrush__axis {
   display: flex;
   justify-content: space-between;
-  color: var(--ds-ink-subtle);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ds-tracking-meta);
   line-height: 1;
+  text-transform: uppercase;
 }

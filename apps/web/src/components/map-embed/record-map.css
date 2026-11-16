@@ -131,9 +131,10 @@
   }
 }
 
-/* The record's place as the plate prints a place: a copper count tab and the name in the display
-   face, on glass of the table's own ground (the explore column's float recipe, data-ground="ink").
-   Visually 28px tall; the 44px hit area is the pseudo-element. */
+/* The record's place as the plate prints a place: a register entry, a copper numeral and the name
+   in mono capitals (the same `--ds-map-count-*` and `--ds-map-name-*` tokens), on glass of the
+   table's own ground (the explore column's float recipe, data-ground="ink"). Visually 28px tall;
+   the 44px hit area is the pseudo-element. */
 .ds-record-map__token {
   position: absolute;
   left: var(--ds-space-3);
@@ -144,7 +145,7 @@
   gap: var(--ds-space-2);
   max-width: calc(100% - var(--ds-space-3) * 2 - 44px);
   min-height: 28px;
-  padding: 3px var(--ds-space-3) 3px 3px;
+  padding: var(--ds-space-1) var(--ds-space-3);
   border-radius: var(--ds-radius-md);
   background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
   box-shadow:
@@ -178,39 +179,32 @@
 
 .ds-record-map__count {
   flex: none;
-  box-sizing: border-box;
-  min-width: 2.2em;
-  padding: 0 var(--ds-space-2);
-  border: 1.5px solid var(--ds-map-label-hi);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink);
-  font-family: var(--ds-font-mono);
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--ds-numeral-soft-text);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-map-count-1);
   font-variant-numeric: tabular-nums;
-  line-height: 19px;
-  text-align: center;
-  transition:
-    background-color var(--ds-duration-fast) var(--ds-easing),
-    color var(--ds-duration-fast) var(--ds-easing);
+  font-weight: var(--ds-weight-numeral);
+  line-height: 1;
+  transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-record-map__name {
   min-width: 0;
   overflow: hidden;
-  font-family: var(--ds-font-display);
-  font-size: 13px;
-  font-weight: 650;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-map-name-1);
+  font-weight: 500;
+  letter-spacing: var(--ds-tracking-meta);
   line-height: 1;
   text-overflow: ellipsis;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-/* Hover answers like the plate's own token: the tab inverts, the name underlines in copper. */
+/* Hover answers like the plate's own token: the numeral takes the type color, the name underlines
+   in copper. */
 .ds-record-map__token:hover .ds-record-map__count {
-  background: var(--ds-map-label-hi);
-  color: var(--ds-map-land);
+  color: var(--ds-map-label-hi);
 }
 
 .ds-record-map__token:hover .ds-record-map__name {

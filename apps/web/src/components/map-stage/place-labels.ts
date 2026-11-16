@@ -67,7 +67,7 @@ function pointOf(feature: MapGeoJSONFeature): [number, number] | undefined {
 export type PlaceLabelsHandle = {
   /** The token under the pointer, drawn in its hover state. */
   readonly setHovered: (placeKey: string | undefined) => void;
-  /** The selected record: its name is on the selection flag, so its plate name steps aside. */
+  /** The selected record: its name is on the callout, so its plate name steps aside. */
   readonly setSelected: (entityId: string | undefined) => void;
   readonly dispose: () => void;
 };

@@ -119,6 +119,8 @@ import {
 } from '../../lib/map-experience/explore-search-marker';
 import { readDocumentColorScheme } from './color-scheme';
 import { buildSelectionFlagElement } from './selection-flag';
+import { kindLabelForMark } from '../entity/record-mark';
+import { rowDecadeLabel } from '../../lib/map-experience/explore-rows';
 import { bindPlaceLabels, type PlaceLabelsHandle } from './place-labels';
 import { dropInIncomingPins } from './selection-sync';
 import { EXPLORE_GHOSTS_SOURCE_ID } from '../../app/map/explore-layer-ids';
@@ -404,6 +406,8 @@ const ENTITY_ANCHOR_SIZE_PX = 8;
 
 type EntityPoint = {
   readonly name: string;
+  /** The callout's meta line: the record's kind and decade, when it has them. */
+  readonly meta: string;
   readonly lng: number;
   readonly lat: number;
   /** False for county- and state-precision records, which draw no point. */
@@ -424,6 +428,14 @@ function indexEntityPoints(
     if (typeof entityId !== 'string' || byId.has(entityId)) continue;
     byId.set(entityId, {
       name: typeof props.displayName === 'string' ? props.displayName : 'Documented record',
+      meta: [
+        kindLabelForMark(props.kind),
+        Array.isArray(props.eraBuckets) && props.eraBuckets.length > 0
+          ? rowDecadeLabel(props.eraBuckets, undefined)
+          : undefined,
+      ]
+        .filter((part) => part && part !== 'Undated')
+        .join(' · '),
       lng,
       lat,
       drawn: recordMarkFor(props.precision) !== 'none',
@@ -664,7 +676,7 @@ export function MapStageProvider({
     return entityIndexRef.current.byId.get(entityId);
   }, []);
 
-  /** The paper name flag on the selected pin (`selection-flag.ts`). */
+  /** The callout on the selected pin (`selection-flag.ts`). */
   const selectionFlagRef = useRef<{ readonly id: string; readonly marker: Marker } | null>(null);
   /** Place tokens and site names in the house type (`place-labels.ts`). */
   const placeLabelsRef = useRef<PlaceLabelsHandle | null>(null);
@@ -678,9 +690,9 @@ export function MapStageProvider({
       const point = entityId ? entityPoint(entityId) : undefined;
       if (!entityId || !point?.drawn || !maplibregl) return;
       const marker = new maplibregl.Marker({
-        element: buildSelectionFlagElement(point.name),
+        element: buildSelectionFlagElement(point.name, point.meta),
         anchor: 'bottom',
-        // The stem starts above the grown pin (1.6 x 6px radius), not on its center.
+        // The leader starts above the grown pin (1.6 x 6px radius), not on its center.
         offset: [0, -12],
       })
         .setLngLat([point.lng, point.lat])

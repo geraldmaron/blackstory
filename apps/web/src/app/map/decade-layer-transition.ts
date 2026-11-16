@@ -31,8 +31,6 @@ import {
   EXPLORE_STATE_DENSITY_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
-  EXPLORE_POINT_SHADOW_LAYER_ID,
 } from './explore-layer-ids';
 
 /**
@@ -66,7 +64,6 @@ export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[]
     paintKey: 'circle-stroke-opacity',
     restOpacity: 0.9,
   },
-  { layerId: EXPLORE_POINT_SHADOW_LAYER_ID, paintKey: 'circle-opacity', restOpacity: 1 },
 ];
 
 /** Incoming-buffer channels — fade from 0 toward rest; stay at 0 when idle. */
@@ -82,7 +79,6 @@ export const DECADE_CROSSFADE_IN_TARGETS: readonly DecadeCrossfadePaintTarget[] 
     paintKey: 'circle-stroke-opacity',
     restOpacity: 0.9,
   },
-  { layerId: EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID, paintKey: 'circle-opacity', restOpacity: 1 },
 ];
 
 const ALL_DECADE_MORPH_TARGETS = [

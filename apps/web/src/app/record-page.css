@@ -57,7 +57,7 @@
   max-height: 56svh;
 }
 
-@media (min-width: 30rem) {
+@media (min-width: 40rem) {
   .ds-recpage__plate .ds-plate__tone {
     aspect-ratio: 2 / 1;
     max-height: 48svh;
@@ -1007,7 +1007,7 @@
   }
 }
 
-@media (max-width: 30rem) {
+@media (max-width: 39.9375rem) {
   .ds-recpage__facts {
     grid-template-columns: minmax(0, 1fr);
   }

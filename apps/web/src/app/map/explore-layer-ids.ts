@@ -35,11 +35,7 @@ export const EXPLORE_PLACE_LEADER_LAYER_ID = 'explore-place-leader';
 /** Every drawn record: a dot at the site, a hollow ring at the neighborhood or city. */
 export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
 export const EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID = 'explore-point-incoming';
-/** The flat ink contact shadow under a site pin, on each entities buffer. */
-export const EXPLORE_POINT_SHADOW_LAYER_ID = 'explore-point-shadow';
-export const EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID = 'explore-point-shadow-incoming';
-/** The hovered pin, lifted 2px over a wider shadow. */
-export const EXPLORE_HOVER_SHADOW_LAYER_ID = 'explore-point-hover-shadow';
+/** The hovered pin, lifted 2px. */
 export const EXPLORE_HOVER_POINT_LAYER_ID = 'explore-point-hover';
 /** Records the lens matches but the brushed decades exclude: a sand ghost, never hittable. */
 export const EXPLORE_GHOSTS_SOURCE_ID = 'explore-ghosts';

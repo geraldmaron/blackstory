@@ -1,0 +1,62 @@
+/*
+ * The map's key (MapKey.tsx): one line, each mark drawn beside its words. The marks are the plate's
+ * own: a copper disc with a keyline in the plate's type color, an open copper ring, and the flat
+ * copper wash a county or state carries. Sizes come from the map tokens.
+ */
+.ds-mapkey {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-4);
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.ds-mapkey__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-mapkey__mark {
+  flex: none;
+  box-sizing: border-box;
+}
+
+.ds-mapkey__mark--site {
+  width: calc(var(--ds-map-pin) * 0.75 + var(--ds-map-keyline));
+  height: calc(var(--ds-map-pin) * 0.75 + var(--ds-map-keyline));
+  border: calc(var(--ds-map-keyline) * 0.75) solid var(--ds-map-label-hi);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+}
+
+.ds-mapkey__mark--area {
+  width: calc(var(--ds-map-ring) * 0.75);
+  height: calc(var(--ds-map-ring) * 0.75);
+  border: var(--ds-map-keyline) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-full);
+}
+
+.ds-mapkey__mark--wash {
+  width: calc(var(--ds-map-ring) * 1.1);
+  height: calc(var(--ds-map-pin) * 0.75);
+  /* The wash's own 16% on the plate; the hairline keeps it findable on glass. */
+  background: color-mix(in srgb, var(--ds-accent-graphic) 16%, transparent);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-border-control);
+}
+
+@media (forced-colors: active) {
+  .ds-mapkey__mark--site {
+    background: CanvasText;
+  }
+
+  .ds-mapkey__mark--area,
+  .ds-mapkey__mark--wash {
+    border-color: CanvasText;
+  }
+}

@@ -838,7 +838,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   ) : (
     <>
       <h2 className="ds-xcol__count" tabIndex={-1} ref={countHeadingRef} aria-live="polite">
-        {count.toLocaleString('en-US')}{' '}
+        <span className="ds-xcol__count-num">{count.toLocaleString('en-US')}</span>{' '}
         <span className="ds-xcol__count-unit">{count === 1 ? 'record' : 'records'}</span>
       </h2>
       <FilterButton

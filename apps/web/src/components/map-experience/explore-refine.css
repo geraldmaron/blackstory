@@ -63,46 +63,17 @@
   line-height: 1.5;
 }
 
-/* The drawing key: what the marks on the map mean. One quiet block at the end. */
+/* The drawing key (MapKey): what the marks on the map mean. On a wide screen the strip carries
+   it, so it shows here only where the strip's leading cell has no room for it. */
 .ds-xrefine__key {
-  display: grid;
-  gap: var(--ds-space-2);
   padding-top: var(--ds-space-4);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
+  white-space: normal;
 }
 
-.ds-xrefine__key-item {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-}
-
-.ds-xrefine__mark {
-  flex: none;
-  box-sizing: border-box;
-  border-radius: var(--ds-radius-full);
-}
-
-.ds-xrefine__mark--dot {
-  width: 8px;
-  height: 8px;
-  margin-inline: 2px;
-  background: var(--ds-ink);
-}
-
-.ds-xrefine__mark--ring {
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid var(--ds-ink);
-}
-
-.ds-xrefine__mark--tag {
-  flex: none;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.04em;
+@media (min-width: 80rem) {
+  .ds-xrefine__key {
+    display: none;
+  }
 }

@@ -33,6 +33,20 @@ const EDGE_LAYER = 'explore-place-edge';
 /** How far the plate outside a place recedes. */
 const RECEDE_OPACITY = 0.55;
 const RESOLVE_MS = 420;
+/**
+ * The zoom each level's outline has faded out by: two levels past the one that frames it
+ * (`PLACE_LEVEL_MIN_ZOOM`). Past it the line is no longer the frame, only a stray rule through a
+ * street map (a state border across Savannah), so it never survives into street zoom.
+ */
+const OUTLINE_GONE_ZOOM = { state: 9, county: 11, city: 14, square: 17 } as const;
+const OUTLINE_FADE_ZOOMS = 1.5;
+
+/** A paint value that holds `peak` at the framing zooms and fades to nothing past them. */
+export function focusFade(placeKey: string | undefined, peak: number): unknown {
+  const level = placeKey?.split('-')[0] as keyof typeof OUTLINE_GONE_ZOOM | undefined;
+  const gone = (level && OUTLINE_GONE_ZOOM[level]) ?? OUTLINE_GONE_ZOOM.square;
+  return ['interpolate', ['linear'], ['zoom'], gone - OUTLINE_FADE_ZOOMS, peak, gone, 0];
+}
 /** A city frame stands a little off its outermost records, so no record sits on the line. */
 const CITY_MARGIN_DEG = 0.01;
 
@@ -241,8 +255,12 @@ export function usePlaceFocus(
           before,
         );
       }
-      map.setPaintProperty(RECEDE_LAYER, 'fill-opacity', shown ? RECEDE_OPACITY : 0);
-      map.setPaintProperty(EDGE_LAYER, 'line-opacity', shown ? 1 : 0);
+      map.setPaintProperty(
+        RECEDE_LAYER,
+        'fill-opacity',
+        shown ? focusFade(placeKey, RECEDE_OPACITY) : 0,
+      );
+      map.setPaintProperty(EDGE_LAYER, 'line-opacity', shown ? focusFade(placeKey, 1) : 0);
     };
 
     // A style rebuild drops the layers, and a rebuild in flight refuses them, so mounting retries
@@ -275,7 +293,7 @@ export function usePlaceFocus(
       map.off('idle', ensure);
       if (clearTimer !== undefined) window.clearTimeout(clearTimer);
     };
-  }, [stage, ringsKey, reducedMotion, plateReady]);
+  }, [stage, ringsKey, placeKey, reducedMotion, plateReady]);
 
   return outlineBounds(rings);
 }

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   EXPLORE_COLUMN_WIDTH,
+  EXPLORE_FLOAT_GUTTER,
   EXPLORE_HISTOGRAM_HEIGHT,
   EXPLORE_PHONE_MAX_WIDTH,
   chromePadding,
@@ -27,6 +28,12 @@ test('padding always leaves part of both axes free, so MapLibre never throws', (
   }
 });
 
+test('a portrait tablet takes the bottom sheet, so an entered place frames on the whole width', () => {
+  const inset = chromePadding({ viewportWidth: 768, viewportHeight: 1024, sheetHeight: 180 });
+  assert.ok(inset.left < EXPLORE_COLUMN_WIDTH);
+  assert.equal(inset.left, inset.right);
+});
+
 test('wide layout clears the left column and the histogram on the bottom edge', () => {
   const inset = chromePadding({ viewportWidth: 1440, viewportHeight: 900 });
   assert.ok(inset.left >= EXPLORE_COLUMN_WIDTH);
@@ -47,5 +54,17 @@ test('phone padding follows the bottom sheet', () => {
   // The lower 48 fill the phone's width: a slim, even gutter on both sides.
   assert.equal(peek.left, peek.right);
   assert.ok(peek.left <= 16);
-  assert.equal(EXPLORE_PHONE_MAX_WIDTH, 767);
+  assert.equal(EXPLORE_PHONE_MAX_WIDTH, 1023);
+});
+
+test('where the column floats, the left inset always clears it plus a gutter on each side', () => {
+  for (const viewport of [
+    { viewportWidth: 1024, viewportHeight: 768 },
+    { viewportWidth: 1280, viewportHeight: 800 },
+    { viewportWidth: 1440, viewportHeight: 900 },
+  ]) {
+    const inset = chromePadding(viewport);
+    assert.ok(inset.left >= EXPLORE_FLOAT_GUTTER * 2 + EXPLORE_COLUMN_WIDTH, JSON.stringify(inset));
+    assert.ok(inset.left + inset.right < viewport.viewportWidth);
+  }
 });

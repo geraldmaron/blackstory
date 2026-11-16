@@ -61,7 +61,7 @@ export function MapControls({
             <path
               d="M10 4v12M4 10h12"
               stroke="currentColor"
-              strokeWidth="1.6"
+              strokeWidth="1.5"
               strokeLinecap="round"
             />
           </svg>
@@ -73,7 +73,7 @@ export function MapControls({
           aria-label="Zoom out"
         >
           <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M4 10h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            <path d="M4 10h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
       </div>
@@ -93,13 +93,13 @@ export function MapControls({
             cy="10"
             r="4"
             stroke="currentColor"
-            strokeWidth="1.6"
+            strokeWidth="1.5"
             fill={located ? 'currentColor' : 'none'}
           />
           <path
             d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3"
             stroke="currentColor"
-            strokeWidth="1.6"
+            strokeWidth="1.5"
             strokeLinecap="round"
           />
         </svg>

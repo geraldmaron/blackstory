@@ -309,18 +309,18 @@ export function DoorSpotlightCallout({
 
   return (
     <div
-      className="ds-door-callout"
+      className="ds-map-callout ds-map-callout--layer"
       ref={layerRef}
       data-side={side ?? undefined}
       data-shown={active && side !== null ? 'true' : 'false'}
       aria-hidden={active && side !== null ? undefined : true}
     >
-      <span className={`ds-door-callout__mark ds-door-callout__mark--${mark}`} ref={markRef} />
-      <span className="ds-door-callout__leader" ref={leaderRef} />
-      <div className="ds-door-callout__card" ref={cardRef} data-ground="paper">
-        <DoorRecordLink className="ds-door-callout__link" href={href}>
-          <span className="ds-door-callout__name">{name}</span>
-          {locality ? <span className="ds-door-callout__place">{locality}</span> : null}
+      <span className={`ds-map-callout__mark ds-map-callout__mark--${mark}`} ref={markRef} />
+      <span className="ds-map-callout__leader" ref={leaderRef} />
+      <div className="ds-map-callout__card" ref={cardRef} data-ground="paper">
+        <DoorRecordLink className="ds-map-callout__link" href={href}>
+          <span className="ds-map-callout__name">{name}</span>
+          {locality ? <span className="ds-map-callout__meta">{locality}</span> : null}
         </DoorRecordLink>
       </div>
     </div>

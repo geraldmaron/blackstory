@@ -1889,39 +1889,70 @@ main[tabindex='-1']:focus-visible {
   }
 }
 
-/* —— The paper name flag on a selected map pin (selection-flag.ts) ——————————————— */
-.ds-pin-flag {
+/* —— The map callout: one component for explore's selection and home's spotlight ——————————
+   A paper card (data-ground="paper"), a 1px ink keyline, the float shadow, the record's name in
+   Schibsted 650 and one mono-caps meta line, tied to its pin by a 1px ink leader. Explore sets it
+   as a map marker above the pin (selection-flag.ts, `--flag`); home positions the same parts
+   around the spotlight record (door-spotlight-callout.tsx, `--layer`). */
+.ds-map-callout--flag {
   display: grid;
   justify-items: center;
   pointer-events: none;
-  animation: ds-pin-flag-in var(--ds-duration-base) var(--ds-ease-entrance) both;
+  animation: ds-callout-in var(--ds-duration-base) var(--ds-ease-entrance) both;
 }
 
-.ds-pin-flag__label {
+.ds-map-callout__card {
+  box-sizing: border-box;
+  width: max-content;
   max-width: 16rem;
-  padding: var(--ds-space-1) var(--ds-space-3);
-  overflow: hidden;
-  /* The home callout card's material (door-home.css): ink keyline, float shadow. */
   border: var(--ds-border-width) solid var(--ds-fixed-ink);
   border-radius: var(--ds-radius-sm);
   box-shadow: var(--ds-shadow-float);
-  background: var(--ds-fixed-paper);
-  color: var(--ds-fixed-ink);
+}
+
+.ds-map-callout__body,
+.ds-map-callout__link {
+  display: grid;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: inherit;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-map-callout__name {
+  overflow: hidden;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-body-sm);
   font-weight: 650;
-  line-height: 1.3;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
   text-overflow: ellipsis;
+}
+
+.ds-map-callout--flag .ds-map-callout__name {
   white-space: nowrap;
 }
 
-.ds-pin-flag__stem {
-  width: 2px;
-  height: var(--ds-space-3);
+.ds-map-callout__meta {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-meta);
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.ds-map-callout__leader {
   background: var(--ds-fixed-ink);
 }
 
-@keyframes ds-pin-flag-in {
+.ds-map-callout--flag .ds-map-callout__leader {
+  width: var(--ds-border-width);
+  height: var(--ds-space-3);
+}
+
+@keyframes ds-callout-in {
   from {
     transform: translateY(4px);
   }
@@ -1930,9 +1961,15 @@ main[tabindex='-1']:focus-visible {
 /* —— Place tokens and site names in the house type (place-labels.ts) ————————————————
    The atlas plate's own type. MapLibre places every count and name on invisible symbol layers;
    these DOM labels print what it placed, so collision and hit testing stay on the map. A token is
-   a copper count tab at the place's anchor with the place named beside it: states and counties in
-   spaced capitals, cities as written, bigger places in bigger letters. */
+   a register entry: a copper numeral centered on the place's anchor, with no box, and the place's
+   name beside it in mono capitals. A 3px halo in the plate's land keeps both legible. The sizes
+   are the `--ds-map-count-*` and `--ds-map-name-*` tokens, mirrored in MAP_TYPE (explore-style.ts)
+   so the symbol layers' collision boxes match. */
 .ds-place-labels {
+  --ds-place-halo:
+    -3px 0 0 var(--ds-map-halo), 3px 0 0 var(--ds-map-halo), 0 -3px 0 var(--ds-map-halo),
+    0 3px 0 var(--ds-map-halo), -2px -2px 0 var(--ds-map-halo), 2px -2px 0 var(--ds-map-halo),
+    -2px 2px 0 var(--ds-map-halo), 2px 2px 0 var(--ds-map-halo), 0 0 4px var(--ds-map-halo);
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -1948,58 +1985,54 @@ main[tabindex='-1']:focus-visible {
 }
 
 .ds-place-token {
-  /* The chip is mono, so its width is the digit count in `ch`: the name starts just past it. */
-  --ds-place-chip-w: calc(var(--ds-place-digits, 2) * 1ch + 14px);
-  font-family: var(--ds-font-mono);
-  font-size: 12px;
+  --ds-place-count: var(--ds-map-count-1);
+  --ds-place-name: var(--ds-map-name-1);
+}
+
+.ds-place-token[data-tier='1'] {
+  --ds-place-count: var(--ds-map-count-2);
+  --ds-place-name: var(--ds-map-name-2);
+}
+
+.ds-place-token[data-tier='2'] {
+  --ds-place-count: var(--ds-map-count-3);
+  --ds-place-name: var(--ds-map-name-3);
 }
 
 .ds-place-token__count {
   position: absolute;
   top: 0;
   left: 0;
-  display: block;
-  box-sizing: border-box;
-  width: var(--ds-place-chip-w);
-  height: 22px;
   translate: -50% -50%;
-  border: 1.5px solid var(--ds-map-label-hi);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink);
-  font-weight: 600;
+  color: var(--ds-numeral-soft-text);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-place-count);
   font-variant-numeric: tabular-nums;
-  line-height: 19px;
-  text-align: center;
+  font-weight: var(--ds-weight-numeral);
+  line-height: 1;
+  text-shadow: var(--ds-place-halo);
+  white-space: nowrap;
   transition:
-    background-color var(--ds-duration-fast) var(--ds-easing),
     color var(--ds-duration-fast) var(--ds-easing),
     scale var(--ds-duration-fast) var(--ds-easing);
   animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
 }
 
-.ds-place-token[data-tier='2'] {
-  font-size: 13px;
-}
-
-.ds-place-token[data-tier='2'] .ds-place-token__count {
-  height: 26px;
-  line-height: 23px;
-}
-
+/* The name starts past the numeral: half its digits (about 0.31em each) and a gap. */
 .ds-place-token__name {
   position: absolute;
   top: 0;
-  left: calc(var(--ds-place-chip-w) / 2 + 6px);
+  left: calc(var(--ds-place-digits, 2) * var(--ds-place-count) * 0.31 + 8px);
   translate: 0 -50%;
   color: var(--ds-map-label-hi);
-  font-family: var(--ds-font-display);
-  font-size: 12px;
-  font-weight: 650;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-place-name);
+  font-weight: 500;
+  letter-spacing: var(--ds-tracking-meta);
   line-height: 1;
+  text-shadow: var(--ds-place-halo);
+  text-transform: uppercase;
   white-space: nowrap;
-  -webkit-text-stroke: 3.5px var(--ds-map-halo);
-  paint-order: stroke fill;
   opacity: 0;
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
 }
@@ -2008,25 +2041,10 @@ main[tabindex='-1']:focus-visible {
   opacity: 1;
 }
 
-.ds-place-token[data-tier='1'] .ds-place-token__name {
-  font-size: 13.5px;
-}
-
-.ds-place-token[data-tier='2'] .ds-place-token__name {
-  font-size: 16px;
-}
-
-.ds-place-token[data-level='state'] .ds-place-token__name,
-.ds-place-token[data-level='county'] .ds-place-token__name {
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* Hover answers the pointer the map already hit-tests: the tab inverts and the name underlines
-   in copper. Press settles the tab. */
+/* Hover answers the pointer the map already hit-tests: the numeral takes the plate's type color
+   and the name underlines in copper. Press settles the numeral. */
 .ds-place-token.is-hovered .ds-place-token__count {
-  background: var(--ds-map-label-hi);
-  color: var(--ds-map-land);
+  color: var(--ds-map-label-hi);
 }
 
 .ds-place-token.is-hovered .ds-place-token__name {
@@ -2044,11 +2062,10 @@ main[tabindex='-1']:focus-visible {
   translate: 11px -50%;
   color: var(--ds-map-label-hi);
   font-family: var(--ds-font-display);
-  font-size: 12.5px;
-  font-weight: 600;
+  font-size: var(--ds-map-name-2);
+  font-weight: 650;
   line-height: 1.15;
-  -webkit-text-stroke: 3.5px var(--ds-map-halo);
-  paint-order: stroke fill;
+  text-shadow: var(--ds-place-halo);
   animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
 }
 
@@ -2058,10 +2075,18 @@ main[tabindex='-1']:focus-visible {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .ds-place-token__count,
+  .ds-place-token__name,
+  .ds-site-name,
+  .ds-map-callout--flag {
+    transition: none;
+    animation: none;
+  }
+}
+
 @media (forced-colors: active) {
   .ds-place-token__count {
-    border-color: CanvasText;
-    background: Canvas;
     color: CanvasText;
   }
 }

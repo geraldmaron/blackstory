@@ -27,8 +27,12 @@ export type ChromeState = {
   readonly sheetHeight?: number;
 };
 
-/** Below this width Explore is a full-screen map with a bottom sheet (explore-column.css). */
-export const EXPLORE_PHONE_MAX_WIDTH = 767;
+/**
+ * Up to this width Explore is a full-screen map with a bottom sheet (explore-column.css): phones
+ * and portrait tablets. A 380px floating column on a 768px screen left 364px of map, too narrow
+ * to frame an entered state at its level's zoom, so the column floats only from 1024px.
+ */
+export const EXPLORE_PHONE_MAX_WIDTH = 1023;
 
 /** The floating left column. */
 export const EXPLORE_COLUMN_WIDTH = 380;
@@ -46,6 +50,8 @@ const CONTROLS = 44 + EXPLORE_FLOAT_GUTTER;
 
 /** Share of each axis the padding may consume before it gets scaled back. */
 const MAX_HORIZONTAL_SHARE = 0.6;
+/** Where the column floats, the map the reader sees is what is left of it; allow it more room. */
+const MAX_HORIZONTAL_SHARE_WIDE = 0.75;
 const MAX_VERTICAL_SHARE = 0.72;
 
 export function chromePadding(state: ChromeState): ChromeInset {
@@ -54,6 +60,8 @@ export function chromePadding(state: ChromeState): ChromeInset {
   let right: number;
   let bottom: number;
   let left: number;
+  let leftFloor = 0;
+  const wide = viewportWidth > EXPLORE_PHONE_MAX_WIDTH;
 
   if (viewportWidth <= EXPLORE_PHONE_MAX_WIDTH) {
     top = PHONE_HEADER + GAP;
@@ -66,14 +74,16 @@ export function chromePadding(state: ChromeState): ChromeInset {
     top = WIDE_HEADER + GAP;
     right = CONTROLS + GAP / 2;
     left = EXPLORE_FLOAT_GUTTER + EXPLORE_COLUMN_WIDTH + GAP;
+    // The column and a gutter on each side are never negotiable: a frame under it is unseen.
+    leftFloor = EXPLORE_FLOAT_GUTTER + EXPLORE_COLUMN_WIDTH + EXPLORE_FLOAT_GUTTER;
     bottom = EXPLORE_FLOAT_GUTTER + EXPLORE_HISTOGRAM_HEIGHT + GAP;
   }
 
   // Horizontal clamp: scale both sides by one factor so the camera stays centered on the free area.
-  const maxHorizontal = viewportWidth * MAX_HORIZONTAL_SHARE;
+  const maxHorizontal = viewportWidth * (wide ? MAX_HORIZONTAL_SHARE_WIDE : MAX_HORIZONTAL_SHARE);
   if (left + right > maxHorizontal) {
     const k = maxHorizontal / (left + right);
-    left = Math.floor(left * k);
+    left = Math.max(leftFloor, Math.floor(left * k));
     right = Math.floor(right * k);
   }
 

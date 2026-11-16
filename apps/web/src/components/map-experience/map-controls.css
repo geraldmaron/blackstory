@@ -75,7 +75,8 @@
   padding: 0;
   border: 0;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-ink);
+  /* Icons are 1.5px strokes in the plate's type color, the way the plate's own type reads. */
+  color: var(--ds-map-label-hi);
   cursor: pointer;
   transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
@@ -106,7 +107,7 @@
   }
 }
 
-@media (max-width: 47.9375rem) {
+@media (max-width: 63.9375rem) {
   .ds-map-controls {
     right: var(--ds-space-3);
     bottom: calc(var(--ds-tabbar-h) + var(--ds-space-3));

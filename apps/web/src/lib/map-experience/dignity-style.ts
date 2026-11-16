@@ -197,10 +197,8 @@ export function plateForScheme(scheme: MapColorScheme) {
     streetLabel: light ? DIGNITY_PALETTE.streetLabelLight : DIGNITY_PALETTE.streetLabelDark,
     /** Single records: a copper pin head (site) or an open copper ring (city). */
     markInk: brandPalette.copperPin,
-    /** The pin's ring sits opposite the plate: ink on paper, paper on charcoal. */
+    /** The site disc's keyline: the plate's type color for the scheme, the same over imagery. */
     markRing: light ? brandPalette.blackInk : brandPalette.archivePaper,
-    /** The flat contact shadow under a pin: ink, offset, no blur. */
-    markShadow: light ? 'rgba(10, 10, 10, 0.28)' : 'rgba(0, 0, 0, 0.55)',
     /** Jurisdiction tags (the ungrouped embed): the plate's own type color. */
     tagText: palette.labelHi,
     /** Area precision is shown as an area: a flat copper tint over the jurisdiction. */

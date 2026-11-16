@@ -23,6 +23,7 @@ import {
 import { AREA_FILL_REFUSAL_NOTE } from '../../lib/map-experience/lens-composition';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import type { ExploreRowSort } from '../../lib/map-experience/explore-rows';
+import { MapKey } from './MapKey';
 import './explore-refine.css';
 
 void React;
@@ -250,22 +251,7 @@ export function ExploreFilters({
         ) : null}
       </Group>
 
-      <div className="ds-xrefine__key" aria-label="How records are drawn">
-        <span className="ds-xrefine__key-item">
-          <span className="ds-xrefine__mark ds-xrefine__mark--dot" aria-hidden="true" />
-          Known site
-        </span>
-        <span className="ds-xrefine__key-item">
-          <span className="ds-xrefine__mark ds-xrefine__mark--ring" aria-hidden="true" />
-          City or neighborhood
-        </span>
-        <span className="ds-xrefine__key-item">
-          <span className="ds-xrefine__mark--tag" aria-hidden="true">
-            N by county
-          </span>
-          County or state, no point
-        </span>
-      </div>
+      <MapKey className="ds-xrefine__key" />
     </div>
   );
 }

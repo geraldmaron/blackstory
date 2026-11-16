@@ -36,7 +36,6 @@ import {
   EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
-  EXPLORE_POINT_SHADOW_LAYER_ID,
   JURISDICTION_TAG_MIN_ZOOM,
   PLATE_BACKGROUND_OPACITY,
   PLATE_STATE_FILL_OPACITY,
@@ -741,13 +740,15 @@ test('the mark is a dot for site precision and a hollow ring for neighborhood or
   // copper stroke.
   assert.equal(fill[2], brandPalette.copperPin);
   const stroke = point.paint?.['circle-stroke-color'] as unknown[];
-  assert.deepEqual([stroke[2], stroke[3]], [brandPalette.archivePaper, brandPalette.copperPin]);
-  // Only a site pin casts the contact shadow: the shadow layer is filtered to the dot shape.
-  const shadow = layerById(style, EXPLORE_POINT_SHADOW_LAYER_ID) as LayerLike & {
-    filter?: unknown;
-  };
-  assert.match(JSON.stringify(shadow.filter), /"site"/);
-  assert.doesNotMatch(JSON.stringify(shadow.filter), /"city"/);
+  assert.deepEqual(
+    [stroke[2], stroke[3]],
+    [plateForScheme('dark').markRing, brandPalette.copperPin],
+  );
+  // No contact shadow: the plate has no shadow layer at all.
+  assert.equal(
+    style.layers.some((layer) => /shadow/.test(layer.id)),
+    false,
+  );
   assert.ok(!JSON.stringify(point.paint).includes('kind'), 'kind is never encoded on the mark');
 });
 
@@ -831,9 +832,11 @@ test('jurisdiction tags stay off the national view and give way to group counts'
       ids.indexOf(EXPLORE_UNCLUSTERED_POINT_LAYER_ID),
   );
   const count = layerById(style, EXPLORE_CLUSTER_COUNT_LAYER_ID);
-  // Counts always draw (legible), and reserve the DOM count chip in the collision index.
+  // Counts always draw (legible) and keep a small margin in the collision index; the numeral has
+  // no chip, and a wide margin would collide every name with its own numeral.
   assert.equal(count.layout?.['text-allow-overlap'], true);
-  assert.ok(Number(count.layout?.['text-padding']) >= 5);
+  const padding = Number(count.layout?.['text-padding']);
+  assert.ok(padding >= 1 && padding <= 3);
   assert.notEqual(count.layout?.['text-ignore-placement'], true);
   assert.notEqual(tag.layout?.['text-allow-overlap'], true);
 });
@@ -860,4 +863,14 @@ test('state labels are a symbol layer under the groups, so a label yields to a c
     data: { features: readonly unknown[] };
   };
   assert.equal(source.data.features.length, 51);
+});
+
+test('the place-name offset is one flat match: a nested match silently drops every name', () => {
+  const style = buildStyleFixture('off');
+  const name = layerById(style, EXPLORE_PLACE_NAME_LAYER_ID) as LayerLike & {
+    layout: Record<string, unknown>;
+  };
+  for (const output of matchExpressionOutputs(name.layout['text-offset'])) {
+    assert.equal((output as unknown[])[0], 'literal');
+  }
 });

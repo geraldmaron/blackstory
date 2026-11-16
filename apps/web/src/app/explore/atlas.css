@@ -84,7 +84,7 @@
   max-width: 560px;
 }
 
-@media (max-width: 47.9375rem) {
+@media (max-width: 63.9375rem) {
   .ds-atlas__notice {
     left: var(--ds-space-4);
   }

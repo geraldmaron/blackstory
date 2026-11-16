@@ -445,6 +445,23 @@
   --ds-weight-numeral: 800;
   --ds-tracking-meta: 0.04em;
 
+  /*
+   * The map's type and marks. A place token is a register entry on the plate: a copper numeral
+   * (count) beside a mono-caps name, in three steps by record count. MapLibre's invisible symbol
+   * layers size their collision boxes from the same numbers (MAP_TYPE in
+   * apps/web/src/app/map/explore-style.ts); change both together.
+   */
+  --ds-map-count-1: 0.9375rem;
+  --ds-map-count-2: 1.0625rem;
+  --ds-map-count-3: 1.25rem;
+  --ds-map-name-1: 0.75rem;
+  --ds-map-name-2: 0.8125rem;
+  --ds-map-name-3: 0.9375rem;
+  /* A site pin's disc and an area's open ring, in diameters; the keyline is the pin's edge. */
+  --ds-map-pin: 12px;
+  --ds-map-ring: 14px;
+  --ds-map-keyline: 2px;
+
   --ds-text-display-numeral: var(--ds-text-numeral);
   --ds-text-display-title: var(--ds-text-display);
   --ds-tracking-numeral: -0.04em;

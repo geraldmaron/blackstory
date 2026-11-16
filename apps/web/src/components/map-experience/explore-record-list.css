@@ -97,11 +97,18 @@
   overflow: hidden;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-subtitle);
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.25;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--ds-tracking-title);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+/* The /records row's hover: the name underlines in a 2px rule. */
+.ds-xlist__row:hover .ds-xlist__name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
 }
 
 .ds-xlist__meta {
@@ -136,6 +143,7 @@
   color: var(--ds-accent);
   font-size: var(--ds-text-body-sm);
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .ds-xlist__row--selected .ds-xlist__decade {

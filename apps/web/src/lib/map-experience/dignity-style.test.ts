@@ -172,7 +172,7 @@ test('no status or skin framing in kind labels or legend prose', () => {
   }
 
   const legendSource = readFileSync(
-    path.join(__dirname, '../../components/map-experience/ExploreFilters.tsx'),
+    path.join(__dirname, '../../components/map-experience/MapKey.tsx'),
     'utf8',
   );
   const jsxTextLines = legendSource
@@ -182,12 +182,12 @@ test('no status or skin framing in kind labels or legend prose', () => {
   assert.doesNotMatch(
     renderedProse,
     bannedPattern,
-    'the map key (ExploreFilters.tsx) must not use status/skin framing',
+    'the map key (MapKey.tsx) must not use status/skin framing',
   );
   // The key says what a mark claims about place, never more: a site, a city, or no point at all.
-  assert.match(renderedProse, /Known site/);
-  assert.match(renderedProse, /City or neighborhood/);
-  assert.match(renderedProse, /County or state, no point/);
+  assert.match(renderedProse, /Exact site/);
+  assert.match(renderedProse, /Within a city or area/);
+  assert.match(renderedProse, /County or state/);
 });
 
 test('no density-tier fill is red-hued — never a crime-heat gradient', () => {

@@ -5,9 +5,7 @@ import {
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_HOVER_POINT_LAYER_ID,
-  EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
-  EXPLORE_HOVER_SHADOW_LAYER_ID,
   EXPLORE_JURISDICTION_TAG_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_SELECTED_TAG_LAYER_ID,
@@ -85,7 +83,6 @@ export const PIN_DROP_MS = 400;
 export function dropInIncomingPins(map: MapLibreMap): void {
   const targets: Array<[string, [number, number]]> = [
     [EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID, [0, 0]],
-    [EXPLORE_POINT_SHADOW_INCOMING_LAYER_ID, [1.5, 2]],
   ];
   for (const [id, rest] of targets) {
     if (!map.getLayer(id)) continue;
@@ -101,20 +98,12 @@ export function dropInIncomingPins(map: MapLibreMap): void {
   });
 }
 
-/** The hovered pin lifts 2px over a wider shadow; `undefined` clears it. */
+/** The hovered pin lifts 2px; `undefined` clears it. */
 export function setHoveredEntityFilter(map: MapLibreMap, entityId: string | undefined): void {
   const filter = selectedPointFilterExpression(entityId);
   if (map.getLayer(EXPLORE_HOVER_POINT_LAYER_ID)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
     map.setFilter(EXPLORE_HOVER_POINT_LAYER_ID, filter as any);
-  }
-  if (map.getLayer(EXPLORE_HOVER_SHADOW_LAYER_ID)) {
-    const current = map.getFilter(EXPLORE_HOVER_SHADOW_LAYER_ID) as unknown[] | undefined;
-    // Keep the shadow's own "site pins only" clause; swap the record clause.
-    const markClause = Array.isArray(current) && current[0] === 'all' ? current[2] : undefined;
-    const next = markClause ? ['all', filter, markClause] : filter;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
-    map.setFilter(EXPLORE_HOVER_SHADOW_LAYER_ID, next as any);
   }
 }
 

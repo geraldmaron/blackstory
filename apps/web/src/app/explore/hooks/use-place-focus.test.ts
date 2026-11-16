@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { SQUARE_STEP_DEG } from '@repo/domain/map/place-groups';
-import { outlineBounds, placeFocusCollection, placeOutline } from './use-place-focus';
+import { focusFade, outlineBounds, placeFocusCollection, placeOutline } from './use-place-focus';
 
 const box = (w: number, s: number, e: number, n: number): [number, number][] => [
   [w, s],
@@ -67,4 +67,20 @@ test('the veil is the world with every ring of the place cut out', () => {
   assert.equal(veil.geometry.type, 'Polygon');
   assert.equal(veil.geometry.coordinates.length, 2);
   assert.deepEqual(placeFocusCollection([]).features, []);
+});
+
+test('a state outline is gone by street zoom, so it never cuts across a street map', () => {
+  const fade = focusFade('state-ga', 1) as [
+    string,
+    unknown,
+    unknown,
+    number,
+    number,
+    number,
+    number,
+  ];
+  assert.equal(fade[3], 7.5);
+  assert.equal(fade[5], 9);
+  assert.equal(fade[6], 0);
+  assert.ok(fade[5] < 14, 'faded out before the site level');
 });

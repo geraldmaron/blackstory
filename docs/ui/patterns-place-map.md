@@ -34,7 +34,7 @@ The thresholds are integers on purpose. MapLibre evaluates zoom inside a layer f
 At city framing a dense city used to draw every site at once: Washington's 272 exact sites read as about 300 stacked dots. Between the city and the street, site-precision records are now counted in **grid squares**: a fixed, global grid of `SQUARE_STEP_DEG` (0.02 degrees of latitude and longitude, about 2.2 km north to south, 58px at zoom 11). The rule:
 
 1. A site-precision record's square is the grid cell its public point falls in (`squareKey`: column and row counted from 180W and 90S).
-2. A square that holds two or more sites is a place: a count tab at the square's fixed center, from zoom 11 to 14. A square holding one site is not a place; that site draws as its own dot from 11.
+2. A square that holds two or more sites is a place: a token at the square's fixed center, from zoom 11 to 14. A square holding one site is not a place; that site draws as its own dot from 11.
 3. Only site-precision records enter squares. City-, county- and state-precision records stay in their city, county or state token at these zooms, so nothing is drawn sharper than stored precision.
 4. Every record is counted once at every zoom: the square level's tokens plus the lone sites add up to the whole set (`place-groups.test.ts`).
 5. The grid never moves with the frame or with the filters, so a square's key and members are stable. Whether a square has two members is read from the records on the map, so a filter can turn a square of two into one dot.
@@ -126,7 +126,7 @@ Values live in `mapPalettes` (`packages/ui/src/tokens/colors.ts`, mirrored as `-
 
 - **Waterlines** show in the national frame only, fading in from zoom 3.4 and gone past 5.5. Lakes carry none.
 - **County names** under the tokens are spaced mono-style capitals in the plate's quiet label color and yield to every token.
-- **Entered place**: a 2px copper outline and a flat veil of the water color at 55% outside it. The outline is drawn only while a place is entered and at the zooms that frame it; it never survives into street zoom after the reader leaves or zooms past it.
+- **Entered place**: a 2px copper outline and a flat veil of the water color at 55% outside it. The outline is drawn only while a place is entered and at the zooms that frame it: each level fades its outline out two levels past the one that frames it (`OUTLINE_GONE_ZOOM` in `use-place-focus.ts`: state by 9, county by 11, city by 14, square by 17), so a state border never cuts across a street map after the reader selects a record inside the place.
 - Marks have no gradients, glows or bevels: their information is shape and copper. Depth belongs to the chrome.
 
 ### How the type gets onto a WebGL map
@@ -138,11 +138,11 @@ Map glyphs cannot set Schibsted or Geist Mono, so the names are DOM (`components
 Every piece of chrome is on the float plane (the `.ds-float` recipe; solid under reduced transparency) on the table's ground. The column and the strip run nearer solid (94%) because they carry reading text.
 
 - **Column = the register.** Its head is the count as a copper numeral (`--ds-text-numeral` scale stepped down) with "records" in mono capitals, and the Filters control. Rows are the `/records` row: name in Schibsted, kind and place in meta, decade as a copper mono numeral, the grade as `GradeTag`. An entered place heads the list with its trail, its level as a mono-caps word (no copper pill), its name in the display face and the precision mix in the Newsreader serif.
-- **Inspector = a record masthead in miniature.** Plate with its credit beside or under it (capped at 3:2 on wide screens and at 160px tall in the phone sheet), the name in the display face, the decade once as a copper numeral, the summary in the Newsreader serif, then the record page's facts as ruled type rows (WHERE, EVIDENCE in mono-caps labels between ink rules), then the actions.
+- **Inspector = a record masthead in miniature.** Plate with its credit beside or under it (capped at 3:2 on wide screens and at 120px tall in the bottom sheet), the name in the display face, the decade once as a copper numeral, the summary in the Newsreader serif, then the record page's facts as ruled type rows (WHERE, EVIDENCE in mono-caps labels between ink rules), then the actions.
 - **Strip = the home histogram.** Records per decade on a true time scale, in the home walk's idiom: bars in a rule tone, bars inside the chosen range in the plate's type color, the range edges and handles copper, decade labels in mono capitals.
-- **Legend.** A one-line key in the strip's leading cell on wide screens and in the Filters view on a phone: the disc ("exact site"), the ring ("within a city or area"), the wash ("county or state"), each mark drawn beside its words.
+- **Legend.** A one-line key in the strip's leading cell from 80rem up and in the Filters view below it (`MapKey`): the disc ("exact site"), the ring ("within a city or area"), the wash ("county or state"), each mark drawn beside its words.
 - **Controls.** One glass stack, 44px buttons, 1.5px stroked icons in the plate's type color.
-- **Geometry.** The 380px column sits one 12px gutter in from the edges; the strip floats beside it; the controls sit above the strip. On a phone the column is a bottom sheet with a 28px top radius. `chromePadding` mirrors this geometry at every width the column floats (768px and up), so an entered place frames in the map the reader can see.
+- **Geometry.** From 1024px the 380px column floats one 12px gutter in from the edges; the strip floats beside it; the controls sit above the strip. Below 1024px (phones and portrait tablets) the column is a bottom sheet, because a floating column on a 768px screen left 364px of map, too narrow to frame an entered state at its level's zoom. `chromePadding` mirrors this geometry, and where the column floats its left inset never drops below the column plus a gutter on each side (404px).
 
 ### Embeds
 
@@ -155,7 +155,7 @@ Embeds draw the same plate and the same marks. The place token on an embed is th
 
 ### Known limits
 
-- A name that would touch a neighbor's count tab is not printed at that zoom. Dense metros name their largest places first and the rest on zoom.
+- A name that would touch a neighbor's numeral is not printed at that zoom. Dense metros name their largest places first and the rest on zoom.
 - Over satellite imagery the DOM labels keep the flat plate's halo; they have not had the imagery pass the GL labels have (`plateOverImagery`).
 
 ---
@@ -166,13 +166,13 @@ Embeds draw the same plate and the same marks. The place token on an embed is th
 
 Every map on the site is this map. The embeds draw the same plate (`buildExploreMapStyle` with `clusteringEnabled: false`), so the night and day atlas, the waterlines and the street ink are the same style, not a lookalike. Embeds add no styling of their own beyond the frame and the token.
 
-- **The record's mark** is the one /explore draws at its stored precision: a copper pin at a site, with its name in the house type beside it (`bindRecordName`, the `ds-site-name` label, drawn at any zoom because an embed frames closer than the plate's own name layer places); one open copper ring at a campus, neighborhood or city. A county or state record has no point. It shows its place as an entered place shows on /explore: a flat copper wash at 16% under the water, and a 2px copper outline, from the same polygons (`placeOutline`). Where the county polygon cannot be found for the stored point, the frame shows no area, never a guessed one. Frames never go closer than `zoomForLocationPrecision` or `EMBED_CONTEXT_MAX_ZOOM`, and the embed never moves its own camera.
-- **The record in its place** is a token on the plate, bottom left, in the column's own recipe: a copper count tab and the place name in the display face, on a plate of the site theme's ground. It names the deepest place the record is counted in (city, else county, else state; `recordPlaceFor`) with the same count /explore shows when that place is entered, and links to `/explore?place=<key>&selected=<id>`, which enters the place and selects the record inside it. The token is server HTML, so it works without script. Where the server cannot read the county polygons it names the state, which is coarser, never sharper.
+- **The record's mark** is the one /explore draws at its stored precision: a solid copper disc with a keyline in the plate's type color at a site, with its name in Schibsted beside it (`bindRecordName`, the `ds-site-name` label, drawn at any zoom because an embed frames closer than the plate's own name layer places); one open copper ring at a campus, neighborhood or city. Neither casts a shadow. A county or state record has no point. It shows its place as an entered place shows on /explore: a flat copper wash at 16% under the water, and a 2px copper outline, from the same polygons (`placeOutline`). Where the county polygon cannot be found for the stored point, the frame shows no area, never a guessed one. Frames never go closer than `zoomForLocationPrecision` or `EMBED_CONTEXT_MAX_ZOOM`, and the embed never moves its own camera.
+- **The record in its place** is a token on the plate, bottom left, set as a register entry on glass: the count as a copper numeral and the place name in mono capitals (the `--ds-map-count-1` and `--ds-map-name-1` tokens), on a plate of the site theme's ground. No tab or box sits behind the numeral. It names the deepest place the record is counted in (city, else county, else state; `recordPlaceFor`) with the same count /explore shows when that place is entered, and links to `/explore?place=<key>&selected=<id>`, which enters the place and selects the record inside it. The token is server HTML, so it works without script. Where the server cannot read the county polygons it names the state, which is coarser, never sharper.
 - **"Open on the map"** carries the place too (`mapHrefInPlace`): the record page's button keeps the reader's narrowing and adds `place=`; a story inset links straight to the place and record.
 - **Neighbors** are not drawn. The token is the context. A neighbor dot would have to follow the grouping bands, and an embed's closest frame never reaches the zoom where sites that share a square draw.
 - **Before the map paints** the frame is the plate's ground (`data-ground="ink"` on the frame, so it follows the site theme even inside a paper sheet) carrying the record's name and its precision in words, with the place token on it. It is page HTML: with scripting off, without WebGL, or while tiles load, the record page still says where the record is and how closely. When the map cannot paint at all the frame collapses to that plate.
 - **Reading-room slot.** `MapMoment` borrows the persistent plate, so its map is already this world. Its slot is the same ground while idle, and its tag and Explore control are the same plate chips with a 44px target.
-- **Unchanged:** precision wording (`precisionInWords`), the privacy rules above, cooperative gestures, and the embed is on the float plane like the explore chrome: its place token is glass, its frame a plate with a keyline, with no gradient or glow on the marks.
+- **Unchanged:** precision wording (`precisionInWords`), the privacy rules above, cooperative gestures, and the embed is on the float plane like the explore chrome: its place token is glass, its frame a plate with a keyline, with no gradient, glow or shadow on the marks.
 
 ---
 
@@ -188,7 +188,7 @@ City-scale records do not spread. They stay counted in their city token, because
 
 - **Tap a token:** the stage fires `placeSelect` and Explore enters the place (below). On a surface that does not listen for `placeSelect`, the stage closes in on its own, never short of the next level.
 - **`?place=<key>`:** the address of a place. Keys are `state-<postal>`, `county-<5-digit FIPS>` `city-<postal>-<slug>` and `square-<column>-<row>` (pattern `PLACE_KEY_PATTERN`). A shared link enters the place on arrival.
-- **List scoping:** with a place selected, the list column and the map both show exactly that place's records, inside whatever filters are on. A chip names the place and clears it. The column heads the list with the places that hold it (a trail of buttons back up: "District of Columbia / Washington"), the level in a copper tab, the place in the display face, and the precision mix in words.
+- **List scoping:** with a place selected, the list column and the map both show exactly that place's records, inside whatever filters are on. A chip names the place and clears it. The column heads the list with the places that hold it (a trail of buttons back up: "District of Columbia / Washington"), its level as a mono-caps word, the place in the display face, and the precision mix in words in the Newsreader serif.
 - **Clear:** the chip, or Clear all.
 - **History:** entering or leaving a place pushes a history entry (`useExploreUrlSync`); every other lens edit replaces the current one. Back and Forward walk the places the reader entered and re-enter each one.
 

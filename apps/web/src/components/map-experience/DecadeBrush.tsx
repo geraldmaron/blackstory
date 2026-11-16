@@ -12,6 +12,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
 import type { DecadeBar } from '../../lib/map-experience/decade-density';
+import { MapKey } from './MapKey';
 import './decade-brush.css';
 
 void React;
@@ -160,31 +161,34 @@ export function DecadeBrush({ bars, range, onChange, className }: DecadeBrushPro
       className={cx('ds-xbrush', active && 'ds-xbrush--active', className)}
       aria-label="Documented decades"
     >
-      <div className="ds-xbrush__label">
-        {active && shown ? (
-          <>
-            <span className="ds-xbrush__range" aria-live="polite">
-              {decadeRangeLabel(shown)}
-            </span>
-            <button
-              type="button"
-              className="ds-xbrush__clear"
-              onClick={() => onChange(null)}
-              aria-label="Clear the decade range"
-            >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path
-                  d="m4.5 4.5 7 7m0-7-7 7"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </>
-        ) : (
-          <span className="ds-xbrush__range ds-xbrush__range--all">All decades</span>
-        )}
+      <div className="ds-xbrush__lead">
+        <div className="ds-xbrush__label">
+          {active && shown ? (
+            <>
+              <span className="ds-xbrush__range" aria-live="polite">
+                {decadeRangeLabel(shown)}
+              </span>
+              <button
+                type="button"
+                className="ds-xbrush__clear"
+                onClick={() => onChange(null)}
+                aria-label="Clear the decade range"
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path
+                    d="m4.5 4.5 7 7m0-7-7 7"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </>
+          ) : (
+            <span className="ds-xbrush__range ds-xbrush__range--all">All decades</span>
+          )}
+        </div>
+        <MapKey className="ds-xbrush__key" />
       </div>
 
       <div className="ds-xbrush__plot">
