@@ -4,7 +4,7 @@
  *   ink     how evidence is graded: one ruled row in the claims block's own language (the grade's
  *           glyph and word, the records holding it), on the table's ground, so the dark map
  *           never hands off to a bright sheet in the dark theme
- *   copper  the lead chapter's cover, edge to edge, sinking into the copper below it
+ *   copper  the lead chapter's cover, edge to edge, as a toned plate beside its title when it has one
  *
  * The decade histogram is not here: it is the walk itself, in the dock beside the map.
  * Every number comes from the same records index `/records` builds (`loadRecordsIndex`), so the
@@ -83,12 +83,13 @@ export function DoorChapters({ lead, grades }: DoorChaptersProps) {
                 />
                 <span className="ds-door-ch__grade-label">{confidenceTierPhrase(level)}</span>
                 <span className="ds-door-ch__grade-count">
-                  {count.toLocaleString('en-US')} records
+                  <span className="ds-door-ch__grade-numeral">{count.toLocaleString('en-US')}</span>{' '}
+                  records
                 </span>
               </li>
             ))}
           </ul>
-          <Link className={buttonClassName('secondary')} href="/methodology">
+          <Link className="ds-door-ch__link" href="/methodology">
             How a record is graded
           </Link>
         </div>
@@ -100,25 +101,33 @@ export function DoorChapters({ lead, grades }: DoorChaptersProps) {
           className="ds-door-ch ds-door-ch--story"
           aria-labelledby="door-ch-story"
         >
-          <div className="ds-door-ch__cover" aria-hidden="true">
-            {/* Lazy, at normal priority, and at a width that fills the band without shipping the
-                full scan: the cover is toned into the copper below it, so 1280px is plenty. */}
-            <CoverImage item={lead} width={640} />
-          </div>
-          <div className="ds-wrap ds-door-ch__inner">
-            <p className="ds-door-ch__years">{lead.eraLabel}</p>
-            <h2 className="ds-door-ch__story-title" id="door-ch-story">
-              <Link href={`/stories/${lead.slug}`}>{lead.title}</Link>
-            </h2>
-            <p className="ds-door-ch__dek">{coverDek(lead.summary)}</p>
-            <div className="ds-door-ch__actions">
-              <Link className={buttonClassName('primary')} href={`/stories/${lead.slug}`}>
-                Read the chapter
-              </Link>
-              <Link className={buttonClassName('quiet')} href="/stories">
-                All stories
-              </Link>
+          <div className="ds-wrap ds-door-ch__inner" data-media={lead.heroImage ? 'plate' : 'none'}>
+            <div className="ds-door-ch__text">
+              {/* The years are the cover: the numeral role, in ink on the copper band. */}
+              <p className="ds-door-ch__years">{lead.eraLabel}</p>
+              <h2 className="ds-door-ch__story-title" id="door-ch-story">
+                <Link href={`/stories/${lead.slug}`}>{lead.title}</Link>
+              </h2>
+              <p className="ds-door-ch__dek">{coverDek(lead.summary)}</p>
+              <div className="ds-door-ch__actions">
+                <Link className={buttonClassName('primary')} href={`/stories/${lead.slug}`}>
+                  Read the chapter
+                </Link>
+                <Link className={buttonClassName('quiet')} href="/stories">
+                  All stories
+                </Link>
+              </div>
             </div>
+            {/* A real cover image stands beside the text as a toned plate with its credit; a
+                chapter without one has no picture and no empty space where one would be. */}
+            {lead.heroImage ? (
+              <figure className="ds-plate ds-door-ch__plate">
+                <span className="ds-plate__tone" aria-hidden="true">
+                  <CoverImage item={lead} width={720} className="ds-plate__img" />
+                </span>
+                <figcaption className="ds-plate__credit">{lead.heroImage.credit}</figcaption>
+              </figure>
+            ) : null}
           </div>
         </Block>
       ) : null}

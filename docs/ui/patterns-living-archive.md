@@ -121,8 +121,11 @@ The map says where; the plate shows what it looks like. They always refer to the
   copper, the rest a rule) and the control (a native range input over the bars, thumb on the
   current bar). Back / Next and the arrow keys step; Escape returns to the opening.
 - **Below the fold.** Two bands over the fixed map: how evidence is graded, as one ruled row in
-  the claims block's language (glyph, word, exact count per grade) on the table's ground, then the
-  lead story's cover on copper. Then the footer: plain navigation on the table's ground with the
+  the claims block's language (glyph, word, exact count as a copper numeral) on the table's
+  ground with an underlined link to the method, then the lead story on copper: its years are the
+  cover (numeral role, ink), and a toned plate with credit stands beside the text only when the
+  chapter has a real cover image, so there is never an empty cover. The map meets the first band
+  on a hard edge, and both bands use `--ds-section-sm` padding. Then the footer: plain navigation on the table's ground with the
   AI-help disclosure, no slogan, no card.
 - **Record page.** The plate leads the masthead field beside the name; the map in the rail shows
   the same place, and its place token links into `/explore?place=`.

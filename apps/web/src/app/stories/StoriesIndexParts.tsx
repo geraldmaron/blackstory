@@ -2,8 +2,8 @@
  * The pieces of the `/stories` front: the lead cover, the chapter covers, a list row and the one
  * toolbar. Server components; the only client code is StoryImage's load and error state.
  *
- * Material: the lead runs edge to edge with an ink panel, the chapter tiles carry sand and copper
- * caption blocks, and the list is one paper sheet on the ink table.
+ * Material: the lead runs edge to edge with an ink panel, the other chapters are ruled rows with
+ * a toned plate, and the list is one paper sheet on the ink table.
  */
 import React from 'react';
 import type { PublicStoryListItemDoc } from '@repo/schemas';
@@ -24,16 +24,19 @@ export function CoverImage({
   item,
   width,
   eager = false,
+  className = 'ds-stories-cover__img',
 }: {
   readonly item: PublicStoryListItemDoc;
   readonly width: number;
   readonly eager?: boolean;
+  /** `ds-plate__img` when the cover stands as a toned plate (home's lead story). */
+  readonly className?: string;
 }) {
   const image = item.heroImage;
   if (!image) return <span className="ds-stories-cover__blank" aria-hidden="true" />;
   return (
     <StoryImage
-      className="ds-stories-cover__img"
+      className={className}
       src={storyImageSrc(image.url, width, image.width)}
       fallbackSrc={image.url}
       alt=""
@@ -67,7 +70,9 @@ export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
             {readLabel(item)}
           </a>
           {item.heroImage ? (
-            <p className="ds-stories-lead__credit">Cover: {item.heroImage.credit}</p>
+            <p className="ds-plate__credit ds-stories-lead__credit">
+              Cover: {item.heroImage.credit}
+            </p>
           ) : null}
         </div>
       </div>
@@ -75,23 +80,14 @@ export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
   );
 }
 
-/**
- * One of the other chapters: the picture, then a color-blocked caption (sand and copper in turn)
- * with the title large in ink. The whole tile is the link.
- */
-export function ChapterCover({
-  item,
-  tone,
-}: {
-  readonly item: PublicStoryListItemDoc;
-  readonly tone: 'sand' | 'copper';
-}) {
+/** One of the other chapters: a ruled row, the plate beside the title large in ink. */
+export function ChapterCover({ item }: { readonly item: PublicStoryListItemDoc }) {
   return (
     <article className="ds-stories-cover">
       <div className="ds-stories-cover__media">
         <CoverImage item={item} width={720} />
       </div>
-      <div className="ds-stories-cover__caption" data-ground={tone}>
+      <div className="ds-stories-cover__caption">
         <p className="ds-stories-cover__years">{item.eraLabel}</p>
         <h2 className="ds-stories-cover__title">
           <a className="ds-stories-cover__link" href={href(item)}>
@@ -100,7 +96,7 @@ export function ChapterCover({
         </h2>
         <p className="ds-stories-cover__dek">{coverDek(item.summary)}</p>
         {item.heroImage ? (
-          <p className="ds-stories-cover__credit">{item.heroImage.credit}</p>
+          <p className="ds-plate__credit ds-stories-cover__credit">{item.heroImage.credit}</p>
         ) : null}
       </div>
     </article>
@@ -215,9 +211,8 @@ export function StoriesToolbar({
           {current?.label}
         </FilterButton>
         <div
-          className="ds-stories-sort"
+          className="ds-stories-sort ds-float"
           id={SORT_MENU_ID}
-          data-ground="paper"
           popover="auto"
           role="dialog"
           aria-labelledby={`${SORT_MENU_ID}-title`}

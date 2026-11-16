@@ -149,6 +149,27 @@
   }
 }
 
+/* A short wide screen (1024x768, 1440x900): the plate and the foot give back height so the record,
+   headline and actions all stay inside the first screen. Type roles do not change. */
+@media (min-width: 48rem) and (min-aspect-ratio: 1001/1000) and (max-height: 56.25rem) {
+  .ds-door__dock > :is(.ds-door-open, .ds-door-walk) {
+    padding-block: var(--ds-space-5) var(--ds-space-6);
+  }
+
+  .ds-door-open {
+    gap: var(--ds-space-3);
+  }
+
+  /* Scoped to the opening so it outranks the base plate rule that follows this block. */
+  .ds-door-open .ds-door-record__plate .ds-plate__tone {
+    max-height: 15dvh;
+  }
+
+  .ds-door-record .ds-evidence__item {
+    padding-block: var(--ds-space-3);
+  }
+}
+
 /* Without JavaScript there is no walk to start; the records link and the notice remain. */
 @media (scripting: none) {
   .ds-door-open__start {
@@ -1034,7 +1055,7 @@ body:has(.ds-door) .ds-door-journey {
   z-index: 2; /* local: dock over the pin field; gaps pass clicks through */
 }
 
-/* —— Below the fold: two chapters, each on its own ground, over the fixed map —————————————— */
+/* —— Below the fold: two bands over the fixed map, each its own ground, one padding token ———— */
 .ds-door-chapters {
   position: relative;
   z-index: 3; /* local: above the fixed field, dock and callout */
@@ -1046,28 +1067,15 @@ body:has(.ds-door) .ds-door-journey {
   display: none;
 }
 
-.ds-door-ch {
-  display: grid;
-  align-items: center;
-  overflow: hidden;
-}
-
-/* The first chapter rises over the map with a rounded leading edge and a shadow onto the plate.
-   It stands on the table's ground, so the dark map never hands off to a bright sheet. */
-.ds-door-ch:first-child {
-  border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
-  box-shadow: var(--ds-shadow-float);
+/* Hard edges: the first band starts exactly where the fixed map ends, so no strip shows between. */
+.ds-door-chapters .ds-door-ch {
+  padding-block: var(--ds-section-sm);
 }
 
 .ds-door-ch__inner {
-  position: relative;
   display: grid;
   justify-items: start;
   gap: var(--ds-space-6);
-}
-
-.ds-door-ch--evidence .ds-door-ch__inner {
-  padding-block: var(--ds-space-18);
 }
 
 .ds-door-ch__title {
@@ -1089,13 +1097,13 @@ body:has(.ds-door) .ds-door-journey {
   line-height: 1.45;
 }
 
-/* The grades as one ruled row in the claims block's language: a heavy ink rule over it, hairline
-   rules between, each grade its glyph and word with the count in the data face. */
+/* The grades as one ruled register row in the claims block's language: a heavy rule over it,
+   hairlines between, each grade its glyph and word with the exact count as a copper numeral. */
 .ds-door-ch__grades {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   width: 100%;
-  margin: var(--ds-space-4) 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   border-top: var(--ds-border-width-strong) solid var(--ds-ink);
@@ -1107,7 +1115,7 @@ body:has(.ds-door) .ds-door-journey {
   grid-template-columns: auto minmax(0, 1fr);
   align-items: baseline;
   gap: var(--ds-space-1) var(--ds-space-3);
-  padding: var(--ds-space-5) var(--ds-space-6) var(--ds-space-5) 0;
+  padding: var(--ds-space-4) var(--ds-space-6) var(--ds-space-4) 0;
 }
 
 .ds-door-ch__grade + .ds-door-ch__grade {
@@ -1127,59 +1135,56 @@ body:has(.ds-door) .ds-door-journey {
 }
 
 .ds-door-ch__grade-count {
-  grid-column: 2;
+  grid-column: 1 / -1;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
-  font-variant-numeric: tabular-nums;
 }
 
-.ds-door-ch--story {
-  align-items: start;
-  padding: 0 0 var(--ds-space-18);
+.ds-door-ch__grade-numeral {
+  color: var(--ds-numeral-accent);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: var(--ds-weight-numeral);
+  font-variant-numeric: lining-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
 
-.ds-door-ch__cover {
-  position: relative;
-  height: min(56dvh, 34rem);
-  overflow: hidden;
-  background: var(--ds-material-ink);
+/* An underlined text link, 44px tall without moving the line. */
+.ds-door-ch__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  font-family: var(--ds-font-sans);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
-/* The cover sinks into the copper below it instead of stopping at a hard line. */
-.ds-door-ch__cover::after {
-  content: '';
-  position: absolute;
-  inset: 40% 0 0;
-  background: linear-gradient(to bottom, transparent, var(--ds-material-copper));
+.ds-door-ch__link:hover {
+  color: var(--ds-accent);
 }
 
-.ds-door-ch__cover img,
-.ds-door-ch__cover .ds-stories-cover__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* The lead story: text, and beside it a toned plate when the chapter has a real cover image. */
+.ds-door-ch__text {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-5);
+  min-width: 0;
 }
 
-/* Chapter covers are archive scans: hold the head of the document, where its title is. */
-.ds-door-ch__cover img {
-  object-position: 50% 8%;
-}
-
-.ds-door-ch--story .ds-door-ch__inner {
-  margin-top: calc(var(--ds-space-12) * -1);
-  padding-top: 0;
-}
-
+/* The years are the cover: the numeral role, ink on copper. */
 .ds-door-ch__years {
   margin: 0;
-  padding: var(--ds-space-2) var(--ds-space-4);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-material-ink);
-  color: var(--ds-material-sand);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-body);
-  font-weight: 600;
+  color: var(--ds-fixed-ink);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-numeral);
+  font-weight: var(--ds-weight-numeral);
+  font-variant-numeric: lining-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
 
 .ds-door-ch__story-title {
@@ -1187,7 +1192,7 @@ body:has(.ds-door) .ds-door-journey {
   margin: 0;
   overflow-wrap: anywhere;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-headline);
+  font-size: var(--ds-text-display-2);
   font-weight: var(--ds-weight-display);
   line-height: 0.98;
   letter-spacing: var(--ds-tracking-display);
@@ -1219,15 +1224,38 @@ body:has(.ds-door) .ds-door-journey {
 .ds-door-ch__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-4);
+  align-items: center;
+  gap: var(--ds-space-3) var(--ds-space-4);
+}
+
+.ds-door-ch__plate {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.ds-door-ch__plate .ds-plate__tone {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-door-ch__plate .ds-plate__img {
+  object-position: 50% 8%;
+}
+
+.ds-door-ch__plate .ds-plate__credit {
+  color: var(--ds-fixed-ink);
+}
+
+@media (min-width: 48rem) {
+  .ds-door-ch--story .ds-door-ch__inner[data-media='plate'] {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--ds-space-12);
+  }
 }
 
 /* A phone: the grades stack, each under a hairline rule. */
 @media (max-width: 47.9375rem) {
-  .ds-door-ch--evidence .ds-door-ch__inner {
-    padding-block: var(--ds-space-12);
-  }
-
   .ds-door-ch__grades {
     grid-template-columns: minmax(0, 1fr);
   }
