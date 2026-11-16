@@ -62,6 +62,8 @@ import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { DoorWalkCard } from './door-walk';
 import { DOOR_TOUR_EVENT, type DoorTourTarget } from './door-tour-scroll';
 import { tourZoom } from './door-tour';
+import { placeDrillZoom } from '../lib/map-experience/place-map';
+import { MAP_MAX_ZOOM } from '../lib/map-experience/camera-presets';
 
 void React;
 
@@ -535,6 +537,38 @@ export function DoorImmersive({
       );
       return true;
     },
+    [measureFrameBoxes, stage],
+  );
+
+  /**
+   * A place tapped on the Door's plate opens one level deeper, framed in the map window. Without
+   * this the stage frames the place against the whole canvas, which lands it behind the column
+   * (desktop) or the dock (phone). Browse skips it: Atlas owns the camera there.
+   */
+  useEffect(
+    () =>
+      stage.subscribe('placeSelect', (_placeKey, frame) => {
+        const map = stage.getMap();
+        if (browseModeRef.current || !frame || !map) return;
+        const { window: windowBox, plate: plateBox } = measureFrameBoxes(map);
+        const padding = windowBox && plateBox ? doorFramePadding(windowBox, plateBox) : null;
+        const [west, south, east, north] = frame.bounds;
+        const fit = map.cameraForBounds(
+          [
+            [west, south],
+            [east, north],
+          ] as never,
+          { padding: padding ?? 48 } as never,
+        );
+        stage.flyPreset(
+          'point',
+          {
+            center: [(west + east) / 2, (south + north) / 2],
+            zoom: placeDrillZoom(frame.level, fit?.zoom, MAP_MAX_ZOOM, frame.openZoom),
+          },
+          { mode: 'ease', pitch: 0, bearing: 0, ...(padding ? { padding } : {}) },
+        );
+      }),
     [measureFrameBoxes, stage],
   );
 

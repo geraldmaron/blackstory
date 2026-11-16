@@ -50,16 +50,72 @@ export function placeNextLevelZoom(level: PlaceToken['level']): number {
 }
 
 /**
- * The zoom a token tap lands on: the place's own frame, but never short of the next level, so
- * one tap always opens the place one level deeper.
+ * The zoom a token tap lands on: the place's own frame, but never short of `openZoom`, so one
+ * tap always shows something other than the token just tapped. `openZoom` is where the place
+ * first draws something finer (`placeOpenZooms`); a place with nothing at the next level (a county
+ * with no city tokens) is drawn again as itself there, and a drill that stopped at that level
+ * landed on the same number.
  */
 export function placeDrillZoom(
   level: PlaceToken['level'],
   framedZoom: number | undefined,
   maxZoom: number,
+  openZoom?: number,
 ): number {
   const fit = framedZoom !== undefined && Number.isFinite(framedZoom) ? framedZoom : 0;
-  return Math.min(maxZoom, Math.max(fit, NEXT_LEVEL_MIN_ZOOM[level]));
+  const floor =
+    openZoom !== undefined && Number.isFinite(openZoom) ? openZoom : NEXT_LEVEL_MIN_ZOOM[level];
+  return Math.min(maxZoom, Math.max(fit, floor));
+}
+
+const LEVEL_ORDER: Readonly<Record<PlaceToken['level'], number>> = {
+  state: 0,
+  county: 1,
+  city: 2,
+  square: 3,
+};
+
+/**
+ * Per place, the first zoom where any of its records is drawn as something finer than the place:
+ * a city or square token, or a site on its own. A county's own token never leaves (it keeps the
+ * records known only by county), so "where it stops being a token" would never open it. A place
+ * with nothing finer (all county-precision records) has no entry; callers fall back to the next
+ * level's zoom.
+ */
+export function placeOpenZooms(groups: PlaceGroups): ReadonlyMap<string, number> {
+  const finer = new Map<string, { order: number; minZoom: number }[]>();
+  for (const token of groups.tokens) {
+    const entry = { order: LEVEL_ORDER[token.level], minZoom: token.minZoom };
+    for (const id of token.memberIds) {
+      const list = finer.get(id);
+      if (list) list.push(entry);
+      else finer.set(id, [entry]);
+    }
+  }
+  const open = new Map<string, number>();
+  for (const token of groups.tokens) {
+    // A state always opens at the county level: the county geometry loads on demand, and until it
+    // has, no county token exists to be the next thing drawn.
+    if (token.level === 'state') continue;
+    const order = LEVEL_ORDER[token.level];
+    let zoom = Infinity;
+    for (const id of token.memberIds) {
+      for (const entry of finer.get(id) ?? []) {
+        if (entry.order > order) zoom = Math.min(zoom, entry.minZoom);
+      }
+      const path = groups.pathById.get(id);
+      // A site alone in its square draws from the first site zoom; a squared one at street zoom.
+      if (path?.band === 'site') {
+        zoom = Math.min(
+          zoom,
+          path.square === undefined ? SITE_MIN_ZOOM : PLACE_LEVEL_MIN_ZOOM.site,
+        );
+      }
+    }
+    if (Number.isFinite(zoom))
+      open.set(token.placeKey, Math.min(open.get(token.placeKey) ?? zoom, zoom));
+  }
+  return open;
 }
 
 let stateAnchors: ReadonlyMap<string, readonly [number, number]> | undefined;
@@ -143,6 +199,8 @@ export type PlaceTokenProperties = {
   readonly point_count_abbreviated: string;
   readonly minZoom: number;
   readonly maxZoom: number;
+  /** The first zoom this place's records draw as something finer (`placeOpenZooms`). */
+  readonly openZoom: number;
   readonly west: number;
   readonly south: number;
   readonly east: number;
@@ -179,6 +237,7 @@ export function placeMapCollection(
   const drawnAt = new Map(groups.sites.map((site) => [site.id, site.drawnPoint] as const));
   const squared = (id: string) => groups.pathById.get(id)?.square !== undefined;
   const features: PlaceMapFeature[] = [];
+  const openZooms = placeOpenZooms(groups);
   for (const token of groups.tokens) {
     const count = token.memberIds.length;
     features.push({
@@ -197,6 +256,7 @@ export function placeMapCollection(
         point_count_abbreviated: abbreviate(count),
         minZoom: token.minZoom,
         maxZoom: token.maxZoom,
+        openZoom: openZooms.get(token.placeKey) ?? NEXT_LEVEL_MIN_ZOOM[token.level],
         west: token.bounds[0],
         south: token.bounds[1],
         east: token.bounds[2],

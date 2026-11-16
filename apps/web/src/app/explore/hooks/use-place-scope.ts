@@ -16,6 +16,8 @@ import type { CountyGeometryCollection } from '../../../lib/map-experience/count
 import {
   placeGroupsFor,
   placeMemberIds,
+  placeNextLevelZoom,
+  placeOpenZooms,
   placeTrail,
   type PlaceInfo,
 } from '../../../lib/map-experience/place-map';
@@ -29,6 +31,8 @@ export type PlaceScope = {
   readonly key: string;
   readonly name: string;
   readonly level: PlaceInfo['level'];
+  /** Where the place stops being its own token on the plate: the zoom that opens it. */
+  readonly openZoom: number;
   readonly ids: ReadonlySet<string>;
   /** The places that hold this one, widest first, for the column's trail back up. */
   readonly trail: readonly PlaceInfo[];
@@ -79,7 +83,8 @@ export function usePlaceScope(
   );
   const scope = useMemo((): PlaceScope | undefined => {
     if (!placeKey) return undefined;
-    const place = placeGroupsFor(all, counties).places.get(placeKey);
+    const groups = placeGroupsFor(all, counties);
+    const place = groups.places.get(placeKey);
     if (!place) return undefined;
     // D.C. is a state, a county and a city of one name: say each name once.
     const bare = (name: string) => name.replace(/,\s*[A-Z]{2}$/, '');
@@ -92,6 +97,7 @@ export function usePlaceScope(
       key: placeKey,
       name: place.name,
       level: place.level,
+      openZoom: placeOpenZooms(groups).get(placeKey) ?? placeNextLevelZoom(place.level),
       ids: placeMemberIds(all, placeKey, counties),
       trail,
     };

@@ -1500,7 +1500,11 @@ export function MapStageProvider({
       ): void {
         notify(listenersRef.current, 'deselect');
         if (listenersRef.current.placeSelect.size > 0) {
-          notify(listenersRef.current, 'placeSelect', hit.placeKey);
+          notify(listenersRef.current, 'placeSelect', hit.placeKey, {
+            level: hit.level,
+            bounds: hit.bounds,
+            ...(hit.openZoom === undefined ? {} : { openZoom: hit.openZoom }),
+          });
           return;
         }
         const [west, south, east, north] = hit.bounds;
@@ -1513,7 +1517,7 @@ export function MapStageProvider({
         );
         activeMap.easeTo({
           center: framed?.center ?? [(west + east) / 2, (south + north) / 2],
-          zoom: placeDrillZoom(hit.level, framed?.zoom, MAP_MAX_ZOOM),
+          zoom: placeDrillZoom(hit.level, framed?.zoom, MAP_MAX_ZOOM, hit.openZoom),
           duration: prefersReducedMotion() ? 0 : 420,
           easing: CAMERA_EASING_SLOW_OUT,
         });

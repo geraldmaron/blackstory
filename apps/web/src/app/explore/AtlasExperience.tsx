@@ -99,7 +99,6 @@ import { useCommandContext } from './hooks/use-command-context';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { scopedMixInWords, usePlaceScope } from './hooks/use-place-scope';
 import { usePlaceFocus } from './hooks/use-place-focus';
-import { placeNextLevelZoom } from '../../lib/map-experience/place-map';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
@@ -548,9 +547,9 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           [east, north],
         ],
         label: placeScope.name,
-        minZoom: placeNextLevelZoom(placeScope.level),
+        minZoom: placeScope.openZoom,
         // A one-record place would fit at street zoom; open it, do not dive past it.
-        maxZoom: placeNextLevelZoom(placeScope.level) + 2,
+        maxZoom: placeScope.openZoom + 2,
       },
       { trigger: 'reader', durationMs: PLACE_FLIGHT_MS },
     );

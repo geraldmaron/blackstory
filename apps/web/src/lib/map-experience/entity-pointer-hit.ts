@@ -37,6 +37,8 @@ export type EntityPointerHit =
       readonly level: Exclude<PlaceLevel, 'site'>;
       /** The place's member extent `[west, south, east, north]`. */
       readonly bounds: readonly [number, number, number, number];
+      /** The first zoom its records draw finer than the place; a tap lands no shallower. */
+      readonly openZoom?: number;
     };
 
 export type RenderedPointerFeature = {
@@ -75,10 +77,12 @@ function placeFromProperties(
     Number,
   );
   if (!bounds.every(Number.isFinite)) return undefined;
+  const openZoom = Number(properties?.openZoom);
   return {
     placeKey,
     level: level as Exclude<PlaceLevel, 'site'>,
     bounds: bounds as unknown as readonly [number, number, number, number],
+    ...(Number.isFinite(openZoom) && properties?.openZoom !== undefined ? { openZoom } : {}),
   };
 }
 
