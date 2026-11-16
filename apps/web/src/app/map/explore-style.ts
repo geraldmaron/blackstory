@@ -329,10 +329,10 @@ export function stateLabelFilters(postalCode: string | undefined): {
  */
 export const MAP_TYPE = {
   /** A place's numeral by count step (`placeTier`). */
-  count: [15, 17, 20],
+  count: [12, 14, 16],
   /** A place's name by count step. */
-  name: [12, 13, 15],
-  /** A site record's name beside its pin (`--ds-map-name-2`). */
+  name: [10, 11, 12],
+  /** A site record's name beside its pin (`--ds-map-site`). */
   site: 13,
   /** Site pin diameter, area ring diameter, and the pin's keyline. */
   pin: 12,

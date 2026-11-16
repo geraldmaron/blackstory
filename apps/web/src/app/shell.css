@@ -1996,22 +1996,25 @@ main[tabindex='-1']:focus-visible {
   position: absolute;
   top: 0;
   left: 0;
-  will-change: transform;
+  /* No blanket will-change: hundreds of county tokens each on their own layer cost more memory
+     than the per-frame transform saves. */
 }
 
 .ds-place-token {
-  --ds-place-count: var(--ds-map-count-1);
-  --ds-place-name: var(--ds-map-name-1);
+  /* `--ds-place-scale` (place-labels.ts) follows the map's width and zoom, so a phone's and a
+     national frame's counts stay small and a close street frame's grow a little. */
+  --ds-place-count: calc(var(--ds-map-count-1) * var(--ds-place-scale, 1));
+  --ds-place-name: calc(var(--ds-map-name-1) * var(--ds-place-scale, 1));
 }
 
 .ds-place-token[data-tier='1'] {
-  --ds-place-count: var(--ds-map-count-2);
-  --ds-place-name: var(--ds-map-name-2);
+  --ds-place-count: calc(var(--ds-map-count-2) * var(--ds-place-scale, 1));
+  --ds-place-name: calc(var(--ds-map-name-2) * var(--ds-place-scale, 1));
 }
 
 .ds-place-token[data-tier='2'] {
-  --ds-place-count: var(--ds-map-count-3);
-  --ds-place-name: var(--ds-map-name-3);
+  --ds-place-count: calc(var(--ds-map-count-3) * var(--ds-place-scale, 1));
+  --ds-place-name: calc(var(--ds-map-name-3) * var(--ds-place-scale, 1));
 }
 
 .ds-place-token__count {
@@ -2120,7 +2123,8 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   display: none;
 }
 
-.ds-place-token.is-phone .ds-place-token__unit {
+/* The unit prints only on the selected or hovered place; the legend line names it for the rest. */
+.ds-place-token.is-phone:is(.is-selected, .is-hovered) .ds-place-token__unit {
   display: block;
   position: absolute;
   top: calc(var(--ds-place-count) / 2 + 2px);
@@ -2128,7 +2132,7 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   translate: -50% 0;
   color: var(--ds-map-label-hi);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
+  font-size: var(--ds-map-name-1);
   letter-spacing: var(--ds-tracking-meta);
   line-height: 1;
   text-shadow: var(--ds-place-halo);
@@ -2153,9 +2157,14 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
 /* On the full-bleed plate (home, explore) the legend clears the tab bar, the explore sheet and
    the attribution chip's row: it sits one 44px row above whichever of them is higher. */
 .ds-map-stage .ds-place-legend {
-  bottom: calc(
-    max(var(--ds-map-attrib-bottom, 0px), var(--ds-tabbar-h, 0px)) + var(--ds-space-3) + 44px +
-      var(--ds-space-2)
+  /* A page that sizes its own map window (home on a phone) names the legend's place directly. */
+  top: var(--ds-map-legend-top, auto);
+  bottom: var(
+    --ds-map-legend-bottom,
+    calc(
+      max(var(--ds-map-attrib-bottom, 0px), var(--ds-tabbar-h, 0px)) + var(--ds-space-3) + 44px +
+        var(--ds-space-2)
+    )
   );
 }
 
@@ -2169,7 +2178,7 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   translate: 11px -50%;
   color: var(--ds-map-label-hi);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-map-name-2);
+  font-size: var(--ds-map-site);
   font-weight: 650;
   line-height: 1.15;
   text-shadow: var(--ds-place-halo);

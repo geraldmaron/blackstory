@@ -35,14 +35,22 @@ import {
   type TokenInput,
 } from './token-layout';
 
-/** Height of the "records" unit under a phone numeral (`--ds-text-micro`) and its gap. */
-const UNIT_PX = 11;
 /** A tracked Geist Mono capital is about 0.72em wide at the unit's size. */
 const UNIT_CHAR_EM = 0.72;
 /** The text list refreshes at most this often; it is a static list, not a live region. */
 const LIST_INTERVAL_MS = 400;
 /** Levels whose counts a phone budgets (`phoneNumeralBudget`). */
 const BUDGETED_LEVELS: ReadonlySet<string> = new Set(['state', 'county']);
+
+/**
+ * The place type's size factor: small on a phone and at the national frame, a little larger on a
+ * wide screen and as the reader zooms toward the street. Clamped, so counts never become posters.
+ */
+export function placeTypeScale(width: number, zoom: number): number {
+  const byWidth = Math.min(1.1, Math.max(0.85, width / 1280));
+  const byZoom = Math.min(1.2, Math.max(1, 1 + (zoom - 4) * 0.04));
+  return Number((byWidth * byZoom).toFixed(3));
+}
 
 /**
  * A place's name written out: a state token's own name is its postal code, so the state's full
@@ -218,6 +226,12 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
 
     const mapBox = map.getContainer();
     const phone = mapBox.clientWidth > 0 && mapBox.clientWidth < PHONE_MAP_MAX_WIDTH;
+    // Type follows the map's width and zoom (`placeTypeScale`); the CSS reads the same factor.
+    const scale = placeTypeScale(mapBox.clientWidth, zoom);
+    const scaleText = scale.toFixed(3);
+    if (layer.style.getPropertyValue('--ds-place-scale') !== scaleText) {
+      layer.style.setProperty('--ds-place-scale', scaleText);
+    }
 
     // 1. Every token MapLibre placed, with its numeral and name boxes.
     type Placed = { props: Record<string, unknown>; input: TokenInput };
@@ -231,10 +245,13 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
       const { x, y } = map.project(at);
       const count = String(props.point_count_abbreviated ?? '');
       const tier = Math.min(2, Math.max(0, Number(props.tier) || 0));
-      const size = MAP_TYPE.count[tier] ?? MAP_TYPE.count[0];
-      const nameSize = MAP_TYPE.name[tier] ?? MAP_TYPE.name[0];
+      const size = (MAP_TYPE.count[tier] ?? MAP_TYPE.count[0]) * scale;
+      const nameSize = (MAP_TYPE.name[tier] ?? MAP_TYPE.name[0]) * scale;
       const isSelected =
         selectedPlace !== undefined && key.toLowerCase() === selectedPlace.toLowerCase();
+      // On a phone only the selected place carries its unit under the numeral.
+      const withUnit = phone && isSelected;
+      const unitPx = MAP_TYPE.name[0] * scale;
       const label = placeLabelText(props, zoom, phone ? { selected: isSelected } : undefined);
       placed.set(key, {
         props,
@@ -247,9 +264,9 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
           // box is as wide as whichever is wider and symmetric about the numeral.
           width: Math.max(
             count.length * size * COUNT_DIGIT_EM,
-            phone ? 'records'.length * UNIT_PX * UNIT_CHAR_EM : 0,
+            withUnit ? 'records'.length * unitPx * UNIT_CHAR_EM : 0,
           ),
-          height: phone ? size + 2 * (UNIT_PX + 2) : size,
+          height: withUnit ? size + 2 * (unitPx + 2) : size,
           ...((phone || named.has(key)) && label
             ? {
                 name: {
@@ -289,10 +306,12 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
       }
     }
 
-    // The callout naming the selected record (home's spotlight or explore's flag) is a card on
-    // the plate; numerals step around it rather than hide under it.
+    // The callout naming the selected record (home's spotlight or explore's flag) and the phone's
+    // count legend sit on the plate; numerals step around them rather than hide under them.
     const box = map.getContainer().getBoundingClientRect();
-    for (const card of document.querySelectorAll<HTMLElement>('.ds-map-callout__card')) {
+    for (const card of document.querySelectorAll<HTMLElement>(
+      '.ds-map-callout__card, .ds-place-legend',
+    )) {
       const r = card.getBoundingClientRect();
       if (r.width === 0 || r.height === 0 || getComputedStyle(card).visibility === 'hidden')
         continue;
@@ -389,6 +408,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
         placeLabelText(props, zoom, phone ? { selected: isSelected } : undefined),
       );
       token.root.classList.toggle('is-phone', phone);
+      token.root.classList.toggle('is-selected', isSelected);
       token.root.classList.toggle('is-named', (phone || named.has(spot.key)) && spot.nameShown);
       token.root.classList.toggle('is-displaced', spot.displaced);
       token.root.classList.toggle('is-hovered', spot.key === hovered);
