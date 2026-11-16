@@ -200,6 +200,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 }
 
 .ds-shell-footer__note a {
+  /* An inline link mid-sentence: vertical padding on an inline box widens its 44px hit area
+     without moving the line. */
+  padding-block: var(--ds-space-3);
   color: var(--ds-accent);
   text-underline-offset: 0.2em;
 }
