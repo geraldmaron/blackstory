@@ -61,6 +61,7 @@ export function DoorChapters({ lead, grades }: DoorChaptersProps) {
       <Block
         tone="ink"
         className="ds-door-ch ds-door-ch--evidence"
+        id="door-ch-evidence-band"
         aria-labelledby="door-ch-evidence"
       >
         <div className="ds-wrap ds-door-ch__inner">

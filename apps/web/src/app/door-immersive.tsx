@@ -767,14 +767,40 @@ export function DoorImmersive({
                   map is the second beat). */}
               <HeroHeadlineMorph className="ds-door-open__headline" id="door-open-heading" />
               <p className="ds-door-open__line">{DOOR_OPEN_LINE}</p>
+              {/* One primary into the lead story and one quiet secondary into the walk, at their
+                  content width; the story is named in the meta line above them. */}
               {story ? (
-                <Link
-                  className={buttonClassName('primary', 'ds-door-open__story')}
-                  href={`/stories/${story.slug}`}
-                >
-                  Read {story.title}
-                </Link>
+                <p className="ds-door-open__lead">
+                  <span className="ds-visually-hidden">Lead story, </span>
+                  <span aria-hidden="true">Lead story · </span>
+                  {story.title}
+                </p>
               ) : null}
+              <div className="ds-door-open__cta">
+                {story ? (
+                  <Link
+                    className={buttonClassName('primary', 'ds-door-open__story')}
+                    href={`/stories/${story.slug}`}
+                    aria-label={`Read the chapter, ${story.title}`}
+                  >
+                    Read the chapter
+                  </Link>
+                ) : null}
+                {stops.length > 0 ? (
+                  <button
+                    ref={startRef}
+                    type="button"
+                    className={buttonClassName('secondary', 'ds-door-open__start')}
+                    onClick={() => goToStep(1)}
+                  >
+                    Walk the decades
+                  </button>
+                ) : null}
+              </div>
+              {/* The page goes on below the map; say so in words, and make it a way there. */}
+              <a className="ds-door-open__next" href="#door-ch-evidence-band">
+                Below the map, how every record is graded
+              </a>
               {/* The record the map is pointing at, the way its record page shows it: name, plate
                   and one claim with its source and grade. Off the map window, so it never covers
                   a live pin. */}
@@ -793,16 +819,6 @@ export function DoorImmersive({
                 </div>
               ) : null}
               <div className="ds-door-open__actions">
-                {stops.length > 0 ? (
-                  <button
-                    ref={startRef}
-                    type="button"
-                    className={buttonClassName('secondary', 'ds-door-open__start')}
-                    onClick={() => goToStep(1)}
-                  >
-                    Walk the decades
-                  </button>
-                ) : null}
                 <Link
                   className={buttonClassName('quiet', 'ds-door-open__browse-link')}
                   href="/records"

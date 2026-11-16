@@ -57,7 +57,10 @@ test('the opening is the map, one headline column, one primary action and one qu
   assert.match(immersive, />\s*Walk the decades\s*</);
   // The one primary action reads the lead story; the walk is the secondary one.
   assert.match(immersive, /buttonClassName\('primary', 'ds-door-open__story'\)/);
-  assert.match(immersive, /Read \{story\.title\}/);
+  // Sentence case, a normal-size button; the story is named in the meta line above it.
+  assert.match(immersive, />\s*Read the chapter\s*</);
+  assert.match(immersive, /className="ds-door-open__lead"/);
+  assert.match(css, /\.ds-door-open__cta > \*\s*\{[^}]*width:\s*auto/);
   assert.match(immersive, /buttonClassName\('secondary', 'ds-door-open__start'\)/);
   assert.match(immersive, /buttonClassName\('quiet', 'ds-door-open__browse-link'\)/);
   assert.match(immersive, />\s*Browse all records\s*</);
@@ -311,7 +314,9 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
     css,
     /\.ds-door__dock\[data-step='open'\]\s*\{[^}]*top:\s*calc\(var\(--ds-island-clearance\)/,
   );
-  assert.match(css, /\.ds-door-open__browse-link\s*\{\s*display:\s*none/);
+  assert.match(css, /\.ds-door-open__browse-link,\s*\.ds-door-open__next\s*\{\s*display:\s*none/);
+  // Something on the opening says the page goes on: a link into the first band.
+  assert.match(immersive, /className="ds-door-open__next" href="#door-ch-evidence-band"/);
   assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
   assert.match(css, /\.ds-map-callout__card,[\s\S]*visibility:\s*hidden !important/);
   assert.match(
@@ -321,7 +326,7 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
   // Stacked (phone or portrait): the dock sits above the tab bar and the window above the dock.
   assert.match(
     css,
-    /@media \(max-width: 47\.9375rem\), \(max-aspect-ratio: 1\/1\)[\s\S]*\.ds-door__dock\s*\{[^}]*bottom:\s*calc\(var\(--ds-tabbar-h\)/,
+    /@media \(max-width: 47\.9375rem\), \(max-width: 63\.9375rem\) and \(max-aspect-ratio: 1\/1\)[\s\S]*\.ds-door__dock\s*\{[^}]*bottom:\s*calc\(var\(--ds-tabbar-h\)/,
   );
   // The attribution, a license obligation, is one collapsed 44px "i" in the window's
   // bottom-right corner, not a box of links on the map.
