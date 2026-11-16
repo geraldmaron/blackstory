@@ -12,6 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { uninvertLeadingArticle } from './lib/uninvert-leading-article.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -96,11 +97,13 @@ const RELISTING_BARE =
   /\s+(?:boundary\s+(?:increase|decrease|expansion)(?:\s+and\s+additional\s+documentation)?|and\s+additional\s+documentation|additional\s+documentation)\s*$/iu;
 
 export function baseListingName(name: string): string {
-  return name
-    .replace(RELISTING_PAREN, ' ')
-    .replace(RELISTING_BARE, '')
-    .replace(/\s{2,}/gu, ' ')
-    .trim();
+  return uninvertLeadingArticle(
+    name
+      .replace(RELISTING_PAREN, ' ')
+      .replace(RELISTING_BARE, '')
+      .replace(/\s{2,}/gu, ' ')
+      .trim(),
+  );
 }
 
 export function isRelistingName(name: string): boolean {
