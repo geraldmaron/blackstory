@@ -127,7 +127,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
 
   if (state.status === 'success') {
     return (
-      <div className="ds-form-done" ref={doneRef} tabIndex={-1} data-ground="copper">
+      <div className="ds-form-done" ref={doneRef} tabIndex={-1}>
         <h2 className="ds-form-done__title">Lead received.</h2>
         <p className="ds-form-done__body">
           It is in the review queue, not on the site. If it is worth pursuing it becomes a private
@@ -177,7 +177,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
             </>
           }
           htmlFor={ids.url}
-          hint="Where this lives online: an article, an archived post, a group page."
+          hint="Where this lives online, such as an article, an archived post or a group page."
           {...errorProps('url')}
         >
           <input

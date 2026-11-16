@@ -5,8 +5,9 @@
  * and an ink border, never by color alone, and never by a copper wash.
  *
  * On the archive table the form sits on a paper sheet; its numbered groups open on copper
- * numerals, the aside is a copper block with its steps set as large ink numerals, and success
- * replaces the form with a full copper block.
+ * numerals, the aside is ruled steps on the same paper (copper numerals, serif text, hairlines
+ * between, no card), and success replaces the form on the sheet. Inside a sheet depth is type
+ * and rules, never a box in a box.
  */
 
 /* —— layout ————————————————————————————————————————————————————————————————— */
@@ -19,11 +20,6 @@
 .ds-form-layout__main {
   min-width: 0;
   max-width: 40rem;
-}
-
-.ds-form-layout__aside {
-  padding: var(--ds-space-6);
-  border-radius: var(--ds-radius-md);
 }
 
 @media (min-width: 64rem) {
@@ -93,9 +89,14 @@
   color: var(--ds-ink-muted);
 }
 
-/* Labels in the form read at body size; the kit's caption-size label is for dense tools. */
+/* Labels are the meta role, the same as the record facts strip's labels. */
 .ds-form .ds-room-field__label {
-  font-size: var(--ds-text-body-sm);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
 }
 
 .ds-form .ds-room-field__error {
@@ -121,13 +122,7 @@
 .ds-form-cards .ds-room-field__choices {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--ds-space-2);
-}
-
-@media (min-width: 40rem) {
-  .ds-form-cards .ds-room-field__choices {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-form-cards .ds-room-field__choice {
@@ -135,6 +130,7 @@
   min-width: 0;
 }
 
+/* Ruled rows, not boxes: the mark and the weight say which is chosen. */
 .ds-form-cards .ds-room-field__choice span {
   position: relative;
   display: flex;
@@ -142,10 +138,8 @@
   flex: 1;
   min-height: 3.5rem;
   padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-3)
-    calc(var(--ds-space-4) + var(--ds-space-6) + var(--ds-space-1));
-  border: var(--ds-border-width) solid var(--ds-border-control);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface);
+    calc(var(--ds-space-6) + var(--ds-space-1));
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   line-height: 1.35;
@@ -155,7 +149,7 @@
 .ds-form-cards .ds-room-field__choice span::before {
   content: '';
   position: absolute;
-  left: var(--ds-space-4);
+  left: 0;
   top: 50%;
   width: 1.125rem;
   height: 1.125rem;
@@ -166,13 +160,10 @@
 }
 
 .ds-form-cards .ds-room-field__choice span:hover {
-  border-color: var(--ds-ink-muted);
+  color: var(--ds-accent);
 }
 
 .ds-form-cards .ds-room-field__choice input:checked + span {
-  border-color: var(--ds-ink);
-  box-shadow: inset 0 0 0 1px var(--ds-ink);
-  background: var(--ds-surface);
   color: var(--ds-ink);
   font-weight: 600;
 }
@@ -181,7 +172,7 @@
   border: 5px solid var(--ds-ink);
 }
 
-.ds-form-cards[data-invalid='true'] .ds-room-field__choice span {
+.ds-form-cards[data-invalid='true'] .ds-room-field__choice span::before {
   border-color: var(--ds-error-border);
 }
 
@@ -286,22 +277,35 @@
 
 /* —— failure ————————————————————————————————————————————————————————————————— */
 .ds-form-failure {
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-error-border);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-error-bg);
+  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-6);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-form-failure:focus {
   outline: none;
 }
 
+/* The glyph and the word, as a grade tag has them; color is never the only signal. */
 .ds-form-failure__title {
+  position: relative;
   margin: 0;
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body);
   font-weight: 600;
   color: var(--ds-error-fg);
+}
+
+.ds-form-failure__title::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--ds-space-6));
+  top: 0.3em;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm-.9 3.5h1.8l-.2 6H7.3l-.2-6Zm.9 9.3a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 
 .ds-form-failure__body {
@@ -319,8 +323,7 @@
 
 /* —— success: replaces the form, same column ——————————————————————————————————— */
 .ds-form-done {
-  padding: var(--ds-space-8) var(--ds-space-6);
-  border-radius: var(--ds-radius-md);
+  padding-block: var(--ds-space-4);
   animation: ds-form-done-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
@@ -405,13 +408,17 @@
 .ds-form-next__steps > li {
   position: relative;
   min-height: 3.5rem;
-  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-12);
+  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-12);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.5;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body);
+  line-height: 1.45;
   color: var(--ds-ink);
   counter-increment: next;
+}
+
+.ds-form-next__steps > li:last-child {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 /* The step number is drawn, not read: the list is already ordered. */
@@ -419,19 +426,18 @@
   content: counter(next) / '';
   position: absolute;
   left: 0;
-  top: var(--ds-space-2);
+  top: var(--ds-space-3);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display-2);
-  font-weight: 600;
+  font-weight: var(--ds-weight-numeral);
   line-height: var(--ds-leading-numeral);
   letter-spacing: var(--ds-tracking-numeral);
+  font-variant-numeric: lining-nums;
   color: var(--ds-numeral-accent);
 }
 
 .ds-form-next__more {
   margin-top: var(--ds-space-4);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   line-height: 1.55;

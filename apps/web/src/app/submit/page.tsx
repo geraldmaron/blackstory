@@ -20,7 +20,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/submit',
   title: 'Submit a lead',
   description:
-    'Point BlackStory toward a lead: a closed group post, a family paper, an oral account. Moderated review, and nothing public on arrival.',
+    'Point BlackStory toward a lead, such as a closed group post, a family paper or an oral account. Moderated review, and nothing public on arrival.',
 });
 
 export default function SubmitLeadPage() {
@@ -35,7 +35,7 @@ export default function SubmitLeadPage() {
             crumb={parentCrumb('/submit')}
             linkAs={Link}
             title="Tell the archive what it's missing"
-            dek="A closed group post, a family paper, an account nobody wrote down: the sources no automated search can reach."
+            dek="A closed group post, a family paper, an account nobody wrote down. These are the sources no automated search can reach."
           />
         </TrustMast>
       }

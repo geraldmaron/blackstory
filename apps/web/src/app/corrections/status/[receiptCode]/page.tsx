@@ -51,7 +51,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
       >
         <TrustSheet>
           <p className="ds-trust-lead">
-            Check the code against the one you were given: it starts with BB-COR and has sixteen
+            Check the code against the one you were given. It starts with BB-COR and has sixteen
             letters and numbers after that.
           </p>
           <div className="ds-receipt-missing">

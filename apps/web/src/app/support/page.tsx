@@ -49,7 +49,7 @@ export default function SupportPage() {
         <div className="ds-support__pair">
           <RoomSection id="record" title="Something in a record is wrong">
             <p className="ds-trust-lead">
-              File it as a correction: a person reads it against the published sources, and you get
+              File it as a correction. A person reads it against the published sources, and you get
               a receipt code to check the outcome.
             </p>
             <div className="ds-support__action">
