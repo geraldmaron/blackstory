@@ -90,9 +90,14 @@ function MorphingPrefix({
     setWidthTransition(false);
     setSlotWidthPx(fromWidth);
 
+    // A background tab pauses frames but not timers: a frame that arrives after the change has
+    // ended must not pin the slot, or it stays at that pixel width and a later resize clips the
+    // word ("Blac").
+    let ended = false;
     let raf2 = 0;
     const raf1 = window.requestAnimationFrame(() => {
       raf2 = window.requestAnimationFrame(() => {
+        if (ended) return;
         const incomingWidth = inRef.current?.getBoundingClientRect().width;
         const toWidth =
           incomingWidth !== undefined && rootRef.current
@@ -104,6 +109,7 @@ function MorphingPrefix({
     });
 
     const timer = window.setTimeout(() => {
+      ended = true;
       setOutgoing(null);
       setSlotWidthPx(null);
       setWidthTransition(false);
