@@ -1567,7 +1567,16 @@ body:has(.ds-door) .ds-door-journey {
    the ink wash. The record's own plate leaves the column (its credit stays). Without JavaScript
    there is no ground to sit on, so the panel stays. */
 @media (scripting: enabled) {
+  /* The page's own ground would start under the map's fixed frame as a hard line; the map and
+     its photograph are the ground until the bands. */
+  .ds-door:has(.ds-door-tour) {
+    background: transparent;
+  }
+
+  /* One column on the map, not a panel that scrolls on its own. */
   .ds-door__dock > .ds-door-open {
+    height: auto;
+    overflow: visible;
     background: transparent;
     box-shadow: none;
     -webkit-backdrop-filter: none;
