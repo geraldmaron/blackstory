@@ -2056,6 +2056,49 @@ main[tabindex='-1']:focus-visible {
   scale: 0.92;
 }
 
+/* A numeral that stepped off its anchor is tethered back to it: a 1px hairline in the plate's type
+color and a copper dot on the true anchor (token-layout.ts). Only a displaced numeral takes a
+pointer, because its hit circle is no longer under it; the pseudo-element pads it to 44px. */
+.ds-place-leaders {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ds-place-leaders line {
+  stroke: var(--ds-map-label-hi);
+  stroke-opacity: 0.6;
+  stroke-width: 1;
+}
+
+.ds-place-leaders circle {
+  fill: var(--ds-accent-graphic);
+  stroke: var(--ds-map-halo);
+  stroke-width: 1;
+}
+
+.ds-place-leaders g {
+  animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
+}
+
+.ds-place-token.is-displaced .ds-place-token__count {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.ds-place-token.is-displaced .ds-place-token__count::after {
+  content: '';
+  position: absolute;
+  inset: -14px;
+}
+
+.ds-place-token.is-displaced .ds-place-token__count:hover {
+  color: var(--ds-map-label-hi);
+}
+
 /* A site record's name beside its pin: the record page's pin and name, on the plate. */
 .ds-site-name {
   max-width: 14em;
@@ -2078,6 +2121,7 @@ main[tabindex='-1']:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .ds-place-token__count,
   .ds-place-token__name,
+  .ds-place-leaders g,
   .ds-site-name,
   .ds-map-callout--flag {
     transition: none;

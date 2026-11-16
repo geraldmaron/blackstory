@@ -340,9 +340,9 @@ export const MAP_TYPE = {
   keyline: 2,
 } as const;
 /** A Geist Mono capital is about 0.6em wide; the name's tracking is `--ds-tracking-meta`. */
-const NAME_TRACKING_EM = 0.04;
+export const NAME_TRACKING_EM = 0.04;
 /** A Schibsted 800 tabular digit is about 0.62em wide. */
-const COUNT_DIGIT_EM = 0.62;
+export const COUNT_DIGIT_EM = 0.62;
 const PIN_RADIUS_PX = MAP_TYPE.pin / 2;
 /** The area ring is a touch wider than the pin: it marks an area, never a spot. */
 const RING_RADIUS_PX = MAP_TYPE.ring / 2;

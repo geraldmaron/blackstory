@@ -89,12 +89,16 @@ The map is the archive's register laid on an atlas. A place is an entry in that 
 
 | Part | Encodes | Spec |
 |---|---|---|
-| Count | Record count | Copper numeral, Schibsted 800, tabular figures, centered on the place's anchor. Abbreviated past 999 ("1.2k"). Always drawn, so every record stays counted at every zoom. No box behind it: a 3px halo in the plate's land color keeps it legible, the way the plate's own type is haloed |
+| Count | Record count | Copper numeral, Schibsted 800, tabular figures, centered on the place's anchor. Abbreviated past 999 ("1.2k"). Always drawn, so every record stays counted at every zoom: a numeral that would collide with another numeral or a pin moves to free space and is tethered (see "Collision layout and tethers" below), never hidden. No box behind it: a 3px halo in the plate's land color keeps it legible, the way the plate's own type is haloed |
 | Name | The place | Geist Mono capitals with meta tracking, in the plate's type color, set beside the numeral on its baseline side. States print their postal code below zoom 4.6 and their name above. Cities print in capitals too: on the plate every place name is meta, and Schibsted is kept for records. Drawn when it fits; it yields to every count and to other names |
 | Size | Count step | Three steps by count (`placeTier`), tokenized: `--ds-map-count-1/2/3` for the numeral and `--ds-map-name-1/2/3` for the name. The invisible symbol layers that place them use the same values (`MAP_TYPE` in `explore-style.ts`). Never color by count |
-| Hit circle | Where a tap opens the place | Invisible circle layer in three radii (`CLUSTER_RADIUS_BY_COUNT`), at least 44px across. The numeral and name take no pointer events |
+| Hit circle | Where a tap opens the place | Invisible circle layer in three radii (`CLUSTER_RADIUS_BY_COUNT`), at least 44px across. The numeral and name take no pointer events while on the anchor; a displaced numeral takes its own 44px target and re-fires the click at the anchor |
 | Hover / focus | Interactive answer | The numeral turns the plate's type color and the name takes a 2px copper underline; press settles the numeral to 92% |
 | Summary | Count and precision mix in words | Unchanged: carried on the token, read by the scoped list header |
+
+#### Collision layout and tethers
+
+Counts are never dropped, so `place-labels.ts` runs a layout pass (`token-layout.ts`) over the screen positions MapLibre projects, every frame, from scratch. Tokens place in descending count order (ties by place key). A numeral whose box is free stays on its anchor. One that collides with a placed numeral, a drawn pin or the selected pin's ring moves to the nearest free spot on a fixed ring of 12 directions at 8px steps, up to 96px out; if none is free it takes the least-overlapping spot and is still drawn. A moved numeral is tied to its anchor by a 1px hairline in the plate's type color ending in a 2px copper dot on the anchor. The anchor is the token's jurisdiction anchor, never a record point, so the tether implies no sharper location. A name yields before a numeral moves, and a moved numeral prints no name. Tokens that did not move draw no tether. The layout is deterministic, with no animated movement (a fade at most, cut under reduced motion). The selected callout card is not an obstacle; its pin ring is.
 
 The precision mix is always words, never color alone. Copper and ink only. No red or alarm hues.
 
@@ -155,7 +159,8 @@ Embeds draw the same plate and the same marks. The place token on an embed is th
 
 ### Known limits
 
-- A name that would touch a neighbor's numeral is not printed at that zoom. Dense metros name their largest places first and the rest on zoom.
+- A name that would touch a neighbor's numeral is not printed at that zoom, and a displaced numeral prints no name. Dense metros name their largest places first and the rest on zoom.
+- In the densest areas a tethered numeral can sit up to 96px from its anchor; the tether keeps the pairing readable, but the reader may need to zoom to separate places that close together.
 - Over satellite imagery the DOM labels keep the flat plate's halo; they have not had the imagery pass the GL labels have (`plateOverImagery`).
 
 ---
