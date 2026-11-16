@@ -57,7 +57,12 @@ import {
 import { AtlasPending } from './explore/AtlasPending';
 import { fetchAtlasCatalog } from './explore/atlas-catalog-fetch';
 import type { AtlasShellModel } from './explore/explore-view-model-wire';
-import { doorFramePadding, sameDoorFrameBox, type DoorFrameBox } from './door-field-frame';
+import {
+  doorDrillPadding,
+  doorFramePadding,
+  sameDoorFrameBox,
+  type DoorFrameBox,
+} from './door-field-frame';
 import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { DoorWalkCard } from './door-walk';
 import { DOOR_TOUR_EVENT, type DoorTourTarget } from './door-tour-scroll';
@@ -561,7 +566,7 @@ export function DoorImmersive({
           return;
         }
         const { window: windowBox, plate: plateBox } = measureFrameBoxes(map);
-        const padding = windowBox && plateBox ? doorFramePadding(windowBox, plateBox) : null;
+        const padding = windowBox && plateBox ? doorDrillPadding(windowBox, plateBox) : null;
         const [west, south, east, north] = frame.bounds;
         const fit = map.cameraForBounds(
           [

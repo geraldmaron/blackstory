@@ -75,6 +75,27 @@ const LEVEL_ORDER: Readonly<Record<PlaceToken['level'], number>> = {
   square: 3,
 };
 
+type FinerMark = { order: number; minZoom: number; anchor: readonly [number, number] };
+
+const finerCache = new WeakMap<PlaceGroups, ReadonlyMap<string, FinerMark[]>>();
+
+/** Every token a record is counted in, by record id (the finer tokens of a place's members). */
+function marksByMember(groups: PlaceGroups): ReadonlyMap<string, FinerMark[]> {
+  const cached = finerCache.get(groups);
+  if (cached) return cached;
+  const byId = new Map<string, FinerMark[]>();
+  for (const token of groups.tokens) {
+    const mark = { order: LEVEL_ORDER[token.level], minZoom: token.minZoom, anchor: token.anchor };
+    for (const id of token.memberIds) {
+      const list = byId.get(id);
+      if (list) list.push(mark);
+      else byId.set(id, [mark]);
+    }
+  }
+  finerCache.set(groups, byId);
+  return byId;
+}
+
 /**
  * Per place, the first zoom where any of its records is drawn as something finer than the place:
  * a city or square token, or a site on its own. A county's own token never leaves (it keeps the
@@ -83,15 +104,7 @@ const LEVEL_ORDER: Readonly<Record<PlaceToken['level'], number>> = {
  * level's zoom.
  */
 export function placeOpenZooms(groups: PlaceGroups): ReadonlyMap<string, number> {
-  const finer = new Map<string, { order: number; minZoom: number }[]>();
-  for (const token of groups.tokens) {
-    const entry = { order: LEVEL_ORDER[token.level], minZoom: token.minZoom };
-    for (const id of token.memberIds) {
-      const list = finer.get(id);
-      if (list) list.push(entry);
-      else finer.set(id, [entry]);
-    }
-  }
+  const marks = marksByMember(groups);
   const open = new Map<string, number>();
   for (const token of groups.tokens) {
     // A state always opens at the county level: the county geometry loads on demand, and until it
@@ -100,8 +113,8 @@ export function placeOpenZooms(groups: PlaceGroups): ReadonlyMap<string, number>
     const order = LEVEL_ORDER[token.level];
     let zoom = Infinity;
     for (const id of token.memberIds) {
-      for (const entry of finer.get(id) ?? []) {
-        if (entry.order > order) zoom = Math.min(zoom, entry.minZoom);
+      for (const mark of marks.get(id) ?? []) {
+        if (mark.order > order) zoom = Math.min(zoom, mark.minZoom);
       }
       const path = groups.pathById.get(id);
       // A site alone in its square draws from the first site zoom; a squared one at street zoom.
@@ -112,10 +125,52 @@ export function placeOpenZooms(groups: PlaceGroups): ReadonlyMap<string, number>
         );
       }
     }
-    if (Number.isFinite(zoom))
+    if (Number.isFinite(zoom)) {
       open.set(token.placeKey, Math.min(open.get(token.placeKey) ?? zoom, zoom));
+    }
   }
   return open;
+}
+
+/**
+ * The extent to frame when a token opens: its records' extent plus the anchors of the finer
+ * tokens drawn for them. The numbers a reader sees sit at those anchors (a county's centroid),
+ * not at the records' points, so a frame of the records alone leaves the outermost number on
+ * the edge of the open space.
+ */
+/**
+ * A state frames before its county tokens exist (the county geometry loads on demand, once the
+ * camera is near), so their anchors cannot be read. A county's centroid sits up to about half a
+ * county from the records it holds; this is that allowance, in degrees.
+ */
+export const STATE_FRAME_ALLOWANCE_DEG = 0.4;
+
+export function placeFrameBounds(
+  groups: PlaceGroups,
+): ReadonlyMap<string, readonly [number, number, number, number]> {
+  const marks = marksByMember(groups);
+  const frames = new Map<string, [number, number, number, number]>();
+  for (const token of groups.tokens) {
+    const order = LEVEL_ORDER[token.level];
+    const box: [number, number, number, number] = [...token.bounds];
+    for (const id of token.memberIds) {
+      for (const mark of marks.get(id) ?? []) {
+        if (mark.order <= order) continue;
+        box[0] = Math.min(box[0], mark.anchor[0]);
+        box[1] = Math.min(box[1], mark.anchor[1]);
+        box[2] = Math.max(box[2], mark.anchor[0]);
+        box[3] = Math.max(box[3], mark.anchor[1]);
+      }
+    }
+    if (token.level === 'state') {
+      box[0] -= STATE_FRAME_ALLOWANCE_DEG;
+      box[1] -= STATE_FRAME_ALLOWANCE_DEG;
+      box[2] += STATE_FRAME_ALLOWANCE_DEG;
+      box[3] += STATE_FRAME_ALLOWANCE_DEG;
+    }
+    frames.set(token.id, box);
+  }
+  return frames;
 }
 
 let stateAnchors: ReadonlyMap<string, readonly [number, number]> | undefined;
@@ -238,6 +293,7 @@ export function placeMapCollection(
   const squared = (id: string) => groups.pathById.get(id)?.square !== undefined;
   const features: PlaceMapFeature[] = [];
   const openZooms = placeOpenZooms(groups);
+  const frames = placeFrameBounds(groups);
   for (const token of groups.tokens) {
     const count = token.memberIds.length;
     features.push({
@@ -263,10 +319,10 @@ export function placeMapCollection(
           : token.level === 'state'
             ? { openZoom: NEXT_LEVEL_MIN_ZOOM.state }
             : {}),
-        west: token.bounds[0],
-        south: token.bounds[1],
-        east: token.bounds[2],
-        north: token.bounds[3],
+        west: frames.get(token.id)![0],
+        south: frames.get(token.id)![1],
+        east: frames.get(token.id)![2],
+        north: frames.get(token.id)![3],
       },
     });
   }

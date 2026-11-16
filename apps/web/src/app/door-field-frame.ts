@@ -90,6 +90,43 @@ export function doorFramePadding(
   return padding;
 }
 
+/** Air a place frame keeps inside the window: a count and its name need room past the edge. */
+export const DOOR_DRILL_AIR_RATIO = 0.12;
+export const DOOR_DRILL_AIR_MIN_PX = 48;
+export const DOOR_DRILL_AIR_MAX_PX = 96;
+
+/**
+ * `doorFramePadding` plus room for a place's own marks. A place frame fits its records' extent, so
+ * the outermost counts sit on the fit's edge; with only the national margin their names run under
+ * the column or off the screen. Falls back to the plain padding when the extra would leave the
+ * plate too little to draw in.
+ */
+export function doorDrillPadding(
+  window: DoorFrameBox,
+  plate: DoorFrameBox,
+  chrome: DoorFrameBox | null = null,
+): DoorFramePadding | null {
+  const base = doorFramePadding(window, plate, chrome);
+  if (!base) return null;
+  const air = Math.min(
+    DOOR_DRILL_AIR_MAX_PX,
+    Math.max(
+      DOOR_DRILL_AIR_MIN_PX,
+      Math.round(Math.min(window.width, window.height) * DOOR_DRILL_AIR_RATIO),
+    ),
+  );
+  const padded = {
+    top: base.top + air,
+    right: base.right + air,
+    bottom: base.bottom + air,
+    left: base.left + air,
+  };
+  const roomy =
+    plate.width - padded.left - padded.right >= DOOR_FRAME_MIN_BOX_PX &&
+    plate.height - padded.top - padded.bottom >= DOOR_FRAME_MIN_BOX_PX;
+  return roomy ? padded : base;
+}
+
 /**
  * Screen-pixel offset from the plate's center to the window's center — MapLibre's `offset`
  * camera option, which moves where a `center` lands without touching the transform's padding.

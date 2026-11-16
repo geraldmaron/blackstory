@@ -1,10 +1,23 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PlaceGroups } from '@repo/domain/map/place-groups';
-import { placeDrillZoom, placeOpenZooms } from './place-map';
+import {
+  placeDrillZoom,
+  placeFrameBounds,
+  placeOpenZooms,
+  STATE_FRAME_ALLOWANCE_DEG,
+} from './place-map';
 
 const token = (placeKey: string, level: string, minZoom: number, memberIds: string[]) =>
-  ({ placeKey, level, minZoom, memberIds }) as never;
+  ({
+    id: `${level}:${placeKey}:${minZoom}`,
+    placeKey,
+    level,
+    minZoom,
+    memberIds,
+    anchor: placeKey === 'square-1' ? [-5, 7] : [0, 0],
+    bounds: [0, 0, 1, 1],
+  }) as never;
 
 // A county keeps its own token through every band (it holds the records known only by county),
 // so it opens where its records first draw finer: a square at 11, a lone site at 11, else 14.
@@ -43,4 +56,15 @@ test('a drill never lands shallower than the open zoom, nor deeper than the map 
   assert.equal(placeDrillZoom('county', 12, 14, 11), 12);
   assert.equal(placeDrillZoom('county', 9, 10, 11), 10);
   assert.equal(placeDrillZoom('county', undefined, 14), 8);
+});
+
+test('a place frames the finer marks drawn for it, not only its records', () => {
+  const frame = placeFrameBounds(groups).get('county:county-a:6');
+  assert.deepEqual(frame, [-5, 0, 1, 7]);
+});
+
+test('a state frame allows for county tokens that have not loaded yet', () => {
+  const frame = placeFrameBounds(groups).get('state:state-x:0')!;
+  assert.equal(frame[0], -5 - STATE_FRAME_ALLOWANCE_DEG);
+  assert.equal(frame[3], 7 + STATE_FRAME_ALLOWANCE_DEG);
 });
