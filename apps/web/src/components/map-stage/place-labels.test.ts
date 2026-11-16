@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { MAP_TYPE } from '../../app/map/explore-style';
 import { placeMapName, placeTier } from '../../lib/map-experience/place-map';
-import { placeLabelText } from './place-labels';
+import { placeFullName, placeLabelText } from './place-labels';
 
 test('the plate names a place atlas style: no state suffix, no "County"', () => {
   assert.equal(placeMapName('county', 'Jefferson County, AL'), 'Jefferson');
@@ -49,4 +49,17 @@ test('MAP_TYPE mirrors the map type and mark tokens in tokens.css', () => {
   assert.equal(px('--ds-map-pin'), MAP_TYPE.pin);
   assert.equal(px('--ds-map-ring'), MAP_TYPE.ring);
   assert.equal(px('--ds-map-keyline'), MAP_TYPE.keyline);
+});
+
+test('a state is written out by name where a code would not read', () => {
+  assert.equal(placeFullName({ level: 'state', mapName: 'VA', postal: 'VA' }), 'Virginia');
+  assert.equal(placeFullName({ level: 'county', mapName: 'Fulton' }), 'Fulton');
+  assert.equal(
+    placeLabelText({ level: 'state', mapName: 'GA', postal: 'GA' }, 3, { selected: false }),
+    'Georgia',
+  );
+  assert.equal(
+    placeLabelText({ level: 'state', mapName: 'GA', postal: 'GA' }, 3, { selected: true }),
+    'GA',
+  );
 });

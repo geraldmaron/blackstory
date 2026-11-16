@@ -102,6 +102,12 @@ Counts are never dropped, so `place-labels.ts` runs a layout pass (`token-layout
 
 The precision mix is always words, never color alone. Copper and ink only. No red or alarm hues.
 
+#### Phone: a few counts, each labeled
+
+On a map narrower than 768px (the explore sheet layout, home, embeds), 48 numerals at the national frame read as noise, so the state level prints only the largest few. The budget is one numeral per 35,000 square pixels of plate, between 4 and 8 (6 at 390 by 500), chosen by count with ties by place key (`phoneNumeralBudget`, `chooseCounted` in `token-layout.ts`). The entered or selected state and the state nearest the selected record always print. Places past the budget keep their invisible hit circles, so a tap still enters them, and they stay in the text list below. County, city and square levels print every count, as before.
+
+Each printed count carries its unit: the numeral, the word "records" under it, and the place's name written out in mono capitals beside it. The postal abbreviation appears only on the selected state. One legend line on the plate, worded for the level shown ("Numbers count records in each state. Tap or zoom for the rest."), says what the numbers are. The same layout and tethers apply to the few numerals that print.
+
 ### Pins and areas (precision is the encoding)
 
 - **Site** (address, site, institution): a solid copper disc with a 2px keyline in the plate's type color. No contact shadow. From zoom 12 the record's name sits beside it in Schibsted 650, the record page's name on the street.
@@ -212,9 +218,9 @@ Leaving the place reverses it: the veil and outline fade, and the camera flies b
 
 ## Accessibility
 
-The scoped list is the accessible path. Every token on the map has an equivalent in the list: select the place and the list holds its records, each a focusable row with its own precision in words. The canvas itself still has no keyboard path to individual tokens; that is an open item below.
+The plate's counts have a text equivalent. `place-labels.ts` keeps a visually hidden list inside the map's container (`.ds-place-list`) of every place counted in view, largest first, as "Georgia, 239 records", whether or not its numeral prints. It is a plain list a reader browses: no live region, no focusable items, refreshed at most every 400ms and only when its content changes. Past that, the scoped list is the accessible path to records. Every token on the map has an equivalent in the list: select the place and the list holds its records, each a focusable row with its own precision in words. The canvas itself still has no keyboard path to individual tokens; that is an open item below.
 
-Color is never the only signal. Token counts and names are text, the precision mix is text, and site dots keep their dot (site) versus ring (area) shapes. The DOM labels are `aria-hidden`: they echo the canvas, and the scoped list stays the accessible path.
+Color is never the only signal. Token counts and names are text, the precision mix is text, and site dots keep their dot (site) versus ring (area) shapes. The DOM labels are `aria-hidden`: they echo the canvas, and the text list and the scoped list carry the same facts for assistive technology.
 
 ---
 

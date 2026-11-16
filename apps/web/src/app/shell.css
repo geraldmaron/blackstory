@@ -1929,6 +1929,12 @@ main[tabindex='-1']:focus-visible {
   text-decoration: none;
 }
 
+/* The link is a 44px target; the card keeps its weight by centering the two lines inside it. */
+.ds-map-callout__link {
+  align-content: center;
+  min-height: 2.75rem;
+}
+
 .ds-map-callout__name {
   overflow: hidden;
   font-family: var(--ds-font-display);
@@ -2106,6 +2112,55 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
 
 .ds-place-token.is-displaced .ds-place-token__count:hover {
   color: var(--ds-map-label-hi);
+}
+
+/* Phone: a few counts, each with its unit under the numeral and its name written out beside it
+   (place-labels.ts). The legend line names what the numbers count at the level shown. */
+.ds-place-token__unit {
+  display: none;
+}
+
+.ds-place-token.is-phone .ds-place-token__unit {
+  display: block;
+  position: absolute;
+  top: calc(var(--ds-place-count) / 2 + 2px);
+  left: 0;
+  translate: -50% 0;
+  color: var(--ds-map-label-hi);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-meta);
+  line-height: 1;
+  text-shadow: var(--ds-place-halo);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ds-place-legend {
+  position: absolute;
+  left: var(--ds-space-3);
+  bottom: var(--ds-space-3);
+  max-width: calc(100% - 2 * var(--ds-space-3));
+  margin: 0;
+  color: var(--ds-map-label-hi);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-meta);
+  line-height: 1.3;
+  text-shadow: var(--ds-place-halo);
+}
+
+/* On the full-bleed plate (home, explore) the legend clears the tab bar, the explore sheet and
+   the attribution chip's row: it sits one 44px row above whichever of them is higher. */
+.ds-map-stage .ds-place-legend {
+  bottom: calc(
+    max(var(--ds-map-attrib-bottom, 0px), var(--ds-tabbar-h, 0px)) + var(--ds-space-3) + 44px +
+      var(--ds-space-2)
+  );
+}
+
+.ds-place-legend[hidden] {
+  display: none;
 }
 
 /* A site record's name beside its pin: the record page's pin and name, on the plate. */

@@ -683,7 +683,8 @@ export function MapStageProvider({
   const syncSelectionFlag = useCallback(
     (map: MapLibreMap, entityId: string | undefined) => {
       const maplibregl = maplibreglRef.current;
-      placeLabelsRef.current?.setSelected(entityId);
+      const at = entityId ? entityPoint(entityId) : undefined;
+      placeLabelsRef.current?.setSelected(entityId, at ? [at.lng, at.lat] : undefined);
       if (selectionFlagRef.current?.id === entityId) return;
       selectionFlagRef.current?.marker.remove();
       selectionFlagRef.current = null;
@@ -1148,6 +1149,9 @@ export function MapStageProvider({
       const apply = () => {
         const { selectedState, selectedEdge, selectedEntity } = configRef.current;
         setSelectedStateFilter(map, selectedState);
+        placeLabelsRef.current?.setSelectedPlace(
+          selectedState ? `state-${selectedState.toLowerCase()}` : undefined,
+        );
         setSelectedEdgeFilter(map, selectedEdge);
         setSelectedEntityFilter(map, selectedEntity);
         syncSelectionFlag(map, selectedEntity);
@@ -1410,6 +1414,11 @@ export function MapStageProvider({
 
         mapRef.current = map;
         placeLabelsRef.current = bindPlaceLabels(map);
+        placeLabelsRef.current.setSelectedPlace(
+          configRef.current.selectedState
+            ? `state-${configRef.current.selectedState.toLowerCase()}`
+            : undefined,
+        );
         if (process.env.NODE_ENV !== 'production') {
           // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;

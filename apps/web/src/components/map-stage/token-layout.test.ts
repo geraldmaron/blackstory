@@ -6,7 +6,10 @@ import { buildExploreMapSource } from '../../lib/map-experience/build-explore-ma
 import { placeGroupsFor, placeTier } from '../../lib/map-experience/place-map';
 import {
   boxesIntersect,
+  chooseCounted,
   layoutTokens,
+  phoneNumeralBudget,
+  placeCountList,
   markBox,
   numeralBox,
   type Box,
@@ -136,4 +139,34 @@ test('the seed catalog laid out at a national frame has no overlapping numerals'
     .filter((t) => t.x >= 0 && t.x <= 1440 && t.y >= 0 && t.y <= 900);
   assert.ok(inputs.length > 0, 'the seed has tokens at zoom 4');
   assertClear(inputs, [], layoutTokens(inputs, []));
+});
+
+test('a phone prints at most the budget of numerals, none overlap, the selected place always prints', () => {
+  const rand = lcg(11);
+  const all = Array.from({ length: 48 }, (_, i) =>
+    token(`state-${i}`, 20 + rand() * 350, 40 + rand() * 420, 1 + Math.floor(rand() ** 2 * 900)),
+  );
+  const budget = phoneNumeralBudget(390, 500);
+  assert.equal(budget, 6);
+  // The smallest state is the selected one.
+  const smallest = [...all].sort((a, b) => a.count - b.count || (a.key < b.key ? -1 : 1))[0]!;
+  const chosen = chooseCounted(all, budget, new Set([smallest.key]));
+  assert.equal(chosen.size, budget + 1);
+  assert.ok(chosen.has(smallest.key));
+  const top = [...all]
+    .sort((a, b) => b.count - a.count || (a.key < b.key ? -1 : 1))
+    .slice(0, budget);
+  for (const t of top) assert.ok(chosen.has(t.key));
+  const shown = all.filter((t) => chosen.has(t.key));
+  assertClear(shown, [], layoutTokens(shown, []));
+  assert.deepEqual(chooseCounted(all, budget, new Set([smallest.key])), chosen);
+});
+
+test('the text equivalent lists every place in view, largest first, with its unit', () => {
+  const lines = placeCountList([
+    { key: 'a', name: 'Alabama', count: 1 },
+    { key: 'g', name: 'Georgia', count: 1239 },
+    { key: 'm', name: 'Maine', count: 12 },
+  ]);
+  assert.deepEqual(lines, ['Georgia, 1,239 records', 'Maine, 12 records', 'Alabama, 1 record']);
 });

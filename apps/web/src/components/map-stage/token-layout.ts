@@ -222,6 +222,45 @@ export function layoutTokens(
   return tokens.map((token) => placed.get(token.key)!);
 }
 
+/** A phone's map is narrower than this (px); the plate prints a few labeled counts there. */
+export const PHONE_MAP_MAX_WIDTH = 768;
+
+/**
+ * How many numerals a phone plate prints at the national and regional levels: one per ~35,000 px^2
+ * of plate, so 390x500 prints 6. Never fewer than 4 or more than 8.
+ */
+export function phoneNumeralBudget(width: number, height: number): number {
+  return Math.min(8, Math.max(4, Math.round((width * height) / 35000)));
+}
+
+/**
+ * The keys that print a numeral: the `budget` highest counts (ties by key), plus every `keep` key
+ * in view. Pure, so the same places always win. Tokens past the budget keep their hit circles and
+ * stay in the text list; they only print no numeral.
+ */
+export function chooseCounted(
+  tokens: readonly Pick<TokenInput, 'key' | 'count'>[],
+  budget: number,
+  keep: ReadonlySet<string> = new Set(),
+): Set<string> {
+  const ranked = [...tokens].sort((a, b) => b.count - a.count || (a.key < b.key ? -1 : 1));
+  const chosen = new Set<string>(ranked.slice(0, Math.max(0, budget)).map((t) => t.key));
+  for (const t of tokens) if (keep.has(t.key)) chosen.add(t.key);
+  return chosen;
+}
+
+/** The text equivalent of the plate's counts: every place in view, largest first. */
+export function placeCountList(
+  places: readonly { readonly key: string; readonly name: string; readonly count: number }[],
+): string[] {
+  return [...places]
+    .sort((a, b) => b.count - a.count || (a.key < b.key ? -1 : 1))
+    .map(
+      (p) =>
+        `${p.name}, ${p.count.toLocaleString('en-US')} ${p.count === 1 ? 'record' : 'records'}`,
+    );
+}
+
 /** The numeral's box as drawn (for tests and obstacle building). */
 export function numeralBox(p: TokenPlacement, token: Pick<TokenInput, 'width' | 'height'>): Box {
   return centered(p.x, p.y, token.width, token.height);
