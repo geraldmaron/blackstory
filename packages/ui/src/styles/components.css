@@ -820,10 +820,23 @@ span.ds-tabs__tab {
   width: min(100% - 2rem, 32rem);
   margin: auto;
   padding: 0;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-lg);
-  background: var(--ds-surface-raised);
+  border: 0;
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-dialog {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .ds-dialog__header,
@@ -980,23 +993,27 @@ span.ds-tabs__tab {
   display: grid;
   gap: var(--ds-space-3);
   justify-items: start;
-  padding: var(--ds-space-8) var(--ds-space-5);
-  border: var(--ds-border-width) dashed var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface);
+  padding: var(--ds-space-5) 0 var(--ds-space-2);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-empty__title {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
 }
 
 .ds-empty__body {
   margin: 0;
   max-width: 36rem;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.55;
 }
 
 /* Icon-only theme toggle (v5 §5 chrome): 44px square, glyph + accessible
@@ -1339,5 +1356,83 @@ span.ds-tabs__tab {
 
   .ds-plate__tone::after {
     content: none;
+  }
+}
+
+/* —— Print: public pages on white paper ————————————————————————————————————————— */
+/* Ink on white. Site chrome, maps, floating layers and controls are left off; a sheet runs the full
+   page width without its shadow, spine bands or radius; grounds lose their fills; a plate prints
+   untoned with its credit; external links print their address after the text. */
+@media print {
+  :root,
+  body,
+  [data-ground] {
+    --ds-canvas: white;
+    --ds-ink: black;
+    --ds-ink-muted: dimgray;
+    background: white;
+    color: black;
+  }
+
+  .ds-bar,
+  .ds-tabbar,
+  .ds-shell-footer,
+  .ds-map-stage,
+  .ds-record-map__frame,
+  .ds-float,
+  .ds-dialog,
+  .ds-command-palette,
+  .ds-toast-stack,
+  .ds-records-menu,
+  .ds-records-sheet,
+  button {
+    display: none !important;
+  }
+
+  .ds-block {
+    background: none;
+    padding-block: var(--ds-space-6);
+  }
+
+  .ds-sheet {
+    --ds-sheet-bands: 0 0 0 transparent;
+    width: auto;
+    max-width: none;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .ds-plate__tone {
+    background: none;
+  }
+
+  .ds-plate__img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  .ds-plate__tone::after {
+    content: none;
+  }
+
+  a[href^='http']:not([href*='blackstory'])::after {
+    content: ' (' attr(href) ')';
+    overflow-wrap: anywhere;
+    font-size: smaller;
+  }
+
+  .ds-evidence__item,
+  li {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
   }
 }

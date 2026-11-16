@@ -14,9 +14,6 @@
      sideways scroller is also the scrollport its sticky head pins to, so a head meant to pin
      to the page could never pin at all; scrolling both axes here is what keeps it in view. */
   overflow: auto;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
 }
 
 .ds-datatable__table {
@@ -44,8 +41,8 @@
   position: sticky;
   top: 0;
   z-index: 1; /* local: lifts the sticky header row above its own scrolling rows, not above the page */
-  background: var(--ds-surface);
-  border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
+  background: var(--ds-canvas);
+  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
   padding: var(--ds-space-2) var(--ds-space-3);
   text-align: start;
   font-family: var(--ds-font-mono);
@@ -378,10 +375,23 @@
      fires, and a centered panel makes every invocation a saccade down and back. */
   margin: min(12vh, 6rem) auto auto;
   padding: 0;
-  border: var(--ds-border-width) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-lg);
-  background: var(--ds-surface-raised);
+  border: 0;
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-command-palette {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .ds-command-palette__panel {
@@ -442,7 +452,7 @@
 /* The highlighted row carries a rule as well as a tint, so it survives grayscale and
    high-contrast modes where the fill alone would vanish. */
 .ds-command-palette__option.is-active {
-  background: var(--ds-canvas);
+  background: var(--ds-surface-sunken);
   box-shadow: inset 2px 0 0 var(--ds-border-strong);
 }
 
