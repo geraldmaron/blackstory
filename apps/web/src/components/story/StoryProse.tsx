@@ -74,7 +74,11 @@ function renderNodes(
       index = end;
       continue;
     }
-    out.push(renderNode(node, index, refNumberById));
+    // A cite hugs the word before it: "the wall²⁵", not "the wall ²⁵".
+    const next = nodes[index + 1];
+    const hugged =
+      node.type === 'text' && next?.type === 'cite' ? { ...node, text: node.text.trimEnd() } : node;
+    out.push(renderNode(hugged, index, refNumberById));
   }
   return out;
 }

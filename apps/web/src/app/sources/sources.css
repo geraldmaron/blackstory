@@ -41,7 +41,7 @@
 }
 
 .ds-sources-table__kind-n {
-  color: var(--ds-numeral-accent);
+  color: var(--ds-numeral-soft-text);
   font-variant-numeric: tabular-nums;
 }
 

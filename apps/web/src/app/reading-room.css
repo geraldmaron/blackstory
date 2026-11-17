@@ -245,7 +245,7 @@ a.ds-memorial-index__jump-link:hover {
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(3.5rem, 2.5rem + 2.6vw, 5.5rem);
+  font-size: var(--ds-text-display-2);
   line-height: 0.9;
   letter-spacing: -0.04em;
   color: var(--ds-ink);
@@ -374,7 +374,7 @@ a.ds-memorial-index__jump-link:hover {
 
   .ds-memorial-index__letter {
     position: static;
-    font-size: var(--ds-text-display-hero);
+    font-size: var(--ds-text-display-2);
   }
 }
 

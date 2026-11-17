@@ -34,6 +34,7 @@ export default async function SourcesPage() {
       className="ds-trust-room"
       masthead={
         <TrustMast
+          art={['mapline']}
           tone="sand"
           numeral={
             library === undefined

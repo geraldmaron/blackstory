@@ -177,7 +177,7 @@
 }
 
 .ds-data-band .ds-data-section__head > .ds-section-heading {
-  font-size: var(--ds-text-display);
+  font-size: var(--ds-text-headline);
   font-weight: 800;
   line-height: 0.95;
 }

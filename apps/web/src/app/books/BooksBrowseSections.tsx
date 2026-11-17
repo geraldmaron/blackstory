@@ -8,6 +8,7 @@
  * register's native popovers of GET links, and every cover and state is an anchor.
  */
 import React from 'react';
+import { BandArt } from '../../components/atmosphere/BandArt';
 import Link from 'next/link';
 import { Block, Chip, DisplayNumeral, Sheet, buttonClassName } from '@repo/ui';
 import { RecordsToolbar, type ToolbarMenu } from '../records/RecordsToolbar';
@@ -293,6 +294,7 @@ function BookBands({ view }: { readonly view: BooksBrowseViewModel }) {
             tone={index % 2 === 0 ? 'ink' : 'sand'}
             className="ds-books-band"
           >
+            <BandArt motifs={index % 2 === 0 ? ['ledger'] : ['grain']} />
             <div className="ds-wrap ds-books-bandgrid">
               <div className="ds-books-mark">
                 <DisplayNumeral decorative className="ds-books-mark__numeral">

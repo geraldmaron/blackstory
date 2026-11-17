@@ -93,14 +93,23 @@
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* Destination names at 40px and up: the row is the door. */
+/* Destination names sit one step under the group heading (display-3), so a row never outranks it. */
 .ds-rooms__name {
   font-family: var(--ds-font-display);
-  font-size: clamp(2rem, 1.2rem + 1.6vw, 3rem);
+  font-size: var(--ds-text-title);
   font-weight: 650;
   line-height: 1.02;
   letter-spacing: var(--ds-tracking-display);
   text-wrap: balance;
+}
+
+.ds-rooms__icon {
+  color: var(--ds-ink-muted);
+  flex: none;
+}
+
+.ds-rooms__row:hover .ds-rooms__icon {
+  color: currentColor;
 }
 
 .ds-rooms__row:hover .ds-rooms__name {

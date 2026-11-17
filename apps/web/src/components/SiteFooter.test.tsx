@@ -38,8 +38,16 @@ describe('SiteFooter', () => {
     assert.match(html, />Banned books</);
     assert.doesNotMatch(html, /\/banned-books|\/journey/);
     assert.doesNotMatch(html, /href="\/chapters"|href="\/library"|href="\/history"/);
-    // No icons beside links, no tagline, no mono caps.
-    assert.doesNotMatch(html, /<svg/);
+    // Every destination link carries its catalog glyph beside the word, decorative only; the
+    // legal row stays plain. No tagline, no mono caps.
+    const nav = html.slice(
+      html.indexOf('aria-label="Footer"'),
+      html.indexOf('aria-label="Policies"'),
+    );
+    const links = nav.match(/<a /g)?.length ?? 0;
+    const glyphs = nav.match(/<svg[^>]*aria-hidden="true"/g)?.length ?? 0;
+    assert.ok(links > 0 && glyphs === links, `${glyphs} glyphs for ${links} footer links`);
+    assert.doesNotMatch(html.slice(html.indexOf('aria-label="Policies"')), /<svg/);
     assert.doesNotMatch(html, /People\. Places\. Evidence\. Context\./);
     assert.doesNotMatch(html, /ds-mono/);
   });

@@ -31,7 +31,7 @@
 .ds-support__email {
   margin: var(--ds-space-4) 0 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
+  font-size: var(--ds-text-title);
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: var(--ds-tracking-title);

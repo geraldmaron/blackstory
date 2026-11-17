@@ -8,6 +8,7 @@
  * and rows are anchors.
  */
 import React from 'react';
+import { BandArt } from '../../components/atmosphere/BandArt';
 import Link from 'next/link';
 import { Block, Chip, DisplayNumeral, Sheet, buttonClassName } from '@repo/ui';
 import { US_STATES } from '@repo/domain';
@@ -344,6 +345,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
           className="ds-law-era"
           aria-labelledby={eraAnchor(group.era)}
         >
+          <BandArt motifs={['decades']} />
           <div className="ds-wrap ds-law-era__inner">
             <header className="ds-law-era__mark">
               <h2 className="ds-law-era__title" id={eraAnchor(group.era)}>

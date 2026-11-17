@@ -5,10 +5,16 @@
  * text contrast is the ground's own.
  */
 
+/* Any band that holds art becomes its host, so a page opts in by rendering <BandArt> alone. */
+:where(:has(> .ds-band-art)) {
+  position: relative;
+  isolation: isolate;
+}
+
 .ds-band-art {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: -1; /* local: under its host's content, inside the host's own isolated stack */
   overflow: hidden;
   pointer-events: none;
   color: var(--ds-ink);
@@ -133,7 +139,9 @@
     100% 100%;
 }
 
-/* Single drawings set in the band's far corner, clear of a left text column. */
+/* Single drawings set in the band's far corner, clear of a left text column. Not for bands whose
+   right column holds text (Rooms rows): use a full-band motif there. */
+.ds-band-art__layer--architecture,
 .ds-band-art__layer--mapline,
 .ds-band-art__layer--tools {
   inset: var(--ds-space-6) var(--ds-space-6) var(--ds-space-6) auto;
@@ -141,6 +149,10 @@
   opacity: 0.55;
   -webkit-mask: var(--ds-band-art-drawing) right bottom / contain no-repeat;
   mask: var(--ds-band-art-drawing) right bottom / contain no-repeat;
+}
+
+.ds-band-art__layer--architecture {
+  --ds-band-art-drawing: url('/brand/motifs/architecture.svg');
 }
 
 .ds-band-art__layer--mapline {

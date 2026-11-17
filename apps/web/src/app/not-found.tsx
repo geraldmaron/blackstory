@@ -45,7 +45,7 @@ export default async function NotFound() {
       masthead={
         // No crumb: the reader is standing on an address that failed, and `/not-found` is not a
         // place in the archive they could go back up from.
-        <TrustMast tone="sand">
+        <TrustMast art={['contours']} tone="sand">
           <PageHeader
             display
             title="That page is not here"

@@ -14,6 +14,7 @@ import { BRAND_ASSETS, PRODUCT_NAME } from '@repo/config';
 import { ShellWordmark } from '@repo/ui';
 import { footerColumns, policyLinks } from '../lib/nav/destination-registry';
 import { MakerCredit } from './MakerCredit';
+import { DestinationIcon } from './patterns/DestinationIcon';
 
 void React;
 
@@ -59,6 +60,7 @@ export function SiteFooter() {
                       {/* Footer nav mounts on every route; skip the default viewport prefetch
                           so it doesn't compete with whatever the current page actually needs. */}
                       <Link href={item.href} prefetch={false}>
+                        <DestinationIcon id={item.icon} className="ds-shell-footer__icon" />
                         {item.label}
                       </Link>
                     </li>

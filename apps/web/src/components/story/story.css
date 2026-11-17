@@ -695,7 +695,7 @@
 .ds-reading-cite a::after {
   content: '';
   position: absolute;
-  inset: -0.9em -0.2em;
+  inset: -0.9em -0.45em;
 }
 
 .ds-story-body .ds-reading-cite a {

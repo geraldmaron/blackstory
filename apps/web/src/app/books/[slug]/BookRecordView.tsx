@@ -254,6 +254,7 @@ export function BookRecordView({
                 author={authors.join(', ')}
                 size="L"
                 decorative={false}
+                bare
                 className="ds-recpage__cover"
               />
             ),

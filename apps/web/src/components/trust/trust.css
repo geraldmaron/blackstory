@@ -278,6 +278,15 @@
   text-decoration: none;
 }
 
+.ds-trust-links__icon {
+  color: var(--ds-ink-muted);
+  flex: none;
+}
+
+.ds-trust-links__row:hover .ds-trust-links__icon {
+  color: currentColor;
+}
+
 .ds-trust-links__title {
   grid-column: 1;
   font-family: var(--ds-font-display);

@@ -104,10 +104,10 @@
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     'media'
-    'extra'
     'lede'
     'note'
     'facts'
+    'extra'
     'body'
     'file'
     'actions';
@@ -1022,7 +1022,7 @@
 
 .ds-recpage__step-name {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
+  font-size: var(--ds-text-title);
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: var(--ds-tracking-title);
@@ -1218,7 +1218,7 @@
   }
 
   .ds-recpage__step-name {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .ds-recpage__position {

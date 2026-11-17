@@ -47,6 +47,18 @@
   font-size: clamp(4rem, 1rem + 9vw, 10rem);
 }
 
+/* A decade with three records or fewer gets a smaller mark and less air, so the sparse early
+   decades on page one do not each spend a full screen on one row. */
+.ds-records-timeline__band:not(:has(.ds-records-timeline__rows > :nth-child(4))) {
+  padding-block: var(--ds-space-6);
+}
+
+.ds-records-timeline__band:not(:has(.ds-records-timeline__rows > :nth-child(4)))
+  .ds-records-timeline__year
+  .ds-numeral {
+  font-size: var(--ds-text-display-1);
+}
+
 .ds-records-timeline__total {
   margin: 0;
   font-family: var(--ds-font-mono);

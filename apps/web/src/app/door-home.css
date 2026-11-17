@@ -900,7 +900,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
      card and is as tall as the contiguous states are at this width (about 0.62 of it), so the
      land fills what the reader sees. The next band starts right under it and shows inside the
      first screen, which is what tells the reader the page goes on. */
-  body:has(.ds-door__dock[data-step='open']) {
+  body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open']) {
     --ds-door-map-top: calc(
       var(--ds-island-clearance) + var(--ds-space-3) + var(--ds-door-dock-h, 12rem) +
         var(--ds-space-3)
@@ -918,17 +918,19 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     --ds-map-legend-top: calc(var(--ds-door-map-top) + var(--ds-space-2));
   }
 
-  body:has(.ds-door__dock[data-step='open']) .ds-door__window {
+  body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open']) .ds-door__window {
     inset: var(--ds-door-map-top) 0 auto 0;
     height: var(--ds-door-map-h);
   }
 
-  body:has(.ds-door__dock[data-step='open']) .ds-door-chapters {
+  body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open']) .ds-door-chapters {
     margin-top: calc(var(--ds-door-map-top) + var(--ds-door-map-h));
   }
 
   /* The attribution sits at the map window's lower edge, not under the band that follows it. */
-  body:has(.ds-door__dock[data-step='open']) .ds-map-stage .maplibregl-ctrl-bottom-left {
+  body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open'])
+    .ds-map-stage
+    .maplibregl-ctrl-bottom-left {
     bottom: var(--ds-door-map-foot);
   }
 
@@ -944,7 +946,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   }
 
   /* Notes about the map sit under the headline column, not behind it. */
-  body:has(.ds-door__dock[data-step='open'])
+  body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open'])
     :is(.ds-door__field-note, .ds-door__loading, .ds-door__places) {
     top: calc(var(--ds-door-dock-h, 12rem) + var(--ds-space-8));
     right: var(--ds-gutter);
@@ -1419,7 +1421,7 @@ body:has(.ds-door) .ds-door-journey {
   max-width: 18ch;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-headline);
+  font-size: var(--ds-text-display-2);
   font-weight: var(--ds-weight-headline);
   line-height: 1;
   letter-spacing: var(--ds-tracking-display);
@@ -1694,7 +1696,7 @@ body:has(.ds-door) .ds-door-journey {
     padding-top: 0;
   }
 
-  body:has(.ds-door__dock[data-step='open']) .ds-door-chapters {
+  body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open']) .ds-door-chapters {
     margin-top: max(
       calc(100dvh - var(--ds-door-peek)),
       calc(

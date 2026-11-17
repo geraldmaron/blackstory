@@ -387,6 +387,13 @@ body:has(.ds-sheet) .ds-bar {
     display: none;
   }
 
+  /* A backdrop-filter makes the bar the containing block for its fixed children, which trapped
+     the full-screen sheet inside the 48px bar. Drop the glass while the sheet is open. */
+  .ds-bar[data-search-open] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
   /* The search sheet: the same field, full screen. */
   .ds-bar[data-search-open] .ds-bar__search-region {
     width: auto;

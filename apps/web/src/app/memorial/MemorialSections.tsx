@@ -112,8 +112,7 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
             })}
 
             <p className="ds-memorial-index__empty" id="memorial-names-empty" hidden>
-              No name on this list matches what you typed. The list is incomplete, and a name that
-              belongs here can be sent through <Link href="/submit">Submit</Link>.
+              No name on this list matches what you typed.
             </p>
 
             <p className="ds-memorial__note">{MEMORIAL_LIST_NOTE}</p>

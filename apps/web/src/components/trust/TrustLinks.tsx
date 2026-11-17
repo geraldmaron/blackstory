@@ -1,10 +1,13 @@
 /**
- * Where a trust page points onward: ruled rows of a name and one line, with no icon plate.
- * The whole row is the link.
+ * Where a trust page points onward: ruled rows of a name and one line. A row that points at a
+ * catalog destination carries that destination's glyph beside its name, so onward links read the
+ * same here as in the footer and Rooms. The whole row is the link.
  */
 import React from 'react';
 import Link from 'next/link';
 import { cx } from '@repo/ui';
+import { destinationFor } from '../../lib/nav/destination-registry';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 
 void React;
 
@@ -26,9 +29,13 @@ export function TrustLinks({ links, label = 'Related pages', className }: TrustL
     <ul className={cx('ds-trust-links', className)} aria-label={label}>
       {links.map((link) => {
         const external = /^(https?:|mailto:)/.test(link.href);
+        const icon = external ? undefined : destinationFor(link.href.split(/[?#]/)[0] ?? '')?.icon;
         const body = (
           <>
-            <span className="ds-trust-links__title">{link.title}</span>
+            <span className="ds-trust-links__title ds-destination-label">
+              {icon ? <DestinationIcon id={icon} className="ds-trust-links__icon" /> : null}
+              {link.title}
+            </span>
             {link.line ? <span className="ds-trust-links__line">{link.line}</span> : null}
             <svg className="ds-trust-links__arrow" viewBox="0 0 16 16" aria-hidden="true">
               <path

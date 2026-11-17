@@ -19,6 +19,15 @@ import {
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
 import { Room } from '../../components/room';
+import { DestinationIcon } from '../../components/patterns/DestinationIcon';
+import { BandArt, type BandArtMotif } from '../../components/atmosphere/BandArt';
+
+/** One full-band motif per room group. Corner drawings would sit under the rows' right-hand text. */
+const ROOM_ART: Partial<Record<string, readonly BandArtMotif[]>> = {
+  read: ['contours'],
+  check: ['ledger'],
+  'take-part': ['weave'],
+};
 import '../reading-room.css';
 import './rooms.css';
 
@@ -75,6 +84,7 @@ export default function RoomsPage() {
           key={group}
           aria-labelledby={group}
         >
+          <BandArt motifs={ROOM_ART[group] ?? ['grain']} />
           <div className="ds-wrap ds-rooms__inner">
             <header className="ds-rooms__mark">
               <DisplayNumeral decorative className="ds-rooms__numeral">
@@ -88,7 +98,10 @@ export default function RoomsPage() {
               {destinationsInGroup(group).map((destination) => (
                 <li key={destination.path}>
                   <Link className="ds-rooms__row" href={destination.path}>
-                    <span className="ds-rooms__name">{cardTitleFor(destination)}</span>
+                    <span className="ds-rooms__name ds-destination-label">
+                      <DestinationIcon id={destination.icon} size="md" className="ds-rooms__icon" />
+                      {cardTitleFor(destination)}
+                    </span>
                     {destination.description ? (
                       <span className="ds-rooms__purpose">{destination.description}</span>
                     ) : null}

@@ -33,6 +33,7 @@ import {
   primaryAxes,
   semanticDestinationsInFamily,
   type DestinationFamily,
+  type DestinationIconId,
   type SemanticDestination,
 } from '@repo/public-contracts/destinations';
 
@@ -324,6 +325,7 @@ export function parentPathFor(pathname: string): string | null {
 export type FooterNavItem = {
   readonly href: string;
   readonly label: string;
+  readonly icon: DestinationIconId;
 };
 
 export type FooterColumn = {
@@ -332,7 +334,7 @@ export type FooterColumn = {
 };
 
 function footerItem(destination: Destination): FooterNavItem {
-  return { href: destination.path, label: destination.label };
+  return { href: destination.path, label: destination.label, icon: destination.icon };
 }
 
 export function footerColumns(): readonly FooterColumn[] {

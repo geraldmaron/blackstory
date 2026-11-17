@@ -178,6 +178,11 @@ body:has(.ds-law) .ds-reading-progress {
 }
 
 /* The span as two stacked years, joined by a small italic "to" so it reads as a range. */
+/* Era years one step under the page title, so the span never matches the h1. */
+.ds-law-era__span.ds-numeral {
+  font-size: var(--ds-text-display-1);
+}
+
 .ds-law-era__span > span {
   display: block;
 }
@@ -254,7 +259,7 @@ body:has(.ds-law) .ds-reading-progress {
   grid-area: year;
   color: var(--ds-accent);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
+  font-size: var(--ds-text-title);
   font-weight: 650;
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;

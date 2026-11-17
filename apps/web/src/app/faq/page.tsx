@@ -50,6 +50,7 @@ export default function FaqPage() {
       className="ds-trust-room"
       masthead={
         <TrustMast
+          art={['weave']}
           tone="copper"
           numeral={{
             value: String(FAQ_ENTRIES.length),

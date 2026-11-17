@@ -21,6 +21,7 @@ import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark, Tabs, toggleDocumentTheme, type TabItem } from '@repo/ui';
 import { BAR_SEARCH_INPUT_ID, CommandBarSearch } from './CommandBarSearch';
 import { PhoneTabBar } from './PhoneTabBar';
+import { DestinationIcon } from '../patterns/DestinationIcon';
 import { SHELL_TABS, currentTabFor, pathIsMapSurface } from './shell-tabs';
 import {
   exitMapBrowse,
@@ -28,6 +29,16 @@ import {
   MAP_BROWSE_EXITED_EVENT,
 } from '../../lib/nav/map-browse';
 import './command-bar.css';
+
+/** Tab label with its destination glyph beside the word, matching the phone tab bar. */
+function tabLabel(tab: (typeof SHELL_TABS)[number]) {
+  return (
+    <span className="ds-destination-label">
+      <DestinationIcon id={tab.icon} />
+      {tab.label}
+    </span>
+  );
+}
 
 void React;
 
@@ -171,9 +182,9 @@ export function CommandBar({
     // link would drop the map's filters from the URL) and never doubles as a way out. The lockup
     // is the way home.
     if (tab.id === '/explore' && pathIsMapSurface(pathname) && browsing) {
-      return { label: tab.label, current: true };
+      return { label: tabLabel(tab), current: true };
     }
-    return { label: tab.label, href: tab.href, current: current === tab.id };
+    return { label: tabLabel(tab), href: tab.href, current: current === tab.id };
   });
 
   return (

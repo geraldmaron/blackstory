@@ -27,6 +27,7 @@ export default function TermsPage() {
       className="ds-trust-room"
       masthead={
         <TrustMast
+          art={['grain']}
           tone="sand"
           numeral={{
             value: String(ACKNOWLEDGEMENT_HOURS),

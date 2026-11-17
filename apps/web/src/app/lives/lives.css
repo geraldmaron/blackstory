@@ -774,7 +774,7 @@ details[open] > summary > .lives-caret {
 
 .lives-era__header .lives-era__years--heading {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-title);
+  font-size: var(--ds-text-display-1);
   line-height: var(--ds-leading-numeral);
   letter-spacing: var(--ds-tracking-numeral);
   color: var(--ds-numeral-accent);
@@ -1193,8 +1193,9 @@ details[open] > summary > .lives-caret {
     column-gap: var(--ds-space-4);
   }
 
+  /* Its own line on a phone: squeezed beside Decade, "Hispanic" clipped at 390. */
   .lives-toolbar__field--lens {
-    flex: 1;
+    flex: 1 1 100%;
   }
 
   .lives-toolbar__field--lens .ds-segmented {
@@ -1216,8 +1217,11 @@ details[open] > summary > .lives-caret {
   color: var(--ds-ink-muted);
 }
 
-.lives-toolbar .ds-segmented__option {
-  white-space: nowrap;
+/* Desktop only: on phones the area names must wrap ("Upper South & the Capital" clipped at 390). */
+@media (min-width: 48rem) {
+  .lives-toolbar .ds-segmented__option {
+    white-space: nowrap;
+  }
 }
 
 /* The Decade control: a native select drawn like the kit's secondary button. */
@@ -1363,7 +1367,7 @@ details[open] > summary > .lives-caret {
 .lives-panel__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-title);
+  font-size: var(--ds-text-display-1);
   font-weight: 600;
   font-variant-numeric: lining-nums;
   line-height: var(--ds-leading-numeral);

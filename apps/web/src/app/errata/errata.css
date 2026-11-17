@@ -39,7 +39,7 @@
 
 /* Never under the 72px display floor, however narrow the screen. */
 .ds-errata__day-numeral.ds-numeral--title {
-  font-size: max(4.5rem, var(--ds-text-display-title));
+  font-size: var(--ds-text-display-1);
 }
 
 .ds-errata__year {
@@ -77,7 +77,7 @@
 
 .ds-errata__name {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
+  font-size: var(--ds-text-title);
   font-weight: 600;
   line-height: 1.12;
   letter-spacing: -0.02em;

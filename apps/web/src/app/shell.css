@@ -234,6 +234,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 .ds-shell-footer__links a {
   display: flex;
   align-items: center;
+  gap: var(--ds-space-2);
   min-height: 2.75rem;
   color: var(--ds-ink);
   text-decoration: none;
@@ -243,6 +244,16 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
+}
+
+.ds-shell-footer__icon {
+  width: 1em;
+  color: var(--ds-ink-muted);
+  flex: none;
+}
+
+.ds-shell-footer__links a:hover .ds-shell-footer__icon {
+  color: currentColor;
 }
 
 .ds-shell-footer__legal {
