@@ -109,6 +109,26 @@
   box-shadow: var(--ds-contact-plate);
 }
 
+.ds-place__group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-place__group + .ds-place__group {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-place__group-label {
+  padding: var(--ds-space-2) var(--ds-space-3) 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
 .ds-place__option {
   display: flex;
   align-items: baseline;

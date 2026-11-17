@@ -51,7 +51,8 @@ export type ExploreFilterLayers = {
 
 export type ExploreFiltersProps = {
   /** The place control, owned by the caller (it shares the surface's locate action). */
-  readonly place: React.ReactNode;
+  /** Optional: the column now carries the search above the list; Filters no longer repeats it. */
+  readonly place?: React.ReactNode;
   /** The decade histogram, set here on a phone; omitted where it docks on the map. */
   readonly when?: React.ReactNode;
 
@@ -131,7 +132,7 @@ export function ExploreFilters({
 
   return (
     <div className={cx('ds-xrefine', className)}>
-      <Group label="Where">{place}</Group>
+      {place ? <Group label="Where">{place}</Group> : null}
 
       <Group label="Kind">
         <div className="ds-xrefine__values">

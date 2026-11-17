@@ -108,7 +108,9 @@ export function PlaceControl({
     () => (deferred.trim().length < 2 ? [] : suggestCatalogRecords(deferred, catalogFeatures, 5)),
     [deferred, catalogFeatures],
   );
-  const showList = listOpen && suggestions.length > 0;
+  // Two groups, so both kinds of search are visible: a place moves the map, a record opens it.
+  const typed = deferred.trim();
+  const showList = listOpen && typed.length >= 2;
 
   function pickRecord(record: CatalogRecordSuggestion) {
     setListOpen(false);
@@ -234,23 +236,40 @@ export function PlaceControl({
       </form>
 
       {showList ? (
-        <ul
-          className="ds-place__list"
-          id={listId}
-          role="listbox"
-          aria-label="Records in the archive"
-        >
-          {suggestions.map((record) => (
-            <li key={record.entityId} role="option" aria-selected={false}>
-              <button type="button" className="ds-place__option" onClick={() => pickRecord(record)}>
-                <span className="ds-place__option-name">{record.displayName}</span>
-                <span className="ds-place__option-kind">
-                  {kindLabelForMark(record.kind) ?? record.kind}
-                </span>
+        <div className="ds-place__list" id={listId} role="listbox" aria-label="Places and records">
+          <ul className="ds-place__group" role="group" aria-labelledby={`${listId}-places`}>
+            <li className="ds-place__group-label" id={`${listId}-places`} role="presentation">
+              Places
+            </li>
+            <li role="option" aria-selected={false}>
+              <button type="button" className="ds-place__option" onClick={() => void lookUp(typed)}>
+                <span className="ds-place__option-name">Find “{typed}” on the map</span>
+                <span className="ds-place__option-kind">Place</span>
               </button>
             </li>
-          ))}
-        </ul>
+          </ul>
+          {suggestions.length > 0 ? (
+            <ul className="ds-place__group" role="group" aria-labelledby={`${listId}-records`}>
+              <li className="ds-place__group-label" id={`${listId}-records`} role="presentation">
+                Records
+              </li>
+              {suggestions.map((record) => (
+                <li key={record.entityId} role="option" aria-selected={false}>
+                  <button
+                    type="button"
+                    className="ds-place__option"
+                    onClick={() => pickRecord(record)}
+                  >
+                    <span className="ds-place__option-name">{record.displayName}</span>
+                    <span className="ds-place__option-kind">
+                      {kindLabelForMark(record.kind) ?? record.kind}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       ) : null}
 
       <p className="ds-place__status" id={statusId} role="status" aria-live="polite">

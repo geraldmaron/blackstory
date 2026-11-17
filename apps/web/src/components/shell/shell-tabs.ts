@@ -18,7 +18,8 @@ export type ShellTabId = '/explore' | '/records' | '/stories' | '/rooms';
 export type ShellTab = {
   readonly id: ShellTabId;
   readonly label: string;
-  /** Where the tab goes. Map's home is the Door (`/`), which opens on the map. */
+  /** Where the tab goes: the axis's own page. Map is the navigable map, `/explore`; the lockup is
+   * the way to the Door (`/`). Owner decision 2026-11-16. */
   readonly href: string;
   readonly icon: DestinationIconId;
 };
@@ -33,7 +34,7 @@ export const SHELL_TABS: readonly ShellTab[] = ORDER.map((id) => {
   return {
     id,
     label: id === '/rooms' ? 'More' : axis.label,
-    href: id === '/explore' ? '/' : axis.path,
+    href: axis.path,
     icon: axis.icon,
   };
 });

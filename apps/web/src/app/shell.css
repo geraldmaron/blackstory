@@ -2168,6 +2168,14 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   text-shadow: var(--ds-place-halo);
 }
 
+/* On a phone the zoom and locate controls hold the right edge: the legend stops short of them
+   instead of running underneath ("Tap or zoom" was cut off at 390). */
+@media (max-width: 47.9375rem) {
+  .ds-place-legend {
+    max-width: calc(100% - 3 * var(--ds-space-3) - 44px);
+  }
+}
+
 /* On the full-bleed plate (home, explore) the legend clears the tab bar, the explore sheet and
    the attribution chip's row: it sits one 44px row above whichever of them is higher. */
 .ds-map-stage .ds-place-legend {

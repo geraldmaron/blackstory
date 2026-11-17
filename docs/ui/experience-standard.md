@@ -40,7 +40,7 @@ the 2026-11-16 audit observed; strike a line when it is fixed and verified on th
 |---|---|---|---|---|---|
 | J1 | First-time visitor gets oriented | `/` | hero, five-record tour, "Open the record" | a record page opens | none open |
 | J2 | Researcher finds a kind of place | header search | type, Enter, `/records?q=`, facet, row | the record opens within two facet changes | result count said three times on a query |
-| J3 | Reader browses by time or place | `/records?layout=chronology`, `/explore` | timeline, decade; or map, state | the decade's or state's rows are on screen | "Jump to decade" sits only in the pager; phone map total (4,378) differs from Records (4,387) without the reason shown |
+| J3 | Reader browses by time or place | `/records?layout=chronology`, the Map tab (`/explore`) | timeline, decade; or map: search, quick filters, pan and zoom | the decade's or area's rows are on screen | "Jump to decade" sits only in the pager; phone map total (4,378) differs from Records (4,387) without the reason shown |
 | J4 | Phone reader searches from a record | header search icon | sheet, type, suggestion or Enter | the record opens | none open |
 | J5 | Reader moves to another room | tab bar More, or footer | `/rooms`, row | the room opens in two taps | footer says "Rooms" where the tab says "More" |
 | J6 | Reader checks whether a law protects them | `/law` | era or topic, law, "Your rights today" | an agency complaint link is opened | rights block sits third, below two prose beats |
@@ -142,7 +142,26 @@ Rules:
   ribbon, fist, broken chain), display count numerals, photos of harm or novelty motion. The names
   wall is its atmosphere. The three onward cards are the ceiling.
 
-## 8. States
+## 8. The map
+
+The Map tab opens `/explore`, the navigable map; the lockup goes to the Door (`/`). Owner
+decisions 2026-11-16, from the map research (NN/g, Baymard, WCAG, MapLibre, comparable archives):
+
+- **The list follows the map.** Closer than the whole country, the column lists only records whose
+  point is in view, with "Show all" to lift it (`lib/map-experience/view-scope.ts`). The map
+  always draws every match, so map and list never disagree about the area on screen.
+- **One search, always visible**, over the list: "Places" moves the map, "Records" opens the
+  record.
+- **Kind, era and state** are pills over the list; evidence, topic, order and layers stay in
+  Filters. Choosing a state frames it; clearing it returns to the nation.
+- **The camera is never shared.** Filters, query and selection go in the URL; position and zoom do
+  not (`EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS`).
+- **The list is the accessible path.** Every record on the map is reachable from the list and the
+  search, by keyboard; records with no place are counted and linked to Records.
+- **Precision is drawn honestly**: exact site, within a city or area, county or state, with the key
+  always on screen.
+
+## 9. States
 
 Every list or search surface ships a designed empty, no-results, loading and error state, in the
 house voice, with one way forward. The 404 is a real 404. A lookup that finds nothing
@@ -150,7 +169,7 @@ house voice, with one way forward. The 404 is a real 404. A lookup that finds no
 never indexed. Where a route has a `loading.tsx`, the stream has started before the lookup ends,
 so the HTTP status stays 200; that is the accepted cost of the loading state.
 
-## 9. Research Source Library
+## 10. Research Source Library
 
 Today there are three layers and they do not share a taxonomy.
 
@@ -167,7 +186,7 @@ address-derived chips should be renamed "Address type" or removed. Open reader g
 search, no link from a publisher to the records citing it, no download. This rollup is an owner
 decision (it changes what the public page claims), so it is recorded here, not shipped.
 
-## 10. Policy pages
+## 11. Policy pages
 
 | Page | States |
 |---|---|

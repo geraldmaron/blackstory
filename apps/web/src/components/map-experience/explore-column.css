@@ -142,6 +142,34 @@
   height: 16px;
 }
 
+/* The search and quick filters, always over the list. */
+.ds-xcol__search {
+  display: grid;
+  flex: none;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Kind, era and state: three equal pills on one row. A select sizes itself to its longest option
+   (a state name), so the grid, not the content, sets the width; a long choice truncates. */
+.ds-xquick {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-2);
+}
+
+.ds-xquick__field .ds-pill-select__control {
+  width: 100%;
+  padding-inline: var(--ds-space-3);
+}
+
+.ds-xquick__field[data-set] .ds-pill-select__control {
+  border-color: var(--ds-ink);
+  background: var(--ds-surface-raised);
+  font-weight: 600;
+}
+
 /* Active filters, echoed as removable chips under the header. */
 .ds-xcol__echoes {
   display: flex;
@@ -187,6 +215,48 @@
 
 .ds-xcol[data-view='filters'] .ds-xlist,
 .ds-xcol[data-view='filters'] .ds-xcol__note {
+  display: none;
+}
+
+/* Whether the list follows the map, and the switch to change it. */
+.ds-xcol__scope {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-xcol__scope-toggle {
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.ds-xcol__scope-toggle:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.ds-xcol[data-view='filters'] .ds-xcol__scope {
+  display: none;
+}
+
+.ds-xcol__note {
   display: none;
 }
 
@@ -429,6 +499,8 @@ body:has(.ds-atlas .ds-xcol) {
   }
 
   /* At peek the sheet shows its count and the top row; nothing scrolls under a finger. */
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__search,
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__scope,
   .ds-xcol--sheet[data-detent='peek'] .ds-xcol__echoes,
   .ds-xcol--sheet[data-detent='peek'] .ds-xcol__note,
   .ds-xcol--sheet[data-detent='peek'] .ds-xcol__trail,

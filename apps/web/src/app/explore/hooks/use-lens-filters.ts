@@ -23,6 +23,7 @@ import {
   MAP_KIND_FAMILY_ENCODING,
   isKnownMapKind,
   isKnownMapKindFamily,
+  kindEncodingFor,
   kindFamilyEncodingFor,
   kindFamilyFor,
   type MapKindFamily,
@@ -298,7 +299,10 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     if (kindFamily) {
       rows.push({
         key: 'kind',
-        label: exactKind ?? kindFamilyEncodingFor(kindFamily).label,
+        // A URL kind (`kind=person`) is a slug; the chip shows its label, never the raw value.
+        label: exactKind
+          ? kindEncodingFor(exactKind).label
+          : kindFamilyEncodingFor(kindFamily).label,
         onClear: () => setKindFamily(null),
       });
     }

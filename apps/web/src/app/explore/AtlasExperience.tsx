@@ -20,6 +20,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Chip, FilterButton, Notice } from '@repo/ui';
 import { recordsHref } from '../../lib/records/records-query';
+import { featuresInView, narrowingBounds } from '../../lib/map-experience/view-scope';
+import { QuickFilters } from '../../components/map-experience/QuickFilters';
+import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
+import type { ExploreMapBounds } from '../../lib/map-experience/url-state';
 import {
   drawableCollection,
   matchExploreCollection,
@@ -304,7 +308,17 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         : null,
     [overlapIds, placeSorted],
   );
-  const listed = overlapFeatures ?? placeSorted;
+  /* —— The list follows the map: closer than the whole country, it lists what is in view. —— */
+  const [viewBounds, setViewBounds] = useState<ExploreMapBounds | null>(null);
+  const [inViewOnly, setInViewOnly] = useState(true);
+  useEffect(() => stage.subscribe('viewport', (frame) => setViewBounds(frame.bounds)), [stage]);
+  // A chosen place already scopes the list to itself; the camera does not narrow it further.
+  const viewScoped = inViewOnly && !placeScope && narrowingBounds(viewBounds) !== null;
+  const inView = useMemo(
+    () => (viewScoped ? featuresInView(placeSorted, viewBounds) : placeSorted),
+    [viewScoped, placeSorted, viewBounds],
+  );
+  const listed = overlapFeatures ?? inView;
 
   /** Overlapping records always open a chooser: the list, narrowed to them. */
   useEffect(
@@ -479,6 +493,18 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const deepLinkRef = useRef(initial.viewState.selected);
   const [plateReady, setPlateReady] = useState(false);
   useEffect(() => stage.subscribe('ready', () => setPlateReady(true)), [stage]);
+
+  /** Choosing a state frames it; clearing one returns to the nation. A filter the map ignores
+   *  reads as a filter that did nothing. */
+  const framedStateRef = useRef('');
+  useEffect(() => {
+    if (!plateReady || framedStateRef.current === stateCode) return;
+    const previous = framedStateRef.current;
+    framedStateRef.current = stateCode;
+    const bbox = stateCode ? findUsStateByPostalCode(stateCode)?.bbox : undefined;
+    if (bbox) stage.flyPreset('state', { bounds: bbox });
+    else if (previous) stage.flyPreset('national', { bounds: US_CONUS_BOUNDS });
+  }, [plateReady, stage, stateCode]);
   useEffect(() => {
     const pending = deepLinkRef.current;
     if (!plateReady || pending === undefined) return;
@@ -828,6 +854,11 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       : []),
     ...columnConstraints,
   ];
+  /** Kind and state already show, set and emphasized, in the quick pills over the list. */
+  const shownEchoes =
+    columnView === 'list'
+      ? echoes.filter((echo) => echo.key !== 'kind' && echo.key !== 'state')
+      : echoes;
 
   const header = !ready ? (
     <h2 className="ds-xcol__count">Loading records</h2>
@@ -865,8 +896,64 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     />
   );
 
+  /** The search sits over the list in every state but the inspector: places move the map, record
+   *  names open the record. It used to live inside Filters, a tap away from where readers look. */
+  const placeSearch = (
+    <PlaceControl
+      catalogFeatures={view.allFeatures}
+      onResolved={onPlaceResolved}
+      // The map's locate button is the one locate control; a phone sheet at
+      // full height covers it, so there the field carries the action instead.
+      {...(phone && shownDetent === 'full'
+        ? { onLocate: nearMe, locating: locateStatus === 'locating' }
+        : {})}
+      placed={nearby !== null}
+      radiusId={radiusId}
+      onRadiusChange={onRadiusChange}
+      autoFocus={findPlace}
+    />
+  );
+
+  const singleDecade =
+    period.start !== '' && period.start === period.end && !periodIsInvalid(period)
+      ? Number(period.start)
+      : null;
+  const quickFilters = (
+    <QuickFilters
+      kindCounts={kindCounts}
+      kindFamily={kindFamily}
+      onKindFamilyChange={setKindFamily}
+      decades={decadeBars}
+      decade={singleDecade}
+      onDecadeChange={(decade) => setPeriod(decade, decade)}
+      states={stateOptions}
+      stateCode={stateCode}
+      onStateChange={setStateCode}
+    />
+  );
+
+  const scopeLine =
+    !overlapIds && !placeScope && narrowingBounds(viewBounds) !== null ? (
+      <p className="ds-xcol__scope" role="status">
+        <span>
+          {viewScoped
+            ? `In view on the map, of ${placeSorted.length.toLocaleString('en-US')} matching`
+            : `All ${placeSorted.length.toLocaleString('en-US')} matching, wherever they are`}
+        </span>
+        <button
+          type="button"
+          className="ds-xcol__scope-toggle"
+          aria-pressed={viewScoped}
+          onClick={() => setInViewOnly((on) => !on)}
+        >
+          {viewScoped ? 'Show all' : 'Only records in view'}
+        </button>
+      </p>
+    ) : null;
+
   const list = (
     <>
+      {scopeLine}
       {unresolvedScope !== undefined ? (
         <p className="ds-xcol__note" role="status">
           {unresolvedScope}
@@ -1011,10 +1098,22 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           view={columnView}
           busy={!ready}
           header={header}
+          {...(columnView === 'list'
+            ? {
+                search: (
+                  <>
+                    {placeSearch}
+                    {quickFilters}
+                  </>
+                ),
+              }
+            : columnView === 'filters'
+              ? { search: placeSearch }
+              : {})}
           echoes={
-            ready && columnView !== 'inspector' && echoes.length > 0 ? (
+            ready && columnView !== 'inspector' && shownEchoes.length > 0 ? (
               <div className="ds-xcol__echoes" role="group" aria-label="Active filters">
-                {echoes.map((echo) => (
+                {shownEchoes.map((echo) => (
                   <Chip
                     key={echo.key}
                     className="ds-xcol__echo"
@@ -1060,21 +1159,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
               {filtersOpen ? (
                 <div className="ds-xcol__refine" id="explore-filters">
                   <ExploreFilters
-                    place={
-                      <PlaceControl
-                        catalogFeatures={view.allFeatures}
-                        onResolved={onPlaceResolved}
-                        // The map's locate button is the one locate control; a phone sheet at
-                        // full height covers it, so there the field carries the action instead.
-                        {...(phone && shownDetent === 'full'
-                          ? { onLocate: nearMe, locating: locateStatus === 'locating' }
-                          : {})}
-                        placed={nearby !== null}
-                        radiusId={radiusId}
-                        onRadiusChange={onRadiusChange}
-                        autoFocus={findPlace}
-                      />
-                    }
                     {...(phone ? { when: brush } : {})}
                     kindCounts={kindCounts}
                     kindFamily={kindFamily}

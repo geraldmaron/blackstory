@@ -66,7 +66,9 @@ export type ExploreColumnProps = {
   readonly onDetentChange: (detent: SheetDetent) => void;
   readonly viewportHeight: number;
   readonly header: React.ReactNode;
-  /** Active-filter echoes, under the header. */
+  /** The always-visible place and record search, under the header (owner decision 2026-11-16). */
+  readonly search?: React.ReactNode;
+  /** Active-filter echoes, under the search. */
   readonly echoes?: React.ReactNode;
   readonly children: React.ReactNode;
   readonly view: 'filters' | 'list' | 'inspector';
@@ -79,6 +81,7 @@ export function ExploreColumn({
   onDetentChange,
   viewportHeight,
   header,
+  search,
   echoes,
   children,
   view,
@@ -171,6 +174,7 @@ export function ExploreColumn({
         ) : null}
         <div className="ds-xcol__head">{header}</div>
       </div>
+      {search ? <div className="ds-xcol__search">{search}</div> : null}
       {echoes}
       <div className="ds-xcol__body">{children}</div>
     </aside>

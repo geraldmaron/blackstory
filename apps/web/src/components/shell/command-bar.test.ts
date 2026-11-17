@@ -19,7 +19,7 @@ test('the tabs are Map, Records, Stories and More, in that order, from the regis
   );
   assert.deepEqual(
     SHELL_TABS.map((tab) => tab.href),
-    ['/', '/records', '/stories', '/rooms'],
+    ['/explore', '/records', '/stories', '/rooms'],
   );
   assert.match(read('shell-tabs.ts'), /primaryNavDestinations\(\)/);
 });
