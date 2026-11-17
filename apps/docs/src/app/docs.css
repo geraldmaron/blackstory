@@ -29,7 +29,13 @@
   --ds-focus: var(--ds-copper);
 }
 
+/* The toggle decides native widgets and scrollbars too, not the OS. */
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
 html[data-theme='dark'] {
+  color-scheme: dark;
   --ds-canvas: var(--ds-ink);
   --ds-raised: var(--ds-charcoal);
   --ds-fg: var(--ds-paper);
@@ -449,10 +455,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
 .btn-primary {
   border-color: var(--ds-accent-graphic);
   background: var(--ds-accent-graphic);
-  color: #fff;
-}
-
-html[data-theme='dark'] .btn-primary {
+  /* Ink on copper in both themes: 4.9:1 on #b86b2a, 6.1:1 on #d07a32 (white was 3.6:1). */
   color: var(--ds-ink);
 }
 
