@@ -348,9 +348,14 @@ const config: ExpoConfig = {
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#208AEF',
-        image: './assets/images/splash-icon.png',
-        imageWidth: 76,
+        // Brand symbol on Archive Paper, and on Black Ink when the device is in dark mode.
+        backgroundColor: '#F4EFE5',
+        image: './assets/brand/symbols/light/BlackStory-symbol-light-transparent-1024.png',
+        imageWidth: 96,
+        dark: {
+          backgroundColor: '#0A0A0A',
+          image: './assets/brand/symbols/dark/BlackStory-symbol-dark-transparent-1024.png',
+        },
       },
     ],
     // MOB-011 (corrected 2026-07-20) / repo-umwk: the official
