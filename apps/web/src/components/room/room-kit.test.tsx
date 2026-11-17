@@ -165,18 +165,14 @@ describe('room kit · a catalog block a second room renders is styled by the kit
 });
 
 describe('room kit · the trail is computed, never hand-written', () => {
-  // Reading rooms use Rooms as their parent. The site root resolves the trail but is not
-  // rendered as a breadcrumb step.
-  it('a reading room hangs off Rooms', () => {
-    assert.deepEqual(resolveTrail('/books'), [
-      { label: 'Rooms', href: '/rooms' },
-      { label: 'Banned books', href: null },
-    ]);
+  // Reading rooms use Rooms as their parent. Neither the site root nor the /rooms hub is
+  // rendered as a breadcrumb step: one is the site, the other sits above nearly every room.
+  it('a reading room prints no Rooms step', () => {
+    assert.deepEqual(resolveTrail('/books'), [{ label: 'Banned books', href: null }]);
   });
 
   it("a record's parent is its catalog, not the site root", () => {
     assert.deepEqual(resolveTrail('/books/the-bluest-eye', 'The Bluest Eye'), [
-      { label: 'Rooms', href: '/rooms' },
       { label: 'Banned books', href: '/books' },
       { label: 'The Bluest Eye', href: null },
     ]);
@@ -193,7 +189,6 @@ describe('room kit · the trail is computed, never hand-written', () => {
 
   it('a nested utility room keeps every intermediate step', () => {
     assert.deepEqual(resolveTrail('/corrections/status/AB12', 'AB12'), [
-      { label: 'Rooms', href: '/rooms' },
       { label: 'Corrections', href: '/corrections' },
       { label: 'AB12', href: null },
     ]);
@@ -203,12 +198,12 @@ describe('room kit · the trail is computed, never hand-written', () => {
     assert.deepEqual(resolveTrail('/books/?sort=year', 'Books'), resolveTrail('/books', 'Books'));
   });
 
-  it('the site root is never rendered as a crumb step', () => {
+  it('neither the site root nor the /rooms hub is ever rendered as a crumb step', () => {
     for (const path of ['/books', '/rooms', '/entity/abc', '/corrections/status/AB12']) {
       const trail = resolveTrail(path, 'Here');
       assert.ok(
-        trail.every((step) => step.href !== '/'),
-        `${path} must not render a site-root step`,
+        trail.every((step) => step.href !== '/' && step.href !== '/rooms'),
+        `${path} must not render a site-root or Rooms step`,
       );
     }
   });
@@ -230,7 +225,7 @@ describe('room kit · the Reading posture is the shared PageHeader', () => {
       href: '/books',
       label: 'Banned books',
     });
-    assert.deepEqual(parentCrumb('/about'), { href: '/rooms', label: 'Rooms' });
+    assert.equal(parentCrumb('/about'), undefined, 'the /rooms hub is not a crumb');
     assert.equal(parentCrumb('/'), undefined);
   });
 
@@ -243,10 +238,12 @@ describe('room kit · the Reading posture is the shared PageHeader', () => {
   });
 
   it('the breadcrumb marks the current step and does not link it', () => {
-    const html = renderToStaticMarkup(<Breadcrumb pathname="/law" />);
+    const html = renderToStaticMarkup(
+      <Breadcrumb pathname="/books/the-bluest-eye" hereLabel="The Bluest Eye" />,
+    );
     assert.match(html, /aria-current="page"/);
-    assert.match(html, /ds-room-crumb__here[^>]*>Law/);
-    assert.match(html, /href="\/rooms"/);
+    assert.match(html, /ds-room-crumb__here[^>]*>The Bluest Eye/);
+    assert.match(html, /href="\/books"/);
     assert.doesNotMatch(html, /href="\/"/);
   });
 });

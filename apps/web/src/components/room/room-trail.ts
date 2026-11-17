@@ -37,8 +37,12 @@ export function roomLabelFor(pathname: string): string | null {
  *
  * The site root (`/`) is resolved as a parent but not rendered as a step: it is the site itself,
  * it is already the brand mark and the first item in the nav bar, and a crumb that reads
- * "Explore /" on all thirteen surfaces carries no information about where the reader is.
+ * "Explore /" on all thirteen surfaces carries no information about where the reader is. The
+ * `/rooms` hub is skipped for the same reason: it is the parent of nearly every room, so a
+ * "Rooms" crumb printed above almost every title and said nothing.
  */
+const TRAIL_SKIPPED: ReadonlySet<string> = new Set(['/', '/rooms']);
+
 export function resolveTrail(pathname: string, hereLabel?: string): readonly RoomCrumb[] {
   const path = normalizeDestinationPath(pathname);
   const here = hereLabel ?? roomLabelFor(path) ?? path;
@@ -54,7 +58,7 @@ export function resolveTrail(pathname: string, hereLabel?: string): readonly Roo
   }
 
   const steps: RoomCrumb[] = ancestors
-    .filter((ancestor) => ancestor !== '/')
+    .filter((ancestor) => !TRAIL_SKIPPED.has(ancestor))
     .map((ancestor) => ({
       label: roomLabelFor(ancestor) ?? ancestor,
       href: ancestor,

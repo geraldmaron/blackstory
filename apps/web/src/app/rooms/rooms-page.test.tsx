@@ -75,12 +75,14 @@ describe('/rooms · the room is reachable', () => {
     assert.equal(new Set(chords).size, chords.length, 'two shortcuts share a chord');
   });
 
-  it('is the first breadcrumb step for a reading room and a utility room alike', () => {
-    // The map root is resolved as a parent but not rendered as a step, so Rooms leads.
+  it('is never a breadcrumb step: it parents nearly every room, so the crumb said nothing', () => {
+    // Reached by L, the footer and the More menu instead.
     for (const path of ['/books', '/methodology', '/corrections', '/submit']) {
       const trail = resolveTrail(path);
-      assert.equal(trail[0]?.label, 'Rooms');
-      assert.equal(trail[0]?.href, '/rooms', 'the rooms step must be a working link');
+      assert.ok(
+        trail.every((step) => step.href !== '/rooms'),
+        `${path} prints a Rooms crumb`,
+      );
     }
   });
 
