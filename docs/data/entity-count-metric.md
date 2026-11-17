@@ -15,7 +15,7 @@ for "how many entities does the project have." Nothing else counts:
 ## Measuring the value
 
 Run `SELECT count(*) FROM canonical.entities` in a read-only transaction for a current
-measurement. The [research audit](../research/framework-audit.md) records a dated observation;
+measurement. The [research audit](../research/archive/framework-audit.md) records a dated observation;
 that observation is not a live count. Do not compare pending intake against a cached number.
 
 ## Avoiding drift

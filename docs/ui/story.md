@@ -154,8 +154,8 @@ this document continues to govern site chrome and microcopy (and, below, the
 Staged `/stories` stories use the **research linking method** from strong oral
 storytelling — start-line relocation, omitted actors, winner-built tests — without
 importing viral rhetorical costume. Skill reference:
-`.agents/skills/blackstory-story-craft/SKILL.md`. Packets use
-`story.research.packet.v1`; human approval turns an approved packet into an editable story draft
+`docs/research/research-operations.md#story-craft-story-research-run`. Packets use
+`story.research.packet.v1`; approval turns an approved packet into an editable story draft
 in `/admin/stories` (publication is Postgres-backed and signed). Nothing
 auto-publishes. Every published story **must** carry a non-empty `references`
 list; `/stories/[slug]` renders it under Evidence / Sources. Related entities remain claim-level off-ramps — they do not replace

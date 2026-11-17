@@ -1,7 +1,7 @@
 # Research framework audit evidence
 
 Engineering verification record, observed 2026-09-19. The maintained method is
-[Research framework](README.md); [Architecture](../architecture.md) owns authority and the challenge
+[Research framework](../README.md); [Architecture](../../architecture.md) owns authority and the challenge
 procedure. Beads epic `repo-91sqj` owns execution status. This record replaces superseded intermediate
 results rather than accumulating competing completion claims.
 
@@ -224,7 +224,7 @@ An identical NARA capture deduplicated successfully. Two one-URL dry-run batches
 cursor without network requests. The bounded authenticated preservation pilot submitted the NARA
 URL once. Internet Archive's account status recorded one daily capture, and CDX reported a new
 HTTP 200 capture at `20260919023853`, eleven seconds after the local revision reservation. The
-[sanitized receipt](../../packages/testing/src/gold-corpus/artifacts/internet-archive-preservation-pilot-2026-09-18.json)
+[sanitized receipt](../../../packages/testing/src/gold-corpus/artifacts/internet-archive-preservation-pilot-2026-09-18.json)
 records the exact URL, local digest, CDX digest, replay URL, capture time and readback result without
 credential values. The exact replay returned HTTP 200 with the matching Memento datetime.
 
@@ -282,7 +282,7 @@ Observed: the exact replay returned HTTP 200 and Memento-Datetime Sat, 19 Sep 20
 
 ## Research evaluation
 
-The reusable [held-out corpus](../../packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval.v1.md)
+The reusable [held-out corpus](../../../packages/testing/src/gold-corpus/fixtures/heldout-evidence-retrieval.v1.md)
 contains six opened primary pages, 20 retrieval questions and 14 entailment cases. It includes
 rare people, aliases, synthetic OCR perturbations, indirect questions, a two-hop chain, conflicting
 fields, missing evidence and a second domain. A separate agent authored provisional gold labels;
@@ -294,7 +294,7 @@ Forbidden-document retrieval occurred in 0.10 of queries. That is a candidate fa
 not an identity-merge rate. The frozen entailment pass matched 12/14 provisional labels and made
 no false-support decisions; two disagreements concern boundary-sensitive labels.
 
-The corrected [embedding pilot](../../packages/testing/src/gold-corpus/artifacts/evidence-retrieval-pilot-2026-09-18.json)
+The corrected [embedding pilot](../../../packages/testing/src/gold-corpus/artifacts/evidence-retrieval-pilot-2026-09-18.json)
 used OpenRouter `openai/text-embedding-3-small`, returning `text-embedding-3-small`, at 768
 dimensions. The explicit normalized model mapping is allowlisted; arbitrary substitutions fail.
 The run scopes lexical and vector fusion to the six held-out source items and isolates synthetic
@@ -328,7 +328,7 @@ category measures retrieval of supporting documents, not end-to-end relationship
 Measurement-only reports use `qualityAdmission: not_evaluated`; zero measurement thresholds
 cannot produce a misleading quality-pass flag. Identity and edge decisions are measured separately below; retrieving a forbidden candidate is not an admitted assertion. No probability calibration or population-level quality claim is supported.
 
-The [controlled index and categorical measurement](../../packages/testing/src/gold-corpus/fixtures/heldout-quality-measurement.v1.json)
+The [controlled index and categorical measurement](../../../packages/testing/src/gold-corpus/fixtures/heldout-quality-measurement.v1.json)
 uses 1,000 included deterministic-vector rows and 100 wrong-model rows. The approximate SQL bounds
 candidates by distance before deterministic outer ordering. Default local planner settings selected
 a sequential scan for the padding preflight; transaction-local planner controls then proved

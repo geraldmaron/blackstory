@@ -3,7 +3,7 @@
 These are transparent development cases for the BlackStory research, prose and experience
 playbooks. They are deliberately small enough to inspect. They are not a blind benchmark,
 a historical truth oracle, or evidence of a production error rate. Sources and current
-observations for the historical cases are in the [audit record](skill-audit-2026-10-07.md).
+observations for the historical cases are in the [audit record](archive/skill-audit-2026-10-07.md).
 
 ## How to use
 

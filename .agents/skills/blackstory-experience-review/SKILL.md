@@ -5,9 +5,6 @@ description: Review or change BlackStory web and native mobile flows for task su
 
 # Experience review
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 Use the [UI index](../../../docs/ui/README.md), its
 [task-based review](../../../docs/ui/README.md#task-based-experience-review), and
 [component registry](../../../docs/ui/patterns-registry.md). Read the affected
@@ -68,15 +65,3 @@ is not proof of real-device assistive-technology or performance behavior.
 Deliver prioritized findings, smallest supported fix, checks actually run and residual
 risks. A screenshot confirms one state; it does not prove the flow, screen-reader support,
 all screen sizes or cross-platform parity. Do not claim those without observing them.
-
-## Working contract
-
-**Input:** A reader task, destination surface and realistic record data.
-
-**Output:** Observed task results across applicable themes and widths, plus actionable failures and untested capabilities.
-
-**Boundary and handoff:** Hand factual errors to claim review and projection disagreements to surface triage. A screenshot or helper test does not prove the complete task.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

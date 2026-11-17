@@ -234,7 +234,7 @@ visible and present; a draft with none has skipped the work.
 ## Part VIII: Production loop and limits
 
 Research → evidence review → draft → prose review → adversarial review → exact final
-revision check → applicable validation → publication-role review. A factual change
+revision check → applicable validation → publication. A factual change
 returns to evidence review. Use a separate reviewer for consequential disputed claims;
 self-review must be identified as such. Review is not permission to publish.
 

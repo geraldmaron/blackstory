@@ -5,9 +5,6 @@ description: Use when a published surface shows something the record's own data 
 
 # Surface triage (the page disagrees with the record)
 
-Requires the BlackStory checkout. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
 A record in this archive is published twice: once as a **projection** in
 `published.release_entities`, which is what the entity page reads, and once as a **search doc**
 in `published.search_index`, which is what `/records`, `/explore`, search, and every facet read.
@@ -149,15 +146,3 @@ inherently true merely because it is populated.
   release identity and relevant cache behavior; report any cache window still outstanding.
 - For interaction, accessibility or mobile usability defects, use `blackstory-experience-review`;
   agreement between data layers does not prove an interface is usable.
-
-## Working contract
-
-**Input:** An observed public mismatch and the record’s actual data/revision.
-
-**Output:** A reproduced cause, scoped repair and observed readback on affected projections.
-
-**Boundary and handoff:** Factual disagreements return to evidence review. Do not rewrite correct source data to accommodate a broken projection.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

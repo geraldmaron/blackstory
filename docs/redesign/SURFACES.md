@@ -8,11 +8,9 @@
 acceptance criteria and ownership after the 2026-11-01 adversarial pass. The inventory below
 describes the audit baseline; it is not a claim that every listed defect still exists.
 
-**Machine-checked inventory:** [`surface-inventory.json`](surface-inventory.json) maps all 66
+**Inventory:** [`surface-inventory.json`](surface-inventory.json) maps all 66
 page modules and six shared surface groups to component sources, state applicability,
-redesign progress and evidence references. Run `pnpm check:surface-inventory` after adding,
-removing or moving routes, and update affected entries in the same change. The check also
-runs inside `pnpm validate`; it verifies mapping integrity, not rendered acceptance. Keep
+redesign progress and evidence references. It is a planning baseline kept by hand; no gate checks it. Keep
 `surface-classes.ts` authoritative for shell behavior and the existing Playwright matrix for
 visual comparisons. A `complete` entry requires a revision and verification references.
 

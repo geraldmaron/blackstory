@@ -669,7 +669,7 @@
 }
 
 /* Narrow screens: the margin is a sheet. */
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   .studio-bar {
     padding: 0 var(--ds-space-3);
   }

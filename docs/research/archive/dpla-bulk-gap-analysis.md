@@ -7,7 +7,7 @@
 
 # DPLA bulk gap analysis (one-shot)
 
-**Purpose:** Offline comparison of DPLA item metadata against the BlackStory catalog to surface **states and decades where DPLA holds material but the corpus is thin or absent**. Informs adapter prioritization and discovery campaigns — not a claim to compete on DPLA scale (see [black-history-data-landscape-intake.md §3.2](./black-history-data-landscape-intake.md#32-rejected-or-rewritten-wrong-on-merits)).
+**Purpose:** Offline comparison of DPLA item metadata against the BlackStory catalog to surface **states and decades where DPLA holds material but the corpus is thin or absent**. Informs adapter prioritization and discovery campaigns — not a claim to compete on DPLA scale (see [black-history-data-landscape-intake.md §3.2](../black-history-data-landscape-intake.md#32-rejected-or-rewritten-wrong-on-merits)).
 
 **Date:** 2026-07-21  
 **Branch:** `research/data-landscape-capitalization`  
@@ -116,7 +116,7 @@ Commit **only** the markdown summary and methodology notes unless the owner expl
 
 ## 5. Disk budget (Supabase Pro 8 GB)
 
-From [supabase-pro-cost-envelope.md §2](./supabase-pro-cost-envelope.md#2-disk-and-egress-headroom-live-corpus):
+From [supabase-pro-cost-envelope.md §2](../supabase-pro-cost-envelope.md#2-disk-and-egress-headroom-live-corpus):
 
 - Each Supabase Pro project includes **8 GB database disk**.
 - Live corpus today is **~260 MB** — ample headroom for embeddings and captures.
@@ -146,9 +146,9 @@ Follow-up work stays in existing pipelines: fixture-first adapters, discovery ca
 | `packages/domain/src/adapters/dpla/fixtures/gap-analysis-*.json` | Tiny demonstration fixtures |
 | `docs/research/dpla-gap-sample-report.md` | Generated sample output |
 | `.cache/dpla-gap/report.json` | Machine-readable sample (regenerated) |
-| [federal-adapters.md](./federal-adapters.md) | Federal DPLA fixture adapter |
-| [discovery-pipeline.md](./discovery-pipeline.md) | Live DPLA v2 discovery (separate from bulk gap) |
-| [supabase-pro-cost-envelope.md](./supabase-pro-cost-envelope.md) | Disk/egress guardrails |
+| [federal-adapters.md](../federal-adapters.md) | Federal DPLA fixture adapter |
+| [discovery-pipeline.md](../discovery-pipeline.md) | Live DPLA v2 discovery (separate from bulk gap) |
+| [supabase-pro-cost-envelope.md](../supabase-pro-cost-envelope.md) | Disk/egress guardrails |
 
 ---
 

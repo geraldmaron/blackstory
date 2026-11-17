@@ -91,7 +91,7 @@ const MARKDOWN_FIELD_KEYS: Record<string, keyof LeadInput> = {
  * Markdown bulk-import format: one `### <title>` heading per lead, followed by `Key: value`
  * lines (case-insensitive; `Description` may wrap multiple lines until the next key). `Source`
  * `Url` may repeat to attach more than one source URL. See
- * `.agents/skills/blackstory-research-intake/SKILL.md` and
+ * `docs/research/research-operations.md#research-intake` and
  * `docs/runbooks/operator-session.md` for a worked example.
  */
 export function parseLeadsFromMarkdown(markdownText: string): LeadInput[] {

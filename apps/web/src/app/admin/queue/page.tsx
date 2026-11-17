@@ -261,7 +261,9 @@ export default async function QueuePage({
                             <Link className="story-review__row-title" href={row.href}>
                               {row.title}
                             </Link>
-                            <p className="story-review__row-meta ds-mono">{row.nativeId}</p>
+                            <p className="story-review__row-meta ds-mono" title={row.nativeId}>
+                              {row.nativeId}
+                            </p>
                             {row.openCaseCount > 1 ? (
                               <span className="queue__badge">{row.openCaseCount} open cases</span>
                             ) : null}
@@ -269,7 +271,9 @@ export default async function QueuePage({
                           <td>{QUEUE_TYPE_LABELS[row.type]}</td>
                           <td>
                             {QUEUE_STAGE_LABELS[row.stage]}
-                            <p className="story-review__row-meta ds-mono">{row.nativeState}</p>
+                            <p className="story-review__row-meta ds-mono" title="Native state">
+                              {row.nativeState.replaceAll('_', ' ')}
+                            </p>
                           </td>
                           <td>
                             {formatWaitingDays(row.waitingSince, now)}

@@ -87,7 +87,7 @@ Any agent can challenge a load-bearing choice without creating an ADR or PRD:
 3. Define the smallest decisive experiment. Use realistic data and the actual interface. For a
    database or authorization change, include production-shaped migration and denial tests.
 4. Record **accepted**, **accepted with controls**, **needs validation**, or **rejected**, with the
-   evidence and the condition that would change the decision. Put work and dependencies in Beads.
+   evidence and the condition that would change the decision.
 5. Change the implementation, tests, and owning document together. Remove superseded paths and
    claims. Do not retain compatibility wrappers unless the user explicitly changes that goal.
 6. Run the applicable project gates and observe the outcome. Report what remains unproven and

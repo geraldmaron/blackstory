@@ -1540,6 +1540,72 @@
       ]
     },
     {
+      "route": "/admin/stories/[slug]/preview/embed",
+      "source": "apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx",
+      "family": "admin",
+      "access": "staff",
+      "status": "partial",
+      "states": {
+        "default": {
+          "status": "baseline",
+          "reason": "Retains the recorded protected desk layout with shared shell, loading and staff-specific error recovery. This records inherited implementation, not a per-desk visual or populated-data acceptance claim. Existing mutation behavior is unchanged; a real staff session is required for populated/selected acceptance.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx",
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx"
+          ]
+        },
+        "loading": {
+          "status": "baseline",
+          "reason": "A route-segment loading component exists and is the current loading-state baseline.",
+          "evidence": ["apps/web/src/app/admin/loading.tsx", "docs/redesign/SURFACES.md"]
+        },
+        "error": {
+          "status": "partial",
+          "reason": "Staff desks share one boundary with staff copy, retry and a way back to the operations desk; detail is sanitized. Synthetic-error component test only; no authenticated session or populated desk data, not rendered in a browser.",
+          "evidence": [
+            "apps/web/src/app/admin/error.tsx",
+            "apps/web/src/app/admin/error.test.tsx",
+            "apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "empty": {
+          "status": "not-applicable",
+          "reason": "This route is not an empty-result or data-absence surface in the redesign inventory.",
+          "evidence": ["apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx"]
+        },
+        "selected": {
+          "status": "pending",
+          "reason": "This admin workflow has route or row selection; the admin task-state redesign is pending.",
+          "evidence": [
+            "apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx",
+            "docs/redesign/SURFACES.md"
+          ]
+        },
+        "auth": {
+          "status": "baseline",
+          "reason": "The route is protected by the existing staff identity gate; redesign status does not change or re-verify authorization.",
+          "evidence": [
+            "apps/web/src/proxy.ts",
+            "apps/web/src/proxy.test.ts",
+            "apps/web/src/admin/auth/protected-paths.test.ts",
+            "apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx"
+          ]
+        }
+      },
+      "componentRefs": [
+        "apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx",
+        "apps/web/src/admin/components/AdminShellChrome.tsx"
+      ],
+      "evidence": [
+        "apps/web/src/app/admin/stories/[slug]/preview/embed/page.tsx",
+        "docs/redesign/SURFACES.md",
+        "apps/web/src/lib/nav/surface-classes.ts",
+        "apps/web/src/lib/nav/surface-classes.test.ts"
+      ]
+    },
+    {
       "route": "/admin/stories/contributors",
       "source": "apps/web/src/app/admin/stories/contributors/page.tsx",
       "family": "admin",

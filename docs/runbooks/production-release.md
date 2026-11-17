@@ -21,7 +21,7 @@ Preview database credentials are removed, direct deployment URLs require Vercel 
 lists are empty, and the four historical scheduled GitHub workflows remain disabled. The final
 transaction check found no active or idle-in-transaction client and no prepared transaction.
 Owner-only records retain recovery locations and execution details; the
-[framework audit](../research/framework-audit.md) contains the sanitized evidence.
+[framework audit](../research/archive/framework-audit.md) contains the sanitized evidence.
 
 The reopened canary returned 200 for `/`, `/records`, `/explore`, the Dunbar place, `/about` and
 `/admin/login`; anonymous admin checks returned 401/307, staff APIs returned 200, and a missing
