@@ -58,6 +58,22 @@ updates:
       # Drop this entry when repo-gvus is done; the migration is the unblock, not the bump.
       - dependency-name: 'zod'
         update-types: ['version-update:semver-major']
+      # @types/node tracks the Node line the repo actually runs (.nvmrc: 22). A major bump hands
+      # every workspace the typings for a runtime CI and production do not use, so an API that
+      # exists only in a newer Node would type-check here and fail at runtime. Move this with
+      # .nvmrc, not on Dependabot's schedule.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # maplibre-gl 6 drops the default export and types paint keys strictly, so MapStage,
+      # EmbeddedMap, map-plate-paint, style-application and decade-layer-transition stop
+      # type-checking (23 errors), and style-spec 26 inserts a `rootKey` argument into
+      # createPropertyExpression (explore-style-spec.test.ts). Everything else in the major
+      # group type-checks and passes its tests, so this pair alone kept that PR red. Same shape as
+      # the zod hold: drop both entries when the MapLibre 6 migration lands.
+      - dependency-name: 'maplibre-gl'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@maplibre/maplibre-gl-style-spec'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: npm
     # apps/mobile keeps its own npm lockfile — deliberately excluded from the root pnpm
@@ -82,9 +98,10 @@ updates:
     # against peers Expo does not ship yet, so npm fails at install and no amount of rebasing
     # helps; they are held until an SDK upgrade moves the pins, not because the versions are bad.
     ignore:
-      # Needs react-native-worklets 0.12.x; SDK 57 pins 0.10.1.
+      # Needs react-native-worklets 0.12.x; SDK 57 pins 0.10.1. SDK 57 also pins reanimated to
+      # exactly 4.5.1, and Expo Doctor rejects even the 4.5.5 patch, so every newer version waits.
       - dependency-name: 'react-native-reanimated'
-        versions: ['>=4.6.0']
+        versions: ['>4.5.1']
       # react-test-renderer pins an exact-ish peer on react, and SDK 57 pins react 19.2.3, so
       # every version above that fails install. 19.2.8 and 19.2.7 were both tried and both
       # resolved to a react this project does not have.
@@ -102,6 +119,23 @@ updates:
       # @typescript-eslint ships a release that supports TypeScript 7.
       - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
+      # An Expo SDK upgrade is one coordinated move (`npx expo install expo@^<next> --fix`), not a
+      # set of independent bumps: the SDK pins react and its native peers together.
+      # Bumped piecemeal, the SDK 58 group left react-native-worklets 0.13.1 out of the lockfile
+      # and failed `npm ci` (EUSAGE), and the minor group failed Expo Doctor on four SDK pins:
+      # react and react-dom 19.3.1 against an exact 19.2.3, @types/react 19.3.0 against ~19.2.4,
+      # and react-native-reanimated 4.5.5 against an exact 4.5.1 (held below). Exact pins reject
+      # even a patch, so react and react-dom hold every update; the tilde pin holds minor and up.
+      - dependency-name: 'expo'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'expo-*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@expo/*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react'
+      - dependency-name: 'react-dom'
+      - dependency-name: '@types/react'
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
 
   - package-ecosystem: pip
     directory: /
