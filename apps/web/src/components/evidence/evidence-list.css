@@ -46,8 +46,8 @@
   margin: 0;
   max-width: 62ch;
   font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  line-height: 1.45;
+  font-size: var(--ds-text-subtitle); /* 1.0625rem, same as .ds-recpage__prose */
+  line-height: 1.55;
   text-wrap: pretty;
 }
 
