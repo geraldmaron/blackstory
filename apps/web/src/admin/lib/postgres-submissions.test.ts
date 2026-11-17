@@ -360,7 +360,12 @@ test('closing a correction emails its outcome to the corrector; spam and leads e
   for (const { current, decision, outcome } of cases) {
     const { dependencies, sent } = fixture(identity('admin'), current);
     const result = await commitSubmissionDecision(
-      { intakeItemId: current.id, decision, reason: 'Checked.' },
+      {
+        intakeItemId: current.id,
+        decision,
+        reason: 'Checked.',
+        publicReason: 'The ledger agrees.',
+      },
       dependencies,
     );
     assert.equal(result.status, 'ok', `${decision} on ${current.status}`);
@@ -371,7 +376,14 @@ test('closing a correction emails its outcome to the corrector; spam and leads e
             [
               'correction.closed',
               'reader@example.org',
-              { receiptCode: 'BS-ABCD-EFGH', outcome, appealAvailable: outcome === 'rejected' },
+              outcome === 'rejected'
+                ? {
+                    receiptCode: 'BS-ABCD-EFGH',
+                    outcome,
+                    appealAvailable: true,
+                    reason: 'The ledger agrees.',
+                  }
+                : { receiptCode: 'BS-ABCD-EFGH', outcome, appealAvailable: false },
             ],
           ]
         : [],
@@ -393,9 +405,84 @@ test('a decline after the one appeal does not offer another', async () => {
   });
   const { dependencies, sent } = fixture(identity('admin'), current);
   await commitSubmissionDecision(
-    { intakeItemId: current.id, decision: 'reject', reason: 'Checked again.' },
+    {
+      intakeItemId: current.id,
+      decision: 'reject',
+      reason: 'Checked again.',
+      publicReason: 'Still no source.',
+    },
     dependencies,
   );
   assert.equal(sent[0]?.event, 'correction.closed');
   assert.equal((sent[0]?.data as { appealAvailable: boolean }).appealAvailable, false);
+});
+
+test('declining a correction needs a public reason, safe to show, and saves it on the receipt', async () => {
+  const correction = submission({
+    kind: 'correction',
+    payload: { receiptDigest: 'digest', receiptCode: 'BS-ABCD-EFGH' },
+  });
+  for (const [publicReason, pattern] of [
+    [undefined, /reason the submitter sees/u],
+    ['   ', /reason the submitter sees/u],
+    ['x'.repeat(1001), /under 1000/u],
+    ['The family lived at 1201 Main Street until 1931.', /street address/u],
+  ] as const) {
+    const { commits, dependencies } = fixture(identity('admin'), correction);
+    const result = await commitSubmissionDecision(
+      {
+        intakeItemId: 'intake-1',
+        decision: 'reject',
+        reason: 'Checked.',
+        ...(publicReason === undefined ? {} : { publicReason }),
+      },
+      dependencies,
+    );
+    assert.equal(result.status, 'invalid');
+    assert.match(result.status === 'invalid' ? result.message : '', pattern);
+    assert.equal(commits.length, 0);
+  }
+
+  const params: unknown[][] = [];
+  const { dependencies } = fixture(identity('admin'), correction);
+  const result = await commitSubmissionDecision(
+    {
+      intakeItemId: 'intake-1',
+      decision: 'reject',
+      reason: 'Internal note.',
+      publicReason: ' The 1924 ledger shows the later date. ',
+    },
+    {
+      ...dependencies,
+      async commit(input) {
+        await input.applyState({
+          query: async (_sql: string, values: unknown[]) => {
+            params.push(values);
+            return { rowCount: 1 };
+          },
+        } as unknown as pg.PoolClient);
+        return { eventId: input.auditEvent.id, replayed: false };
+      },
+    },
+  );
+  assert.equal(result.status, 'ok');
+  assert.equal(params[0]?.[4], true);
+  assert.equal(
+    JSON.parse(String(params[0]?.[5])).publicReason,
+    'The 1924 ledger shows the later date.',
+  );
+});
+
+test('a lead or spam decision needs no public reason', async () => {
+  for (const [current, decision] of [
+    [submission(), 'reject'],
+    [submission({ kind: 'correction', payload: { receiptDigest: 'd' } }), 'spam'],
+  ] as const) {
+    const { dependencies } = fixture(identity('admin'), current);
+    const result = await commitSubmissionDecision(
+      { intakeItemId: current.id, decision, reason: 'Checked.' },
+      dependencies,
+    );
+    assert.equal(result.status, 'ok');
+  }
 });

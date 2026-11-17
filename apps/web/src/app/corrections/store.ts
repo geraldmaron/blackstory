@@ -21,6 +21,8 @@ export type StoredCorrection = {
   readonly classificationDispute: boolean;
   readonly appeals: readonly StoredAppeal[];
   readonly closureReason?: PublicClosureReason;
+  /** Staff's plain-language decline reason, written for the submitter. */
+  readonly publicReason?: string;
   readonly updatedAt: string;
 };
 

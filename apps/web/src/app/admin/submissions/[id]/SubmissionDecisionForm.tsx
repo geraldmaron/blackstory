@@ -20,16 +20,22 @@ const DECISION_LABEL = {
 export function SubmissionDecisionForm({
   intakeItemId,
   decisions,
+  needsPublicReason = false,
 }: {
   readonly intakeItemId: string;
   readonly decisions: readonly SubmissionDecision[];
+  /** A correction with a receipt: declining it needs a reason its submitter will read. */
+  readonly needsPublicReason?: boolean;
 }) {
   const [state, formAction, pending] = useActionState<SubmissionDecisionState, FormData>(
     decideSubmission,
     SUBMISSION_DECISION_INITIAL,
   );
   const [reason, setReason] = useState('');
+  const [publicReason, setPublicReason] = useState('');
   const canSubmit = reason.trim().length > 0 && !pending;
+  const blocked = (decision: SubmissionDecision) =>
+    !canSubmit || (decision === 'reject' && needsPublicReason && !publicReason.trim());
 
   if (state.status === 'decided') {
     return (
@@ -72,6 +78,19 @@ export function SubmissionDecisionForm({
           placeholder="Cite what you checked and the resulting record change."
         />
       </label>
+      {needsPublicReason ? (
+        <label>
+          <span>Reason the submitter sees (needed to reject)</span>
+          <FormTextarea
+            name="publicReason"
+            rows={3}
+            maxLength={1000}
+            value={publicReason}
+            onChange={(event) => setPublicReason(event.target.value)}
+            placeholder="Shown on their receipt page and in the email. Plain language, written to them. No street addresses or internal notes."
+          />
+        </label>
+      ) : null}
       <div className="entity-edit__actions">
         {decisions.map((decision, index) => (
           <FormButton
@@ -80,7 +99,7 @@ export function SubmissionDecisionForm({
             name="decision"
             value={decision}
             className={index === 0 ? 'ds-button' : 'ds-button ds-button--secondary'}
-            disabled={!canSubmit}
+            disabled={blocked(decision)}
           >
             {pending ? 'Working…' : DECISION_LABEL[decision]}
           </FormButton>

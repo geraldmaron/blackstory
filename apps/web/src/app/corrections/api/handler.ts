@@ -86,6 +86,7 @@ function toPublicStatus(stored: StoredCorrection) {
     updatedAt: stored.updatedAt,
     classificationDispute: stored.classificationDispute,
     ...(stored.closureReason ? { closureReason: stored.closureReason } : {}),
+    ...(stored.publicReason ? { publicReason: stored.publicReason } : {}),
     appealCount: stored.appeals.length,
   });
 }

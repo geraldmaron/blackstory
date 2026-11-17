@@ -32,6 +32,7 @@ const STORED_CORRECTION_OWN_KEYS = [
   'classificationDispute',
   'appeals',
   'closureReason',
+  'publicReason',
   'updatedAt',
 ] as const satisfies readonly (keyof StoredCorrection)[];
 

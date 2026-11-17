@@ -142,3 +142,18 @@ test('submitter text is escaped in the HTML', () => {
   assert.doesNotMatch(html, /<script>|<b>x/u);
   assert.match(html, /&lt;script&gt;/u);
 });
+
+test('a decline with a reason quotes it right under the line that introduces it', () => {
+  const { text } = renderNotification({
+    event: 'correction.closed',
+    to: 'x@example.org',
+    data: {
+      receiptCode: 'C',
+      outcome: 'rejected',
+      appealAvailable: true,
+      reason: 'The ledger says 1926.',
+    },
+    idempotencyKey: 'k',
+  });
+  assert.match(text, /Here’s why\.\n\n> The ledger says 1926\.\n\nIf you think/u);
+});

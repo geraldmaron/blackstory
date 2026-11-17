@@ -1,5 +1,5 @@
 /**
- * The receipt: the code, and where the correction has got to.
+ * The receipt: the code, and where the correction stands.
  *
  * Rendered on the status page and, with no phase yet, straight after a submission. It replaced a
  * bordered "Status" warning notice holding a definition list — a receipt is not a warning, and
@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import { UtilityStep } from '../../components/room';
+import { formatRecordDate } from '../../components/patterns/format-record-date';
 import type { PublicCorrectionPhase } from './public-status';
 import './corrections.css';
 
@@ -21,6 +22,8 @@ export type ReceiptBlockProps = {
 };
 
 export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: ReceiptBlockProps) {
+  const submittedOn = formatRecordDate(submittedAt);
+  const updatedOn = formatRecordDate(updatedAt);
   const reached = phase ?? 'received';
   const inReview = reached === 'under_review' || reached === 'closed';
   const closed = reached === 'closed';
@@ -37,17 +40,17 @@ export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: Rec
         <span className="ds-receipt__label">Receipt code</span>
         <code className="ds-receipt__value">{receiptCode}</code>
         <p className="ds-receipt__keep">
-          Keep this. Without an email address on file, it is the only way to check the outcome.
+          Keep this code. It’s how you look up the outcome on this page.
         </p>
       </div>
 
-      <ol className="ds-receipt__steps" aria-label="Where this correction has got to">
+      <ol className="ds-receipt__steps" aria-label="Where this correction stands">
         <li>
           <UtilityStep
             index={1}
             title="Received"
             done
-            {...(submittedAt ? { detail: submittedAt } : {})}
+            {...(submittedOn ? { detail: submittedOn } : {})}
           />
         </li>
         <li>
@@ -56,7 +59,7 @@ export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: Rec
             title="In review"
             done={inReview}
             detail={
-              inReview && updatedAt ? `Last moved ${updatedAt}` : 'Usually within ten working days'
+              inReview && updatedOn ? `Updated ${updatedOn}` : 'Usually within ten working days'
             }
           />
         </li>

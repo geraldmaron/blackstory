@@ -12,6 +12,7 @@ import {
   getIntakeItemDetail,
   SUBMISSION_DECISION_PERMISSION,
   submissionDecisionOptions,
+  submissionHasReceipt,
 } from '../../../../admin/lib/postgres-submissions';
 import { SubmissionDecisionForm } from './SubmissionDecisionForm';
 
@@ -109,6 +110,7 @@ export default async function SubmissionDetailPage({
               key={decisions.join(',')}
               intakeItemId={submission.id}
               decisions={decisions}
+              needsPublicReason={decisions.includes('reject') && submissionHasReceipt(submission)}
             />
           </section>
         ) : (

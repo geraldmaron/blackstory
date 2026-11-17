@@ -18,7 +18,7 @@ export const PUBLIC_STATUS_LABELS: Readonly<Record<PublicCorrectionPhase, string
 };
 
 export const APPEAL_ELIGIBILITY_NOTICE =
-  'If your correction was closed and you believe the outcome was wrong, you can file one appeal against your receipt code. An appeal re-enters the same quarantine review lane. Volume never changes confidence or publication.';
+  'If your correction was closed and you believe the outcome was wrong, you can file one appeal against your receipt code. An appeal sends it back for one more review. Volume never changes confidence or publication.';
 
 export const ABUSE_REPORT_NOTICE =
   'Report abusive or harassing correction activity. Abuse reports are reviewed separately, and they never expose another submitter’s identity.';

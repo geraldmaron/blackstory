@@ -47,7 +47,8 @@ type Email = {
   readonly paragraphs: readonly string[];
   /** A receipt code, set apart in mono so it can be copied. */
   readonly code?: string;
-  /** What the submitter wrote, shown to the owner as a quote. */
+  /** Quoted words, placed right after the first paragraph: what a submitter wrote (to the
+   * owner), or the decline reason staff wrote (to the submitter). */
   readonly quote?: string;
   readonly action?: { readonly label: string; readonly href: string };
   readonly signed: boolean;
@@ -80,6 +81,8 @@ const TEMPLATES = {
     receiptCode: string;
     outcome: 'resolved' | 'rejected';
     appealAvailable: boolean;
+    /** The reason staff wrote for the submitter when declining. */
+    reason?: string;
   }) =>
     d.outcome === 'resolved'
       ? {
@@ -101,11 +104,14 @@ const TEMPLATES = {
           preheader: 'The record stays as it is.',
           heading: 'The record stays as it is',
           paragraphs: [
-            'I reviewed your correction against the published sources and didn’t change the record.',
+            d.reason
+              ? 'I reviewed your correction against the published sources and didn’t change the record. Here’s why.'
+              : 'I reviewed your correction against the published sources and didn’t change the record.',
             d.appealAvailable
               ? 'If you think the review missed something, you can appeal once from the status page. Say what was missed and link the source that shows it.'
               : 'This was the review of your appeal, so it’s the final outcome for this correction.',
           ],
+          ...(d.reason ? { quote: d.reason } : {}),
           code: d.receiptCode,
           action: {
             label: d.appealAvailable ? 'Appeal or see the outcome' : 'See the outcome',
@@ -176,9 +182,11 @@ function escapeHtml(value: string): string {
 }
 
 function renderText(e: Email): string {
-  const parts = [e.heading, '', ...e.paragraphs.flatMap((p) => [p, ''])];
-  if (e.code) parts.push(`Receipt code  ${e.code}`, '');
+  const [first = '', ...rest] = e.paragraphs;
+  const parts = [e.heading, '', first, ''];
   if (e.quote) parts.push(...e.quote.split('\n').map((line) => `> ${line}`), '');
+  parts.push(...rest.flatMap((p) => [p, '']));
+  if (e.code) parts.push(`Receipt code  ${e.code}`, '');
   if (e.action) parts.push(e.action.label, e.action.href, '');
   if (e.signed) parts.push(...SIGNATURE, '');
   parts.push('---', e.footer);
@@ -223,8 +231,9 @@ function renderHtml(e: Email): string {
 <tr><td style="padding:0 4px 20px;"><a href="${escapeHtml(siteOrigin())}"><img src="${escapeHtml(siteOrigin())}/brand/email-lockup.png" width="160" height="49" alt="BlackStory" style="display:block;border:0;"></a></td></tr>
 <tr><td style="padding:32px;background:${C.surface};border:1px solid ${C.rule};border-top:3px solid ${C.copper};border-radius:8px;">
 <h1 style="margin:0 0 16px;font:700 24px/1.25 ${HEAD};letter-spacing:-0.01em;color:${C.ink};">${escapeHtml(e.heading)}</h1>
-${e.paragraphs.map(p).join('\n')}
-${code}${quote}${action}${signature}
+${e.paragraphs.slice(0, 1).map(p).join('')}${quote}
+${e.paragraphs.slice(1).map(p).join('\n')}
+${code}${action}${signature}
 </td></tr>
 <tr><td style="padding:20px 4px 0;font:400 13px/1.5 ${SANS};color:${C.stone};">${escapeHtml(e.footer)}</td></tr>
 </table></td></tr></table></body></html>`;
