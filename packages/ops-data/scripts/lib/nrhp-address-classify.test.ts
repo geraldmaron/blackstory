@@ -139,9 +139,15 @@ test('proposeNrhpTier: address_found proposes the tier table site tier', () => {
   assert.equal(proposal.flagged, false);
 });
 
-test('proposeNrhpTier: vicinity proposes the tier table city tier', () => {
-  const proposal = proposeNrhpTier('vicinity', null, null);
-  assert.equal(proposal.tier, NRHP_ADDRESS_TIER_TABLE.vicinity);
+test('proposeNrhpTier: vicinity is tiered by point accuracy like coordinates_only', () => {
+  assert.equal(
+    proposeNrhpTier('vicinity', 12, null).tier,
+    NRHP_ADDRESS_TIER_TABLE.coordinatesOnlyWithinThreshold,
+  );
+  assert.equal(
+    proposeNrhpTier('vicinity', null, null).tier,
+    NRHP_ADDRESS_TIER_TABLE.coordinatesOnlyBeyondThreshold,
+  );
 });
 
 test('proposeNrhpTier: coordinates_only within the accuracy threshold proposes site', () => {

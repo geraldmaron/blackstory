@@ -89,12 +89,11 @@ export function classifyNrhpAddressOutcome(input: {
  * Reuses this lane's own already-published precision vocabulary (see the orchestrating script's
  * module doc) — 'site' for a parcel-level address, a high-confidence coordinates_only hit, or an
  * entity_locations row this script is not allowed to touch (restricted, current tier held as-is);
- * 'city' for a vicinity description; 'neighborhood' for a coordinates_only hit whose own SRC_ACCU
- * says it isn't parcel-accurate.
+ * 'neighborhood' for a coordinates_only or vicinity hit whose own SRC_ACCU says it isn't
+ * parcel-accurate. A vicinity row is tiered by its point's accuracy, not by its address text.
  */
 export const NRHP_ADDRESS_TIER_TABLE = {
   addressFound: 'site',
-  vicinity: 'city',
   coordinatesOnlyAccuracyThresholdMeters: 30,
   coordinatesOnlyWithinThreshold: 'site',
   coordinatesOnlyBeyondThreshold: 'neighborhood',
@@ -121,10 +120,9 @@ export function proposeNrhpTier(
   if (outcome === 'address_found') {
     return { tier: NRHP_ADDRESS_TIER_TABLE.addressFound, flagged: false, flagReason: null };
   }
-  if (outcome === 'vicinity') {
-    return { tier: NRHP_ADDRESS_TIER_TABLE.vicinity, flagged: false, flagReason: null };
-  }
-  if (outcome === 'coordinates_only') {
+  // A vicinity row has no street address, but its point is NPS's own map of the property, so
+  // its accuracy decides the tier exactly as for coordinates_only.
+  if (outcome === 'vicinity' || outcome === 'coordinates_only') {
     const within =
       accuracyMeters !== null &&
       accuracyMeters <= NRHP_ADDRESS_TIER_TABLE.coordinatesOnlyAccuracyThresholdMeters;
