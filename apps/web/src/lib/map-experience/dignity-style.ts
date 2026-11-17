@@ -191,8 +191,12 @@ export function plateForScheme(scheme: MapColorScheme) {
     /** The selected state's abbreviation, beside its copper outline. */
     selectedStateLabel: light ? brandPalette.copperTextLight : brandPalette.copperDark,
     selected: light ? DIGNITY_PALETTE.selectedDark : DIGNITY_PALETTE.selected,
-    densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
-    densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
+    densityUnknown: light
+      ? DIGNITY_PALETTE.densityUnknownFillLight
+      : DIGNITY_PALETTE.densityUnknownFill,
+    densityDisabled: light
+      ? DIGNITY_PALETTE.densityDisabledFillLight
+      : DIGNITY_PALETTE.densityDisabledFill,
     street: light ? DIGNITY_PALETTE.streetLight : DIGNITY_PALETTE.streetDark,
     streetLabel: light ? DIGNITY_PALETTE.streetLabelLight : DIGNITY_PALETTE.streetLabelDark,
     /** Single records: a copper pin head (site) or an open copper ring (city). */

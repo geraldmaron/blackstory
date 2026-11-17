@@ -42,7 +42,7 @@ test('joinDensityOntoStatePolygons copies tier by FIPS and defaults to none', ()
   assert.equal(joined.features[0]?.properties.count, 4);
   assert.equal(joined.features[1]?.id, '06');
   assert.equal(joined.features[1]?.properties.densityTier, 'none');
-  assert.equal(joined.features[1]?.properties.fillColor, DIGNITY_PALETTE.densityUnknownFillLight);
+  assert.equal(joined.features[1]?.properties.fillColor, DIGNITY_PALETTE.densityUnknownFill);
   assert.equal(joined.features[1]?.properties.count, 0);
 });
 

@@ -1152,6 +1152,24 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   aspect-ratio: 240 / 280;
 }
 
+/* The mark is drawn in its ground's roles, so it turns with the sheet it sits on. The SVG's own
+   fill attributes are the no-CSS fallback. */
+.ds-entity-mark__ground {
+  fill: var(--ds-surface-sunken);
+}
+
+.ds-entity-mark__body {
+  fill: var(--ds-ink);
+}
+
+.ds-entity-mark__accent {
+  fill: var(--ds-accent-graphic);
+}
+
+.ds-entity-mark__line {
+  stroke: var(--ds-ink);
+}
+
 .ds-entity-mark__context {
   margin: 0;
   padding: var(--ds-space-3) var(--ds-space-4);

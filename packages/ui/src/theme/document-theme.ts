@@ -47,9 +47,47 @@ void assertBootstrapKeyMatches;
  * attribute looks like it worked until the reader navigates and it snaps back.
  */
 export function toggleDocumentTheme(): ThemeName {
-  const root = document.documentElement;
-  const next: ThemeName = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  root.dataset.theme = next;
-  window.localStorage.setItem(THEME_STORAGE_KEY, next);
+  const next: ThemeName = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyDocumentTheme(next);
   return next;
+}
+
+/**
+ * Set and persist a theme, crossfading the whole page where the browser has view transitions and
+ * the reader has not asked for reduced motion; elsewhere the switch is instant.
+ */
+export function applyDocumentTheme(next: ThemeName): void {
+  const flip = () => {
+    document.documentElement.dataset.theme = next;
+    window.localStorage.setItem(THEME_STORAGE_KEY, next);
+  };
+  const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const doc = document as Document & { startViewTransition?: (update: () => void) => unknown };
+  if (!calm && typeof doc.startViewTransition === 'function') {
+    doc.startViewTransition(flip);
+  } else {
+    flip();
+  }
+}
+
+/**
+ * Keep every `<meta name="theme-color">` (browser chrome, installed shell) on the page's own
+ * canvas. The tags are rendered per `prefers-color-scheme`, which disagrees with the toggle and
+ * the dark default, so this repaints them from `--ds-canvas` now and on each `data-theme` change.
+ * Returns the observer's disconnect, for a mount effect's cleanup.
+ */
+export function syncThemeColorMeta(): () => void {
+  const sync = () => {
+    const canvas = getComputedStyle(document.documentElement)
+      .getPropertyValue('--ds-canvas')
+      .trim();
+    if (!canvas) return;
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+      meta.setAttribute('content', canvas);
+    }
+  };
+  sync();
+  const observer = new MutationObserver(sync);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  return () => observer.disconnect();
 }

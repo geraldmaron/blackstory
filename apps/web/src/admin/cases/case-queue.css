@@ -50,7 +50,7 @@
   width: 1.125rem;
   height: 1.125rem;
   margin: 0;
-  accent-color: var(--ds-accent-copper, #8e4f2a);
+  accent-color: var(--ds-accent);
 }
 
 .acq__bulk {
@@ -98,8 +98,8 @@
 
 .acq__button--primary {
   color: var(--ds-inverse-ink, #f4efe5);
-  background: var(--ds-accent-copper, #8e4f2a);
-  border-color: var(--ds-accent-copper, #8e4f2a);
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
 }
 
 .acq__button--ghost {
@@ -134,7 +134,7 @@
 
 .acq__table thead th a:hover,
 .acq__table thead th a:focus-visible {
-  color: var(--ds-accent-copper-text, #8e4f2a);
+  color: var(--ds-accent);
   text-decoration: underline;
 }
 
@@ -157,7 +157,7 @@
 
 .acq__row.is-selected {
   background: var(--ds-canvas, #f4efe5);
-  outline: 2px solid var(--ds-accent-copper, #8e4f2a);
+  outline: 2px solid var(--ds-accent);
   outline-offset: -2px;
 }
 
@@ -493,14 +493,14 @@
 
 .acq__stats a:focus-visible,
 .acq__stats button:focus-visible {
-  outline: 2px solid var(--ds-accent-copper, #8e4f2a);
+  outline: 2px solid var(--ds-accent);
   outline-offset: 2px;
 }
 
 .acq__stats a.is-active,
 .acq__stats button.is-active {
-  border-color: var(--ds-accent-copper, #8e4f2a);
-  color: var(--ds-accent-copper-text, #8e4f2a);
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
 }
 
 .acq__field {
@@ -516,7 +516,7 @@
 .acq__alert {
   margin: 0;
   padding: var(--ds-space-3);
-  border: var(--ds-border-width, 1px) solid #8e4f2a;
+  border: var(--ds-border-width, 1px) solid var(--ds-accent);
   background: var(--ds-canvas, #f4efe5);
 }
 

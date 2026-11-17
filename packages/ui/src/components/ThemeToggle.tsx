@@ -10,7 +10,11 @@ import React, { useEffect, useState } from 'react';
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
 import type { ThemeName } from '../tokens/colors.js';
-import { resolvePreferredTheme, THEME_STORAGE_KEY } from '../theme/document-theme.js';
+import {
+  applyDocumentTheme,
+  resolvePreferredTheme,
+  THEME_STORAGE_KEY,
+} from '../theme/document-theme.js';
 import { cx } from '../utils/cx.js';
 
 function readPreferredTheme(): ThemeName {
@@ -40,8 +44,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   function toggle() {
     const next: ThemeName = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
-    document.documentElement.dataset.theme = next;
-    window.localStorage.setItem(THEME_STORAGE_KEY, next);
+    applyDocumentTheme(next);
   }
 
   const next = theme === 'light' ? 'dark' : 'light';

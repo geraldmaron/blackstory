@@ -1310,6 +1310,9 @@ export function MapStageProvider({
           },
         } as never);
       }
+      // A theme switch re-runs this with the layers already added: repaint them in the new accent.
+      map.setPaintProperty(SEARCH_AREA_FILL, 'fill-color', accent);
+      map.setPaintProperty(SEARCH_AREA_LINE, 'line-color', accent);
     } catch (error) {
       console.error('[MapStage] search area sync failed', error);
     }

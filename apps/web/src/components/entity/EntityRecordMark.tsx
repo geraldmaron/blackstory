@@ -78,7 +78,7 @@ export function EntityRecordMark({
             aria-hidden="true"
             focusable="false"
           >
-            <rect width="240" height="280" fill="#F4EFE5" />
+            <rect width="240" height="280" className="ds-entity-mark__ground" fill="#F4EFE5" />
             <RecordMarkShapeGraphic shape={shape} markId={markId} />
           </svg>
         </div>
@@ -120,12 +120,22 @@ function RecordMarkShapeGraphic({
         <g id={markId}>
           <path
             d="M28 52c28-18 60-26 92-26s64 8 92 26v188c-28-14-60-22-92-22s-64 8-92 22V52zm92 8c-30 0-58 6-80 16v152c22-10 50-16 80-16V60zm0 0c30 0 58 6 80 16v152c-22-10-50-16-80-16V60z"
+            className="ds-entity-mark__body"
             fill="#161616"
           />
-          <rect x="118" y="52" width="4" height="188" fill="#B86B2A" aria-hidden="true" />
+          <rect
+            x="118"
+            y="52"
+            width="4"
+            height="188"
+            className="ds-entity-mark__accent"
+            fill="#B86B2A"
+            aria-hidden="true"
+          />
           <path
             d="M28 52c28-18 60-26 92-26s64 8 92 26v188c-28-14-60-22-92-22s-64 8-92 22V52zm92 8c-30 0-58 6-80 16v152c22-10 50-16 80-16V60zm0 0c30 0 58 6 80 16v152c-22-10-50-16-80-16V60z"
             fill="none"
+            className="ds-entity-mark__line"
             stroke="#0A0A0A"
             strokeWidth="1.5"
           />
@@ -137,13 +147,22 @@ function RecordMarkShapeGraphic({
           <path
             fillRule="evenodd"
             d="M120 272S48 178 48 112a72 72 0 1 1 144 0c0 66-72 160-72 160z"
+            className="ds-entity-mark__body"
             fill="#161616"
           />
-          <circle cx="120" cy="112" r="36" fill="#B86B2A" aria-hidden="true" />
+          <circle
+            cx="120"
+            cy="112"
+            r="36"
+            className="ds-entity-mark__accent"
+            fill="#B86B2A"
+            aria-hidden="true"
+          />
           <path
             fillRule="evenodd"
             d="M120 272S48 178 48 112a72 72 0 1 1 144 0c0 66-72 160-72 160zm0-124a36 36 0 1 0 0-72 36 36 0 0 0 0 72z"
             fill="none"
+            className="ds-entity-mark__line"
             stroke="#0A0A0A"
             strokeWidth="1.5"
           />
@@ -154,11 +173,13 @@ function RecordMarkShapeGraphic({
         <g id={markId}>
           <path
             d="M40 272V120C40 64 78 24 120 24s80 40 80 96v152h-40V124c0-24-18-44-40-44s-40 20-40 44v148H40z"
+            className="ds-entity-mark__body"
             fill="#161616"
           />
           <path
             d="M40 272V120C40 64 78 24 120 24s80 40 80 96v152h-40V124c0-24-18-44-40-44s-40 20-40 44v148H40z"
             fill="none"
+            className="ds-entity-mark__line"
             stroke="#0A0A0A"
             strokeWidth="1.5"
           />

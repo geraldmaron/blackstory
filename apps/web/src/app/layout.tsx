@@ -51,7 +51,8 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Theme colors for browser chrome and installed home-screen shell.
- * Light/dark follow prefers-color-scheme; site theme toggle is separate.
+ * These are the no-JS values, keyed on prefers-color-scheme; once the shell mounts,
+ * syncThemeColorMeta (SiteShellProviders) repaints them from the site theme on every toggle.
  */
 export const viewport: Viewport = {
   themeColor: [
