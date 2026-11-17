@@ -12,6 +12,7 @@ v10 is the authoritative product architecture. It amends the door-tip implementa
 
 | Document | Governs | Status |
 |---|---|---|
+| [`experience-standard.md`](./experience-standard.md) | Pillars, critical user journeys, and the type, spacing, icon, pattern, theme and state rules every public surface follows; source library and policy-page gaps. Checked with `scripts/surface-audit.mjs`. | Binding (2026-11-16) |
 | [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md) | Memorial, evidence honesty, precision, dignity, public access, brand integrity. Overrides aesthetics. | Binding (2026-08-31) |
 | [`design-direction-v10.md`](./design-direction-v10.md) | Product thesis, visual models, surface law, KEEP AS IS, authority order. | Binding (2026-08-31) |
 | [`brand.md`](./brand.md) | Signature, palette, type, dignity law. Where this doc and the brand pack disagree, the pack wins. | Binding |
