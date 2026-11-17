@@ -121,11 +121,18 @@
   color: var(--ds-ink);
 }
 
-/* `safe`: a column taller than the screen scrolls from its top instead of losing it. */
+/* `safe`: a column taller than the screen scrolls from its top instead of losing it.
+   The section is a layout box the size of the screen, laid over the map window: it passes clicks
+   through so a place on the plate opens (`placeSelect`), while its own content stays clickable. */
 .ds-door-open {
   display: grid;
   align-content: safe end;
   gap: var(--ds-space-4);
+  pointer-events: none;
+}
+
+.ds-door-open > * {
+  pointer-events: auto;
 }
 
 /* Wide: the column is a card on the float plane, set on the header's left edge, the way the
@@ -634,6 +641,31 @@ body:has(.ds-map-callout--layer[data-shown='true']) .ds-map-callout--flag {
 .ds-map-callout__link:hover .ds-map-callout__name {
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+/*
+ * Wide Door: place counts belong to the map window, not under the card's words. The label layer
+ * fades out across the card's width. The layer is a sibling of `.ds-door`, so it cannot read the
+ * card variables; this restates `--ds-door-edge + --ds-door-card-w` from the same global tokens.
+ * shortcut: duplicated formula, upgrade by lifting the door width tokens to :root if they change.
+ */
+@media (min-width: 64rem), (min-width: 48rem) and (min-aspect-ratio: 1001/1000) {
+  body:has(.ds-door-journey:not(.ds-door-journey--browse)) .ds-map-stage .ds-place-labels {
+    --ds-door-card-right: calc(
+      max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2)) + min(36rem, 38vw) +
+        var(--ds-space-6) * 2
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent var(--ds-door-card-right),
+      black calc(var(--ds-door-card-right) + var(--ds-space-8))
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent var(--ds-door-card-right),
+      black calc(var(--ds-door-card-right) + var(--ds-space-8))
+    );
+  }
 }
 
 /*
