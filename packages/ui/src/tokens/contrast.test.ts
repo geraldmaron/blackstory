@@ -92,7 +92,7 @@ test('brand guide dark-theme pairs meet WCAG AA for text', () => {
  * them is an ink plate with paper type; a sheet's paper carries ink, stone and copper text; and a
  * copper pin or numeral holds 3:1 on both paper steps and on the map's paper land.
  */
-test('copper and sand grounds carry ink text at 4.5:1 and controls at 3:1', () => {
+test('copper and sand grounds carry their text at 4.5:1 and controls at 3:1', () => {
   for (const [name, g] of Object.entries(groundPalettes)) {
     for (const [pair, fg, bg, min] of [
       ['ink', g.ink, g.ground, 4.5],

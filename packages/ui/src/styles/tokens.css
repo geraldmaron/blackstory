@@ -110,6 +110,8 @@
 }
 
 [data-theme='dark'] [data-ground='paper']:not([data-ground-fixed]),
+[data-theme='dark'] [data-ground='copper']:not([data-ground-fixed]),
+[data-theme='dark'] [data-ground='sand']:not([data-ground-fixed]),
 [data-theme='dark'],
 [data-ground='ink'] {
   color-scheme: dark;
@@ -215,6 +217,8 @@
 }
 
 [data-theme='dark'] [data-ground='paper']:not([data-ground-fixed]),
+[data-theme='dark'] [data-ground='copper']:not([data-ground-fixed]),
+[data-theme='dark'] [data-ground='sand']:not([data-ground-fixed]),
 [data-theme='dark'],
 [data-ground='ink'] {
   --ds-lockup-on-light: none;
@@ -374,6 +378,51 @@
   --ds-surface-raised: #e0ae89;
   --ds-focus-ring-offset: var(--ds-material-sand);
   --ds-accent-muted: #b86b2a;
+}
+
+/*
+ * On the dark table the copper and sand bands deepen and carry paper type instead of ink, so a
+ * switch to dark changes them too (they join the dark role list above, which sets the status
+ * trios and color-scheme). Measured: paper on copper-deep #8e4f2a 5.6, on deep sand #5c4130 8.1;
+ * ink on the paper plate 17.3, on its hover #ddd3c3 13.4. `data-ground-fixed` keeps a band at
+ * full strength in both themes. Asserted in tokens/contrast.test.ts (groundPalettes).
+ */
+[data-theme='dark'] [data-ground='copper']:not([data-ground-fixed]),
+[data-theme='dark'] [data-ground='sand']:not([data-ground-fixed]) {
+  --ds-ink: #f4efe5;
+  --ds-ink-muted: #f4efe5;
+  --ds-ink-subtle: #f4efe5;
+  --ds-border: rgb(244 239 229 / 28%);
+  --ds-rule: rgb(244 239 229 / 28%);
+  --ds-border-control: #f4efe5;
+  --ds-border-strong: #f4efe5;
+  --ds-focus-ring: #f4efe5;
+  --ds-accent: #f4efe5;
+  --ds-accent-graphic: #f4efe5;
+  --ds-primary-bg: #f4efe5;
+  --ds-primary-ink: #0a0a0a;
+  --ds-primary-hover: #ddd3c3;
+  --ds-numeral-accent: #f4efe5;
+  --ds-numeral-soft: #f4efe5;
+  --ds-numeral-soft-text: #f4efe5;
+}
+
+[data-theme='dark'] [data-ground='copper']:not([data-ground-fixed]) {
+  --ds-canvas: var(--ds-material-copper-deep);
+  --ds-surface: var(--ds-material-copper-deep);
+  --ds-surface-sunken: #7a4322;
+  --ds-surface-raised: #9e5a31;
+  --ds-focus-ring-offset: var(--ds-material-copper-deep);
+  --ds-accent-muted: #f4efe5;
+}
+
+[data-theme='dark'] [data-ground='sand']:not([data-ground-fixed]) {
+  --ds-canvas: #5c4130;
+  --ds-surface: #5c4130;
+  --ds-surface-sunken: #4f3a2a;
+  --ds-surface-raised: #6a4c38;
+  --ds-focus-ring-offset: #5c4130;
+  --ds-accent-muted: #d8a178;
 }
 
 :root {

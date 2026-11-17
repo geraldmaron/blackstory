@@ -277,7 +277,24 @@ export const groundPalettes = {
     primaryInk: brandPalette.archivePaper,
     primaryHover: '#2A2622',
   },
-} as const satisfies Record<'copper' | 'sand', GroundPalette>;
+  /* On the dark table both bands deepen and carry paper type (tokens.css). */
+  copperDark: {
+    ground: '#8E4F2A',
+    ink: brandPalette.archivePaper,
+    borderControl: brandPalette.archivePaper,
+    primaryBg: brandPalette.archivePaper,
+    primaryInk: brandPalette.blackInk,
+    primaryHover: '#DDD3C3',
+  },
+  sandDark: {
+    ground: '#5C4130',
+    ink: brandPalette.archivePaper,
+    borderControl: brandPalette.archivePaper,
+    primaryBg: brandPalette.archivePaper,
+    primaryInk: brandPalette.blackInk,
+    primaryHover: '#DDD3C3',
+  },
+} as const satisfies Record<'copper' | 'sand' | 'copperDark' | 'sandDark', GroundPalette>;
 
 export const statusPalettes = {
   light: lightStatus,

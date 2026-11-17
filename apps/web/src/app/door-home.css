@@ -1549,10 +1549,10 @@ body:has(.ds-door) .ds-door-journey {
   min-width: 0;
 }
 
-/* The years are the cover: the numeral role, ink on copper. */
+/* The years are the cover: the numeral role, the ground's ink on copper. */
 .ds-door-ch__years {
   margin: 0;
-  color: var(--ds-fixed-ink);
+  color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-numeral);
   font-weight: var(--ds-weight-numeral);
@@ -1617,7 +1617,7 @@ body:has(.ds-door) .ds-door-journey {
 }
 
 .ds-door-ch__plate .ds-plate__credit {
-  color: var(--ds-fixed-ink);
+  color: var(--ds-ink);
 }
 
 @media (min-width: 48rem) {
