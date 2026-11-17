@@ -67,6 +67,7 @@ import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { DoorWalkCard } from './door-walk';
 import { DOOR_TOUR_EVENT, type DoorTourTarget } from './door-tour-scroll';
 import { tourZoom } from './door-tour';
+import { BandRule } from '../components/atmosphere/BandArt';
 import { placeDrillZoom } from '../lib/map-experience/place-map';
 import { MAP_MAX_ZOOM } from '../lib/map-experience/camera-presets';
 
@@ -938,6 +939,7 @@ export function DoorImmersive({
                   Browse all records
                 </Link>
               </div>
+              <BandRule motif="grain" className="ds-door-open__edge" />
             </section>
           ) : current ? (
             <DoorWalkCard

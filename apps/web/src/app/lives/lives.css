@@ -1764,3 +1764,17 @@ details[open] > summary > .lives-caret {
 .lives-cell__why {
   font-size: var(--ds-text-micro);
 }
+
+/* The tools still life rests above the sheet that overlaps the mast's foot. */
+.ds-trust-mast .ds-band-art__layer--tools {
+  bottom: calc(var(--trust-overlap) + var(--ds-space-3));
+}
+
+/* Wide: the tools still life stands between the title column and the decade numeral, clear of
+   both. Narrow screens keep the shared corner placement, beside the numeral's caption. */
+@media (min-width: 80rem) {
+  .ds-trust-mast .ds-band-art__layer--tools {
+    right: 19%;
+    width: 34%;
+  }
+}

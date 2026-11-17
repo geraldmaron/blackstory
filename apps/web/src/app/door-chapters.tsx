@@ -23,6 +23,7 @@ import { confidenceTierPhrase } from '../lib/evidence/confidence-language';
 import { CoverImage } from './stories/StoriesIndexParts';
 import type { DoorJourneyRecord } from './door-decade-walk';
 import { DoorTour } from './door-tour-section';
+import { BandArt } from '../components/atmosphere/BandArt';
 
 void React;
 
@@ -70,6 +71,7 @@ export function DoorChapters({ lead, grades, tour = [] }: DoorChaptersProps) {
         id="door-ch-evidence-band"
         aria-labelledby="door-ch-evidence"
       >
+        <BandArt motifs={['contours', 'grain']} />
         <div className="ds-wrap ds-door-ch__inner">
           <h2 className="ds-door-ch__title" id="door-ch-evidence">
             Every record carries its grade
@@ -108,6 +110,7 @@ export function DoorChapters({ lead, grades, tour = [] }: DoorChaptersProps) {
           className="ds-door-ch ds-door-ch--story"
           aria-labelledby="door-ch-story"
         >
+          <BandArt motifs={['weave', 'grain']} />
           <div className="ds-wrap ds-door-ch__inner" data-media={lead.heroImage ? 'plate' : 'none'}>
             <div className="ds-door-ch__text">
               {/* The years are the cover: the numeral role, in ink on the copper band. */}

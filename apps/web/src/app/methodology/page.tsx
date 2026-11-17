@@ -38,6 +38,7 @@ export default function MethodologyPage() {
       masthead={
         <TrustMast
           tone="sand"
+          art={['ledger']}
           numeral={{
             value: String(ADMISSION_STEPS.length),
             label: 'steps from a lead to a public page',

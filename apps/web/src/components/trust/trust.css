@@ -17,6 +17,7 @@
 
   padding-block: var(--ds-space-12) calc(var(--trust-overlap) + var(--ds-space-10));
   overflow: hidden;
+  isolation: isolate;
 }
 
 .ds-trust-mast__inner {

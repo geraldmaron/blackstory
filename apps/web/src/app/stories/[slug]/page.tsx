@@ -37,6 +37,7 @@ import { nextInCollection, prevInCollection, sortItems } from '../stories-index'
 import { storyCitedEntities } from '../../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
 import { IMPLICIT_AUTHOR_NAME, storyBylineLines } from '../../../lib/stories/byline';
+import { BandRule } from '../../../components/atmosphere/BandArt';
 import '../../../components/story/story.css';
 
 type StoryPageProps = {
@@ -192,6 +193,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
             <PageTitle className="ds-story-mast__title">{doc.title}</PageTitle>
             <p className="ds-story-mast__dek">{lede.dek}</p>
             {lede.rest ? <p className="ds-story-mast__rest">{lede.rest}</p> : null}
+            <BandRule motif="architecture" className="ds-story-mast__art" />
           </div>
           {year && !isEntry ? (
             <DisplayNumeral className="ds-story-mast__numeral" tone="soft" decorative>

@@ -20,6 +20,7 @@ import type {
 } from '@repo/domain/statistics/data-page-series';
 import { DisplayNumeral, SectionHeading, buttonClassName, cx } from '@repo/ui';
 import { TrustSheet } from '../../components/trust';
+import { BandArt, type BandArtMotif } from '../../components/atmosphere/BandArt';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
 import { DataContents, type ContentsGroup } from '../../components/data/DataContents';
@@ -305,6 +306,11 @@ const SECTION_BAND: Partial<Record<DataPageSectionId, 'sand' | 'copper'>> = {
   reading: 'sand',
 };
 
+const SECTION_ART: Partial<Record<DataPageSectionId, readonly BandArtMotif[]>> = {
+  lives: ['weave', 'grain', 'decades'],
+  reading: ['contours', 'grain'],
+};
+
 function Section({
   id,
   meta,
@@ -333,6 +339,7 @@ function Section({
       aria-labelledby={`${id}-heading`}
       data-ground={band}
     >
+      {SECTION_ART[id] ? <BandArt motifs={SECTION_ART[id]} /> : null}
       <div className="ds-wrap ds-data-band__inner">{body}</div>
     </section>
   ) : (

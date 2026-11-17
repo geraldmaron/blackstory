@@ -1478,3 +1478,9 @@
   display: grid;
   gap: var(--ds-space-4);
 }
+
+/* The mast's drawn streetscape: decorative, under the dek. */
+.ds-story-mast__art {
+  margin-top: var(--ds-space-8);
+  max-width: 44rem;
+}

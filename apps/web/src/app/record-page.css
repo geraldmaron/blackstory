@@ -39,6 +39,9 @@
   /* The sheet laid over the field's foot overlaps it by this much. */
   --ds-recpage-overlap: var(--ds-space-12);
   padding-block: var(--ds-space-12) calc(var(--ds-recpage-overlap) + var(--ds-space-12));
+  /* Band art (contours, when there is no plate) sits behind the head. */
+  position: relative;
+  isolation: isolate;
 }
 
 /*

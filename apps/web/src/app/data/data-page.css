@@ -155,6 +155,16 @@
   padding-block: var(--ds-space-16);
   background: var(--ds-canvas);
   color: var(--ds-ink);
+  position: relative;
+  isolation: isolate;
+}
+
+/* Narrow screens: the decade rule gets its own floor under the text instead of sitting behind it. */
+@media (max-width: 79.99rem) {
+  .ds-data-band:has(.ds-band-art__layer--decades) {
+    --ds-band-art-floor: clamp(7rem, 30vw, 15rem);
+    padding-bottom: calc(var(--ds-space-16) + var(--ds-band-art-floor));
+  }
 }
 
 .ds-data-band:last-child {

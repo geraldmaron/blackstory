@@ -155,3 +155,21 @@
   padding-top: var(--ds-space-4);
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
+
+/* —— section dividers: a row of pieced quilt blocks over each section's ink rule ———————— */
+.ds-about-room .ds-room-section > .ds-section-heading {
+  position: relative;
+}
+
+.ds-about-room .ds-room-section > .ds-section-heading::after {
+  --ds-quilt-row: 1.75rem;
+  content: '';
+  position: absolute;
+  inset: calc(-1 * (var(--ds-quilt-row) + var(--ds-space-2))) 0 auto;
+  height: var(--ds-quilt-row);
+  background-color: var(--ds-ink);
+  opacity: 0.42;
+  -webkit-mask: url('/brand/motifs/weave.svg') left top / calc(var(--ds-quilt-row) * 4) repeat-x;
+  mask: url('/brand/motifs/weave.svg') left top / calc(var(--ds-quilt-row) * 4) repeat-x;
+  pointer-events: none;
+}

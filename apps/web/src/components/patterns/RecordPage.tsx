@@ -35,6 +35,7 @@ import {
   faQuoteLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { buttonClassName, DisplayNumeral, SectionHeading, Sheet } from '@repo/ui';
+import { BandArt } from '../atmosphere/BandArt';
 import '../../app/record-page.css';
 
 void React;
@@ -357,6 +358,8 @@ export function RecordPage({
           data-plate={plated ? '' : undefined}
           data-grounded={grounded ? '' : undefined}
         >
+          {/* No plate: the mast carries survey lines instead of an empty ground. */}
+          {plated ? null : <BandArt motifs={['contours']} />}
           <div className="ds-recpage__head ds-wrap">
             {numeral?.caption ? (
               <div

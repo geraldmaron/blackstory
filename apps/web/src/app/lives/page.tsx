@@ -54,7 +54,7 @@ export default async function LivesIndexPage({
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast tone="sand" numeral={livesDecadeNumeral(bundle)}>
+        <TrustMast tone="sand" numeral={livesDecadeNumeral(bundle)} art={['tools', 'grain']}>
           <PageHeader
             display
             crumb={parentCrumb('/lives')}

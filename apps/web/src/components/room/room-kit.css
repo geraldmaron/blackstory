@@ -2482,6 +2482,20 @@ a.ds-room-chip {
   border-radius: var(--ds-radius-md);
   background: var(--ds-canvas);
   color: var(--ds-ink);
+  /* The map-line vignette sits behind the text, clipped to the rounded box; the floor gives it
+     room below the headline. */
+  min-height: 16rem;
+  align-content: start;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* The map-line vignette sits under the headline row, in the box's lower-right corner. */
+.ds-records-outcome .ds-band-art__layer--mapline {
+  inset: 36% var(--ds-space-4) var(--ds-space-3) auto;
+  width: 52%;
+  opacity: 0.6;
 }
 
 .ds-records-outcome__title {

@@ -8,6 +8,7 @@
  */
 import React, { type ReactNode } from 'react';
 import { Block, DisplayNumeral, Sheet, cx, type BlockTone } from '@repo/ui';
+import { BandArt, type BandArtMotif } from '../atmosphere/BandArt';
 import './trust.css';
 
 void React;
@@ -29,11 +30,14 @@ export type TrustMastProps = {
   /** Controls that belong to the whole page (a question picker), under the header. */
   readonly tools?: ReactNode;
   readonly className?: string;
+  /** Decorative band art behind the mast, chosen to suit the page. */
+  readonly art?: readonly BandArtMotif[];
 };
 
-export function TrustMast({ tone, children, numeral, tools, className }: TrustMastProps) {
+export function TrustMast({ tone, children, numeral, tools, className, art }: TrustMastProps) {
   return (
     <Block tone={tone} as="div" className={cx('ds-trust-mast', className)}>
+      {art ? <BandArt motifs={art} /> : null}
       <div className="ds-wrap ds-trust-mast__inner">
         <div className="ds-trust-mast__head">{children}</div>
         {numeral === undefined ? null : (

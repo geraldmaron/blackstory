@@ -49,7 +49,7 @@ export default async function AboutPage() {
   return (
     <Room
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-room ds-about-room"
       masthead={
         <TrustMast
           tone="copper"

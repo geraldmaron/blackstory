@@ -29,6 +29,7 @@ import { recordsQueryString } from '../../lib/records/records-query';
 import { earliestDecade } from '../../lib/records/records-matching';
 import { DecadeJump } from './DecadeJump';
 import { RecordRow } from './RecordRow';
+import { BandArt } from '../../components/atmosphere/BandArt';
 import { RecordsToolbar, type ToolbarMenu } from './RecordsToolbar';
 
 void React;
@@ -154,6 +155,7 @@ export function Outcome({
 }) {
   return (
     <div className="ds-records-outcome" role="status" data-ground="sand">
+      <BandArt motifs={['mapline']} />
       <h2 className="ds-records-outcome__title">{title}</h2>
       <p className="ds-records-outcome__body">{children}</p>
       <div className="ds-records-outcome__actions">

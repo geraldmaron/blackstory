@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120" width="240" height="120">
+<g fill="none" stroke="#000" stroke-linecap="butt">
+<path d="M0 26H240M0 30H240" stroke-width="1.6"/>
+<path d="M4 28v-5M12 28v-5M20 28v-5M28 28v-5M36 28v-5M44 28v-5M52 28v-5M60 28v-5M68 28v-5M76 28v-5M84 28v-5M92 28v-5M100 28v-5M108 28v-5M116 28v-5M124 28v-5M132 28v-5M140 28v-5M148 28v-5M156 28v-5M164 28v-5M172 28v-5M180 28v-5M188 28v-5M196 28v-5M204 28v-5M212 28v-5M220 28v-5M228 28v-5M236 28v-5" stroke-width="1"/>
+<path d="M0 36H240M0 50H240M0 64H240M0 78H240M0 92H240M0 106H240" stroke-width="1" opacity=".5"/>
+<path d="M64 28V120M176 28V120" stroke-width="1.2" stroke-dasharray="2 3" opacity=".7"/>
+</g>
+<g fill="#000"><circle cx="6" cy="14" r="2.4"/><circle cx="18" cy="14" r="2.4"/><circle cx="30" cy="14" r="2.4"/><circle cx="42" cy="14" r="2.4"/><circle cx="54" cy="14" r="2.4"/><circle cx="66" cy="14" r="2.4"/><circle cx="78" cy="14" r="2.4"/><circle cx="90" cy="14" r="2.4"/><circle cx="102" cy="14" r="2.4"/><circle cx="114" cy="14" r="2.4"/><circle cx="126" cy="14" r="2.4"/><circle cx="138" cy="14" r="2.4"/><circle cx="150" cy="14" r="2.4"/><circle cx="162" cy="14" r="2.4"/><circle cx="174" cy="14" r="2.4"/><circle cx="186" cy="14" r="2.4"/><circle cx="198" cy="14" r="2.4"/><circle cx="210" cy="14" r="2.4"/><circle cx="222" cy="14" r="2.4"/><circle cx="234" cy="14" r="2.4"/></g>
+</svg>

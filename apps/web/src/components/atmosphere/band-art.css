@@ -1,0 +1,221 @@
+/*
+ * Band art: monochrome SVG motifs used as masks and painted with the ground's ink, so one asset
+ * serves every ground and theme. The host band sets `position: relative; isolation: isolate` and
+ * lifts its content above the art. Each layer fades away from where text sits, so the band's
+ * text contrast is the ground's own.
+ */
+
+.ds-band-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--ds-ink);
+}
+
+.ds-band-art__layer {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Pieced-quilt geometry, strongest at the band's far edge and gone under the text column. */
+.ds-band-art__layer--weave {
+  opacity: 0.12;
+  -webkit-mask-image:
+    url('/brand/motifs/weave.svg'), linear-gradient(to right, transparent 55%, #000 95%);
+  mask-image: url('/brand/motifs/weave.svg'), linear-gradient(to right, transparent 55%, #000 95%);
+  -webkit-mask-size:
+    10rem 10rem,
+    100% 100%;
+  mask-size:
+    10rem 10rem,
+    100% 100%;
+}
+
+/* Topographic survey lines, the same fade as the weave. */
+.ds-band-art__layer--contours {
+  opacity: 0.28;
+  -webkit-mask-image:
+    url('/brand/motifs/contours.svg'), linear-gradient(to right, transparent 55%, #000 95%);
+  mask-image:
+    url('/brand/motifs/contours.svg'), linear-gradient(to right, transparent 55%, #000 95%);
+  -webkit-mask-size:
+    20rem 20rem,
+    100% 100%;
+  mask-size:
+    20rem 20rem,
+    100% 100%;
+}
+
+/* Halftone print edge at top and bottom, inside the band's padding only (the host may set
+   --ds-band-art-edge to its own padding). */
+.ds-band-art__layer--grain {
+  opacity: 0.32;
+  -webkit-mask-image:
+    url('/brand/motifs/grain.svg'),
+    linear-gradient(
+      to bottom,
+      #000,
+      transparent var(--ds-band-art-edge, var(--ds-space-16)),
+      transparent calc(100% - var(--ds-band-art-edge, var(--ds-space-16))),
+      #000
+    );
+  mask-image:
+    url('/brand/motifs/grain.svg'),
+    linear-gradient(
+      to bottom,
+      #000,
+      transparent var(--ds-band-art-edge, var(--ds-space-16)),
+      transparent calc(100% - var(--ds-band-art-edge, var(--ds-space-16))),
+      #000
+    );
+  -webkit-mask-size:
+    12px 12px,
+    100% 100%;
+  mask-size:
+    12px 12px,
+    100% 100%;
+}
+
+/* The drafted decade rule: right of the text on a wide screen, under it on a narrow one. */
+.ds-band-art__layer--decades {
+  inset: var(--ds-space-8) 0 var(--ds-space-8) auto;
+  width: min(42%, 46rem);
+  opacity: 0.8;
+  -webkit-mask: url('/brand/motifs/decades.svg') right center / contain no-repeat;
+  mask: url('/brand/motifs/decades.svg') right center / contain no-repeat;
+}
+
+@media (max-width: 79.99rem) {
+  .ds-band-art__layer--weave {
+    -webkit-mask-image:
+      url('/brand/motifs/weave.svg'), linear-gradient(to bottom, transparent 60%, #000 100%);
+    mask-image:
+      url('/brand/motifs/weave.svg'), linear-gradient(to bottom, transparent 60%, #000 100%);
+  }
+
+  .ds-band-art__layer--contours {
+    -webkit-mask-image:
+      url('/brand/motifs/contours.svg'), linear-gradient(to bottom, transparent 60%, #000 100%);
+    mask-image:
+      url('/brand/motifs/contours.svg'), linear-gradient(to bottom, transparent 60%, #000 100%);
+  }
+
+  /* The host reserves --ds-band-art-floor below its content for this layer. */
+  .ds-band-art__layer--decades {
+    inset: auto var(--ds-space-4) var(--ds-space-6);
+    width: auto;
+    height: calc(var(--ds-band-art-floor, 8rem) - var(--ds-space-6));
+    -webkit-mask-position: center bottom;
+    mask-position: center bottom;
+  }
+}
+
+/* Ruled ledger with a perforated stub edge: right of the text on wide screens, in the band's foot
+   on narrow ones, never through a line of text. */
+.ds-band-art__layer--ledger {
+  opacity: 0.36;
+  -webkit-mask-image:
+    url('/brand/motifs/ledger.svg'), linear-gradient(to right, transparent 50%, black 80%);
+  mask-image:
+    url('/brand/motifs/ledger.svg'), linear-gradient(to right, transparent 50%, black 80%);
+  -webkit-mask-size:
+    15rem 7.5rem,
+    100% 100%;
+  mask-size:
+    15rem 7.5rem,
+    100% 100%;
+}
+
+/* Single drawings set in the band's far corner, clear of a left text column. */
+.ds-band-art__layer--mapline,
+.ds-band-art__layer--tools {
+  inset: var(--ds-space-6) var(--ds-space-6) var(--ds-space-6) auto;
+  width: min(42%, 34rem);
+  opacity: 0.55;
+  -webkit-mask: var(--ds-band-art-drawing) right bottom / contain no-repeat;
+  mask: var(--ds-band-art-drawing) right bottom / contain no-repeat;
+}
+
+.ds-band-art__layer--mapline {
+  --ds-band-art-drawing: url('/brand/motifs/mapline.svg');
+}
+
+.ds-band-art__layer--tools {
+  --ds-band-art-drawing: url('/brand/motifs/tools.svg');
+}
+
+/* —— BandRule: an in-flow strip or vignette ——————————————————————————————————— */
+.ds-band-rule {
+  --ds-band-rule-h: 1.25rem;
+  display: block;
+  height: var(--ds-band-rule-h);
+  background-color: currentColor;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+
+/* One row of pieced blocks: the tile is four blocks square. */
+.ds-band-rule--weave {
+  opacity: 0.32;
+  -webkit-mask-image: url('/brand/motifs/weave.svg');
+  mask-image: url('/brand/motifs/weave.svg');
+  -webkit-mask-size: calc(var(--ds-band-rule-h) * 4);
+  mask-size: calc(var(--ds-band-rule-h) * 4);
+  -webkit-mask-position: left top;
+  mask-position: left top;
+}
+
+/* Halftone that thickens toward the foot. */
+.ds-band-rule--grain {
+  --ds-band-rule-h: 2rem;
+  opacity: 0.4;
+  -webkit-mask-image:
+    url('/brand/motifs/grain.svg'), linear-gradient(to bottom, transparent, black);
+  mask-image: url('/brand/motifs/grain.svg'), linear-gradient(to bottom, transparent, black);
+  -webkit-mask-size:
+    12px 12px,
+    100% 100%;
+  mask-size:
+    12px 12px,
+    100% 100%;
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* The ledger's perforated stub edge and double rule: the top strip of its tile. */
+.ds-band-rule--ledger {
+  --ds-band-rule-h: 2rem;
+  opacity: 0.5;
+  -webkit-mask-image: url('/brand/motifs/ledger.svg');
+  mask-image: url('/brand/motifs/ledger.svg');
+  -webkit-mask-size: 15rem 7.5rem;
+  mask-size: 15rem 7.5rem;
+  -webkit-mask-position: left top;
+  mask-position: left top;
+}
+
+/* A drawn vignette rather than a strip. */
+.ds-band-rule--architecture {
+  --ds-band-rule-h: clamp(6rem, 16vw, 11rem);
+  opacity: 0.7;
+  -webkit-mask: url('/brand/motifs/architecture.svg') left bottom / contain no-repeat;
+  mask: url('/brand/motifs/architecture.svg') left bottom / contain no-repeat;
+}
+
+@media (max-width: 79.99rem) {
+  .ds-band-art__layer--ledger {
+    -webkit-mask-image:
+      url('/brand/motifs/ledger.svg'), linear-gradient(to bottom, transparent 72%, black 92%);
+    mask-image:
+      url('/brand/motifs/ledger.svg'), linear-gradient(to bottom, transparent 72%, black 92%);
+  }
+}

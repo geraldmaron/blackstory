@@ -1377,6 +1377,36 @@ body:has(.ds-door) .ds-door-journey {
 /* Hard edges: the first band starts exactly where the fixed map ends, so no strip shows between. */
 .ds-door-chapters .ds-door-ch {
   padding-block: var(--ds-section-sm);
+  /* Band art sits behind the band's content; its print edges fill exactly the padding. */
+  isolation: isolate;
+  --ds-band-art-edge: var(--ds-section-sm);
+}
+
+/* Copper carries ink text at under 5:1, so its quilt stays out of the text: one row of pieced
+   blocks across the top padding, a quilted border, with the halftone edge below. */
+.ds-door-ch--story .ds-band-art__layer--weave {
+  opacity: 0.24;
+  -webkit-mask-image:
+    url('/brand/motifs/weave.svg'),
+    linear-gradient(to bottom, black var(--ds-quilt-row), transparent 0);
+  mask-image:
+    url('/brand/motifs/weave.svg'),
+    linear-gradient(to bottom, black var(--ds-quilt-row), transparent 0);
+  /* The tile is four blocks square, so four strips' height makes one exact row of blocks. */
+  --ds-quilt-row: calc(var(--ds-section-sm) - var(--ds-space-3));
+  -webkit-mask-size:
+    calc(var(--ds-quilt-row) * 4) calc(var(--ds-quilt-row) * 4),
+    100% 100%;
+  mask-size:
+    calc(var(--ds-quilt-row) * 4) calc(var(--ds-quilt-row) * 4),
+    100% 100%;
+}
+
+.ds-door-ch--story .ds-band-art__layer--grain {
+  -webkit-mask-image:
+    url('/brand/motifs/grain.svg'), linear-gradient(to top, black, transparent var(--ds-section-sm));
+  mask-image:
+    url('/brand/motifs/grain.svg'), linear-gradient(to top, black, transparent var(--ds-section-sm));
 }
 
 .ds-door-ch__inner {
