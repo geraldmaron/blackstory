@@ -309,7 +309,7 @@ export function CorrectionForm({
         <Field
           label="Email"
           htmlFor={ids.contact}
-          hint="Only used to send you the outcome."
+          hint="Only used to send your receipt and the outcome."
           {...errorProps('contact')}
         >
           <input

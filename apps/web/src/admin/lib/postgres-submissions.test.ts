@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import type pg from 'pg';
 import type { ServerAdminIdentity } from '../auth/supabase-server.js';
 import type { PostgresCommitInput } from './postgres-commit.js';
+import type { Notification } from '../../lib/notify/notify';
 import {
   commitSubmissionDecision,
   deriveSubmissionTitle,
@@ -35,6 +36,7 @@ function submission(overrides: Partial<SubmissionDetail> = {}): SubmissionDetail
 
 function fixture(who: ServerAdminIdentity | null, current: SubmissionDetail | null) {
   const commits: PostgresCommitInput[] = [];
+  const sent: Notification[] = [];
   let counter = 0;
   const dependencies: SubmissionDecisionDependencies = {
     readIdentity: async () => who,
@@ -50,8 +52,9 @@ function fixture(who: ServerAdminIdentity | null, current: SubmissionDetail | nu
     },
     newId: () => `id-${++counter}`,
     now: () => '2026-08-04T00:00:00.000Z',
+    notify: (n) => sent.push(n),
   };
-  return { commits, dependencies };
+  return { commits, dependencies, sent };
 }
 
 test('deriveSubmissionTitle prefers the real nested payload.normalized.title', () => {
@@ -333,4 +336,40 @@ test('resolution is allowed only for an open promoted correction', async () => {
     ).status,
     'ok',
   );
+});
+
+test('closing a correction emails its outcome to the corrector; spam and leads email no one', async () => {
+  const correction = (status: SubmissionDetail['status']) =>
+    submission({
+      status,
+      kind: 'correction',
+      payload: {
+        receiptDigest: 'digest',
+        receiptCode: 'BS-ABCD-EFGH',
+        original: { payload: { submitterContact: 'reader@example.org' } },
+      },
+    });
+  const cases = [
+    { current: correction('promoted'), decision: 'resolve', outcome: 'resolved' },
+    { current: correction('promoted'), decision: 'reject', outcome: 'rejected' },
+    { current: correction('quarantined'), decision: 'reject', outcome: 'rejected' },
+    { current: correction('quarantined'), decision: 'spam', outcome: null },
+    { current: correction('quarantined'), decision: 'promote', outcome: null },
+    { current: submission(), decision: 'reject', outcome: null },
+  ] as const;
+  for (const { current, decision, outcome } of cases) {
+    const { dependencies, sent } = fixture(identity('admin'), current);
+    const result = await commitSubmissionDecision(
+      { intakeItemId: current.id, decision, reason: 'Checked.' },
+      dependencies,
+    );
+    assert.equal(result.status, 'ok', `${decision} on ${current.status}`);
+    assert.deepEqual(
+      sent.map((n) => [n.event, n.to, n.data]),
+      outcome
+        ? [['correction.closed', 'reader@example.org', { receiptCode: 'BS-ABCD-EFGH', outcome }]]
+        : [],
+      `${decision} on ${current.status} ${current.kind}`,
+    );
+  }
 });

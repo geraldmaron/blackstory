@@ -29,6 +29,8 @@ import {
   createPostgresCorrectionSubmissionStore,
   saveQuarantinedRecord,
 } from '../../../lib/public-data/corrections-store';
+import { notify as defaultNotify, recipientFrom, type Notifier } from '../../../lib/notify/notify';
+import { CORRECTION_CATEGORY_LABELS } from '../categories';
 import type { CorrectionRequestIntegrityGuard } from '../request-integrity-guard';
 import type { createCorrectionRateLimitGuard } from '../rate-limit-guard';
 
@@ -57,6 +59,8 @@ export type CorrectionRouteDependencies = {
    * `store` for the in-memory one, rather than reaching the network.
    */
   readonly saveAbuseReport?: (record: QuarantinedSubmissionRecord) => Promise<void>;
+  /** Defaults to real (env-gated) email; tests pass a recorder. */
+  readonly notify?: Notifier;
 };
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
@@ -172,6 +176,27 @@ export async function handleCorrectionSubmitRequest(
     });
     await deps.store.save(stored);
 
+    const send = deps.notify ?? defaultNotify;
+    const contact = recipientFrom(validation.payload.submitterContact);
+    if (contact) {
+      send({
+        event: 'correction.received',
+        to: contact,
+        data: { receiptCode: stored.receiptCode },
+        idempotencyKey: `correction.received:${stored.record.id}`,
+      });
+    }
+    send({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: {
+        kind: 'correction',
+        summary: `${CORRECTION_CATEGORY_LABELS[validation.metadata.category]}: ${(body as CorrectionSubmissionInput).targetRecordId.trim().slice(0, 80)}`,
+        id: stored.record.id,
+      },
+      idempotencyKey: `owner.new_submission:${stored.record.id}`,
+    });
+
     return NextResponse.json(
       {
         accepted: true,
@@ -260,6 +285,25 @@ export async function handleCorrectionAppealRequest(
     });
     if (!attached) return jsonError(409, 'appeal_not_available');
 
+    const send = deps.notify ?? defaultNotify;
+    const contact =
+      recipientFrom(input.contact) ??
+      recipientFrom(stored.record.original.payload.submitterContact);
+    if (contact) {
+      send({
+        event: 'appeal.received',
+        to: contact,
+        data: { receiptCode: stored.receiptCode },
+        idempotencyKey: `appeal.received:${appealRecord.id}`,
+      });
+    }
+    send({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: { kind: 'appeal', summary: `Appeal on ${stored.receiptCode}`, id: stored.record.id },
+      idempotencyKey: `owner.new_submission:${appealRecord.id}`,
+    });
+
     return NextResponse.json(
       {
         accepted: true,
@@ -308,6 +352,16 @@ export async function handleCorrectionAbuseReportRequest(
     // Abuse reports have no receipt/status scheme (nothing for a submitter to check later), so
     // they use the same durable intake writer without receipt metadata.
     await (deps.saveAbuseReport ?? saveQuarantinedRecord)(result.record);
+    (deps.notify ?? defaultNotify)({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: {
+        kind: 'abuse report',
+        summary: 'Abuse report on correction activity',
+        id: result.record.id,
+      },
+      idempotencyKey: `owner.new_submission:${result.record.id}`,
+    });
 
     return NextResponse.json(
       {

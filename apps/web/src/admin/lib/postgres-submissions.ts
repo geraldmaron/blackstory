@@ -14,6 +14,7 @@ import { StaffPermissionDeniedError, assertStaffPermission } from '../auth/staff
 import { queryPostgres } from './canonical-postgres-client.js';
 import { commitWithAuditPostgres } from './postgres-commit.js';
 import { writeResearchCasePostgres } from './postgres-research-cases.js';
+import { notify, recipientFrom, type Notifier } from '../../lib/notify/notify';
 
 export const INTAKE_STATUSES = ['quarantined', 'promoted', 'rejected', 'spam'] as const;
 export type IntakeStatus = (typeof INTAKE_STATUSES)[number];
@@ -431,6 +432,7 @@ export type SubmissionDecisionDependencies = {
   ) => Promise<{ readonly eventId: string; readonly replayed: boolean }>;
   readonly newId: () => string;
   readonly now: () => string;
+  readonly notify: Notifier;
 };
 
 /**
@@ -447,7 +449,31 @@ const defaultDependencies: SubmissionDecisionDependencies = {
   commit: commitWithAuditPostgres,
   newId: () => randomUUID(),
   now: () => new Date().toISOString(),
+  notify,
 };
+
+/**
+ * Tells the corrector their receipt closed. Only receipts (corrections) are mailed, and never on
+ * 'spam': confirming receipt to a spammer is the one email that only helps them.
+ */
+function notifyCorrectionOutcome(
+  payload: unknown,
+  decision: SubmissionDecision,
+  eventId: string,
+  send: Notifier,
+): void {
+  const fields = asRecord(payload);
+  const receiptCode = typeof fields?.receiptCode === 'string' ? fields.receiptCode : undefined;
+  const outcome = decision === 'resolve' ? 'resolved' : decision === 'reject' ? 'rejected' : null;
+  const contact = recipientFrom(asRecord(asRecord(fields?.original)?.payload)?.submitterContact);
+  if (!receiptCode || !outcome || !contact) return;
+  send({
+    event: 'correction.closed',
+    to: contact,
+    data: { receiptCode, outcome },
+    idempotencyKey: `correction.closed:${eventId}`,
+  });
+}
 
 /** Thrown inside the transaction to roll it back without writing an audit row for a no-op. */
 class SubmissionAlreadyProcessedError extends Error {}
@@ -568,6 +594,8 @@ export async function commitSubmissionDecision(
     );
     return { status: 'failed', message: error instanceof Error ? error.message : String(error) };
   }
+
+  notifyCorrectionOutcome(current.payload, request.decision, plan.auditEvent.id, deps.notify);
 
   return {
     status: 'ok',

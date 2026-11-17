@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { createQuarantinedSubmission } from '@repo/security';
 import { saveQuarantinedRecord } from '@/lib/public-data/corrections-store';
 import { requirePrivacyPepper } from '@/lib/web-security';
+import { notify } from '@/lib/notify/notify';
 import { createSubmitLeadRequestIntegrityGuard } from '../request-integrity-guard';
 import { createSubmitLeadRateLimitGuard } from '../rate-limit-guard';
 import { validateLeadSubmission, type LeadSubmissionInput } from '../lead-intake';
@@ -85,6 +86,17 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     await saveQuarantinedRecord(result.record);
+    // The form promises the email is only for a question about this lead, so only the owner hears.
+    notify({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: {
+        kind: 'lead',
+        summary: result.record.normalized.title.slice(0, 100),
+        id: result.record.id,
+      },
+      idempotencyKey: `owner.new_submission:${result.record.id}`,
+    });
 
     // 202 Accepted: this is a quarantine write, never a confirmation that the lead is public,
     // true, or will ever be researched it only confirms the lead entered the moderated queue.

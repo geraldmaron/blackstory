@@ -9,6 +9,7 @@ import { createSubmissionCampaignDetector } from '@repo/security';
 import { createCorrectionRequestIntegrityGuard } from '../request-integrity-guard';
 import { createCorrectionRateLimitGuard } from '../rate-limit-guard';
 import { createCorrectionSubmissionStore } from '../store';
+import type { Notification } from '../../../lib/notify/notify';
 import {
   buildDefaultCorrectionRouteDependencies,
   handleCorrectionAbuseReportRequest,
@@ -263,4 +264,35 @@ test('default route dependencies retain quotas across requests', async () => {
     statuses.push(response.status);
   }
   assert.deepEqual(statuses, [202, 202, 429]);
+});
+
+test('a correction with an email mails its receipt; every correction alerts the owner', async () => {
+  const sent: Notification[] = [];
+  const deps = await buildDeps({ notify: (n) => sent.push(n) });
+  const withEmail = await handleCorrectionSubmitRequest(
+    postJson(
+      '/corrections/api',
+      { ...VALID_CORRECTION, contact: 'reader@example.org' },
+      '203.0.113.40',
+    ),
+    deps,
+  );
+  const { receiptCode } = (await withEmail.json()) as { receiptCode: string };
+  await handleCorrectionSubmitRequest(
+    postJson(
+      '/corrections/api',
+      { ...VALID_CORRECTION, targetRecordId: 'entity-9' },
+      '203.0.113.41',
+    ),
+    deps,
+  );
+  assert.deepEqual(
+    sent.map((n) => [n.event, n.to]),
+    [
+      ['correction.received', 'reader@example.org'],
+      ['owner.new_submission', 'owner'],
+      ['owner.new_submission', 'owner'],
+    ],
+  );
+  assert.deepEqual(sent[0]?.data, { receiptCode });
 });
