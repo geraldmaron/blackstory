@@ -1,7 +1,7 @@
 /** `/lives`: one life question across time, using only publishable and cited comparisons. */
 import type { Metadata } from 'next';
 import React from 'react';
-import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
+import { LIVES_NATIONAL, LIVES_REGIONS } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { PageHeader } from '@repo/ui';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { parentCrumb, Room } from '../../components/room';
 import { TrustMast, TrustSheet } from '../../components/trust';
 import { livesDecadeNumeral } from '../../components/lives/lives-mast';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../lib/lives/lives-source';
-import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
+import { LIVES_EXPLORER_PATH, type RawLivesSearchParams } from '../../lib/lives/lives-url-state';
 import { parseLivesMilestone } from '../../lib/lives/lives-milestones';
 import { LivesSourceNotice } from '../../components/lives/LivesSourceNotice';
 import { LivesMilestoneExperience } from '../../components/lives/LivesMilestoneExperience';
@@ -54,7 +54,28 @@ export default async function LivesIndexPage({
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast tone="sand" numeral={livesDecadeNumeral(bundle)} art={['tools', 'grain']}>
+        <TrustMast
+          tone="sand"
+          numeral={livesDecadeNumeral(bundle)}
+          art={['tools', 'grain']}
+          tools={
+            // The page reads the nation; each region's own tables live in the appendix. Without
+            // this row the only way there was a link at the foot of a very long page.
+            <nav className="lives-regions" aria-label="By region">
+              <span className="lives-regions__label">By region</span>
+              {LIVES_REGIONS.map((region) => (
+                <Link
+                  key={region.slug}
+                  className="ds-room-chip"
+                  href={`${LIVES_EXPLORER_PATH}?area=${region.slug}`}
+                  title={region.summary}
+                >
+                  {region.name}
+                </Link>
+              ))}
+            </nav>
+          }
+        >
           <PageHeader
             display
             crumb={parentCrumb('/lives')}

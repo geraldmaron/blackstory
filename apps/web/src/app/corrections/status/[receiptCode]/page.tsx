@@ -4,7 +4,8 @@
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Button, PageHeader } from '@repo/ui';
+import { notFound } from 'next/navigation';
+import { PageHeader } from '@repo/ui';
 import { parentCrumb, Room } from '../../../../components/room';
 import { TrustMast, TrustSheet } from '../../../../components/trust';
 import '../../../utility.css';
@@ -20,6 +21,8 @@ import { CorrectionStatusPanel } from '../../CorrectionStatusPanel';
 export const metadata: Metadata = {
   title: 'Correction status',
   description: 'Check the public status of a submitted correction using your receipt code.',
+  // A receipt is one person's submission: never in a search index, found or not.
+  robots: { index: false, follow: false },
 };
 
 type PageProps = {
@@ -32,38 +35,8 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
   const deps = await buildDefaultCorrectionRouteDependencies();
   const status = await lookupPublicStatusByReceipt(receiptCode, deps);
 
-  if (!status) {
-    return (
-      <Room
-        width="wide"
-        className="ds-trust-room"
-        masthead={
-          <TrustMast tone="sand">
-            <PageHeader
-              display
-              crumb={parentCrumb('/corrections/status')}
-              linkAs={Link}
-              title="Receipt not found"
-              dek="No correction matches that code. There is no way to browse other people’s submissions."
-            />
-          </TrustMast>
-        }
-      >
-        <TrustSheet>
-          <p className="ds-trust-lead">
-            Check the code against the one you were given. It starts with BB-COR and has sixteen
-            letters and numbers after that.
-          </p>
-          <div className="ds-receipt-missing">
-            <Button href="/corrections/status">Try another code</Button>
-            <Button href="/corrections" variant="quiet">
-              Send a new correction
-            </Button>
-          </div>
-        </TrustSheet>
-      </Room>
-    );
-  }
+  // A real 404, not a 200 page that says "not found": the designed body is in not-found.tsx.
+  if (!status) notFound();
 
   return (
     <Room

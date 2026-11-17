@@ -35,6 +35,9 @@ import React, {
  */
 const UNAVAILABLE_NOTE = 'Suggestions are unavailable right now. Press Enter to search.';
 
+/** Shown when a settled lookup found nothing, with the way forward that still works. */
+const NO_MATCH_NOTE = 'No suggestions match. Press Enter to search every record.';
+
 /** Shown while a remote lookup is outstanding, so a slow answer is not mistaken for none. */
 const SEARCHING_NOTE = 'Searching…';
 
@@ -220,6 +223,14 @@ export function TypeaheadCombobox({
 
   const showUnavailable = unavailable && suggestions.length === 0;
   const showSearching = pending && suggestions.length === 0 && !showUnavailable;
+  // Settled means the lookup for exactly this text has answered, so a keystroke in flight never
+  // flashes "no match" before its own request starts.
+  const showNoMatch =
+    query.trim().length >= minChars &&
+    deferredQuery === query &&
+    !pending &&
+    !showUnavailable &&
+    suggestions.length === 0;
 
   const statusMessage =
     deferredQuery.trim().length < minChars
@@ -283,6 +294,11 @@ export function TypeaheadCombobox({
       {showSearching && open ? (
         <p className="ds-typeahead__note" aria-hidden="true">
           {SEARCHING_NOTE}
+        </p>
+      ) : null}
+      {showNoMatch && open ? (
+        <p className="ds-typeahead__note" aria-hidden="true">
+          {NO_MATCH_NOTE}
         </p>
       ) : null}
       {showUnavailable && open ? (

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import { cx, SectionHeading } from '@repo/ui';
 import { DestinationIcon } from '../patterns/DestinationIcon';
+import { BandRule, type BandArtMotif } from '../atmosphere/BandArt';
 
 void React;
 
@@ -15,12 +16,15 @@ export type RoomSectionProps = {
   readonly title: ReactNode;
   readonly children: ReactNode;
   readonly className?: string;
+  /** A drawn rule over the heading (About's quilt row). Decorative. */
+  readonly rule?: BandArtMotif;
 };
 
-export function RoomSection({ id, title, children, className }: RoomSectionProps) {
+export function RoomSection({ id, title, children, className, rule }: RoomSectionProps) {
   const headingId = `${id}-heading`;
   return (
     <section id={id} className={cx('ds-room-section', className)} aria-labelledby={headingId}>
+      {rule ? <BandRule motif={rule} className="ds-room-section__rule" /> : null}
       <SectionHeading id={headingId}>{title}</SectionHeading>
       {children}
     </section>

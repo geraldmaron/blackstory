@@ -1180,6 +1180,21 @@ details[open] > summary > .lives-caret {
   margin: 0 0 var(--ds-space-3);
 }
 
+/* The region row under the /lives mast: chips into the appendix, one per region. */
+.lives-regions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.lives-regions__label {
+  margin-right: var(--ds-space-2);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
 /* —— /lives/explorer: one control row, one result panel ————————————————————— */
 .lives-toolbar {
   display: flex;

@@ -41,16 +41,16 @@ the 2026-11-16 audit observed; strike a line when it is fixed and verified on th
 | J1 | First-time visitor gets oriented | `/` | hero, five-record tour, "Open the record" | a record page opens | none open |
 | J2 | Researcher finds a kind of place | header search | type, Enter, `/records?q=`, facet, row | the record opens within two facet changes | result count said three times on a query |
 | J3 | Reader browses by time or place | `/records?layout=chronology`, `/explore` | timeline, decade; or map, state | the decade's or state's rows are on screen | "Jump to decade" sits only in the pager; phone map total (4,378) differs from Records (4,387) without the reason shown |
-| J4 | Phone reader searches from a record | header search icon | sheet, type, suggestion or Enter | the record opens | no visible no-results line in the sheet |
+| J4 | Phone reader searches from a record | header search icon | sheet, type, suggestion or Enter | the record opens | none open |
 | J5 | Reader moves to another room | tab bar More, or footer | `/rooms`, row | the room opens in two taps | footer says "Rooms" where the tab says "More" |
 | J6 | Reader checks whether a law protects them | `/law` | era or topic, law, "Your rights today" | an agency complaint link is opened | rights block sits third, below two prose beats |
 | J7 | Parent or teacher checks a book challenge | `/books` | state, title, challenge table | their state and district with a cited report | no title search on the page |
 | J8 | Reader goes from a story to its evidence | `/stories` | cover, Contents, citation, Sources, records strip | a cited source or record opens | none open |
 | J9 | Teacher looks up a published figure | `/data` | section nav, figure, Source/Limits | the agency table is reached | none open |
-| J10 | Reader compares a region's lives | `/lives` | footer link to explorer, Area tab | the region panel with cited tables | `/lives` offers no region entry; bad `?area=` falls back to national silently |
+| J10 | Reader compares a region's lives | `/lives` | "By region" chips under the mast, or the explorer's Area tab | the region panel with cited tables | a bad `?area=` falls back to national silently |
 | J11 | Family member finds a name | `/memorial` | past the wall, Find a name or letter strip | the name row with year and place | none open |
 | J12 | Skeptic decides whether a record is citable | record, "How a record gets in" | Methodology, Sources, Errata | understands the grade and opens the publisher | Sources rows do not link to the records that cite them; three source taxonomies disagree (section 6) |
-| J13 | Descendant reports an error | record or Support | `/corrections`, receipt, `/corrections/status` | receipt, outcome, an Errata entry | unknown receipt codes return 200 |
+| J13 | Descendant reports an error | record or Support | `/corrections`, receipt, `/corrections/status` | receipt, outcome, an Errata entry | an unknown code is a noindex not-found, but its HTTP status stays 200 because the route's loading state streams first |
 | J14 | Lost reader on a bad link | 404 | map, search, records or stories | lands on content in one click | none open |
 
 ## 3. Theme
@@ -133,8 +133,8 @@ the floor, so no full-width band reads as a blank color field.
 Rules:
 
 - A band opts in by rendering `<BandArt>` inside it; `band-art.css` makes any band holding art its
-  own host. No page re-implements a motif in local CSS (About's weave rule predates this and
-  should move to `BandRule`).
+  own host. A section heading takes a drawn rule through `RoomSection rule`. No page re-implements
+  a motif in local CSS.
 - Art fades away from the text column, so the band's contrast is the ground's own. The corner
   drawings (`architecture`, `mapline`, `tools`) need a clear right side; a band with text on the
   right (Rooms rows) takes a full-band motif instead.
@@ -146,7 +146,9 @@ Rules:
 
 Every list or search surface ships a designed empty, no-results, loading and error state, in the
 house voice, with one way forward. The 404 is a real 404. A lookup that finds nothing
-(`/corrections/status/[code]`) returns 404, not a 200 page that says "not found".
+(`/corrections/status/[code]`) calls `notFound()` so it renders the not-found boundary and is
+never indexed. Where a route has a `loading.tsx`, the stream has started before the lookup ends,
+so the HTTP status stays 200; that is the accepted cost of the loading state.
 
 ## 9. Research Source Library
 

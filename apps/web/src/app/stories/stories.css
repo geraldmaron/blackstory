@@ -136,6 +136,13 @@
   animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
+.ds-stories-lead__page {
+  margin-right: var(--ds-space-3);
+  padding-right: var(--ds-space-3);
+  border-right: var(--ds-border-width) solid currentColor;
+  color: var(--ds-ink);
+}
+
 .ds-stories-lead__years {
   grid-area: years;
   margin: 0;

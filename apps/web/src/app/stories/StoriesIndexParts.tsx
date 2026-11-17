@@ -59,7 +59,13 @@ export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
       </div>
       <div className="ds-wrap ds-stories-lead__wrap">
         <div className="ds-stories-lead__panel" data-ground="ink">
-          <p className="ds-stories-lead__years">{item.eraLabel}</p>
+          <p className="ds-stories-lead__years">
+            {/* The page's name, visible; the outline's h1 says it for assistive tech. */}
+            <span className="ds-stories-lead__page" aria-hidden="true">
+              Stories
+            </span>
+            {item.eraLabel}
+          </p>
           <h2 className="ds-stories-lead__title">
             <a className="ds-stories-lead__link" href={href(item)}>
               {item.title}

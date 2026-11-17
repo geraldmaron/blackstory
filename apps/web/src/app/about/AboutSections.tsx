@@ -65,11 +65,11 @@ export function AboutSections({ states }: AboutSectionsProps) {
       <TrustSheet>
         <RoomJump sections={ABOUT_JUMP} />
 
-        <RoomSection id="origin" title="Why this exists">
+        <RoomSection rule="weave" id="origin" title="Why this exists">
           <LeadThenProse paragraphs={ABOUT_ORIGIN} />
         </RoomSection>
 
-        <RoomSection id="stance" title={ABOUT_STANCE.heading}>
+        <RoomSection rule="weave" id="stance" title={ABOUT_STANCE.heading}>
           <LeadThenProse paragraphs={ABOUT_STANCE.paragraphs} />
           <Prose>
             <p>
@@ -82,7 +82,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
           </Prose>
         </RoomSection>
 
-        <RoomSection id="pillars" title="What every record stands on">
+        <RoomSection rule="weave" id="pillars" title="What every record stands on">
           <p className="ds-trust-lead">
             Four rules travel with every record, enforced where the record is built, so you can
             check each one on any record page instead of taking it on faith.
@@ -111,7 +111,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
       {/* How the writing is made stands on its own ink band, and what the archive will not do on
           sand: the page changes ground between chapters instead of running one sheet. */}
       <TrustBand tone="ink" fixed>
-        <RoomSection id="neo" title={ABOUT_NEO.heading}>
+        <RoomSection rule="weave" id="neo" title={ABOUT_NEO.heading}>
           <Prose>
             {ABOUT_NEO.rules.slice(0, 2).map((paragraph) => (
               <p key={paragraph.slice(0, 40)}>{paragraph}</p>
@@ -132,7 +132,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
       </TrustBand>
 
       <TrustBand tone="sand">
-        <RoomSection id="refusals" title="What it will not do">
+        <RoomSection rule="weave" id="refusals" title="What it will not do">
           <ul className="ds-trust-list" aria-label="What it will not do">
             {ABOUT_REFUSALS.map((refusal) => {
               const stop = refusal.indexOf('. ');
@@ -162,7 +162,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
       </TrustBand>
 
       <TrustSheet>
-        <RoomSection id="contribute" title={ABOUT_CONTRIBUTE.heading}>
+        <RoomSection rule="weave" id="contribute" title={ABOUT_CONTRIBUTE.heading}>
           <LeadThenProse paragraphs={[ABOUT_CONTRIBUTE.lede, ABOUT_CONTRIBUTE.terms]} />
           <Prose>
             <p>
@@ -179,7 +179,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
           />
         </RoomSection>
 
-        <RoomSection id="begin" title="Where to begin">
+        <RoomSection rule="weave" id="begin" title="Where to begin">
           <p className="ds-trust-lead">{ABOUT_ROOMS_HANDOFF.lede}</p>
           <TrustLinks
             links={[
