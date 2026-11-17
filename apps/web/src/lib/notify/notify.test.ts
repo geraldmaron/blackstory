@@ -16,7 +16,7 @@ test('every template renders a subject and a body carrying its link', () => {
   const closed = renderNotification({
     event: 'correction.closed',
     to: 'x@example.org',
-    data: { receiptCode: 'C', outcome: 'rejected' },
+    data: { receiptCode: 'C', outcome: 'rejected', appealAvailable: true },
     idempotencyKey: 'k',
   });
   assert.match(closed.text, /appeal/);
@@ -48,7 +48,7 @@ test('a configured send posts to Resend with the idempotency key; owner resolves
     {
       event: 'owner.new_submission',
       to: 'owner',
-      data: { kind: 'lead', summary: 's', id: 'i' },
+      data: { kind: 'lead', headline: 's', id: 'i' },
       idempotencyKey: 'o',
     },
     env,
@@ -77,4 +77,68 @@ test('only a plausible address is mailed', () => {
   assert.equal(recipientFrom(' reader@example.org '), 'reader@example.org');
   assert.equal(recipientFrom('call me'), undefined);
   assert.equal(recipientFrom(undefined), undefined);
+});
+
+const EVERY_EMAIL: Notification[] = [
+  received,
+  {
+    event: 'appeal.received',
+    to: 'x@example.org',
+    data: { receiptCode: 'C' },
+    idempotencyKey: 'k',
+  },
+  ...(['resolved', 'rejected'] as const).flatMap((outcome) =>
+    [true, false].map((appealAvailable): Notification => ({
+      event: 'correction.closed',
+      to: 'x@example.org',
+      data: { receiptCode: 'C', outcome, appealAvailable },
+      idempotencyKey: 'k',
+    })),
+  ),
+  {
+    event: 'owner.new_submission',
+    to: 'owner',
+    data: { kind: 'correction', headline: 'h', statement: 's', id: 'i' },
+    idempotencyKey: 'k',
+  },
+];
+
+test('every email keeps the house voice and carries the brand layout', () => {
+  for (const n of EVERY_EMAIL) {
+    const { subject, text, html } = renderNotification(n);
+    const words = `${subject}\n${text}`;
+    assert.doesNotMatch(words, /\bwe\b|\bour\b|\bus\b/iu, `${n.event} speaks as "we"`);
+    assert.doesNotMatch(words, /!/u, `${n.event} uses an exclamation mark`);
+    assert.doesNotMatch(
+      words,
+      /quarantin|promot|queue|graylist/iu,
+      `${n.event} leaks pipeline words`,
+    );
+    assert.match(html, /email-lockup\.png/u);
+    assert.match(html, /#B86B2A/u);
+  }
+});
+
+test('a declined correction offers an appeal only while one is left', () => {
+  const closed = (appealAvailable: boolean) =>
+    renderNotification({
+      event: 'correction.closed',
+      to: 'x@example.org',
+      data: { receiptCode: 'C', outcome: 'rejected', appealAvailable },
+      idempotencyKey: 'k',
+    }).text;
+  assert.match(closed(true), /appeal once/u);
+  assert.doesNotMatch(closed(false), /appeal once/u);
+  assert.match(closed(false), /final outcome/u);
+});
+
+test('submitter text is escaped in the HTML', () => {
+  const { html } = renderNotification({
+    event: 'owner.new_submission',
+    to: 'owner',
+    data: { kind: 'lead', headline: '<b>x</b>', statement: '<script>alert(1)</script>', id: 'i' },
+    idempotencyKey: 'k',
+  });
+  assert.doesNotMatch(html, /<script>|<b>x/u);
+  assert.match(html, /&lt;script&gt;/u);
 });

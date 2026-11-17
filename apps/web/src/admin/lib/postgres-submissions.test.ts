@@ -367,9 +367,35 @@ test('closing a correction emails its outcome to the corrector; spam and leads e
     assert.deepEqual(
       sent.map((n) => [n.event, n.to, n.data]),
       outcome
-        ? [['correction.closed', 'reader@example.org', { receiptCode: 'BS-ABCD-EFGH', outcome }]]
+        ? [
+            [
+              'correction.closed',
+              'reader@example.org',
+              { receiptCode: 'BS-ABCD-EFGH', outcome, appealAvailable: outcome === 'rejected' },
+            ],
+          ]
         : [],
       `${decision} on ${current.status} ${current.kind}`,
     );
   }
+});
+
+test('a decline after the one appeal does not offer another', async () => {
+  const current = submission({
+    status: 'quarantined',
+    kind: 'correction',
+    payload: {
+      receiptDigest: 'digest',
+      receiptCode: 'BS-ABCD-EFGH',
+      appeals: [{ id: 'a1' }],
+      original: { payload: { submitterContact: 'reader@example.org' } },
+    },
+  });
+  const { dependencies, sent } = fixture(identity('admin'), current);
+  await commitSubmissionDecision(
+    { intakeItemId: current.id, decision: 'reject', reason: 'Checked again.' },
+    dependencies,
+  );
+  assert.equal(sent[0]?.event, 'correction.closed');
+  assert.equal((sent[0]?.data as { appealAvailable: boolean }).appealAvailable, false);
 });

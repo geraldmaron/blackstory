@@ -15,6 +15,7 @@ import { queryPostgres } from './canonical-postgres-client.js';
 import { commitWithAuditPostgres } from './postgres-commit.js';
 import { writeResearchCasePostgres } from './postgres-research-cases.js';
 import { notify, recipientFrom, type Notifier } from '../../lib/notify/notify';
+import { isAppealEligible } from '../../app/corrections/public-status';
 
 export const INTAKE_STATUSES = ['quarantined', 'promoted', 'rejected', 'spam'] as const;
 export type IntakeStatus = (typeof INTAKE_STATUSES)[number];
@@ -467,10 +468,16 @@ function notifyCorrectionOutcome(
   const outcome = decision === 'resolve' ? 'resolved' : decision === 'reject' ? 'rejected' : null;
   const contact = recipientFrom(asRecord(asRecord(fields?.original)?.payload)?.submitterContact);
   if (!receiptCode || !outcome || !contact) return;
+  const appealAvailable = isAppealEligible({
+    phase: 'closed',
+    closureReason: outcome,
+    classificationDispute: fields?.classificationDispute === true,
+    appealCount: Array.isArray(fields?.appeals) ? fields.appeals.length : 0,
+  });
   send({
     event: 'correction.closed',
     to: contact,
-    data: { receiptCode, outcome },
+    data: { receiptCode, outcome, appealAvailable },
     idempotencyKey: `correction.closed:${eventId}`,
   });
 }

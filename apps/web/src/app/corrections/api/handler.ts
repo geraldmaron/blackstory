@@ -191,7 +191,8 @@ export async function handleCorrectionSubmitRequest(
       to: 'owner',
       data: {
         kind: 'correction',
-        summary: `${CORRECTION_CATEGORY_LABELS[validation.metadata.category]}: ${(body as CorrectionSubmissionInput).targetRecordId.trim().slice(0, 80)}`,
+        headline: `${CORRECTION_CATEGORY_LABELS[validation.metadata.category]} on “${(body as CorrectionSubmissionInput).targetRecordId.trim().slice(0, 80)}”, receipt ${stored.receiptCode}`,
+        statement: (body as CorrectionSubmissionInput).statement,
         id: stored.record.id,
       },
       idempotencyKey: `owner.new_submission:${stored.record.id}`,
@@ -300,7 +301,12 @@ export async function handleCorrectionAppealRequest(
     send({
       event: 'owner.new_submission',
       to: 'owner',
-      data: { kind: 'appeal', summary: `Appeal on ${stored.receiptCode}`, id: stored.record.id },
+      data: {
+        kind: 'appeal',
+        headline: `Appeal on correction ${stored.receiptCode}`,
+        statement: input.statement,
+        id: stored.record.id,
+      },
       idempotencyKey: `owner.new_submission:${appealRecord.id}`,
     });
 
@@ -357,7 +363,10 @@ export async function handleCorrectionAbuseReportRequest(
       to: 'owner',
       data: {
         kind: 'abuse report',
-        summary: 'Abuse report on correction activity',
+        headline: (body as AbuseReportInput).receiptCode?.trim()
+          ? `Report about correction ${(body as AbuseReportInput).receiptCode?.trim()}`
+          : 'Report about correction activity',
+        statement: (body as AbuseReportInput).statement,
         id: result.record.id,
       },
       idempotencyKey: `owner.new_submission:${result.record.id}`,

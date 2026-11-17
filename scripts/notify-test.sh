@@ -6,6 +6,7 @@
 # Usage:
 #   pnpm notify:test                  # to the owner mailbox (SUPPORT_CONTACT)
 #   pnpm notify:test you@example.org  # to another address
+#   pnpm notify:test --all            # every template, to see them all in an inbox
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -19,5 +20,7 @@ fi
 
 # Same sender as Vercel production.
 export NOTIFY_FROM_EMAIL="${NOTIFY_FROM_EMAIL:-BlackStory <notify@mail.blackstory.app>}"
+# Links and the logo point at the live site, as they will in production mail.
+export NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://blackstory.app}"
 cd "$ROOT/apps/web"
 exec node --conditions development --import tsx scripts/send-test-notification.mts "$@"

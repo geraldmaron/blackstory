@@ -92,7 +92,8 @@ export async function POST(request: Request): Promise<Response> {
       to: 'owner',
       data: {
         kind: 'lead',
-        summary: result.record.normalized.title.slice(0, 100),
+        headline: result.record.normalized.title.slice(0, 100),
+        statement: result.record.normalized.statement,
         id: result.record.id,
       },
       idempotencyKey: `owner.new_submission:${result.record.id}`,
