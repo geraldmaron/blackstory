@@ -339,14 +339,6 @@
   justify-self: start;
 }
 
-.ds-door-tour__end {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  line-height: 1.45;
-}
-
 /* —— Wide: glass cards in the opening card's column, the map free to their right ——————————— */
 @media (min-width: 64rem), (min-width: 48rem) and (min-aspect-ratio: 1001/1000) {
   /* The empty map beside the cards stays reachable: only the cards take hits. */

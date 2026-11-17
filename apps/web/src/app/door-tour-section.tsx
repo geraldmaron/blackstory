@@ -92,9 +92,6 @@ export function DoorTour({ records }: DoorTourProps) {
             );
           })}
         </ol>
-        <p className="ds-door-tour__end ds-door-tour__card">
-          Every record here carries a grade. The next section says what the grades mean.
-        </p>
       </div>
     </section>
   );
