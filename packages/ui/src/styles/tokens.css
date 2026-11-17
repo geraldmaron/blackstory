@@ -109,6 +109,7 @@
   --ds-map-halo: #fbf8f2;
 }
 
+[data-theme='dark'] [data-ground='paper']:not([data-ground-fixed]),
 [data-theme='dark'],
 [data-ground='ink'] {
   color-scheme: dark;
@@ -213,6 +214,7 @@
   --ds-lockup-on-dark: none;
 }
 
+[data-theme='dark'] [data-ground='paper']:not([data-ground-fixed]),
 [data-theme='dark'],
 [data-ground='ink'] {
   --ds-lockup-on-light: none;
@@ -299,6 +301,19 @@
   --ds-surface: var(--ds-material-paper);
   /* Sand on paper is 1.7:1, a fill only; a numeral there steps to copper. */
   --ds-numeral-soft: var(--ds-accent-graphic);
+}
+
+/*
+ * On the dark table the paper ground is ink, the mirror of the ink ground on the light table: a
+ * sheet takes the dark roles (the selector joins the dark role list) one surface step above the
+ * table, with --ds-ground-edge so it still reads as a sheet. `data-ground-fixed` keeps a plate
+ * paper in both themes.
+ */
+[data-theme='dark'] [data-ground='paper']:not([data-ground-fixed]) {
+  --ds-canvas: var(--ds-surface);
+  --ds-numeral-soft: #d8a178;
+  --ds-numeral-soft-text: #d8a178;
+  --ds-ground-edge: var(--ds-rule);
 }
 
 [data-ground='ink'] {
