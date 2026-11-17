@@ -2116,15 +2116,18 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
 }
 
-/* The numeral and a shown name both open the place (place-labels.ts routes either click to it).
-   An unnamed token's name is only faded out, so it must not catch clicks. */
-.ds-place-token__count,
-.ds-place-token.is-named .ds-place-token__name {
+/* A label is its mark: the numeral, a shown place name and a record's name beside its pin each open
+   what they name (place-labels.ts `actionable`). An unnamed token's name is only faded out, so it
+   must not catch clicks; the record-page embed's name is not actionable and stays inert. */
+.ds-place-token__count.is-actionable,
+.ds-place-token.is-named .ds-place-token__name.is-actionable,
+.ds-site-name.is-actionable {
   pointer-events: auto;
   cursor: pointer;
 }
 
-.ds-place-token.is-named .ds-place-token__name:hover {
+.ds-site-name.is-actionable:hover,
+.ds-place-token.is-named .ds-place-token__name.is-actionable:hover {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;

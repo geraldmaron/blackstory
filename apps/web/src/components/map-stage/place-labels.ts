@@ -191,6 +191,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
   const leaders = new Map<string, ReturnType<typeof buildLeader>>();
   const tokenAnchors = new Map<string, [number, number]>();
   const sites = new Map<string, HTMLElement>();
+  const siteAnchors = new Map<string, [number, number]>();
   let hovered: string | undefined;
   let pressed = false;
   let selected: string | undefined;
@@ -223,8 +224,8 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
     );
   }
 
-  function tokenClick(key: string): void {
-    const at = tokenAnchors.get(key);
+  /** A label is its mark: a click on the words is replayed as a click on the anchor it names. */
+  function clickAt(at: [number, number] | undefined): void {
     if (!at) return;
     const point = map.project(at);
     map.fire('click', {
@@ -232,6 +233,15 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
       lngLat: map.unproject(point),
       originalEvent: new MouseEvent('click'),
     } as never);
+  }
+
+  /** Wires an element so a press on it opens what it labels and never pans or deselects. */
+  function actionable(element: HTMLElement, at: () => [number, number] | undefined): void {
+    element.classList.add('is-actionable');
+    element.addEventListener('click', () => clickAt(at()));
+    for (const type of ['mousedown', 'mouseup', 'dblclick', 'touchstart', 'pointerdown']) {
+      element.addEventListener(type, (event) => event.stopPropagation());
+    }
   }
 
   function update(): void {
@@ -410,13 +420,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
         const key = spot.key;
         // The numeral and the name are both the place: a click on "SALT LAKE" used to fall through
         // to empty plate, because only the anchor point under the numeral was hit-tested.
-        for (const part of [token.count, token.name]) {
-          part.addEventListener('click', () => tokenClick(key));
-          // Keep the map from reading the press as a pan or a click on empty plate.
-          for (const type of ['mousedown', 'mouseup', 'dblclick', 'touchstart', 'pointerdown']) {
-            part.addEventListener(type, (event) => event.stopPropagation());
-          }
-        }
+        for (const part of [token.count, token.name]) actionable(part, () => tokenAnchors.get(key));
         layer.append(token.root);
       }
       const count = String(props.point_count_abbreviated ?? '');
@@ -473,9 +477,12 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
       const at = pointOf(feature);
       if (typeof id !== 'string' || id === selected || seenSites.has(id) || !at) continue;
       seenSites.add(id);
+      siteAnchors.set(id, at);
       let site = sites.get(id);
       if (!site) {
         site = buildSite(String(props.displayName ?? ''));
+        // The record's name opens the record, like its pin. It used to be inert text beside it.
+        actionable(site, () => siteAnchors.get(id));
         sites.set(id, site);
         layer.append(site);
       }
@@ -486,6 +493,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
       if (seenSites.has(id)) continue;
       site.remove();
       sites.delete(id);
+      siteAnchors.delete(id);
     }
   }
 
