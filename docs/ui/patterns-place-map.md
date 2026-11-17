@@ -102,9 +102,9 @@ Counts are never dropped, so `place-labels.ts` runs a layout pass (`token-layout
 
 The precision mix is always words, never color alone. Copper and ink only. No red or alarm hues.
 
-#### Phone: a few counts, each labeled
+#### Phone: counts spread over the plate
 
-On a map narrower than 768px (the explore sheet layout, home, embeds), 48 numerals at the national frame read as noise, so the state level prints only the largest few. The budget is one numeral per 35,000 square pixels of plate, between 4 and 8 (6 at 390 by 500), chosen by count with ties by place key (`phoneNumeralBudget`, `chooseCounted` in `token-layout.ts`). The same budget applies at the county level on a phone. The entered or selected place and the place nearest the selected record always print. Places past the budget keep their invisible hit circles, so a tap still enters them, and they stay in the text list below. City and square levels print every count.
+On a map narrower than 768px (the explore sheet layout, home, embeds), 48 numerals at the national frame would crowd, so the state and county levels print only the counts that fit with room around them (`chooseUncrowded` in `token-layout.ts`). Largest count first, ties by place key, a numeral prints when its box, and its name where that also fits, clears every printed numeral and name, the frame edges, the callout and the legend by 6px. The plate then shows counts from coast to coast, about 30 at 520 by 900, instead of the few largest crowding the Southeast (the earlier rule, a top-8 by count, left the West and Plains blank and read as empty). The entered or selected place and the place nearest the selected record always print. Places that yield keep their invisible hit circles, so a tap still enters them, and they stay in the text list below. City and square levels print every count.
 
 Type is small and responsive: the count tokens (`--ds-map-count-*`, mirrored by `MAP_TYPE`, a test keeps them equal) are multiplied by `--ds-place-scale` (`placeTypeScale`), 0.85 up to about 1,090px of map width, 1.1 at 1,440 and wider, and up to 20% more toward street zoom. That puts a phone's counts at 10 to 14px and a wide screen's at 13 to 18px.
 

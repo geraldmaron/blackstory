@@ -6,9 +6,8 @@ import { buildExploreMapSource } from '../../lib/map-experience/build-explore-ma
 import { placeGroupsFor, placeTier } from '../../lib/map-experience/place-map';
 import {
   boxesIntersect,
-  chooseCounted,
+  chooseUncrowded,
   layoutTokens,
-  phoneNumeralBudget,
   placeCountList,
   markBox,
   numeralBox,
@@ -141,25 +140,43 @@ test('the seed catalog laid out at a national frame has no overlapping numerals'
   assertClear(inputs, [], layoutTokens(inputs, []));
 });
 
-test('a phone prints at most the budget of numerals, none overlap, the selected place always prints', () => {
+test('a phone prints counts spread over the plate, none crowded, the selected place always', () => {
   const rand = lcg(11);
   const all = Array.from({ length: 48 }, (_, i) =>
     token(`state-${i}`, 20 + rand() * 350, 40 + rand() * 420, 1 + Math.floor(rand() ** 2 * 900)),
   );
-  const budget = phoneNumeralBudget(390, 500);
-  assert.equal(budget, 6);
-  // The smallest state is the selected one.
-  const smallest = [...all].sort((a, b) => a.count - b.count || (a.key < b.key ? -1 : 1))[0]!;
-  const chosen = chooseCounted(all, budget, new Set([smallest.key]));
-  assert.equal(chosen.size, budget + 1);
+  // The smallest state is the selected one, set on top of the largest so only keep can print it.
+  const largest = [...all].sort((a, b) => b.count - a.count)[0]!;
+  const smallest = {
+    ...[...all].sort((a, b) => a.count - b.count)[0]!,
+    x: largest.x,
+    y: largest.y,
+  };
+  const tokens = all.map((t) => (t.key === smallest.key ? smallest : t));
+  const chosen = chooseUncrowded(tokens, [], new Set([smallest.key]));
   assert.ok(chosen.has(smallest.key));
-  const top = [...all]
-    .sort((a, b) => b.count - a.count || (a.key < b.key ? -1 : 1))
-    .slice(0, budget);
-  for (const t of top) assert.ok(chosen.has(t.key));
-  const shown = all.filter((t) => chosen.has(t.key));
-  assertClear(shown, [], layoutTokens(shown, []));
-  assert.deepEqual(chooseCounted(all, budget, new Set([smallest.key])), chosen);
+  assert.ok(!chosen.has(largest.key), 'a crowded numeral yields, even the largest');
+  // More than the old cap of 8, and from every quarter of the plate, not one region.
+  assert.ok(chosen.size > 8, `printed ${chosen.size}`);
+  const shown = tokens.filter((t) => chosen.has(t.key));
+  for (const [xs, ys] of [
+    [0, 0],
+    [1, 0],
+    [0, 1],
+    [1, 1],
+  ] as const) {
+    assert.ok(
+      shown.some((t) => t.x >= 195 === (xs === 1) && t.y >= 250 === (ys === 1)),
+      `quarter ${xs},${ys} prints a count`,
+    );
+  }
+  const free = shown.filter((t) => t.key !== smallest.key);
+  const layout = layoutTokens(free, []);
+  assert.ok(
+    layout.every((p) => !p.displaced),
+    'every chosen numeral stays on its anchor',
+  );
+  assert.deepEqual(chooseUncrowded(tokens, [], new Set([smallest.key])), chosen);
 });
 
 test('the text equivalent lists every place in view, largest first, with its unit', () => {

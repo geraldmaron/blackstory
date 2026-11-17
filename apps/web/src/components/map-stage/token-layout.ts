@@ -226,26 +226,39 @@ export function layoutTokens(
 export const PHONE_MAP_MAX_WIDTH = 768;
 
 /**
- * How many numerals a phone plate prints at the national and regional levels: one per ~35,000 px^2
- * of plate, so 390x500 prints 6. Never fewer than 4 or more than 8.
+ * The keys a phone plate prints a numeral for at the state and county levels. Largest count first
+ * (ties by key), a numeral prints when its box, and its name where that also fits, clears every
+ * numeral and name already printed and every obstacle by `gap` px; `keep` keys always print and
+ * claim their room first. So the counts spread over the whole plate instead of the few largest
+ * crowding one region, and none sits close enough to read as noise. Pure and deterministic.
  */
-export function phoneNumeralBudget(width: number, height: number): number {
-  return Math.min(8, Math.max(4, Math.round((width * height) / 35000)));
-}
-
-/**
- * The keys that print a numeral: the `budget` highest counts (ties by key), plus every `keep` key
- * in view. Pure, so the same places always win. Tokens past the budget keep their hit circles and
- * stay in the text list; they only print no numeral.
- */
-export function chooseCounted(
-  tokens: readonly Pick<TokenInput, 'key' | 'count'>[],
-  budget: number,
+export function chooseUncrowded(
+  tokens: readonly TokenInput[],
+  obstacles: readonly Box[],
   keep: ReadonlySet<string> = new Set(),
+  gap = 6,
 ): Set<string> {
-  const ranked = [...tokens].sort((a, b) => b.count - a.count || (a.key < b.key ? -1 : 1));
-  const chosen = new Set<string>(ranked.slice(0, Math.max(0, budget)).map((t) => t.key));
-  for (const t of tokens) if (keep.has(t.key)) chosen.add(t.key);
+  const grid = new Grid();
+  for (const obstacle of obstacles) grid.add(obstacle);
+  const chosen = new Set<string>();
+  const ranked = [...tokens].sort(
+    (a, b) =>
+      Number(keep.has(b.key)) - Number(keep.has(a.key)) ||
+      b.count - a.count ||
+      (a.key < b.key ? -1 : 1),
+  );
+  for (const t of ranked) {
+    const numeral = grow(centered(t.x, t.y, t.width, t.height), gap);
+    if (!keep.has(t.key) && grid.overlap(numeral) > 0) continue;
+    chosen.add(t.key);
+    grid.add(numeral);
+    if (!t.name) continue;
+    const name = grow(
+      centered(t.x + t.name.dx + t.name.width / 2, t.y, t.name.width, t.name.height),
+      gap,
+    );
+    if (grid.overlap(name) === 0) grid.add(name);
+  }
   return chosen;
 }
 

@@ -27,10 +27,9 @@ import {
 } from '../../app/map/explore-style';
 import {
   PHONE_MAP_MAX_WIDTH,
-  chooseCounted,
+  chooseUncrowded,
   layoutTokens,
   markBox,
-  phoneNumeralBudget,
   placeCountList,
   type Box,
   type TokenInput,
@@ -40,7 +39,7 @@ import {
 const UNIT_CHAR_EM = 0.72;
 /** The text list refreshes at most this often; it is a static list, not a live region. */
 const LIST_INTERVAL_MS = 400;
-/** Levels whose counts a phone budgets (`phoneNumeralBudget`). */
+/** Levels whose counts a phone thins (`chooseUncrowded`). */
 const BUDGETED_LEVELS: ReadonlySet<string> = new Set(['state', 'county']);
 
 /**
@@ -336,10 +335,11 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
     }
 
     // The callout naming the selected record (home's spotlight or explore's flag) and the phone's
-    // count legend sit on the plate; numerals step around them rather than hide under them.
+    // count legend sit on the plate, as does the attribution button ("FLORIDA" ran under it at
+    // 390); numerals and names step around them rather than hide under them.
     const box = map.getContainer().getBoundingClientRect();
     for (const card of document.querySelectorAll<HTMLElement>(
-      '.ds-map-callout__card, .ds-place-legend',
+      '.ds-map-callout__card, .ds-place-legend, .maplibregl-ctrl-attrib',
     )) {
       const r = card.getBoundingClientRect();
       if (r.width === 0 || r.height === 0 || getComputedStyle(card).visibility === 'hidden')
@@ -362,9 +362,9 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
     );
     if (listTimer === undefined) listTimer = setTimeout(flushList, LIST_INTERVAL_MS);
 
-    // On a phone the state and county plates print only the largest few counts, labeled; the
-    // selected place and the selected record's place always print. City and square levels, where
-    // a frame holds few places, print all.
+    // On a phone the state and county plates print the counts that fit with room around them,
+    // largest first, spread over the whole plate; the selected place and the selected record's
+    // place always print. City and square levels, where a frame holds few places, print all.
     let counted = new Set(placed.keys());
     const stateInputs = [...placed.values()]
       .map((p) => p.input)
@@ -384,11 +384,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
         }
         if (nearest) keep.add(nearest.key);
       }
-      const chosen = chooseCounted(
-        stateInputs,
-        phoneNumeralBudget(mapBox.clientWidth, mapBox.clientHeight),
-        keep,
-      );
+      const chosen = chooseUncrowded(stateInputs, obstacles, keep);
       counted = new Set(
         [...placed.keys()].filter((k) => chosen.has(k) || !stateInputs.some((i) => i.key === k)),
       );
