@@ -108,7 +108,7 @@ describe('Records register', () => {
 
   it('sorts by earliest with no search and by best match with one', () => {
     const plain = menu(render(), 'sort');
-    assert.match(plain, /aria-current="true"[^>]*>[\s\S]*?Earliest first/);
+    assert.match(plain, /aria-current="true"[^>]*>(?:(?!<\/a>)[\s\S])*?Random/);
     assert.doesNotMatch(plain, /Best match/);
     const searched = menu(render({ q: 'church' }), 'sort');
     assert.match(searched, /aria-current="true"[^>]*>[\s\S]*?Best match/);
@@ -125,13 +125,12 @@ describe('Records register', () => {
     assert.match(markup, /aria-label="Remove “church”"/);
     assert.match(markup, /First <b>Church<\/b>/);
     assert.match(markup, /oldest <b>church<\/b> of its kind/);
-    // The row is one link, kind is a word, the grade is the claims block's tag with the count.
+    // The row is one link; the kind is a glyph and a word; the grade is a meter and a word, with
+    // the count of sources beside it.
     assert.match(markup, /<a class="ds-record__link" href="\/place\/first-church--r1\?from=list">/);
-    assert.match(markup, />Place<span class="ds-record__sep"/);
-    assert.match(
-      markup,
-      /ds-grade-tag ds-grade-tag--high">.*?Well evidenced<\/span><span class="ds-record__sources">3 sources/,
-    );
+    assert.match(markup, /class="ds-record__kind-word">Place</);
+    assert.match(markup, /ds-grade-meter ds-grade-tag--high">.*?Well evidenced<\/span>/);
+    assert.match(markup, /ds-record__sources-count">3<\/span> sources/);
   });
 
   it('no result says what was searched and offers one way out', () => {

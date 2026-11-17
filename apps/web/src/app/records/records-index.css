@@ -82,13 +82,15 @@ body:has(.ds-records) .ds-reading-progress {
   display: grid;
   grid-template-columns: 6rem minmax(0, 1fr) auto;
   grid-template-areas:
-    'thumb name data'
-    'thumb meta data'
-    'thumb summary data';
+    'mark name decade'
+    'mark place place'
+    'mark summary summary'
+    'mark foot foot';
   align-items: start;
-  gap: var(--ds-space-1) var(--ds-space-6);
-  padding: var(--ds-space-4) var(--ds-space-2);
-  margin-inline: calc(var(--ds-space-2) * -1);
+  gap: var(--ds-space-1) var(--ds-space-5);
+  padding: var(--ds-space-5) var(--ds-space-3);
+  margin-inline: calc(var(--ds-space-3) * -1);
+  border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   text-decoration: none;
   transition: background-color var(--ds-duration-fast) var(--ds-easing);
@@ -103,15 +105,70 @@ body:has(.ds-records) .ds-reading-progress {
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* The plate column is reserved on every row, so every title starts on one edge. A record with its
-   own photograph leads with it as a plate (`.ds-plate__tone` tones it); a record without one gets
-   no stand-in, and its column is simply empty. */
-
-.ds-record__thumb.ds-plate__tone {
-  grid-area: thumb;
-  width: 6rem;
+/* The mark: the record's own photograph as a plate, or its kind tile. Every row has one, so every
+   title starts on one edge and no row opens on an empty column. */
+.ds-record__mark {
+  grid-area: mark;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
   aspect-ratio: 4 / 3;
+  overflow: hidden;
   border-radius: var(--ds-radius-sm);
+  background: color-mix(in oklab, var(--kind-shade) 26%, var(--ds-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--kind-shade) 50%, transparent);
+}
+
+.ds-record__mark.ds-plate__tone {
+  box-shadow: none;
+}
+
+.ds-record__kind {
+  display: grid;
+  justify-items: center;
+  gap: var(--ds-space-1);
+  color: color-mix(in oklab, var(--kind-shade) 58%, var(--ds-ink));
+}
+
+.ds-record__kind-icon {
+  width: 1.625rem;
+  height: 1.625rem;
+}
+
+.ds-plate__tone > .ds-record__kind .ds-record__kind-icon {
+  width: 0.6875rem;
+  height: 0.6875rem;
+}
+
+.ds-record__kind-word {
+  max-width: 100%;
+  overflow: hidden;
+  color: color-mix(in oklab, var(--kind-shade) 35%, var(--ds-ink));
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  font-weight: 600;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* On a photograph the kind rides as a chip in the plate's corner, on the paper's own ground. */
+.ds-plate__tone > .ds-record__kind {
+  position: absolute;
+  bottom: 0.3125rem;
+  left: 0.3125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1875rem 0.375rem 0.1875rem 0.25rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ds-surface) 92%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 18%);
+}
+
+.ds-plate__tone > .ds-record__kind .ds-record__kind-word {
+  color: var(--ds-ink);
 }
 
 .ds-record__name {
@@ -137,23 +194,66 @@ body:has(.ds-records) .ds-reading-progress {
   color: var(--ds-ink);
 }
 
-.ds-record__meta {
-  grid-area: meta;
-  overflow: hidden;
-  color: var(--ds-ink);
-  font-size: var(--ds-text-body-sm);
-  font-weight: 500;
-  line-height: 1.25rem;
-  text-overflow: ellipsis;
+.ds-record__decade {
+  grid-area: decade;
+  justify-self: end;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-title);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
-.ds-record__sep {
-  color: var(--ds-ink-subtle);
+/* No decade is a fact, not a headline: it reads at caption weight, out of the accent. */
+.ds-record__decade[data-undated] {
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.75rem;
+  text-transform: uppercase;
+}
+
+.ds-record__icon {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--ds-accent);
 }
 
 .ds-record__place {
+  grid-area: place;
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  min-width: 0;
   color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+.ds-record__place .ds-record__icon {
+  align-self: center;
+}
+
+/* The state as the map prints it: a mono postal code on a copper-ruled chip. */
+.ds-record__state {
+  flex: none;
+  align-self: center;
+  padding: 0.0625rem 0.3125rem;
+  border: var(--ds-border-width) solid color-mix(in oklab, var(--ds-accent) 45%, transparent);
+  border-radius: 0.25rem;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.1rem;
+  text-decoration: none;
 }
 
 .ds-record__summary {
@@ -170,63 +270,73 @@ body:has(.ds-records) .ds-reading-progress {
   -webkit-line-clamp: 2;
 }
 
-/* Right column: the decade as a bold mono numeral, the grade tag and source count under it. */
-.ds-record__data {
-  grid-area: data;
-  display: grid;
-  justify-items: end;
-  align-content: start;
-  gap: var(--ds-space-1);
+/* The foot: the evidence, set off by a hairline so it reads as the record's receipt line. */
+.ds-record__foot {
+  grid-area: foot;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-5);
+  margin-top: var(--ds-space-2);
+  padding-top: var(--ds-space-2);
+  border-top: var(--ds-border-width) dashed var(--ds-rule);
+}
+
+.ds-record__sources {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
   color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.25rem;
+}
+
+.ds-record__sources .ds-record__icon {
+  color: var(--ds-ink-muted);
+}
+
+.ds-record__sources-count {
+  color: var(--ds-ink);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.ds-record__decade {
-  color: var(--ds-accent);
-  font-size: var(--ds-text-title);
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.ds-record__evidence {
-  display: grid;
-  justify-items: end;
-  gap: var(--ds-space-1);
 }
 
 /* The timeline's row: the band states the decade, so the row is a small tile, the name with its
-   kind and place under it, and the grade. Two lines fit the tile's height, and the place gets the
-   name's full width at every column width (one line squeezed it against the grade). */
+   place under it, and the grade at the right. The kind tile shows the glyph alone; its word stays
+   for screen readers. */
 .ds-record__link--compact {
-  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
   grid-template-areas:
-    'thumb name data'
-    'thumb meta data';
+    'mark name'
+    'mark place'
+    'mark foot';
   align-items: center;
-  gap: 0 var(--ds-space-4);
-  padding-block: var(--ds-space-2);
+  gap: 0.125rem var(--ds-space-4);
+  padding-block: var(--ds-space-3);
 }
 
-.ds-record__link--compact .ds-record__data {
-  align-content: center;
+.ds-record__link--compact .ds-record__kind-word {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-.ds-record__link--compact .ds-record__thumb.ds-plate__tone {
-  width: 3.5rem;
+.ds-record__link--compact .ds-plate__tone > .ds-record__kind {
+  padding: 0.1875rem;
 }
 
 .ds-record__link--compact .ds-record__name {
   font-size: var(--ds-text-subtitle);
 }
 
-/* A long place wraps rather than ending in an ellipsis. */
-.ds-record__link--compact .ds-record__meta {
-  overflow: visible;
-  white-space: normal;
+.ds-record__link--compact .ds-record__foot {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 /* —— pager ———————————————————————————————————————————————————————————————— */
@@ -320,59 +430,34 @@ body:has(.ds-records) .ds-reading-progress {
     margin-inline: calc(var(--ds-gutter) * -1);
   }
 
-  /* The name gets the width beside the decade; kind and place, the summary and the grade each
-     take a full line under it, so nothing is squeezed against the grade tag. */
+  /* The mark and the name share the first lines; the summary and the evidence foot take the
+     card's full width under them. */
   .ds-record__link {
-    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
     grid-template-areas:
-      'thumb name decade'
-      'thumb meta meta'
+      'mark name decade'
+      'mark place place'
       'summary summary summary'
-      'evidence evidence evidence';
+      'foot foot foot';
     gap: var(--ds-space-1) var(--ds-space-3);
-    padding-block: var(--ds-space-3);
+    padding-block: var(--ds-space-4);
   }
 
-  .ds-record__thumb.ds-plate__tone {
-    width: 4rem;
+  .ds-record__mark {
+    align-self: start;
   }
 
-  .ds-record__data {
-    display: contents;
-  }
-
-  /* Kind and place wrap beside the grade instead of running under it. */
-  .ds-record__meta {
-    overflow: visible;
-    white-space: normal;
+  .ds-record__kind-icon {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .ds-record__decade {
-    grid-area: decade;
-    justify-self: end;
     font-size: var(--ds-text-subtitle);
-  }
-
-  .ds-record__evidence {
-    grid-area: evidence;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-self: start;
-    gap: var(--ds-space-1) var(--ds-space-3);
-    margin-top: var(--ds-space-1);
   }
 
   .ds-record__link--compact {
     grid-template-columns: 3rem minmax(0, 1fr);
-    grid-template-areas:
-      'thumb name'
-      'thumb meta'
-      'thumb evidence';
-  }
-
-  .ds-record__link--compact .ds-record__thumb.ds-plate__tone {
-    width: 3rem;
   }
 
   /* Under the chips, flush to the gutter. */

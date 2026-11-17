@@ -60,6 +60,35 @@ export function GradeTag({ level }: { readonly level: ConfidenceLevel | 'unrated
   );
 }
 
+const METER_FILLED: Readonly<Record<ConfidenceLevel | 'unrated', number>> = {
+  high: 3,
+  medium: 2,
+  low: 1,
+  unrated: 0,
+};
+
+/**
+ * The grade as a meter: three rising bars, as many filled as the grade earns, then the word. The
+ * filled count carries the grade without color, and the word carries it without sight.
+ */
+export function GradeMeter({ level }: { readonly level: ConfidenceLevel | 'unrated' }) {
+  const filled = METER_FILLED[level];
+  return (
+    <span className={`ds-grade-meter ds-grade-tag--${level}`}>
+      <span className="ds-grade-meter__bars" aria-hidden="true">
+        {[0, 1, 2].map((bar) => (
+          <span
+            key={bar}
+            className="ds-grade-meter__bar"
+            data-on={bar < filled ? 'true' : undefined}
+          />
+        ))}
+      </span>
+      <span className="ds-grade-meter__word">{confidenceTierPhrase(level)}</span>
+    </span>
+  );
+}
+
 function SourceLine({ source }: { readonly source: EvidenceSource }) {
   const publisher = source.publisher && sourceDisplayName(source.publisher, source.href);
   const title = sourceDisplayName(source.title, source.href);

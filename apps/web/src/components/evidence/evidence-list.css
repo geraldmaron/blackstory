@@ -158,3 +158,49 @@ a.ds-evidence__title:hover,
 .ds-grade-tag--low {
   --grade-hue: var(--ds-confidence-low-fg);
 }
+
+/* —— the grade as a meter: three rising bars, filled to the grade, then the word ————————————— */
+.ds-grade-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--grade-hue, var(--ds-ink-muted));
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.ds-grade-meter__bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 1rem;
+}
+
+.ds-grade-meter__bar {
+  width: 0.375rem;
+  border-radius: 1.5px;
+  background: var(--ds-rule);
+}
+
+.ds-grade-meter__bar:nth-child(1) {
+  height: 45%;
+}
+
+.ds-grade-meter__bar:nth-child(2) {
+  height: 72%;
+}
+
+.ds-grade-meter__bar:nth-child(3) {
+  height: 100%;
+}
+
+.ds-grade-meter__bar[data-on] {
+  background: currentColor;
+}
+
+.ds-grade-tag--unrated.ds-grade-meter {
+  color: var(--ds-ink-muted);
+  font-weight: 500;
+}
