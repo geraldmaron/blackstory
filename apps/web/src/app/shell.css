@@ -2116,9 +2116,18 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
 }
 
-.ds-place-token.is-displaced .ds-place-token__count {
+/* The numeral and a shown name both open the place (place-labels.ts routes either click to it).
+   An unnamed token's name is only faded out, so it must not catch clicks. */
+.ds-place-token__count,
+.ds-place-token.is-named .ds-place-token__name {
   pointer-events: auto;
   cursor: pointer;
+}
+
+.ds-place-token.is-named .ds-place-token__name:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
 .ds-place-token.is-displaced .ds-place-token__count::after {

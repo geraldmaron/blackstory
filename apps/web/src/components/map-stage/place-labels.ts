@@ -13,6 +13,7 @@ import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { queryRenderedLayers } from './query-rendered';
 import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_PLACE_NAME_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_SITE_NAME_LAYER_ID,
@@ -204,6 +205,24 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
    * A displaced numeral is a DOM target. Its hit circle stays on the anchor, so a click re-fires at
    * the anchor and the stage's own pointer hit test opens the place, the same path a tap there takes.
    */
+  /**
+   * A county with a count token is already named by it; the basemap's own county name (drawn once
+   * per tile a polygon crosses) printed it twice more beside the token. Drop those, keep the rest.
+   */
+  let hiddenCounties = '';
+  function hideNamedCounties(keys: ReadonlySet<string>): void {
+    const fips = [...keys].filter((key) => key.startsWith('county-')).map((key) => key.slice(7));
+    const signature = fips.sort().join(',');
+    if (signature === hiddenCounties || !map.getLayer(EXPLORE_COUNTY_LABEL_LAYER_ID)) return;
+    hiddenCounties = signature;
+    map.setFilter(
+      EXPLORE_COUNTY_LABEL_LAYER_ID,
+      fips.length === 0
+        ? null
+        : ['!', ['in', ['concat', ['get', 'stateFips'], ['get', 'countyFips']], ['literal', fips]]],
+    );
+  }
+
   function tokenClick(key: string): void {
     const at = tokenAnchors.get(key);
     if (!at) return;
@@ -389,10 +408,14 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
         token = buildToken(String(props.level ?? ''), String(props.tier ?? 0));
         tokens.set(spot.key, token);
         const key = spot.key;
-        token.count.addEventListener('click', () => tokenClick(key));
-        // Keep the map from reading the press as a pan or a click on empty plate.
-        for (const type of ['mousedown', 'mouseup', 'dblclick', 'touchstart', 'pointerdown']) {
-          token.count.addEventListener(type, (event) => event.stopPropagation());
+        // The numeral and the name are both the place: a click on "SALT LAKE" used to fall through
+        // to empty plate, because only the anchor point under the numeral was hit-tested.
+        for (const part of [token.count, token.name]) {
+          part.addEventListener('click', () => tokenClick(key));
+          // Keep the map from reading the press as a pan or a click on empty plate.
+          for (const type of ['mousedown', 'mouseup', 'dblclick', 'touchstart', 'pointerdown']) {
+            part.addEventListener(type, (event) => event.stopPropagation());
+          }
         }
         layer.append(token.root);
       }
@@ -441,6 +464,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
       leaders.get(key)?.g.remove();
       leaders.delete(key);
     }
+    hideNamedCounties(seenTokens);
 
     const seenSites = new Set<string>();
     for (const feature of query(EXPLORE_SITE_NAME_LAYER_ID)) {
