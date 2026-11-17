@@ -29,6 +29,11 @@ export type RecordsQuery = {
   /** Only meaningful with a bound; redundant (and dropped) without one. */
   readonly includeUndated: boolean;
   readonly sort: RecordsSort;
+  /**
+   * The shuffle behind the default browse order (no search, default sort). The bare URL draws a
+   * fresh one per visit; paging carries it so page 2 continues the same shuffle.
+   */
+  readonly seed: string;
   readonly layout: RecordsLayout;
   readonly page: number;
 };
@@ -46,6 +51,7 @@ export const EMPTY_RECORDS_QUERY: RecordsQuery = Object.freeze({
   periodEnd: '',
   includeUndated: false,
   sort: 'discovery',
+  seed: '',
   layout: 'index',
   page: 1,
 });
@@ -53,7 +59,7 @@ export const EMPTY_RECORDS_QUERY: RecordsQuery = Object.freeze({
 /**
  * Orderings `/records` understands. `discovery` is the default, the one the bare URL means and
  * never written into it. Explore reads it as best evidence first; the Records register resolves
- * it to relevance when the reader searched and to earliest otherwise (`recordsComparator`).
+ * it to relevance when the reader searched and to a seeded shuffle otherwise (`recordsComparator`).
  */
 export const RECORDS_SORTS = Object.freeze(['discovery', 'era', 'name', 'evidence'] as const);
 export type RecordsSort = (typeof RECORDS_SORTS)[number];
@@ -79,6 +85,7 @@ export const RECORDS_PAGE_PARAM_ALLOWLIST: readonly string[] = Object.freeze([
   'periodEnd',
   'includeUndated',
   'sort',
+  'seed',
   'layout',
   // Read only as a spelling of `layout` (`?view=timeline`); the canonical URL never emits it.
   'view',
@@ -94,6 +101,7 @@ const MAX_QUERY_LENGTH = 120;
 const TIMELINE_SPELLINGS = new Set(['chronology', 'timeline']);
 /** Far above any real page count (the catalog is a few thousand rows); bounds `?page=<huge>`. */
 const MAX_PAGE = 1000;
+const SEED = /^[a-z0-9]{1,8}$/;
 
 function slugOrEmpty(value: string): string {
   return FACET_SLUG.test(value) ? value : '';
@@ -141,6 +149,7 @@ export function parseRecordsQuery(
     sort: (RECORDS_SORTS as readonly string[]).includes(one('sort').toLowerCase())
       ? (one('sort').toLowerCase() as RecordsSort)
       : 'discovery',
+    seed: SEED.test(one('seed').toLowerCase()) ? one('seed').toLowerCase() : '',
     evidence: EVIDENCE_GRADES.has(evidence) ? evidence : '',
     page: Number.isFinite(rawPage) && rawPage > 1 ? Math.min(rawPage, MAX_PAGE) : 1,
   };
@@ -168,6 +177,10 @@ export function recordsQueryString(query: Partial<RecordsQuery>): string {
   // The default sort is never emitted, for the same reason `page=1` is not: it would give one
   // ordering two URLs, and both would claim to be canonical.
   if (merged.sort !== 'discovery') params.set('sort', merged.sort);
+  // The seed only orders the shuffled browse; under any other order it would be a second URL.
+  if (merged.seed.length > 0 && merged.sort === 'discovery' && merged.q.length === 0) {
+    params.set('seed', merged.seed);
+  }
   if (merged.layout === 'chronology') params.set('layout', 'chronology');
   // `page=1` is never emitted: `/records` and `/records?page=1` would otherwise be two URLs for
   // one page, and each would claim to be canonical.

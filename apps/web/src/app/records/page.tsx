@@ -14,7 +14,8 @@
  */
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { recordsHref } from '../../lib/records/build-records-index';
+import { cache } from 'react';
+import { parseRecordsQuery, recordsHref } from '../../lib/records/build-records-index';
 import { RecordsIndexRoom } from './RecordsIndex';
 import { loadRecordsIndex, recordsQueryCacheKey } from './load-records-index';
 import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
@@ -28,13 +29,30 @@ type RecordsPageProps = {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048';
 
+/** One shuffle seed per request, shared by the metadata and the page. */
+const requestSeed = cache(() => Math.random().toString(36).slice(2, 8) || '0');
+
+/**
+ * The default browse order is a shuffle: a visit without a seed draws one, and the page's own
+ * links carry it so paging continues the same order.
+ */
+async function seededParams(
+  searchParams: RecordsPageProps['searchParams'],
+): Promise<Record<string, string | string[] | undefined>> {
+  const params = await searchParams;
+  const query = parseRecordsQuery(params);
+  return query.sort === 'discovery' && query.q.length === 0 && query.seed.length === 0
+    ? { ...params, seed: requestSeed() }
+    : params;
+}
+
 /**
  * The canonical is self-referential and carries the narrowing, because a filtered page is a
  * distinct, useful set — pointing every combination at bare `/records` is exactly the mistake
  * §4 names. `prev`/`next` are emitted as real link relations alongside the anchors in the body.
  */
 export async function generateMetadata({ searchParams }: RecordsPageProps): Promise<Metadata> {
-  const key = recordsQueryCacheKey(await searchParams);
+  const key = recordsQueryCacheKey(await seededParams(searchParams));
   const { model } = await loadRecordsIndex(key);
   const absolute = (path: string): string => new URL(path, SITE_URL).toString();
   // An unresolved collection or unreadable range is an explicit error state, never indexable.
@@ -66,7 +84,7 @@ export async function generateMetadata({ searchParams }: RecordsPageProps): Prom
 }
 
 export default async function RecordsPage({ searchParams }: RecordsPageProps) {
-  const key = recordsQueryCacheKey(await searchParams);
+  const key = recordsQueryCacheKey(await seededParams(searchParams));
   const { model, query, collection } = await loadRecordsIndex(key);
 
   // A well-formed reference to a story the release does not have redirects TEMPORARILY (307)

@@ -139,17 +139,35 @@ function compareDiscoveryOrder(a: CollectionFacts, b: CollectionFacts): number {
   return a.row.name.localeCompare(b.row.name);
 }
 
+/** FNV-1a, 32-bit: a stable shuffle key for a record under a seed. */
+function shuffleKey(seed: string, id: string): number {
+  let hash = 0x811c9dc5;
+  for (const char of `${seed}:${id}`) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
 /**
  * The ordering the Records register reads, which resolves the URL's default (`discovery`) by
- * context: relevance when the reader searched, earliest documented decade otherwise. An explicit
- * sort is the sort. Explore keeps `comparatorFor`, where the default means best evidence.
+ * context: relevance when the reader searched, a shuffle by `seed` otherwise, so a visit opens on
+ * records from across the archive. Without a seed (a record page's previous/next, the home and
+ * about figures) there is no shuffle a reader saw, so the default reads earliest first. An
+ * explicit sort is the sort. Explore keeps `comparatorFor`, where the default means best evidence.
  */
 export function recordsComparator(
-  query: Pick<RecordsQuery, 'sort' | 'q'>,
+  query: Pick<RecordsQuery, 'sort' | 'q' | 'seed'>,
 ): (a: CollectionFacts, b: CollectionFacts) => number {
   if (query.sort !== 'discovery') return comparatorFor(query.sort);
   const needle = query.q.trim().toLowerCase();
-  if (needle.length === 0) return comparatorFor('era');
+  if (needle.length === 0) {
+    if (query.seed.length === 0) return comparatorFor('era');
+    return (a, b) =>
+      internalLast(a, b) ||
+      shuffleKey(query.seed, a.row.id) - shuffleKey(query.seed, b.row.id) ||
+      a.row.id.localeCompare(b.row.id);
+  }
   const byEvidence = comparatorFor('evidence');
   const byEra = comparatorFor('era');
   return (a, b) =>
@@ -160,8 +178,13 @@ export function recordsComparator(
 }
 
 /** True when the register is read in time order, so a decade can be jumped to. */
-export function recordsOrderIsChronological(query: Pick<RecordsQuery, 'sort' | 'q'>): boolean {
-  return query.sort === 'era' || (query.sort === 'discovery' && query.q.trim().length === 0);
+export function recordsOrderIsChronological(
+  query: Pick<RecordsQuery, 'sort' | 'q' | 'seed'>,
+): boolean {
+  return (
+    query.sort === 'era' ||
+    (query.sort === 'discovery' && query.q.trim().length === 0 && query.seed.length === 0)
+  );
 }
 
 /** Name hits outrank summary and place hits; a whole-name or leading match outranks the rest. */

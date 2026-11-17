@@ -570,9 +570,25 @@ describe('/records · order and decade jumps', () => {
     assert.equal(model.decadeJumps[1]?.href, '/records?page=2#decade-1950');
   });
 
-  it('sort=era without a search is the default order under another spelling', () => {
-    const model = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, sort: 'era' });
-    assert.equal(model.canonicalPath, '/records');
+  it('a seeded visit opens on a shuffle that pages stably and stays out of the canonical', () => {
+    const many = Array.from({ length: 150 }, (_, index) =>
+      entity({ id: `r${String(index).padStart(3, '0')}`, era: `${1800 + (index % 20) * 10}s` }),
+    );
+    const ids = (seed: string, page = 1) =>
+      buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, seed, page }).rows.map((row) => row.id);
+    const earliest = buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, sort: 'era' });
+    assert.deepEqual(ids('abc'), ids('abc'), 'one seed, one order');
+    assert.notDeepEqual(ids('abc'), ids('xyz'), 'another visit, another order');
+    assert.notDeepEqual(
+      ids('abc'),
+      earliest.rows.map((row) => row.id),
+    );
+    assert.equal(new Set([...ids('abc', 1), ...ids('abc', 2)]).size, 150, 'no row repeats');
+    const seeded = buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, seed: 'abc' });
+    assert.equal(seeded.canonicalPath, '/records');
+    assert.equal(seeded.nextHref, '/records?seed=abc&page=2');
+    assert.deepEqual(seeded.decadeJumps, [], 'a shuffle has no decade to jump to');
+    assert.equal(earliest.canonicalPath, '/records?sort=era');
   });
 });
 

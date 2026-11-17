@@ -45,21 +45,21 @@ const FILTER_TITLES: Readonly<Record<RecordsFilterKey, string>> = Object.freeze(
 
 /**
  * The orders the Sort menu offers. The default (`discovery`, never written into the URL) is
- * relevance for a search and earliest otherwise, so earliest is its own option only with a search.
+ * relevance for a search and a shuffle otherwise; earliest first is always one choice away.
  */
 function sortMenu(query: RecordsQuery): ToolbarMenu {
   const searching = query.q.length > 0;
   const options: readonly { readonly id: RecordsSort; readonly label: string }[] = [
-    { id: 'discovery', label: searching ? 'Best match' : 'Earliest first' },
-    ...(searching ? [{ id: 'era' as const, label: 'Earliest first' }] : []),
+    { id: 'discovery', label: searching ? 'Best match' : 'Random' },
+    { id: 'era', label: 'Earliest first' },
     { id: 'name', label: 'Name, A to Z' },
     { id: 'evidence', label: 'Strongest evidence' },
   ];
-  const current: RecordsSort = !searching && query.sort === 'era' ? 'discovery' : query.sort;
+  const current: RecordsSort = query.sort;
   return {
     key: 'sort',
     title: 'Sort',
-    value: options.find((option) => option.id === current)?.label ?? 'Earliest first',
+    value: options.find((option) => option.id === current)?.label ?? 'Random',
     active: 0,
     options: options.map((option) => ({
       id: option.id,

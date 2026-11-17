@@ -740,13 +740,7 @@ export function buildRecordsIndex(
     constraints.push({
       key: 'q',
       label: `“${query.q}”`,
-      // Without a search, earliest is the default order and `sort=era` would be a second URL.
-      clearHref: recordsHref({
-        ...query,
-        q: '',
-        page: 1,
-        ...(query.sort === 'era' ? { sort: 'discovery' as const } : {}),
-      }),
+      clearHref: recordsHref({ ...query, q: '', page: 1 }),
     });
   }
   if (collection.state === 'live') {
@@ -798,12 +792,8 @@ export function buildRecordsIndex(
       singular: 'record',
       plural: 'records',
     }),
-    // `sort=era` without a search is the default order under a second spelling.
-    canonicalPath: recordsHref({
-      ...query,
-      page,
-      ...(query.sort === 'era' && query.q.length === 0 ? { sort: 'discovery' as const } : {}),
-    }),
+    // The shuffle seed is per visit, never part of what the page is.
+    canonicalPath: recordsHref({ ...query, page, seed: '' }),
     indexable: recordsQueryIndexable(query),
     previousHref: page > 1 ? recordsHref({ ...query, page: page - 1 }) : undefined,
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
