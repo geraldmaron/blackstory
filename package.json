@@ -41,6 +41,7 @@
     "validate:governance": "node scripts/validate-github-governance.mjs",
     "dev:web": "./scripts/dev-web.sh",
     "env:local:op": "./scripts/env-local-op.sh",
+    "notify:test": "./scripts/notify-test.sh",
     "mobile:seeds": "node --conditions=development --import tsx apps/mobile/scripts/generate-seeds.mjs",
     "mobile:seeds:check": "node --conditions=development --import tsx apps/mobile/scripts/generate-seeds.mjs --check",
     "mobile:ios:release": "./scripts/mobile-ios-release.sh",
