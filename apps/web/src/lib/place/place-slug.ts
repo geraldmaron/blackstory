@@ -209,9 +209,15 @@ export function resolvePlaceSlugFromSearchIndex(
   if (entityId) {
     return docs.some((doc) => doc.id === entityId) ? entityId : undefined;
   }
-  const matches = docs.filter(
+  const named = docs.filter(
     (doc) => !isInternalRecordLabel(doc.displayName) && publicPlaceSlug(doc.displayName) === base,
   );
+  // A renamed record keeps its former name as an alias, so its old address still finds it (the
+  // place page then redirects). A current name always wins the address over a former one.
+  const matches =
+    named.length > 0
+      ? named
+      : docs.filter((doc) => doc.aliases.some((alias) => publicPlaceSlug(alias) === base));
   if (matches.length === 0) return undefined;
   if (matches.length === 1) return matches[0]!.id;
   return [...matches].sort(comparePlaceCandidates)[0]?.id;

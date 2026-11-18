@@ -10,6 +10,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { EntityRecordPage } from '../../entity/[id]/EntityRecordPage';
 import { familyForKind } from '../../record-family';
 import { loadPlaceRecord } from '../place-record';
+import { publicPlaceSlug } from '../../../lib/place/public-place-path';
 import {
   discoveryFromSearchParams,
   recordArrivalQuery,
@@ -35,6 +36,12 @@ export default async function PlacePage({ params, searchParams }: PlacePageProps
   const rawArrival = await searchParams;
   const place = await loadPlaceRecord(slug);
   if (!place) notFound();
+  // Reached by a former name (an alias): `/entity/{id}` decides the record's current address.
+  if (!slug.includes('--') && publicPlaceSlug(place.displayName) !== slug.trim()) {
+    permanentRedirect(
+      withQuery(`/entity/${encodeURIComponent(place.id)}`, recordArrivalQuery(rawArrival)),
+    );
+  }
   if (familyForKind(place.kind) !== 'place') {
     permanentRedirect(withQuery(`/invention/${slug}`, recordArrivalQuery(rawArrival)));
   }
