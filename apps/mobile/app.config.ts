@@ -106,12 +106,11 @@ const APP_NAMES: Record<AppVariant, string> = {
 const bundleIdentifier = BUNDLE_IDS[APP_VARIANT];
 const appName = APP_NAMES[APP_VARIANT];
 
-// --- API surface config (MOB-004 wire contract; MOB-016 corrections) --------
+// --- API surface config (MOB-004 wire contract) ------------------------------
 //
-// The native reader talks to `apps/api-public` (and, once distinct, a
-// submissions host) over HTTPS. These are NON-SECRET public origins, safe to
-// bake into a build and read at runtime from `extra` (see
-// src/security/bootstrap.ts + src/features/corrections/runtime.ts). Set per
+// The native reader talks to `apps/api-public` over HTTPS. This is a NON-SECRET
+// public origin, safe to bake into a build and read at runtime from `extra`
+// (see src/security/bootstrap.ts). Corrections open the web form instead. Set per
 // EAS profile via the non-secret `env` blocks in eas.json; a production build
 // is rejected above if handed a cleartext (http) origin.
 // `api.blackstory.app` is the host the published contract advertises
@@ -122,11 +121,6 @@ const appName = APP_NAMES[APP_VARIANT];
 // right one here is not.
 const DEFAULT_API_BASE_URL = 'https://api.blackstory.app';
 const API_BASE_URL = resolveHttpUrl('API_BASE_URL', process.env.API_BASE_URL, DEFAULT_API_BASE_URL);
-const SUBMISSIONS_BASE_URL = resolveHttpUrl(
-  'SUBMISSIONS_BASE_URL',
-  process.env.SUBMISSIONS_BASE_URL,
-  API_BASE_URL,
-);
 
 // --- Observability (dev-console crash/perf reporting) config (MOB-018) --------
 //
@@ -402,12 +396,10 @@ const config: ExpoConfig = {
   },
   extra: {
     appVariant: APP_VARIANT,
-    // API origins read at runtime by src/security/bootstrap.ts
-    // (`createDefaultApiClient`) and src/features/corrections/runtime.ts
-    // (`resolveSubmissionsBaseUrl`). Non-secret public hosts, validated above
+    // API origin read at runtime by src/security/bootstrap.ts
+    // (`createDefaultApiClient`). Non-secret public host, validated above
     // (https required for production). Set per EAS profile via eas.json `env`.
     apiBaseUrl: API_BASE_URL,
-    submissionsBaseUrl: SUBMISSIONS_BASE_URL,
     // MOB-018: observability kill switch + perf-trace sample rate, read at
     // runtime by src/observability/bootstrap.ts's `resolveObservabilityConfig`.
     // Defaults to enabled/10% — see src/observability/README.md.

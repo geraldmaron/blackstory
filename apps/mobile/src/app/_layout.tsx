@@ -87,10 +87,6 @@ function EditionStack() {
         name="corrections/submit"
         options={{ presentation: 'modal', title: 'Submit a correction', headerShown: true }}
       />
-      <Stack.Screen
-        name="corrections/status"
-        options={{ title: 'Correction status', headerBackTitle: 'Back', headerShown: true }}
-      />
     </Stack>
   );
 }

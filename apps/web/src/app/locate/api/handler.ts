@@ -14,6 +14,7 @@
  * provides manual place search), not request errors.
  */
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
 import type { fetchCensusAddressGeocode, fetchCensusCoordinatesGeocode } from '@repo/domain';
 import {
   geocodeAddress,
@@ -47,12 +48,6 @@ export type LocateRouteDependencies = {
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 const ZIP_ONLY_PATTERN = /^\d{5}(-\d{4})?$/;

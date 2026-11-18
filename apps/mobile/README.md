@@ -425,7 +425,7 @@ emit nothing from that layer.
 | Env var (read by `app.config.ts`) | Purpose | Secret? |
 |---|---|---|
 | `APP_VARIANT` | `development` \| `preview` \| `production` identity tier | no |
-| `API_BASE_URL` / `SUBMISSIONS_BASE_URL` | public API origins (→ `extra.apiBaseUrl`) | no |
+| `API_BASE_URL` | public API origin (→ `extra.apiBaseUrl`) | no |
 | `OBSERVABILITY_ENABLED` / `PERFORMANCE_SAMPLE_RATE` | MOB-018 kill switch + sampling | no |
 
 All are validated at config-eval time — a bad URL or an out-of-range sample rate

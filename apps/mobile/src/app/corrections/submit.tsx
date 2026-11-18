@@ -1,25 +1,24 @@
 /**
- * Correction-submission modal. Only validated entityId and returnTo values enter route
- * parameters. Correction text, contact details and receipt codes stay in component state and
- * are not persisted across restarts or embedded in URLs. Submission uses the shared
- * client-header protocol and server validation; the header does not establish identity.
+ * Correction hand-off. Corrections are filed on the website: no public API host accepts them
+ * from the phone, and the web form owns intake, receipts and status. Only a validated entityId
+ * enters the URL; correction text never leaves the web form.
  */
-import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { Linking, StyleSheet, View } from 'react-native';
 
+import { CANONICAL_WEB_ORIGIN } from '@/features/entity/share';
 import { parseEntityId, parseReturnTo } from '@/lib/route-params';
-import {
-  CorrectionForm,
-  CorrectionReceipt,
-  createCorrectionClientDeps,
-  submitCorrection,
-  type CorrectionClientDeps,
-  type CorrectionFormState,
-  type SubmitResult,
-} from '@/features/corrections';
-import { UtilityScreenShell } from '@/ui';
+import { Button, Text, UtilityScreenShell, space } from '@/ui';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
+
+function correctionsWebUrl(entityId: string | null): string {
+  const url = new URL('/corrections', CANONICAL_WEB_ORIGIN);
+  if (entityId) {
+    url.searchParams.set('target', entityId);
+    url.searchParams.set('targetType', 'entity');
+  }
+  return url.toString();
+}
 
 export default function CorrectionsSubmitSheet() {
   const params = useLocalSearchParams<{
@@ -27,84 +26,41 @@ export default function CorrectionsSubmitSheet() {
     returnTo?: string | string[];
   }>();
   const entityId = parseEntityId(params.entityId);
-  const safeReturnTo = parseReturnTo(params.returnTo) ?? '/more';
 
   useEditionStackBack({
-    fallbackHref: safeReturnTo,
+    fallbackHref: parseReturnTo(params.returnTo) ?? '/more',
     accessibilityHint: 'Closes this sheet when there is no previous screen',
   });
 
-  // The receipt is held only in local state — never in a route/URL param.
-  const [receiptCode, setReceiptCode] = useState<string | null>(null);
-  const scrollRef = useRef<ScrollView>(null);
-
-  // Memoize transport, secure storage and connectivity dependencies so native backends
-  // initialize once.
-  const depsPromise = useMemo(() => createCorrectionClientDeps(), []);
-
-  async function handleSubmit(state: CorrectionFormState): Promise<SubmitResult> {
-    const deps: CorrectionClientDeps = await depsPromise;
-    return submitCorrection(state, deps);
-  }
-
-  if (receiptCode) {
-    return (
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        {/* Title left to the Notice inside CorrectionReceipt (which also carries the
-            assistive-tech focus/announcement); the shell header stays distinct. */}
-        <UtilityScreenShell
-          ref={scrollRef}
-          kicker="Trust"
-          title="Correction submitted"
-          edges={SHELL_EDGES}
-          scrollProps={UTILITY_SCROLL_PROPS}
-        >
-          <CorrectionReceipt
-            receiptCode={receiptCode}
-            onCheckStatus={() => router.replace('/corrections/status')}
-            onDone={() => router.replace(safeReturnTo as never)}
-          />
-        </UtilityScreenShell>
-      </KeyboardAvoidingView>
-    );
-  }
-
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <UtilityScreenShell
+      kicker="Trust"
+      title="Submit a correction"
+      dek="Say what should change and link to evidence someone else can check."
+      edges={['left', 'right', 'bottom']}
     >
-      <UtilityScreenShell
-        ref={scrollRef}
-        kicker="Trust"
-        title="Submit a correction"
-        dek="Say what should change and link to evidence someone else can check."
-        edges={SHELL_EDGES}
-        scrollProps={UTILITY_SCROLL_PROPS}
-      >
-        <CorrectionForm
-          entityId={entityId ?? undefined}
-          scrollRef={scrollRef}
-          onSubmit={handleSubmit}
-          onAccepted={(code) => setReceiptCode(code)}
-        />
-      </UtilityScreenShell>
-    </KeyboardAvoidingView>
+      <View style={styles.body}>
+        <Text variant="body" colorRole="ink">
+          Corrections are filed on the BlackStory website. You get a receipt code there to check on
+          it later.
+        </Text>
+        <View style={styles.actions}>
+          <Button
+            label="Open corrections form"
+            variant="primary"
+            density="compact"
+            onPress={() => {
+              void Linking.openURL(correctionsWebUrl(entityId));
+            }}
+            accessibilityHint="Opens the BlackStory corrections form in your browser"
+          />
+        </View>
+      </View>
+    </UtilityScreenShell>
   );
 }
 
-/** Header-bearing modal: the native header owns the top inset, so the canvas only
- * insets the sides and bottom (not a tab-screen top inset). */
-const SHELL_EDGES = ['left', 'right', 'bottom'] as const;
-
-const UTILITY_SCROLL_PROPS = {
-  keyboardShouldPersistTaps: 'handled' as const,
-  keyboardDismissMode: 'on-drag' as const,
-};
-
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
+  body: { gap: space['3'] },
+  actions: { alignItems: 'flex-start' },
 });

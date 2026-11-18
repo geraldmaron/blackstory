@@ -1,6 +1,6 @@
 /**
  * Native Submit shell — honest contribute entry when lead intake is web-only.
- * Primary path: corrections (native). Secondary: optional web lead form.
+ * Corrections hand off to the web form via /corrections/submit; leads open the web lead form.
  */
 import { Linking, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
@@ -23,7 +23,7 @@ const CANONICAL_WEB_ORIGIN = 'https://blackstory.app';
 export const SUBMIT_INTRO = {
   kicker: 'Contribute',
   title: 'Submit',
-  lede: 'Help improve the archive. On mobile you can report an error in a published record now. New leads still use the moderated web form.',
+  lede: 'Help improve the archive. Corrections and new leads both use moderated forms on the website.',
 } as const;
 
 export function SubmitScreen() {
@@ -45,7 +45,7 @@ export function SubmitScreen() {
         />
 
         <View style={styles.section}>
-          <LedgerSectionLabel>On this device</LedgerSectionLabel>
+          <LedgerSectionLabel>Corrections</LedgerSectionLabel>
           <LedgerRow
             title="Submit a correction"
             summary="Report an error or missing citation on a published record"
@@ -53,7 +53,7 @@ export function SubmitScreen() {
             showChevron
             showDivider={false}
             onPress={() => router.push('/corrections/submit' as never)}
-            accessibilityLabel="Submit a correction. Opens the native corrections form."
+            accessibilityLabel="Submit a correction"
           />
           <View style={styles.actions}>
             <Button

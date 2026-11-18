@@ -7,6 +7,7 @@
  * human-gated step.
  */
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
 import { createHash } from 'node:crypto';
 import { createQuarantinedSubmission } from '@repo/security';
 import { saveQuarantinedRecord } from '@/lib/public-data/corrections-store';
@@ -23,12 +24,6 @@ const rateLimitGuard = createSubmitLeadRateLimitGuard();
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 /** Never store a raw client IP as the campaign-detector network token only a keyed hash.  */

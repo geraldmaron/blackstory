@@ -7,6 +7,7 @@
  * navigation.
  */
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
 import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
 import {
   applyExploreFilters,
@@ -41,12 +42,6 @@ export type ExploreRouteDependencies = {
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 const GUARDRAIL_FILTER_KEYS = ['kind', 'era'] as const;

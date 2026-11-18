@@ -13,6 +13,7 @@
  * in tests and degraded mode).
  */
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
 import {
   encodeSearchCursor,
   evaluateSearchQueryGuardrails,
@@ -54,12 +55,6 @@ export type SearchRouteDependencies = {
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 /**

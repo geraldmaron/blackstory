@@ -44,8 +44,6 @@ export const UNIVERSAL_LINK_PATHS: readonly string[] = [
   '/myths/*',
   '/methodology',
   '/about',
-  '/corrections',
-  '/corrections/*',
   '/errata',
   '/facts',
   '/facts/*',

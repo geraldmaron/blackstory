@@ -4,6 +4,7 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
 import {
   createQuarantinedSubmission,
   createSubmissionCampaignDetector,
@@ -65,12 +66,6 @@ export type CorrectionRouteDependencies = {
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 function networkTokenFor(clientIp: string, pepper: string): string {
