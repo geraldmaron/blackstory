@@ -34,8 +34,8 @@
 .ds-band-art__layer--weave {
   opacity: 0.12;
   -webkit-mask-image:
-    url('/brand/motifs/weave.svg'), linear-gradient(to right, transparent 55%, #000 95%);
-  mask-image: url('/brand/motifs/weave.svg'), linear-gradient(to right, transparent 55%, #000 95%);
+    url('/brand/motifs/weave.svg'), linear-gradient(to right, transparent 55%, black 95%);
+  mask-image: url('/brand/motifs/weave.svg'), linear-gradient(to right, transparent 55%, black 95%);
   -webkit-mask-size:
     10rem 10rem,
     100% 100%;
@@ -48,9 +48,9 @@
 .ds-band-art__layer--contours {
   opacity: 0.28;
   -webkit-mask-image:
-    url('/brand/motifs/contours.svg'), linear-gradient(to right, transparent 55%, #000 95%);
+    url('/brand/motifs/contours.svg'), linear-gradient(to right, transparent 55%, black 95%);
   mask-image:
-    url('/brand/motifs/contours.svg'), linear-gradient(to right, transparent 55%, #000 95%);
+    url('/brand/motifs/contours.svg'), linear-gradient(to right, transparent 55%, black 95%);
   -webkit-mask-size:
     20rem 20rem,
     100% 100%;

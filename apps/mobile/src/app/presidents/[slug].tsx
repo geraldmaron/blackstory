@@ -15,6 +15,6 @@ export default function PresidentRoute() {
     fallbackHref: '/presidents',
     accessibilityHint: 'Returns to Presidents when there is no previous screen',
   });
-  if (!safeSlug) return <Redirect href={"/presidents" as never} />;
+  if (!safeSlug) return <Redirect href={'/presidents' as never} />;
   return <StoryScreen slug={safeSlug} base="/presidents" />;
 }

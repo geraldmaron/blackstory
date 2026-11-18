@@ -8,7 +8,11 @@ export default function PresidentsStackLayout() {
   const editionStackScreenOptions = useEditionStackScreenOptions();
   return (
     <Stack
-      screenOptions={{ ...editionStackScreenOptions, headerBackTitle: 'Presidents', title: 'Presidents' }}
+      screenOptions={{
+        ...editionStackScreenOptions,
+        headerBackTitle: 'Presidents',
+        title: 'Presidents',
+      }}
     >
       <Stack.Screen name="index" options={{ title: 'Presidents', headerBackTitle: 'More' }} />
       <Stack.Screen name="[slug]" options={{ title: 'President', headerBackTitle: 'Presidents' }} />

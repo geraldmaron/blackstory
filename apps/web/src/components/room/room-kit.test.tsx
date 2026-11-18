@@ -1091,6 +1091,8 @@ describe('room kit · one public control system', () => {
     'ds-privacy',
     'ds-rec-pill',
     'ds-rec-pills',
+    // The record page's own capsule (2979d7e2), same exemption as ds-rec-pill above.
+    'ds-recpage',
     'ds-relation-chip',
     'ds-sheet',
     'ds-state-chip',

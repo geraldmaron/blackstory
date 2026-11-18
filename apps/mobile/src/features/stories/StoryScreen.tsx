@@ -41,7 +41,10 @@ export function StoryScreen({ slug, base }: { readonly slug: string; readonly ba
         }}
       >
         {state.kind === 'loading' || misplaced ? (
-          <ActivityIndicator accessibilityLabel="Loading the story" style={{ margin: space['6'] }} />
+          <ActivityIndicator
+            accessibilityLabel="Loading the story"
+            style={{ margin: space['6'] }}
+          />
         ) : null}
         {state.kind === 'not-found' ? (
           <ErrorState
@@ -71,7 +74,9 @@ export function StoryScreen({ slug, base }: { readonly slug: string; readonly ba
             ) : null}
             {story.collection ? (
               <Text variant="sectionLabel" colorRole="accent">
-                {[story.collection.label, story.collection.positionLabel].filter(Boolean).join(' · ')}
+                {[story.collection.label, story.collection.positionLabel]
+                  .filter(Boolean)
+                  .join(' · ')}
               </Text>
             ) : null}
             <Text variant="entityTitle" isHeading>

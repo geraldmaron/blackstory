@@ -111,7 +111,9 @@ describe('StoryBlocks', () => {
           ]}
         />
         <StoryReferences
-          references={[{ id: 'nara', label: 'National Archives', url: 'https://www.archives.gov/x' }]}
+          references={[
+            { id: 'nara', label: 'National Archives', url: 'https://www.archives.gov/x' },
+          ]}
         />
       </>,
     );

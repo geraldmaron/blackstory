@@ -65,7 +65,10 @@ function useLoad<T>(key: string, load: (deps: StoryDataDeps) => Promise<StoryFet
       if (mounted.current) setState(toState(result));
     } catch {
       if (mounted.current) {
-        setState({ kind: 'error', message: 'Couldn’t load this. Check your connection and try again.' });
+        setState({
+          kind: 'error',
+          message: 'Couldn’t load this. Check your connection and try again.',
+        });
       }
     }
   }, [deps]);

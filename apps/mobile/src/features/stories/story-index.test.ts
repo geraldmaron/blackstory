@@ -41,9 +41,8 @@ describe('story-index', () => {
   });
 
   it('orders a collection by its own position', () => {
-    expect(collectionMembers([lincoln, chapter, washington], 'presidents').map((s) => s.slug)).toEqual([
-      'george-washington',
-      'abraham-lincoln',
-    ]);
+    expect(
+      collectionMembers([lincoln, chapter, washington], 'presidents').map((s) => s.slug),
+    ).toEqual(['george-washington', 'abraham-lincoln']);
   });
 });

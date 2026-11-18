@@ -245,7 +245,9 @@ async function run(job) {
   await ctx.addInitScript((t) => {
     try {
       localStorage.setItem('ds-theme', t);
-    } catch {}
+    } catch {
+      // Storage can be blocked; the page then keeps its default theme.
+    }
   }, job.theme);
   const p = await ctx.newPage();
   const errs = [];

@@ -34,8 +34,18 @@ function StoryBands({ all }: { readonly all: readonly StoryListItemV1[] }) {
   const featured = pickFeaturedStory(stories);
   const rest = stories.filter((story) => story !== featured);
   const bands = [
-    { id: 'chapters', label: 'Chapters', meta: 'The long form', items: rest.filter((s) => s.format === 'chapter') },
-    { id: 'more', label: 'More stories', meta: 'Shorter pieces', items: rest.filter((s) => s.format !== 'chapter') },
+    {
+      id: 'chapters',
+      label: 'Chapters',
+      meta: 'The long form',
+      items: rest.filter((s) => s.format === 'chapter'),
+    },
+    {
+      id: 'more',
+      label: 'More stories',
+      meta: 'Shorter pieces',
+      items: rest.filter((s) => s.format !== 'chapter'),
+    },
   ].filter((band) => band.items.length > 0);
 
   return (
@@ -43,7 +53,10 @@ function StoryBands({ all }: { readonly all: readonly StoryListItemV1[] }) {
       {featured ? (
         <View>
           <LedgerSectionLabel meta={countLabel(stories)}>Start here</LedgerSectionLabel>
-          <FeaturedStoryCard story={featured} onPress={() => router.push(storyHref(featured) as never)} />
+          <FeaturedStoryCard
+            story={featured}
+            onPress={() => router.push(storyHref(featured) as never)}
+          />
         </View>
       ) : null}
       {bands.map((band) => (
@@ -89,7 +102,10 @@ export function StoriesHomeScreen() {
           />
 
           {state.kind === 'loading' ? (
-            <ActivityIndicator accessibilityLabel="Loading stories" style={{ margin: space['6'] }} />
+            <ActivityIndicator
+              accessibilityLabel="Loading stories"
+              style={{ margin: space['6'] }}
+            />
           ) : null}
           {state.kind === 'ready' ? (
             <>

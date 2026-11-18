@@ -43,7 +43,10 @@ export function PresidentsScreen() {
             dense
           />
           {state.kind === 'loading' ? (
-            <ActivityIndicator accessibilityLabel="Loading the presidents" style={{ margin: space['6'] }} />
+            <ActivityIndicator
+              accessibilityLabel="Loading the presidents"
+              style={{ margin: space['6'] }}
+            />
           ) : null}
           {state.kind === 'offline-no-cache' ? (
             <ErrorState
@@ -66,7 +69,9 @@ export function PresidentsScreen() {
               {state.result.freshness.degraded ? (
                 <Notice tone="info" title="Showing the list saved on this phone" compact />
               ) : null}
-              <LedgerSectionLabel meta={`${presidents.length} entries`}>In term order</LedgerSectionLabel>
+              <LedgerSectionLabel meta={`${presidents.length} entries`}>
+                In term order
+              </LedgerSectionLabel>
               {presidents.map((president, index) => (
                 <LedgerRow
                   key={president.slug}

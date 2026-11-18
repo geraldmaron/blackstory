@@ -689,7 +689,7 @@
   max-width: 65ch;
   color: var(--room-ink-2);
   font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
+  font-size: var(--ds-text-subtitle);
   line-height: 1.62;
 }
 

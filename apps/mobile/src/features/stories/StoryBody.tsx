@@ -9,11 +9,7 @@
  */
 import { Linking, Text as NativeText, View, type TextStyle } from 'react-native';
 import { router } from 'expo-router';
-import type {
-  StoryBlockV1,
-  StoryReferenceV1,
-  StoryRunV1,
-} from '@repo/public-contracts/v1/story';
+import type { StoryBlockV1, StoryReferenceV1, StoryRunV1 } from '@repo/public-contracts/v1/story';
 import {
   Divider,
   EXTERNAL_LINK_HINT,
@@ -257,7 +253,11 @@ export function StoryBlocks({
   );
 }
 
-export function StoryReferences({ references }: { readonly references: readonly StoryReferenceV1[] }) {
+export function StoryReferences({
+  references,
+}: {
+  readonly references: readonly StoryReferenceV1[];
+}) {
   if (references.length === 0) return null;
   return (
     <View style={{ gap: space['2'], marginTop: space['6'] }}>

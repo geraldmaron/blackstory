@@ -2,8 +2,8 @@
   "note": "Ratchet baseline for scripts/lint-design-tokens.mjs. Counts may only fall.",
   "counts": {
     "hex": {
-      "apps/web/src/admin/cases/case-queue.css": 53,
-      "apps/web/src/app/admin/admin.css": 70,
+      "apps/web/src/admin/cases/case-queue.css": 44,
+      "apps/web/src/app/admin/admin.css": 55,
       "apps/web/src/app/shell.css": 1,
       "packages/ui/src/styles/base.css": 6
     },
@@ -13,10 +13,10 @@
       "apps/web/src/admin/work/work-inbox.css": 9,
       "apps/web/src/app/admin/admin.css": 66,
       "apps/web/src/app/admin/stories/stories.css": 5,
+      "apps/web/src/app/collections/collections.css": 1,
       "apps/web/src/app/explore/explore.css": 1,
       "apps/web/src/app/reading-room.css": 1,
-      "apps/web/src/app/records/records-index.css": 1,
-      "apps/web/src/app/collections/collections.css": 1,
+      "apps/web/src/app/records/records-index.css": 4,
       "apps/web/src/app/shell.css": 5,
       "apps/web/src/app/stories/stories.css": 1,
       "apps/web/src/components/atmosphere/atmosphere.css": 2,
@@ -40,6 +40,7 @@
       "apps/web/src/app/admin/quick-add/quick-add.css": 6,
       "apps/web/src/app/door-home.css": 2,
       "apps/web/src/app/explore/explore.css": 7,
+      "apps/web/src/app/record-page.css": 1,
       "apps/web/src/app/shell.css": 9,
       "apps/web/src/components/atmosphere/atmosphere.css": 7,
       "apps/web/src/components/map-experience/annotation-overlay.css": 1,

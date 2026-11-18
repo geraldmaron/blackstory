@@ -1,9 +1,6 @@
 const { readFileSync } = require('fs');
 const path = require('path');
-const {
-  applySceneAppDelegate,
-  applySceneManifest,
-} = require('../with-scene-lifecycle');
+const { applySceneAppDelegate, applySceneManifest } = require('../with-scene-lifecycle');
 
 // The AppDelegate the SDK 57 prebuild generates for this app, captured verbatim.
 const TEMPLATE = readFileSync(path.join(__dirname, 'AppDelegate.sdk57.swift.fixture'), 'utf8');

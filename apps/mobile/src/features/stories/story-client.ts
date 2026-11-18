@@ -103,9 +103,10 @@ async function fetchReleased<T>(
   }
 }
 
-const parseList: Parse<{ readonly releaseId: string; readonly stories: readonly StoryListItemV1[] }> = (
-  raw,
-) => {
+const parseList: Parse<{
+  readonly releaseId: string;
+  readonly stories: readonly StoryListItemV1[];
+}> = (raw) => {
   const parsed = storiesResponseV1Schema.safeParse(raw);
   return parsed.success ? parsed.data : undefined;
 };
@@ -144,5 +145,9 @@ export function collectionMembers(
 ): readonly StoryListItemV1[] {
   return stories
     .filter((story) => story.collection?.id === collectionId)
-    .sort((a, b) => (a.collection?.position ?? 0) - (b.collection?.position ?? 0) || a.slug.localeCompare(b.slug));
+    .sort(
+      (a, b) =>
+        (a.collection?.position ?? 0) - (b.collection?.position ?? 0) ||
+        a.slug.localeCompare(b.slug),
+    );
 }
