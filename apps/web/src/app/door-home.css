@@ -752,7 +752,8 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     font-size: clamp(1.75rem, 8vw, 2.5rem);
   }
 
-  .ds-door-open__line,
+  /* The one sentence stays: a reader from a shared link must learn what the archive is before
+     the map. Only the record's place line steps out. */
   .ds-door-open .ds-door-record__place {
     display: none;
   }
@@ -919,13 +920,15 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     display: none;
   }
 
-  /* No sticky bar: the actions are the column's last lines, nothing scrolls under them. */
+  /* The opening sentence costs about 84px here; the grain edge (decoration), the empty actions
+     row and the padding that framed the edge give it back, so the map window keeps its height. */
+  .ds-door-open {
+    padding-bottom: var(--ds-space-4);
+  }
+
+  .ds-door-open__edge,
   .ds-door-open__actions {
-    position: static;
-    margin: 0;
-    padding: 0;
-    border-top: 0;
-    background: none;
+    display: none;
   }
 
   /* The map window is sized to the country, not to the screen: it starts under the headline

@@ -206,7 +206,10 @@ export function DoorImmersive({
     else if (serverOpening) pinOpening(serverOpening);
     // Mount only: later changes come from the reader's own "Another record".
   }, []);
+  /** Set once the reader asks for another record, so the live region names it. */
+  const [openingChosen, setOpeningChosen] = useState(false);
   const anotherOpening = useCallback(() => {
+    setOpeningChosen(true);
     setOpening((now) => {
       const at = openingChoices.findIndex((choice) => choice.href === now?.href);
       const next = openingChoices[(at + 1) % openingChoices.length] ?? now;
@@ -788,9 +791,11 @@ export function DoorImmersive({
 
   const liveLabel = browseMode
     ? 'Browsing the map'
-    : step === 0 || !current
+    : !current || (step === 0 && !openingChosen)
       ? 'United States'
-      : `${current.decade}s. ${current.name}${current.locality ? `, ${current.locality}` : ''}`;
+      : step === 0
+        ? `${current.name}${current.locality ? `, ${current.locality}` : ''}`
+        : `${current.decade}s. ${current.name}${current.locality ? `, ${current.locality}` : ''}`;
 
   return (
     <>
@@ -918,8 +923,13 @@ export function DoorImmersive({
                   and one claim with its source and grade. Off the map window, so it never covers
                   a live pin. */}
               {opening ? (
-                <div className="ds-door-open__spotlight" key={opening.href}>
-                  <DoorRecordBlock record={opening} className="ds-door-open__record" />
+                <div className="ds-door-open__spotlight">
+                  {/* Only the record remounts on "Another record"; the button keeps focus. */}
+                  <DoorRecordBlock
+                    key={opening.href}
+                    record={opening}
+                    className="ds-door-open__record"
+                  />
                   {openingChoices.length > 1 ? (
                     <button
                       type="button"

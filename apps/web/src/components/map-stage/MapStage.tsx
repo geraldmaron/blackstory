@@ -1208,6 +1208,9 @@ export function MapStageProvider({
    */
   const syncRotateGestures = useCallback(
     (map: MapLibreMap, posture: PlatePosture, pointerFine: boolean) => {
+      // The plate is aria-hidden, so its canvas is a Tab stop only where the reader steers it
+      // (live); a backdrop or framed map would be a focus stop that announces nothing.
+      map.getCanvas().tabIndex = posture === 'live' ? 0 : -1;
       const container = containerRef.current;
       const current = rotateGesturesRef.current;
       const allowed = container !== null && rotateGestureAllowed(posture, { pointerFine });
@@ -1883,6 +1886,7 @@ export function MapStageProvider({
     const map = mapRef.current;
     if (!map) return;
     lockGestures(map);
+    map.getCanvas().tabIndex = -1;
     // Only a real size change needs the drawing buffer re-measured. A scroll no longer produces
     // one at all, which is the point: MapLibre never resizes mid-gesture.
     if (resized) resizeMapInPlace(map);

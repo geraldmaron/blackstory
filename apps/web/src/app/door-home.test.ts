@@ -343,7 +343,12 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
 
 test('the opening leads with one record the way its record page shows it', () => {
   // Name, plate with its credit, one claim in the claims block's language.
-  assert.match(immersive, /opening \? \(\s*<div[^>]*>\s*<DoorRecordBlock record=\{opening\}/);
+  assert.match(
+    immersive,
+    /opening \? \(\s*<div[^>]*>[\s\S]*?<DoorRecordBlock\s+key=\{opening\.href\}\s+record=\{opening\}/,
+  );
+  // Only the record remounts on "Another record": a key on the wrapper would drop the button's focus.
+  assert.doesNotMatch(immersive, /ds-door-open__spotlight"\s+key=/);
   // The headline and the story lead the column; the record follows them.
   assert.ok(immersive.indexOf('<HeroHeadlineMorph') < immersive.indexOf('<DoorRecordBlock'));
   assert.ok(immersive.indexOf('ds-door-open__story') < immersive.indexOf('<DoorRecordBlock'));
