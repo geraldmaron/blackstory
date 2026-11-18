@@ -27,4 +27,3 @@
 
 # Publication surface (projection workers + internal promotion API)
 /workers/publication/ @geraldmaron
-/apps/api-internal/ @geraldmaron

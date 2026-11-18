@@ -58,7 +58,7 @@ for anonymous) deny by default.
 |------|------|
 | [`packages/security/src/rate-limits.ts`](../../packages/security/src/rate-limits.ts) | Policy matrix, token bucket, store, risk aggregation |
 | [`apps/api-public/src/rate-limits.ts`](../../apps/api-public/src/rate-limits.ts) | `createPublicRateLimitGuard` |
-| [`apps/api-submissions/src/rate-limits.ts`](../../apps/api-submissions/src/rate-limits.ts) | `createSubmissionsRateLimitGuard` |
+| [`apps/web/src/lib/web-security/public-rate-limit-guard.ts`](../../apps/web/src/lib/web-security/public-rate-limit-guard.ts) | `createPublicRateLimitGuard` for the web corrections, lead, search and locate routes |
 
 ## Safe retry guidance
 
@@ -84,7 +84,6 @@ Production should swap the store interface for Redis/Memorystore without changin
 ```bash
 pnpm --filter @repo/security test
 pnpm --filter @repo/api-public test
-pnpm --filter @repo/api-submissions test
 ```
 
 ## Acceptance mapping

@@ -183,7 +183,7 @@
       "residualRisk": "Human brigades with diverse IPs and unique prose can still consume moderator time; automation reduces but does not eliminate attention cost.",
       "implementationRefs": [
         "docs/security/submission-quarantine.md",
-        "apps/api-submissions/src/quarantine.ts",
+        "apps/web/src/app/corrections/api/handler.ts",
         "packages/security/src/submissions/quarantine.ts"
       ]
     },
@@ -331,7 +331,7 @@
       "residualRisk": "Uploads remain disabled until quarantine and scanning controls are implemented and verified; scanners would still carry zero-day residual risk.",
       "implementationRefs": [
         "docs/security/submission-quarantine.md",
-        "apps/api-submissions/src/quarantine.ts",
+        "apps/web/src/app/corrections/api/handler.ts",
         "docs/security/abuse-cases.md"
       ]
     },

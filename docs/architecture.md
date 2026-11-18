@@ -33,8 +33,6 @@ or in the owning contract. Update existing authoritative prose instead of adding
 |---|---|
 | `apps/web` | Next.js public web and staff-gated `/admin` console on Vercel |
 | `apps/api-public` | Released public read/search/location API and mobile data boundary |
-| `apps/api-submissions` | Quarantined contributions and corrections |
-| `apps/api-internal` | Internal publication and control operations |
 | `apps/mobile` | Expo native app, its own npm graph and verification path |
 | `apps/docs` | Public documentation source, exported to GitHub Pages |
 | `packages/research-kernel` | Generic schemas, profiles, validation, priority and stopping rules |

@@ -14,10 +14,8 @@ provider state.
 
 - apps/web and /admin run in the shared Vercel web deployment.
 - apps/api-public has a Vercel function entry point in apps/api-public/vercel.json.
-- apps/api-submissions has a quarantine-only capability contract. Its live provider and edge
-  controls require separate verification.
-- apps/api-internal accepts service identity in code. A private network or deployed service is not
-  proven here.
+- Public intake (corrections, appeals, abuse reports, leads) runs as apps/web routes and writes to
+  quarantine only. The phone app hands corrections to the web form.
 - Admin authorization is Supabase Auth plus trusted app_metadata.app_role; IAP and Firebase are
   not current admin controls. MFA and recent reauthentication are not enforced.
 - Application rate-limit evaluators exist in @repo/security and API packages, but the shared

@@ -29,9 +29,7 @@ trustworthy as the gates between research and release.
 |---------|---------------|
 | `apps/web` | Public read of released projections |
 | `apps/api-public` | Public read / search / location with abuse controls |
-| `apps/api-submissions` | Untrusted intake into quarantine |
 | `apps/web`'s `/admin` route group | Authenticated staff only (Supabase session + role) |
-| `apps/api-internal` | Private publication and control |
 | Workers | Research and batch only; cannot publish. No research schedule is installed. |
 
 ## Reporting

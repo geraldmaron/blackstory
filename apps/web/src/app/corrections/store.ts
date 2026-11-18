@@ -40,13 +40,18 @@ export type CorrectionSubmissionStore = {
     pepper: string,
     appeal: StoredAppeal,
   ): Promise<StoredCorrection | undefined>;
+};
+
+/** Test store. `markClosed` stands in for a staff decision, which production makes in
+ * `admin/lib/postgres-submissions.ts`, never through the public store. */
+export type InMemoryCorrectionSubmissionStore = CorrectionSubmissionStore & {
   markClosed(
     submissionId: string,
     closureReason: PublicClosureReason,
   ): Promise<StoredCorrection | undefined>;
 };
 
-export function createCorrectionSubmissionStore(): CorrectionSubmissionStore {
+export function createCorrectionSubmissionStore(): InMemoryCorrectionSubmissionStore {
   const bySubmissionId = new Map<string, StoredCorrection>();
   const byReceiptDigest = new Map<string, string>();
 

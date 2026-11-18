@@ -408,7 +408,7 @@ Metro should log `[blackstory] apiBaseUrl=…` and
 
 ## Client attestation & observability (MOB-010 / MOB-018)
 
-The app attests to `apps/api-public` and `apps/api-submissions` via the
+The app attests to `apps/api-public` via the
 `X-BlackStory-Client: mobile/<version>; api=<major>` header on every request.
 Server-side validation is a stateless format check
 (`packages/security/src/client-attestation.ts`) — there is **no** database

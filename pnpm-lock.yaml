@@ -38,28 +38,6 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  apps/api-internal:
-    dependencies:
-      '@repo/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@repo/domain':
-        specifier: workspace:*
-        version: link:../../packages/domain
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:^
-        version: link:../../packages/typescript-config
-      '@types/node':
-        specifier: ^22.20.1
-        version: 22.20.1
-      tsx:
-        specifier: ^4.23.15
-        version: 4.23.15
-      typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
-
   apps/api-public:
     dependencies:
       '@repo/config':
@@ -96,34 +74,6 @@ importers:
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1
-      tsx:
-        specifier: ^4.23.15
-        version: 4.23.15
-      typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
-
-  apps/api-submissions:
-    dependencies:
-      '@repo/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@repo/domain':
-        specifier: workspace:*
-        version: link:../../packages/domain
-      '@repo/ops-data':
-        specifier: workspace:*
-        version: link:../../packages/ops-data
-      '@repo/security':
-        specifier: workspace:*
-        version: link:../../packages/security
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:^
-        version: link:../../packages/typescript-config
-      '@types/node':
-        specifier: ^22.20.1
-        version: 22.20.1
       tsx:
         specifier: ^4.23.15
         version: 4.23.15
