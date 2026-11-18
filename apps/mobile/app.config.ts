@@ -392,6 +392,9 @@ const config: ExpoConfig = {
         },
       },
     ],
+    // iOS 27 refuses to launch apps without the UIScene life cycle; Expo SDK 57's template does
+    // not adopt it yet. See the plugin's header for what it changes and when to retire it.
+    './plugins/with-scene-lifecycle',
   ],
   experiments: {
     typedRoutes: true,
