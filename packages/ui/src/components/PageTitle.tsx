@@ -1,5 +1,5 @@
 /**
- * The display-scale page title (Schibsted SemiBold, 56-120px, tight leading). It may run two
+ * The display-scale page title (Schibsted at the display weight, 56-120px, tight leading). It may run two
  * lines and bleed toward the edge. One per page; `PageHeader display` renders the same style.
  */
 

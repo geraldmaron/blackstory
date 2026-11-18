@@ -4,7 +4,7 @@
  * Also wires Add to Home Screen metadata (manifest + Apple web app) without a service worker.
  *
  * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Schibsted
- * Grotesk SemiBold for headlines/titles/key statements, Geist for UI and body, Newsreader for
+ * Grotesk for headlines/titles/key statements (800 display, 700 headline, 650 title), Geist for UI and body, Newsreader for
  * editorial longform, Geist Mono for data/citations. All four are variable faces, so no weight
  * list is passed: next/font serves the axis and the type-scale tokens pick weights off it.
  *

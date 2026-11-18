@@ -1,6 +1,7 @@
 {
   "wordmark": "Use the approved BlackStory wordmark lockup as provided in the production PNGs.",
-  "display": "Schibsted Grotesk SemiBold",
+  "display": "Schibsted Grotesk",
+  "displayWeights": { "display": 800, "headline": 700, "title": 650 },
   "uiBody": "Geist",
   "editorial": "Newsreader",
   "dataMono": "Geist Mono"

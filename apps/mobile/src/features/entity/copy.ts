@@ -77,7 +77,7 @@ export const SECTION_HEADINGS = {
   citedIn: 'Stories that cite this record',
   visit: 'Visit',
   revision: 'Revision',
-  maturity: 'Record maturity',
+  maturity: 'Research so far',
   media: 'Primary image',
 } as const;
 

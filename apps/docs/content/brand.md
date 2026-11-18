@@ -51,7 +51,7 @@ about 1.4:1, so a form field uses the control-edge token, which holds 3:1 on eve
 
 ## Type
 
-- **Schibsted Grotesk SemiBold**: headlines
+- **Schibsted Grotesk**: headlines, with weight as the contrast axis (800 display, 700 headline, 650 title)
 - **Geist**: UI / body
 - **Newsreader**: editorial / longform
 - **Geist Mono**: data, citations, dates, confidence

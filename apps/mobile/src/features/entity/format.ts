@@ -81,3 +81,15 @@ export function formatFetchedAt(epochMs: number): string {
   const time = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
   return `${date} ${time} UTC`;
 }
+
+/** Reader wording for record-maturity tokens; mirrors web's `recordMaturityLabel`
+ * (apps/web/src/lib/evidence/confidence-language.ts) so no pipeline state prints raw. */
+const RECORD_MATURITY_COPY: Readonly<Record<string, string>> = {
+  projection_stub: 'Listed, not yet researched',
+  partial_enrichment: 'Partly researched',
+  full_enrichment: 'Fully researched',
+};
+
+export function recordMaturityLabel(token: string): string {
+  return RECORD_MATURITY_COPY[token] ?? 'Research in progress';
+}

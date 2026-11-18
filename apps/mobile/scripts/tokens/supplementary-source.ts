@@ -67,8 +67,9 @@ export const EASING_STANDARD_CSS = 'cubic-bezier(0.16, 1, 0.3, 1)';
  * values" borrowed from an existing source because none exists.
  */
 export const TYPE_SCALE = {
-  display: { size: 34, lineHeight: 40, weight: '600', family: 'display' as const },
-  title: { size: 26, lineHeight: 32, weight: '600', family: 'display' as const },
+  /** Web weight roles (tokens.css --ds-weight-display 800, --ds-weight-headline 700). */
+  display: { size: 34, lineHeight: 40, weight: '800', family: 'display' as const },
+  title: { size: 26, lineHeight: 32, weight: '700', family: 'display' as const },
   subtitle: { size: 20, lineHeight: 27, weight: '600', family: 'uiBody' as const },
   /** Ledger Line tab masthead — 16 Inter Medium (docs/ui/design-direction-v6-mobile.md). */
   masthead: { size: 16, lineHeight: 22, weight: '500', family: 'uiBody' as const },
