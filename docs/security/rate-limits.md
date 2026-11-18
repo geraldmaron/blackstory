@@ -58,7 +58,7 @@ for anonymous) deny by default.
 |------|------|
 | [`packages/security/src/rate-limits.ts`](../../packages/security/src/rate-limits.ts) | Policy matrix, token bucket, store, risk aggregation |
 | [`apps/api-public/src/rate-limits.ts`](../../apps/api-public/src/rate-limits.ts) | `createPublicRateLimitGuard` |
-| [`apps/web/src/lib/web-security/public-rate-limit-guard.ts`](../../apps/web/src/lib/web-security/public-rate-limit-guard.ts) | `createPublicRateLimitGuard` for the web corrections, lead, search and locate routes |
+| [`apps/web/src/lib/web-security/public-rate-limit-guard.ts`](../../apps/web/src/lib/web-security/public-rate-limit-guard.ts) | `createPublicRateLimitGuard` for the web corrections, lead, search and locate routes, and admin password sign-in (`authentication` class, `/api/admin-auth/token`) |
 
 ## Safe retry guidance
 

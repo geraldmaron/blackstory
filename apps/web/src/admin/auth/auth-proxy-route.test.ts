@@ -133,3 +133,34 @@ test('accepts the browser Host when Next normalizes the request URL to localhost
   assert.equal(response.status, 200);
   assert.equal(upstream.mock.callCount(), 1);
 });
+
+test('stops relaying password attempts from one address once its quota is spent', async (t) => {
+  configureTestAuth(t);
+  let relayed = 0;
+  t.mock.method(globalThis, 'fetch', async () => {
+    relayed += 1;
+    return new Response('{"msg":"Invalid login credentials"}', { status: 400 });
+  });
+  const attempt = (grant: string, ip: string) =>
+    POST(
+      new Request(`https://admin.example/api/admin-auth/token?grant_type=${grant}`, {
+        method: 'POST',
+        headers: { 'x-forwarded-for': ip },
+        body: '{}',
+      }),
+      context('token'),
+    );
+
+  let last = await attempt('password', '203.0.113.9');
+  for (let i = 0; i < 10 && last.status !== 429; i += 1)
+    last = await attempt('password', '203.0.113.9');
+  assert.equal(last.status, 429);
+  assert.ok(last.headers.get('retry-after'));
+  assert.equal(last.headers.get('cache-control'), 'private, no-store');
+  assert.match((await last.json()).message, /too many requests/i);
+
+  const before = relayed;
+  assert.equal((await attempt('password', '203.0.113.10')).status, 400);
+  assert.equal((await attempt('refresh_token', '203.0.113.9')).status, 400);
+  assert.equal(relayed, before + 2);
+});
