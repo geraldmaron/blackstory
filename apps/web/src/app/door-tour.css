@@ -318,11 +318,6 @@
   list-style: none;
 }
 
-/* The step is the tall box the scroll probe reads; its card sits at the top of it. */
-.ds-door-tour__step {
-  min-height: 78dvh;
-}
-
 /* The copper step number, in the numeral role, carries the step. */
 .ds-door-tour__num {
   margin: 0;
@@ -348,6 +343,13 @@
 
   .ds-door-chapters > :not(.ds-door-tour) {
     pointer-events: auto;
+  }
+
+  /* One fixed gap under every card. A step used to be a 78dvh box with the card at its top, so
+     the gap was whatever the card left over: uneven step to step, and several hundred pixels of
+     empty wash on a tall screen. The scroll probe reads the step box, padding included. */
+  .ds-door-tour__step {
+    padding-bottom: var(--ds-section-sm);
   }
 
   .ds-door-tour__card {
@@ -431,5 +433,9 @@
 @media (scripting: none) {
   .ds-door-tour__step::before {
     display: none;
+  }
+
+  .ds-door-tour__step {
+    padding-bottom: var(--ds-section-sm);
   }
 }
