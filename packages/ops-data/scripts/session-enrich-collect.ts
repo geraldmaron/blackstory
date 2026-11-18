@@ -10,8 +10,11 @@
  *
  * REFUSALS ARE NOT FAILURES. A subject whose captured evidence carries no Black-history
  * significance should be refused, not padded to reach the 120-char summary floor. Those are
- * reported and written to a separate file for triage. The ledger has no terminal refusal state,
- * so refused subjects remain 'pending' and may be offered again on the next pass.
+ * reported in a companion refusals file. Pass it explicitly to session-enrich-apply.ts, which
+ * records no-lane-significance against the evidence digest. New evidence permits reopening;
+ * absent, changed or misattached evidence remains unresolved rather than a terminal refusal.
+ * Legacy prompts without evidenceDigest must be prepared and reviewed again before refusal
+ * application. Conflicting draft/refuse/defer files fail before outputs are written.
  *
  * This validates NOTHING itself. Everything it emits still goes through
  * session-enrich-apply.ts -> validateEnrichmentResponse, which is the single validator for both
@@ -26,10 +29,12 @@
  *   set -a && source apps/web/.env.local && set +a
  *   export DATABASE_SSL=1
  *   node --conditions development --import tsx \
- *     packages/ops-data/scripts/session-enrich-apply.ts --answers-file=<dir>/answers.jsonl
+ *     packages/ops-data/scripts/session-enrich-apply.ts --answers-file=<dir>/answers.jsonl \
+ *     --refusals-file=<dir>/answers.refusals.json
  *   DRY_RUN=0 ENRICH_ENTITIES_LLM_APPLY=1 SESSION_ENRICH_MODEL_ID=<who-actually-drafted> \
  *     node --conditions development --import tsx \
- *     packages/ops-data/scripts/session-enrich-apply.ts --answers-file=<dir>/answers.jsonl
+ *     packages/ops-data/scripts/session-enrich-apply.ts --answers-file=<dir>/answers.jsonl \
+ *     --refusals-file=<dir>/answers.refusals.json
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -51,7 +56,10 @@ function main(): void {
   const subjects = readFileSync(PROMPTS, 'utf8')
     .trim()
     .split('\n')
-    .map((line) => JSON.parse(line) as { entityId: string; displayName: string });
+    .map(
+      (line) =>
+        JSON.parse(line) as { entityId: string; displayName: string; evidenceDigest?: string },
+    );
 
   const answers: string[] = [];
   const refusals: unknown[] = [];
@@ -64,6 +72,10 @@ function main(): void {
     const refusePath = join(DRAFTS, `refuse-${lineNo}.json`);
     const deferPath = join(DRAFTS, `defer-${lineNo}.json`);
 
+    if ([draftPath, refusePath, deferPath].filter(existsSync).length > 1) {
+      throw new Error(`Conflicting outcome files for line ${lineNo} (${subject.entityId})`);
+    }
+
     if (existsSync(draftPath)) {
       // Passed through as the raw string, not re-serialized: the validator anchors citation
       // quotes as verbatim substrings, and a JSON round-trip here could normalize a character
@@ -73,7 +85,12 @@ function main(): void {
       );
     } else if (existsSync(refusePath)) {
       const parsed = JSON.parse(readFileSync(refusePath, 'utf8')) as Record<string, unknown>;
-      refusals.push({ line: lineNo, entityId: subject.entityId, ...parsed });
+      refusals.push({
+        ...parsed,
+        line: lineNo,
+        entityId: subject.entityId,
+        evidenceDigest: subject.evidenceDigest ?? null,
+      });
     } else if (existsSync(deferPath)) {
       // A reason string is enough (repo-w5zo) — unlike a refusal this is not terminal, the
       // row stays 'pending' and is re-offered on the next pass, so it is reported as its own

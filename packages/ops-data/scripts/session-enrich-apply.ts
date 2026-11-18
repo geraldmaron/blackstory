@@ -5,6 +5,10 @@
  * ENRICH_ENTITIES_LLM_APPLY=1. Uses the same review sampling as the model-driven importer.
  */
 import { readFileSync } from 'node:fs';
+import {
+  assertSessionEnrichmentBatch,
+  canRecordSignificanceRefusal,
+} from './lib/session-enrichment-batch.ts';
 import pg from 'pg';
 import { TOPIC_REGISTRY } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -48,14 +52,18 @@ function loadAnswers(path: string): readonly Answer[] {
   });
 }
 
-type Refusal = { readonly entityId: string; readonly reason: string };
+type Refusal = {
+  readonly entityId: string;
+  readonly reason: string;
+  readonly evidenceDigest: string | null;
+};
 
 /** The array session-enrich-collect.ts writes to `<out>.refusals.json`. */
 function loadRefusals(path: string): readonly Refusal[] {
   const parsed = JSON.parse(readFileSync(path, 'utf8')) as unknown;
   if (!Array.isArray(parsed)) throw new Error(`${path}: expected a JSON array`);
   return parsed.map((entry, index) => {
-    const row = entry as { entityId?: unknown; reason?: unknown };
+    const row = entry as { entityId?: unknown; reason?: unknown; evidenceDigest?: unknown };
     if (typeof row.entityId !== 'string') {
       throw new Error(`refusals-file entry ${index}: missing entityId`);
     }
@@ -64,7 +72,11 @@ function loadRefusals(path: string): readonly Refusal[] {
     if (typeof row.reason !== 'string' || row.reason.trim().length === 0) {
       throw new Error(`refusals-file entry ${index} (${row.entityId}): missing reason`);
     }
-    return { entityId: row.entityId, reason: row.reason.trim() };
+    return {
+      entityId: row.entityId,
+      reason: row.reason.trim(),
+      evidenceDigest: typeof row.evidenceDigest === 'string' ? row.evidenceDigest : null,
+    };
   });
 }
 
@@ -72,10 +84,10 @@ async function main(): Promise<void> {
   const answersFile = flag('answers-file', '');
   if (!answersFile) throw new Error('--answers-file=/path/to/answers.jsonl is required');
   const answers = loadAnswers(answersFile);
-  if (answers.length === 0) throw new Error(`${answersFile} contained no answers`);
 
   const refusalsFile = flag('refusals-file', '');
   const refusals = refusalsFile.length > 0 ? loadRefusals(refusalsFile) : [];
+  assertSessionEnrichmentBatch(answers, refusals);
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
@@ -129,7 +141,12 @@ async function main(): Promise<void> {
   const isMisattachedVerdict = (reason: string): boolean => /^\s*MIS-ATTACHED\b/iu.test(reason);
   const noEvidence = new Set(skippedNoEvidence);
   const blocked = (refusal: Refusal): boolean =>
-    noEvidence.has(refusal.entityId) || isMisattachedVerdict(refusal.reason);
+    noEvidence.has(refusal.entityId) ||
+    !canRecordSignificanceRefusal(
+      refusal.reason,
+      subjectById.get(refusal.entityId)?.evidenceDigest,
+      refusal.evidenceDigest,
+    );
   const recordable = refusals.filter((refusal) => !blocked(refusal));
   const unrecordable = refusals.filter(blocked);
   if (refusals.length > 0) {
@@ -150,7 +167,7 @@ async function main(): Promise<void> {
       for (const refusal of unrecordable) {
         const why = isMisattachedVerdict(refusal.reason)
           ? 'drafter flagged MIS-ATTACHED'
-          : 'no captured evidence remains';
+          : 'captured evidence is missing or differs from the reviewed snapshot; prepare and review again';
         console.log(`    ${refusal.entityId} — ${why}`);
       }
     }
@@ -180,7 +197,7 @@ async function main(): Promise<void> {
       await applyLaneSignificanceRefusal(client, {
         entityId: refusal.entityId,
         reason: refusal.reason,
-        evidenceDigest: subjectById.get(refusal.entityId)?.evidenceDigest ?? null,
+        evidenceDigest: refusal.evidenceDigest,
         modelId: SESSION_MODEL_ID,
       });
     }
