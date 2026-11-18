@@ -53,6 +53,7 @@ test('the space scale is the CSS scale on a 4px rhythm', () => {
     10: 40,
     12: 48,
     16: 64,
+    18: 72,
     24: 96,
     32: 128,
     48: 192,

@@ -51,6 +51,16 @@ function topLevelBlocks(css) {
   return blocks.filter((b) => b.body !== undefined);
 }
 
+/** Follows a bare `var(--ds-x)` alias to the value it names; anything else is returned as is. */
+function resolveVar(value, decl) {
+  for (let hops = 0; hops < 8; hops += 1) {
+    const m = /^var\((--ds-[\w-]+)\)$/.exec(value);
+    if (!m || decl[m[1]] === undefined) return value;
+    value = decl[m[1]];
+  }
+  return value;
+}
+
 const isColor = (value) => /^#[0-9a-f]{3,8}$/i.test(value) || /^rgba?\(/i.test(value);
 const remToPx = (value) => {
   const m = /^(-?[\d.]+)rem$/.exec(value);
@@ -68,23 +78,32 @@ const msValue = (value) => {
 export function readDesignTokens(cssPath = TOKENS_CSS) {
   const css = readFileSync(cssPath, 'utf8');
   const blocks = topLevelBlocks(css);
-  const light = blocks.find((b) => /\[data-theme='light'\]/.test(b.selector));
-  const dark = blocks.find((b) => /\[data-theme='dark'\]/.test(b.selector));
+  // A block belongs to a theme when one of its comma-separated selectors IS the theme selector.
+  // Matching by substring took the light block for dark: its list holds
+  // `:root:not([data-theme='dark']) [data-ground='ink']`. Themes are spread over several blocks.
+  const selectors = (b) => b.selector.split(',').map((part) => part.trim());
+  const withSelector = (...wanted) =>
+    blocks.filter((b) => selectors(b).some((sel) => wanted.includes(sel)));
+  const lightBlocks = withSelector(':root', "[data-theme='light']");
+  const darkBlocks = withSelector("[data-theme='dark']");
   const root = blocks
     .filter((b) => b.selector === ':root')
     .sort(
       (a, b) => Object.keys(declarations(b.body)).length - Object.keys(declarations(a.body)).length,
     )[0];
-  if (!light || !dark || !root)
+  if (lightBlocks.length === 0 || darkBlocks.length === 0 || !root)
     throw new Error('tokens.css: expected light, dark and a large :root block');
 
   const themes = { light: {}, dark: {} };
   const nonColor = { light: [], dark: [] };
-  for (const [name, block] of [
-    ['light', light],
-    ['dark', dark],
+  // Dark cascades over the light and :root values, as it does in the browser.
+  for (const [name, themeBlocks] of [
+    ['light', lightBlocks],
+    ['dark', [...lightBlocks, ...darkBlocks]],
   ]) {
-    for (const [prop, value] of Object.entries(declarations(block.body))) {
+    const merged = Object.assign({}, ...themeBlocks.map((block) => declarations(block.body)));
+    for (const [prop, raw] of Object.entries(merged)) {
+      const value = resolveVar(raw, merged);
       if (isColor(value)) themes[name][camel(prop)] = value.toLowerCase();
       else nonColor[name].push(prop);
     }
@@ -99,7 +118,8 @@ export function readDesignTokens(cssPath = TOKENS_CSS) {
   const leading = {};
   const duration = {};
   const unparsed = [];
-  for (const [prop, value] of Object.entries(rootDecl)) {
+  for (const [prop, raw] of Object.entries(rootDecl)) {
+    const value = resolveVar(raw, rootDecl);
     const name = prop.replace(/^--ds-/, '');
     let m;
     if ((m = /^space-(\d+)$/.exec(name))) {
@@ -120,7 +140,7 @@ export function readDesignTokens(cssPath = TOKENS_CSS) {
           .replace(/^text/, '')
           .replace(/^./, (c) => c.toLowerCase())
       ] = {
-        css: value,
+        css: raw,
         px: px ?? (clampMin ? remToPx(clampMin[1]) : undefined),
         fluid: px === undefined,
       };
