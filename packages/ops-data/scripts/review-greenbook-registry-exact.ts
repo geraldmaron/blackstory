@@ -20,7 +20,12 @@
 import pg from 'pg';
 import { connectWithDeadline, normalizePgConnectionString } from './lib/pg-connection.ts';
 import { loadReviewClaims, runClaimReview, type Verdict } from './lib/claim-review-ledger.ts';
-import { listingClaim, listingFactsFromRow, listingQuotes } from './lib/greenbook-registry.ts';
+import {
+  listingClaim,
+  listingFactsFromRow,
+  listingQuotes,
+  requiresPrimaryScanReview,
+} from './lib/greenbook-registry.ts';
 
 export const REGISTRY_EXACT_ACTOR = 'script:registry-exact';
 const REVIEWER = { actorId: REGISTRY_EXACT_ACTOR, modelFamily: 'deterministic-script' } as const;
@@ -59,8 +64,13 @@ async function main(): Promise<void> {
     }
     const { prepared, blocked } = await loadReviewClaims(client, entityIds);
     let noVerdict = 0;
+    let primaryScanHolds = 0;
     const verdicts: Verdict[] = [];
     for (const claim of prepared) {
+      if (requiresPrimaryScanReview(claim.row.provenance)) {
+        primaryScanHolds += 1;
+        continue;
+      }
       const base = {
         packetId: claim.packet.packetId,
         packetHash: claim.packet.packetHash,
@@ -124,6 +134,7 @@ async function main(): Promise<void> {
           rejected: report.rejected.length,
           refused: report.refused.length,
           noVerdictCaptureTruncated: noVerdict,
+          primaryScanHolds,
           written: report.written.length,
           publishable: report.publishable.length,
         },

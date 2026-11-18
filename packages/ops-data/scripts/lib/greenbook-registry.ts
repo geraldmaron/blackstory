@@ -114,6 +114,7 @@ export function isRestatedListing(input: {
   readonly impactStatement?: string | undefined;
   readonly claims: readonly { readonly object: unknown }[];
 }): boolean {
+  if (requiresPrimaryScanReview(input.provenance)) return false;
   const facts = listingFactsFromRow(input.displayName, input.provenance);
   return (
     input.summary.trim() === listingSummary(facts) &&
@@ -130,4 +131,9 @@ export function listingCitation(year: number): { citationSource: string; citatio
     citationSource: 'New York Public Library',
     citationLabel: `Negro Motorist Green Book, ${year} edition`,
   };
+}
+
+/** A source discrepancy is not cleared by re-matching the same derived registry. */
+export function requiresPrimaryScanReview(provenance: Readonly<Record<string, unknown>>): boolean {
+  return Object.prototype.hasOwnProperty.call(provenance, 'primaryScanCorrection');
 }
