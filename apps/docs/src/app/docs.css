@@ -1,13 +1,13 @@
 /**
  * BlackStory docs site tokens and layout.
- * Brand kit: archive paper / black ink, copper accent, flat matte, radii 8/16/28.
- * No gradients, shadows, glows, or ornamental motion.
+ * Values mirror the main site (packages/ui/src/styles/tokens.css): paper and ink grounds, copper
+ * accent, radii 8/14/28, Schibsted at 800/700 for headlines. Kept as a local copy because this
+ * app is a standalone static export.
  */
 
 :root {
   color-scheme: light dark;
   --ds-ink: #0a0a0a;
-  --ds-charcoal: #161616;
   --ds-paper: #f4efe5;
   --ds-surface: #fbf8f2;
   --ds-copper: #b86b2a;
@@ -15,9 +15,9 @@
   --ds-stone: #6d675f;
   --ds-rule: #d7d0c4;
   --ds-radius-sm: 8px;
-  --ds-radius-md: 16px;
+  --ds-radius-md: 14px;
   --ds-radius-lg: 28px;
-  --ds-canvas: var(--ds-paper);
+  --ds-canvas: #f8f4ec;
   --ds-raised: var(--ds-surface);
   --ds-fg: var(--ds-ink);
   --ds-muted: var(--ds-stone);
@@ -26,7 +26,7 @@
   --ds-hairline: var(--ds-rule);
   --ds-sidebar-width: 17.5rem;
   --ds-header-height: 3.75rem;
-  --ds-focus: var(--ds-copper);
+  --ds-focus: var(--ds-ink);
 }
 
 /* The toggle decides native widgets and scrollbars too, not the OS. */
@@ -36,14 +36,14 @@ html[data-theme='light'] {
 
 html[data-theme='dark'] {
   color-scheme: dark;
-  --ds-canvas: var(--ds-ink);
-  --ds-raised: var(--ds-charcoal);
+  --ds-canvas: #131110;
+  --ds-raised: #1b1917;
   --ds-fg: var(--ds-paper);
-  --ds-muted: #a39e95;
+  --ds-muted: #bdb5a9;
   --ds-accent: #d07a32;
   --ds-accent-graphic: #d07a32;
-  --ds-hairline: #2a2a2a;
-  --ds-focus: #d07a32;
+  --ds-hairline: #2c2823;
+  --ds-focus: var(--ds-paper);
 }
 
 *,
@@ -68,7 +68,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--ds-focus);
+  outline: 3px solid var(--ds-focus);
   outline-offset: 2px;
 }
 
@@ -261,8 +261,8 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0.4rem 0.65rem;
   border: 1px solid var(--ds-hairline);
   border-radius: var(--ds-radius-sm);
@@ -284,7 +284,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
 
 .search-wrap input {
   width: 100%;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0.45rem 0.85rem;
   border: 1px solid var(--ds-hairline);
   border-radius: var(--ds-radius-lg);
@@ -401,7 +401,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
   margin: 0 0 1rem;
   font-family: var(--ds-font-display), sans-serif;
   font-size: clamp(2.2rem, 5vw, 3.4rem);
-  font-weight: 600;
+  font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -491,7 +491,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
 
 .stat .v {
   font-family: var(--ds-font-display), sans-serif;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.05rem;
   line-height: 1.3;
 }
@@ -544,7 +544,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
 .section-title {
   flex: 1;
   font-family: var(--ds-font-display), sans-serif;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.15rem;
 }
 
@@ -597,7 +597,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
   margin: 0 0 0.4rem;
   font-family: var(--ds-font-display), sans-serif;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .feature p {
@@ -610,7 +610,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
 .prose h2,
 .prose h3 {
   font-family: var(--ds-font-display), sans-serif;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.01em;
 }

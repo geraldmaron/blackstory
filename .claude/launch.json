@@ -4,7 +4,10 @@
     {
       "name": "web",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["run", "dev:web"],
+      "runtimeArgs": [
+        "run",
+        "dev:web"
+      ],
       "port": 3048
     },
     {
@@ -22,9 +25,26 @@
     {
       "name": "design-mocks",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4173", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4173",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 4173,
       "url": "http://localhost:4173"
+    },
+    {
+      "name": "docs",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "apps/docs",
+        "run",
+        "dev"
+      ],
+      "port": 3050
     }
   ]
 }
