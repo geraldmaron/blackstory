@@ -630,3 +630,24 @@ export function canonicalPathForLegacy(pathname: string): string | null {
 export function isLegacyPath(pathname: string): boolean {
   return canonicalPathForLegacy(pathname) !== null;
 }
+
+/**
+ * Story collections that are their own destination rather than part of Stories, keyed by the
+ * story projection's `collection.id`. A set of uniform entries with a natural order (the
+ * presidents, by term) is browsed, not read start to finish, so its entries live under the
+ * collection's own path. Web routing, the public API's `webPath` and native routing all read this
+ * one table. The slug namespace is shared, so a member has exactly one canonical address.
+ */
+export const STORY_COLLECTION_PATHS: Readonly<Record<string, string>> = Object.freeze({
+  presidents: '/presidents',
+});
+
+/** The base path a story lives under: its collection's own path, or `/stories`. */
+export function storyBasePathFor(collectionId: string | undefined): string {
+  return (collectionId !== undefined && STORY_COLLECTION_PATHS[collectionId]) || '/stories';
+}
+
+/** The one canonical site path for a story or collection entry. */
+export function storyPath(slug: string, collectionId?: string): string {
+  return `${storyBasePathFor(collectionId)}/${slug}`;
+}

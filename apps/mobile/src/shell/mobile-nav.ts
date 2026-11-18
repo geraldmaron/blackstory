@@ -89,9 +89,11 @@ type MoreRowPresentation = {
 };
 
 const MORE_PRESENTATION: Readonly<Record<string, MoreRowPresentation>> = Object.freeze({
-  // No native screen: the row opens the web list. The phone has no live story data (its Stories
-  // tab reads the bundled `content-catalog.ts`), so there is nothing native to route to yet.
-  presidents: { line: 'Every president, in order, with the sources', icon: 'institution' },
+  presidents: {
+    line: 'Every president, in order, with the sources',
+    route: '/presidents',
+    icon: 'institution',
+  },
   law: { line: 'Statutes and rulings, in plain language', route: '/law', icon: 'law' },
   data: { line: 'National series with their sources attached', route: '/data' },
   lives: { line: 'One life question, followed across the decades' },

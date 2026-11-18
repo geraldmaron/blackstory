@@ -10,6 +10,8 @@ import {
   handleHealth,
   handleMap,
   handleSearch,
+  handleStories,
+  handleStory,
   handleVectorSearch,
   type ApiRequest,
   type HandlerDeps,
@@ -17,6 +19,7 @@ import {
 import { errorResponse, type ApiResponse } from './responses.js';
 
 const ENTITY_PATH = /^\/v1\/entity\/([^/]+)$/;
+const STORY_PATH = /^\/v1\/stories\/([^/]+)$/;
 
 export async function dispatch(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
   // Only GET/HEAD are served — this is a read surface (docs/decisions-carryover.md, "Service
@@ -41,6 +44,8 @@ export async function dispatch(request: ApiRequest, deps: HandlerDeps): Promise<
       return handleVectorSearch(request, deps);
     case '/v1/map':
       return handleMap(request, deps);
+    case '/v1/stories':
+      return handleStories(request, deps);
     default:
       break;
   }
@@ -48,6 +53,11 @@ export async function dispatch(request: ApiRequest, deps: HandlerDeps): Promise<
   const entityMatch = ENTITY_PATH.exec(request.path);
   if (entityMatch?.[1]) {
     return handleEntity(request, decodeSegment(entityMatch[1]), deps);
+  }
+
+  const storyMatch = STORY_PATH.exec(request.path);
+  if (storyMatch?.[1]) {
+    return handleStory(request, decodeSegment(storyMatch[1]), deps);
   }
 
   return notFound(request);

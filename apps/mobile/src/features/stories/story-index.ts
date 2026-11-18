@@ -1,49 +1,26 @@
 /**
- * Story-shaped catalog helpers: the featured band, the compact index, and story routing.
+ * Story list helpers over the live `/v1/stories` list.
  *
- * There used to be three narrative partitions (`history`, `topics`, `myths`) and a
- * `LONGFORM_SECTIONS` list that named them. There is one now, and the distinction that mattered
- * — a myth correction reads differently from a chapter — survives as the entry's `format`.
+ * The phone mirrors the site's addresses: a story lives at `/stories/{slug}`, and a collection
+ * that is its own destination (the presidents) at its own path, from the one shared table
+ * (`storyPath` in `@repo/public-contracts/destinations`, carried on each item as `webPath`).
  */
-import type { ContentEntry, StoryFormat } from '@/features/content';
-import { CONTENT_CATALOG } from '@/features/content';
+import type { StoryListItemV1 } from '@repo/public-contracts/v1/story';
+import { storyBasePathFor } from '@repo/public-contracts/destinations';
 
-/** Every narrative entry, newest first. */
-export function listStoryEntries(): readonly ContentEntry[] {
-  return CONTENT_CATALOG.filter((entry) => entry.section === 'stories').sort((a, b) =>
-    b.page.publishedAt.localeCompare(a.page.publishedAt),
-  );
+/** The native route for a story: the same path the site uses. */
+export function storyHref(story: Pick<StoryListItemV1, 'webPath'>): string {
+  return story.webPath;
 }
 
-/** Narrative entries of one editorial format, newest first. */
-export function listStoriesOfFormat(format: StoryFormat): readonly ContentEntry[] {
-  return listStoryEntries().filter((entry) => entry.format === format);
+/** True when the item belongs on the Stories tab rather than on its collection's own screen. */
+export function listedOnStories(story: Pick<StoryListItemV1, 'collection'>): boolean {
+  return storyBasePathFor(story.collection?.id) === '/stories';
 }
 
-/**
- * The featured story: the newest Chapter, falling back to the newest entry of any format.
- *
- * Deliberately kind-aware, and the same rule the web Stories index uses. Straight newest-first
- * made the flagship of the whole surface whichever short piece happened to publish last.
- */
+/** The featured story: the newest chapter, falling back to the newest story of any format. */
 export function pickFeaturedStory(
-  entries: readonly ContentEntry[] = listStoryEntries(),
-): ContentEntry | undefined {
-  if (entries.length === 0) return undefined;
-  return entries.find((entry) => entry.format === 'chapter') ?? entries[0];
-}
-
-/** How a format is named to a reader. Never the raw token. */
-export const STORY_FORMAT_LABELS: Readonly<Record<StoryFormat, string>> = Object.freeze({
-  chapter: 'Chapter',
-  entry: 'Entry',
-  myth: 'Correction',
-});
-
-export function storyFormatLabel(entry: ContentEntry): string {
-  return entry.format ? STORY_FORMAT_LABELS[entry.format] : 'Story';
-}
-
-export function storyHref(entry: ContentEntry): `/stories/${string}` {
-  return `/stories/${entry.page.slug}`;
+  stories: readonly StoryListItemV1[],
+): StoryListItemV1 | undefined {
+  return stories.find((story) => story.format === 'chapter') ?? stories[0];
 }

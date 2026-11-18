@@ -12,6 +12,7 @@ import {
 import type { CanonicalSearchQuery } from '@repo/security';
 import { normalizeSearchText } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
+import { storyV1Schema, type StoryV1 } from '@repo/public-contracts/v1/story';
 import {
   confidenceTierFromEvidenceInputs,
   recordConfidenceTier,
@@ -59,6 +60,8 @@ export interface PublicDataAccess {
    * adapter scan ceilings; callers must still validate the map payload against MapSourceV1.
    */
   listEntities(releaseId: string): Promise<readonly EntityV1[]>;
+  /** Every published story in the release, on the wire contract, newest first. */
+  listStories(releaseId: string): Promise<readonly StoryV1[]>;
   /** A bounded search page over the active release for an already-validated canonical query. */
   search(
     canonical: CanonicalSearchQuery,
@@ -103,6 +106,8 @@ export type InMemoryPublicDataOptions = {
    * chain is never walked here either.
    */
   readonly redirects?: Readonly<Record<string, string>>;
+  /** Published stories for this release, already on the wire contract. */
+  readonly stories?: readonly StoryV1[];
 };
 
 export function createInMemoryPublicDataAccess(
@@ -113,6 +118,7 @@ export function createInMemoryPublicDataAccess(
   for (const entity of options.entities) {
     byId.set(entity.id, entityV1Schema.parse(entity));
   }
+  const stories = (options.stories ?? []).map((story) => storyV1Schema.parse(story));
 
   return {
     async getReleasePointer() {
@@ -130,6 +136,10 @@ export function createInMemoryPublicDataAccess(
 
     async listEntities(_releaseId) {
       return [...byId.values()];
+    },
+
+    async listStories(_releaseId) {
+      return stories;
     },
 
     async search(canonical) {
@@ -300,6 +310,8 @@ export type PublicDataAccessReaders = {
   readonly readEntityRedirect: (releaseId: string, entityId: string) => Promise<string | undefined>;
   /** All published entities for map FeatureCollection construction. */
   readonly readEntities: (releaseId: string) => Promise<readonly EntityV1[]>;
+  /** All published stories, on the wire contract. */
+  readonly readStories: (releaseId: string) => Promise<readonly StoryV1[]>;
   readonly readSearchPage: (
     canonical: CanonicalSearchQuery,
     options: { readonly releaseId: string },
@@ -325,6 +337,10 @@ export function createPublicDataAccessFromReaders(
     async listEntities(releaseId) {
       const entities = await readers.readEntities(releaseId);
       return entities.map((entity) => entityV1Schema.parse(entity));
+    },
+    async listStories(releaseId) {
+      const stories = await readers.readStories(releaseId);
+      return stories.map((story) => storyV1Schema.parse(story));
     },
     async search(canonical, options) {
       return readers.readSearchPage(canonical, options);

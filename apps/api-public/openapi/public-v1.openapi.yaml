@@ -174,6 +174,81 @@ paths:
           $ref: '#/components/responses/RateLimited'
         '503':
           $ref: '#/components/responses/UpstreamUnavailable'
+  /v1/stories:
+    get:
+      operationId: listStories
+      tags: [corpus]
+      summary: Every published story in the active release, newest first
+      description: |
+        List items only (no body, sources or byline). `webPath` is the story's canonical site
+        path: `/stories/{slug}`, or a collection's own path such as `/presidents/{slug}`.
+        Static read (`entityRetrieval` quota).
+      parameters:
+        - $ref: '#/components/parameters/XBlackStoryClient'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: Story list for the active release
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'public, max-age=60, stale-while-revalidate=300' }
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoriesResponseV1'
+              examples:
+                stories:
+                  $ref: '#/components/examples/StoriesActiveRelease'
+        '304':
+          description: Not modified
+        '426':
+          $ref: '#/components/responses/ClientVersionUnsupported'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/UpstreamUnavailable'
+  /v1/stories/{slug}:
+    get:
+      operationId: getStory
+      tags: [corpus]
+      summary: One published story, with its body as parsed blocks and inline runs
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+            maxLength: 200
+        - $ref: '#/components/parameters/XBlackStoryClient'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: One story on the reading contract
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'public, max-age=60, stale-while-revalidate=300' }
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoryV1'
+              examples:
+                president:
+                  $ref: '#/components/examples/StoryPresident'
+        '304':
+          description: Not modified
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '426':
+          $ref: '#/components/responses/ClientVersionUnsupported'
+        '429':
+          $ref: '#/components/responses/RateLimited'
   /v1/search:
     get:
       operationId: search
@@ -333,6 +408,19 @@ components:
         Public entity projection — no raw scores, no residential coordinates, no internal review fields.
         Full shape enforced by `@repo/public-contracts/v1/entity`.
       additionalProperties: false
+    StoriesResponseV1:
+      type: object
+      description: |
+        `{ releaseId, stories: StoryListItemV1[] }`, at most 2,000 items.
+        Full shape enforced by `@repo/public-contracts/v1/story`.
+    StoryV1:
+      type: object
+      description: |
+        A list item plus `body` (blocks: heading, paragraph, list, quote, dispute, image, table,
+        record, webOnly, divider), `references` and `contributors`. Prose arrives as flat runs
+        (`text`, `cite` with its source number, `break`); clients never parse markup. Blocks only
+        the site can draw are `webOnly` with a caption. Full shape enforced by
+        `@repo/public-contracts/v1/story`.
     SearchResponseV1:
       type: object
       required: [results, facets, totalMatched, hasMore]
@@ -469,6 +557,10 @@ components:
       externalValue: ../fixtures/redacted-response-examples/entity-200.json
     MapSourceActiveRelease:
       externalValue: ../fixtures/redacted-response-examples/map-200.json
+    StoriesActiveRelease:
+      externalValue: ../fixtures/redacted-response-examples/stories-200.json
+    StoryPresident:
+      externalValue: ../fixtures/redacted-response-examples/story-200.json
     SearchDunbar:
       externalValue: ../fixtures/redacted-response-examples/search-200.json
     ErrorNotFound:

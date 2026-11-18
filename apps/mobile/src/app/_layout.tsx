@@ -33,6 +33,7 @@ function EditionStack() {
       />
       <Stack.Screen name="books" options={{ headerShown: false, title: 'Banned books' }} />
       <Stack.Screen name="law" options={{ headerShown: false, title: 'Law' }} />
+      <Stack.Screen name="presidents" options={{ headerShown: false, title: 'Presidents' }} />
       <Stack.Screen
         name="memorial"
         options={{

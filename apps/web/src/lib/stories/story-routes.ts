@@ -1,30 +1,29 @@
 /**
- * Where a published story lives on the site.
- *
- * Most stories live at `/stories/{slug}`. A collection listed here is its own destination instead:
- * a set of uniform, comparable entries with a natural order (the presidents, by term) is a
- * collection a reader browses, not a story they read start to finish, so its entries live under
- * the collection's own path. The slug namespace stays shared, so a member is reachable at exactly
- * one address and the other one 308s to it.
+ * Where a published story lives on the site: `/stories/{slug}`, or a collection's own path when
+ * the collection is its own destination (the presidents). The table is shared with the public API
+ * and the phone (`STORY_COLLECTION_PATHS` in `@repo/public-contracts/destinations`); this module
+ * only adapts it to the web's story documents.
  */
 import type { PublicStoryListItemDoc } from '@repo/schemas';
+import {
+  STORY_COLLECTION_PATHS,
+  storyBasePathFor,
+  storyPath,
+} from '@repo/public-contracts/destinations';
 
 /** Collection id -> the collection's own path. */
-export const COLLECTION_ROUTES: Readonly<Record<string, string>> = Object.freeze({
-  presidents: '/presidents',
-});
+export const COLLECTION_ROUTES = STORY_COLLECTION_PATHS;
 
 type Routable = Pick<PublicStoryListItemDoc, 'slug' | 'collection'>;
 
 /** The base path an item lives under: a collection's path, or `/stories`. */
 export function storyBasePath(item: Routable): string {
-  const id = item.collection?.id;
-  return (id !== undefined && COLLECTION_ROUTES[id]) || '/stories';
+  return storyBasePathFor(item.collection?.id);
 }
 
 /** The one canonical address for a story or collection entry. */
 export function storyHref(item: Routable): string {
-  return `${storyBasePath(item)}/${item.slug}`;
+  return storyPath(item.slug, item.collection?.id);
 }
 
 /** True when an item is listed on `/stories` rather than on its own collection's page. */
