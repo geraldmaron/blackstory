@@ -13,7 +13,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
-  buildKindChips,
   buildStoriesFront,
   filterItems,
   hasActiveNarrowing,
@@ -252,42 +251,6 @@ describe('/stories · sorting', () => {
     const original = [...unordered];
     sortItems(unordered, 'title');
     assert.deepEqual(unordered, original);
-  });
-});
-
-describe('/stories · format segments', () => {
-  const items = [
-    item({ id: 'c1', slug: 'c1', format: 'chapter', eraLabel: '1911–present', placeLabel: 'US' }),
-    item({
-      id: 'p1',
-      slug: 'p1',
-      format: 'entry',
-      eraLabel: '1789–1797',
-      placeLabel: 'US',
-      tags: ['Founding era'],
-      collection: { id: 'presidents', label: 'Presidential records', position: 1 },
-    }),
-  ];
-
-  it('counts each format, and drops a chip with no entries behind it', () => {
-    const chips = buildKindChips(items, EMPTY);
-    assert.deepEqual(
-      chips.map((chip) => [chip.label, chip.count]),
-      [
-        ['All', 2],
-        ['Chapters', 1],
-        ['Entries', 1],
-      ],
-    );
-    // EMPTY is the All view, so All is the engaged chip.
-    assert.equal(chips[0]?.active, true);
-    assert.equal(chips[1]?.active, false);
-  });
-
-  it('marks the engaged chip as current for assistive technology', () => {
-    const chips = buildKindChips(items, { ...EMPTY, format: 'entry' });
-    assert.equal(chips.find((chip) => chip.label === 'Entries')?.active, true);
-    assert.equal(chips.find((chip) => chip.label === 'All')?.active, false);
   });
 });
 

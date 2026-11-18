@@ -15,9 +15,10 @@
  * silently the moment a paragraph was inserted above them, and inserting paragraphs is what a
  * rewrite of this page does.
  *
- * Contribution cards (`take-part`) are generated from `lib/nav/destination-registry.ts`. The full
- * room catalogue lives on `/rooms`; About hands off there instead of re-listing every room. The
- * previous hardcoded list pointed twice at `/history`, which has been a redirect for months.
+ * About is the hub for the trust pages and forms: both lists (`check`, `take-part`) are generated
+ * from `lib/nav/destination-registry.ts`. The collections live on `/collections`; About hands off
+ * there instead of re-listing them. The previous hardcoded list pointed twice at `/history`,
+ * which has been a redirect for months.
  */
 import { MAKER } from '@repo/config';
 import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../methodology/methodology-copy';
@@ -98,12 +99,12 @@ export const ABOUT_SOURCE_LIBRARY_HANDOFF = {
   label: 'Where the evidence comes from',
 } as const;
 
-/** Handoff from About to the published room list. The catalogue lives on `/rooms`, not here. */
-export const ABOUT_ROOMS_HANDOFF = {
-  href: '/rooms',
-  label: 'Browse the rooms',
-  lede: 'Law, data, lives across the decades, the source library, the memorial wall, the methods behind each record, and the ways to add what is missing all live on one page.',
-  line: 'If a room is not on that list, it is not finished.',
+/** Handoff from About to the collections. The list lives on `/collections`, not here. */
+export const ABOUT_COLLECTIONS_HANDOFF = {
+  href: '/collections',
+  label: 'Browse the collections',
+  lede: 'Past the map and the records, the archive keeps sets you read in their own order, from every president on the record to the laws, the data, lives decade by decade, banned books and the memorial wall.',
+  line: 'If a collection is not on that list, it is not finished.',
 } as const;
 
 /**

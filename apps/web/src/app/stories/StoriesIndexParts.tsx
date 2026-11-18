@@ -7,14 +7,14 @@
  */
 import React from 'react';
 import type { PublicStoryListItemDoc } from '@repo/schemas';
-import { FilterButton, Segmented, buttonClassName } from '@repo/ui';
+import { FilterButton, buttonClassName } from '@repo/ui';
 import { StoryImage } from '../../components/story/StoryImage';
 import { storyImageSrc } from '../../components/story/story-image';
 import { coverDek } from '../../components/story/story-text';
 
 void React;
 
-const href = (item: PublicStoryListItemDoc) => `/stories/${item.slug}`;
+import { storyHref as href } from '../../lib/stories/story-routes';
 
 function readLabel(item: PublicStoryListItemDoc): string {
   return item.format === 'entry' ? 'Read the entry' : 'Read the chapter';
@@ -179,35 +179,14 @@ function CheckGlyph() {
 }
 
 /**
- * The one toolbar: All | Chapters | Entries, then Sort. Both are links (the state is the URL), and
- * the Sort menu is a native popover, so the page narrows with JavaScript off.
+ * The one toolbar: Sort. Every option is a link (the state is the URL), and the menu is a native
+ * popover, so the page narrows with JavaScript off. The editorial format is not a reader's filter.
  */
-export function StoriesToolbar({
-  formats,
-  format,
-  sort,
-}: {
-  readonly formats: readonly {
-    readonly value: string;
-    readonly label: string;
-    readonly href: string;
-  }[];
-  readonly format: string;
-  readonly sort: readonly SortOption[];
-}) {
+export function StoriesToolbar({ sort }: { readonly sort: readonly SortOption[] }) {
   const current = sort.find((option) => option.current) ?? sort[0];
   return (
     <div className="ds-stories-toolbar">
       <div className="ds-stories-toolbar__controls">
-        <Segmented
-          label="Show"
-          value={format}
-          options={formats.map((option) => ({
-            value: option.value,
-            label: option.label,
-            href: option.href,
-          }))}
-        />
         <FilterButton
           className="ds-stories-toolbar__sort"
           popoverTarget={SORT_MENU_ID}

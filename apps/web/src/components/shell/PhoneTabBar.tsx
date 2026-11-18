@@ -1,10 +1,7 @@
 /**
  * The phone's primary navigation: a tab bar along the bottom edge with the same four tabs on
- * every page, Map, Records, Stories and More (the Rooms hub). Shown below 48rem only
- * (tab-bar.css); from 48rem up the header carries the same tabs.
- *
- * Every tab is a plain link. More goes to `/rooms`, the one index of everything else, rather than
- * opening a second copy of it in a sheet.
+ * every page, Map, Records, Stories and Collections. Shown below 48rem only (tab-bar.css); from
+ * 48rem up the header carries the same tabs. Every tab is a plain link.
  */
 'use client';
 

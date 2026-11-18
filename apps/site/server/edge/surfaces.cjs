@@ -10,7 +10,8 @@ const { isPublicRecordPath, normalizeQueryString } = require('./query-normalizat
 const SURFACE_CLASS_BY_PATH = new Map([
   ['/', 'door'],
   ['/explore', 'door'],
-  ['/rooms', 'reading'],
+  ['/collections', 'reading'],
+  ['/presidents', 'reading'],
   ['/records', 'reading'],
   ['/stories', 'reading'],
   ['/books', 'reading'],
@@ -35,6 +36,7 @@ const SURFACE_CLASS_BY_PATH = new Map([
 const SURFACE_CLASS_PREFIXES = [
   ['/corrections/status', 'utility'],
   ['/stories/', 'reading'],
+  ['/presidents/', 'reading'],
   ['/lives/', 'reading'],
   ['/place/', 'record'],
   ['/invention/', 'record'],

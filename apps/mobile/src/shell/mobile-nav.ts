@@ -37,8 +37,8 @@ export type MobileTabDefinition = {
 /**
  * The bottom tab bar: the three product axes a phone navigates between, plus More.
  *
- * Rooms is the web name for the hub; on a phone the same job is the platform's own `More`, and
- * forcing the Rooms metaphor into a bottom tab would name a room a reader cannot walk into.
+ * Collections is the web's fourth tab; on a phone that job, plus the trust pages and forms, is the
+ * platform's own `More`.
  * Search is not a tab: it is a capability of Records, reachable from Explore and from the bar.
  */
 export const MOBILE_PRIMARY_TABS: readonly MobileTabDefinition[] = [
@@ -89,6 +89,9 @@ type MoreRowPresentation = {
 };
 
 const MORE_PRESENTATION: Readonly<Record<string, MoreRowPresentation>> = Object.freeze({
+  // No native screen yet: the row opens the web list. Each entry still opens natively from a
+  // story link, because the phone serves entries at `/stories/{slug}`.
+  presidents: { line: 'Every president, in order, with the sources', icon: 'institution' },
   law: { line: 'Statutes and rulings, in plain language', route: '/law', icon: 'law' },
   data: { line: 'National series with their sources attached', route: '/data' },
   lives: { line: 'One life question, followed across the decades' },
@@ -145,14 +148,14 @@ const section = (
 });
 
 /**
- * The More ledger: the same supporting destinations the web Rooms hub holds, grouped the same
- * way, rendered as native rows rather than as a card grid squeezed onto a phone.
+ * The More ledger: the web's collections, then the trust pages and forms About lists, grouped the
+ * way the web footer groups them, rendered as native rows rather than cards squeezed onto a phone.
  *
  * The product axes are deliberately absent — a tab duplicated inside More is a second, worse
  * route to somewhere the tab bar already goes.
  */
 export const MOBILE_MORE_SECTIONS: readonly MobileMoreSection[] = [
-  section('read', 'Read deeper', 'Reference', 'read'),
+  section('read', 'Collections', 'Read in order', 'read'),
   section('trust', 'Trust & About', 'Method & corrections', 'trust'),
   section('take-part', 'Take part', 'Community', 'participate'),
   section('policies', 'Policies', 'Product policy', 'policy'),
@@ -207,12 +210,12 @@ export function nativeLegacyRoutes(): readonly (readonly [string, string])[] {
  * Where a canonical WEB path lands on the phone, when the two platforms name the same job
  * differently.
  *
- * There is exactly one such pair, and it is deliberate: the web hub is `/rooms`, and the phone's
- * version of that job is the platform's own `More`. Forcing "Rooms" into a bottom tab would name
- * a room a reader cannot walk into. Anything not listed here uses the same path on both.
+ * There is exactly one such pair, and it is deliberate: the web hub is `/collections`, and the
+ * phone's version of that job is the platform's own `More`. Anything not listed here uses the same
+ * path on both.
  */
 export const WEB_TO_NATIVE_ROUTE: Readonly<Record<string, `/${string}`>> = Object.freeze({
-  '/rooms': '/more',
+  '/collections': '/more',
 });
 
 /** The native route for a canonical web path. */

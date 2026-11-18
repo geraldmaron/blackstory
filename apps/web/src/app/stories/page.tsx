@@ -1,7 +1,7 @@
 /**
- * Stories index at `/stories`: the long-form publication surface. A story is one published piece,
- * and `format` says under which editorial contract: `chapter` for the era-immersion long-forms,
- * `entry` for short cited entries published in ordered collections.
+ * Stories index at `/stories`: authored pieces with an argument, from era-spanning chapters to
+ * single-subject features. Collections of uniform entries (the presidents) are not listed here;
+ * they live at their own path.
  *
  * Bare `/stories` is an editorial front: the newest chapter edge to edge with its title on an ink
  * panel, the other chapters as tiles with sand and copper captions, then everything else as one
@@ -13,9 +13,9 @@
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { listPublicStoryListItems } from '../../lib/stories/source';
+import { listedOnStories } from '../../lib/stories/story-routes';
 import { Chip, DisplayNumeral, Notice, Sheet, buttonClassName } from '@repo/ui';
 import {
-  buildKindChips,
   buildStoriesFront,
   filterItems,
   hasActiveNarrowing,
@@ -36,7 +36,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/stories',
   title: 'Stories',
   description:
-    'Evidence-led long-form chapters and cited short entries from the BlackStory archive: history pinned to place and record, with every figure and claim cited inline.',
+    'Evidence-led long-form stories from the BlackStory archive: history pinned to place and record, with every figure and claim cited inline.',
 });
 
 type StoriesPageProps = {
@@ -45,7 +45,9 @@ type StoriesPageProps = {
 
 export default async function StoriesIndexPage({ searchParams }: StoriesPageProps) {
   const query = parseStoriesQuery(await searchParams);
-  const { items, source } = await listPublicStoryListItems();
+  const all = await listPublicStoryListItems();
+  const { source } = all;
+  const items = all.items.filter(listedOnStories);
   const filtered = sortItems(filterItems(items, query), query.sort);
   const notice = storiesNotice(source, items.length, filtered.length);
 
@@ -68,11 +70,6 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
     .filter(([, value]) => value.length > 0)
     .map(([key, , label]) => ({ key, label, href: storiesHref({ ...query, [key]: '', page: 1 }) }));
 
-  const formats = buildKindChips(items, query).map((chip) => ({
-    value: chip.label === 'All' ? '' : chip.label === 'Chapters' ? 'chapter' : 'entry',
-    label: `${chip.label} ${chip.count.toLocaleString('en-US')}`,
-    href: chip.href,
-  }));
   const sort = STORY_SORT_KEYS.map((key) => ({
     key,
     label: STORY_SORT_LABELS[key],
@@ -80,10 +77,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
     current: query.sort === key,
   }));
 
-  const toolbar =
-    source === 'live' && items.length > 0 ? (
-      <StoriesToolbar formats={formats} format={query.format} sort={sort} />
-    ) : null;
+  const toolbar = source === 'live' && items.length > 0 ? <StoriesToolbar sort={sort} /> : null;
 
   // The list's own head: what the sheet below holds, with its count as a copper numeral.
   const listed = front ? front.rest.length : filtered.length;

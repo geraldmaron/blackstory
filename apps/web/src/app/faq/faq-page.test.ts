@@ -25,7 +25,7 @@ test('/faq is a registered reading room, not an unclassified route', () => {
   assert.equal(surfaceClassFor('/faq'), 'reading');
   const destination = destinationFor('/faq');
   assert.ok(destination, '/faq has no registry entry, so it is in no reader-facing list');
-  assert.equal(destination.parent, '/rooms');
+  assert.equal(destination.parent, '/about');
   assert.equal(destination.group, 'check');
 });
 

@@ -129,7 +129,7 @@ describe('StoryRecords', () => {
 });
 
 describe('page wiring', () => {
-  const page = readFileSync(new URL('../../app/stories/[slug]/page.tsx', import.meta.url), 'utf8');
+  const page = readFileSync(new URL('./StoryDetail.tsx', import.meta.url), 'utf8');
 
   it('derives links only from storyCitedEntities and captures the read source', () => {
     assert.match(page, /storyCitedEntities\(doc\)/);

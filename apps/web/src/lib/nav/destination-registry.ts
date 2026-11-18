@@ -17,10 +17,10 @@
  * for months after both became permanent redirects, so the top nav on every page pointed into a
  * 308, and the mobile tab bar carried a `History` tab that was a renamed search screen.
  *
- * ONE TABLE, FIVE READERS: the breadcrumb chain, the /rooms hub, the site footer, the command
- * palette's Go section, and the sitemap. `destination-registry.test.ts` fails when a route
- * classified in `surface-classes.ts` has no entry here, which is what makes "a new public route
- * cannot be missing from Rooms" a test rather than a habit.
+ * ONE TABLE, FIVE READERS: the breadcrumb chain, the /collections hub, the site footer, the
+ * command palette's Go section, and the sitemap. `destination-registry.test.ts` fails when a
+ * route classified in `surface-classes.ts` has no entry here, which is what makes "a new public
+ * route cannot be missing from the footer" a test rather than a habit.
  *
  * WHAT IS NOT HERE. Endpoints — redirects, JSON, feeds, crawler files. They render no chrome and
  * are no reader's destination; `ENDPOINT_ROUTES` in `surface-classes.ts` is their list. A route
@@ -40,12 +40,12 @@ import {
 import { CLASSIFIED_PATHS } from './surface-classes';
 
 /**
- * The card groups Rooms renders, in order, plus `find`.
+ * The footer's groups, in order, plus `find`.
  *
- * `find` is the four product axes and the door. They are deliberately NOT cards in Rooms: Rooms
- * lists the rooms. Home is the door, Explore is the map, Stories and Records are the archive's
- * own two axes. Listing an axis as an ordinary room card is how Records once read as a supporting
- * page rather than as one of the ways into the product.
+ * `find` is the four product axes and the door. `read` is the collections the /collections hub
+ * lists; `check` and `take-part` are the trust pages and forms that About lists. Listing an axis
+ * as an ordinary row is how Records once read as a supporting page rather than as one of the
+ * ways into the product, so `find` is never a row in either list.
  */
 export const DESTINATION_GROUPS = ['find', 'read', 'check', 'take-part'] as const;
 export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
@@ -61,13 +61,13 @@ const GROUP_FAMILY: Readonly<Record<DestinationGroup, DestinationFamily>> = Obje
 /** The heading each group renders under in the footer. `find` has none. */
 export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> = Object.freeze({
   find: null,
-  read: 'Read deeper',
+  read: 'Collections',
   check: 'How it decides',
   'take-part': 'Add to it',
 });
 
-/** Rooms' card groups, in render order. The axes are not among them. */
-export const ROOMS_CARD_GROUPS: readonly DestinationGroup[] = ['read', 'check', 'take-part'];
+/** The browsable groups, in render order. The axes are not among them. */
+export const BROWSE_GROUPS: readonly DestinationGroup[] = ['read', 'check', 'take-part'];
 
 /**
  * What the web surface adds to a semantic destination. Keyed by the catalog's stable id, so a
@@ -80,7 +80,7 @@ type WebPresentation = {
    */
   readonly cardTitle?: string;
   /**
-   * What sort of thing this room is, for the About page's room cards.
+   * What sort of thing this destination is, for the About page's cards.
    */
   readonly kind?: string;
   /**
@@ -116,8 +116,12 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     kind: 'INDEX',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
-  rooms: { kind: 'HUB', crawl: { changeFrequency: 'monthly', priority: 0.7 } },
+  collections: { kind: 'HUB', crawl: { changeFrequency: 'monthly', priority: 0.7 } },
 
+  presidents: {
+    kind: 'SERIES',
+    crawl: { changeFrequency: 'weekly', priority: 0.7 },
+  },
   law: {
     kind: 'REFERENCE',
     crawl: { changeFrequency: 'weekly', priority: 0.7 },
@@ -175,8 +179,8 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     crawl: { changeFrequency: 'monthly', priority: 0.4 },
   },
 
-  // Product policy. Reachable from the footer's policy row and from More on native; not a Rooms
-  // card, because a privacy notice is not a room a reader browses into.
+  // Product policy. Reachable from the footer's policy row and from More on native; not a
+  // browsable row, because a privacy notice is not a page a reader browses into.
   privacy: { crawl: { changeFrequency: 'monthly', priority: 0.3 } },
   // `terms` carried no `crawl` while `/terms` existed only as a bundled native screen: giving it
   // one would have advertised a web route that 404s. The web page is built, so it is sitemapped
@@ -207,10 +211,10 @@ const FAMILY_GROUP = new Map<DestinationFamily, DestinationGroup>(
 /**
  * Every rendered public route, in the catalog's product order.
  *
- * A destination's `group` is derived from its family, so a route joins Rooms, the footer and the
- * palette by being classified once rather than by being remembered in four places. A family with
- * no rendered group (`policy`, `record`, `utility`) yields no group, which is what keeps a
- * privacy notice and a fixture gallery off the room cards.
+ * A destination's `group` is derived from its family, so a route joins Collections or About, the
+ * footer and the palette by being classified once rather than by being remembered in four places.
+ * A family with no rendered group (`policy`, `record`, `utility`) yields no group, which is what
+ * keeps a privacy notice and a fixture gallery off every list.
  */
 const DESTINATIONS: readonly Destination[] = allSemanticDestinations().map((semantic) => {
   const presentation = WEB_PRESENTATION[semantic.id] ?? {};
@@ -246,11 +250,12 @@ const DESTINATION_BY_ID: ReadonlyMap<string, Destination> = new Map(
 export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/corrections/status/', '/corrections'],
   ['/stories/', '/stories'],
+  ['/presidents/', '/presidents'],
   // A record's catalog is Records, on both the entity and the place address. It used to be the
   // door, on the theory that a reader most likely arrived from the map — but a breadcrumb states
   // where a page SITS, not how the reader got there, and the way back to a map selection is
-  // return state, not hierarchy. With Records a top-level axis rather than a room inside Rooms,
-  // the catalog that lists a record is the honest parent.
+  // return state, not hierarchy. With Records a top-level axis, the catalog that lists a record
+  // is the honest parent.
   ['/place/', '/records'],
   ['/invention/', '/records'],
   ['/entity/', '/records'],
@@ -288,12 +293,11 @@ export function destinationsInGroup(group: DestinationGroup): readonly Destinati
 }
 
 /**
- * The one room list: the same three groups as `/rooms` and the editorial footer columns.
- * About hands off here rather than re-listing every room. Explore, Records, and Rooms itself
- * stay off this list; Find chrome lists them separately.
+ * Every browsable page off the axes: the same three groups as the editorial footer columns.
+ * The axes themselves stay off this list; Find chrome lists them separately.
  */
 export function browsableDestinations(): readonly Destination[] {
-  return ROOMS_CARD_GROUPS.flatMap((group) => destinationsInGroup(group));
+  return BROWSE_GROUPS.flatMap((group) => destinationsInGroup(group));
 }
 
 /** The card title: the verb form when there is one, the crumb label otherwise. */
@@ -318,7 +322,7 @@ export function parentPathFor(pathname: string): string | null {
 /**
  * The footer columns, derived rather than authored.
  *
- * Find (Home / Explore / Rooms / Records) leads; the three editorial groups follow. A route
+ * Find (the four axes) leads; the three editorial groups follow. A route
  * joins the footer by having a group, and leaves it by losing one — so `/history` cannot linger
  * after it becomes a redirect.
  */
@@ -343,13 +347,13 @@ export function footerColumns(): readonly FooterColumn[] {
     items: groups.flatMap((group) => destinationsInGroup(group)).map(footerItem),
   });
 
-  /* Find stays in the footer and the command bar; Rooms / browsableDestinations stay editorial. */
+  /* Find stays in the footer and the command bar; browsableDestinations stays editorial. */
   return [
     {
       title: 'Find',
       items: destinationsInGroup('find').map(footerItem),
     },
-    column(GROUP_HEADINGS.read ?? 'Where to begin', ['read']),
+    column(GROUP_HEADINGS.read ?? 'Collections', ['read']),
     column(GROUP_HEADINGS.check ?? 'How it decides', ['check']),
     column(GROUP_HEADINGS['take-part'] ?? 'Add to it', ['take-part']),
   ];

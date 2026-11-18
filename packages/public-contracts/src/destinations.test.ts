@@ -63,11 +63,11 @@ test('the parent chain terminates at the door with no cycles', () => {
 test('primary navigation is the four product axes, in order', () => {
   assert.deepEqual(
     primaryAxes().map((destination) => destination.label),
-    ['Map', 'Stories', 'Records', 'Rooms'],
+    ['Map', 'Stories', 'Records', 'Collections'],
   );
   assert.deepEqual(
     primaryAxes().map((destination) => destination.path),
-    ['/explore', '/stories', '/records', '/rooms'],
+    ['/explore', '/stories', '/records', '/collections'],
   );
 });
 
@@ -75,8 +75,8 @@ test('the door is not a primary nav item — it is reached through the brand loc
   assert.ok(!primaryAxes().some((destination) => destination.path === '/'));
 });
 
-test('Stories and Records are top-level axes, not children of Rooms', () => {
-  // Modeling them under Rooms was the old Library hierarchy surviving a rename: it told a
+test('Stories and Records are top-level axes, not children of Collections', () => {
+  // Modeling them under the hub was the old Library hierarchy surviving a rename: it told a
   // reader the archive index was a supporting page rather than a way into the product.
   for (const path of ['/stories', '/records']) {
     const destination = semanticDestinationByPath(path);
@@ -114,9 +114,21 @@ test('every legacy alias resolves to a canonical destination in one hop', () => 
 test('subtree aliases cover their children', () => {
   assert.equal(canonicalPathForLegacy('/chapters/tulsa-1921'), '/stories');
   assert.equal(canonicalPathForLegacy('/themes/redlining'), '/stories');
-  assert.equal(canonicalPathForLegacy('/library'), '/rooms');
+  assert.equal(canonicalPathForLegacy('/library'), '/collections');
+  assert.equal(canonicalPathForLegacy('/rooms'), '/collections');
   // `/library` is not a subtree alias, so a child of it is not silently swallowed.
   assert.equal(canonicalPathForLegacy('/library/anything'), null);
+});
+
+test('collections parent to the hub; trust pages and forms parent to About', () => {
+  for (const destination of semanticDestinationsInFamily('read')) {
+    assert.equal(destination.parent, '/collections', destination.id);
+  }
+  for (const family of ['trust', 'participate'] as const) {
+    for (const destination of semanticDestinationsInFamily(family)) {
+      assert.equal(destination.parent, destination.id === 'about' ? '/' : '/about', destination.id);
+    }
+  }
 });
 
 test('myth corrections resolve to Stories, never to Methodology', () => {
@@ -185,10 +197,10 @@ test('an axis destination carries an axis, and a non-axis destination does not',
   }
 });
 
-test('the Rooms families each hold the destinations Rooms groups them under', () => {
+test('each family holds the destinations its group lists', () => {
   assert.deepEqual(
     semanticDestinationsInFamily('read').map((destination) => destination.label),
-    ['Law', 'Data', 'Lives', 'Banned books', 'Memorial'],
+    ['Presidents', 'Law', 'Data', 'Lives', 'Banned books', 'Memorial'],
   );
   assert.deepEqual(
     semanticDestinationsInFamily('trust').map((destination) => destination.label),
@@ -218,11 +230,11 @@ test('Terms sits beside Privacy in the policy family, addressed at its own route
   );
   const terms = semanticDestinationByPath('/terms');
   assert.ok(terms);
-  assert.equal(terms.parent, '/rooms');
+  assert.equal(terms.parent, '/about');
   assert.equal(terms.icon, 'terms');
 });
 
-test('Rooms does not list the primary axes as ordinary rooms', () => {
+test('no family lists a primary axis as an ordinary page', () => {
   const roomFamilies = ['read', 'trust', 'participate'] as const;
   const roomPaths = roomFamilies.flatMap((family) =>
     semanticDestinationsInFamily(family).map((destination) => destination.path),
@@ -237,7 +249,7 @@ test('utility destinations are never browsable', () => {
     assert.equal(
       destination.browsable,
       false,
-      `${destination.id} is utility and must not appear in Rooms`,
+      `${destination.id} is utility and must not be offered for browsing`,
     );
   }
 });

@@ -2,11 +2,11 @@
  * The `/stories` index's pure logic: query parsing, href building, filtering, sorting,
  * windowing, the editorial front and the three notice states.
  *
- * A story is one long-form publication, and `format` says under which editorial contract:
- * `chapter` (era-immersion, prose floor) or `entry` (a short entry — a paragraph of
- * context plus individually cited call-outs). Both live in one index because a reader
- * looking for what the archive says about a subject should not have to know which
- * contract the answer was written under.
+ * A story is one authored piece with an argument: a chapter, a standalone feature, or a member
+ * of a story series. `format` is the editorial contract it was written under and decides which
+ * review gates apply; it is not shown to readers as a filter. Collections of uniform entries (the
+ * presidents) are not stories: they live at their own path (`lib/stories/story-routes.ts`) and
+ * the page filters them out before any of this logic runs.
  *
  * Filtering, sorting and search are all URL state — no client-side store. Every control
  * is a link or a form GET, so a narrowed view is bookmarkable, shareable, crawlable, and
@@ -300,45 +300,8 @@ export function buildStoriesFront(
   return { lead, covers, rest: items.filter((item) => !shown.has(item)) };
 }
 
-/** Kind chips, with live counts, so a reader can see both contracts exist. */
-export function buildKindChips(
-  items: readonly PublicStoryListItemDoc[],
-  query: StoriesQuery,
-): readonly {
-  readonly label: string;
-  readonly href: string;
-  readonly count: number;
-  readonly active: boolean;
-}[] {
-  const countOf = (format: string) =>
-    items.filter((item) => (item.format ?? 'chapter') === format).length;
-  const base = { ...query, page: 1 };
-  return [
-    {
-      label: 'All',
-      href: storiesHref({ ...base, format: '' }),
-      count: items.length,
-      active: query.format === '',
-    },
-    {
-      label: 'Chapters',
-      href: storiesHref({ ...base, format: 'chapter' }),
-      count: countOf('chapter'),
-      active: query.format === 'chapter',
-    },
-    {
-      // Not "Records": `/records` is the unrelated whole-archive entity index, and reusing its
-      // name here sent a reader clicking this chip expecting that list.
-      label: 'Entries',
-      href: storiesHref({ ...base, format: 'entry' }),
-      count: countOf('entry'),
-      active: query.format === 'entry',
-    },
-  ].filter((chip) => chip.count > 0 || chip.active);
-}
-
 export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
-  collection: 'Collection order',
+  collection: 'Series order',
   newest: 'Newest first',
   oldest: 'Oldest first',
   title: 'Title A–Z',

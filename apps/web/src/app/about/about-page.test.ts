@@ -17,7 +17,7 @@ import {
   ABOUT_ORIGIN,
   ABOUT_PILLARS,
   ABOUT_REFUSALS,
-  ABOUT_ROOMS_HANDOFF,
+  ABOUT_COLLECTIONS_HANDOFF,
   ABOUT_SOURCE_LIBRARY_HANDOFF,
   ABOUT_STANCE,
 } from './about-copy';
@@ -59,14 +59,15 @@ test('the page states what the archive refuses to do', () => {
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
 });
 
-test('contribution links come from the registry; the room catalogue hands off to /rooms', () => {
+test('trust and contribution links come from the registry; collections hand off to /collections', () => {
   assert.match(sectionsSource, /destinationsInGroup\('take-part'\)/);
+  assert.match(sectionsSource, /destinationsInGroup\('check'\)/);
   assert.match(sectionsSource, /cardTitleFor/);
   // Flat link rows: no icon plates and no cards.
   assert.doesNotMatch(sectionsSource, /DestinationIcon|CardGrid|RoomCard|RoomHandoff/);
   assert.match(sectionsSource, /TrustLinks/);
-  assert.match(sectionsSource, /ABOUT_ROOMS_HANDOFF/);
-  assert.equal(ABOUT_ROOMS_HANDOFF.href, '/rooms');
+  assert.match(sectionsSource, /ABOUT_COLLECTIONS_HANDOFF/);
+  assert.equal(ABOUT_COLLECTIONS_HANDOFF.href, '/collections');
   assert.doesNotMatch(sectionsSource, /readRooms|checkRooms|\[\.\.\.readRooms/);
   // The old page hardcoded six links, two of them into `/history`, which is a redirect endpoint.
   assert.doesNotMatch(sectionsSource, /href="\/history"/);
@@ -189,8 +190,8 @@ test('nothing on this page speaks as an institutional "we"', () => {
     ABOUT_CONTRIBUTE.lede,
     ABOUT_CONTRIBUTE.terms,
     ABOUT_CONTRIBUTE.direct,
-    ABOUT_ROOMS_HANDOFF.lede,
-    ABOUT_ROOMS_HANDOFF.label,
+    ABOUT_COLLECTIONS_HANDOFF.lede,
+    ABOUT_COLLECTIONS_HANDOFF.label,
     ...ABOUT_PILLARS.map((pillar) => pillar.body),
   ];
   for (const value of strings) {
@@ -211,8 +212,8 @@ test('user-facing copy avoids em dashes', () => {
     ABOUT_CONTRIBUTE.lede,
     ABOUT_CONTRIBUTE.terms,
     ABOUT_CONTRIBUTE.direct,
-    ABOUT_ROOMS_HANDOFF.lede,
-    ABOUT_ROOMS_HANDOFF.label,
+    ABOUT_COLLECTIONS_HANDOFF.lede,
+    ABOUT_COLLECTIONS_HANDOFF.label,
     ABOUT_STANCE.heading,
     ...ABOUT_STANCE.paragraphs,
     ABOUT_STANCE.maker.lead,

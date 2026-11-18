@@ -1,79 +1,51 @@
 /**
- * `/rooms`: a display header, then each group as a full-bleed color block (Block sets the ground,
- * so every text and control inside takes its ink or paper). At desktop widths the group's numeral
- * and name sit in a left column beside its rows; on a phone they stack above them. Spacing uses
- * the shared scale only.
+ * `/collections`: a display header, then one full-bleed copper block (Block sets the ground, so
+ * every text and control inside takes its ink or paper) holding the collections as numbered ruled
+ * rows. On a phone the purpose line drops under the name. Spacing uses the shared scale only.
  */
 
 /* —— header ———————————————————————————————————————————————————————————————————— */
-.ds-rooms__head {
+.ds-collections__head {
   align-items: flex-end;
   flex-wrap: nowrap;
 }
 
-.ds-rooms__head .ds-page-header__dek {
+.ds-collections__head .ds-page-header__dek {
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial-lede);
   font-style: italic;
   line-height: 1.3;
 }
 
-.ds-rooms__count {
+.ds-collections__count {
   margin-bottom: -0.06em;
 }
 
 /* —— groups: full-bleed blocks ——————————————————————————————————————————————— */
 /* The last block meets the footer directly, with no strip of table between them. */
-.ds-rooms .ds-room__doc {
+.ds-collections .ds-room__doc {
   padding-bottom: 0;
 }
 
-.ds-rooms__group {
+.ds-collections__group {
   margin-inline: calc(50% - 50vw);
   padding-block: var(--ds-space-16) var(--ds-space-12);
 }
 
-.ds-rooms__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ds-space-6) var(--ds-space-12);
-}
-
-.ds-rooms__mark {
-  display: grid;
-  align-content: start;
-  gap: var(--ds-space-4);
-}
-
-/* The group's number, cropped toward the heading under it. */
-.ds-rooms__numeral {
-  font-size: var(--ds-text-display-title);
-}
-
-.ds-rooms__heading {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 650;
-  line-height: 1.05;
-  letter-spacing: var(--ds-tracking-display);
-  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-4));
-}
-
-.ds-rooms__list {
+.ds-collections__list {
   margin: 0;
   padding: 0;
   list-style: none;
   border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
-.ds-rooms__list > li + li {
+.ds-collections__list > li + li {
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-rooms__row {
+.ds-collections__row {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) 1.5rem;
+  grid-template-columns: 4.5rem minmax(0, 5fr) minmax(0, 6fr) 1.5rem;
   align-items: center;
   gap: var(--ds-space-2) var(--ds-space-8);
   min-height: 2.75rem;
@@ -84,17 +56,24 @@
   transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-rooms__row:hover {
+.ds-collections__row:hover {
   background: var(--ds-surface-sunken);
 }
 
-.ds-rooms__row:focus-visible {
+.ds-collections__row:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* Destination names sit one step under the group heading (display-3), so a row never outranks it. */
-.ds-rooms__name {
+/* The row's number: display numerals at title scale, muted so the name leads. */
+.ds-collections__num {
+  font-size: var(--ds-text-display-3);
+  line-height: 1;
+  opacity: 0.55;
+}
+
+/* Collection names sit under the page title (display), so a row never outranks it. */
+.ds-collections__name {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-title);
   font-weight: 650;
@@ -103,22 +82,22 @@
   text-wrap: balance;
 }
 
-.ds-rooms__icon {
+.ds-collections__icon {
   color: var(--ds-ink-muted);
   flex: none;
 }
 
-.ds-rooms__row:hover .ds-rooms__icon {
+.ds-collections__row:hover .ds-collections__icon {
   color: currentColor;
 }
 
-.ds-rooms__row:hover .ds-rooms__name {
+.ds-collections__row:hover .ds-collections__name {
   text-decoration: underline;
   text-decoration-thickness: 3px;
   text-underline-offset: 0.12em;
 }
 
-.ds-rooms__purpose {
+.ds-collections__purpose {
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial);
@@ -126,71 +105,55 @@
   text-wrap: pretty;
 }
 
-.ds-rooms__arrow {
+.ds-collections__arrow {
   width: 1.5rem;
   height: 1.5rem;
   color: var(--ds-ink);
   transition: transform var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-rooms__row:hover .ds-rooms__arrow {
+.ds-collections__row:hover .ds-collections__arrow {
   transform: translateX(var(--ds-space-2));
 }
 
-@media (min-width: 64rem) {
-  .ds-rooms__inner {
-    grid-template-columns: 18rem minmax(0, 1fr);
-  }
-
-  .ds-rooms__mark {
-    position: sticky;
-    top: calc(var(--ds-island-clearance) + var(--ds-space-6));
-    align-self: start;
-  }
-}
-
 @media (max-width: 47.9375rem) {
-  .ds-rooms__head {
+  .ds-collections__head {
     flex-wrap: wrap;
   }
 
-  .ds-rooms__group {
+  .ds-collections__group {
     padding-block: var(--ds-space-12) var(--ds-space-8);
   }
 
-  .ds-rooms__mark {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: end;
-    column-gap: var(--ds-space-4);
-  }
-
-  .ds-rooms__heading {
-    font-size: var(--ds-text-display-3);
-  }
-
-  .ds-rooms__row {
-    grid-template-columns: minmax(0, 1fr) 1.5rem;
+  .ds-collections__row {
+    grid-template-columns: auto minmax(0, 1fr) 1.5rem;
     grid-template-areas:
-      'name arrow'
-      'purpose purpose';
+      'num name arrow'
+      'num purpose purpose';
+    align-items: start;
     padding-block: var(--ds-space-4);
   }
 
-  .ds-rooms__name {
+  .ds-collections__num {
+    grid-area: num;
+    font-size: var(--ds-text-title);
+  }
+
+  .ds-collections__name {
     grid-area: name;
   }
 
-  .ds-rooms__purpose {
+  .ds-collections__purpose {
     grid-area: purpose;
   }
 
-  .ds-rooms__arrow {
+  .ds-collections__arrow {
     grid-area: arrow;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-rooms__row:hover .ds-rooms__arrow {
+  .ds-collections__row:hover .ds-collections__arrow {
     transform: none;
   }
 }

@@ -11,7 +11,7 @@ import { storyImageSrc } from './story-image';
 
 void React;
 
-const href = (item: PublicStoryListItemDoc) => `/stories/${item.slug}`;
+import { storyHref as href } from '../../lib/stories/story-routes';
 
 /** One row of the index: direction, name, term and one line, with the portrait as a small plate. */
 function IndexRow({

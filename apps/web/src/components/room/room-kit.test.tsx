@@ -165,14 +165,18 @@ describe('room kit · a catalog block a second room renders is styled by the kit
 });
 
 describe('room kit · the trail is computed, never hand-written', () => {
-  // Reading rooms use Rooms as their parent. Neither the site root nor the /rooms hub is
-  // rendered as a breadcrumb step: one is the site, the other sits above nearly every room.
-  it('a reading room prints no Rooms step', () => {
-    assert.deepEqual(resolveTrail('/books'), [{ label: 'Banned books', href: null }]);
+  // A collection crumbs to Collections and a trust page to About. The site root is never a
+  // step: it is the site, not a place in it.
+  it('a collection prints its hub, never the site root', () => {
+    assert.deepEqual(resolveTrail('/books'), [
+      { label: 'Collections', href: '/collections' },
+      { label: 'Banned books', href: null },
+    ]);
   });
 
   it("a record's parent is its catalog, not the site root", () => {
     assert.deepEqual(resolveTrail('/books/the-bluest-eye', 'The Bluest Eye'), [
+      { label: 'Collections', href: '/collections' },
       { label: 'Banned books', href: '/books' },
       { label: 'The Bluest Eye', href: null },
     ]);
@@ -189,6 +193,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
 
   it('a nested utility room keeps every intermediate step', () => {
     assert.deepEqual(resolveTrail('/corrections/status/AB12', 'AB12'), [
+      { label: 'About', href: '/about' },
       { label: 'Corrections', href: '/corrections' },
       { label: 'AB12', href: null },
     ]);
@@ -1147,7 +1152,8 @@ describe('room kit · every page picks one of the three containers', () => {
     'methodology/page.tsx',
     'privacy/page.tsx',
     'records/RecordsIndex.tsx',
-    'rooms/page.tsx',
+    'collections/page.tsx',
+    'presidents/page.tsx',
     'sources/page.tsx',
     'stories/page.tsx',
     'submit/page.tsx',

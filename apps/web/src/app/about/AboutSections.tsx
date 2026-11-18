@@ -15,7 +15,7 @@ import {
   ABOUT_PILLARS,
   ABOUT_REFUSALS,
   ABOUT_STANCE,
-  ABOUT_ROOMS_HANDOFF,
+  ABOUT_COLLECTIONS_HANDOFF,
   ABOUT_SOURCE_LIBRARY_HANDOFF,
 } from './about-copy';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
@@ -58,7 +58,9 @@ export type AboutSectionsProps = {
 };
 
 export function AboutSections({ states }: AboutSectionsProps) {
-  const takePartRooms = destinationsInGroup('take-part');
+  const takePart = destinationsInGroup('take-part');
+  // About is the hub for the trust pages; it does not list itself.
+  const decides = destinationsInGroup('check').filter((destination) => destination.id !== 'about');
 
   return (
     <>
@@ -171,7 +173,18 @@ export function AboutSections({ states }: AboutSectionsProps) {
           </Prose>
           <TrustLinks
             label="Ways to add to it"
-            links={takePartRooms.map((destination) => ({
+            links={takePart.map((destination) => ({
+              href: destination.path,
+              title: cardTitleFor(destination),
+              ...(destination.description === undefined ? {} : { line: destination.description }),
+            }))}
+          />
+        </RoomSection>
+
+        <RoomSection rule="weave" id="decides" title="How it decides">
+          <TrustLinks
+            label="How the archive decides"
+            links={decides.map((destination) => ({
               href: destination.path,
               title: cardTitleFor(destination),
               ...(destination.description === undefined ? {} : { line: destination.description }),
@@ -180,13 +193,13 @@ export function AboutSections({ states }: AboutSectionsProps) {
         </RoomSection>
 
         <RoomSection rule="weave" id="begin" title="Where to begin">
-          <p className="ds-trust-lead">{ABOUT_ROOMS_HANDOFF.lede}</p>
+          <p className="ds-trust-lead">{ABOUT_COLLECTIONS_HANDOFF.lede}</p>
           <TrustLinks
             links={[
               {
-                href: ABOUT_ROOMS_HANDOFF.href,
-                title: ABOUT_ROOMS_HANDOFF.label,
-                line: ABOUT_ROOMS_HANDOFF.line,
+                href: ABOUT_COLLECTIONS_HANDOFF.href,
+                title: ABOUT_COLLECTIONS_HANDOFF.label,
+                line: ABOUT_COLLECTIONS_HANDOFF.line,
               },
             ]}
           />

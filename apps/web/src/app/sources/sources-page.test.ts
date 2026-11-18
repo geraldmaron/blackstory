@@ -19,7 +19,7 @@ test('/sources is a registered reading room in the trust group', () => {
   assert.equal(surfaceClassFor('/sources'), 'reading');
   const destination = destinationFor('/sources');
   assert.ok(destination, '/sources has no registry entry, so it is in no reader-facing list');
-  assert.equal(destination.parent, '/rooms');
+  assert.equal(destination.parent, '/about');
   assert.equal(destination.group, 'check');
   assert.equal(destination.label, 'Source library');
   assert.equal(destination.browsable, true);

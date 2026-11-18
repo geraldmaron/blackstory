@@ -77,14 +77,15 @@ describe('MOBILE_PRIMARY_TABS', () => {
 });
 
 describe('MOBILE_MORE_SECTIONS', () => {
-  it('groups the supporting rooms the way the web hub groups them', () => {
+  it('groups the supporting pages the way the web footer groups them', () => {
     expect(MOBILE_MORE_SECTIONS.map((section) => section.title)).toEqual([
-      'Read deeper',
+      'Collections',
       'Trust & About',
       'Take part',
       'Policies',
     ]);
     expect(MOBILE_MORE_SECTIONS[0]?.rows.map((row) => row.title)).toEqual([
+      'Presidents',
       'Law',
       'Data',
       'Lives',
@@ -225,7 +226,7 @@ describe('normalizeMobileTabRoot', () => {
     for (const [from, target] of nativeLegacyRoutes()) {
       const shared = canonicalPathForLegacy(from);
       if (shared === null) continue;
-      // Through the one declared platform equivalence: the web hub `/rooms` is the phone's More.
+      // Through the one declared platform equivalence: the web hub `/collections` is the phone's More.
       expect(target).toBe(nativeRouteForWebPath(shared));
     }
   });
@@ -233,7 +234,7 @@ describe('normalizeMobileTabRoot', () => {
   it('declares exactly one web-to-native route difference, and says why', () => {
     // Every other destination uses the same path on both platforms. A second entry here would
     // mean the two products had started to diverge in addressing, not just in presentation.
-    expect(nativeRouteForWebPath('/rooms')).toBe('/more');
+    expect(nativeRouteForWebPath('/collections')).toBe('/more');
     expect(nativeRouteForWebPath('/records')).toBe('/records');
     expect(nativeRouteForWebPath('/stories')).toBe('/stories');
   });

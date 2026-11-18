@@ -24,13 +24,14 @@ describe('SiteFooter', () => {
     assert.match(html, /href="\/methodology#how-a-record-gets-in"/);
     assert.match(html, /aria-label="Footer"/);
     assert.match(html, /class="ds-shell-footer__column-title">Find</);
-    assert.match(html, /class="ds-shell-footer__column-title">Read deeper</);
+    assert.match(html, /class="ds-shell-footer__column-title">Collections</);
     assert.match(html, /class="ds-shell-footer__column-title">How it decides</);
     assert.match(html, /class="ds-shell-footer__column-title">Add to it</);
     assert.match(html, /href="\/explore"/);
     assert.match(html, /href="\/stories"/);
     assert.match(html, /href="\/records"/);
-    assert.match(html, /href="\/rooms"/);
+    assert.match(html, /href="\/collections"/);
+    assert.match(html, /href="\/presidents"/);
     assert.match(html, new RegExp(`© \\d{4} ${PRODUCT_NAME}<`));
     assert.match(html, /aria-label="Policies"/);
     // Banned books is a shipped reading room and belongs in the footer; `/banned-books` is a
