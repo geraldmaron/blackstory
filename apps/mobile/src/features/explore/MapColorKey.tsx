@@ -4,9 +4,8 @@
  */
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Text, space, useThemeColors } from '@/ui';
+import { Text, space, useConfidenceColors, useThemeColors } from '@/ui';
 import {
-  CONFIDENCE_TIER_COLOR,
   CONFIDENCE_TIER_GLYPH,
   CLUSTER_RADIUS_BY_COUNT,
   DIGNITY_PALETTE,
@@ -100,6 +99,7 @@ export type MapColorKeyProps = {
 
 export function MapColorKey({ testID = 'map-color-key', embedded = false }: MapColorKeyProps) {
   const theme = useThemeColors();
+  const confidence = useConfidenceColors();
   return (
     <ScrollView
       contentContainerStyle={[styles.content, embedded ? styles.contentEmbedded : undefined]}
@@ -165,7 +165,10 @@ export function MapColorKey({ testID = 'map-color-key', embedded = false }: MapC
       <SectionTitle>Confidence</SectionTitle>
       {CONFIDENCE_TIER_ROWS.map(([tier, label]) => (
         <LegendRow key={tier} label={label}>
-          <Text variant="code" style={{ color: CONFIDENCE_TIER_COLOR[tier], width: 20 }}>
+          <Text
+            variant="code"
+            style={{ color: tier === 'unrated' ? theme.inkMuted : confidence[tier].fg, width: 20 }}
+          >
             {CONFIDENCE_TIER_GLYPH[tier]}
           </Text>
         </LegendRow>

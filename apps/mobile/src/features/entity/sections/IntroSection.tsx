@@ -4,12 +4,16 @@
  * — Ledger Line, not a Surface card.
  */
 import { StyleSheet, View } from 'react-native';
-import { Image, Logo, Text, space, useThemeColors } from '@/ui';
+import { Image, Logo, Plate, Text, space, useThemeColors } from '@/ui';
 import type { EntityMarkShape } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import { humanizeToken } from '../format';
 import type { Entity, EntityKind } from '../types';
-import { deriveHistoricalFraming, historicalFramingLabel } from '../entity-view-model';
+import {
+  deriveHistoricalFraming,
+  historicalFramingLabel,
+  isQuietRecord,
+} from '../entity-view-model';
 
 /** Compact lockup width (guide digital minimum). */
 const BRAND_LOCKUP_WIDTH = 120;
@@ -58,6 +62,17 @@ export function IntroSection({ entity }: IntroSectionProps) {
   const shape = shapeForKind(entity.kind);
   const kindLabel = humanizeToken(entity.kind);
   const metaLine = buildIntroMetaLine(entity);
+  const image = entity.primaryImage;
+  const media = {
+    source: image?.url,
+    alt: image?.alt ?? entity.displayName,
+    fallback: {
+      entityName: entity.displayName,
+      shape,
+      kindLabel,
+      reason: image ? ('pending-rights-review' as const) : ('absent' as const),
+    },
+  };
 
   return (
     <View style={styles.introStack}>
@@ -76,24 +91,19 @@ export function IntroSection({ entity }: IntroSectionProps) {
           </Text>
         }
       >
-        <View style={styles.mediaBlock}>
-          <Image
-            source={entity.primaryImage?.url}
-            alt={entity.primaryImage?.alt ?? entity.displayName}
-            aspectRatio={16 / 9}
-            fallback={{
-              entityName: entity.displayName,
-              shape,
-              kindLabel,
-              reason: entity.primaryImage ? 'pending-rights-review' : 'absent',
-            }}
-          />
-          {entity.primaryImage?.credit ? (
-            <Text variant="caption" colorRole="inkSubtle">
-              {entity.primaryImage.credit}
-            </Text>
-          ) : null}
-        </View>
+        {image?.credit && !isQuietRecord(entity) ? (
+          <Plate {...media} credit={image.credit} />
+        ) : (
+          // A quiet record keeps its photograph plain: no plate (patterns-living-archive.md).
+          <View style={styles.mediaBlock}>
+            <Image {...media} aspectRatio={16 / 9} />
+            {image?.credit ? (
+              <Text variant="caption" colorRole="inkSubtle">
+                {image.credit}
+              </Text>
+            ) : null}
+          </View>
+        )}
 
         {entity.summary.trim().length > 0 ? (
           <Text variant="editorial" colorRole="ink">

@@ -1,9 +1,15 @@
 /**
- * Map color tokens for kind encoding, semantic tones, confidence, and cluster sizing.
- * Mirrors `apps/web/src/lib/map-experience/dignity-style.ts` — mobile map paint and
- * the Color key legend read from this module so they cannot drift from web v6.
+ * Map colors for kind encoding, semantic tones and cluster sizing.
+ *
+ * The plate roles (land, water, boundaries, labels, halo) are the web `--ds-map-*` roles,
+ * generated into `mapColors`; the map plate stays on the dark register in both themes.
+ * Kind and tone shades have no token: they mirror `DIGNITY_PALETTE` in
+ * `apps/web/src/lib/map-experience/dignity-style.ts` and must be changed there first.
+ * Confidence colors are the themed `confidenceColors` tokens, not declared here.
  */
-import { brandCore } from '@/ui';
+import { brandCore, mapColors } from '@/ui';
+
+const PLATE = mapColors.dark;
 
 export const CLUSTER_RADIUS_BY_COUNT: readonly (readonly [minCount: number, radius: number])[] = [
   [0, 10],
@@ -22,28 +28,31 @@ export const DIGNITY_PALETTE = {
   /** Copper orientation ring for the selected pin (web Explore parity). */
   selectedAccent: brandCore.copperPin,
   /**
-   * Continental land plate (warm charcoal). Must stay clearly lighter than
-   * `ocean` so Pacific / west-coast coastline reads at national zoom — OpenMapTiles
-   * has no full-land polygon, so background = land and water polygons = ocean.
+   * Land plate. OpenMapTiles has no full-land polygon, so background = land and water
+   * polygons = ocean; the web contract keeps land clearly lighter than water.
    */
-  land: '#2C2824',
-  /** Deep ink ocean (web Explore dark plate parity). */
-  ocean: '#080606',
-  /** Sand hairline on water polygon outlines — orientation, not glow. */
+  land: PLATE.land,
+  ocean: PLATE.water,
+  /** Sand hairline on water polygon outlines — orientation, not glow. No web role. */
   coastline: 'rgba(216, 161, 120, 0.45)',
+  stateBounds: PLATE.line,
+  /** Streets mirror web dignity-style `street*Dark` (paper at low alpha), not a plate role. */
   streetCasing: 'rgba(244, 239, 229, 0.22)',
   street: 'rgba(244, 239, 229, 0.38)',
   streetLabel: 'rgba(244, 239, 229, 0.55)',
-  placeLabel: 'rgba(244, 239, 229, 0.62)',
+  /** State labels. */
+  placeLabel: PLATE.label,
+  /** City and town labels. */
+  placeLabelHi: PLATE.labelHi,
   /** Halo matches land plate so state labels sit on CONUS, not the ocean void. */
-  placeLabelHalo: '#2C2824',
+  placeLabelHalo: PLATE.halo,
   kindPerson: brandCore.copperPin,
   kindPlace: '#E09A55',
   kindSchool: '#7A8B52',
   kindOrganization: '#9A5828',
   kindInstitution: '#8B7355',
   kindInstitutionStroke: '#C9BA9A',
-  kindEvent: '#8E4F2A',
+  kindEvent: '#D07A32',
   kindLaw: '#356494',
   kindCase: '#7BA8D4',
   kindPublication: '#5C6B4E',
@@ -51,13 +60,9 @@ export const DIGNITY_PALETTE = {
   kindInvention: '#6BA894',
   kindMovement: '#C4683A',
   kindOther: '#6D675F',
-  kindMassacre: '#8E4F2A',
+  kindMassacre: '#B83A2A',
   kindPlantation: '#2C2824',
   kindEpicenter: '#C9A227',
-  confidenceHigh: '#2F6B3C',
-  confidenceMedium: '#8B8A2E',
-  confidenceLow: '#D07A32',
-  confidenceUnrated: '#6D675F',
 } as const;
 
 export const CONFIDENCE_TIER_GLYPH: Readonly<Record<string, string>> = {
@@ -65,13 +70,6 @@ export const CONFIDENCE_TIER_GLYPH: Readonly<Record<string, string>> = {
   medium: '◐',
   low: '○',
   unrated: '·',
-};
-
-export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
-  high: DIGNITY_PALETTE.confidenceHigh,
-  medium: DIGNITY_PALETTE.confidenceMedium,
-  low: DIGNITY_PALETTE.confidenceLow,
-  unrated: DIGNITY_PALETTE.confidenceUnrated,
 };
 
 /** Cluster count `step` at locality zoom (matches web explore-style). */

@@ -175,7 +175,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       'source-layer': 'boundary',
       filter: ['all', ['<=', ['get', 'admin_level'], 4], ['!=', ['get', 'maritime'], 1]],
       paint: {
-        'line-color': DIGNITY_PALETTE.pointHalo,
+        'line-color': DIGNITY_PALETTE.stateBounds,
         'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.55, 6, 0.9, 9, 1.15],
         'line-opacity': 0.78,
       },
@@ -251,7 +251,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
         'text-optional': true,
       },
       paint: {
-        'text-color': DIGNITY_PALETTE.placeLabel,
+        'text-color': DIGNITY_PALETTE.placeLabelHi,
         'text-halo-color': DIGNITY_PALETTE.placeLabelHalo,
         'text-halo-width': 1,
         'text-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.45, 7, 0.7, 10, 0.85],
@@ -308,7 +308,7 @@ function pmtilesArchiveLayers(sourceId: string): readonly Record<string, unknown
       source: sourceId,
       'source-layer': 'boundaries',
       paint: {
-        'line-color': DIGNITY_PALETTE.pointHalo,
+        'line-color': DIGNITY_PALETTE.stateBounds,
         'line-width': 0.7,
         'line-opacity': 0.75,
       },

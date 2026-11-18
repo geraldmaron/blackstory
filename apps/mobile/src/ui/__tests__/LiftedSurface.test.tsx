@@ -1,5 +1,5 @@
 /**
- * LiftedSurface — flat matte edition panel.
+ * LiftedSurface: record sheet with the web sheet shadow by default.
  */
 import { render } from '@testing-library/react-native';
 import { Text } from 'react-native';
@@ -11,7 +11,6 @@ jest.mock('../tokens', () => {
   return {
     ...actual,
     useThemeColors: () => actual.themeColors.light,
-    useShadowStyle: () => ({}),
   };
 });
 
@@ -25,13 +24,19 @@ describe('LiftedSurface', () => {
     expect(getByText('Panel content')).toBeTruthy();
   });
 
-  it('applies no shadow styles by default (flat matte)', async () => {
-    const { toJSON } = await render(
-      <LiftedSurface testID="panel">
-        <Text>Flat</Text>
+  it('carries the sheet shadow by default and none when asked', async () => {
+    const sheet = await render(
+      <LiftedSurface>
+        <Text>Sheet</Text>
       </LiftedSurface>,
     );
-    const tree = JSON.stringify(toJSON());
-    expect(tree).not.toContain('shadowOpacity');
+    expect(JSON.stringify(sheet.toJSON())).toContain('boxShadow');
+
+    const flush = await render(
+      <LiftedSurface shadow="none">
+        <Text>Flush</Text>
+      </LiftedSurface>,
+    );
+    expect(JSON.stringify(flush.toJSON())).not.toContain('boxShadow');
   });
 });

@@ -1,65 +1,22 @@
 /**
- * Mobile elevation tokens — flat matte per web `--ds-elevation-*: none`.
+ * Mobile elevation tokens: the web living-archive planes
+ * (`docs/ui/patterns-living-archive.md`), from the same values.
  *
- * Browse and shell surfaces use hairline borders only. Map floating instruments
- * may opt into `sm` shadow under the narrow exception in
- * `docs/ui/design-direction-v6-mobile.md`; default is always flat, and no caller
- * takes the exception today. This was never an ADR-013 rule; see
- * `docs/decisions-carryover.md`, "Map stack" (ADR-013 does not exist).
+ *   sheet  reading paper and record surfaces (web `--ds-shadow-sheet`)
+ *   lift   a linked sheet while pressed (web `--ds-shadow-lift`)
+ *   float  header, map chrome and dialogs (web `--ds-shadow-float`)
+ *
+ * The layers are generated from `packages/ui/src/styles/tokens.css`, so edit them there and
+ * run `npm run tokens:generate`. `none` is for surfaces that sit flush with the page.
  */
-import { Platform, type ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
-import { brandCore, type ThemeName } from './generated/colors.generated';
+import type { ThemeName } from './generated/colors.generated';
+import { shadows } from './generated/shadows.generated';
 
-/** Shadow tiers — `none` is the default everywhere except explicit map chrome. */
-export type ShadowLevel = 'none' | 'sm' | 'md' | 'lg';
+export type ShadowLevel = 'none' | keyof typeof shadows.light;
 
-const MAP_CHROME_SHADOW: Record<
-  Exclude<ShadowLevel, 'none'>,
-  {
-    offsetY: number;
-    radius: number;
-    opacity: Record<ThemeName, number>;
-    elevation: number;
-  }
-> = {
-  sm: {
-    offsetY: 1,
-    radius: 3,
-    opacity: { light: 0.06, dark: 0.32 },
-    elevation: 2,
-  },
-  md: {
-    offsetY: 4,
-    radius: 8,
-    opacity: { light: 0.08, dark: 0.4 },
-    elevation: 4,
-  },
-  lg: {
-    offsetY: 8,
-    radius: 16,
-    opacity: { light: 0.1, dark: 0.48 },
-    elevation: 8,
-  },
-};
-
-/** Returns a React Native shadow style. Browse/shell surfaces pass `none` (default). */
+/** Returns the React Native `boxShadow` style for a plane in the given theme. */
 export function getShadowStyle(level: ShadowLevel, theme: ThemeName): ViewStyle {
-  if (level === 'none') {
-    return {};
-  }
-
-  const spec = MAP_CHROME_SHADOW[level];
-  const style: ViewStyle = {
-    shadowColor: brandCore.ebonyInk,
-    shadowOffset: { width: 0, height: spec.offsetY },
-    shadowOpacity: spec.opacity[theme],
-    shadowRadius: spec.radius,
-  };
-
-  if (Platform.OS === 'android') {
-    style.elevation = spec.elevation;
-  }
-
-  return style;
+  return level === 'none' ? {} : { boxShadow: shadows[theme][level] };
 }
