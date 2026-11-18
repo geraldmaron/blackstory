@@ -318,18 +318,6 @@
   list-style: none;
 }
 
-/* The copper step number, in the numeral role, carries the step. */
-.ds-door-tour__num {
-  margin: 0;
-  color: var(--ds-numeral-accent);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-numeral);
-  font-weight: var(--ds-weight-numeral);
-  font-variant-numeric: lining-nums;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
 .ds-door-tour__open {
   justify-self: start;
 }

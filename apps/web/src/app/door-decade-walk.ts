@@ -79,12 +79,18 @@ export function doorClaimFor(entity: PublicEntityView): EvidenceItem | null {
     // A sentence that stands alone: a fragment ("on the National Register ...", "1976,
     // designated ...") reads as a glitch when it is the only claim on the screen.
     .filter(
-      ({ statement }) => /^[\p{Lu}"“]/u.test(statement) && statement.length <= MAX_STATEMENT_CHARS,
+      ({ statement }) =>
+        /^[\p{Lu}"“]/u.test(statement) &&
+        statement.length <= MAX_STATEMENT_CHARS &&
+        standsAlone(statement),
     )
-    // A whole sentence says more than a label ("Significant for: Black heritage"); then the grade.
+    // A whole sentence says more than a label ("Significant for: Black heritage"); one that names
+    // the record says more than one about its neighborhood; then the grade.
     .sort(
       (a, b) =>
         Number(isSentence(b.statement)) - Number(isSentence(a.statement)) ||
+        Number(namesSubject(b.statement, entity.displayName)) -
+          Number(namesSubject(a.statement, entity.displayName)) ||
         LEVEL_RANK[a.card.confidenceLevel] - LEVEL_RANK[b.card.confidenceLevel],
     );
   const best = ranked[0];
@@ -149,6 +155,24 @@ export function doorRecords(
 export function isCameraSafe(entity: PublicEntityView): boolean {
   if (entity.sensitivityClass) return false;
   return String(entity.kind) !== 'person' || entity.livingStatus === 'deceased';
+}
+
+/**
+ * Most claims are sentences lifted from a source. One that opens on the sentence before it ("It
+ * was built in 1882.", "Ultimately this led to a law ...") says nothing as the only claim shown.
+ * shortcut: reads the opening words only, so a dangling "his" mid-sentence still passes; a real
+ * fix is a claim written to stand alone at ingest.
+ */
+export function standsAlone(statement: string): boolean {
+  return !/^(?:(?:ultimately|however|thus|therefore|also|then|and|but),?\s|(?:this|these|those|it|its|he|she|they|his|her|their|such)\b)/i.test(
+    statement.trim(),
+  );
+}
+
+/** Does the statement use a word of the record's own name (four letters or more)? */
+export function namesSubject(statement: string, name: string): boolean {
+  const text = statement.toLowerCase();
+  return (name.toLowerCase().match(/\p{L}{4,}/gu) ?? []).some((word) => text.includes(word));
 }
 
 function isSentence(statement: string): boolean {

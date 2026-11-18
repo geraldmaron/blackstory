@@ -4,8 +4,8 @@
  * Server-rendered and complete without JavaScript: a heading, one line of prompt, a way past it,
  * and one section per record (its name, where it is and how exactly, its photograph as a plate
  * with the credit, one sourced claim, a link to the record). With JavaScript the map follows the
- * reader's scroll (door-tour-scroll.tsx). Each step is an ordinary heading and link; the copper
- * numeral carries the step.
+ * reader's scroll (door-tour-scroll.tsx) and its chip says which step is in front ("4 of 5").
+ * Each step is an ordinary heading and link.
  */
 import React from 'react';
 import { RecordImage } from '../components/entity/RecordImage';
@@ -61,9 +61,6 @@ export function DoorTour({ records }: DoorTourProps) {
                   data-tour-step={i}
                 >
                   <div className="ds-door-tour__card ds-door-record">
-                    <p className="ds-door-tour__num" aria-hidden="true">
-                      {i + 1}
-                    </p>
                     <h3 className="ds-door-record__name" id={`${step.id}-name`}>
                       {record.name}
                     </h3>

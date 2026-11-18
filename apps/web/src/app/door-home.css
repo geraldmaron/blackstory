@@ -282,18 +282,18 @@
   object-position: 50% 25%;
 }
 
-/* The claims block at the column's measure: the same numeral, rule and serif, a step smaller. */
+/* The claims block at the column's measure: the same rule and serif, a step smaller. A record
+   shows one claim here, so the list's numeral would always read "1": it and its gutter go. */
 .ds-door-record .ds-evidence {
   margin-top: var(--ds-space-2);
 }
 
 .ds-door-record .ds-evidence__item {
-  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-12);
+  padding: var(--ds-space-4) 0;
 }
 
 .ds-door-record .ds-evidence__item::before {
-  top: var(--ds-space-3);
-  width: var(--ds-space-8);
+  content: none;
 }
 
 .ds-door-record .ds-evidence__statement {

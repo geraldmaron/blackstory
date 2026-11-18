@@ -5,6 +5,8 @@ import {
   pickDecadeStops,
   pickDoorOpening,
   pickDoorOpeningCandidates,
+  namesSubject,
+  standsAlone,
   type DoorRecord,
 } from './door-decade-walk';
 
@@ -97,4 +99,17 @@ test('the grade row counts each grade exactly, not by floor', async () => {
     { level: 'medium', count: 15 },
     { level: 'low', count: 15 },
   ]);
+});
+
+test('a claim that opens on the sentence before it does not stand alone', () => {
+  assert.equal(standsAlone('It was built in 1882.'), false);
+  assert.equal(standsAlone('Ultimately this led to a law passed in 1935.'), false);
+  assert.equal(standsAlone('They hired a local contractor.'), false);
+  assert.equal(standsAlone('The school operated until 1954.'), true);
+  assert.equal(standsAlone('Italian masons laid the stone.'), true);
+});
+
+test('a claim names its record when it uses a word of the name', () => {
+  assert.equal(namesSubject('The Lincoln was the largest theater.', 'Lincoln Theater'), true);
+  assert.equal(namesSubject('Feminists were at the vanguard.', "The Women's Building"), false);
 });

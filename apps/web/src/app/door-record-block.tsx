@@ -1,7 +1,7 @@
 /**
  * One record on the home page, shown the way its record page shows it: the name (a link to the
  * record), its own sourced photograph as a plate with its credit when it has one, and one claim in
- * the claims block's language (copper numeral, the statement in the editorial serif, its source as
+ * the claims block's language (the statement in the editorial serif, its source as
  * a link, the grade as a glyph and a word). Used by the opening and by every decade of the walk.
  */
 import React from 'react';
