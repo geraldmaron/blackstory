@@ -8,6 +8,7 @@
  */
 import { NextResponse } from 'next/server';
 import { clientIpFrom } from '@/lib/web-security/client-ip';
+import { integritySatisfiesRateLimitGate } from '@/lib/request-integrity/server';
 import { createHash } from 'node:crypto';
 import { createQuarantinedSubmission } from '@repo/security';
 import { saveQuarantinedRecord } from '@/lib/public-data/corrections-store';
@@ -51,9 +52,7 @@ export async function POST(request: Request): Promise<Response> {
   const rateDecision = rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    // Monitor allow-through must satisfy the quota gate; otherwise missing integrity
-    // tokens become fake 429s. Field name remains clientAttested for @repo/security compat.
-    clientAttested: integrityDecision.verified || integrityDecision.mode === 'monitor',
+    clientAttested: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = rateLimitGuard.formatDeniedResponse(rateDecision);

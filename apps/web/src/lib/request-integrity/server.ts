@@ -125,3 +125,15 @@ export function createRequestIntegrityGuard(
     };
   };
 }
+
+/**
+ * Whether a request counts as attested for the rate-limit gate. Monitor mode lets unverified
+ * requests through, so they must also pass the quota gate; otherwise a missing token turns into
+ * a fake 429. (`clientAttested` is @repo/security's field name for this.)
+ */
+export function integritySatisfiesRateLimitGate(decision: {
+  readonly verified: boolean;
+  readonly mode: RequestIntegrityMode;
+}): boolean {
+  return decision.verified || decision.mode === 'monitor';
+}

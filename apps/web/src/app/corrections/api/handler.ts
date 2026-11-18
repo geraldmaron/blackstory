@@ -5,6 +5,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { clientIpFrom } from '@/lib/web-security/client-ip';
+import { integritySatisfiesRateLimitGate } from '@/lib/request-integrity/server';
 import {
   createQuarantinedSubmission,
   createSubmissionCampaignDetector,
@@ -34,17 +35,6 @@ import { notify as defaultNotify, recipientFrom, type Notifier } from '../../../
 import { CORRECTION_CATEGORY_LABELS } from '../categories';
 import type { CorrectionRequestIntegrityGuard } from '../request-integrity-guard';
 import type { createCorrectionRateLimitGuard } from '../rate-limit-guard';
-
-/**
- * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
- * `clientAttested` field name on rate-limit requests).
- */
-function integritySatisfiesRateLimitGate(decision: {
-  readonly verified: boolean;
-  readonly mode: 'monitor' | 'enforce';
-}): boolean {
-  return decision.verified || decision.mode === 'monitor';
-}
 
 export type CorrectionRouteDependencies = {
   readonly integrityGuard: CorrectionRequestIntegrityGuard;
