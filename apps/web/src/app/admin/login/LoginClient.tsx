@@ -26,6 +26,7 @@ import { safeAdminNextPath } from './safe-admin-next-path';
 
 const NOT_PROVISIONED =
   'This account is not provisioned for admin access. Ask an administrator to set a staff role on it.';
+const NOT_CONFIRMED = 'Could not confirm your staff access. Please try again in a moment.';
 
 function loginErrorMessage(err: unknown): string {
   const message = err instanceof Error ? err.message : String(err);
@@ -77,7 +78,8 @@ export default function LoginClient() {
     }
     if (!response?.ok) {
       await signOut().catch(() => undefined);
-      setError(NOT_PROVISIONED);
+      // Only a 403 means the role is missing; an expired token or a server fault is not that.
+      setError(response?.status === 403 ? NOT_PROVISIONED : NOT_CONFIRMED);
       setBusy(false);
       return;
     }
@@ -91,13 +93,18 @@ export default function LoginClient() {
     }
   }, [ready, user, enterConsole]);
 
+  // The fields are disabled while a sign-in runs, which drops focus to the page; put it back.
+  useEffect(() => {
+    if (error) passwordRef.current?.focus();
+  }, [error]);
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError(null);
     try {
+      // Signing in sets `user`, and the effect above then verifies staff access once.
       await signIn(email, password);
-      await enterConsole();
     } catch (err: unknown) {
       setError(loginErrorMessage(err));
       setBusy(false);
