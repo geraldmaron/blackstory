@@ -6,6 +6,7 @@
  * A slug that resolves to nothing returns nothing; the page 404s rather than standing somewhere
  * else.
  */
+import { cache } from 'react';
 import { shouldUseLivePublicProjections } from '../../lib/public-data/live-policy';
 import { getPublicSearchIndex, resolvePublicEntityView } from '../../lib/public-data/source';
 import { getPublicEntity, listPublicEntities, type PublicEntityView } from '../../data/public-seed';
@@ -34,13 +35,18 @@ async function readById(id: string): Promise<PublicEntityView | undefined> {
   return seeded && canStandHere(seeded) ? seeded : undefined;
 }
 
-/** The published place at this slug, or undefined. Internal ids never title a page. */
-export async function loadPlaceRecord(slug: string): Promise<PublicEntityView | undefined> {
-  const trimmed = slug.trim();
-  if (!isResolvablePlaceSlug(trimmed)) return undefined;
-  const record = await resolve(trimmed);
-  return record && !isInternalRecordLabel(record.displayName) ? record : undefined;
-}
+/**
+ * The published place at this slug, or undefined. Internal ids never title a page. Memoized per
+ * request: the 404 gate, the metadata and the page all ask, and should read once.
+ */
+export const loadPlaceRecord = cache(
+  async (slug: string): Promise<PublicEntityView | undefined> => {
+    const trimmed = slug.trim();
+    if (!isResolvablePlaceSlug(trimmed)) return undefined;
+    const record = await resolve(trimmed);
+    return record && !isInternalRecordLabel(record.displayName) ? record : undefined;
+  },
+);
 
 async function resolve(slug: string): Promise<PublicEntityView | undefined> {
   const { base, entityId } = parsePlaceAddress(slug);

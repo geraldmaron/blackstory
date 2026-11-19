@@ -4,7 +4,10 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ReleasedRecordGate, releasedRecordExists } from './released-record-gate';
+import { releasedRecordGate } from './released-record-gate';
+import { loadPlaceRecord } from './place/place-record';
+
+const ReleasedRecordGate = releasedRecordGate(loadPlaceRecord);
 
 const params = (slug: string) => Promise.resolve({ slug });
 
@@ -21,7 +24,7 @@ test('a slug with no released record throws notFound from the gate', async () =>
 });
 
 test('a malformed slug is gated without a lookup', async () => {
-  assert.equal(await releasedRecordExists('../../etc/passwd'), false);
+  assert.equal(await loadPlaceRecord('../../etc/passwd'), undefined);
   await assert.rejects(
     ReleasedRecordGate({ children: 'room', params: params('../../etc/passwd') }),
     isNotFound,
