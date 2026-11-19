@@ -58,3 +58,9 @@ packages/ops-data/drafts
 
 .playwright-mcp/
 /apps/site
+
+# Local, untracked design-tool output (.impeccable/config.json is the only tracked file there).
+# CI never sees these, but without this entry `pnpm format:check` fails locally on them.
+.impeccable/*
+!.impeccable/config.json
+apps/web/.impeccable
