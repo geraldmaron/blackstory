@@ -9,6 +9,7 @@
 import { getPublicActiveReleaseMeta, getPublicSearchIndex } from '../../lib/public-data/source';
 import { shouldUseLivePublicProjections } from '../../lib/public-data/live-policy';
 import { listPublicStoryListItems } from '../../lib/stories/source';
+import { storyHref } from '../../lib/stories/story-routes';
 import {
   SITEMAP_CACHE_CONTROL,
   buildPublicSitemapEntries,
@@ -50,6 +51,7 @@ export async function GET(): Promise<Response> {
       })),
       stories: stories.map((story) => ({
         slug: story.slug,
+        path: storyHref(story),
         ...(story.publishedAt !== undefined ? { publishedAt: story.publishedAt } : {}),
         ...(story.updatedAt !== undefined ? { updatedAt: story.updatedAt } : {}),
       })),

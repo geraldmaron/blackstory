@@ -16,9 +16,11 @@ export type SitemapEntityEntry = {
   readonly updatedAt?: string;
 };
 
-/** A published story, addressed at `/stories/{slug}`. */
+/** A published story. `path` is its canonical address when it lives under a collection's own
+ * route (`/presidents/{slug}`); without one it is addressed at `/stories/{slug}`. */
 export type SitemapStoryEntry = {
   readonly slug: string;
+  readonly path?: string;
   readonly publishedAt?: string;
   readonly updatedAt?: string;
 };
@@ -120,7 +122,7 @@ export function buildPublicSitemapEntries(
   for (const story of options.stories ?? []) {
     const slug = story.slug.trim();
     if (slug.length === 0) continue;
-    const url = toAbsolute(siteUrl, `/stories/${encodeURIComponent(slug)}`);
+    const url = toAbsolute(siteUrl, story.path ?? `/stories/${encodeURIComponent(slug)}`);
     if (seenStories.has(url)) continue;
     seenStories.add(url);
     storyEntries.push({

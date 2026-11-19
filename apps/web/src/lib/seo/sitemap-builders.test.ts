@@ -254,3 +254,13 @@ test('an invention is advertised in its own family, never at a place address', (
   );
   assert.ok(urls.has('https://blackbook.example/place/fifteenth-street-presbyterian-church'));
 });
+
+test('a collection story is listed at its canonical collection address, not under /stories', () => {
+  const entries = buildPublicSitemapEntries({
+    siteUrl: 'https://example.test',
+    stories: [{ slug: 'abraham-lincoln', path: '/presidents/abraham-lincoln' }],
+  });
+  const urls = entries.map((entry) => entry.url);
+  assert.ok(urls.includes('https://example.test/presidents/abraham-lincoln'));
+  assert.ok(!urls.includes('https://example.test/stories/abraham-lincoln'));
+});
