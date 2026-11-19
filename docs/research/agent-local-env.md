@@ -33,6 +33,34 @@ rotates it (the symptom is `password authentication failed for user "postgres"`,
 existing compatibility file. Never print its contents or assume its database role is suitable
 for every operation.
 
+## Which database login a script needs
+
+`DATABASE_URL` in `apps/web/.env.local` is the web role (`blackstory_web_runtime`). It reads
+`published.*` and nothing in `research.*` or `evidence.*`, so sourcing the file as-is fails the
+research scripts with `permission denied`. Three logins cover the work:
+
+| Work | Login | How |
+|---|---|---|
+| Web dev server, read-only queries on `published.*` | web role | source `.env.local` as-is |
+| `capture-backfill --commit`, `session-claim-review-prepare.ts`, `session-public-text-review.ts --step=prepare`, every dry run, `publish-release-entities-incremental.ts`, `publish-release-catalog-artifacts.ts` | `blackstory_admin` | source `.env.local`, then `export DATABASE_URL="$ADMIN_DATABASE_URL"` for that command |
+| Ledger writes: `session-claim-review-apply.ts` and `session-public-text-review.ts --step=apply` with `DRY_RUN=0` | database owner | `scripts/with-owner-db.sh <command>` |
+
+The owner login is needed only because the ledger writers run `SET LOCAL ROLE service_role` and
+`research.approve_artifact` refuses any other caller; `blackstory_admin` may not assume that role.
+`with-owner-db.sh` reads the password for one process and never writes it to the env file.
+
+The person, not an agent, refreshes the file after a rotation:
+
+```bash
+WITH_ADMIN=1 WITH_STORAGE=1 pnpm env:local:op
+```
+
+`WITH_ADMIN=1` writes `ADMIN_DATABASE_URL` for `blackstory_admin`. `WITH_STORAGE=1` refreshes
+`SUPABASE_SECRET_KEY`, which `capture-backfill` and the catalog upload send to Supabase Storage;
+a stale key fails with `403 Invalid Compact JWS`. A new-style secret key that still returns that
+error has been deleted or replaced: copy the current one from the project's API keys page into
+1Password first.
+
 ## Verify injection without revealing values
 
 ```bash
