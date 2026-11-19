@@ -34,6 +34,7 @@ import { nextInCollection, prevInCollection, sortItems } from '../../app/stories
 import { storyCitedEntities } from '../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../lib/public-data/source';
 import { IMPLICIT_AUTHOR_NAME, storyBylineLines } from '../../lib/stories/byline';
+import { absolutePublicUrl } from '../../lib/seo/metadata-builders';
 import { COLLECTION_ROUTES, storyBasePath, storyHref } from '../../lib/stories/story-routes';
 import { BandRule } from '../atmosphere/BandArt';
 import './story.css';
@@ -71,7 +72,12 @@ function buildStoryJsonLd(story: HydratedStory) {
     description: doc.summary,
     datePublished: doc.publishedAt,
     ...(doc.updatedAt ? { dateModified: doc.updatedAt } : {}),
-    '@id': storyHref(doc),
+    '@id': absolutePublicUrl(storyHref(doc)),
+    url: absolutePublicUrl(storyHref(doc)),
+    mainEntityOfPage: absolutePublicUrl(storyHref(doc)),
+    ...(doc.collection
+      ? { isPartOf: { '@type': 'CreativeWorkSeries', name: doc.collection.label } }
+      : {}),
     author: doc.contributors.some((c) => c.roles.includes('author'))
       ? doc.contributors
           .filter((c) => c.roles.includes('author'))

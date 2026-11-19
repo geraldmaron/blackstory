@@ -1,5 +1,5 @@
 /**
- * `GET /sitemap.xml` — registry routes plus active-release record URLs, CDN-cached.
+ * `GET /sitemap.xml` — registry routes, published story URLs and active-release record URLs, CDN-cached.
  *
  * Must not statically generate at build: App Hosting mounts DATABASE_URL at runtime only, and a
  * baked sitemap would ship the 4-entity seed plus localhost. Being dynamic does not stop the
@@ -8,6 +8,7 @@
  */
 import { getPublicActiveReleaseMeta, getPublicSearchIndex } from '../../lib/public-data/source';
 import { shouldUseLivePublicProjections } from '../../lib/public-data/live-policy';
+import { listPublicStoryListItems } from '../../lib/stories/source';
 import {
   SITEMAP_CACHE_CONTROL,
   buildPublicSitemapEntries,
@@ -31,9 +32,12 @@ export async function GET(): Promise<Response> {
     });
   }
 
-  const [{ data: index }, release] = await Promise.all([
+  // A failed story read degrades to no story URLs (the reader returns an empty list), never to a
+  // failed sitemap: record URLs are the larger set and must not depend on the story table.
+  const [{ data: index }, release, { items: stories }] = await Promise.all([
     getPublicSearchIndex(),
     getPublicActiveReleaseMeta(),
+    listPublicStoryListItems(),
   ]);
 
   const xml = serializeSitemapXml(
@@ -43,6 +47,11 @@ export async function GET(): Promise<Response> {
         displayName: doc.displayName,
         kind: doc.kind,
         ...(doc.summary !== undefined ? { summary: doc.summary } : {}),
+      })),
+      stories: stories.map((story) => ({
+        slug: story.slug,
+        ...(story.publishedAt !== undefined ? { publishedAt: story.publishedAt } : {}),
+        ...(story.updatedAt !== undefined ? { updatedAt: story.updatedAt } : {}),
       })),
       ...(release ? { releaseGeneratedAt: release.activatedAt } : {}),
     }),
