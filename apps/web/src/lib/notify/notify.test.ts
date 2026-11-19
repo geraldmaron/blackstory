@@ -139,7 +139,7 @@ test('submitter text is escaped in the HTML', () => {
     data: { kind: 'lead', headline: '<b>x</b>', statement: '<script>alert(1)</script>', id: 'i' },
     idempotencyKey: 'k',
   });
-  assert.doesNotMatch(html, /<script>|<b>x/u);
+  assert.ok(!html.toLowerCase().includes('<script') && !html.includes('<b>x'));
   assert.match(html, /&lt;script&gt;/u);
 });
 

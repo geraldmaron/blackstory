@@ -56,12 +56,13 @@ export function pickPhotoIds(
 ): Readonly<Record<string, PinPhotoView>> {
   const raw = new URL(url).searchParams.get('ids');
   if (raw === null) return index;
-  const picked: Record<string, PinPhotoView> = {};
-  for (const id of raw.split(',').slice(0, MAX_PHOTO_IDS)) {
-    const view = Object.hasOwn(index, id) ? index[id] : undefined;
-    if (view) picked[id] = view;
-  }
-  return picked;
+  // Built from entries, never by writing a caller-named key onto an object.
+  return Object.fromEntries(
+    raw
+      .split(',')
+      .slice(0, MAX_PHOTO_IDS)
+      .flatMap((id) => (Object.hasOwn(index, id) && index[id] ? [[id, index[id]]] : [])),
+  );
 }
 
 /** Entity id → pin photo, for every entity in `entities` that carries a showable `primaryImage`. */

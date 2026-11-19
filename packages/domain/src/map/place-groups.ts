@@ -170,13 +170,14 @@ export type PlaceGroups = {
 
 const STATE_LIKE = /\b(county|parish|borough|census area)\b/i;
 
+/** Dash runs collapse to one first, so one dash at each end is all there is to trim. */
 function slug(text: string): string {
   return text
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/^-|-$/g, '');
 }
 
 /**

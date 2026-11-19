@@ -79,7 +79,7 @@ test('an invention never claims to stand today and never offers directions', () 
   const html = render(clock, { point: POINT });
   assert.doesNotMatch(html, /Still standing|operating today/i);
   assert.doesNotMatch(html, /Open in maps|Directions/);
-  assert.doesNotMatch(html, /google\.com\/maps|maps\.apple\.com/);
+  assert.ok(!html.includes('google.com/maps') && !html.includes('maps.apple.com'));
   // Its status token is not read back as a fact about the physical world.
   assert.doesNotMatch(html, />Active</);
 });

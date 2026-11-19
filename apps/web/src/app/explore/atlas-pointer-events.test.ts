@@ -58,7 +58,7 @@ describe('Explore pointer-events', () => {
       assert.match(
         atlasCss,
         new RegExp(
-          `\\.ds-atlas\\s*>\\s*${selector.replace(/\./g, '\\.')}[\\s\\S]*?pointer-events:\\s*none`,
+          `\\.ds-atlas\\s*>\\s*${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?pointer-events:\\s*none`,
         ),
         `missing pass-through for ${selector}`,
       );
