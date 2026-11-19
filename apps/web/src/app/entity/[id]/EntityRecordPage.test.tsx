@@ -79,7 +79,13 @@ test('an invention never claims to stand today and never offers directions', () 
   const html = render(clock, { point: POINT });
   assert.doesNotMatch(html, /Still standing|operating today/i);
   assert.doesNotMatch(html, /Open in maps|Directions/);
-  assert.ok(!html.includes('google.com/maps') && !html.includes('maps.apple.com'));
+  // Compared as parsed hosts: a substring test on a URL is what CodeQL flags, rightly.
+  const linkedHosts = [...html.matchAll(/href="(https?:[^"]+)"/g)].map(
+    ([, href]) => new URL(href!).hostname,
+  );
+  assert.ok(
+    !linkedHosts.some((host) => /^(maps\.apple\.com|(www\.|maps\.)?google\.com)$/.test(host)),
+  );
   // Its status token is not read back as a fact about the physical world.
   assert.doesNotMatch(html, />Active</);
 });
