@@ -17,8 +17,8 @@ Requests pass through these controls in order:
 4. Deterministic spam scoring and duplicate/coordinated-campaign assessment.
 5. Append to submission quarantine with `canonicalWriteAllowed: false`.
 
-`apps/api-submissions/src/quarantine.ts` requires the client-header check and quota decisions explicitly. It
-also calls the  `write:quarantine` capability guard. A denied prerequisite or validation error
+The web intake routes (`apps/web/src/app/corrections/api/handler.ts`, `apps/web/src/app/submit/api/route.ts`)
+run the request-integrity check and quota decision before `createQuarantinedSubmission`. A denied prerequisite or validation error
 cannot append a record.
 
 ## State and data separation
@@ -77,14 +77,11 @@ a guarded invoker trigger performs the requeue without granting public status-wr
 Quick add and Attach evidence derive the actor from the verified staff session, require
 `research:write`, and use the admin pool.
 
-The separate `api-submissions` HTTP adapter still uses in-memory repositories and is not a durable
-production intake service. Its mobile deployment path must be completed before accepting traffic.
+The phone app does not submit directly; it opens the web corrections form.
 
 ## Validation
 
 ```bash
 pnpm --filter @repo/security test
 pnpm --filter @repo/security typecheck
-pnpm --filter @repo/api-submissions test
-pnpm --filter @repo/api-submissions typecheck
 ```

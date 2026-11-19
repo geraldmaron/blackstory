@@ -128,66 +128,55 @@ describe('horizontal overflow guards', () => {
   });
 
   it('does not size explore chrome with 100vw (scrollbar gutter / hide-translate overflow)', () => {
-    assert.doesNotMatch(mapSurfacesCss, /calc\(\s*100vw/);
-    assert.doesNotMatch(mapSurfacesCss, /min\(\s*\d+vw/);
+    const columnCss = readFileSync(
+      join(here, '../components/map-experience/explore-column.css'),
+      'utf8',
+    );
+    for (const source of [mapSurfacesCss, columnCss]) {
+      assert.doesNotMatch(source, /calc\(\s*100vw/);
+      assert.doesNotMatch(source, /min\(\s*\d+vw/);
+    }
+    // The column and the histogram dock are inset from the viewport edges, never sized to it.
+    // Both float one gutter in from the edges.
     assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__instruments\s*\{[^}]*left:\s*var\(--ds-explore-edge\)/s,
+      columnCss,
+      /\.ds-xcol\s*\{[^}]*left:\s*var\(--ds-xfloat[^}]*width:\s*var\(--ds-xcol-w\)/s,
     );
     assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__results\s*\{[^}]*right:\s*var\(--ds-explore-edge\)/s,
-    );
-    assert.match(
-      mapSurfacesCss,
-      /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-instruments-width:\s*auto/s,
-    );
-    assert.match(
-      mapSurfacesCss,
-      /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-results-width:\s*auto/s,
+      columnCss,
+      /\.ds-xdock\s*\{[^}]*right:\s*var\(--ds-xfloat\)[^}]*left:\s*calc\(var\(--ds-xcol-w\)/s,
     );
   });
 
-  it('explore v6 panels use opaque Surface fills without backdrop blur or fixed-ink cockpit', () => {
-    assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__instruments\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
-    );
-    assert.match(
-      mapSurfacesCss,
-      /\.ds-explore-stage__results\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
-    );
-    assert.doesNotMatch(mapSurfacesCss, /backdrop-filter/);
-    assert.doesNotMatch(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s);
-  });
-
-  it('Explore chrome is matte surface, not shop blur or elevation', () => {
+  it('the header is glass over the map, solid when the reader asks for less transparency', () => {
+    // Living archive float plane (owner lifted the glass ban, 2026-11-15).
     const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
-    const lensCss = readFileSync(join(here, '../components/map-experience/lens-panel.css'), 'utf8');
-    const resultsCss = readFileSync(
-      join(here, '../components/map-experience/results-rail.css'),
-      'utf8',
+    assert.match(commandBarCss, /\.ds-bar\s*\{[^}]*backdrop-filter:\s*blur/s);
+    assert.match(
+      commandBarCss,
+      /prefers-reduced-transparency: reduce\)\s*\{\s*\.ds-bar\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
     );
-    const sheetCss = readFileSync(
-      join(here, '../components/map-experience/record-sheet.css'),
-      'utf8',
-    );
-    const cameraCss = readFileSync(
-      join(here, '../components/map-experience/camera-console.css'),
-      'utf8',
-    );
+    assert.doesNotMatch(commandBarCss, /box-shadow:\s*0\s+\d+px/, 'command-bar must not elevate');
+  });
+
+  it('Explore chrome blurs only on the float plane: the column and dock, nothing inside them', () => {
+    const mapCss = (file: string) =>
+      readFileSync(join(here, '../components/map-experience', file), 'utf8');
     const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
-    const timeCss = readFileSync(join(here, '../components/map-experience/time-panel.css'), 'utf8');
     for (const [name, source] of [
-      ['command-bar', commandBarCss],
-      ['lens', lensCss],
-      ['results', resultsCss],
-      ['sheet', sheetCss],
-      ['camera', cameraCss],
+      ['column', mapCss('explore-column.css')],
+      ['list', mapCss('explore-record-list.css')],
+      ['inspector', mapCss('record-inspector.css')],
+      ['histogram', mapCss('decade-brush.css')],
       ['atlas', atlasCss],
-      ['time', timeCss],
     ] as const) {
-      assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
+      // Glass lives on the float surfaces (column, dock, controls); parts inside stay unblurred.
+      if (name === 'column') {
+        assert.match(source, /backdrop-filter:\s*blur\(18px\)/, 'column is glass');
+        assert.match(source, /prefers-reduced-transparency/, 'column has a solid fallback');
+      } else {
+        assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
+      }
       assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);
       assert.doesNotMatch(
         source,
@@ -199,22 +188,22 @@ describe('horizontal overflow guards', () => {
 });
 
 describe('shell footer theme tokens', () => {
-  // Ink direction: the Surface card frame comes off the footer — it sits directly on the page
-  // ground above a hairline, the same move RoomCard makes (see room-kit.css).
-  it('styles the footer as a theme-aware ground with a top hairline, not a Surface card', () => {
-    assert.doesNotMatch(shellCss, /\.ds-shell-footer__card\s*\{[^}]*background:/s);
-    assert.match(shellCss, /\.ds-shell-footer__card\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer__card\s*\{[^}]*border-top:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
+  // The footer is plain navigation on the table's ground: no slogan, no card, no copper block,
+  // and every color from the ground.
+  it('styles the footer as plain navigation on the table ground, its type from the ground', () => {
+    assert.doesNotMatch(shellCss, /\.ds-shell-footer__card|\.ds-shell-footer__line/);
+    const footer = readFileSync(join(here, '../components/SiteFooter.tsx'), 'utf8');
+    assert.match(footer, /className="ds-shell-footer" data-ground="ink"/);
+    assert.doesNotMatch(footer, /<Sheet|History, pinned to place|data-ground="(copper|sand)"/);
+    // The AI-help disclosure stays.
+    assert.match(footer, /AI helps with the research and drafting here/);
+    assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+    const footerRules = shellCss.slice(
+      shellCss.indexOf('/* —— Footer: plain navigation'),
+      shellCss.indexOf('/* Maker credit'),
     );
-    assert.match(shellCss, /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-accent\)/s);
-    assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer__links a:hover\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
-    );
-    assert.match(shellCss, /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);
+    assert.doesNotMatch(footerRules, /#[0-9a-f]{3,6}\b/i);
+    assert.doesNotMatch(footerRules, /text-transform:\s*uppercase/);
     assert.doesNotMatch(
       shellCss,
       /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-fixed-charcoal\)/s,
@@ -223,16 +212,14 @@ describe('shell footer theme tokens', () => {
 });
 
 describe('maker credit theme marks', () => {
-  it('swaps inline GD marks with [data-theme] like the shell wordmark', () => {
-    assert.match(shellCss, /\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*block/s);
-    assert.match(shellCss, /\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*none/s);
+  it('swaps inline GD marks by the nearest ground, like the shell wordmark', () => {
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*none/s,
+      /\.ds-maker-credit__mark--theme-light\s*\{[^}]*display:\s*var\(--ds-lockup-on-light, block\)/s,
     );
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*block/s,
+      /\.ds-maker-credit__mark--theme-dark\s*\{[^}]*display:\s*var\(--ds-lockup-on-dark, none\)/s,
     );
   });
 });
@@ -339,5 +326,27 @@ describe('the plate is styled globally, not from the route group', () => {
       shellCss,
       /\.ds-map-stage\[data-plate-slot\]\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
     );
+  });
+});
+
+/*
+ * The CSS build (Lightning CSS) keeps only the LAST of `backdrop-filter` and
+ * `-webkit-backdrop-filter` in a rule. With the standard one first it shipped only the prefix,
+ * which current Chrome ignores, so every glass surface rendered unblurred.
+ */
+describe('glass survives the CSS build', () => {
+  it('declares -webkit-backdrop-filter before backdrop-filter, never after', () => {
+    const files = [
+      join(here, 'shell.css'),
+      join(here, '../components/shell/command-bar.css'),
+      join(here, '../components/map-embed/record-map.css'),
+      join(here, '../components/map-experience/map-controls.css'),
+      join(here, '../components/map-experience/explore-column.css'),
+      join(here, '../../../../packages/ui/src/styles/components.css'),
+    ];
+    for (const file of files) {
+      const css = readFileSync(file, 'utf8');
+      assert.doesNotMatch(css, /^\s*backdrop-filter:[^;]*;\s*-webkit-backdrop-filter:/m, file);
+    }
   });
 });

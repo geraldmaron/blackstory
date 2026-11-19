@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { StyleSpecification } from 'maplibre-gl';
-import { mapPalettes } from '@repo/ui';
+import { plateForScheme } from '../../lib/map-experience/dignity-style';
 import {
   buildArchiveBaseStyle,
   collectLayerPaintUpdates,
@@ -29,13 +29,6 @@ const SAMPLE_STYLE: StyleSpecification = {
       paint: { 'raster-opacity': 0.76 },
     },
     {
-      id: 'plate-landcover',
-      type: 'fill',
-      source: 'openfreemap',
-      'source-layer': 'landcover',
-      paint: { 'fill-color': '#ebe5d1' },
-    },
-    {
       id: 'plate-water',
       type: 'fill',
       source: 'openfreemap',
@@ -57,13 +50,6 @@ const SAMPLE_STYLE: StyleSpecification = {
       paint: { 'text-color': '#2e2a24', 'text-halo-color': '#f8f5ee', 'text-halo-width': 1.4 },
     },
     {
-      id: 'explore-street-casing',
-      type: 'line',
-      source: 'openfreemap',
-      'source-layer': 'transportation',
-      paint: { 'line-color': 'rgba(10, 10, 10, 0.18)', 'line-width': 1 },
-    },
-    {
       id: 'explore-street-fill',
       type: 'line',
       source: 'openfreemap',
@@ -80,6 +66,18 @@ const SAMPLE_STYLE: StyleSpecification = {
         'text-halo-color': '#E8E0D2',
         'text-halo-width': 1,
       },
+    },
+    {
+      id: 'explore-state-label',
+      type: 'symbol',
+      source: 'explore-state-labels',
+      paint: { 'text-color': '#6d675f' },
+    },
+    {
+      id: 'explore-state-label-selected',
+      type: 'symbol',
+      source: 'explore-state-labels',
+      paint: { 'text-color': '#8E4F2A' },
     },
     {
       id: 'explore-unclustered-point',
@@ -130,7 +128,6 @@ test('buildArchiveBaseStyle paints the pre-load frame from the scheme land token
   // The plate's background is LAND: the tiles' `water` source-layer paints the oceans and
   // lakes over it. A water-colored pre-load frame would flash the inverse of the map that is
   // about to arrive — a continent-shaped hole rather than a continent.
-  assert.equal(backgroundColor('light'), mapPalettes.light.land);
-  assert.equal(backgroundColor('dark'), mapPalettes.dark.land);
-  assert.notEqual(backgroundColor('light'), backgroundColor('dark'));
+  assert.equal(backgroundColor('light'), plateForScheme('light').ocean);
+  assert.equal(backgroundColor('dark'), plateForScheme('dark').ocean);
 });

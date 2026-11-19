@@ -12,24 +12,21 @@
 import React from 'react';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import Link from 'next/link';
-import { RoomJump, RoomSection, roomSectionTone } from '../../components/room';
-import type { DestinationIconId } from '@repo/public-contracts/destinations';
-import './privacy.css';
+import { RoomJump, RoomSection } from '../../components/room';
 
 void React;
 
 const PAGE_SECTIONS: readonly {
   readonly id: string;
   readonly label: string;
-  readonly icon: DestinationIconId;
 }[] = [
-  { id: 'scope', label: 'Scope', icon: 'about' },
-  { id: 'web', label: 'Website', icon: 'records' },
-  { id: 'not-collected', label: 'Not collected', icon: 'privacy' },
-  { id: 'location', label: 'Location', icon: 'precision' },
-  { id: 'integrity', label: 'Abuse checks', icon: 'evidence' },
-  { id: 'corrections', label: 'Corrections', icon: 'correction' },
-  { id: 'changes', label: 'Changes', icon: 'support' },
+  { id: 'scope', label: 'Scope' },
+  { id: 'web', label: 'Website' },
+  { id: 'not-collected', label: 'Not collected' },
+  { id: 'location', label: 'Location' },
+  { id: 'integrity', label: 'Abuse checks' },
+  { id: 'corrections', label: 'Corrections' },
+  { id: 'changes', label: 'Changes' },
 ];
 
 const WEB_INVENTORY = [
@@ -61,7 +58,7 @@ const WEB_INVENTORY = [
     id: 'web-analytics',
     term: 'Visit measurement',
     definition:
-      'The public site records pageviews and a coarse traffic class (likely human, automated, search crawler, AI crawler, or tool) so I can tell readers apart from scrapers. The class is one of those five values and nothing more: no user id, no stored fingerprint, no advertising use.',
+      'The public site records pageviews and a coarse traffic class (likely human, automated, search crawler, AI crawler, or tool) so I can tell readers apart from scrapers. The class is one of those five values and nothing more, with no user id, no stored fingerprint, and no advertising use.',
   },
 ] as const;
 
@@ -83,117 +80,77 @@ function InventoryLedger({
   readonly label: string;
 }) {
   return (
-    <div className="ds-privacy__ledger" aria-label={label}>
+    <dl className="ds-trust-dl ds-trust-dl--split" aria-label={label}>
       {items.map((item) => (
-        <article key={item.id} className="ds-privacy__ledger-item">
-          <div className="ds-privacy__ledger-head">
-            <span className="ds-privacy__chip">{item.term}</span>
-          </div>
-          <p className="ds-privacy__ledger-summary">{item.definition}</p>
-        </article>
+        <div key={item.id}>
+          <dt>{item.term}</dt>
+          <dd>{item.definition}</dd>
+        </div>
       ))}
-    </div>
+    </dl>
   );
 }
 
 export function PrivacySections() {
   return (
-    <div className="ds-privacy">
+    <>
       <RoomJump sections={PAGE_SECTIONS} />
 
-      <RoomSection
-        id="scope"
-        icon="about"
-        kicker="Who this covers"
-        title="BlackStory public website"
-        tone={roomSectionTone(0)}
-      >
-        <p className="ds-privacy__follow">
+      <RoomSection id="scope" title="BlackStory public website">
+        <p className="ds-trust-copy">
           This policy describes how BlackStory handles information on{' '}
           <span className="ds-phrase-nowrap">blackstory.app</span>. It covers what the site does
           now. It is not a promise about features that do not exist yet.
         </p>
-        <p className="ds-privacy__follow">
+        <p className="ds-trust-copy">
           Data controller: <strong>Gerald Dagher</strong> (individual).
         </p>
-        <p className="ds-privacy__meta">Last updated: August 2026</p>
+        <p className="ds-trust-meta">Last updated: August 2026</p>
       </RoomSection>
 
-      <RoomSection
-        id="web"
-        icon="records"
-        kicker="Website"
-        title="What this site may process"
-        tone={roomSectionTone(1)}
-      >
-        <p className="ds-privacy__follow">
+      <RoomSection id="web" title="What this site may process">
+        <p className="ds-trust-copy">
           The public website is read-first. Interactive flows are optional and labeled before you
           use them.
         </p>
         <InventoryLedger items={WEB_INVENTORY} label="Website data inventory" />
-        <p className="ds-privacy__follow">
+        <p className="ds-trust-copy">
           For how published records are verified and corrected, see{' '}
           <Link href="/methodology">methodology</Link> and the{' '}
           <Link href="/corrections">corrections lane</Link>.
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="not-collected"
-        icon="privacy"
-        kicker="Explicit limits"
-        title="What I do not collect"
-        tone={roomSectionTone(2)}
-      >
-        <p className="ds-privacy__follow">
+      <RoomSection id="not-collected" title="What I do not collect">
+        <p className="ds-trust-copy">
           These are rules the software follows. If a release ever adds one of the things listed
           here, this page changes before that release ships.
         </p>
-        <ol className="ds-privacy__rule-strip" aria-label="Limits on what is collected">
+        <ul className="ds-trust-list" aria-label="Limits on what is collected">
           {NOT_COLLECTED_RULES.map((rule) => (
-            <li key={rule} className="ds-privacy__rule-row">
-              <span className="ds-privacy__rule-text">{rule}</span>
-            </li>
+            <li key={rule}>{rule}</li>
           ))}
-        </ol>
+        </ul>
       </RoomSection>
 
-      <RoomSection
-        id="location"
-        icon="precision"
-        kicker="Optional location"
-        title="Location is never required"
-        tone={roomSectionTone(3)}
-      >
-        <p className="ds-privacy__follow">
+      <RoomSection id="location" title="Location is never required">
+        <p className="ds-trust-copy">
           Location lookup starts only after you press a labeled control; the page never requests
           device location automatically. You can always browse by state or search by place name
           instead.
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="integrity"
-        icon="evidence"
-        kicker="Abuse protection"
-        title="What the abuse checks look at"
-        tone={roomSectionTone(4)}
-      >
-        <p className="ds-privacy__follow">
+      <RoomSection id="integrity" title="What the abuse checks look at">
+        <p className="ds-trust-copy">
           Pages that could be hit at scale (search, corrections, lead submission) sit behind rate
           limits and same-origin checks. Nothing those checks record is used to build a marketing
           profile.
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="corrections"
-        icon="correction"
-        kicker="Submissions"
-        title="Corrections and leads"
-        tone={roomSectionTone(5)}
-      >
-        <p className="ds-privacy__follow">
+      <RoomSection id="corrections" title="Corrections and leads">
+        <p className="ds-trust-copy">
           When you file a correction, appeal, abuse report, or research lead, you choose what to
           write. Submissions go into a private queue, are kept so they can be opened later, and are
           never published as submitted. A screen runs over incoming mail before I read it, so
@@ -201,7 +158,7 @@ export function PrivacySections() {
           models. The optional contact fields are used only to follow up with you about that
           submission, and they are never shown publicly.
         </p>
-        <p className="ds-privacy__follow">
+        <p className="ds-trust-copy">
           Read the corrections privacy notice on the{' '}
           <Link href="/corrections">corrections page</Link> before submitting. Do not include
           anyone&apos;s home address or other sensitive personal details about a living person
@@ -209,20 +166,14 @@ export function PrivacySections() {
         </p>
       </RoomSection>
 
-      <RoomSection
-        id="changes"
-        icon="support"
-        kicker="Updates"
-        title="Changes and contact"
-        tone={roomSectionTone(6)}
-      >
-        <p className="ds-privacy__follow">
+      <RoomSection id="changes" title="Changes and contact">
+        <p className="ds-trust-copy">
           A material change to this policy is posted here, with a new date at the top. For a privacy
           request, or a question about how any of this runs, write to{' '}
           <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
           <Link href="/support">support page</Link>.
         </p>
       </RoomSection>
-    </div>
+    </>
   );
 }

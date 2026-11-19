@@ -162,8 +162,8 @@ function gateStandaloneProse(story: StoryAuthoring): { warnings: string[] } {
 }
 
 /**
- * Word-level voice (docs/content/neo-voice.md never-list item 9): em dashes and expanded
- * contractions in narration. Warnings only, at every status: published chapters predate this
+ * Word-level voice (docs/content/neo-voice.md, the never-list and Part IV): em dashes, expanded
+ * contractions, poster language, source terms as narration, negate-then-correct and staccato runs. Warnings only, at every status: published chapters predate this
  * check, and a gate that turned hard overnight would block unrelated republishes. Quoted
  * testimony is exempt inside findProseVoiceIssues.
  */
@@ -177,7 +177,8 @@ function gateProseVoice(story: StoryAuthoring): { warnings: string[] } {
         : [];
     for (const text of texts) {
       for (const finding of findProseVoiceIssues(text)) {
-        if (finding.rule !== 'em-dash' && finding.rule !== 'expanded-contraction') continue;
+        // Self-reference and page pointers have their own gate in this file.
+        if (finding.rule === 'self-reference' || finding.rule === 'page-pointer') continue;
         warnings.push(
           `${story.id} / body[${index}] (${block.type}): prose ${finding.label}: …${finding.excerpt}…`,
         );

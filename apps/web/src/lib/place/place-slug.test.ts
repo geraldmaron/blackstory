@@ -13,9 +13,20 @@ import {
   placeHrefForEntity,
   placeSlugCollisionCounts,
   publicRecordHref,
+  resolvePlaceSlugFromSearchIndex,
 } from './place-slug';
 
 describe('place slug addresses', () => {
+  it('finds a renamed record at its former address, unless a current name holds it', () => {
+    const doc = (id: string, displayName: string, aliases: string[] = []) =>
+      ({ id, displayName, aliases, kind: 'place' }) as never;
+    const renamed = doc('a', 'Medgar Evers House', ['evers, medgar, house']);
+    assert.equal(resolvePlaceSlugFromSearchIndex([renamed], 'medgar-evers-house'), 'a');
+    assert.equal(resolvePlaceSlugFromSearchIndex([renamed], 'evers-medgar-house'), 'a');
+    const holder = doc('b', 'Evers Medgar House');
+    assert.equal(resolvePlaceSlugFromSearchIndex([renamed, holder], 'evers-medgar-house'), 'b');
+  });
+
   it('parses disambiguated entity ids', () => {
     assert.deepEqual(parsePlaceAddress('vernon-ame-church--ent_vernon_ame_001'), {
       base: 'vernon-ame-church',
@@ -127,7 +138,7 @@ describe('place slug addresses', () => {
         kind: 'law',
         summary: 'A statute.',
       }),
-      '/law',
+      '/entity/law_1',
     );
   });
 

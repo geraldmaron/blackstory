@@ -9,7 +9,7 @@
  * (`apps/web/src/components/map-stage/MapStage.tsx`) is the only caller that turns these into real
  * `maplibre-gl` camera calls (`flyPreset`); this module has zero `maplibre-gl` runtime import so
  * it stays unit-testable in plain Node — the same split this repo already uses for
- * `marker-size.ts` / `kind-encoding.ts` / `state-labels.ts`.
+ * `kind-encoding.ts` / `state-labels.ts`.
  *
  * Design source: design-direction-v3.md "Camera grammar ()" — duration ~2000-2600ms
  * national -> state, ~1600ms state -> locality, ~1200ms -> point; curve ~1.32-1.42; authored
@@ -141,9 +141,7 @@ export const MAP_MAX_ZOOM = 14;
 
 /**
  * The frame a plate opens on before any surface has asked for one: CONUS fitted to the canvas
- * with this much clearance (`MapStage`'s constructor). Explore's first-paint board is drawn at
- * the same fit (explore-map-underlay.css, pinned by explore-map-underlay.test.ts), which is why
- * the number lives here and not in either of them.
+ * with this much clearance (`MapStage`'s constructor).
  */
 export const PLATE_OPENING_PADDING_PX = 32;
 
@@ -154,7 +152,7 @@ export const CAMERA_POINT_ZOOM = 13;
 
 /** County / locality resting zoom when a selected-record card closes from beyond-county
  * framing — wide enough to read county hairlines and nearby pins, tighter than `viewportForState`
- * (~6.2). Calibrated against marker-size's z9 locality stop (a county spans hundreds of px). */
+ * (~6.2): at z9 a county spans hundreds of px. */
 export const CAMERA_COUNTY_ZOOM = 9;
 
 /** True when the browser's `prefers-reduced-motion: reduce` media query is active. `false` in

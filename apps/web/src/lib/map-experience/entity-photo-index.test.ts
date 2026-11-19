@@ -4,6 +4,8 @@ import type { PublicEntityView } from '../../data/public-seed';
 import {
   buildDoorPinPhotoIndex,
   buildEntityPhotoIndex,
+  MAX_PHOTO_IDS,
+  pickPhotoIds,
   PIN_PHOTO_THUMBNAIL_WIDTH,
 } from './entity-photo-index';
 import { firstPaintPinId } from './first-paint-pins';
@@ -64,6 +66,21 @@ test('the photo index contains only entities carrying a primaryImage', () => {
   assert.deepEqual(Object.keys(index).sort(), ['ent_imaged_commons', 'ent_imaged_gcs']);
 });
 
+test("a quiet record and an artist's rendering never reach the photo index", () => {
+  const quiet = entity({
+    id: 'ent_quiet',
+    sensitivity: 'high' as never,
+    primaryImage: IMAGED_COMMONS.primaryImage!,
+  });
+  const rendering = entity({
+    id: 'ent_rendering',
+    primaryImage: { ...IMAGED_COMMONS.primaryImage!, alt: "An artist's rendering of the memorial" },
+  });
+  assert.deepEqual(Object.keys(buildEntityPhotoIndex([quiet, rendering, IMAGED_COMMONS])), [
+    'ent_imaged_commons',
+  ]);
+});
+
 test('each entry carries only url, alt, credit (and optional license/sourcePageUrl) — no rightsStatus, objectPath, width, or height', () => {
   const index = buildEntityPhotoIndex([IMAGED_COMMONS, IMAGED_NON_COMMONS]);
   const allowedKeys = new Set(['url', 'alt', 'credit', 'license', 'sourcePageUrl']);
@@ -108,4 +125,18 @@ test('the Door pin photo index is keyed by opaque pin id, never by a real entity
   // No real entity id appears anywhere in the serialized payload.
   const serialized = JSON.stringify(index);
   assert.doesNotMatch(serialized, /ent_[a-z0-9_]+/);
+});
+
+test('pickPhotoIds answers only the ids a request names, and the whole index without ids', () => {
+  const view = { url: 'https://example.org/a.jpg', alt: 'a', credit: 'c' };
+  const index = { a: view, b: view, c: view };
+  assert.deepEqual(pickPhotoIds(index, 'http://x/atlas/photos'), index);
+  assert.deepEqual(Object.keys(pickPhotoIds(index, 'http://x/atlas/photos?ids=a,c,zz')), [
+    'a',
+    'c',
+  ]);
+  assert.deepEqual(pickPhotoIds(index, 'http://x/atlas/photos?ids=__proto__,toString'), {});
+  const many = Array.from({ length: MAX_PHOTO_IDS + 5 }, (_, i) => `a${i}`).join(',');
+  const wide = Object.fromEntries(many.split(',').map((id) => [id, view]));
+  assert.equal(Object.keys(pickPhotoIds(wide, `http://x/p?ids=${many}`)).length, MAX_PHOTO_IDS);
 });

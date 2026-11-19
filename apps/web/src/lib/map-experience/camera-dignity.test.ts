@@ -40,9 +40,9 @@ function sorted(moves: ReadonlySet<CameraMove>): readonly string[] {
   return [...moves].sort();
 }
 
-test('a lynching record permits exactly wide, flyToRecord and tilt', () => {
+test('a lynching record permits exactly wide, frameRecord and tilt', () => {
   const record: RecordLike = { kind: 'event', topicTags: ['lynching'] };
-  assert.deepEqual(sorted(allowedMovesFor(record)), ['flyToRecord', 'tilt', 'wide']);
+  assert.deepEqual(sorted(allowedMovesFor(record)), ['frameRecord', 'tilt', 'wide']);
 });
 
 test('no violence-adjacent record permits a dramatic move', () => {
@@ -94,8 +94,8 @@ test('kind by tone grid: violence-adjacent tones restrict, presence does not', (
       // Arrival and framing are always available. A record you cannot fly to is unreachable.
       assert.ok(allowed.has('wide'), `${kind}/${mapTone}: wide must always be permitted`);
       assert.ok(
-        allowed.has('flyToRecord'),
-        `${kind}/${mapTone}: flyToRecord must always be permitted`,
+        allowed.has('frameRecord'),
+        `${kind}/${mapTone}: frameRecord must always be permitted`,
       );
       assert.ok(allowed.has('tilt'), `${kind}/${mapTone}: tilt must always be permitted`);
 

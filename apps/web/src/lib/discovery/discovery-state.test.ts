@@ -123,10 +123,11 @@ describe('DiscoveryState map/list continuity', () => {
     assert.equal(arrival.evidence, 'B');
     assert.deepEqual(arrival.topic, ['abolition']);
 
-    const ret = placeDiscoveryReturn('ent_dunbar_school_001', arrival, {
-      lat: 38.9,
-      lng: -77.0,
-    });
+    const ret = placeDiscoveryReturn('ent_dunbar_school_001', arrival);
+    // The map frames the record at its stored precision; the link never forces a closer zoom.
+    for (const key of ['lat', 'lng', 'zoom']) {
+      assert.equal(new URL(ret.mapHref, 'https://example.test').searchParams.has(key), false);
+    }
     assert.equal(ret.mapHref.includes('selected=ent_dunbar_school_001'), true);
     assert.equal(ret.mapHref.includes('floor=B'), true);
     assert.equal(ret.mapHref.includes('state=OK'), true);
@@ -160,12 +161,16 @@ describe('DiscoveryState map/list continuity', () => {
   });
 
   it('placeDiscoveryReturn carries list prev/next when neighbors are supplied', () => {
-    const ret = placeDiscoveryReturn('ent_a', { view: 'list', state: ['DC'] }, undefined, {
-      previous: { href: '/place/alpha?from=list&state=DC', name: 'Alpha' },
-      next: { href: '/place/gamma?from=list&state=DC', name: 'Gamma' },
-      index: 1,
-      total: 3,
-    });
+    const ret = placeDiscoveryReturn(
+      'ent_a',
+      { view: 'list', state: ['DC'] },
+      {
+        previous: { href: '/place/alpha?from=list&state=DC', name: 'Alpha' },
+        next: { href: '/place/gamma?from=list&state=DC', name: 'Gamma' },
+        index: 1,
+        total: 3,
+      },
+    );
     assert.equal(ret.previousHref?.includes('alpha'), true);
     assert.equal(ret.nextHref?.includes('gamma'), true);
     assert.equal(ret.positionLabel, '2 of 3 in this list');
@@ -282,7 +287,6 @@ test('a protected or undrawable record returns to the collection without a pin o
   const result = placeDiscoveryReturn(
     'protected-record',
     { query: 'school', sort: 'name', selected: 'other' },
-    { lat: 1, lng: 2 },
     undefined,
     false,
   );
@@ -296,7 +300,6 @@ test('record return restores the displayed chronology page and its prior index o
   const result = placeDiscoveryReturn(
     'record-125',
     { layout: 'chronology', sort: 'name', view: 'list' },
-    undefined,
     { index: 124, total: 300 },
   );
   const params = new URL(result.listHref, 'https://example.test').searchParams;

@@ -92,7 +92,7 @@
 .ds-shortcuts__settinghint {
   display: block;
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   color: var(--ds-ink-muted);
 }
 
@@ -129,11 +129,9 @@
 
 .ds-shortcuts__section {
   margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--ds-accent);
 }
 
@@ -172,7 +170,7 @@
   background: var(--ds-canvas);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   line-height: 1;
   letter-spacing: 0.04em;
 }

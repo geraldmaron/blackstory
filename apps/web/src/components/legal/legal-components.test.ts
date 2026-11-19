@@ -3,25 +3,21 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { LEGAL_DISCLAIMER_TITLE, LAW_BROWSE_LEDE } from './copy';
-import { humanizeLegalKind, isLawStatus, lawStatusTone, legalStatusDisplay } from './format';
+import { LEGAL_DISCLAIMER_BODY } from './copy';
+import { humanizeLegalKind, isLawStatus, legalStatusDisplay } from './format';
 
-test('legal disclaimer title is present', () => {
-  assert.equal(LEGAL_DISCLAIMER_TITLE, 'Not legal advice');
-});
-
-test('law browse lede does not call the room civil rights law', () => {
-  assert.doesNotMatch(LAW_BROWSE_LEDE, /—/);
-  assert.doesNotMatch(LAW_BROWSE_LEDE, /civil rights/i);
+test('the not-legal-advice line says so in words', () => {
+  assert.match(LEGAL_DISCLAIMER_BODY, /not legal advice/);
+  assert.doesNotMatch(LEGAL_DISCLAIMER_BODY, /—/);
 });
 
 test('humanizeLegalKind maps federal-statute', () => {
   assert.equal(humanizeLegalKind('federal-statute'), 'Federal statute');
 });
 
-test('lawStatusTone maps struck_down to error tone', () => {
-  assert.equal(lawStatusTone('struck_down'), 'error');
+test('legalStatusDisplay reads a status in words', () => {
   assert.equal(legalStatusDisplay('in_force'), 'In force');
+  assert.equal(legalStatusDisplay('struck_down'), 'Struck down');
 });
 
 test('isLawStatus validates vocabulary', () => {

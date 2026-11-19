@@ -26,10 +26,13 @@
  */
 import {
   matchesExcept,
-  comparatorFor,
+  recordsComparator,
+  recordsOrderIsChronological,
+  earliestDecade,
   type RecordFacts,
   type CollectionFacts,
 } from './records-matching';
+import { recordEvidenceInputs } from '@repo/public-contracts/evidence';
 import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
 import {
   findUsStateByPostalCode,
@@ -44,7 +47,6 @@ import {
 } from '../map-experience/build-explore-map-source';
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
 import { geoAnchorFor } from '../map-experience/entity-geo';
-import { mapListContinuityLabel } from '../discovery/continuity-label';
 import { canStandHere, staysOffPublicMap } from '../place/public-place-path';
 import { publicRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 import {
@@ -65,7 +67,7 @@ import {
   type ChronologyPage,
 } from '../discovery/collection-chronology';
 import {
-  documentedDecades,
+  decadeLabel,
   periodIsActive,
   periodIsInvalid,
   periodLabel,
@@ -150,6 +152,13 @@ export type RecordsRow = {
   /** Known map availability for this released plate; omitted by legacy callers. */
   readonly mappable?: boolean;
   readonly documentedDecades?: readonly string[];
+  /** The record's own summary, cut to a length one row can show. Empty when it has none. */
+  readonly summary: string;
+  /**
+   * Distinct publishers cited on the record (the lineages the grade rule counts). `undefined`
+   * when the catalog row carries no evidence inputs, which is not the same as zero.
+   */
+  readonly sourceCount: number | undefined;
 };
 
 export type RecordsFacet = {
@@ -159,12 +168,6 @@ export type RecordsFacet = {
   readonly href: string;
   /** True when `href` leads to a narrowing crawlers must not follow (see `recordsQueryIndexable`). */
   readonly nofollow: boolean;
-};
-
-export type RecordsGroup = {
-  readonly label: string;
-  readonly count: number;
-  readonly href: string;
 };
 
 /** One active constraint, with the words that say why the set is narrowed. */
@@ -181,8 +184,19 @@ export type RecordsNotice = {
   readonly message: string;
 };
 
-/** A decade a period select can offer: only decades the collection actually documents. */
-export type RecordsPeriodDecade = { readonly decade: number; readonly count: number };
+/** One decade a reader can jump to: the page it starts on, with an anchor at its first row. */
+export type RecordsDecadeJump = {
+  /** `null` is the undated group, which sits after every dated one. */
+  readonly decade: number | null;
+  readonly label: string;
+  readonly page: number;
+  readonly href: string;
+};
+
+/** The anchor id the first row (or the timeline band) of a decade carries. */
+export function decadeAnchor(decade: number | null): string {
+  return decade === null ? 'decade-undated' : `decade-${decade}`;
+}
 
 export type RecordsIndex = {
   readonly query: RecordsQuery;
@@ -198,14 +212,11 @@ export type RecordsIndex = {
   readonly previousHref: string | undefined;
   readonly nextHref: string | undefined;
   readonly facets: Readonly<Record<RecordsFilterKey, readonly RecordsFacet[]>>;
-  readonly eraGroups: readonly RecordsGroup[];
-  readonly stateGroups: readonly RecordsGroup[];
   readonly constraints: readonly RecordsConstraint[];
   readonly clearAllHref: string;
-  /** Hands the current narrowing to Explore, with the reason string the off-ramp reads out. */
+  /** Hands the current narrowing to Explore. */
   readonly atlasHref: string;
-  readonly atlasReason: string;
-  /** Matched records that carry a public map anchor (honest Explore continuity). */
+  /** Matched records the current map plate draws; Explore's count must equal it. */
   readonly mappableMatched: number;
   /** The resolved named collection (`none` when the whole archive is the collection). */
   readonly collection: CollectionDescriptor;
@@ -216,10 +227,8 @@ export type RecordsIndex = {
   readonly chronologyHref: string;
   /** Lifts the period only (bounds and includeUndated), keeping q, facets, sort and layout. */
   readonly periodClearHref: string;
-  /** Known decades in the collection with the period lifted, ascending. Sparse stays sparse. */
-  readonly periodDecades: readonly RecordsPeriodDecade[];
-  /** Records without a documented decade that the active period leaves out. */
-  readonly undatedExcluded: number;
+  /** Every decade in the matched set, in reading order; empty unless the order is by time. */
+  readonly decadeJumps: readonly RecordsDecadeJump[];
   /** Present for `layout=chronology`: the page's rows grouped by documented decade. */
   readonly chronology: ChronologyPage<RecordsRow> | undefined;
 };
@@ -262,6 +271,8 @@ export type RecordsCatalogEntry = {
   readonly confidenceTier: ConfidenceTier;
   readonly mappable: boolean;
   readonly locationPrecision?: string;
+  /** Distinct cited publishers; absent when the source row carries no evidence inputs. */
+  readonly sourceCount?: number;
 };
 
 /**
@@ -304,6 +315,7 @@ export function recordsCatalogFromEntity(entity: PublicEntityView): RecordsCatal
     eraBuckets,
     ...(entity.status !== undefined ? { status: entity.status } : {}),
     confidenceTier: recordConfidenceTier(entity.claims),
+    sourceCount: recordEvidenceInputs(entity.claims).citedLineageKeys.length,
     mappable: carriesPublicMapAnchor(entity),
     ...(entity.locationPrecision !== undefined
       ? { locationPrecision: entity.locationPrecision }
@@ -331,6 +343,9 @@ export function recordsCatalogFromSearchDoc(doc: PublicSearchIndexDoc): RecordsC
       doc.evidenceInputs === undefined
         ? 'unrated'
         : confidenceTierFromEvidenceInputs(doc.evidenceInputs),
+    ...(doc.evidenceInputs === undefined
+      ? {}
+      : { sourceCount: doc.evidenceInputs.citedLineageKeys.length }),
     mappable:
       !staysOffPublicMap({ displayName: doc.displayName }) &&
       typeof doc.geohash === 'string' &&
@@ -343,13 +358,54 @@ function carriesPublicMapAnchor(entity: PublicEntityView): boolean {
   return entity.geoAnchor !== undefined || geoAnchorFor(entity.id) !== undefined;
 }
 
-function toFacts(entry: RecordsCatalogEntry, collisions: ReadonlyMap<string, number>): RecordFacts {
+/** Long enough for a search snippet window; the row clamps what it draws to one line. */
+const ROW_SUMMARY_MAX = 320;
+
+function rowSummary(summary: string): string {
+  const text = summary.replace(/\s+/g, ' ').trim();
+  if (text.length <= ROW_SUMMARY_MAX) return text;
+  const cut = text.slice(0, ROW_SUMMARY_MAX);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), ROW_SUMMARY_MAX - 40))}…`;
+}
+
+/** The decade a row states: its earliest documented one, not whichever bucket was stored first. */
+function earliestEraLabel(eraBuckets: readonly string[]): string {
+  const decade = earliestDecade({ eraBuckets });
+  return decade === null ? (eraBuckets[0] ?? 'Undated') : decadeLabel(decade);
+}
+
+/** `greenbook-<edition year>-<n>`: the id names the edition the listing was read from. */
+const GREEN_BOOK_LISTING_ID = /^greenbook-(\d{4})-/;
+/** The Green Book's first edition (1936) falls in this decade; a listing cannot be documented earlier. */
+const GREEN_BOOK_FIRST_DECADE = 1930;
+
+/**
+ * A Green Book listing's only dated evidence is its edition. Releases published before the claim
+ * year parser learned to skip street numbers stored the house number as a decade ("1510 South
+ * St." became the 1510s); those decades are dropped here so no listing reads as colonial.
+ * shortcut: read-time screen over stored buckets; drop it once every listing is republished.
+ */
+function screenListingDecades(id: string, eraBuckets: readonly string[]): readonly string[] {
+  const edition = GREEN_BOOK_LISTING_ID.exec(id)?.[1];
+  if (edition === undefined) return eraBuckets;
+  const kept = eraBuckets.filter((bucket) => {
+    const decade = Number.parseInt(bucket, 10);
+    return Number.isFinite(decade) && decade >= GREEN_BOOK_FIRST_DECADE;
+  });
+  return kept.length > 0 ? kept : [decadeLabel(Math.floor(Number(edition) / 10) * 10)];
+}
+
+function toFacts(
+  entry: RecordsCatalogEntry,
+  collisions: ReadonlyMap<string, number>,
+  drawnHrefs?: ReadonlyMap<string, string>,
+): RecordFacts {
   const mapTone = resolveMapTone({
     topicTags: entry.topicTags,
     ...(entry.topicIds !== undefined ? { topicIds: entry.topicIds } : {}),
     displayName: entry.displayName,
   });
-  const eraBuckets = entry.eraBuckets ?? [];
+  const eraBuckets = screenListingDecades(entry.id, entry.eraBuckets ?? []);
   const confidenceTier = entry.confidenceTier;
   const state = findUsStateFromJurisdictionLabel(entry.jurisdictionLabel);
   const location = entry.locationLabel.trim();
@@ -358,17 +414,23 @@ function toFacts(entry: RecordsCatalogEntry, collisions: ReadonlyMap<string, num
   const standable = canStandHere({
     displayName: entry.displayName,
     kind: entry.kind,
-    summary: entry.summary.length > 0 ? entry.summary : entry.displayName,
+    // The record page stands on the record's own summary, so the row must not invent one.
+    summary: entry.summary,
     ...(entry.locationPrecision !== undefined
       ? { locationPrecision: entry.locationPrecision }
       : {}),
   });
-  const href = standable
+  // The slim index lacks the precision and can disagree with the record on kind, so a `/place`
+  // address guessed from it can be dead. The plate's address was resolved from the full record;
+  // off the plate, `/entity/{id}` always resolves and forwards to the record's own address.
+  const guessed = standable
     ? publicRecordHref(
         { id: entry.id, displayName: entry.displayName, kind: entry.kind },
         collisions,
       )
     : `/entity/${entry.id}`;
+  const href =
+    drawnHrefs === undefined ? guessed : (drawnHrefs.get(entry.id) ?? `/entity/${entry.id}`);
 
   return {
     row: {
@@ -378,13 +440,15 @@ function toFacts(entry: RecordsCatalogEntry, collisions: ReadonlyMap<string, num
       // An honest blank, not an invented place: some records genuinely have no located anchor,
       // and that is the population this index exists to keep visible.
       place: place.length > 0 ? place : 'Place not recorded',
-      era: eraBuckets[0] ?? 'Undated',
+      era: earliestEraLabel(eraBuckets),
       kindFamily: kindFamilyFor(entry.kind),
       kind: entry.kind,
       mapTone,
       grade: gradeForConfidence(confidenceTier),
       gradeDescription: gradeDescription(gradeForConfidence(confidenceTier)),
       confidenceTier,
+      summary: rowSummary(entry.summary),
+      sourceCount: entry.sourceCount,
     },
     eraBuckets,
     topicIds: topicSource.filter(isValidTopicId),
@@ -472,10 +536,6 @@ function labelFor(key: RecordsFilterKey, value: string, stateNames: Map<string, 
   }
 }
 
-function compareGroups(a: RecordsGroup, b: RecordsGroup): number {
-  return b.count - a.count || a.label.localeCompare(b.label);
-}
-
 /**
  * Builds everything `/records` renders for one request.
  *
@@ -513,7 +573,8 @@ export function buildRecordsIndex(
   catalog:
     readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
   query: RecordsQuery,
-  drawableIds?: ReadonlySet<string>,
+  /** Records the current map plate draws, each with the address the plate resolved for it. */
+  drawableIds?: ReadonlyMap<string, string>,
   /**
    * The resolved named collection for `query.collection`. Omitted for the whole archive. A named
    * query with a missing or unresolved descriptor matches nothing, never everything.
@@ -522,7 +583,7 @@ export function buildRecordsIndex(
 ): RecordsIndex {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
-  const facts = entries.map((entry) => toFacts(entry, collisions));
+  const facts = entries.map((entry) => toFacts(entry, collisions, drawableIds));
   const stateNames = new Map<string, string>();
   for (const record of facts) {
     if (record.statePostal !== undefined && record.stateName !== undefined) {
@@ -538,28 +599,7 @@ export function buildRecordsIndex(
 
   const matched = facts
     .filter((record) => matchesExcept(record, query, 'none', members))
-    .sort(comparatorFor(query.sort));
-  const periodDecades = [
-    ...facts
-      .filter((record) => !query.collection || members?.has(record.row.id) === true)
-      .reduce((counts, record) => {
-        for (const decade of documentedDecades(record.eraBuckets)) {
-          counts.set(decade, (counts.get(decade) ?? 0) + 1);
-        }
-        return counts;
-      }, new Map<number, number>())
-      .entries(),
-  ]
-    .map(([decade, count]) => ({ decade, count }))
-    .sort((a, b) => a.decade - b.decade);
-  const undatedExcluded =
-    periodIsActive(period) && !periodIsInvalid(period) && !query.includeUndated
-      ? facts.filter(
-          (record) =>
-            documentedDecades(record.eraBuckets).length === 0 &&
-            matchesExcept(record, { ...query, includeUndated: true }, 'none', members),
-        ).length
-      : 0;
+    .sort(recordsComparator(query));
   const mappableMatched = matched.filter((record) =>
     drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
   ).length;
@@ -623,6 +663,42 @@ export function buildRecordsIndex(
   const chronology = ordered
     ? buildChronologyPage(ordered, start, start + RECORDS_PAGE_SIZE, toRow)
     : undefined;
+  const jumpHref = (decade: number | null, target: number) =>
+    `${recordsHref({ ...query, page: target })}#${decadeAnchor(decade)}`;
+  const decadeJumps: RecordsDecadeJump[] = [];
+  if (chronology !== undefined) {
+    for (const item of chronology.coverage) {
+      decadeJumps.push({
+        decade: item.decade,
+        label: decadeLabel(item.decade),
+        page: item.page,
+        href: jumpHref(item.decade, item.page),
+      });
+    }
+    if (chronology.undatedPage !== null) {
+      decadeJumps.push({
+        decade: null,
+        label: 'Undated',
+        page: chronology.undatedPage,
+        href: jumpHref(null, chronology.undatedPage),
+      });
+    }
+  } else if (recordsOrderIsChronological(query)) {
+    // The list read in time order: a decade starts where its first record falls.
+    const seen = new Set<number | null>();
+    matched.forEach((record, index) => {
+      const decade = earliestDecade(record);
+      if (seen.has(decade)) return;
+      seen.add(decade);
+      const target = Math.floor(index / RECORDS_PAGE_SIZE) + 1;
+      decadeJumps.push({
+        decade,
+        label: decade === null ? 'Undated' : decadeLabel(decade),
+        page: target,
+        href: jumpHref(decade, target),
+      });
+    });
+  }
   const rows = ordered
     ? ordered.slice(start, start + RECORDS_PAGE_SIZE).map((entry) => toRow(entry.facts))
     : matched.slice(start, start + RECORDS_PAGE_SIZE).map(toRow);
@@ -659,6 +735,14 @@ export function buildRecordsIndex(
           : undefined;
 
   const constraints: RecordsConstraint[] = [];
+  // The search echo leads the row: it is what the reader typed, every other chip narrows it.
+  if (query.q.length > 0) {
+    constraints.push({
+      key: 'q',
+      label: `“${query.q}”`,
+      clearHref: recordsHref({ ...query, q: '', page: 1 }),
+    });
+  }
   if (collection.state === 'live') {
     constraints.push({
       key: 'collection',
@@ -685,13 +769,6 @@ export function buildRecordsIndex(
       }),
     });
   }
-  if (query.q.length > 0) {
-    constraints.push({
-      key: 'q',
-      label: `Matching “${query.q}”`,
-      clearHref: recordsHref({ ...query, q: '', page: 1 }),
-    });
-  }
   for (const key of RECORDS_FILTER_KEYS) {
     const value = query[key];
     if (value.length === 0) continue;
@@ -701,24 +778,6 @@ export function buildRecordsIndex(
       clearHref: recordsHref({ ...query, [key]: '', page: 1 }),
     });
   }
-
-  const groupBy = (key: 'era' | 'state'): readonly RecordsGroup[] =>
-    [
-      ...matched
-        .reduce((counts, record) => {
-          for (const value of valuesFor(record, key)) {
-            counts.set(value, (counts.get(value) ?? 0) + 1);
-          }
-          return counts;
-        }, new Map<string, number>())
-        .entries(),
-    ]
-      .map(([value, count]) => ({
-        label: labelFor(key, value, stateNames),
-        count,
-        href: recordsHref({ ...query, [key]: value, page: 1 }),
-      }))
-      .sort(compareGroups);
 
   return {
     query: { ...query, page },
@@ -733,17 +792,15 @@ export function buildRecordsIndex(
       singular: 'record',
       plural: 'records',
     }),
-    canonicalPath: recordsHref({ ...query, page }),
+    // The shuffle seed is per visit, never part of what the page is.
+    canonicalPath: recordsHref({ ...query, page, seed: '' }),
     indexable: recordsQueryIndexable(query),
     previousHref: page > 1 ? recordsHref({ ...query, page: page - 1 }) : undefined,
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
     facets,
-    eraGroups: groupBy('era'),
-    stateGroups: groupBy('state'),
     constraints,
     clearAllHref: '/records',
     atlasHref: buildAtlasHref(query),
-    atlasReason: mapListContinuityLabel(matched.length, mappableMatched),
     mappableMatched,
     collection,
     notice,
@@ -764,8 +821,7 @@ export function buildRecordsIndex(
       includeUndated: false,
       page: 1,
     }),
-    periodDecades,
-    undatedExcluded,
+    decadeJumps,
     chronology,
   };
 }
@@ -795,13 +851,15 @@ export function findRecordsNeighbors(
   arrivalQuery = '',
   /** Resolved member ids of `query.collection`; without them a named collection has no records. */
   members?: ReadonlySet<string>,
+  /** The plate's resolved addresses (`loadDrawnRecordHrefs`), the same ones the register links. */
+  drawnHrefs?: ReadonlyMap<string, string>,
 ): RecordsNeighbors | undefined {
   const entries = toRecordsCatalog(catalog);
   const collisions = placeSlugCollisionCounts(entries);
   const inCollection = entries
-    .map((entry) => toFacts(entry, collisions))
+    .map((entry) => toFacts(entry, collisions, drawnHrefs))
     .filter((record) => matchesExcept(record, query, 'none', members))
-    .sort(comparatorFor(query.sort));
+    .sort(recordsComparator(query));
   // Stepping follows the displayed order: decade groups for chronology, the sort otherwise.
   const matched =
     query.layout === 'chronology'

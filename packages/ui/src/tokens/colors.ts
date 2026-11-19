@@ -18,6 +18,8 @@ export type ConfidenceLevel = (typeof confidenceLevels)[number];
 
 /** Semantic surface/text/border colors shared by both themes (hex). */
 export type ThemePalette = {
+  /** The well a plate or inset list sits in; one value step below canvas. */
+  readonly surfaceSunken: string;
   readonly canvas: string;
   readonly surface: string;
   readonly surfaceRaised: string;
@@ -25,6 +27,8 @@ export type ThemePalette = {
   readonly inkMuted: string;
   readonly inkSubtle: string;
   readonly border: string;
+  /** Form-control edge; 3:1 on every surface step (WCAG 1.4.11). */
+  readonly borderControl: string;
   readonly borderStrong: string;
   readonly focusRing: string;
   readonly focusRingOffset: string;
@@ -52,6 +56,7 @@ export type ConfidencePalette = Record<ConfidenceLevel, StatusPalette>;
 export const lightTheme: ThemePalette = {
   // Canvas and raised plate sit one value step either side of the brand Archive Paper swatch
   // (tokens.css four-step surface set), so they are literals rather than brand swatches.
+  surfaceSunken: '#EDE7DA',
   canvas: '#F8F4EC',
   surface: brandPalette.surface,
   surfaceRaised: '#FFFDF8',
@@ -59,6 +64,7 @@ export const lightTheme: ThemePalette = {
   inkMuted: brandPalette.stone,
   inkSubtle: brandPalette.stone,
   border: brandPalette.rule,
+  borderControl: '#878073',
   borderStrong: brandPalette.blackInk,
   focusRing: brandPalette.blackInk,
   focusRingOffset: brandPalette.archivePaper,
@@ -73,6 +79,7 @@ export const lightTheme: ThemePalette = {
 export const darkTheme: ThemePalette = {
   // "Ink" direction: warmer than brandPalette.blackInk/charcoal by design, so these are
   // theme-specific overrides rather than brand swatches — see tokens.css [data-theme='dark'].
+  surfaceSunken: '#0C0B0A',
   canvas: '#131110',
   surface: '#1B1917',
   surfaceRaised: '#232019',
@@ -80,6 +87,7 @@ export const darkTheme: ThemePalette = {
   inkMuted: '#BDB5A9',
   inkSubtle: '#BDB5A9',
   border: '#2C2823',
+  borderControl: '#746E65',
   borderStrong: brandPalette.archivePaper,
   focusRing: brandPalette.archivePaper,
   focusRingOffset: brandPalette.blackInk,
@@ -101,8 +109,6 @@ export const darkTheme: ThemePalette = {
 export type MapPalette = {
   readonly land: string;
   readonly water: string;
-  /** Parks and wood. Subtle against land by design. */
-  readonly green: string;
   /** State boundary. Dashed. */
   readonly line: string;
   /** Country boundary. Solid and heavier than `line`. */
@@ -116,27 +122,26 @@ export type MapPalette = {
 };
 
 export const lightMap: MapPalette = {
-  land: '#f6f2e9',
-  water: '#c7bdaa',
-  green: '#ebe5d1',
-  line: '#bdb19a',
-  line2: '#a2957c',
-  road: '#e6dcc6',
+  land: '#fbf8f2',
+  water: '#cbbfad',
+  line: '#a2957c',
+  line2: '#6d675f',
+  road: '#ebe4d6',
   label: '#6d675f',
   labelHi: '#2e2a24',
-  halo: '#f8f5ee',
+  halo: '#fbf8f2',
 };
 
+/** Night atlas: a charcoal plate on ink water, paper type. `docs/ui/patterns-place-map.md`. */
 export const darkMap: MapPalette = {
-  land: '#38332b',
-  water: '#0a0a0c',
-  green: '#3e3728',
-  line: '#665e4f',
-  line2: '#776c5a',
-  road: '#474034',
-  label: '#9e9587',
-  labelHi: '#ded7c9',
-  halo: '#16130f',
+  land: '#38332d',
+  water: '#0a0a0a',
+  line: '#7d7468',
+  line2: '#a39885',
+  road: '#4a443c',
+  label: '#b8ad9b',
+  labelHi: '#f4efe5',
+  halo: '#38332d',
 };
 
 export const mapPalettes = {
@@ -148,7 +153,7 @@ export const lightStatus: Record<'warning' | 'dispute' | 'error', StatusPalette>
   warning: {
     fg: '#6B4A17',
     bg: '#F3E4C6',
-    border: '#B87A2A',
+    border: '#AD7226',
     cue: 'Warning',
   },
   dispute: {
@@ -197,7 +202,7 @@ export const lightConfidence: ConfidencePalette = {
   medium: {
     fg: '#6B6A17',
     bg: '#EBEBC6',
-    border: '#8B8A2E',
+    border: '#83822A',
     cue: 'Medium confidence',
   },
   low: {
@@ -234,6 +239,63 @@ export const themePalettes = {
   dark: darkTheme,
 } as const;
 
+/**
+ * Color-blocked grounds (art direction v2): the copper and sand blocks a page is broken into. Paper
+ * and ink grounds reuse the light and dark roles. Every text on copper or sand is Black Ink; the
+ * primary action there is an ink plate with paper type. Mirrors `[data-ground]` in tokens.css.
+ */
+export type GroundPalette = {
+  readonly ground: string;
+  readonly ink: string;
+  readonly borderControl: string;
+  readonly primaryBg: string;
+  readonly primaryInk: string;
+  /** The primary button's hover plate (`--ds-primary-hover`). */
+  readonly primaryHover: string;
+};
+
+/** `--ds-primary-hover` on the paper and ink grounds, where the primary plate is copper. */
+export const primaryHoverPalettes = {
+  light: { primaryBg: '#B86B2A', primaryHover: '#C98A55', primaryInk: brandPalette.blackInk },
+  dark: { primaryBg: '#D07A32', primaryHover: '#DD955D', primaryInk: brandPalette.blackInk },
+} as const;
+
+export const groundPalettes = {
+  copper: {
+    ground: brandPalette.copperPin,
+    ink: brandPalette.blackInk,
+    borderControl: brandPalette.blackInk,
+    primaryBg: brandPalette.blackInk,
+    primaryInk: brandPalette.archivePaper,
+    primaryHover: '#2A2622',
+  },
+  sand: {
+    ground: brandPalette.pageSand,
+    ink: brandPalette.blackInk,
+    borderControl: brandPalette.blackInk,
+    primaryBg: brandPalette.blackInk,
+    primaryInk: brandPalette.archivePaper,
+    primaryHover: '#2A2622',
+  },
+  /* On the dark table both bands deepen and carry paper type (tokens.css). */
+  copperDark: {
+    ground: '#8E4F2A',
+    ink: brandPalette.archivePaper,
+    borderControl: brandPalette.archivePaper,
+    primaryBg: brandPalette.archivePaper,
+    primaryInk: brandPalette.blackInk,
+    primaryHover: '#DDD3C3',
+  },
+  sandDark: {
+    ground: '#5C4130',
+    ink: brandPalette.archivePaper,
+    borderControl: brandPalette.archivePaper,
+    primaryBg: brandPalette.archivePaper,
+    primaryInk: brandPalette.blackInk,
+    primaryHover: '#DDD3C3',
+  },
+} as const satisfies Record<'copper' | 'sand' | 'copperDark' | 'sandDark', GroundPalette>;
+
 export const statusPalettes = {
   light: lightStatus,
   dark: darkStatus,
@@ -257,6 +319,11 @@ export function criticalTextPairs(
     ['ink/surfaceRaised', p.ink, p.surfaceRaised],
     ['inkMuted/canvas', p.inkMuted, p.canvas],
     ['inkMuted/surface', p.inkMuted, p.surface],
+    ['ink/surfaceSunken', p.ink, p.surfaceSunken],
+    ['inkMuted/surfaceSunken', p.inkMuted, p.surfaceSunken],
+    ['accent/surfaceSunken', p.accent, p.surfaceSunken],
+    ['accent/surfaceRaised', p.accent, p.surfaceRaised],
+    ['inkMuted/surfaceRaised', p.inkMuted, p.surfaceRaised],
     ['inkSubtle/canvas', p.inkSubtle, p.canvas],
     ['inverseInk/inverse', p.inverseInk, p.inverse],
     ['accent/canvas', p.accent, p.canvas],
@@ -278,14 +345,30 @@ export function criticalUiPairs(
   const confidence = confidencePalettes[theme];
   return [
     ['borderStrong/canvas', p.borderStrong, p.canvas],
+    ['borderControl/surfaceSunken', p.borderControl, p.surfaceSunken],
+    ['borderControl/canvas', p.borderControl, p.canvas],
+    ['borderControl/surface', p.borderControl, p.surface],
+    ['borderControl/surfaceRaised', p.borderControl, p.surfaceRaised],
     ['focusRing/canvas', p.focusRing, p.canvas],
     ['focusRing/surface', p.focusRing, p.surface],
     ['accentGraphic/canvas', p.accentGraphic, p.canvas],
+    ['accentGraphic/surfaceSunken', p.accentGraphic, p.surfaceSunken],
+    ['accentGraphic/surface', p.accentGraphic, p.surface],
+    ['accentGraphic/surfaceRaised', p.accentGraphic, p.surfaceRaised],
     ['warning-border/canvas', status.warning.border, p.canvas],
     ['dispute-border/canvas', status.dispute.border, p.canvas],
     ['error-border/canvas', status.error.border, p.canvas],
     ['confidence-high-border/canvas', confidence.high.border, p.canvas],
     ['confidence-medium-border/canvas', confidence.medium.border, p.canvas],
     ['confidence-low-border/canvas', confidence.low.border, p.canvas],
+    // Status edges also sit in sunken wells and against their own fill.
+    ['warning-border/surfaceSunken', status.warning.border, p.surfaceSunken],
+    ['warning-border/own-bg', status.warning.border, status.warning.bg],
+    ['dispute-border/surfaceSunken', status.dispute.border, p.surfaceSunken],
+    ['error-border/surfaceSunken', status.error.border, p.surfaceSunken],
+    ['confidence-high-border/surfaceSunken', confidence.high.border, p.surfaceSunken],
+    ['confidence-medium-border/surfaceSunken', confidence.medium.border, p.surfaceSunken],
+    ['confidence-medium-border/own-bg', confidence.medium.border, confidence.medium.bg],
+    ['confidence-low-border/surfaceSunken', confidence.low.border, p.surfaceSunken],
   ];
 }

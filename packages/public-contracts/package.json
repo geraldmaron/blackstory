@@ -75,6 +75,11 @@
       "types": "./dist/v1/story-citation.d.ts",
       "import": "./dist/v1/story-citation.js"
     },
+    "./v1/story": {
+      "development": "./src/v1/story.ts",
+      "types": "./dist/v1/story.d.ts",
+      "import": "./dist/v1/story.js"
+    },
     "./v1/evidence-inputs": {
       "development": "./src/v1/evidence-inputs.ts",
       "types": "./dist/v1/evidence-inputs.d.ts",

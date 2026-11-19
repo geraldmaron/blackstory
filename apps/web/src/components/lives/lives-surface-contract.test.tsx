@@ -112,13 +112,12 @@ test('the reader and the appendix describe rules with one shared card', () => {
   assert.match(appendix, /<LivesRuleCard /);
 });
 
-test('every group’s comparison bar is drawn at the same weight', () => {
+test('every group’s mark on the era strip is drawn at the same weight', () => {
   const css = readFileSync(path.join(here, '../../app/lives/lives.css'), 'utf8');
-  // No per-group override may thin or fade one group's bar against another's.
-  assert.doesNotMatch(css, /\[data-lens=['"][a-z]+['"]\]\s+\.lives-era__bar/);
-  const bar = css.slice(css.indexOf('.lives-era__bar {'));
-  const block = bar.slice(0, bar.indexOf('}'));
-  assert.doesNotMatch(block, /opacity/);
+  // No group's mark may be faded against another's: groups differ by shape, never by opacity.
+  const rules = [...css.matchAll(/([^{}]*\.lives-scrub__mark[^{}]*)\{([^}]*)\}/g)];
+  assert.ok(rules.length > 0);
+  for (const [, , body] of rules) assert.doesNotMatch(body!, /opacity/);
 });
 
 test('an account plays from the archive, and is complete without the audio', async () => {
@@ -412,6 +411,7 @@ test('without a narrative the decades are the heading, and the measure is named 
     panel,
     /<h3[^>]*class="lives-era__years lives-era__years--heading"[^>]*>1870s–1890s<\/h3>/,
   );
-  assert.equal((panel.match(/Share of everyone living in the area/g) ?? []).length, 2); // aria-label + the figure's heading
+  // Named once, as the comparison's accessible name; the strip above carries the measure's title.
+  assert.equal((panel.match(/Share of everyone living in the area/g) ?? []).length, 1);
   assert.doesNotMatch(panel, /<h3[^>]*>Share of everyone living in the area<\/h3>/);
 });

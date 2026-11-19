@@ -1,391 +1,502 @@
 /**
- * `/books` catalog body: how to read the list, GET search and facets, then cover-led rows
- * with author, summary, cited states and source count. Related rooms leave as handoffs.
+ * The `/books` index body: the register's toolbar (State, Author, Sort, and a Covers | States
+ * switch), the active narrowing as removable chips, then either ruled bands that change ground
+ * (each title a row, its challenge count a copper numeral, a cover only where real art exists) or the states by challenge
+ * count (a sand block: the tile map in copper steps beside a paper sheet of ranked states).
  *
- * Rows reuse `ds-room-idx-*` slots plus books-specific copy/facts styled in `reading-room.css`
- * (`ds-books-idx`), with subgrid alignment like `/law`. Cover art is decorative; the row's
- * accessible name is the title.
+ * Server-rendered and JavaScript-free apart from the cover's image fallback: menus are the
+ * register's native popovers of GET links, and every cover and state is an anchor.
  */
 import React from 'react';
+import { BandArt } from '../../components/atmosphere/BandArt';
 import Link from 'next/link';
-import type { BannedBooksListingSnapshot } from '@repo/domain';
-import { bannedBookReportedStates } from '@repo/domain';
+import { Block, Chip, DisplayNumeral, Sheet, buttonClassName } from '@repo/ui';
+import { RecordsToolbar, type ToolbarMenu } from '../records/RecordsToolbar';
+import { Outcome } from '../records/RecordsIndex';
 import {
-  EmptyList,
-  Prose,
-  FindBar,
-  FindBarFilters,
-  RoomFactList,
-  RoomHandoff,
-  RoomJump,
-  RoomSection,
-  roomSectionTone,
-} from '../../components/room';
-import type { BannedBookSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
-import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect.js';
-import {
+  BOOKS_SORT_PRESETS,
+  bookStateName,
   buildBooksBrowseHref,
-  stateLabel,
   type BooksBrowseItem,
   type BooksBrowseViewModel,
+  type BooksView,
 } from './books-view-model';
 import { BooksCoverArt } from './BooksCoverArt';
-import { BooksSearchTypeahead } from './BooksSearchTypeahead';
-import {
-  BOOKS_ABOUT,
-  BOOKS_CATALOG,
-  BOOKS_JUMP,
-  BOOKS_READ_FACTS,
-  BOOKS_RELATED,
-} from './books-copy';
-import '../typeahead.css';
-import { formatResultSummary } from '../../lib/discovery/result-summary';
+import { STATE_TILES } from './state-tiles';
+import { BOOKS_COVER_CREDIT, BOOKS_INDEX_NOTE } from './books-copy';
 
 void React;
 
 export type BooksBrowseSectionsProps = {
   readonly view: BooksBrowseViewModel;
-  readonly suggestCorpus: readonly BannedBookSuggestCorpusItem[];
-  readonly snapshot: BannedBooksListingSnapshot;
 };
 
-type StateChip = {
-  readonly id: string;
-  readonly label: string;
-  readonly count: number;
-  readonly href: string;
-};
+type Params = Parameters<typeof buildBooksBrowseHref>[0];
 
-/** State facet chips, counted across the full catalog rather than the current page. */
-function buildStateChips(
-  snapshot: BannedBooksListingSnapshot,
-  view: BooksBrowseViewModel,
-): readonly StateChip[] {
-  const counts = new Map<string, number>();
-  for (const book of snapshot.books) {
-    for (const code of bannedBookReportedStates(book)) {
-      counts.set(code, (counts.get(code) ?? 0) + 1);
-    }
-  }
-
-  const hrefFor = (state: string) =>
-    `${buildBooksBrowseHref({
-      q: view.q,
-      state,
-      author: view.author,
-      sort: view.sort,
-      dir: view.dir,
-    })}#browse`;
-
-  const all: StateChip = {
-    id: 'all',
-    label: 'All states',
-    count: snapshot.books.length,
-    href: hrefFor('all'),
+function currentParams(view: BooksBrowseViewModel): Params {
+  return {
+    q: view.q,
+    state: view.state,
+    author: view.author,
+    sort: view.sort,
+    dir: view.dir,
+    view: view.view,
   };
-
-  const ranked = [...counts.entries()].sort(
-    (left, right) => right[1] - left[1] || left[0].localeCompare(right[0]),
-  );
-  const topCodes = new Set(ranked.slice(0, 8).map(([code]) => code));
-  if (view.state !== 'all' && counts.has(view.state)) {
-    topCodes.add(view.state);
-  }
-
-  const states = ranked
-    .filter(([code]) => topCodes.has(code))
-    .map(([code, count]): StateChip => ({
-      id: code,
-      label: stateLabel(code),
-      count,
-      href: hrefFor(code),
-    }));
-
-  return [all, ...states];
 }
 
-/** What was searched for, in words, so the empty state can say why. */
-function activeFacetWords(view: BooksBrowseViewModel): readonly string[] {
-  const words: string[] = [];
-  if (view.q.trim()) words.push(`the search "${view.q.trim()}"`);
-  if (view.state !== 'all') {
-    const label =
-      view.stateOptions.find((entry) => entry.value === view.state)?.label ?? view.state;
-    words.push(label);
-  }
-  if (view.author !== 'all') words.push(view.author);
-  return words;
+function titlesPhrase(count: number): string {
+  return `${count.toLocaleString('en-US')} ${count === 1 ? 'title' : 'titles'}`;
 }
 
-function buildActiveChips(
-  view: BooksBrowseViewModel,
-): readonly { readonly key: string; readonly label: string; readonly href: string }[] {
-  const chips: { readonly key: string; readonly label: string; readonly href: string }[] = [];
-  if (view.q.trim()) {
-    chips.push({
-      key: 'q',
-      label: `Search: ${view.q.trim()}`,
-      href: `${buildBooksBrowseHref({
-        q: '',
-        state: view.state,
-        author: view.author,
-        sort: view.sort,
-        dir: view.dir,
-      })}#browse`,
-    });
-  }
-  if (view.state !== 'all') {
-    const label =
-      view.stateOptions.find((entry) => entry.value === view.state)?.label ?? view.state;
-    chips.push({
+function filterMenus(view: BooksBrowseViewModel): ToolbarMenu[] {
+  const params = currentParams(view);
+  const states = [...view.stateCounts].sort((a, b) => a.name.localeCompare(b.name));
+  return [
+    {
       key: 'state',
-      label,
-      href: `${buildBooksBrowseHref({
-        q: view.q,
-        state: 'all',
-        author: view.author,
-        sort: view.sort,
-        dir: view.dir,
-      })}#browse`,
+      title: 'State',
+      value: view.state === 'all' ? 'Any' : bookStateName(view.state),
+      active: view.state === 'all' ? 0 : 1,
+      options: states.map((entry) => ({
+        id: entry.code,
+        label: entry.name,
+        count: entry.count,
+        href: buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' }),
+        current: entry.code === view.state,
+      })),
+      ...(view.state === 'all'
+        ? {}
+        : { clearHref: buildBooksBrowseHref({ ...params, state: 'all' }) }),
+    },
+    {
+      key: 'author',
+      title: 'Author',
+      value: view.author === 'all' ? 'Any' : view.author,
+      active: view.author === 'all' ? 0 : 1,
+      options: view.authorCounts.map((entry) => ({
+        id: entry.name,
+        label: entry.name,
+        count: entry.count,
+        href: buildBooksBrowseHref({ ...params, author: entry.name }),
+        current: entry.name === view.author,
+      })),
+      ...(view.author === 'all'
+        ? {}
+        : { clearHref: buildBooksBrowseHref({ ...params, author: 'all' }) }),
+    },
+  ];
+}
+
+function sortMenu(view: BooksBrowseViewModel): ToolbarMenu {
+  const params = currentParams(view);
+  return {
+    key: 'sort',
+    title: 'Sort',
+    value: view.sortLabel,
+    active: 0,
+    options: BOOKS_SORT_PRESETS.map((preset) => ({
+      id: `${preset.sort}-${preset.dir}`,
+      label: preset.label,
+      href: buildBooksBrowseHref({ ...params, sort: preset.sort, dir: preset.dir }),
+      current: preset.sort === view.sort && preset.dir === view.dir,
+    })),
+  };
+}
+
+type ActiveFilter = { readonly key: string; readonly label: string; readonly href: string };
+
+function activeFilters(view: BooksBrowseViewModel): ActiveFilter[] {
+  const params = currentParams(view);
+  const active: ActiveFilter[] = [];
+  const q = view.q.trim();
+  // The header search lands on /records; a `q` here comes from an older link, and still narrows.
+  if (q)
+    active.push({ key: 'q', label: `“${q}”`, href: buildBooksBrowseHref({ ...params, q: '' }) });
+  if (view.state !== 'all') {
+    active.push({
+      key: 'state',
+      label: bookStateName(view.state),
+      href: buildBooksBrowseHref({ ...params, state: 'all' }),
     });
   }
   if (view.author !== 'all') {
-    chips.push({
+    active.push({
       key: 'author',
       label: view.author,
-      href: `${buildBooksBrowseHref({
-        q: view.q,
-        state: view.state,
-        author: 'all',
-        sort: view.sort,
-        dir: view.dir,
-      })}#browse`,
+      href: buildBooksBrowseHref({ ...params, author: 'all' }),
     });
   }
-  return chips;
+  return active;
 }
 
-function sourcesLabel(count: number): string {
-  return `${count.toLocaleString('en-US')} source${count === 1 ? '' : 's'}`;
-}
-
-function BooksCatalogRow({ item }: { readonly item: BooksBrowseItem }) {
-  const statesOnFile =
-    item.states.length > 0 ? item.states.map((state) => state.code).join(' ') : 'None on file';
-  const summary = item.summary.trim();
-
+/** The closing note, set as a caption inside the last block so the page meets the footer on it. */
+function BooksNote() {
   return (
-    <Link className="ds-room-idx__row" href={`/books/${item.slug}`}>
-      <span className="ds-room-idx__glyph" aria-hidden="true">
-        <BooksCoverArt
-          title={item.title}
-          size="M"
-          {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
-        />
-      </span>
-      <span className="ds-books-idx__copy">
-        <span className="ds-room-idx__name">{item.title}</span>
-        <span className="ds-books-idx__byline">
-          {item.authorNames}
-          {item.publishedDate ? ` · ${item.publishedDate}` : ''}
-        </span>
-        {summary ? <span className="ds-books-idx__gloss">{summary}</span> : null}
-      </span>
-      <span className="ds-books-idx__facts">
-        <span
-          className="ds-room-idx__grade"
-          title={item.states.map((state) => state.name).join(', ')}
-        >
-          {statesOnFile}
-        </span>
-        <span className="ds-books-idx__cites">{sourcesLabel(item.citationCount)}</span>
-      </span>
-    </Link>
+    <p className="ds-books-note">
+      {BOOKS_INDEX_NOTE} {BOOKS_COVER_CREDIT}{' '}
+      <Link href="/methodology">How this list is built</Link>
+    </p>
   );
 }
 
-export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrowseSectionsProps) {
-  const countLabel = formatResultSummary({
-    matched: view.totalMatched,
-    total: view.totalMatched,
-    singular: 'title',
-    plural: 'titles',
-    page: view.pagination.page,
-    pageCount: view.pagination.totalPages,
+/**
+ * The sand lead over the cover wall: the state with the most challenged titles as a display
+ * numeral, then the next four in mono. Every entry opens the states view; the numbers are the
+ * same `stateCounts` the states view ranks.
+ */
+function StatesLead({ view }: { readonly view: BooksBrowseViewModel }) {
+  const [top, ...rest] = view.stateCounts;
+  if (!top) return null;
+  const href = buildBooksBrowseHref({ ...currentParams(view), view: 'states' });
+  return (
+    <Block tone="sand" className="ds-books-lead">
+      <div className="ds-wrap ds-books-lead__inner">
+        <a className="ds-books-lead__top" href={href}>
+          <DisplayNumeral size="title" className="ds-books-lead__numeral">
+            {top.count.toLocaleString('en-US')}
+          </DisplayNumeral>
+          <span className="ds-books-lead__label">
+            <span className="ds-books-lead__state">{top.name}</span>
+            <span className="ds-books-lead__unit">
+              {top.count === 1 ? 'title' : 'titles'} challenged, the most of any state
+            </span>
+          </span>
+        </a>
+        <ol className="ds-books-lead__rest" aria-label="Next states by challenged titles">
+          {rest.slice(0, 4).map((entry) => (
+            <li key={entry.code}>
+              <a className="ds-books-lead__row" href={href}>
+                <span>{entry.name}</span>
+                <span className="ds-books-lead__count">{titlesPhrase(entry.count)}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </Block>
+  );
+}
+
+/** A band holds about two screens of rows at 1440, then the ground changes. */
+const BAND_ROWS = 18;
+
+export type BookGroup = { readonly label: string; readonly items: readonly BooksBrowseItem[] };
+
+/** The label an ordered title falls under, read off the same field the order sorts by. */
+function groupLabel(item: BooksBrowseItem, sort: BooksBrowseViewModel['sort']): string {
+  const initial = (text: string) => {
+    const first = text.trim().charAt(0).toLocaleUpperCase('en-US');
+    return /[A-Z]/.test(first) ? first : '#';
+  };
+  switch (sort) {
+    case 'author':
+      return initial(item.authorNames);
+    case 'year': {
+      const year = Number(/^\d{4}/.exec(item.publishedDate)?.[0]);
+      return year ? `${Math.floor(year / 10) * 10}s` : 'Undated';
+    }
+    case 'states':
+      return item.states.length === 0
+        ? 'No state on file'
+        : `${item.states.length} ${item.states.length === 1 ? 'state' : 'states'}`;
+    case 'citations':
+      return `${item.citationCount} ${item.citationCount === 1 ? 'source' : 'sources'}`;
+    case 'title':
+    default:
+      return initial(item.title);
+  }
+}
+
+/**
+ * Consecutive titles under one label, then the groups packed into bands of about `BAND_ROWS`
+ * rows. A group is never split, so a long one is a band of its own.
+ */
+export function bandBooks(
+  items: readonly BooksBrowseItem[],
+  sort: BooksBrowseViewModel['sort'],
+): BookGroup[][] {
+  const groups: { label: string; items: BooksBrowseItem[] }[] = [];
+  for (const item of items) {
+    const label = groupLabel(item, sort);
+    const last = groups.at(-1);
+    if (last?.label === label) last.items.push(item);
+    else groups.push({ label, items: [item] });
+  }
+  const bands: BookGroup[][] = [];
+  let rows = 0;
+  for (const group of groups) {
+    if (bands.length === 0 || rows + group.items.length > BAND_ROWS) {
+      bands.push([]);
+      rows = 0;
+    }
+    bands.at(-1)!.push(group);
+    rows += group.items.length;
+  }
+  return bands;
+}
+
+function bandName(band: readonly BookGroup[]): string {
+  const first = band[0]!.label;
+  const last = band.at(-1)!.label;
+  return first === last ? first : `${first} to ${last}`;
+}
+
+function BookRow({ item }: { readonly item: BooksBrowseItem }) {
+  const count = item.states.length;
+  return (
+    <li>
+      <Link className="ds-books-row" href={`/books/${item.slug}`}>
+        <span className="ds-books-row__text">
+          <span className="ds-books-row__title">{item.title}</span>
+          {item.authorNames ? (
+            <span className="ds-books-row__author">{item.authorNames}</span>
+          ) : null}
+        </span>
+        {count > 0 ? (
+          <span className="ds-books-row__count">
+            <span className="ds-visually-hidden">Challenged in </span>
+            <span className="ds-books-row__n">{count}</span>
+            <span className="ds-books-row__word">{count === 1 ? 'state' : 'states'}</span>
+          </span>
+        ) : (
+          <span className="ds-books-row__count ds-books-row__count--none">State not recorded</span>
+        )}
+        {/* Real art or nothing: a title with no cover is a row, never a stand-in card. */}
+        <span className="ds-books-row__cover">
+          <BooksCoverArt
+            bare
+            className="ds-books-row__art"
+            title={item.title}
+            size="M"
+            {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
+          />
+        </span>
+      </Link>
+    </li>
+  );
+}
+
+/**
+ * The titles as bands that change ground every couple of screens, grouped by the field the order
+ * sorts on. Each band names its range and counts its titles in a copper numeral; the titles are
+ * ruled rows, a restrained cover at the row's end where real art exists.
+ */
+function BookBands({ view }: { readonly view: BooksBrowseViewModel }) {
+  const bands = bandBooks(view.items, view.sort);
+  return (
+    <>
+      {bands.map((band, index) => {
+        const total = band.reduce((sum, group) => sum + group.items.length, 0);
+        const last = index === bands.length - 1;
+        return (
+          <Block
+            key={bandName(band)}
+            tone={index % 2 === 0 ? 'ink' : 'sand'}
+            className="ds-books-band"
+          >
+            <BandArt motifs={index % 2 === 0 ? ['ledger'] : ['grain']} />
+            <div className="ds-wrap ds-books-bandgrid">
+              <div className="ds-books-mark">
+                <DisplayNumeral decorative className="ds-books-mark__numeral">
+                  {total.toLocaleString('en-US')}
+                </DisplayNumeral>
+                <h2 className="ds-books-mark__name">{bandName(band)}</h2>
+                <p className="ds-books-mark__meta">{titlesPhrase(total)}</p>
+              </div>
+              <div className="ds-books-groups">
+                {band.map((group) => (
+                  <section key={group.label} aria-label={group.label}>
+                    {band.length > 1 ? (
+                      <h3 className="ds-books-group__label">{group.label}</h3>
+                    ) : null}
+                    <ul className="ds-books-list">
+                      {group.items.map((item) => (
+                        <BookRow key={item.id} item={item} />
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+              {last ? <BooksNote /> : null}
+            </div>
+          </Block>
+        );
+      })}
+    </>
+  );
+}
+
+/** Steps for the tile grid: paper, copper, copper text, ink; none is an outline (books.css). */
+const TILE_STEPS = 4;
+
+/** Square root, so the states behind one outlier still read apart from each other. */
+export function tileStep(count: number, max: number): number {
+  return count <= 0 || max <= 0 ? 0 : Math.ceil(Math.sqrt(count / max) * TILE_STEPS);
+}
+
+/** The legend's ranges, read off `tileStep` itself so the key cannot drift from the tiles. */
+export function tileLegend(max: number): { step: number; from: number; to: number }[] {
+  const ranges: { step: number; from: number; to: number }[] = [];
+  for (let count = 1; count <= max; count += 1) {
+    const step = tileStep(count, max);
+    const range = ranges.at(-1);
+    if (range?.step === step) range.to = count;
+    else ranges.push({ step, from: count, to: count });
+  }
+  return ranges;
+}
+
+/**
+ * The states by how many titles carry a cited challenge there. The tile grid is the picture: a
+ * state code and a shade, decorative, since the ranked list beside it prints every number. The
+ * list is the control, each row a link to the cover wall filtered to that state.
+ */
+function StateView({ view }: { readonly view: BooksBrowseViewModel }) {
+  const params = currentParams(view);
+  const counts = new Map(view.stateCounts.map((entry) => [entry.code, entry.count]));
+  const max = Math.max(...view.stateCounts.map((entry) => entry.count));
+  return (
+    <Block tone="sand" className="ds-books-band ds-books-band--states">
+      <div className="ds-wrap ds-books-states">
+        <div className="ds-books-map" aria-hidden="true">
+          <div className="ds-books-tiles">
+            {Object.entries(STATE_TILES).map(([code, [row, column]]) => {
+              const step = tileStep(counts.get(code) ?? 0, max);
+              return (
+                <span
+                  key={code}
+                  className="ds-books-tiles__tile"
+                  data-step={step}
+                  data-current={code === view.state ? 'true' : undefined}
+                  style={{ gridRow: row + 1, gridColumn: column + 1 }}
+                >
+                  {code}
+                </span>
+              );
+            })}
+          </div>
+          <ul className="ds-books-legend">
+            {tileLegend(max).map((range) => (
+              <li key={range.step}>
+                <span className="ds-books-tiles__tile" data-step={range.step} />
+                {range.from === range.to ? range.from : `${range.from} to ${range.to}`}{' '}
+                {range.to === 1 ? 'title' : 'titles'}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <Sheet className="ds-books-ranks-sheet">
+          <ol className="ds-books-ranks" aria-label="States by challenged titles">
+            {view.stateCounts.map((entry) => (
+              <li key={entry.code}>
+                <a
+                  className="ds-books-ranks__row"
+                  href={buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' })}
+                  aria-current={entry.code === view.state ? 'true' : undefined}
+                >
+                  <span className="ds-books-ranks__name">{entry.name}</span>
+                  <span className="ds-books-ranks__bar" aria-hidden="true">
+                    <span style={{ width: `${(entry.count / max) * 100}%` }} />
+                  </span>
+                  <span className="ds-books-ranks__count">{titlesPhrase(entry.count)}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </Sheet>
+        <BooksNote />
+      </div>
+    </Block>
+  );
+}
+
+export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
+  const params = currentParams(view);
+  const active = activeFilters(view);
+  const facets = active.filter((filter) => filter.key !== 'q').length;
+  const viewHref = (value: BooksView) => buildBooksBrowseHref({ ...params, view: value });
+  const clearHref = buildBooksBrowseHref({
+    q: '',
+    state: 'all',
+    author: 'all',
+    sort: view.sort,
+    dir: view.dir,
+    view: view.view,
   });
-  const activeWords = activeFacetWords(view);
-  const activeChips = buildActiveChips(view);
-  const stateChips = buildStateChips(snapshot, view);
+
+  const empty = view.view === 'states' ? view.stateCounts.length === 0 : view.items.length === 0;
+  let body: React.ReactNode;
+  if (view.view === 'states') {
+    body =
+      view.stateCounts.length === 0 ? (
+        <Outcome title="No states to show" action={{ href: clearHref, label: 'Clear filters' }}>
+          No title matching {active.map((filter) => filter.label).join(', ')} carries a cited
+          challenge with a state.
+        </Outcome>
+      ) : (
+        <StateView view={view} />
+      );
+  } else {
+    body =
+      view.items.length === 0 ? (
+        <Outcome title="No titles match" action={{ href: clearHref, label: 'Clear filters' }}>
+          Nothing in the catalog matches {active.map((filter) => filter.label).join(', ')}.
+        </Outcome>
+      ) : (
+        <>
+          <StatesLead view={view} />
+          <BookBands view={view} />
+        </>
+      );
+  }
 
   return (
     <>
-      <RoomJump sections={BOOKS_JUMP} />
-
-      <RoomSection
-        id="read"
-        icon="books"
-        kicker={BOOKS_ABOUT.kicker}
-        title={BOOKS_ABOUT.title}
-        tone={roomSectionTone(0)}
-      >
-        <Prose>
-          <p>{BOOKS_ABOUT.lede}</p>
-        </Prose>
-        <RoomFactList
-          items={BOOKS_READ_FACTS.map((fact) => ({
-            title: fact.title,
-            body: fact.body,
-            icon: fact.icon,
-          }))}
-        />
-      </RoomSection>
-
-      <RoomSection
-        id="browse"
-        icon="publication"
-        kicker={BOOKS_CATALOG.kicker}
-        title={BOOKS_CATALOG.title}
-        tone={roomSectionTone(1)}
-      >
-        <Prose>
-          <p>{BOOKS_CATALOG.lede}</p>
-        </Prose>
-
-        <div className="ds-find-anchor">
-          <FindBar
-            id="books"
-            action="/books#browse"
-            queryLabel="Search titles, authors and summaries"
-            placeholder="Title, author, or summary…"
-            query={view.q}
-            searchSlot={<BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />}
-            formFields={
-              <FindBarFilters
-                label="State and author"
-                activeCount={(view.state === 'all' ? 0 : 1) + (view.author === 'all' ? 0 : 1)}
-              >
-                <AutoSubmitSelect
-                  id="state"
-                  name="state"
-                  label="State"
-                  defaultValue={view.state}
-                  options={view.stateOptions}
-                />
-                <AutoSubmitSelect
-                  id="author"
-                  name="author"
-                  label="Author"
-                  defaultValue={view.author}
-                  options={view.authorOptions}
-                />
-              </FindBarFilters>
+      <RecordsToolbar
+        filters={filterMenus(view)}
+        {...(view.view === 'covers' ? { sort: sortMenu(view) } : {})}
+        view={{
+          label: 'Show books as',
+          value: view.view,
+          options: [
+            { value: 'covers', label: 'Titles', href: viewHref('covers') },
+            { value: 'states', label: 'States', href: viewHref('states') },
+          ],
+        }}
+        activeCount={facets}
+        showLabel={`Show ${titlesPhrase(view.totalMatched)}`}
+        {...(facets > 0
+          ? {
+              clearAllHref: buildBooksBrowseHref({ ...params, state: 'all', author: 'all' }),
             }
-            preserved={{ sort: view.sort, dir: view.dir }}
-            active={activeChips}
-            clearHref="/books#browse"
-            rows={[
-              {
-                label: 'Filter by state',
-                chips: stateChips.map((chip) => ({
-                  label: chip.label,
-                  href: chip.href,
-                  active: (view.state === 'all' ? 'all' : view.state) === chip.id,
-                  count: chip.count,
-                })),
-              },
-            ]}
-            sort={view.sortOptions.map((option) => ({
-              label: option.label,
-              href: `${option.href}#browse`,
-              active: option.active,
-              mark: option.active ? (view.dir === 'asc' ? '↑' : '↓') : undefined,
-            }))}
-            summary={countLabel}
-          />
+          : {})}
+      />
 
-          {view.items.length === 0 ? (
-            activeWords.length > 0 ? (
-              <EmptyList title={BOOKS_CATALOG.emptyTitle}>
-                Nothing in the catalog matches {activeWords.join(', ')}.{' '}
-                <Link href="/books#browse">Clear every facet</Link> to see all{' '}
-                {snapshot.books.length.toLocaleString('en-US')} titles, or{' '}
-                <Link href="/submit">tell the archive about a title it is missing</Link>.
-              </EmptyList>
-            ) : (
-              <EmptyList title={BOOKS_CATALOG.emptyTitle}>
-                No titles are on file yet. <Link href="/submit">Tell the archive about one</Link>.
-              </EmptyList>
-            )
-          ) : (
-            <div className="ds-books-idx ds-room-idx__list" aria-labelledby="books-results-heading">
-              {view.items.map((item) => (
-                <BooksCatalogRow item={item} key={item.id} />
-              ))}
-            </div>
-          )}
-
-          {view.pagination.totalPages > 1 ? (
-            <nav className="ds-room-idx__bar" aria-label="Books catalog pages">
-              {view.pagination.previousHref ? (
-                <Link
-                  className="ds-cta ds-cta--quiet ds-cta--sm"
-                  href={`${view.pagination.previousHref}#browse`}
-                  rel="prev"
-                >
-                  Previous
-                </Link>
-              ) : null}
-              <span className="ds-room-idx__count">
-                Page {view.pagination.page} of {view.pagination.totalPages}
-              </span>
-              {view.pagination.nextHref ? (
-                <Link
-                  className="ds-cta ds-cta--quiet ds-cta--sm"
-                  href={`${view.pagination.nextHref}#browse`}
-                  rel="next"
-                >
-                  Next
-                </Link>
-              ) : null}
-            </nav>
+      {active.length > 0 ? (
+        <div className="ds-records-active">
+          <ul className="ds-records-active__chips" aria-label="Active filters">
+            {active.map((filter) => (
+              <li key={filter.key}>
+                <Chip removable href={filter.href} label={filter.label}>
+                  {filter.label}
+                </Chip>
+              </li>
+            ))}
+          </ul>
+          {/* The empty state carries its own Clear filters; one control per job. */}
+          {active.length > 1 && !empty ? (
+            <a className={buttonClassName('quiet')} href={clearHref}>
+              Clear all
+            </a>
           ) : null}
         </div>
-      </RoomSection>
+      ) : null}
 
-      <RoomSection
-        id="related"
-        icon="rooms"
-        kicker={BOOKS_RELATED.kicker}
-        title={BOOKS_RELATED.title}
-        tone={roomSectionTone(2)}
-      >
-        <Prose>
-          <p>
-            How the list is built, the statutes and rulings that sat around it, and a way to point
-            at a title that is missing.
-          </p>
-        </Prose>
-        <div className="ds-room-handoffs">
-          <RoomHandoff
-            href="/methodology"
-            icon="methodology"
-            title="How this catalog is built"
-            line="Sources, method, and what a cited challenge means here."
-          />
-          <RoomHandoff
-            href="/law"
-            icon="law"
-            title="Law"
-            line="Statutes and rulings, in plain language."
-          />
-          <RoomHandoff
-            href="/submit"
-            icon="submit"
-            title="Point at a missing title"
-            line="A lead is reviewed. Nothing you send is published as you sent it."
-          />
-        </div>
-      </RoomSection>
+      {body}
+
+      {/* With a band on the page the note rides its foot; an outcome keeps it here. */}
+      {empty ? <BooksNote /> : null}
     </>
   );
 }

@@ -67,8 +67,10 @@ export function redirectsForNextConfig() {
     // and is unaffected by this page redirect.
     { source: '/locate', destination: '/explore?find=place', permanent: true },
 
-    // `/library` is the old name for Rooms.
-    { source: '/library', destination: '/rooms', permanent: true },
+    // `/library` and `/rooms` are the old names for the Collections hub. The trust pages and
+    // forms Rooms also listed now hang off About; a bookmark lands on the collections.
+    { source: '/library', destination: '/collections', permanent: true },
+    { source: '/rooms', destination: '/collections', permanent: true },
 
     // Retired hub escape hatches. Query strings are preserved by Next when the destination
     // omits its own query, so `/law/browse?q=voting` lands on `/law?q=voting`.

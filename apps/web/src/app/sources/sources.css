@@ -1,0 +1,197 @@
+/**
+ * `/sources`: the publisher table. Chips filter by kind; column headers sort; the count column
+ * carries a neutral bar so the long tail reads at a glance. Numbers are tabular mono.
+ */
+.ds-sources-table {
+  margin-top: var(--ds-space-6);
+}
+
+/* The ruled filter idiom: mono caps labels, counts as copper numerals, the current one underlined. */
+.ds-sources-table__kinds {
+  padding-bottom: var(--ds-space-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind {
+  height: 2.75rem;
+  padding: 0 var(--ds-space-1);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind::before {
+  inset: 0;
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind:hover {
+  color: var(--ds-ink);
+}
+
+.ds-sources-table__kinds .ds-sources-table__kind--current {
+  border-bottom-color: var(--ds-accent-graphic);
+  background: none;
+  color: var(--ds-ink);
+  font-weight: 650;
+}
+
+.ds-sources-table__kind-n {
+  color: var(--ds-numeral-soft-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 12px between rows: each 32px chip keeps its own 44px hit area when the group wraps. */
+.ds-sources-table__kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-5);
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-sources-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-sources-table__th {
+  padding: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-ink-muted);
+  text-align: left;
+  font-weight: 600;
+}
+
+.ds-sources-table__th button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ds-ink-muted);
+  font: inherit;
+  font-size: var(--ds-text-caption);
+  cursor: pointer;
+}
+
+.ds-sources-table__th button:hover,
+.ds-sources-table__th[aria-sort='ascending'] button,
+.ds-sources-table__th[aria-sort='descending'] button {
+  color: var(--ds-ink);
+}
+
+.ds-sources-table__sort {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.ds-sources-table__th--records {
+  width: 40%;
+}
+
+.ds-sources-table__th--kind {
+  width: 9rem;
+}
+
+.ds-sources-table__table tbody th,
+.ds-sources-table__table td {
+  padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-2) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  vertical-align: middle;
+  text-align: left;
+}
+
+.ds-sources-table__name {
+  font-weight: 500;
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+/* One line of type as a 44px target: padding paid back in margin, so the row does not move. */
+.ds-sources-table__name a {
+  display: inline-block;
+  margin-block: calc(var(--ds-space-4) * -1);
+  padding-block: var(--ds-space-4);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-sources-table__name a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ds-sources-table__kind,
+.ds-sources-table__kind-inline {
+  color: var(--ds-ink-muted);
+  font-weight: 400;
+}
+
+.ds-sources-table__kind-inline {
+  display: none;
+}
+
+.ds-sources-table__count {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--ds-space-3);
+}
+
+.ds-sources-table__n {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--ds-ink);
+}
+
+.ds-sources-table__bar {
+  display: block;
+  height: 6px;
+  background: color-mix(in srgb, var(--ds-ink) 8%, var(--ds-canvas));
+}
+
+.ds-sources-table__bar > span {
+  display: block;
+  height: 100%;
+  background: var(--ds-ink-muted);
+}
+
+.ds-sources-table__table tbody tr:hover .ds-sources-table__bar > span {
+  background: var(--ds-ink);
+}
+
+.ds-sources-table__foot {
+  margin-top: var(--ds-space-4);
+}
+
+/* Phone: kind moves under the name, so the count keeps its bar. */
+@media (max-width: 39.9375rem) {
+  .ds-sources-table__th--kind,
+  .ds-sources-table__kind {
+    display: none;
+  }
+
+  .ds-sources-table__kind-inline {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--ds-text-caption);
+  }
+
+  .ds-sources-table__th--records {
+    width: 45%;
+  }
+
+  .ds-sources-table__count {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    column-gap: var(--ds-space-2);
+  }
+}

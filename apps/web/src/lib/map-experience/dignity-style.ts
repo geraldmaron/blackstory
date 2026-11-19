@@ -4,23 +4,11 @@
  */
 import { brandPalette, mapPalettes } from '@repo/ui';
 
-export const EXPLORE_CLUSTER_CONFIG = {
-  /** Pixel radius for grouping nearby points — tighter than default so metro clouds collapse. */
-  clusterRadius: 52,
-  /**
-   * Keep aggregates through state/locality; individuals emerge past this zoom.
-   * Must stay below `MAP_MAX_ZOOM` so expansion flights remain inside the envelope.
-   */
-  clusterMaxZoom: 12,
-  clusterMinPoints: 2,
-} as const;
-
-/** Cluster disc radii by point_count, then scaled by zoom in explore-style (national shrink). */
+/** Place-token circle radii by record count: three steps, no zoom scaling, no color. */
 export const CLUSTER_RADIUS_BY_COUNT: ReadonlyArray<readonly [minCount: number, radius: number]> = [
-  [0, 10],
-  [10, 14],
-  [50, 18],
-  [200, 22],
+  [0, 11],
+  [10, 15],
+  [100, 20],
 ];
 
 /** OpenFreeMap vector tiles + fonts — free street basemap under the archive layers. */
@@ -54,7 +42,6 @@ export const DIGNITY_PALETTE = {
   point: brandPalette.copperPin,
   pointHalo: brandPalette.pageSand,
   cluster: brandPalette.copperInk,
-  clusterText: brandPalette.archivePaper,
   densityLow: 'rgba(184, 107, 42, 0.12)',
   densityMid: 'rgba(184, 107, 42, 0.28)',
   densityHigh: 'rgba(184, 107, 42, 0.5)',
@@ -97,11 +84,10 @@ export const DIGNITY_PALETTE = {
   confidenceLow: '#D07A32',
   confidenceUnrated: brandPalette.stone,
 
-  streetCasingDark: 'rgba(244, 239, 229, 0.22)',
-  streetDark: 'rgba(244, 239, 229, 0.38)',
+  /** Streets are one quiet line (no casing), about a third of the ink at most. */
+  streetDark: 'rgba(244, 239, 229, 0.26)',
   streetLabelDark: 'rgba(244, 239, 229, 0.55)',
-  streetCasingLight: 'rgba(10, 10, 10, 0.18)',
-  streetLight: 'rgba(10, 10, 10, 0.22)',
+  streetLight: 'rgba(10, 10, 10, 0.26)',
   streetLabelLight: 'rgba(10, 10, 10, 0.55)',
 } as const;
 
@@ -174,93 +160,62 @@ export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
 export const LIGHT_PLATE_OCEAN = '#FFFFFF';
 
 /**
- * Plate color for a scheme.
+ * Plate color for a scheme: an atlas plate in the app's own materials (`docs/ui/patterns-place-map.md`,
+ * "Visual").
  *
- * `land`, `water`, `stateBounds` and `countyLine` come from `mapPalettes` in `@repo/ui`, which is
- * the source of truth for the plate: MapLibre styles are JSON, not CSS, so the TypeScript export
- * leads and `tokens.css` mirrors it. Those four carry the ΔL\* contract from design law §3 and are
- * contract-tested in `map-contrast.test.ts` — do not hand-tune them here.
+ * Dark theme is the night atlas: the lower 48 (`land`) is a charcoal plate, the land around it
+ * (`ocean`, the background: Canada, Mexico, the islands) one step darker, the water ink black with
+ * paper waterlines along every coast, and the type paper. Light theme is the same atlas by day:
+ * Surface paper land on an Archive Paper surround, stone-sand water, ink waterlines and ink type.
  *
- * The remaining members are still local literals. They are pin, cluster, density and history
- * encoding, not plate cartography, and §3 does not govern them.
+ * `land`, `water`, boundaries, labels and halo come from `mapPalettes` in `@repo/ui` (the source of
+ * truth, ΔL* contract in `map-contrast.test.ts`). Copper is kept for the archive's own marks: place
+ * counts, site pins and the selection. A copper pin holds 3:1 on both land steps, and every pin also
+ * carries a ring in the opposite value, so its edge never depends on the copper alone.
  */
 export function plateForScheme(scheme: MapColorScheme) {
-  if (scheme === 'light') {
-    return {
-      /**
-       * The background is LAND. The plate draws real cartography: OpenFreeMap's `water`
-       * source-layer paints the oceans, lakes and rivers over it, so coastline comes from the
-       * tiles rather than from the edge of the state polygons. Before this the background was
-       * water and the only landmass was the 49 state shapes, which is why the plate read as a
-       * floating chart of the United States with no coast, no lakes and no continent around it.
-       */
-      ocean: mapPalettes.light.land,
-      land: mapPalettes.light.land,
-      water: mapPalettes.light.water,
-      green: mapPalettes.light.green,
-      /** Country boundary. Solid and heavier than `stateBounds`. */
-      countryBounds: mapPalettes.light.line2,
-      road: mapPalettes.light.road,
-      /** Place labels from the vector tiles: state register and city/town register. */
-      placeLabel: mapPalettes.light.label,
-      placeLabelHi: mapPalettes.light.labelHi,
-      placeLabelHalo: mapPalettes.light.halo,
-      selected: DIGNITY_PALETTE.selectedDark,
-      densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
-      densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
-      streetCasing: DIGNITY_PALETTE.streetCasingLight,
-      street: DIGNITY_PALETTE.streetLight,
-      streetLabel: DIGNITY_PALETTE.streetLabelLight,
-      clusterText: DIGNITY_PALETTE.selectedDark,
-      /** State bounds. `line` is contrast-held against `land` by design law §3. */
-      stateBounds: mapPalettes.light.line,
-      /**
-       * County hairlines stay a local value. The §3 token table has no county role — its `line-2`
-       * is the *country* border, heavier than `line`, and using it here would make counties
-       * out-read states. Stone is deliberate: `rule` (#D7D0C4) vanishes against land.
-       */
-      countyLine: brandPalette.stone,
-      /** County name labels — stone text + white halo (WCAG: color is not the only boundary signal). */
-      countyLabel: brandPalette.stone,
-      countyLabelHalo: LIGHT_PLATE_OCEAN,
-      /**
-       * History relationship lines — copper brown on white (≥3:1 non-text). pageSand
-       * (`pointHalo`) reads as invisible wash on the light plate (~2.3:1).
-       */
-      historyEdge: brandPalette.copperTextLight,
-      /** Selected relationship line — Copper Pin accent (navigational signal). */
-      historyEdgeSelected: brandPalette.copperPin,
-    } as const;
-  }
+  const palette = mapPalettes[scheme];
+  const light = scheme === 'light';
   return {
-    /** See the light branch: the background is land, and the tiles supply the water. */
-    ocean: mapPalettes.dark.land,
-    land: mapPalettes.dark.land,
-    water: mapPalettes.dark.water,
-    green: mapPalettes.dark.green,
-    countryBounds: mapPalettes.dark.line2,
-    road: mapPalettes.dark.road,
-    placeLabel: mapPalettes.dark.label,
-    placeLabelHi: mapPalettes.dark.labelHi,
-    placeLabelHalo: mapPalettes.dark.halo,
-    selected: DIGNITY_PALETTE.selected,
-    densityUnknown: DIGNITY_PALETTE.densityUnknownFill,
-    densityDisabled: DIGNITY_PALETTE.densityDisabledFill,
-    streetCasing: DIGNITY_PALETTE.streetCasingDark,
-    street: DIGNITY_PALETTE.streetDark,
-    streetLabel: DIGNITY_PALETTE.streetLabelDark,
-    clusterText: DIGNITY_PALETTE.selectedDark,
-    stateBounds: mapPalettes.dark.line,
-    /** Local, for the reason given on the light branch: §3 has no county role. */
-    countyLine: DIGNITY_PALETTE.selected,
-    countyLabel: DIGNITY_PALETTE.streetLabelDark,
-    countyLabelHalo: DIGNITY_PALETTE.ocean,
-    /**
-     * History relationship lines — copper on ink (≥3:1). pageSand blends into presence
-     * density fills; copperDark stays a clear navigational signal without alarm red.
-     */
-    historyEdge: brandPalette.copperDark,
-    historyEdgeSelected: DIGNITY_PALETTE.point,
+    /** The background layer: the land around the lower 48. The tiles supply the water over it. */
+    ocean: light ? '#efe8dc' : '#24201c',
+    land: palette.land,
+    water: palette.water,
+    /** Waterlines: offset hairlines inside every coast, the engraved atlas signature. */
+    waterline: light ? 'rgba(10, 10, 10, 0.3)' : 'rgba(244, 239, 229, 0.24)',
+    countryBounds: palette.line2,
+    road: palette.road,
+    placeLabel: palette.label,
+    placeLabelHi: palette.labelHi,
+    placeLabelHalo: palette.halo,
+    /** The selected state's abbreviation, beside its copper outline. */
+    selectedStateLabel: light ? brandPalette.copperTextLight : brandPalette.copperDark,
+    selected: light ? DIGNITY_PALETTE.selectedDark : DIGNITY_PALETTE.selected,
+    densityUnknown: light
+      ? DIGNITY_PALETTE.densityUnknownFillLight
+      : DIGNITY_PALETTE.densityUnknownFill,
+    densityDisabled: light
+      ? DIGNITY_PALETTE.densityDisabledFillLight
+      : DIGNITY_PALETTE.densityDisabledFill,
+    street: light ? DIGNITY_PALETTE.streetLight : DIGNITY_PALETTE.streetDark,
+    streetLabel: light ? DIGNITY_PALETTE.streetLabelLight : DIGNITY_PALETTE.streetLabelDark,
+    /** Single records: a copper pin head (site) or an open copper ring (city). */
+    markInk: brandPalette.copperPin,
+    /** The site disc's keyline: the plate's type color for the scheme, the same over imagery. */
+    markRing: light ? brandPalette.blackInk : brandPalette.archivePaper,
+    /** Jurisdiction tags (the ungrouped embed): the plate's own type color. */
+    tagText: palette.labelHi,
+    /** Area precision is shown as an area: a flat copper tint over the jurisdiction. */
+    areaTint: brandPalette.copperPin,
+    /** Pins outside the brushed decades: a sand ghost. */
+    ghost: brandPalette.pageSand,
+    selectedHalo: light ? brandPalette.archivePaper : brandPalette.blackInk,
+    stateBounds: palette.line,
+    countyLine: light ? brandPalette.stone : '#8a8172',
+    countyLabel: palette.label,
+    countyLabelHalo: palette.halo,
+    historyEdge: light ? brandPalette.copperTextLight : brandPalette.copperDark,
+    historyEdgeSelected: brandPalette.copperPin,
   } as const;
 }
 
@@ -365,7 +320,6 @@ export function plateOverImagery(scheme: MapColorScheme): MapPlate {
       countryBounds: brandPalette.blackInk,
       stateBounds: brandPalette.blackInk,
       countyLine: brandPalette.blackInk,
-      clusterText: brandPalette.blackInk,
     } as const;
   }
   return {
@@ -379,7 +333,6 @@ export function plateOverImagery(scheme: MapColorScheme): MapPlate {
     countryBounds: brandPalette.archivePaper,
     stateBounds: brandPalette.archivePaper,
     countyLine: brandPalette.archivePaper,
-    clusterText: brandPalette.archivePaper,
   } as const;
 }
 

@@ -1,6 +1,7 @@
 /**
- * One decade panel: count sight, regime, frame, class shares, conditions, rules.
- * World beats render beside this panel in the timeline.
+ * One decade, the result of the appendix's controls: how class was measured, what the count could
+ * see, the frame, class shares, conditions, the rules that began, and the world
+ * beats. Every block is optional; a decade shows only what it has.
  */
 import React from 'react';
 import type { LivesDecadeBundle, LivesLens } from '@repo/domain/statistics/lives';
@@ -9,6 +10,7 @@ import { LivesConditionsChart } from './LivesConditionsChart';
 import { LivesCountSight } from './LivesCountSight';
 import { LivesRegimeNotice } from './LivesRegimeNotice';
 import { LivesRulesInForce } from './LivesRulesInForce';
+import { LivesWorldBeats } from './LivesWorldBeats';
 
 void React;
 
@@ -16,46 +18,44 @@ export type LivesDecadePanelProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
   readonly disclaimer: string;
-  readonly labelledBy?: string;
   readonly id?: string;
 };
 
-export function LivesDecadePanel({
-  decade,
-  emphasis,
-  disclaimer,
-  labelledBy,
-  id,
-}: LivesDecadePanelProps) {
+export function LivesDecadePanel({ decade, emphasis, disclaimer, id }: LivesDecadePanelProps) {
   return (
     <section
       {...(id ? { id } : {})}
-      {...(labelledBy ? { role: 'tabpanel', 'aria-labelledby': labelledBy } : {})}
       className="lives-panel"
+      aria-labelledby={`lives-panel-title-${decade.decade}`}
     >
-      <h2 className="lives-panel__title">The {decade.label}</h2>
+      <header className="lives-panel__head">
+        <h2 className="lives-panel__title" id={`lives-panel-title-${decade.decade}`}>
+          The {decade.label}
+        </h2>
+        <LivesRegimeNotice decade={decade} />
+      </header>
       <LivesCountSight decade={decade} />
-      <LivesRegimeNotice decade={decade} />
       {decade.frame ? (
         <div className="lives-frame">
-          <h3>{decade.frame.heading}</h3>
+          <h3 className="lives-frame__title">{decade.frame.heading}</h3>
           {decade.frame.paragraphs.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
         </div>
       ) : null}
       {decade.decade >= 2010 ? (
-        <aside className="lives-panel__definition-note" aria-label="How these groups overlap">
+        <p className="lives-note" role="note">
           <strong>These are not three slices of one population.</strong> Homeownership counts Black
           or African American alone, including Black Hispanic households. The Hispanic figure
           includes people of any race. The white figure excludes Hispanic households. These figures
           overlap and do not add to 100. Population share on this panel uses a separate table whose
           displayed groups do partition.
-        </aside>
+        </p>
       ) : null}
       <LivesClassSharesChart decade={decade} emphasis={emphasis} />
       <LivesConditionsChart decade={decade} emphasis={emphasis} />
       <LivesRulesInForce decade={decade} emphasis={emphasis} disclaimer={disclaimer} />
+      <LivesWorldBeats decade={decade.decade} beats={decade.worldBeats} emphasis={emphasis} />
     </section>
   );
 }

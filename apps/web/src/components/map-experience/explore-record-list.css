@@ -1,0 +1,151 @@
+/*
+ * The Explore record list: register rows, windowed. Row height is RESULTS_ROW_HEIGHT (84px) in
+ * ExploreRecordList.tsx, set inline on each row.
+ */
+.ds-xlist {
+  position: relative;
+  /* Basis 0: the list takes what the column has left, never the height of its own rows. */
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-border-control) transparent;
+}
+
+.ds-xlist--empty {
+  overflow: visible;
+  padding: var(--ds-space-6) var(--ds-space-4);
+}
+
+.ds-xlist__rows {
+  position: relative;
+}
+
+.ds-xlist__row {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: var(--ds-space-3);
+  row-gap: var(--ds-space-1);
+  /* The height is set inline from RESULTS_ROW_HEIGHT, the one number the list scrolls by. */
+  padding: 0 var(--ds-space-4) 0 var(--ds-space-6);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink);
+  cursor: pointer;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-xlist__row:hover {
+  background: var(--ds-surface);
+}
+
+.ds-xlist__row:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+/* The selected row: copper with ink type (copper on paper, the selected thing anywhere), plus
+   the map's own selected mark at its edge. Never the fill alone. */
+.ds-xlist__row--selected {
+  background: var(--ds-material-copper);
+  color: var(--ds-material-ink);
+  --ds-ink: var(--ds-material-ink);
+  --ds-ink-muted: var(--ds-material-ink);
+}
+
+.ds-xlist__row--selected::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: var(--ds-space-1);
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%);
+  border: 2px solid var(--ds-material-ink);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-material-paper);
+}
+
+/* A record's own photograph, toned as a plate (`.ds-plate__tone`); no stand-in without one. */
+.ds-xlist__row[data-photo='true'] {
+  grid-template-columns: 56px minmax(0, 1fr);
+}
+
+.ds-xlist__thumb.ds-plate__tone {
+  grid-row: 1 / span 2;
+  width: 56px;
+  aspect-ratio: 1;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-xlist__line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  min-width: 0;
+}
+
+/* A name runs to two lines before it is cut; most never need the second. */
+.ds-xlist__name {
+  flex: 1 1 auto;
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: var(--ds-tracking-title);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* The /records row's hover: the name underlines in a 2px rule. */
+.ds-xlist__row:hover .ds-xlist__name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-xlist__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-xlist__grade .ds-grade-tag {
+  gap: var(--ds-space-1);
+  letter-spacing: 0;
+}
+
+.ds-xlist__decade,
+.ds-xlist__grade {
+  flex: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ds-xlist__decade {
+  color: var(--ds-accent);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ds-xlist__row--selected .ds-xlist__decade {
+  color: var(--ds-ink);
+}

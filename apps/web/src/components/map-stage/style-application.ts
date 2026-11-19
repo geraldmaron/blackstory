@@ -21,19 +21,28 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
+  EXPLORE_JURISDICTION_TAG_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  EXPLORE_SELECTED_TAG_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_SOURCE_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_HOVER_POINT_LAYER_ID,
+  EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  EXPLORE_COUNTY_HATCH_LAYER_ID,
+  EXPLORE_US_LAND_LAYER_ID,
+  EXPLORE_PLACE_LEADER_LAYER_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
+  EXPLORE_SITE_NAME_LAYER_ID,
+  PLATE_WATERLINE_LAYER_IDS,
 } from '../../app/map/explore-layer-ids';
-import { buildExploreMapStyle } from '../../app/map/explore-style';
+import { buildExploreMapStyle, stateLabelFilters } from '../../app/map/explore-style';
 import {
   DECADE_CROSSFADE_IN_TARGETS,
   DECADE_CROSSFADE_OUT_TARGETS,
@@ -42,6 +51,8 @@ import {
 import { syncSingleLayerPaint } from './map-plate-paint';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import type { StageConfig } from './stage-config';
+import { hatchedCountyKeys } from '../../lib/map-experience/county-hatch';
+import { loadedCountyPolygons } from './geo-source-loaders';
 
 export const SELECTED_FILL_ID = 'explore-state-selected-fill';
 export const SELECTED_LINE_ID = 'explore-state-selected-line';
@@ -49,11 +60,13 @@ export const SELECTED_LINE_ID = 'explore-state-selected-line';
 export const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
   SATELLITE_LAYER_ID,
-  'plate-landcover',
+  EXPLORE_US_LAND_LAYER_ID,
+  EXPLORE_JURISDICTION_HATCH_LAYER_ID,
+  EXPLORE_COUNTY_HATCH_LAYER_ID,
   'plate-water',
+  ...PLATE_WATERLINE_LAYER_IDS,
   'plate-boundary-country',
   'plate-place-city',
-  'explore-street-casing',
   'explore-street-fill',
   'explore-street-label',
   'explore-state-density-fill',
@@ -64,26 +77,30 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
   'explore-state-bounds-line',
   'explore-state-selected-fill',
   'explore-state-selected-line',
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
   'explore-jurisdiction-area-fill',
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
 ]);
-/** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: halo beneath
- * point beneath the event glyph ring, clusters above singles, selected ring on top. Incoming
- * dual-buffer layers sit above the current stack and below the selected ring. Added once
- * then paint-refreshed on style rebuild (theme plate stroke, kind shade expressions). */
+/** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: record marks
+ * beneath groups, incoming dual-buffer layers above the current stack, then the jurisdiction
+ * tags, then the selection on top. Added once then paint-refreshed on style rebuild. */
 export const ENTITY_LAYER_IDS = new Set([
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_PLACE_LEADER_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
+  EXPLORE_SITE_NAME_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
+  EXPLORE_JURISDICTION_TAG_LAYER_ID,
+  EXPLORE_SELECTED_TAG_LAYER_ID,
+  EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
 ]);
 /** Sources whose real geometry arrives from a lazy client fetch (`loadStatePolygonsWithDensity`,
@@ -149,9 +166,8 @@ export function applyGeographyStyle(
   const paintOmit = options?.preserveDecadeFadeOpacities ? DECADE_FADE_OMIT_CHANNELS : undefined;
 
   if (recreateEntities) {
-    // Clustering is baked into the GeoJSON source at add time — toggling it requires a
-    // deliberate remove/re-add of the entities source + its layers. Do this only on an
-    // explicit grouping flip (not on every data patch), and tear layers down first.
+    // A grouping flip (place tokens on or off) rebuilds the entities source and its layers
+    // from scratch, tearing the layers down first. Only on an explicit flip, never per patch.
     for (const layerId of ENTITY_LAYER_IDS) {
       if (map.getLayer(layerId)) map.removeLayer(layerId);
     }
@@ -195,8 +211,8 @@ export function applyGeographyStyle(
   // paint/layout sync). Removing them on every apply read as a full map refresh and killed
   // MapLibre opacity transitions. New layers still append beneath the entity stack when the
   // halo anchor already exists.
-  const entityAnchor = map.getLayer(EXPLORE_UNCLUSTERED_HALO_LAYER_ID)
-    ? EXPLORE_UNCLUSTERED_HALO_LAYER_ID
+  const entityAnchor = map.getLayer(EXPLORE_UNCLUSTERED_POINT_LAYER_ID)
+    ? EXPLORE_UNCLUSTERED_POINT_LAYER_ID
     : undefined;
   for (const layer of style.layers ?? []) {
     if (GEOGRAPHY_LAYER_IDS.has(layer.id)) {
@@ -241,6 +257,13 @@ export function setSelectedStateFilter(map: MapLibreMap, postalCode: string | un
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
     map.setFilter(SELECTED_LINE_ID, filter as any);
   }
+  const labels = stateLabelFilters(postalCode);
+  if (map.getLayer(EXPLORE_STATE_LABEL_LAYER_ID)) {
+    map.setFilter(EXPLORE_STATE_LABEL_LAYER_ID, labels.rest as never);
+  }
+  if (map.getLayer(EXPLORE_STATE_LABEL_SELECTED_LAYER_ID)) {
+    map.setFilter(EXPLORE_STATE_LABEL_SELECTED_LAYER_ID, labels.selected as never);
+  }
 }
 /**
  * Rebuild the plate style from the resting stage config for one color scheme.
@@ -256,6 +279,7 @@ export function buildStyleForScheme(
 ): StyleSpecification {
   return buildExploreMapStyle({
     featureCollection: cfg.featureCollection,
+    ghostCollection: cfg.ghostCollection,
     jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
     layerMode: cfg.layerMode,
     popGeo: cfg.popGeo,
@@ -263,5 +287,7 @@ export function buildStyleForScheme(
     clusteringEnabled: cfg.clusteringEnabled,
     satellite: cfg.satellite,
     colorScheme,
+    hatchedCountyKeys: hatchedCountyKeys(cfg.featureCollection, loadedCountyPolygons()),
+    ...(loadedCountyPolygons() ? { counties: loadedCountyPolygons()! } : {}),
   });
 }

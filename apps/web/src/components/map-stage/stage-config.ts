@@ -16,6 +16,8 @@ import type { ExplorePopulationGeo } from '../../lib/map-experience/explore-popu
 export type StageConfig = {
   style: StyleSpecification;
   featureCollection: ExploreMapFeatureCollection;
+  /** Lens matches outside the brushed decades, drawn as sand ghosts. */
+  ghostCollection: ExploreMapFeatureCollection;
   jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   layerMode: ExploreLayerMode;
   popGeo: ExplorePopulationGeo;

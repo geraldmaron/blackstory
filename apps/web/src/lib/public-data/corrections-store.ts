@@ -32,6 +32,7 @@ const STORED_CORRECTION_OWN_KEYS = [
   'classificationDispute',
   'appeals',
   'closureReason',
+  'publicReason',
   'updatedAt',
 ] as const satisfies readonly (keyof StoredCorrection)[];
 
@@ -162,30 +163,6 @@ export function createPostgresCorrectionSubmissionStore(): CorrectionSubmissionS
         ],
       );
       return rows[0] ? parseStoredCorrection(rows[0]) : undefined;
-    },
-
-    async markClosed(submissionId, closureReason) {
-      const rows = await queryPostgres<IntakeRow>(
-        `SELECT id, payload FROM submissions.intake_items WHERE id = $1`,
-        [submissionId],
-      );
-      const row = rows[0];
-      if (!row) return undefined;
-      const existing = parseStoredCorrection(row);
-      const updated: StoredCorrection = {
-        ...existing,
-        closureReason,
-        updatedAt: new Date().toISOString(),
-        record: {
-          ...existing.record,
-          moderationState: closureReason === 'rejected' ? 'blocked' : 'resolved',
-        },
-      };
-      await queryPostgres(`UPDATE submissions.intake_items SET payload = $2 WHERE id = $1`, [
-        row.id,
-        JSON.stringify(serializeStoredCorrection(updated)),
-      ]);
-      return updated;
     },
   };
 }

@@ -110,3 +110,29 @@ test('promotion means under review, never resolved or published', () => {
   assert.equal(status.phase, 'under_review');
   assert.equal(status.appealAvailable, false);
 });
+
+test('a declined receipt shows the reason staff wrote for the submitter, never for other outcomes', () => {
+  const base = {
+    receiptCode: 'BB-COR-1',
+    moderationState: 'blocked' as const,
+    submittedAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-02T00:00:00.000Z',
+    classificationDispute: false,
+    appealCount: 0,
+    publicReason: 'The 1924 ledger shows the later date.',
+  };
+  assert.equal(
+    buildPublicCorrectionStatus({ ...base, closureReason: 'rejected' }).outcomeReason,
+    'The 1924 ledger shows the later date.',
+  );
+  assert.equal(
+    buildPublicCorrectionStatus({ ...base, closureReason: 'resolved', moderationState: 'resolved' })
+      .outcomeReason,
+    undefined,
+  );
+  const { publicReason: _unused, ...withoutReason } = base;
+  assert.equal(
+    buildPublicCorrectionStatus({ ...withoutReason, closureReason: 'rejected' }).outcomeReason,
+    'The record was not changed after review.',
+  );
+});

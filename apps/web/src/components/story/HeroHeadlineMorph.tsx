@@ -1,11 +1,11 @@
 'use client';
 
 /**
- * Door cold-open headline subject morph: History splits into His Story (gap +
- * uppercase S), then the prefix crossfades through Her / Their / Your / Black
- * Story before holding. The prefix slot width interpolates so Story slides
+ * Door cold-open headline subject morph, once: History splits into His story (gap + s), the
+ * prefix crossfades through Her, Your and Their, then the gap closes on BlackStory set in the
+ * wordmark's type, and it holds there. The prefix slot width interpolates so story slides
  * instead of jumping. Trailer stays "happened *here*." Letter spans are
- * aria-hidden; the heading exposes the full accessible label.
+ * aria-hidden; the heading's accessible name is the settled line throughout.
  *
  * Paced by one timer per phase boundary, not a per-frame loop, and only while the heading is on
  * screen: Explore mounts the Door with its journey hidden, and a morph nobody can see was still
@@ -38,6 +38,9 @@ function inlinePaddingWidth(element: HTMLElement): number {
 
 /** Survives React Strict Mode remount so the morph clock does not restart mid-sequence in dev. */
 let morphSequenceStartedAt: number | null = null;
+
+/** The longest the morph waits for the display face before it plays anyway. */
+const FONT_WAIT_CAP_MS = 1500;
 
 function readClientMotionPreference(): { readonly reduced: boolean; readonly phaseIndex: number } {
   if (typeof window === 'undefined') {
@@ -88,9 +91,14 @@ function MorphingPrefix({
     setWidthTransition(false);
     setSlotWidthPx(fromWidth);
 
+    // A background tab pauses frames but not timers: a frame that arrives after the change has
+    // ended must not pin the slot, or it stays at that pixel width and a later resize clips the
+    // word ("Blac").
+    let ended = false;
     let raf2 = 0;
     const raf1 = window.requestAnimationFrame(() => {
       raf2 = window.requestAnimationFrame(() => {
+        if (ended) return;
         const incomingWidth = inRef.current?.getBoundingClientRect().width;
         const toWidth =
           incomingWidth !== undefined && rootRef.current
@@ -102,6 +110,7 @@ function MorphingPrefix({
     });
 
     const timer = window.setTimeout(() => {
+      ended = true;
       setOutgoing(null);
       setSlotWidthPx(null);
       setWidthTransition(false);
@@ -160,7 +169,7 @@ export function HeroHeadlineMorph({
   readonly className: string;
 }) {
   // SSR + first client render always start on History so markup hydrates cleanly.
-  // Reduced-motion jumps to Black Story in useLayoutEffect (before paint).
+  // Reduced-motion jumps to BlackStory in useLayoutEffect (before paint).
   const [reducedMotion, setReducedMotion] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
   /** The sequence stopped early because the heading left the screen: no more transitions. */
@@ -176,14 +185,14 @@ export function HeroHeadlineMorph({
   }, []);
 
   useEffect(() => {
-    if (reducedMotion) return undefined;
+    // Read the preference here too: on the first pass this effect still sees the initial `false`,
+    // and its first step would put the heading back on History after the layout effect settled it.
+    if (reducedMotion || readClientMotionPreference().reduced) return undefined;
 
-    if (morphSequenceStartedAt === null) {
-      morphSequenceStartedAt = performance.now();
-    }
-    const startedAt = morphSequenceStartedAt;
     let timer = 0;
     let done = false;
+    let cancelled = false;
+    let startedAt = 0;
 
     const step = () => {
       const elapsed = performance.now() - startedAt;
@@ -196,7 +205,23 @@ export function HeroHeadlineMorph({
       const nextStartMs = heroHeadlinePhaseStartMs(next + 1);
       timer = window.setTimeout(step, Math.max(0, nextStartMs - elapsed) + 1);
     };
-    step();
+    // The words change in the brand's display face, never in a fallback: the sequence waits for
+    // the page's fonts (capped, so a font that never arrives cannot hold the heading on History).
+    const begin = () => {
+      // Left the screen while waiting: the observer already settled it on BlackStory.
+      if (cancelled || done) return;
+      if (morphSequenceStartedAt === null) morphSequenceStartedAt = performance.now();
+      startedAt = morphSequenceStartedAt;
+      step();
+    };
+    if (morphSequenceStartedAt !== null || typeof document === 'undefined' || !document.fonts) {
+      begin();
+    } else {
+      void Promise.race([
+        document.fonts.ready,
+        new Promise((resolve) => window.setTimeout(resolve, FONT_WAIT_CAP_MS)),
+      ]).then(begin);
+    }
 
     const heading = headingRef.current;
     let observer: IntersectionObserver | undefined;
@@ -213,6 +238,7 @@ export function HeroHeadlineMorph({
     }
 
     return () => {
+      cancelled = true;
       window.clearTimeout(timer);
       observer?.disconnect();
     };
@@ -221,18 +247,31 @@ export function HeroHeadlineMorph({
   const phase = HERO_HEADLINE_PHASES[phaseIndex] ?? FINAL_PHASE;
   const split = phase.storySplit || reducedMotion;
   const prefix = subjectPrefix(phase);
-  const animatePrefix = !reducedMotion && !settled && phase.storySplit && phase.id !== 'his-story';
+  const animatePrefix = !reducedMotion && !settled && phase.storySplit;
   const splitMs = HERO_HEADLINE_PHASES[1]?.transitionMs ?? 1500;
   const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 
   return (
-    <h1 ref={headingRef} className={className} id={id} aria-label={phase.accessibleLabel}>
+    // The name is the settled line, not the frame on screen: a heading that renames itself every
+    // few hundred milliseconds reads to a screen reader (and in a shared screenshot) as a typo.
+    // It is real text, read once; every animated fragment below is aria-hidden.
+    <h1 ref={headingRef} className={className} id={id}>
+      <span className="ds-visually-hidden">{FINAL_PHASE.accessibleLabel}</span>
+      {/* Reduced motion, before hydration too: the settled words from the first paint. Hidden
+          by CSS whenever motion is allowed, so the animated sequence is unchanged. */}
+      <span
+        className="ds-hero-headline-morph__static ds-hero-headline-morph__wordmark"
+        aria-hidden="true"
+      >
+        {FINAL_PHASE.subjectLabel}
+      </span>
       <span
         className="ds-hero-headline-morph"
         aria-hidden="true"
         data-phase={phase.id}
         data-settled={settled ? 'true' : undefined}
         data-split={split ? 'true' : 'false'}
+        data-wordmark={phase.wordmark ? 'true' : undefined}
         style={{
           ['--ds-hero-split-ms' as string]: `${splitMs}ms`,
           ['--ds-hero-prefix-ms' as string]: `${prefixMs}ms`,
@@ -242,7 +281,7 @@ export function HeroHeadlineMorph({
         <span className="ds-hero-headline-morph__gap" />
         <span className="ds-hero-headline-morph__story">
           <span className="ds-hero-headline-morph__s-slot">
-            <span className="ds-hero-headline-morph__s">S</span>
+            <span className="ds-hero-headline-morph__s">{phase.storyInitial}</span>
           </span>
           <span className="ds-hero-headline-morph__tail">{STORY_TAIL}</span>
         </span>

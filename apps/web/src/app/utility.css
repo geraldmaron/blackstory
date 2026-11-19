@@ -1,33 +1,69 @@
 /**
- * Utility surface class — the only stylesheet a Utility route imports.
+ * Utility surface class: the stylesheet a Utility route imports for the room kit.
  *
- * Design law: docs/ui/patterns-utility-edition.md, design-direction-v9-surfaces.md §4.
- * A utility room is a task surface: finished and left. The measure is the narrowest of the
- * three and the card stack, not prose, is the primary block.
+ * A utility room is a task surface, finished and left. Its width is chosen by the page: the read
+ * container for policy and lookup pages, the record container for a form beside its "what
+ * happens next" aside. Trust blocks come from `components/trust/trust.css`, form parts from
+ * `components/forms/form-kit.css`.
  */
 
 @import '../components/room/room-kit.css';
 
-/* Declared on the room, not the column: the railed grid sizes its first track from this
-   measure so the column-plus-rail pair centers as a unit. The column inherits it. */
-[data-surface='utility'] .ds-room {
-  --room-doc-w: 560px;
+/* —— the 404's exits: a short ruled list on the paper sheet under the sand mast ——————— */
+.ds-utility-exits {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-/* The frame is not the measure. A ledger utility room (Support, Submit, Corrections, Privacy,
-   Terms) opens on the same hero masthead as its siblings, and in a 560px column that headline
-   wrapped to five lines and the page read as a phone layout on a desktop. These rooms take the
-   reading rooms' 900px frame; what stays narrow is the thing that should be narrow, the form and
-   the running text inside it (see the measure rules in room-kit.css). */
-[data-surface='utility'] .ds-room--ledger {
-  --room-doc-w: 900px;
+.ds-utility-exits:not(:first-child) {
+  margin-top: var(--ds-space-6);
 }
 
-/* Utility titles sit one step down: nothing here is a headline. */
-[data-surface='utility'] .ds-room-header__title {
-  font-size: clamp(26px, 3.2vw, 34px);
+.ds-utility-exits__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  min-height: 44px;
+  padding-block: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-[data-surface='utility'] .ds-room-header__lede {
-  font-size: 16.5px;
+.ds-utility-exits__link {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ds-utility-exits__line {
+  flex: 1 1 14rem;
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+}
+
+.ds-utility-exits__search {
+  max-width: 52ch;
+  margin: var(--ds-space-6) 0 0;
+  color: var(--ds-ink-muted);
+}
+
+/* A phone has no ⌘K; it has the search button in the bar. */
+.ds-utility-exits__touch {
+  display: none;
+}
+
+@media (max-width: 47.9375rem), (pointer: coarse) {
+  .ds-utility-exits__keys {
+    display: none;
+  }
+
+  .ds-utility-exits__touch {
+    display: inline;
+  }
 }

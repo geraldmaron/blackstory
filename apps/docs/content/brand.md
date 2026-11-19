@@ -43,11 +43,15 @@ active locations, selected filters, primary actions, evidence markers. Raw
 Copper Pin never carries body-size text on light canvas. Dark theme is
 first-class.
 
-Flat matte fills only. No bevels, shadows, glows, or gradients.
+Flat matte fills only. No bevels, glows, or gradients, and no elevation shadows. The one
+exception is a low-opacity contact shadow where a layer overlaps another.
+
+UI is built from theme roles (`--ds-*` tokens), not from these swatches. Rule is a divider at
+about 1.4:1, so a form field uses the control-edge token, which holds 3:1 on every surface.
 
 ## Type
 
-- **Schibsted Grotesk SemiBold**: headlines
+- **Schibsted Grotesk**: headlines, with weight as the contrast axis (800 display, 700 headline, 650 title)
 - **Geist**: UI / body
 - **Newsreader**: editorial / longform
 - **Geist Mono**: data, citations, dates, confidence
@@ -61,7 +65,14 @@ Inter at UI sizes without Inter's ubiquity.
 
 ## Shape
 
-Radii 8 / 16 / 28px (sm / md / lg). Flat matte fills. No ornamental motion.
+Radii 8 / 14 / 28px (sm / md / lg). Flat matte fills. No ornamental motion.
+
+## Accessibility
+
+The target is WCAG 2.2 AA. Text holds 4.5:1 and control edges and graphic marks hold 3:1 on
+every surface step in both themes, checked by the token tests. Focus is always a visible
+outline, touch targets are at least 44px, the smallest text is 11px and reserved for mono
+labels, and motion collapses under reduced-motion settings.
 
 ## The mark
 

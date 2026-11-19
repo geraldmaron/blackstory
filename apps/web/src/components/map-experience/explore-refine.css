@@ -1,0 +1,79 @@
+/* The filter state of the Explore column (ExploreFilters.tsx). Groups are separated by space and
+   one rule; nothing here is boxed. */
+.ds-xrefine {
+  display: grid;
+  gap: var(--ds-space-6);
+  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-6);
+}
+
+.ds-xrefine__group {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-xrefine__label {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+}
+
+.ds-xrefine__values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3) var(--ds-space-2);
+}
+
+.ds-xrefine__count {
+  margin-left: var(--ds-space-1);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-xrefine__value[aria-pressed='true'] .ds-xrefine__count {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.ds-xrefine__value:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Segmented controls fill the column so their options stay at least 44px wide. */
+.ds-xrefine .ds-segmented {
+  display: flex;
+}
+
+.ds-xrefine .ds-segmented__option {
+  flex: 1 1 0;
+  padding-inline: var(--ds-space-2);
+  white-space: nowrap;
+}
+
+.ds-xrefine__note {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+}
+
+/* The drawing key (MapKey): what the marks on the map mean. On a wide screen the strip carries
+   it, so it shows here only where the strip's leading cell has no room for it. */
+.ds-xrefine__key {
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-size: var(--ds-text-caption);
+  white-space: normal;
+}
+
+@media (min-width: 80rem) {
+  .ds-xrefine__key {
+    display: none;
+  }
+}

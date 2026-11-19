@@ -6,8 +6,8 @@ import { test } from 'node:test';
 import type { ExploreMapFeature } from './build-explore-map-source';
 import {
   emitExplorePinSelect,
-  pointerExceededClickSlop,
   resolveExplorePinEntityId,
+  resolveExplorePinEntityIds,
   subscribeExplorePinSelect,
 } from './explore-pin-select';
 
@@ -68,6 +68,26 @@ test('coincident points prefer a holding walk', () => {
   );
 });
 
+test('two co-located pins handed off together keep every record at that spot', () => {
+  const catalog = [
+    feature('ent_a', -80.14, 26.12),
+    feature('ent_b', -80.14, 26.12),
+    feature('ent_far', -77.02, 38.91),
+  ];
+  const pins = [
+    { pinId: 'pin-0', lng: -80.14, lat: 26.12 },
+    { pinId: 'pin-1', lng: -80.14, lat: 26.12 },
+  ];
+  // Resolved one at a time, both pins land on the first record and the chooser loses one.
+  assert.deepEqual(
+    pins.map((pin) => resolveExplorePinEntityId(pin, catalog)),
+    ['ent_a', 'ent_a'],
+  );
+  assert.deepEqual(resolveExplorePinEntityIds(pins, catalog), ['ent_a', 'ent_b']);
+  // A pin id still in the source selects itself.
+  assert.deepEqual(resolveExplorePinEntityIds([{ pinId: 'ent_far' }], catalog), ['ent_far']);
+});
+
 test('attribute round-trip still matches catalog floats', () => {
   const lng = -77.036_870_7;
   const catalog = [feature('ent_ok', lng, 38.907_192_3)];
@@ -85,11 +105,6 @@ test('unknown geography does not invent an id', () => {
     resolveExplorePinEntityId({ pinId: 'pin-9', lng: 0, lat: 0 }, [feature('ent_ok', -77, 38)]),
     undefined,
   );
-});
-
-test('click slop treats a tap as select and a drag as pan', () => {
-  assert.equal(pointerExceededClickSlop(10, 10, 12, 11), false);
-  assert.equal(pointerExceededClickSlop(10, 10, 20, 20), true);
 });
 
 test('pin-select subscribers receive the emitted target', () => {

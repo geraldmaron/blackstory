@@ -25,16 +25,11 @@ const loaderSource = readFileSync(join(here, 'load-data-page-model.ts'), 'utf8')
 
 const allCopy = [
   DATA_PAGE_DESCRIPTION,
-  DATA_INTRO.kicker,
   DATA_INTRO.lede,
-  ...DATA_READING_RULES.flatMap((rule) => [rule.kicker, rule.body]),
+  ...DATA_READING_RULES.flatMap((rule) => [rule.title, rule.body]),
   ...DATA_READING_LINKS.map((link) => link.label),
   DATA_SOURCE_LIBRARY_HANDOFF.label,
-  ...Object.values(DATA_SECTION_COPY).flatMap((section) => [
-    section.kicker,
-    section.title,
-    section.lede,
-  ]),
+  ...Object.values(DATA_SECTION_COPY).flatMap((section) => [section.title, section.lede]),
   ...DATA_PAGE_SECTIONS.map((section) => section.label),
 ];
 
@@ -80,34 +75,16 @@ test('data sections keep census and indicator chart wiring', () => {
   assert.doesNotMatch(sectionsSource, /UtilityCard|ds-data-edition/);
 });
 
-test('data page keeps section anchors for the section rail', () => {
+test('data page keeps a deep-linkable anchor for every section, under a plain heading', () => {
   for (const section of DATA_PAGE_SECTIONS) {
     assert.match(sectionsSource, new RegExp(`id="${section.id}"`));
-    assert.ok(section.icon, `${section.id} carries a section glyph`);
   }
-  assert.match(sectionsSource, /DataPageNav sections=\{DATA_PAGE_SECTIONS\}/);
-  assert.match(sectionsSource, /DestinationIcon/);
-  assert.match(sectionsSource, /ds-kicker-glyph/);
+  assert.match(sectionsSource, /<SectionHeading/);
+  assert.doesNotMatch(sectionsSource, /DataPageNav|RoomStats|ds-room-section__plate/);
 });
 
-test('reading rules carry orientation glyphs', () => {
-  for (const rule of DATA_READING_RULES) {
-    assert.ok(rule.icon, `${rule.kicker} carries a rule glyph`);
-  }
-  assert.match(sectionsSource, /rule\.icon/);
-});
-
-test('the headline band links into the figures it summarizes', () => {
-  for (const anchor of [
-    '#population-count',
-    '#wealth-gap',
-    '#housing-ownership',
-    '#justice-imprisonment',
-  ]) {
-    assert.match(loaderSource, new RegExp(anchor));
-    const id = anchor.slice(1);
-    assert.match(sectionsSource, new RegExp(`id="${id}"`), `no figure carries ${anchor}`);
-  }
+test('reading rules and section heads carry no icon plates or kickers', () => {
+  assert.doesNotMatch(sectionsSource, /DestinationIcon|ds-kicker|kicker/);
 });
 
 test('data user-facing copy does not leak internal vocabulary', () => {
@@ -134,8 +111,7 @@ test('the reading rules are not numbered: they hold at once', () => {
 
 test('data reading section links to the source library room', () => {
   assert.equal(DATA_SOURCE_LIBRARY_HANDOFF.href, '/sources');
-  assert.match(sectionsSource, /DATA_SOURCE_LIBRARY_HANDOFF/);
-  assert.match(sectionsSource, /ds-data-reading__handoff/);
+  assert.match(sectionsSource, /href=\{DATA_SOURCE_LIBRARY_HANDOFF\.href\}/);
   assert.equal(DATA_SOURCE_LIBRARY_HANDOFF.label, 'Where these figures come from');
 });
 
@@ -168,5 +144,64 @@ test('the indicator fixture captions the figures print verbatim keep the same vo
         `${entry.id}: internal vocabulary`,
       );
     }
+  }
+});
+
+test('figure findings compare the values instead of restating them', async () => {
+  const { createElement, Fragment } = await import('react');
+  const { renderToStaticMarkup } = await import('react-dom/server');
+  const { deltaTrendReading, gapTrendReading, shareRiseReading } = await import('./DataSections');
+  const text = (node: unknown) =>
+    renderToStaticMarkup(createElement(Fragment, null, node as never)).replace(/<!-- -->/g, '');
+
+  const delta = (label: string, value: string) => ({ id: label, label, value });
+  assert.equal(
+    text(
+      deltaTrendReading([
+        delta('Black population, 1990 to 2000', '+4,975,063'),
+        delta('Black population, 2000 to 2010', '+4,429,694'),
+        delta('Black population, 2010 to 2020', '+1,942,094'),
+      ]),
+    ),
+    'Growth slowed each decade since 1990',
+  );
+  // Mixed movement has no single finding; the caller falls back to the latest value.
+  assert.equal(
+    deltaTrendReading([delta('A, 1990 to 2000', '+5'), delta('B', '+9'), delta('C', '+2')]),
+    null,
+  );
+
+  const row = (decade: string, black: number) => ({
+    decade,
+    blackPopulation: black,
+    totalPopulation: 100,
+    blackShareOfTotalPct: black,
+  });
+  assert.equal(
+    text(
+      shareRiseReading([
+        row('1910', 11),
+        row('1930', 9),
+        row('1950', 10),
+        row('1970', 11),
+      ] as never),
+    ),
+    'The share has risen at every census since 1930',
+  );
+  assert.equal(
+    text(
+      shareRiseReading([
+        row('1930', 9),
+        row('1950', 10),
+        row('1970', 9.5),
+        row('1990', 12),
+      ] as never),
+    ),
+    'The share rose at 2 of the 3 censuses since 1930',
+  );
+
+  const trend = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthTrend;
+  if (trend && trend.points.length > 1) {
+    assert.match(text(gapTrendReading(trend)), /^The gap has (widened|narrowed) in dollars since /);
   }
 });

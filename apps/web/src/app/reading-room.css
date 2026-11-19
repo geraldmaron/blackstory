@@ -2,20 +2,13 @@
  * Reading room surface class — the only stylesheet a Reading route imports.
  *
  * Design law: docs/ui/patterns-reading-room.md, design-direction-v9-surfaces.md §4.
- * Everything drawn here comes from the shared kit; this file sets the measure and the two
- * rules that are specific to a room you read rather than scan.
+ * Everything drawn here comes from the shared kit; this file holds the rules that are specific
+ * to a room you read rather than scan. Widths come from the page's container (`Room width`).
  */
 
 @import '../components/room/room-kit.css';
 
-/* Declared on the room, not the column: the railed grid sizes its first track from this
-   measure so the column-plus-rail pair centers as a unit. The column inherits it. */
-[data-surface='reading'] .ds-room {
-  --room-doc-w: 900px;
-}
-
-/* A reading room ends in an off-ramp. The rule is enforced by room-kit.test.tsx, not by CSS,
-   but the spacing assumes it is the last block in the column. */
+/* The memorial wall (protected) still ends on its off-ramp card; nothing else renders one. */
 [data-surface='reading'] .ds-room-offramp:not(:last-child) {
   margin-bottom: var(--ds-space-8);
 }
@@ -55,1180 +48,16 @@
  * design-direction-v9-surfaces.md §4.2 "/errata".
  * ============================================================================================ */
 
-.ds-errata__feedbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  margin: 0 0 var(--ds-space-8);
-}
-
-.ds-errata__log {
-  display: grid;
-  gap: 1px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  background: var(--ds-rule);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  overflow: hidden;
-}
-
-.ds-errata__row {
-  display: grid;
-  grid-template-columns: 6.5rem 12rem 1fr auto;
-  align-items: baseline;
-  gap: var(--ds-space-4);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-}
-
-.ds-errata__row-date {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.ds-errata__row-id {
-  overflow: hidden;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-a.ds-errata__row-id {
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
-.ds-errata__row-statement {
-  margin: 0;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.5;
-}
-
-.ds-errata__row-phase {
-  padding: 0.2rem 0.55rem;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface-raised);
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
 @media (max-width: 40rem) {
-  .ds-errata__row {
-    grid-template-columns: 1fr auto;
-    row-gap: var(--ds-space-2);
-  }
-
-  .ds-errata__row-statement {
-    grid-column: 1 / -1;
-  }
-
   /* A grid item stretches to its column, which turned a two-word tag into a wide empty box. */
-  .ds-errata__row-phase {
-    justify-self: start;
-  }
 }
-
-.ds-errata__empty {
-  margin: 0;
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) dashed var(--ds-border);
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.5;
-}
-
-/* —— /chapters pager (SP-atlas-v9 chapters package) ————————————————————————————
-   Fifty-plus chapters windows the same way `/records` does: a fixed page size, real
-   anchors, prev/next link relations. Naming is kept separate from `.ds-records-pager`
-   (which lives in the /records route stylesheet) so this reading room adds no
-   per-route stylesheet of its own, per design law. */
-.ds-chapters-pager {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  margin-top: var(--ds-space-6);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-chapters-pager__link {
-  font-size: var(--ds-text-caption);
-  font-weight: 550;
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-chapters-pager__link:hover {
-  color: var(--ds-accent);
-}
-
-.ds-chapters-pager__at {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
-}
-
-.ds-chapters-pager__spacer {
-  flex: 0 0 1px;
-}
-/* —— end /chapters pager —————————————————————————————————————————————————————— */
-
-/* —— /law detail sections ————————————————————————————————————————————————————
-   Hairline-divided blocks, not route-owned Surface-card panels — the same vocabulary
-   `.ds-room-prose h2` and `GroupHeading` use everywhere else on a reading room. */
-.ds-law-section {
-  margin-top: var(--ds-space-8);
-}
-
-.ds-law-toc {
-  margin-top: var(--ds-space-8);
-  padding-top: var(--ds-space-5);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-law-toc__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-3) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ds-law-toc__link {
-  color: var(--ds-ink);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 550;
-  text-decoration: none;
-  border-bottom: var(--ds-border-width-strong) solid transparent;
-}
-
-.ds-law-toc__link:hover {
-  border-bottom-color: var(--ds-accent);
-}
-
-.ds-law-toc__lede {
-  margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  color: var(--room-ink-3);
-}
-
-.ds-law-provenance {
-  display: flex;
-  flex-direction: column;
-  margin: var(--ds-space-4) 0 0;
-}
-
-.ds-law-provenance__row {
-  display: grid;
-  grid-template-columns: 9rem minmax(0, 1fr);
-  gap: var(--ds-space-3);
-  padding-block: 9px;
-  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-law-provenance__row:last-child {
-  border-bottom: 0;
-}
-
-.ds-law-provenance__row dt {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
-}
-
-.ds-law-provenance__row dd {
-  margin: 0;
-  font-size: var(--ds-text-caption);
-  color: var(--room-ink-2);
-}
-/* —— end /law detail sections —————————————————————————————————————————————— */
-
-/* —— legal status badge (LegalStatusBadge) ———————————————————————————————————
-   `.ds-badge` had no rule anywhere else in the repo — LegalStatusBadge rendered as
-   bare text without it. Tones map to lawStatusTone() in @repo/domain. */
-.ds-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  padding: 0.15rem 0.5rem;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-surface);
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.ds-badge--info {
-  border-color: color-mix(in srgb, var(--ds-accent-graphic) 45%, var(--ds-border));
-  background: color-mix(in srgb, var(--ds-accent-graphic) 12%, transparent);
-  color: var(--ds-accent);
-}
-
-.ds-badge--warning {
-  border-color: var(--ds-warning-border);
-  background: var(--ds-warning-bg);
-  color: var(--ds-warning-fg);
-}
-
-.ds-badge--error {
-  border-color: var(--ds-error-border);
-  background: var(--ds-error-bg);
-  color: var(--ds-error-fg);
-}
-
-/* —— legal explainer sections (LegalExplainerSections) ———————————————————————
-   Hairline-divided, not boxed: consistent with every other section on the page. */
-.ds-law__explainer-stack {
-  display: grid;
-  gap: var(--ds-space-3);
-}
-
-.ds-law__section-card {
-  margin: 0;
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-law__section-title {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: var(--ds-text-subtitle);
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-}
-
-.ds-law__section-body {
-  margin: var(--ds-space-3) 0 0;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-}
-
-.ds-law__section-body p {
-  margin: 0;
-}
-
-.ds-law__section-body p + p {
-  margin-top: var(--ds-space-3);
-}
-
-.ds-law__section-list {
-  margin: var(--ds-space-3) 0 0;
-  padding-left: var(--ds-space-4);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-}
-
-.ds-law__section-list li + li {
-  margin-top: var(--ds-space-2);
-}
-
-.ds-law__terms-nav {
-  margin-top: var(--ds-space-4);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-law__terms-kicker {
-  margin: 0 0 var(--ds-space-2);
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.ds-law__review-line {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-}
-/* —— end legal explainer sections ——————————————————————————————————————————— */
-
-/* —— /books detail: cover, tags, evidence, rip list ——————————————————————————
-   Room kit edition: each detail section is a hairline block (`.ds-room-section`), not a
-   route-owned Surface-card panel. These classes are the content-specific pieces the kit
-   has no shared primitive for yet — the fact strip is `Anatomy` (BooksAnatomyStrip.tsx). */
-
-/* `.ds-room-section` never actually carried a rule: every section on the detail page (context,
-   challenges, evidence, lookup, related, connected) rendered back to back with no top margin
-   and no divider, so the whole page read as one continuous run of orange mono labels instead of
-   a sequence of grouped blocks. This is the hairline block the class name promises: a generous
-   gap, then a rule, same register as the state-facet rows and the record index. */
-.ds-room-section {
-  margin-top: var(--ds-space-10);
-  padding-top: var(--ds-space-8);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-/* The Lookup section nests Identifiers and Provenance as their own labeled sub-sections
-   (`ids-heading`, `provenance-heading`). Unstyled, they inherited no separation either, so
-   "Purchase and identifiers", "Identifiers" and "Provenance" ran together as one block. A
-   lighter echo of the section rule reads them as two distinct fact groups under the same
-   parent instead of a continuation of the purchase links above them. */
-.ds-books-edition__subsection {
-  margin-top: var(--ds-space-6);
-  padding-top: var(--ds-space-5);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-books-edition__panel-title {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.ds-books-edition__panel-heading {
-  margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: var(--ds-text-title);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  color: var(--ds-ink);
-}
-
-.ds-books-edition__body {
-  margin: 0;
-  max-width: 54ch;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.65;
-  color: var(--ds-ink);
-}
-
-.ds-books-edition__lede {
-  margin: var(--ds-space-3) 0 0;
-  max-width: 54ch;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial);
-  line-height: 1.6;
-  color: var(--ds-ink-muted);
-}
-
-.ds-books-edition__footnote {
-  margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink-muted);
-}
-
-.ds-books-edition__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-4);
-  margin-top: var(--ds-space-5);
-}
-
-.ds-books-edition__nested-heading {
-  margin: var(--ds-space-4) 0 var(--ds-space-2);
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: var(--ds-text-body);
-  letter-spacing: -0.015em;
-  color: var(--ds-ink);
-}
-
-/* —— Cover art (BooksCoverArt — browse rows and the detail header) ——————————— */
-.ds-books-edition__cover {
-  flex: 0 0 auto;
-  width: 5rem;
-  margin: 0;
-  overflow: hidden;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-canvas);
-}
-
-.ds-books-edition__cover--placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 2 / 3;
-  min-height: 7.5rem;
-}
-
-.ds-books-edition__cover-initials {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--ds-accent);
-}
-
-.ds-books-edition__cover-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-}
-
-.ds-books-edition__intro-cover {
-  width: clamp(7rem, 18vw, 11rem);
-}
-
-.ds-books-edition__intro-grid {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--ds-space-4) var(--ds-space-5);
-  align-items: start;
-  margin-top: var(--ds-space-6);
-}
-
-@media (max-width: 35rem) {
-  .ds-books-edition__intro-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* —— Search field (BooksSearchTypeahead) ——————————————————————————————————— */
-.ds-books-edition__q {
-  min-width: min(100%, 28rem);
-  border-radius: var(--ds-radius-full);
-}
-
-/* —— State tags (detail header) ——————————————————————————————————————————— */
-.ds-books-edition__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  margin-top: var(--ds-space-4);
-}
-
-/* A state code is a two-character label. At the shared 44px action height it drew a box three
-   times taller than its own text and read as a button promising something bigger than the facet
-   link it is. Sized to its content, in the same register as the row chips. */
-.ds-books-edition__tag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0 var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-ink);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.04em;
-  text-decoration: none;
-  background: var(--ds-canvas);
-}
-
-.ds-books-edition__tag:hover,
-.ds-books-edition__tag:focus-visible {
-  border-color: var(--ds-accent-graphic);
-  color: var(--ds-accent);
-}
-
-/* —— Evidence lists (challenges, citations) ——————————————————————————————— */
-.ds-books-edition__evidence-list {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ds-books-edition__evidence-item {
-  margin: 0;
-  padding: var(--ds-space-3) 0;
-  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-books-edition__evidence-item:last-child {
-  border-bottom: none;
-}
-
-.ds-books-edition__evidence-lead {
-  margin: 0 0 var(--ds-space-1);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.45;
-  color: var(--ds-ink);
-}
-
-.ds-books-edition__evidence-scope {
-  color: var(--ds-ink-muted);
-}
-
-.ds-books-edition__evidence-cite {
-  color: var(--ds-accent);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.4;
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
-}
-
-.ds-books-edition__evidence-meta {
-  margin: var(--ds-space-1) 0 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-}
-
-/* —— Meta list (identifiers, provenance) ————————————————————————————————— */
-.ds-books-edition__meta-list {
-  display: grid;
-  gap: var(--ds-space-3);
-  margin: 0;
-}
-
-.ds-books-edition__meta-list-row {
-  display: grid;
-  grid-template-columns: minmax(6rem, auto) 1fr;
-  gap: var(--ds-space-2) var(--ds-space-4);
-}
-
-.ds-books-edition__meta-list-row dt {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-.ds-books-edition__meta-list-row dd {
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  color: var(--ds-ink);
-}
-
-/* —— Related-titles rip list (BooksRipRow) ————————————————————————————————— */
-.ds-books-edition__rip-list {
-  display: grid;
-  gap: 0;
-}
-
-.ds-books-edition__rip-list--compact .ds-books-edition__rip-summary {
-  -webkit-line-clamp: 2;
-}
-
-.ds-books-edition__rip-row {
-  display: grid;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-4) 0;
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-books-edition__rip-row[data-first-row='true'] {
-  border-top: 0;
-  padding-top: 0;
-}
-
-.ds-books-edition__rip-main {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--ds-space-4);
-  align-items: start;
-}
-
-@media (max-width: 35rem) {
-  .ds-books-edition__rip-main {
-    grid-template-columns: 1fr;
-  }
-}
-
-.ds-books-edition__rip-body {
-  display: grid;
-  gap: var(--ds-space-2);
-  min-width: 0;
-}
-
-.ds-books-edition__rip-title {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-}
-
-.ds-books-edition__rip-link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-books-edition__rip-link:hover,
-.ds-books-edition__rip-link:focus-visible {
-  color: var(--ds-accent);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-}
-
-.ds-books-edition__rip-link:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-books-edition__rip-summary {
-  margin: 0;
-  max-width: 42rem;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-}
-
-.ds-books-edition__rip-facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
-  gap: var(--ds-space-2) var(--ds-space-3);
-  margin: var(--ds-space-2) 0 0;
-}
-
-.ds-books-edition__rip-fact {
-  display: grid;
-  gap: var(--ds-space-1);
-  margin: 0;
-}
-
-.ds-books-edition__rip-fact-label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-.ds-books-edition__rip-fact-value {
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.35;
-  color: var(--ds-ink);
-}
-
-.ds-books-edition__rip-fact-link {
-  color: var(--ds-accent);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
-}
-
-.ds-books-edition__rip-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
-}
-
-.ds-books-edition__rip-buy.ds-cta {
-  padding-inline: var(--ds-space-4);
-  font-size: var(--ds-text-caption);
-}
-/* —— end /books detail —————————————————————————————————————————————————————— */
-
-/* —— /stories/[slug] rail — "Records cited" stays in view while the reader scrolls the
-   chapter, the same way a printed margin note tracks the page it annotates. —————————— */
-@media (min-width: 68rem) {
-  .ds-reading-rail {
-    position: sticky;
-    top: 24px;
-  }
-}
-
-/* "Next in this collection" — panel ground behind a copper left rule, per Ink spec §4:
-   the one rail block that reaches forward rather than describing the current chapter. */
-.ds-reading-rail__next {
-  margin-top: var(--ds-space-7);
-  padding: var(--ds-space-4);
-  background: var(--room-note-wash);
-  border-left: var(--ds-border-width-strong) solid var(--ds-accent-graphic);
-  border-radius: var(--ds-radius-sm);
-}
-
-.ds-reading-rail__next-link {
-  display: block;
-  margin-top: var(--ds-space-2);
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-reading-rail__next-link:hover {
-  color: var(--ds-accent);
-}
-
-.ds-reading-rail__next-position {
-  display: block;
-  font-size: var(--ds-text-caption);
-  letter-spacing: 0.06em;
-  color: var(--room-ink-4);
-}
-
-.ds-reading-rail__next-title {
-  display: block;
-  margin-top: 2px;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: var(--ds-text-body-sm);
-  letter-spacing: -0.015em;
-  line-height: 1.3;
-}
-/* —— end /stories/[slug] rail —————————————————————————————————————————————— */
-/* —— end /chapters pager —————————————————————————————————————————————————————— */
-
-/* —— /books catalog rows —————————————————————————————————————————————————————
-   Kit rows are a 16px glyph plus clipped 13.5px name. A challenged title is a book: the
-   cover has to be readable, the title has to wrap, and the summary has to sit under the
-   byline. Subgrid sizes cover / copy / facts once across the list, same as `/law`. */
-.ds-books-idx.ds-room-idx__list {
-  --books-row-cover: 4.5rem;
-  display: grid;
-  grid-template-columns: var(--books-row-cover) minmax(0, 1fr) minmax(7rem, 0.55fr);
-  column-gap: var(--ds-space-5);
-}
-
-.ds-books-idx .ds-room-idx__row {
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-  align-items: start;
-  column-gap: unset;
-  padding-block: var(--ds-space-4);
-}
-
-.ds-books-idx .ds-room-idx__glyph {
-  display: block;
-  width: var(--books-row-cover);
-  justify-self: start;
-}
-
-.ds-books-idx .ds-books-edition__cover {
-  width: var(--books-row-cover);
-}
-
-.ds-books-idx .ds-books-edition__cover--placeholder {
-  min-height: 0;
-}
-
-.ds-books-idx .ds-books-edition__cover-initials {
-  font-size: var(--ds-text-body-sm);
-  letter-spacing: 0.04em;
-}
-
-.ds-books-idx__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.ds-books-idx .ds-room-idx__name {
-  overflow: visible;
-  text-overflow: unset;
-  white-space: normal;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.ds-books-idx__byline {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.4;
-  color: var(--ds-ink-muted);
-}
-
-.ds-books-idx__gloss {
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.ds-books-idx__facts {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  min-width: 0;
-  padding-top: 0.2rem;
-}
-
-.ds-books-idx .ds-room-idx__grade {
-  justify-self: start;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  white-space: normal;
-  color: var(--room-ink-3);
-}
-
-.ds-books-idx__cites {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.08em;
-  color: var(--room-ink-4);
-}
-
-@media (max-width: 47.9375rem) {
-  .ds-books-idx.ds-room-idx__list {
-    grid-template-columns: var(--books-row-cover) minmax(0, 1fr);
-    column-gap: var(--ds-space-4);
-  }
-
-  .ds-books-idx .ds-room-idx__row {
-    row-gap: var(--ds-space-2);
-  }
-
-  .ds-books-idx .ds-room-idx__name {
-    grid-column: auto;
-    grid-row: auto;
-  }
-
-  .ds-books-idx__facts {
-    grid-column: 2;
-  }
-}
-
-/* —— end /books index rows ————————————————————————————————————————————————— */
-
-/* —— /law browse index rows ——————————————————————————————————————————————————
-   Hairline rows carry title, jurisdiction, year, citation and a one-line gloss.
-   Citations are long and belong in their own mono column, not the kit's `__grade`
-   slot (a dot elsewhere). Subgrid keeps jurisdiction, year and citation aligned
-   down the list; the gloss sits on a second line in the stone caption register. */
-.ds-law-idx.ds-room-idx__list {
-  display: grid;
-  grid-template-columns:
-    16px
-    minmax(0, 1.6fr)
-    minmax(0, 0.65fr)
-    auto
-    minmax(0, 1fr);
-  column-gap: var(--ds-space-3);
-}
-
-ul.ds-law-idx {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ds-law-idx > li {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-}
-
-.ds-law-idx .ds-room-idx__row {
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-  grid-template-rows: auto auto;
-  align-items: start;
-  row-gap: 4px;
-  padding-block: 12px;
-}
-
-.ds-law-idx .ds-room-idx__glyph {
-  grid-row: 1 / 3;
-  align-self: start;
-  padding-top: 2px;
-}
-
-.ds-law-idx .ds-room-idx__name {
-  grid-column: 2;
-  grid-row: 1;
-  /* A glossed row is a title over a sentence, the same object as a /books row. */
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-subtitle);
-  font-weight: 600;
-  letter-spacing: -0.012em;
-}
-
-.ds-law-idx .ds-room-idx__place {
-  grid-column: 3;
-  grid-row: 1;
-}
-
-.ds-law-idx .ds-room-idx__era {
-  grid-column: 4;
-  grid-row: 1;
-  text-align: right;
-}
-
-.ds-law-idx .ds-law-idx__citation {
-  grid-column: 5;
-  grid-row: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.04em;
-  color: var(--room-ink-3);
-}
-
-.ds-law-idx .ds-law-idx__gloss {
-  grid-column: 2 / -1;
-  grid-row: 2;
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.45;
-  color: var(--room-ink-3);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-@media (max-width: 40rem) {
-  .ds-law-idx.ds-room-idx__list {
-    grid-template-columns: 16px minmax(0, 1fr) auto auto;
-    column-gap: var(--ds-space-3);
-  }
-
-  .ds-law-idx .ds-room-idx__row {
-    grid-template-rows: auto auto auto;
-  }
-
-  .ds-law-idx .ds-room-idx__name {
-    grid-column: 2 / -1;
-    grid-row: 1;
-  }
-
-  .ds-law-idx .ds-room-idx__place {
-    grid-column: 2;
-    grid-row: 2;
-  }
-
-  .ds-law-idx .ds-room-idx__era {
-    grid-column: 3;
-    grid-row: 2;
-    text-align: right;
-  }
-
-  .ds-law-idx .ds-law-idx__citation {
-    grid-column: 4;
-    grid-row: 2;
-    max-width: 7.5rem;
-  }
-
-  .ds-law-idx .ds-law-idx__gloss {
-    grid-column: 2 / -1;
-    grid-row: 3;
-  }
-
-  .ds-law-idx .ds-room-idx__glyph {
-    grid-row: 1 / 4;
-  }
-}
-
-/* Ledger row (docs/ui/design-direction-v10-rooms.md): in a legal ledger the year is the anchor, so
-   it leads the row in display numerals; the kind is a copper tag; citation and gloss sit under the
-   title at reading size. */
-.ds-room--ledger .ds-law-idx.ds-room-idx__list {
-  grid-template-columns: clamp(4.5rem, 10vw, 8.5rem) minmax(0, 1fr) auto;
-  column-gap: var(--ds-space-6);
-}
-
-.ds-room--ledger .ds-law-idx .ds-room-idx__row {
-  grid-template-rows: auto auto auto;
-  row-gap: 6px;
-  padding-block: var(--ds-space-5);
-  border-color: var(--ds-ink);
-}
-
-.ds-room--ledger .ds-law-idx .ds-room-idx__glyph {
-  display: none;
-}
-
-.ds-room--ledger .ds-law-idx .ds-room-idx__era {
-  grid-column: 1;
-  grid-row: 1 / 4;
-  text-align: left;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ds-ink);
-}
-
-.ds-room--ledger .ds-law-idx .ds-room-idx__name {
-  grid-column: 2;
-  grid-row: 1;
-  font-size: var(--ds-text-title);
-  white-space: normal;
-}
-
-.ds-law-idx__kind {
-  display: none;
-}
-
-.ds-room--ledger .ds-law-idx__kind {
-  display: block;
-  grid-column: 3;
-  grid-row: 1;
-  text-align: right;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.ds-room--ledger .ds-law-idx .ds-law-idx__citation {
-  grid-column: 2;
-  grid-row: 2;
-  white-space: normal;
-}
-
-.ds-room--ledger .ds-law-idx .ds-room-idx__place {
-  grid-column: 3;
-  grid-row: 2;
-  text-align: right;
-}
-
-.ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
-  grid-column: 2 / -1;
-  grid-row: 3;
-  max-width: 46rem;
-  font-size: var(--ds-text-body);
-  color: var(--room-ink-2);
-  -webkit-line-clamp: 3;
-}
-
-@media (max-width: 40rem) {
-  .ds-room--ledger .ds-law-idx.ds-room-idx__list {
-    grid-template-columns: 3.75rem minmax(0, 1fr);
-    column-gap: var(--ds-space-3);
-  }
-
-  .ds-room--ledger .ds-law-idx .ds-room-idx__row {
-    grid-template-rows: auto;
-  }
-
-  .ds-room--ledger .ds-law-idx .ds-room-idx__era {
-    grid-row: 1 / 5;
-    font-size: var(--ds-text-title);
-  }
-
-  .ds-room--ledger .ds-law-idx__kind,
-  .ds-room--ledger .ds-law-idx .ds-law-idx__citation,
-  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
-    grid-column: 2;
-    text-align: left;
-  }
-
-  .ds-room--ledger .ds-law-idx__kind {
-    grid-row: 2;
-  }
-
-  .ds-room--ledger .ds-law-idx .ds-law-idx__citation {
-    grid-row: 3;
-    display: block;
-    /* The compact row capped the citation at 120px beside the year; here it has the column. */
-    max-width: none;
-  }
-
-  .ds-room--ledger .ds-law-idx .ds-law-idx__gloss {
-    grid-row: 4;
-  }
-
-  .ds-room--ledger .ds-law-idx .ds-room-idx__place {
-    display: none;
-  }
-}
-
-/* —— end /law browse index rows —————————————————————————————————————————————— */
 
 /* —— /methodology hand-drawn figures ————————————————————————————————————————
  * Bounded figures in the reading column, styled after the room kit's own MapMoment
  * plate (hairline border, sunk ground, mono caption with a left rule) rather than the
  * superseded v6 copper-mosaic sketch. SVG shapes and text sizing live in
  * MethodologyDiagrams.tsx; this sheet only owns the frame and the caption. */
-.ds-mdiag {
-  margin: var(--ds-space-8) 0;
-}
 
-.ds-mdiag__frame {
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  background: var(--room-sunk);
-}
-
-.ds-mdiag__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  color: var(--ds-ink);
-}
-
-.ds-mdiag__figcaption {
-  margin-bottom: var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
-}
 /* —— end /methodology hand-drawn figures ————————————————————————————————————— */
 
 /* ===========================================================================
@@ -1252,282 +81,340 @@ ul.ds-law-idx {
   z-index: var(--ds-z-content);
 }
 
-/* First screen is the wall: the opening block reserves the field so the full
-   list starts well below the fold. 125svh matches the wall's own height
-   (MEMORIAL_OPENING_SCREENS); the 7rem subtraction is the room's offset from
-   the top of the viewport. */
-.ds-memorial__opening {
-  /* This block only reserves the opening viewport; the wall is behind it. */
-  min-block-size: calc(100vh - 7rem);
-  min-block-size: calc(100svh - 7rem);
-  /* The remaining quarter screen of wall (MEMORIAL_OPENING_SCREENS = 1.25):
-     open field before the list. */
-  margin-block-end: 25vh;
-  margin-block-end: 25svh;
+/* The wall is the room's masthead (one screen plus the step-closer stretch, memorial-wall.css).
+   The body rises over its last 40svh, so the list arrives in front of the dimming wall instead of
+   after it. Positioned so it paints over the sticky wall it overlaps. */
+.ds-memorial .ds-room__body {
+  position: relative;
+  margin-top: -40vh;
+  margin-top: -40svh;
 }
 
-/* The list is the page here, not a card on it: no border, no raised ground, no inset. */
-.ds-memorial__list {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
+/* ---- the names index ------------------------------------------------------
+   A heading on the table, rising over the dimming wall, then one paper sheet with page bands
+   that holds every name: a finder column (Find a name, letter jump) beside the letter groups.
+   Each group is marked by its letter at display size and read down in columns, like a wall.
+   Ink on paper in both themes; no copper on this surface. */
+
+.ds-memorial-index__head {
+  max-width: 46rem;
+  padding-bottom: var(--ds-space-10);
 }
 
-/* Heading and count share one baseline over one rule: the count is a fact about the list, not a
-   second heading under the first. */
-.ds-memorial__header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--ds-space-4) var(--ds-space-8);
-  padding-bottom: var(--ds-space-4);
-  margin-bottom: var(--ds-space-5);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-memorial__title {
+.ds-memorial-index__title {
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(1.5rem, 1.15rem + 1.1vw, 2rem);
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   color: var(--ds-ink);
+  text-wrap: balance;
 }
 
-/* No copper accent on this surface — italic alone carries the emphasis this em would
-   otherwise take from the room kit's ReadingEntry convention. */
-.ds-memorial__title em {
+.ds-memorial-index__lede {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 38em;
   font-family: var(--ds-font-editorial);
-  font-style: italic;
-  font-weight: 400;
-  color: var(--ds-ink);
-}
-
-/* Sans, sentence case. Mono caps made a count of the dead read like a system readout. */
-.ds-memorial__count {
-  margin: 0;
-  flex: none;
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
-  letter-spacing: 0;
-  text-transform: none;
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.6;
   color: var(--ds-ink-muted);
 }
 
-/* ---- alphabetical groups + jump rail ------------------------------------- */
-
-/*
- * The list runs past a thousand names. As one flat `<ul>` that is tens of
- * screens with nothing to scroll against: no way to tell how far in you are,
- * and no way to reach a name without dragging the scrollbar and guessing. The
- * rail and the letter headings give the same list a spine — the names all stay
- * on one page, which for a memorial is the point.
- */
-.ds-memorial__jump {
-  position: sticky;
-  /* Clears the shell's floating bar so the rail is reachable at any depth. */
-  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
-  z-index: var(--ds-z-memorial-jump);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-block: var(--ds-space-5);
-  padding-block: var(--ds-space-2) var(--ds-space-3);
-  /* One hairline under it instead of a box around it: a bordered island floating over a list of
-     names is a widget, and this rail is part of the page it sits in. Opaque because it sticks. */
-  border-bottom: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
-  background: var(--ds-canvas);
+.ds-memorial-index__sheet {
+  display: grid;
+  grid-template-columns: 12.75rem minmax(0, 1fr);
+  gap: var(--ds-space-12);
+  --ds-sheet-pad: var(--ds-space-12);
 }
 
-.ds-memorial__jump-link {
-  display: inline-grid;
+/* The finder holds still beside the names while the reader scrolls through them. */
+.ds-memorial-index__finder {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-8));
+  align-self: start;
+  display: grid;
+  gap: var(--ds-space-8);
+}
+
+.ds-memorial-index__find {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-memorial-index__find-label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__find-input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border-control, var(--ds-ink));
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-subtitle);
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__find-input:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
+  outline-offset: 2px;
+}
+
+/* Reserves its line so a result count appearing never pushes the letters down. */
+.ds-memorial-index__find-status {
+  min-height: 1.5em;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-memorial-index__jump-list {
+  display: grid;
+  grid-template-columns: repeat(4, 2.75rem);
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-memorial-index__jump-link {
+  display: grid;
   place-items: center;
   min-width: 2.75rem;
   min-height: 2.75rem;
   border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
-  color: var(--ds-ink-muted);
-  text-decoration: none;
-  transition:
-    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
-    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
-}
-
-.ds-memorial__jump-link:hover,
-.ds-memorial__jump-link[aria-current='location'] {
-  background: var(--ds-surface-raised);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 500;
   color: var(--ds-ink);
+  text-decoration: none;
 }
 
-.ds-memorial__jump-link:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+a.ds-memorial-index__jump-link:hover {
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ink);
+}
+
+/* The letter being read: a solid ink tile in heavier type, so it reads by shape and weight. */
+.ds-memorial-index__jump-link[aria-current='location'] {
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-weight: 700;
+}
+
+.ds-memorial-index__jump-link[aria-disabled='true'] {
+  color: var(--ds-ink-subtle, var(--ds-ink-muted));
+  opacity: 0.45;
+}
+
+.ds-memorial-index__jump-link:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
   outline-offset: 2px;
 }
 
-/* On a phone the wrapped rail is four rows and roughly a fifth of the screen,
-   which is a lot of permanently-stuck chrome over a memorial. One row that
-   scrolls sideways instead keeps every letter reachable at ~44px tall. */
-@media (max-width: 640px) {
-  .ds-memorial__jump {
-    flex-wrap: nowrap;
+.ds-memorial-index__group {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: var(--ds-space-8);
+  padding-bottom: var(--ds-space-10);
+}
+
+/* A rule between groups, counted from the first one still showing while the list is filtered. */
+.ds-memorial-index__group:not([hidden]) ~ .ds-memorial-index__group {
+  padding-top: var(--ds-space-10);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Outranks `.ds-memorial [id]` below, which would otherwise set the jump offset. */
+.ds-memorial section.ds-memorial-index__group {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+/* The letter stays in view while its names scroll past. */
+.ds-memorial-index__letter {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-8));
+  align-self: start;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: var(--ds-text-display-2);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__names {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 3 15rem;
+  column-gap: var(--ds-space-10);
+}
+
+.ds-memorial-index__entry {
+  display: grid;
+  gap: 0.125rem;
+  padding-block: 0.625rem;
+  break-inside: avoid;
+}
+
+.ds-memorial-index__entry[hidden],
+.ds-memorial-index__group[hidden] {
+  display: none;
+}
+
+.ds-memorial-index__name {
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.35;
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+.ds-memorial-index__name a,
+.ds-memorial-index__empty a {
+  color: var(--ds-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-memorial-index__name a:focus-visible,
+.ds-memorial-index__empty a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
+  outline-offset: 2px;
+}
+
+.ds-memorial-index__meta {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-muted);
+}
+
+.ds-memorial-index__empty {
+  max-width: 34em;
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.6;
+  color: var(--ds-ink);
+}
+
+/* Phone: the sheet runs full-bleed; the field sits at its top and only the letters stick, as one
+   row that scrolls sideways, so the stuck chrome stays one 44px line. */
+@media (max-width: 47.9375rem) {
+  .ds-memorial-index__sheet {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    margin-inline: calc(var(--ds-gutter) * -1);
+    --ds-sheet-pad: var(--ds-space-5);
+  }
+
+  .ds-memorial-index__finder {
+    display: contents;
+  }
+
+  .ds-memorial-index__find {
+    padding-bottom: var(--ds-space-2);
+  }
+
+  .ds-memorial-index__jump {
+    position: sticky;
+    top: var(--ds-island-clearance);
+    z-index: var(--ds-z-memorial-jump);
+    margin-inline: calc(var(--ds-sheet-pad) * -1) 0;
+    padding: var(--ds-space-2) var(--ds-sheet-pad);
+    border-bottom: var(--ds-border-width) solid var(--ds-rule);
+    background: var(--ds-canvas);
     overflow-x: auto;
     overscroll-behavior-inline: contain;
     scrollbar-width: none;
   }
 
-  .ds-memorial__jump::-webkit-scrollbar {
+  .ds-memorial-index__jump::-webkit-scrollbar {
     display: none;
   }
 
-  .ds-memorial__jump-link {
+  .ds-memorial-index__jump-list {
+    display: flex;
+    gap: var(--ds-space-1);
+  }
+
+  .ds-memorial-index__jump-link {
     flex: none;
+  }
+
+  .ds-memorial-index__groups {
+    padding-top: var(--ds-space-6);
+  }
+
+  .ds-memorial-index__group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-3);
+    padding-bottom: var(--ds-space-8);
+  }
+
+  .ds-memorial-index__group:not([hidden]) ~ .ds-memorial-index__group {
+    padding-top: var(--ds-space-8);
+  }
+
+  /* Clears the stuck letter row. */
+  .ds-memorial section.ds-memorial-index__group {
+    scroll-margin-top: calc(var(--ds-island-clearance) + 3.75rem);
+  }
+
+  .ds-memorial-index__letter {
+    position: static;
+    font-size: var(--ds-text-display-2);
   }
 }
 
-.ds-memorial__group + .ds-memorial__group {
-  margin-block-start: var(--ds-space-10);
-}
-
-/* The letter, in the display face at the size of a heading and in ink. As accent mono caps it
-   read as a label on the group; the memorial takes no accent. */
-.ds-memorial__group-letter {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-3);
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-display);
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--ds-ink);
-}
-
-.ds-memorial__group-count {
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: var(--ds-ink-muted);
-}
-
 /*
- * Scroll target, offset from the heading it sits in rather than the heading
- * carrying `scroll-margin-top` itself: the sticky rail above would otherwise
- * cover the letter the reader just jumped to.
- */
-.ds-memorial__group-anchor {
-  display: block;
-  scroll-margin-top: calc(var(--ds-island-clearance) + 5rem);
-}
-
-.ds-memorial__name-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  /* Narrower track than the old 14rem: a name is short, and at 14rem a desktop
-     fitted four columns and the list ran to some 16,000px. */
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-  gap: var(--ds-space-2) var(--ds-space-4);
-}
-
-.ds-memorial__name-list li {
-  margin: 0;
-  font-family: var(--ds-font-editorial);
-  font-size: 1rem;
-  line-height: 1.45;
-  color: var(--ds-ink);
-  padding-block: 0.2rem;
-  border-bottom: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 70%, transparent);
-}
-
-/* Quiet "this one goes further" cue: exact-match names with a real entity page (~3% of the
-   list). No accent on this surface, so the signal is the underline alone — every name still
-   gets exactly the same ink color, which is the point of a memorial that plays no favorites. */
-.ds-memorial__name-link {
-  color: var(--ds-ink);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
-}
-
-.ds-memorial__name-link:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
-  outline-offset: 2px;
-}
-
-.ds-memorial__name-year {
-  font-family: var(--ds-font-mono);
-  font-size: 0.8em;
-  color: var(--ds-ink-muted);
-}
-
-/* Contrast lift for the long list once it's mostly in view: the wall's
-   ambient names have faded out behind it by this point (scroll fade), so
-   this replaces that atmosphere with a legibility boost rather than
-   competing with it. No full theme toggle, just this zone's own background. */
-/*
- * Widened out of `.ds-room__doc`'s prose measure. That measure is right for the
- * room's paragraphs and wrong for this: an index of 1,672 names held to a 900px
- * column fits three narrow tracks and runs to some 28,000px, so the reader pays
- * for a line length the content never uses. Breaking the zone (and only the
- * zone) out to the room's full width fits roughly twice the columns and roughly
- * halves the scroll, with the surrounding prose untouched.
- *
- * `50% - 50vw` is the standard full-bleed escape (half the zone's own width less
- * half the viewport), plus a 2rem gutter so it never touches the window edge.
- * The clamp bounds it at both ends: -14rem stops it sprawling on an ultrawide,
- * and 0px makes it a no-op on narrow screens, where the doc has no side margin
- * left to give back and the value would otherwise go positive and indent the
- * list.
+ * Widened out of `.ds-room__doc`'s prose measure, which is right for the room's paragraphs and
+ * wrong for an index of 1,600 names. `50% - 50vw` is the standard full-bleed escape plus a 2rem
+ * gutter; the clamp stops it sprawling on an ultrawide and makes it a no-op on narrow screens.
  */
 .ds-memorial__list-zone {
   margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
-  transition:
-    background-color 0.4s ease-out,
-    padding 0.4s ease-out;
-  border-radius: var(--ds-radius-md);
 }
 
-/* The panel inside fills the zone edge to edge, so the boosted background
-   needs a little breathing room to actually show — plus the panel's own
-   surface darkens a touch for a real contrast lift on the list text. */
-.ds-memorial__list-zone[data-contrast='boosted'] {
-  background: color-mix(in srgb, var(--ds-canvas) 90%, black 10%);
-  padding: var(--ds-space-3);
-}
-
-[data-theme='dark'] .ds-memorial__list-zone[data-contrast='boosted'] {
-  background: color-mix(in srgb, var(--ds-canvas) 70%, black 30%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-memorial__list-zone {
-    transition: none;
-  }
-}
-
+/* The sheet's colophon: the list is incomplete, said once, after the last name. */
 .ds-memorial__note {
-  margin: var(--ds-space-4) 0 0;
-  padding-top: var(--ds-space-4);
+  max-width: 44em;
+  margin: var(--ds-space-6) 0 0;
+  padding-top: var(--ds-space-8);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.6;
   color: var(--ds-ink-muted);
 }
 
 .ds-memorial__related {
-  margin-top: var(--ds-space-6);
+  margin-top: var(--ds-space-16);
+}
+
+/* The closing card lines up with the list's width and ends the page with room before the footer. */
+.ds-memorial .ds-room-offramp {
+  margin-block: var(--ds-space-16) var(--ds-space-24);
+  margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
 }
 
 /* Related rooms sit after the names. Ink plates, not copper: this surface takes no accent. */
-.ds-memorial .ds-room-section__plate {
+.ds-memorial .ds-room-handoff__plate {
   color: var(--ds-ink);
 }
 
-.ds-memorial .ds-room-handoff:hover .ds-room-section__plate,
-.ds-memorial .ds-room-handoff:focus-visible .ds-room-section__plate {
+.ds-memorial .ds-room-handoff:hover .ds-room-handoff__plate,
+.ds-memorial .ds-room-handoff:focus-visible .ds-room-handoff__plate {
   color: var(--ds-ink);
   border-color: var(--ds-ink);
 }

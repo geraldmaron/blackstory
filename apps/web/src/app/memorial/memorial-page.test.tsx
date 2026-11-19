@@ -150,8 +150,56 @@ test('no plate posture other than Parked is reachable on /memorial', () => {
   assert.equal(defaultPostureFor(surfaceClassFor('/memorial')), 'parked');
 });
 
-test('letter headings announce a letter and a name count as words without changing the wall', () => {
+test('letter headings announce a letter and a name count as words, with no visible counter', () => {
   const html = renderToStaticMarkup(<MemorialSections />);
-  assert.match(html, /aria-label="A: \d+ names"/);
-  assert.ok(html.includes('ds-memorial__group-count'));
+  assert.match(html, /<h2[^>]*aria-label="A: \d+ names"[^>]*>A<\/h2>/);
+  // No totals as spectacle: the count is spoken with the heading, never printed beside it.
+  assert.doesNotMatch(html, /\d,\d{3} names/);
+});
+
+test('every name is server-rendered as a list entry under its letter, with a find field and empty state', () => {
+  const html = renderToStaticMarkup(<MemorialSections />);
+  assert.equal(
+    (html.match(/class="ds-memorial-index__entry"/g) ?? []).length,
+    MEMORIAL_NAMES.length,
+  );
+  assert.equal((html.match(/<h2 /g) ?? []).length, memorialNamesByInitial().length);
+  assert.match(html, /<label[^>]*for="memorial-find"[^>]*>Find a name<\/label>/);
+  assert.match(html, /role="status" aria-live="polite"/);
+  assert.match(html, /<nav[^>]*aria-label="Jump to a letter"/);
+  assert.match(html, /id="memorial-names-empty" hidden=""/);
+  // Year and place sit beside a name in words; nothing about how anyone died.
+  assert.match(html, /Emmett Till<\/span><span class="ds-memorial-index__meta">1955/);
+  // The handwriting faces belong to the wall, not the list.
+  assert.doesNotMatch(html, /font-hand/);
+});
+
+test('find matching folds case, accents and punctuation', async () => {
+  const { memorialNameMatches, memorialFindKey } = await import('./memorial-name-find');
+  assert.equal(memorialFindKey('  J. D.  Mayfield '), 'jdmayfield');
+  assert.ok(memorialNameMatches('J. D. Mayfield', 'jd may'));
+  assert.ok(memorialNameMatches('Emmett Till', 'TILL'));
+  assert.ok(memorialNameMatches('Élan Doe', 'elan'));
+  assert.ok(memorialNameMatches("A'donte Washington", 'adonte'));
+  assert.ok(memorialNameMatches('"Jack" Dillingham', 'jack dill'));
+  assert.ok(memorialNameMatches('Anyone', '   '));
+  assert.ok(!memorialNameMatches('Emmett Till', 'tillman'));
+});
+
+test('the wall is decorative, its inscription is real text, and nothing on it announces or counts', async () => {
+  const { MemorialWallAtmosphere } =
+    await import('../../components/patterns/memorial-wall/MemorialWallAtmosphere');
+  const { MEMORIAL_HELD_MESSAGE_LINES } = await import('./memorial-copy');
+  const html = renderToStaticMarkup(
+    <MemorialWallAtmosphere messageLines={MEMORIAL_HELD_MESSAGE_LINES} />,
+  );
+  // The canvas and the name brought forward are hidden from assistive tech; the list is the path.
+  assert.match(html, /<canvas[^>]*aria-hidden="true"/);
+  assert.match(html, /class="ds-memorial-wall__presence"[^>]*aria-hidden="true"/);
+  // The inscription is outside every aria-hidden subtree, so a screen reader hears it.
+  const inscription = html.slice(html.indexOf('ds-memorial-wall__inscription"'));
+  assert.ok(inscription.includes(MEMORIAL_HELD_MESSAGE_LINES[0]!));
+  assert.doesNotMatch(inscription, /aria-hidden/);
+  // No live region rotating names into a screen reader, and no controls on the opening.
+  assert.doesNotMatch(html, /aria-live|role="status"|<button/);
 });

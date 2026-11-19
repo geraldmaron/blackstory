@@ -1,26 +1,18 @@
 ---
 name: blackstory-publish-preview
-description: Prepares a publication preview and names what still blocks release. Use when asking if a record is ready to publish, running geo QA before release, checking promotion eligibility, or reviewing rights and dignity before a human activation.
+description: Prepares a publication preview and names what still blocks release. Use when asking if a record is ready to publish, running geo QA before release, checking promotion eligibility, or reviewing rights and dignity before release.
 ---
 
 # Publish preview
 
-Repository workflows require the BlackStory checkout; configured remote management clients do not. See [loading and capabilities](../../../docs/research/README.md#skills-and-harness-portability)
-for tool requirements and use from any harness.
-
-Judgment playbook. For a new release, prepare the preview and preserve the
-publication-role permission and evidence checks. A canonical-case proposer with the
-publication role may also promote the reviewed record; record the authenticated actor
-and reason. The separate research-artifact release SQL path still requires its
-reviewer and publisher each to differ from the producer; they may be the same person
-as each other. Do not apply the canonical-case rule to it.
+Judgment playbook. Prepare the preview and preserve the evidence checks. Who may publish
+is set in [publication authority](../../../docs/research/README.md#publication-authority);
+record the acting session and reason. The separate research-artifact release SQL path
+still requires its reviewer and publisher each to differ from the producer.
 
 There is no `--publish` / `--approve` / `--promote` anywhere on operator-cli
 (`packages/operator-cli/src/promotion-boundary.test.ts`). The web release route only
 stages a decision (`executionAllowed: false`); it does not activate a release.
-Fresh reauthentication within 10 minutes is a required operating control for activation,
-but the current admin route authorizer does not enforce it. Do not describe it as an
-implemented gate or activate through an unreviewed direct database call.
 
 ## Approved management proposals
 
@@ -50,15 +42,15 @@ Task:
 - [ ] Rights clearance on copy and image
 - [ ] Dignity: no residential living addresses, no alarm-map encoding
 - [ ] Release preview / claim diff inspected
-- [ ] An authenticated publication-role actor activates after final review
+- [ ] Publication recorded with the acting session and reason
 ```
 
 ## Explicitly authorized corrections to an existing release
 
-A human may authorize a bounded correction to already published records without creating a
+The owner may authorize a bounded correction to already published records without creating a
 new release. Reuse that authorization; do not request it again. Use the repository's existing
 correction and artifact-publication path. This does not authorize impersonating a reviewer,
-creating a reauthentication token, bypassing an enforced gate, or recertifying untouched fields.
+bypassing an enforced gate, or recertifying untouched fields.
 
 Bind authorization to exact proposed content and compare current rows with the reviewed
 baseline inside a guarded transaction. Append claim versions and correction dispositions;
@@ -108,7 +100,7 @@ Preview still reports missing geography and era as enrichment gaps, because the 
 anatomy shows them.
 
 Citation weight: [`blackstory-claim-corroborate`](../blackstory-claim-corroborate/SKILL.md).
-Case assembly: [`blackstory-case-drafting`](../blackstory-case-drafting/SKILL.md).
+Case assembly: [`case-drafting`](../../../docs/research/research-operations.md#case-drafting).
 Blank public fields: [`blackstory-entity-complete`](../blackstory-entity-complete/SKILL.md).
 
 ## Dignity and language
@@ -128,27 +120,8 @@ A preview packet:
 - blocking failures with file-or-gate names
 - non-blocking enrichment gaps
 - reviewed draft revision and evidence map; distinguish machine checks from editorial review
-- whether an authorized publication-role actor activated the release
+- whether the release was published, and by which session
 
 **Never:** call `transitionResearchCase` / `markResearchCasePublished` without the
 authenticated workflow; treat dry-run JSON as live;
 silently rewrite a pin so the geo gate passes.
-
-## End-to-end owner requests
-
-For requests spanning research through publication, follow the
-[shared management workflow](../../../docs/research/research-operations.md#account-owned-management-work).
-Infer scope, carry existing authorization forward, and present one concise review. Use the
-remote service only when deployed and verified; its current limits are part of that contract.
-
-## Working contract
-
-**Input:** The saved exact proposal, applicable evidence decisions and existing authorization.
-
-**Output:** A reviewable preview or blockers, followed by verified public receipts only when authorized execution actually succeeds.
-
-**Boundary and handoff:** Owner approval, independent factual review and publication credentials are separate. Reuse existing authorization for its exact scope; do not invent a second approval ceremony.
-
-**Capabilities:** Follow [capability and permission limits](../../../docs/research/README.md#capabilities-and-permissions).
-Use the active harness’s available tools and report unsupported steps. Operational flags stay
-in the linked operations contract; no proprietary client or model family is required.

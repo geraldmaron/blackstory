@@ -5,17 +5,48 @@
  * Authorization still happens in Supabase and at BlackStory's staff-role gates.
  */
 import { readSupabaseServerConfig } from '../../../../admin/auth/supabase-session-authorizer';
+import { clientIpFrom } from '../../../../lib/web-security/client-ip';
+import { createPublicRateLimitGuard } from '../../../../lib/web-security/public-rate-limit-guard';
 
 type RouteContext = { readonly params: Promise<{ readonly endpoint: string }> };
 
 const RESPONSE_HEADERS = { 'Cache-Control': 'private, no-store', Pragma: 'no-cache' };
 const MAX_BODY_BYTES = 16_384;
 
+// Supabase sees this server's address for every relayed attempt, so its own per-IP sign-in limit
+// is shared by all callers: without a limit here one script could lock every operator out.
+// shortcut: the store is per function instance, upgrade when a shared store exists (docs/security/rate-limits.md).
+const passwordAttempts = createPublicRateLimitGuard('authentication');
+
 function jsonError(status: number, message: string): Response {
   return Response.json({ message }, { status, headers: RESPONSE_HEADERS });
 }
 
 async function relay(request: Request, context: RouteContext): Promise<Response> {
+  // Password attempts only: session refreshes are routine and carry a credential already.
+  if (new URL(request.url).searchParams.get('grant_type') !== 'password') {
+    return forward(request, context);
+  }
+  const clientIp = clientIpFrom(request);
+  const decision = passwordAttempts.evaluate({
+    subject: 'anonymous',
+    ...(clientIp ? { clientIp } : {}),
+  });
+  if (!decision.allowed) {
+    const denied = passwordAttempts.formatDeniedResponse(decision);
+    return Response.json(denied.body, {
+      status: denied.status,
+      headers: { ...RESPONSE_HEADERS, ...denied.headers },
+    });
+  }
+  try {
+    return await forward(request, context);
+  } finally {
+    passwordAttempts.release(decision.key);
+  }
+}
+
+async function forward(request: Request, context: RouteContext): Promise<Response> {
   const { endpoint } = await context.params;
   const method = request.method;
   if (!(

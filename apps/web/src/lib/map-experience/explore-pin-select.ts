@@ -1,13 +1,10 @@
 /**
- * Explore pin clicks: first-paint discs use opaque `pin-N` ids, so geography
- * (lng/lat on the disc) matches the catalog entity once it arrives. The locator
- * underlay emits a select; the Explore sheet subscribes.
+ * Explore pin hand-offs: first-paint pins use opaque `pin-N` ids, so geography
+ * (lng/lat on the pin) matches the catalog entity once it arrives. The home hand-off
+ * emits a select; the Explore column subscribes.
  */
 
 import type { ExploreMapFeature } from './build-explore-map-source';
-
-/** Movement below this is a pin select, not a map pan. */
-export const EXPLORE_PIN_CLICK_SLOP_PX = 8;
 
 /** Degrees; about a meter, enough to survive attribute string round-trip. */
 const POINT_MATCH_EPSILON = 1e-5;
@@ -21,30 +18,6 @@ export type ExplorePinSelectTarget = {
 type ExplorePinSelectListener = (target: ExplorePinSelectTarget) => void;
 
 const listeners = new Set<ExplorePinSelectListener>();
-
-export function pointerExceededClickSlop(
-  startX: number,
-  startY: number,
-  x: number,
-  y: number,
-  slopPx = EXPLORE_PIN_CLICK_SLOP_PX,
-): boolean {
-  return Math.hypot(x - startX, y - startY) > slopPx;
-}
-
-export function readExplorePinTarget(target: EventTarget | null): ExplorePinSelectTarget | null {
-  if (!(target instanceof Element)) return null;
-  const pin = target.closest('[data-entity-id]');
-  if (!pin || !pin.closest('.ds-explore-underlay')) return null;
-  const pinId = pin.getAttribute('data-entity-id');
-  if (!pinId) return null;
-  const lng = Number(pin.getAttribute('data-lng'));
-  const lat = Number(pin.getAttribute('data-lat'));
-  return {
-    pinId,
-    ...(Number.isFinite(lng) && Number.isFinite(lat) ? { lng, lat } : {}),
-  };
-}
 
 export function subscribeExplorePinSelect(listener: ExplorePinSelectListener): () => void {
   listeners.add(listener);
@@ -83,4 +56,30 @@ export function resolveExplorePinEntityId(
   if (matches.length === 1) return matches[0]?.properties.entityId;
   const walk = matches.find((feature) => feature.properties.holdingWalk === true);
   return (walk ?? matches[0])?.properties.entityId;
+}
+
+/**
+ * Resolves a group of pins (the Door's overlap hand-off) together. Resolving each pin alone picks
+ * the first record at a shared coordinate for every pin, so two co-located pins collapse into one
+ * record; here every record at each pin's coordinate is kept, once, so the chooser loses nothing.
+ */
+export function resolveExplorePinEntityIds(
+  targets: readonly ExplorePinSelectTarget[],
+  features: readonly ExploreMapFeature[],
+): string[] {
+  const ids = new Set<string>();
+  for (const target of targets) {
+    if (features.some((feature) => feature.properties.entityId === target.pinId)) {
+      ids.add(target.pinId);
+      continue;
+    }
+    if (target.lng === undefined || target.lat === undefined) continue;
+    for (const feature of features) {
+      const [lng, lat] = feature.geometry.coordinates;
+      if (samePoint(lng, target.lng) && samePoint(lat, target.lat)) {
+        ids.add(feature.properties.entityId);
+      }
+    }
+  }
+  return [...ids];
 }

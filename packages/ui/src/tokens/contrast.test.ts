@@ -5,6 +5,9 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   contrastRatio,
+  groundPalettes,
+  primaryHoverPalettes,
+  mapPalettes,
   criticalTextPairs,
   criticalUiPairs,
   dataViz,
@@ -81,5 +84,58 @@ test('brand guide dark-theme pairs meet WCAG AA for text', () => {
   for (const [name, fg, bg, min] of pairs) {
     const ratio = contrastRatio(fg, bg);
     assert.ok(ratio >= min, `${name}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1 (need ${min}:1)`);
+  }
+});
+
+/**
+ * Art direction v2 grounds. Text on copper and sand is ink at body size; the primary action on
+ * them is an ink plate with paper type; a sheet's paper carries ink, stone and copper text; and a
+ * copper pin or numeral holds 3:1 on both paper steps and on the map's paper land.
+ */
+test('copper and sand grounds carry their text at 4.5:1 and controls at 3:1', () => {
+  for (const [name, g] of Object.entries(groundPalettes)) {
+    for (const [pair, fg, bg, min] of [
+      ['ink', g.ink, g.ground, 4.5],
+      ['control edge', g.borderControl, g.ground, 3],
+      ['primary label', g.primaryInk, g.primaryBg, 4.5],
+      ['primary label on hover', g.primaryInk, g.primaryHover, 4.5],
+    ] as const) {
+      const ratio = contrastRatio(fg, bg);
+      assert.ok(ratio >= min, `${name} ${pair}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1`);
+    }
+  }
+});
+
+test('the copper primary button keeps its ink label at 4.5:1 at rest and on hover', () => {
+  for (const [theme, p] of Object.entries(primaryHoverPalettes)) {
+    for (const [state, bg] of [
+      ['rest', p.primaryBg],
+      ['hover', p.primaryHover],
+    ] as const) {
+      const ratio = contrastRatio(p.primaryInk, bg);
+      assert.ok(ratio >= 4.5, `${theme} ${state}: ink on ${bg} is ${ratio.toFixed(2)}:1`);
+    }
+  }
+});
+
+test('paper sheets carry ink, stone and copper text, and copper marks at 3:1', () => {
+  for (const paper of ['#F4EFE5', '#FFFDF8']) {
+    for (const [pair, fg, min] of [
+      ['ink', '#0A0A0A', 4.5],
+      ['stone', '#6D675F', 4.5],
+      ['copper text', '#8E4F2A', 4.5],
+      ['copper pin', '#B86B2A', 3],
+    ] as const) {
+      const ratio = contrastRatio(fg, paper);
+      assert.ok(ratio >= min, `${pair} on ${paper} is ${ratio.toFixed(2)}:1 (need ${min}:1)`);
+    }
+  }
+});
+
+test('copper record marks hold 3:1 against the paper land in both themes', () => {
+  // Both themes' land steps: the lower 48 and the paper and Surface neighbors around it.
+  for (const land of [mapPalettes.light.land, mapPalettes.dark.land, '#F4EFE5', '#FBF8F2']) {
+    const ratio = contrastRatio('#B86B2A', land);
+    assert.ok(ratio >= 3, `copper pin on land ${land} is ${ratio.toFixed(2)}:1 (need 3:1)`);
   }
 });

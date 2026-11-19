@@ -1,17 +1,20 @@
 /**
- * Memorial edition list section. The opening screen is the wall (see page.tsx);
- * this renders the full alphabetical list below the fold, the accessible record
- * of the same names.
+ * The memorial's names index, below the wall (see page.tsx): every name, server-rendered, on one
+ * paper sheet laid on the table. A heading on the table rises over the dimming wall; the sheet
+ * carries the finder (a "Find a name" field and the letter jump) and the names grouped by initial,
+ * each group marked by its letter at display size and read down in columns.
  */
 import React from 'react';
 import Link from 'next/link';
+import { Sheet } from '@repo/ui';
 import {
+  memorialNamePlace,
   memorialNameYear,
   memorialNamesByInitial,
 } from '../../components/patterns/memorial-wall/memorial-names';
-import { MEMORIAL_LIST_NOTE } from './memorial-copy';
-import { MemorialListContrastZone } from './MemorialListContrastZone';
-import { MemorialLetterJump } from './MemorialLetterJump';
+import { MEMORIAL_LIST_LEDE, MEMORIAL_LIST_NOTE } from './memorial-copy';
+import { memorialGroupId } from './memorial-group-id';
+import { MemorialNameFinder } from './MemorialNameFinder';
 import { RoomHandoff } from '../../components/room';
 
 void React;
@@ -35,82 +38,86 @@ export type MemorialSectionsProps = {
   readonly entityLinksByName?: Readonly<Record<string, string>>;
 };
 
-/** DOM id for a letter group, shared by its heading and the jump rail link. */
-const groupId = (letter: string) => `memorial-names-${letter === '#' ? 'other' : letter}`;
-
 export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsProps = {}) {
   const groups = memorialNamesByInitial();
-  const total = groups.reduce((count, group) => count + group.names.length, 0);
   // The sentence is shown when the difference it explains actually exists on the page. With no
   // name linked there is no difference to explain, and stating one would describe a distinction
   // the reader cannot see.
   const anyLinked = groups.some((group) => group.names.some((name) => entityLinksByName[name]));
 
   return (
-    <MemorialListContrastZone>
-      {/*
-        No panel, no numeral, no kicker. This list is not section 01 of a publication and it is
-        not a card: it is the names, and every frame drawn around them was chrome asserting
-        itself over them. What is left is a heading, a count, and the list.
-      */}
+    <div className="ds-memorial__list-zone">
       <article
-        className="ds-memorial__list"
+        className="ds-memorial-index"
         aria-labelledby="memorial-names-heading"
         id="memorial-names"
         tabIndex={-1}
       >
-        <header className="ds-memorial__header">
-          <h1 className="ds-memorial__title" id="memorial-names-heading">
+        <header className="ds-memorial-index__head">
+          <h1 className="ds-memorial-index__title" id="memorial-names-heading">
             Every name on this memorial
           </h1>
-          <p className="ds-memorial__count">{total.toLocaleString('en-US')} names, alphabetical</p>
+          <p className="ds-memorial-index__lede">{MEMORIAL_LIST_LEDE}</p>
           {anyLinked ? (
-            <p className="ds-memorial__link-note">
+            <p className="ds-memorial-index__lede">
               Where this archive also holds a record of someone, their name is a link to it. Where
               it does not, the name is written plainly. Both are held here the same.
             </p>
           ) : null}
         </header>
 
-        <MemorialLetterJump letters={groups.map((group) => group.letter)} />
+        <Sheet className="ds-memorial-index__sheet">
+          <MemorialNameFinder letters={groups.map((group) => group.letter)} />
 
-        {groups.map((group) => (
-          <section
-            className="ds-memorial__group"
-            key={group.letter}
-            aria-labelledby={`${groupId(group.letter)}-heading`}
-          >
-            <h2
-              className="ds-memorial__group-letter"
-              id={`${groupId(group.letter)}-heading`}
-              aria-label={`${group.letter}: ${group.names.length} ${group.names.length === 1 ? 'name' : 'names'}`}
-            >
-              <span id={groupId(group.letter)} className="ds-memorial__group-anchor" />
-              {group.letter}
-              <span className="ds-memorial__group-count">{group.names.length}</span>
-            </h2>
-            <ul className="ds-memorial__name-list">
-              {group.names.map((name) => {
-                const year = memorialNameYear(name);
-                const entityId = entityLinksByName[name];
-                return (
-                  <li key={name}>
-                    {entityId ? (
-                      <Link className="ds-memorial__name-link" href={`/entity/${entityId}`}>
-                        {name}
-                      </Link>
-                    ) : (
-                      name
-                    )}
-                    {year ? <span className="ds-memorial__name-year"> · {year}</span> : null}
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ))}
+          <div className="ds-memorial-index__groups">
+            {groups.map((group) => {
+              const id = memorialGroupId(group.letter);
+              return (
+                <section
+                  className="ds-memorial-index__group"
+                  id={id}
+                  key={group.letter}
+                  aria-labelledby={`${id}-heading`}
+                >
+                  <h2
+                    className="ds-memorial-index__letter"
+                    id={`${id}-heading`}
+                    aria-label={`${group.letter}: ${group.names.length} ${group.names.length === 1 ? 'name' : 'names'}`}
+                  >
+                    {group.letter}
+                  </h2>
+                  <ul className="ds-memorial-index__names">
+                    {group.names.map((name) => {
+                      const year = memorialNameYear(name);
+                      const place = memorialNamePlace(name);
+                      const entityId = entityLinksByName[name];
+                      return (
+                        <li className="ds-memorial-index__entry" key={name}>
+                          <span className="ds-memorial-index__name">
+                            {entityId ? <Link href={`/entity/${entityId}`}>{name}</Link> : name}
+                          </span>
+                          {year || place ? (
+                            <span className="ds-memorial-index__meta">
+                              {year}
+                              {year && place ? <span aria-hidden="true"> · </span> : null}
+                              {place}
+                            </span>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              );
+            })}
 
-        <p className="ds-memorial__note">{MEMORIAL_LIST_NOTE}</p>
+            <p className="ds-memorial-index__empty" id="memorial-names-empty" hidden>
+              No name on this list matches what you typed.
+            </p>
+
+            <p className="ds-memorial__note">{MEMORIAL_LIST_NOTE}</p>
+          </div>
+        </Sheet>
 
         <div className="ds-memorial__related ds-room-handoffs">
           <RoomHandoff
@@ -133,6 +140,6 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
           />
         </div>
       </article>
-    </MemorialListContrastZone>
+    </div>
   );
 }

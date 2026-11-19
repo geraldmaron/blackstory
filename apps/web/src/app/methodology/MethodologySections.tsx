@@ -1,354 +1,221 @@
 /**
- * `/methodology` — how a record gets in, in English. Shop tokens stay off the page.
+ * `/methodology`: how a record gets in, what its grade means, and the rules around place and
+ * living people. Each section opens on its one-sentence answer; processes are drawn as figures;
+ * enumerations are lists.
+ *
+ * This is the one page that defines the evidence grades. Every other page links here.
  */
 import React from 'react';
-import { Citation, Confidence, Notice } from '@repo/ui';
-import { FACT_CONFIDENCE_GRADES, type FactConfidenceGrade } from '@repo/domain/facts';
-import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/format';
-import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
+import { Citation } from '@repo/ui';
+import { getDisclaimer } from '@repo/domain/disclaimers';
 import { formatCitation } from '../../lib/citation/format';
+import { Prose, RoomFactList, RoomJump, RoomSection } from '../../components/room';
+import { TrustBand, TrustFlow, TrustLinks, TrustSheet } from '../../components/trust';
+import { GradeKey, GradeMatrix, PrecisionLadder } from './MethodologyFigures';
 import {
-  DocumentPlate,
-  Note,
-  Prose,
-  ReadingEntry,
-  RoomFactList,
-  RoomHandoff,
-  RoomJump,
-  RoomSection,
-  roomSectionTone,
-} from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
-import {
-  EvidenceConvergenceDiagram,
-  MapPrecisionDiagram,
-  RecordDataModelDiagram,
-  RecordIntakeDiagram,
-  SiteStructureDiagram,
-} from './MethodologyDiagrams';
-import {
+  ADMISSION_GREEN_BOOK_NOTE,
+  ADMISSION_LEAD,
+  ADMISSION_OWNERSHIP,
+  ADMISSION_STEPS,
+  CATALOG_VIEWS,
   DIGNITY_RULES,
   EDITORIAL_STANDARDS,
-  EVIDENCE_GRADE_DEFINITIONS,
+  GRADE_RULE_NOTES,
+  GRADES_LEAD,
+  INTERNET_ARCHIVE_LEAD,
   LIMITATION_RULES,
+  LIVES_METHOD_LEAD,
+  LIVES_METHOD_POINTS,
+  LIVES_METHOD_RULES,
+  LIVING_LEAD,
   METHODOLOGY_DIGNITY_LINE,
-  METHODOLOGY_INTRO_LEDE,
-  METHODOLOGY_MISSION_BEATS,
   METHODOLOGY_PAGE_SECTIONS,
   METHODOLOGY_PUBLISH_RULES,
   METHODOLOGY_SOURCE_LIBRARY_HREF,
-  METHODOLOGY_STRUCTURE_LEDE,
-  LIVES_METHOD_LEDE,
-  LIVES_METHOD_RULES,
-  SOURCE_LIBRARY_LEDE,
+  PRECISION_CONTEXT,
+  PRECISION_LEAD,
+  RECORD_ANATOMY_STEPS,
+  SOURCE_LIBRARY_LEAD,
+  STRUCTURE_LEAD,
   VERIFICATION_STEPS,
 } from './methodology-copy';
 
 void React;
 
+/** The citation format, shown once, with the letter grade the real Copy citation prints. */
 const EXAMPLE_CITATION = formatCitation({
   name: 'Record name',
   place: 'City, State',
   era: 'Decade',
-  grade: 'established',
+  grade: 'A',
   sourceCount: 2,
   url: 'https://blackstory.app/place/example',
   accessed: new Date('2026-01-01T00:00:00Z'),
 });
 
-const METHODOLOGY_JUMP = METHODOLOGY_PAGE_SECTIONS.filter(
-  (section) => section.id !== 'see-it-applied',
-);
+function Lead({ children }: { readonly children: React.ReactNode }) {
+  return <p className="ds-trust-lead">{children}</p>;
+}
 
-export function MethodologySections({ omitEntry = false }: { readonly omitEntry?: boolean }) {
-  const grades = FACT_CONFIDENCE_GRADES as readonly FactConfidenceGrade[];
-  let chapter = 0;
-  const nextTone = () => roomSectionTone(chapter++);
+function PlainList({
+  items,
+  label,
+}: {
+  readonly items: readonly string[];
+  readonly label: string;
+}) {
+  return (
+    <ul className="ds-trust-list" aria-label={label}>
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
+export function MethodologySections() {
+  const disclaimer = getDisclaimer('site_wide');
 
   return (
     <>
-      {omitEntry ? null : (
-        <ReadingEntry
-          pathname="/methodology"
-          title={
-            <>
-              How the archive <em>works</em>.
-            </>
-          }
-          lede={METHODOLOGY_INTRO_LEDE}
-          plate={
-            <DocumentPlate
-              label="The grade key"
-              citation="The four grades a public statement can carry, as they appear on a record."
-              href="#evidence-grades"
-              hrefLabel="Read the definitions"
-            >
-              {grades.map((grade) => (
-                <div className="ds-room-plate__row" key={grade}>
-                  <Confidence level={mapConfidenceToUiLevel(grade)} label={humanizeToken(grade)} />
-                </div>
-              ))}
-            </DocumentPlate>
-          }
-        />
-      )}
+      <TrustSheet>
+        <RoomJump sections={METHODOLOGY_PAGE_SECTIONS} />
 
-      <RoomJump sections={METHODOLOGY_JUMP} />
-
-      <Prose>
-        <TrustSiteDisclaimer />
-      </Prose>
-
-      <RoomSection
-        id="how-a-record-gets-in"
-        icon="records"
-        kicker="Admission"
-        title="How a record gets in"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>
-            Candidates come in from research runs, and every one gets pinned to somewhere real
-            before it can publish, whether that&apos;s a state, a city, a campus or a documented
-            site. After that, I use a model from another company to check proposed claims against
-            their captured sources. That tests what a source supports, and it can still miss an
-            error in the source. The Negro Motorist Green Book listings don&apos;t go through that
-            model check. A program confirms that the name, address, kind of business and edition
-            year on each one appear exactly in the New York Public Library&apos;s digitized listing
-            data for the directory, and each is marked as a registry listing. The address is the one
-            printed in that edition, and the business may be long gone. There&apos;s more here than
-            one person can read, so I built these checks and I answer for them. When one gets
-            something wrong, that&apos;s on me, and I fix it where you can see it.
-          </p>
-        </Prose>
-        <RecordIntakeDiagram />
-        <RoomFactList
-          items={METHODOLOGY_MISSION_BEATS.map((beat) => ({
-            title: beat.kicker,
-            body: beat.body,
-            icon: 'methodology' as const,
-            kicker: beat.kicker,
-          }))}
-        />
-        <ol className="ds-stack">
-          {METHODOLOGY_PUBLISH_RULES.map((item, index) => (
-            <li key={item.title}>
-              <span className="ds-mono" aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}
-              </span>{' '}
-              <strong>{item.title}</strong>
-              <p>{item.body}</p>
-            </li>
-          ))}
-        </ol>
-        <Note kind="VERIFICATION">{VERIFICATION_STEPS.join(' ')}</Note>
-      </RoomSection>
-
-      <RoomSection
-        id="evidence-grades"
-        icon="evidence"
-        kicker="Grades"
-        title="What the evidence grades mean"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>
-            A grade is never a color on its own. Each one carries a mark, a label in words, and the
-            definition printed under it.
-          </p>
-        </Prose>
-        <ul className="ds-stack">
-          {grades.map((grade) => (
-            <li key={grade}>
-              <Confidence level={mapConfidenceToUiLevel(grade)} label={humanizeToken(grade)} />
-              <p>{EVIDENCE_GRADE_DEFINITIONS[grade]}</p>
-            </li>
-          ))}
-        </ul>
-        <EvidenceConvergenceDiagram />
-        <Notice tone="warning" title="Crime statistics never enter this score">
-          A record&apos;s grade is measured on independence and proximity to the event alone. Crime
-          statistics and violence-adjacent framing never factor into it.
-        </Notice>
-        <Prose>
-          <p>Every citation on the site is built the same way, including this example:</p>
-        </Prose>
-        <Citation label="Example citation" source={EXAMPLE_CITATION} />
-      </RoomSection>
-
-      <RoomSection
-        id="editorial-standards"
-        icon="publication"
-        kicker="Framing"
-        title="Editorial standards"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>
-            Accuracy is not enough on its own. These are the framing and corroboration rails a
-            hostile reader can hold any public record to, including enrichment drafts that have not
-            yet published.
-          </p>
-        </Prose>
-        <RoomFactList
-          items={EDITORIAL_STANDARDS.map((item) => ({
-            title: item.title,
-            body: item.body,
-            icon: 'publication' as const,
-          }))}
-        />
-      </RoomSection>
-
-      <RoomSection
-        id="how-a-point-is-drawn"
-        icon="precision"
-        kicker="Map dignity"
-        title="Why a point is never drawn sharper than its source"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>
-            Place is how this archive is organized. It is also the field most likely to put a living
-            person on a map at their own front door, so it carries the strictest rules on the site.
-            A record is drawn no sharper than its sources support, and exact residential addresses
-            are not drawn at all.
-          </p>
-        </Prose>
-        <MapPrecisionDiagram />
-        <ol className="ds-stack" aria-label="Map dignity rules">
-          {DIGNITY_RULES.map((rule) => (
-            <li key={rule}>{rule}</li>
-          ))}
-        </ol>
-        <Note kind="LIMITATIONS">{LIMITATION_RULES.join(' ')}</Note>
-      </RoomSection>
-
-      <RoomSection
-        id="how-it-holds-together"
-        icon="collection"
-        kicker="Structure"
-        title="How it holds together"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>{METHODOLOGY_STRUCTURE_LEDE}</p>
-        </Prose>
-        <RecordDataModelDiagram />
-        <SiteStructureDiagram />
-      </RoomSection>
-
-      <RoomSection
-        id="lives-across-decades"
-        icon="person"
-        kicker="Lives"
-        title="Lives across the decades"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>{LIVES_METHOD_LEDE}</p>
-        </Prose>
-        <RoomFactList
-          items={LIVES_METHOD_RULES.map((rule) => ({
-            title: rule.title,
-            body: rule.body,
-            icon: 'person' as const,
-          }))}
-        />
-        <div className="ds-room-handoffs">
-          <RoomHandoff
-            href="/lives"
-            icon="person"
-            title="Open Lives"
-            line="Published counts beside sourced voices, places, laws, and records."
+        <RoomSection id="how-a-record-gets-in" title="How a record gets in">
+          <Lead>{ADMISSION_LEAD}</Lead>
+          <TrustFlow
+            caption="From a lead to a public page"
+            steps={ADMISSION_STEPS}
+            note={ADMISSION_GREEN_BOOK_NOTE}
           />
-          <RoomHandoff
-            href="/data#lives"
-            icon="data"
-            title="Data · Lived"
-            line="A compact door on Data. The timeline itself lives on Lives."
-          />
-        </div>
-      </RoomSection>
+          <Prose>
+            <p>{ADMISSION_OWNERSHIP}</p>
+          </Prose>
+          <RoomFactList items={METHODOLOGY_PUBLISH_RULES} />
+          <h3 className="ds-trust-subhead">How a claim is verified</h3>
+          <PlainList items={VERIFICATION_STEPS} label="How a claim is verified" />
+        </RoomSection>
 
-      <RoomSection
-        id="where-the-evidence-comes-from"
-        icon="source"
-        kicker="Sources"
-        title="Where the evidence comes from"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>{SOURCE_LIBRARY_LEDE}</p>
-          <p>
-            Publisher kinds, the citation chain, and where sources already appear live in the source
-            library. This heading stays so an old link still lands on the method page.
+        <RoomSection id="evidence-grades" title="What the evidence grades mean">
+          <Lead>{GRADES_LEAD}</Lead>
+          <GradeKey />
+          <GradeMatrix />
+          <PlainList items={GRADE_RULE_NOTES} label="How the grade rule reads its inputs" />
+          <p className="ds-trust-note">
+            Every citation on the site is built the same way, including the one the Copy citation
+            command puts on your clipboard. Here is one.
           </p>
-        </Prose>
-        <RoomHandoff
-          href={METHODOLOGY_SOURCE_LIBRARY_HREF}
-          icon="source"
-          title="Open the source library"
-          line="Publisher kinds, how a URL becomes a citation, and where sources already appear."
-        />
-      </RoomSection>
+          <Citation label="Example citation" source={EXAMPLE_CITATION} />
+        </RoomSection>
 
-      <RoomSection
-        id="living-person-protection"
-        icon="privacy"
-        kicker="Dignity"
-        title="Living person protection"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>{METHODOLOGY_DIGNITY_LINE}</p>
-          <p>
-            When the sources do not say whether someone is living, the archive treats them as living
-            and publishes accordingly. Some of the people this rule exists for are named on the
-            memorial wall, which holds a name and nothing else.
-          </p>
-        </Prose>
-        <RoomHandoff
-          href="/memorial"
-          icon="memorial"
-          title="The memorial wall"
-          line="A name, held. Not a join from a place record."
-        />
-      </RoomSection>
+        <RoomSection id="editorial-standards" title="Editorial standards">
+          <RoomFactList items={EDITORIAL_STANDARDS} />
+        </RoomSection>
 
-      <RoomSection
-        id="internet-archive"
-        icon="collection"
-        kicker="Preservation"
-        title="Internet Archive handoff"
-        tone={nextTone()}
-      >
-        <Prose>
-          <p>
-            BlackStory links out to preserved copies rather than republishing full third-party
-            pages. When a citation points to the Internet Archive or the Wayback Machine, the record
-            page lists those archived copies beside the bibliography.
-          </p>
-          <p>
-            Outbound contribution is operator-gated: cited public URLs are captured through the
-            Wayback workflow, and curated research exports may be staged for human review before any
-            Internet Archive upload. Operators use the research CLI capture and export verbs; there
-            is no automatic public upload from the reader site.
-          </p>
-        </Prose>
-      </RoomSection>
-
-      <div id="see-it-applied">
-        <WalkOffRamp
-          title="See it applied"
-          extra={[
-            { label: 'Errata', href: '/errata' },
-            { label: 'Request a correction', href: '/corrections' },
-            { label: 'Source library', href: '/sources' },
-          ]}
+        <RoomSection
+          id="how-a-point-is-drawn"
+          title="Why a point is never drawn sharper than its source"
         >
-          Here&apos;s where those rules show up, and where to tell me when they fall short.
-        </WalkOffRamp>
-      </div>
+          <Lead>{PRECISION_LEAD}</Lead>
+          <Prose>
+            <p>{PRECISION_CONTEXT}</p>
+          </Prose>
+          <PrecisionLadder />
+          <h3 className="ds-trust-subhead">The rules a point follows</h3>
+          <PlainList items={DIGNITY_RULES} label="Map dignity rules" />
+          <h3 className="ds-trust-subhead">What the map and the grades cannot tell you</h3>
+          <PlainList items={LIMITATION_RULES} label="Limitations" />
+        </RoomSection>
+      </TrustSheet>
+
+      {/* The page changes ground between chapters: how a record is built stands on sand, and the
+          rule that protects living people on its own ink band. */}
+      <TrustBand tone="sand">
+        <RoomSection id="how-it-holds-together" title="How it holds together">
+          <Lead>{STRUCTURE_LEAD}</Lead>
+          <TrustFlow caption="What one record is made of" steps={RECORD_ANATOMY_STEPS} />
+          <dl className="ds-trust-dl ds-trust-dl--split" aria-label="One catalog, three ways in">
+            {CATALOG_VIEWS.map((view) => (
+              <div key={view.title}>
+                <dt>{view.title}</dt>
+                <dd>{view.body}</dd>
+              </div>
+            ))}
+          </dl>
+        </RoomSection>
+      </TrustBand>
+
+      <TrustSheet>
+        <RoomSection id="lives-across-decades" title="Lives across the decades">
+          <Lead>{LIVES_METHOD_LEAD}</Lead>
+          <PlainList items={LIVES_METHOD_POINTS} label="How Lives reads its figures" />
+          <RoomFactList items={LIVES_METHOD_RULES} />
+          <TrustLinks
+            links={[
+              {
+                href: '/lives',
+                title: 'Lives',
+                line: 'Published counts beside sourced voices, places, laws and records.',
+              },
+              {
+                href: '/data',
+                title: 'Data',
+                line: 'The national indicator charts, each with its source and limits.',
+              },
+            ]}
+          />
+        </RoomSection>
+
+        <RoomSection id="where-the-evidence-comes-from" title="Where the evidence comes from">
+          <Lead>{SOURCE_LIBRARY_LEAD}</Lead>
+          <TrustLinks
+            links={[
+              {
+                href: METHODOLOGY_SOURCE_LIBRARY_HREF,
+                title: 'Open the source library',
+                line: 'Every publisher the archive cites, how many records cite it, and how a URL becomes a citation.',
+              },
+            ]}
+          />
+        </RoomSection>
+      </TrustSheet>
+
+      <TrustBand tone="ink" fixed>
+        <RoomSection id="living-person-protection" title="Living person protection">
+          <Lead>{LIVING_LEAD}</Lead>
+          <Prose>
+            <p>{METHODOLOGY_DIGNITY_LINE}</p>
+            <p>
+              Some of the people this rule exists for are named on the memorial wall, which holds a
+              name and nothing else.
+            </p>
+          </Prose>
+          <TrustLinks
+            links={[{ href: '/memorial', title: 'The memorial wall', line: 'A name, held.' }]}
+          />
+        </RoomSection>
+      </TrustBand>
+
+      <TrustSheet>
+        <RoomSection id="internet-archive" title="Internet Archive handoff">
+          <Lead>{INTERNET_ARCHIVE_LEAD}</Lead>
+          <Prose>
+            <p>
+              When a citation points to the Internet Archive or the Wayback Machine, the record page
+              lists those archived copies beside the bibliography.
+            </p>
+            <p>
+              Outbound contribution is operator-gated: cited public URLs are captured through the
+              Wayback workflow, and curated research exports may be staged for human review before
+              any Internet Archive upload. There is no automatic public upload from the reader site.
+            </p>
+          </Prose>
+        </RoomSection>
+
+        <p className="ds-trust-foot">
+          {disclaimer.body} Language reviewed {disclaimer.reviewDate}.
+        </p>
+      </TrustSheet>
     </>
   );
 }

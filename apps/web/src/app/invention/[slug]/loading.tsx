@@ -1,2 +1,2 @@
-/** An invention renders the shared record room, so it waits behind the same skeleton as `/entity/{id}`. */
+/** An invention waits behind the one record-page skeleton every family shares. */
 export { default } from '../../entity/[id]/loading';

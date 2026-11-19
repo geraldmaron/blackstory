@@ -8,7 +8,7 @@ import {
   rowToProjectionAuthoring,
   type StoryRow,
 } from '../../../../../../../../packages/ops-data/scripts/lib/story-lifecycle';
-import { StoryHeroPhoto } from '@/components/story/StoryHeroPhoto';
+import { StoryFigure } from '@/components/story/StoryFigure';
 import { StoryBody } from '@/components/story/StoryBody';
 import { StoryReferences } from '@/components/story/StoryReferences';
 import { hydrateStory, storyPacketIds, storyMapEntityIds } from '@/lib/stories/hydrate';
@@ -55,10 +55,7 @@ export default async function Preview({
         </>
       )}
       {parsed.success && parsed.data.heroImage && (
-        <figure>
-          <StoryHeroPhoto url={parsed.data.heroImage.url} alt={parsed.data.heroImage.alt} />
-          <figcaption>{parsed.data.heroImage.credit}</figcaption>
-        </figure>
+        <StoryFigure image={parsed.data.heroImage} eager />
       )}
       <h1>{raw.title}</h1>
       <p>{raw.summary}</p>

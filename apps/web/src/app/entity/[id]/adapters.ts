@@ -1,18 +1,31 @@
 /**
- * Maps public claim views into evidence inputs and inclusion explanations.
- * Stored inclusion decisions and their evidence links remain intact. A citation about the
- * subject cannot establish a criterion or repair a missing evidence assignment.
+ * Maps public claim views into evidence inputs for the record page's evidence list, and decides
+ * the record's trauma-content notice.
  */
 import {
-  buildPublicWhyThisAppears,
-  type PublicWhyThisAppears,
-  type RelevanceEvidence,
+  classifyStoryDimensions,
+  deriveTraumaContentNotice,
+  type DisclaimerRecord,
 } from '@repo/domain';
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import type { PublicClaimView, PublicEntityView } from '../../../data/public-seed';
+import { humanizeToken } from '../../../components/entity/format';
+import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 
-function citedClaims(entity: PublicEntityView): readonly PublicClaimView[] {
-  return entity.claims.filter((claim) => claim.citationSource.trim().length > 0);
+/**
+ * The sensitive-content disclaimer when the record's own accepted prose documents harm, else
+ * undefined. Same texts and the same domain rule (`deriveTraumaContentNotice`) the "why this
+ * appears" composer uses; it reads the story dimensions directly, so the notice never depends on
+ * whether the inclusion explanation passes its separate prose gates.
+ */
+export function traumaContentDisclaimerFor(entity: PublicEntityView): DisclaimerRecord | undefined {
+  const dimensions = classifyStoryDimensions([
+    entity.relevanceExplanation,
+    entity.historicalContext,
+    ...entity.claims.map((claim) => `${claim.predicate} ${claim.object}`),
+  ]);
+  const notice = deriveTraumaContentNotice(dimensions);
+  return notice.warranted ? notice.disclaimer : undefined;
 }
 
 /**
@@ -30,9 +43,8 @@ function normalizeForEcho(text: string): string {
  * claim carries no information the reader has not already had, so it is not shown.
  *
  * Suppression is display-only and scoped to the claims section (and the matching research-gap
- * disclosure, so the two never contradict each other). The rail's source list and the record's
- * evidence grade still read the full claim set — the citation behind that summary is real and
- * stays visible as a source.
+ * disclosure, so the two never contradict each other). The record's evidence grade still reads the
+ * full claim set, and the record file lists that summary's source under "Also cited".
  */
 export function withoutSummaryEchoClaims(
   claims: readonly PublicClaimView[],
@@ -41,16 +53,6 @@ export function withoutSummaryEchoClaims(
   const normalizedSummary = normalizeForEcho(summary);
   if (normalizedSummary.length === 0) return claims;
   return claims.filter((claim) => normalizeForEcho(claim.object) !== normalizedSummary);
-}
-
-/**
- * Matches text the page already prints as an accepted claim. The "Inclusion evidence" list under
- * "Can I trust this" quotes the same claims a second time, with the same source link; with this it
- * can point back to them instead. Same normalization as the summary-echo check above.
- */
-export function claimTextMatcher(claims: readonly PublicClaimView[]): (text: string) => boolean {
-  const printed = new Set(claims.map((claim) => normalizeForEcho(claim.object)));
-  return (text) => printed.has(normalizeForEcho(text));
 }
 
 /** Maps seed `PublicClaimView` rows into `EvidenceClaimInput` (citation field rename + dispute).  */
@@ -91,57 +93,31 @@ export function toEvidenceClaimInputs(
   });
 }
 
-/** Source-kind evidence from real claim citations only — never topic/jurisdiction metadata. */
-function relevanceEvidenceForEntity(entity: PublicEntityView): readonly RelevanceEvidence[] {
-  return citedClaims(entity).map((claim) => ({
-    kind: 'source' as const,
-    summary: claim.citationSource,
-    detail: `${claim.citationLabel}: ${claim.predicate.replaceAll('_', ' ')}. ${claim.object}`,
-  }));
-}
-
-/** Claim-id → public citation for WhyThisAppears link rendering. */
-export type WhyAppearsEvidenceCitation = {
-  readonly id: string;
-  readonly source: string;
-  readonly label: string;
-  readonly href?: string;
-};
-
-export function whyAppearsEvidenceById(
-  entity: PublicEntityView,
-): Readonly<Record<string, WhyAppearsEvidenceCitation>> {
-  const map: Record<string, WhyAppearsEvidenceCitation> = {};
-  for (const claim of citedClaims(entity)) {
-    map[claim.id] = {
-      id: claim.id,
-      source: claim.citationSource,
-      label: claim.citationLabel,
-      ...(claim.citationHref !== undefined ? { href: claim.citationHref } : {}),
-    };
-  }
-  return map;
-}
-
 /**
- * Returns the structured inclusion explanation, or undefined when the domain composer rejects
- * it. The record page reports the missing explanation without substituting a general rubric
- * for record-specific evidence. Publication applies the stricter content gate.
+ * A sensitive or violence-adjacent record: a sensitivity flag, a trauma content note, or a
+ * massacre or plantation tone. It stands on a quiet ground (no plate, no lamplight, no motion) on
+ * its own page and is never lifted onto the home page.
  */
-export function buildWhyThisAppearsForEntity(
-  entity: PublicEntityView,
-): PublicWhyThisAppears | undefined {
-  try {
-    return buildPublicWhyThisAppears({
-      explanation: entity.relevanceExplanation,
-      evidence: relevanceEvidenceForEntity(entity),
-      notabilityBasis: entity.notabilityBasis ?? [],
-      storyTexts: [
-        entity.historicalContext,
-        ...entity.claims.map((c) => `${c.predicate} ${c.object}`),
-      ],
-    });
-  } catch {
-    return undefined;
-  }
+export function isQuietRecord(entity: PublicEntityView): boolean {
+  if (entity.sensitivity) return true;
+  if (traumaContentDisclaimerFor(entity) !== undefined) return true;
+  const tone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
+  return tone === 'massacre' || tone === 'plantation';
+}
+
+/** A citation's publisher as a reader names it: the bare host, no scheme or `www.`. */
+export function publisherOf(claim: PublicClaimView): string {
+  return claim.citationSource
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/$/, '');
+}
+
+/** A short claim whose object is a bare name reads as nothing; prefix the predicate in words. */
+export function statementFor(predicate: string, object: string): string {
+  const text = object.trim();
+  const isSentence = /[.!?]["')\]]?$/.test(text) || text.split(/\s+/).length > 8;
+  if (isSentence || predicate.trim().length === 0) return text;
+  return `${humanizeToken(predicate)}: ${text}`;
 }

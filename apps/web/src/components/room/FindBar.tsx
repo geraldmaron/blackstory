@@ -69,7 +69,7 @@ export type FindBarProps = {
 const count = (value: number) => value.toLocaleString('en-US');
 
 /** One facet as one row of chip links. Exported for a route that puts a facet inside `FindBarFilters`. */
-export function FindBarChips({ row }: { readonly row: FindBarChipRow }) {
+function FindBarChips({ row }: { readonly row: FindBarChipRow }) {
   return (
     <div className="ds-find__chips" role="group" aria-label={row.label}>
       {row.chips.map((chip) => (

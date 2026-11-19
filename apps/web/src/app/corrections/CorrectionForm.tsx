@@ -1,36 +1,47 @@
 'use client';
 
 /**
- * Public correction intake form. Posts to `/corrections/api` quarantine-only, never
- * public. Supports entity/claim/source/location targets, structured categories, source URL,
+ * Public correction intake form. Posts to `/corrections/api`, quarantine-only, never public.
+ * Supports entity/claim/source/location targets, structured categories, a source URL and
  * privacy consent, and returns a receipt code on success.
+ *
+ * Checked as the reader goes (`correction-form.ts`); the server still decides. On success the
+ * form is replaced by the receipt; on failure everything typed stays in place.
  */
 import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import { Button, Notice } from '@repo/ui';
+import { buttonClassName, Segmented } from '@repo/ui';
 import { ChoiceField, Field, fieldControlProps, fieldErrorId } from '../../components/room';
+import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
+import { useFieldErrors } from '../../components/forms/use-field-errors';
 import { ReceiptBlock } from './ReceiptBlock';
 import {
   CORRECTION_CATEGORIES,
   CORRECTION_CATEGORY_LABELS,
-  CORRECTION_TARGET_LABELS,
+  CORRECTION_TARGET_SHORT_LABELS,
   CORRECTION_TARGET_TYPES,
   type CorrectionTargetType,
 } from './categories';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
+import { validateCorrectionForm } from './correction-form';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+
+void React;
+
+const FORM_FIELDS = new Set([
+  'targetType',
+  'targetRecordId',
+  'category',
+  'statement',
+  'sourceUrl',
+  'contact',
+  'privacyConsent',
+]);
 
 type SubmitState =
   | { readonly status: 'idle' }
   | { readonly status: 'submitting' }
   | { readonly status: 'success'; readonly receiptCode: string; readonly statusHref: string }
-  | {
-      readonly status: 'error';
-      readonly message: string;
-      readonly fieldIssues?: readonly { field: string; message: string }[];
-    };
-
-const DEFAULT_ERROR_MESSAGE =
-  'Something went wrong submitting this correction. Please try again in a moment.';
+  | { readonly status: 'failed'; readonly title: string; readonly detail: string };
 
 export type CorrectionFormProps = {
   readonly initialTarget?: string;
@@ -44,26 +55,42 @@ export function CorrectionForm({
   targetName,
 }: CorrectionFormProps) {
   const [state, setState] = useState<SubmitState>({ status: 'idle' });
+  const fields = useFieldErrors(validateCorrectionForm);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const receiptRef = useRef<HTMLDivElement | null>(null);
+  const failureRef = useRef<HTMLDivElement | null>(null);
+  const id = useId();
+  const ids = {
+    target: `${id}-target`,
+    statement: `${id}-statement`,
+    source: `${id}-source`,
+    contact: `${id}-contact`,
+    privacy: `${id}-privacy`,
+  };
 
-  const targetTypeId = useId();
-  const targetRecordId = useId();
-  const statementId = useId();
-  const sourceUrlId = useId();
-  const contactId = useId();
-  const privacyId = useId();
+  /*
+   * The receipt code is the only credential for looking up what happened to a report, and the
+   * receipt replaces the whole form, so focus moves to it; a failure moves focus to its message.
+   */
+  useEffect(() => {
+    if (state.status === 'success') receiptRef.current?.focus();
+    if (state.status === 'failed') failureRef.current?.focus();
+  }, [state.status]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
+    if (!fields.validateAll(form)) return;
     const data = new FormData(form);
+    const text = (name: string) => String(data.get(name) ?? '').trim();
     const payload = {
-      targetType: String(data.get('targetType') ?? 'entity'),
-      targetRecordId: String(data.get('targetRecordId') ?? '').trim(),
-      category: String(data.get('category') ?? ''),
-      statement: String(data.get('statement') ?? '').trim(),
-      sourceUrl: String(data.get('sourceUrl') ?? '').trim() || undefined,
+      targetType: text('targetType') || 'entity',
+      targetRecordId: text('targetRecordId'),
+      category: text('category'),
+      statement: text('statement'),
+      sourceUrl: text('sourceUrl') || undefined,
       privacyConsent: data.get('privacyConsent') === 'on',
-      contact: String(data.get('contact') ?? '').trim() || undefined,
+      contact: text('contact') || undefined,
     };
 
     setState({ status: 'submitting' });
@@ -80,245 +107,253 @@ export function CorrectionForm({
       if (response.status === 202 && body && typeof body === 'object' && 'receiptCode' in body) {
         const receiptCode = String((body as { receiptCode: unknown }).receiptCode);
         const statusHref =
-          body && 'statusHref' in body
+          'statusHref' in body
             ? String((body as { statusHref: unknown }).statusHref)
             : `/corrections/status/${encodeURIComponent(receiptCode)}`;
         setState({ status: 'success', receiptCode, statusHref });
-        form.reset();
         return;
       }
-
       if (response.status === 429) {
         setState({
-          status: 'error',
-          message: 'Too many corrections from this connection. Please try again shortly.',
+          status: 'failed',
+          title: 'Too many corrections from this connection just now.',
+          detail: 'Wait a few minutes, then send it again. Nothing you typed has been lost.',
         });
         return;
       }
-
       if (response.status === 400 && body && typeof body === 'object' && 'issues' in body) {
-        const issues = (body as { issues?: readonly { field: string; message: string }[] }).issues;
-        setState({
-          status: 'error',
-          message: 'Please fix the highlighted fields and resubmit.',
-          ...(issues ? { fieldIssues: issues } : {}),
-        });
+        const issues =
+          (body as { issues?: readonly { field: string; message: string }[] }).issues ?? [];
+        const elsewhere = issues.filter((issue) => !FORM_FIELDS.has(issue.field));
+        fields.showIssues(
+          formRef.current,
+          issues.filter((issue) => FORM_FIELDS.has(issue.field)),
+        );
+        setState(
+          elsewhere.length === 0
+            ? { status: 'idle' }
+            : {
+                status: 'failed',
+                title: 'The correction was not accepted.',
+                detail: elsewhere.map((issue) => issue.message).join(' '),
+              },
+        );
         return;
       }
-
-      setState({ status: 'error', message: DEFAULT_ERROR_MESSAGE });
+      throw new Error(`correction intake answered ${response.status}`);
     } catch {
-      setState({ status: 'error', message: DEFAULT_ERROR_MESSAGE });
+      setState({
+        status: 'failed',
+        title: 'The correction was not sent.',
+        detail: 'Nothing you typed has been lost. Check your connection and send it again.',
+      });
     }
   }
 
-  const fieldIssue = (field: string) =>
-    state.status === 'error'
-      ? state.fieldIssues?.find((issue) => issue.field === field)
-      : undefined;
-
-  const receiptRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (state.status === 'success') receiptRef.current?.focus();
-  }, [state.status]);
-
-  /*
-   * Submit-wide error handling belongs to the form, not to a field: only the form knows which
-   * of its fields failed and which one is first in reading order. Without this, a rejected
-   * submission announced the summary and then left the caret on a submit button, so a keyboard
-   * user had to tab back through the whole form to find what was wrong.
-   */
-  const formRef = useRef<HTMLFormElement | null>(null);
-  useEffect(() => {
-    if (state.status !== 'error') return;
-    const firstInvalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
-    if (firstInvalid) firstInvalid.focus();
-    else formRef.current?.querySelector<HTMLElement>('[role="alert"]')?.focus();
-  }, [state]);
-
   if (state.status === 'success') {
     return (
-      <div
-        className="ds-corrections__received"
-        /*
-         * The receipt code is the only credential for looking up what happened to a report,
-         * and this panel replaces the whole form. Without moving focus here, a screen-reader
-         * user was left on a submit button that no longer exists and never heard the code.
-         * Focus lands on the panel, which carries the heading and the receipt; that is the
-         * confirmation-panel pattern, and it avoids the double announcement a live region
-         * would cause on a node that has just been inserted.
-         */
-        ref={receiptRef}
-        tabIndex={-1}
-      >
-        <h2>It arrived. Here is your receipt.</h2>
-        <ReceiptBlock receiptCode={state.receiptCode} />
-        <p className="ds-room-field__hint">
-          Nothing you sent is public. If your correction is declined, you get the reason.
+      <div className="ds-form-done" ref={receiptRef} tabIndex={-1}>
+        <h2 className="ds-form-done__title">It arrived. Here is your receipt.</h2>
+        <p className="ds-form-done__body">
+          Nothing you sent is public. A person reads it against the published sources, and if it is
+          declined you get the reason.
         </p>
-        <p className="ds-corrections__received-actions">
-          <a className="ds-cta ds-cta--quiet" href={state.statusHref}>
+        <ReceiptBlock receiptCode={state.receiptCode} />
+        <div className="ds-form-done__actions">
+          <a className={buttonClassName('secondary')} href={state.statusHref}>
             Check this receipt
           </a>
-        </p>
+        </div>
       </div>
     );
   }
 
+  const error = (name: string) => fields.errors[name];
+  const errorProps = (name: string) => (error(name) ? { error: error(name) } : {});
+
   return (
-    <form className="ds-stack" onSubmit={handleSubmit} ref={formRef} noValidate>
-      {state.status === 'error' && !state.fieldIssues ? (
-        <Notice tone="error" title="Submission failed">
-          {state.message}
-        </Notice>
-      ) : null}
-      {state.status === 'error' && state.fieldIssues ? (
-        <Notice tone="error" title="Check the following">
-          <ul>
-            {state.fieldIssues.map((issue) => (
-              <li key={issue.field}>{issue.message}</li>
-            ))}
-          </ul>
-        </Notice>
-      ) : null}
+    <form
+      className="ds-form"
+      onSubmit={handleSubmit}
+      onBlur={fields.onBlur}
+      onChange={fields.onChange}
+      ref={formRef}
+      noValidate
+      aria-busy={state.status === 'submitting' || undefined}
+    >
+      <RequiredNote />
 
-      <Field label="What are you correcting?" htmlFor={targetTypeId}>
-        <select id={targetTypeId} name="targetType" defaultValue={initialTargetType} required>
-          {CORRECTION_TARGET_TYPES.map((targetType) => (
-            <option key={targetType} value={targetType}>
-              {CORRECTION_TARGET_LABELS[targetType]}
-            </option>
-          ))}
-        </select>
-      </Field>
+      <fieldset className="ds-form-group">
+        <legend>The record</legend>
 
-      {targetName && initialTargetType === 'entity' ? (
-        <p className="ds-room-field__hint">
-          Opened from <a href={`/entity/${encodeURIComponent(initialTarget)}`}>{targetName}</a>. The
-          record reference is filled in below; you can change it.
-        </p>
-      ) : null}
+        <div className="ds-room-field">
+          <span className="ds-room-field__label" aria-hidden="true">
+            What are you correcting?
+          </span>
+          <Segmented
+            label="What are you correcting?"
+            name="targetType"
+            value={initialTargetType}
+            options={CORRECTION_TARGET_TYPES.map((targetType) => ({
+              value: targetType,
+              label: CORRECTION_TARGET_SHORT_LABELS[targetType],
+            }))}
+          />
+        </div>
 
-      <Field
-        label="Which record is wrong?"
-        htmlFor={targetRecordId}
-        hint="Name the place or paste its page address. You do not need an internal id."
-        {...(fieldIssue('targetRecordId') ? { error: fieldIssue('targetRecordId')!.message } : {})}
-      >
-        <input
-          {...fieldControlProps({
-            htmlFor: targetRecordId,
-            hint: true,
-            error: fieldIssue('targetRecordId'),
-          })}
-          name="targetRecordId"
-          type="text"
-          defaultValue={initialTarget}
-          maxLength={128}
+        {targetName && initialTargetType === 'entity' ? (
+          <p className="ds-form-group__hint">
+            Opened from <a href={`/entity/${encodeURIComponent(initialTarget)}`}>{targetName}</a>.
+            The record reference is filled in below; you can change it.
+          </p>
+        ) : null}
+
+        <Field
+          label={
+            <>
+              Which record is wrong?
+              <RequiredMark />
+            </>
+          }
+          htmlFor={ids.target}
+          hint="Name the place or paste its page address. You do not need an internal id."
+          {...errorProps('targetRecordId')}
+        >
+          <input
+            {...fieldControlProps({
+              htmlFor: ids.target,
+              hint: true,
+              error: error('targetRecordId'),
+            })}
+            name="targetRecordId"
+            type="text"
+            defaultValue={initialTarget}
+            maxLength={128}
+            required
+          />
+        </Field>
+
+        <ChoiceField
+          className="ds-form-cards"
+          legend={
+            <>
+              What is wrong with it?
+              <RequiredMark />
+            </>
+          }
+          name="category"
+          id={`${id}-category`}
           required
-          placeholder="Fifteenth Street Presbyterian Church"
+          choices={CORRECTION_CATEGORIES.map((category) => ({
+            value: category,
+            label: CORRECTION_CATEGORY_LABELS[category],
+          }))}
+          {...errorProps('category')}
         />
-      </Field>
+      </fieldset>
 
-      {/* Four pills rather than a select: the set is small enough to read faster than it opens,
-          and they are real radios, so the answer survives JavaScript being off. */}
-      <ChoiceField
-        legend="What is wrong with it?"
-        name="category"
-        required
-        choices={CORRECTION_CATEGORIES.map((category) => ({
-          value: category,
-          label: CORRECTION_CATEGORY_LABELS[category],
-        }))}
-        {...(fieldIssue('category') ? { error: fieldIssue('category')!.message } : {})}
+      <fieldset className="ds-form-group">
+        <legend>The fix</legend>
+        <Field
+          label={
+            <>
+              What should it say instead?
+              <RequiredMark />
+            </>
+          }
+          htmlFor={ids.statement}
+          hint="For example: The 1891 building was purpose-built, not converted. Plain language is fine."
+          {...errorProps('statement')}
+        >
+          <textarea
+            {...fieldControlProps({
+              htmlFor: ids.statement,
+              hint: true,
+              error: error('statement'),
+            })}
+            name="statement"
+            rows={5}
+            required
+            minLength={20}
+          />
+        </Field>
+
+        {/*
+          Required, and marked so: `correction-intake.ts` rejects a submission with no source URL,
+          and the link is what makes a correction reviewable rather than an assertion.
+        */}
+        <Field
+          label={
+            <>
+              Where can it be checked?
+              <RequiredMark />
+            </>
+          }
+          htmlFor={ids.source}
+          hint="A link to the source that shows the right version."
+          {...errorProps('sourceUrl')}
+        >
+          <input
+            {...fieldControlProps({ htmlFor: ids.source, hint: true, error: error('sourceUrl') })}
+            name="sourceUrl"
+            type="url"
+            inputMode="url"
+            required
+            placeholder="https://"
+          />
+        </Field>
+      </fieldset>
+
+      <fieldset className="ds-form-group">
+        <legend>About you</legend>
+        <Field
+          label="Email"
+          htmlFor={ids.contact}
+          hint="Only used to send your receipt and the outcome."
+          {...errorProps('contact')}
+        >
+          <input
+            {...fieldControlProps({ htmlFor: ids.contact, hint: true, error: error('contact') })}
+            name="contact"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.org"
+          />
+        </Field>
+
+        <div className="ds-form-check" data-invalid={error('privacyConsent') ? 'true' : undefined}>
+          <input
+            {...fieldControlProps({ htmlFor: ids.privacy, error: error('privacyConsent') })}
+            name="privacyConsent"
+            type="checkbox"
+            required
+          />
+          <label htmlFor={ids.privacy}>
+            I have read how a correction is handled, and understand it enters a restricted review
+            queue.
+            <RequiredMark />
+            <small>{CORRECTION_PRIVACY_NOTICE.body}</small>
+          </label>
+          {error('privacyConsent') ? (
+            <p className="ds-room-field__error" id={fieldErrorId(ids.privacy)} role="alert">
+              {error('privacyConsent')}
+            </p>
+          ) : null}
+        </div>
+      </fieldset>
+
+      {state.status === 'failed' ? (
+        <div ref={failureRef} tabIndex={-1}>
+          <FormFailure title={state.title}>{state.detail}</FormFailure>
+        </div>
+      ) : null}
+
+      <SubmitRow
+        pending={state.status === 'submitting'}
+        label="Send the correction"
+        pendingLabel="Sending"
+        note="You get a receipt code on the next screen."
       />
-
-      <Field
-        label="What should it say instead?"
-        htmlFor={statementId}
-        hint="Plain language is fine. You do not need to write like a citation."
-        {...(fieldIssue('statement') ? { error: fieldIssue('statement')!.message } : {})}
-      >
-        <textarea
-          {...fieldControlProps({
-            htmlFor: statementId,
-            hint: true,
-            error: fieldIssue('statement'),
-          })}
-          name="statement"
-          rows={5}
-          required
-          minLength={20}
-          placeholder="The 1891 building was purpose-built, not converted."
-        />
-      </Field>
-
-      {/*
-        The mock marks this field optional. It is not: `correction-intake.ts` rejects a submission
-        with no source URL, and a label that promises otherwise would send a reader through the
-        whole form to a validation error. It is stated as what it is instead — the thing that makes
-        a correction reviewable rather than an assertion.
-      */}
-      <Field
-        label={
-          <>
-            Where can I check it? <small>A link is what makes a correction reviewable</small>
-          </>
-        }
-        htmlFor={sourceUrlId}
-        {...(fieldIssue('sourceUrl') ? { error: fieldIssue('sourceUrl')!.message } : {})}
-      >
-        <input
-          {...fieldControlProps({ htmlFor: sourceUrlId, error: fieldIssue('sourceUrl') })}
-          name="sourceUrl"
-          type="url"
-          required
-          placeholder="https://"
-        />
-      </Field>
-
-      <Field
-        label={
-          <>
-            Email <small>Only used to send the outcome</small>
-          </>
-        }
-        htmlFor={contactId}
-      >
-        {/* type="email": the label says Email, so the control should bring the email
-            keyboard on a phone and get the browser's own format check. */}
-        <input id={contactId} name="contact" type="email" placeholder="you@example.org" />
-      </Field>
-
-      <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
-        {CORRECTION_PRIVACY_NOTICE.body}
-      </Notice>
-
-      <div className="ds-row" style={{ alignItems: 'flex-start' }}>
-        <input
-          {...fieldControlProps({ htmlFor: privacyId, error: fieldIssue('privacyConsent') })}
-          name="privacyConsent"
-          type="checkbox"
-          required
-        />
-        <label htmlFor={privacyId} className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)' }}>
-          I have read the privacy notice and understand this submission enters a restricted review
-          queue. <span aria-hidden="true">*</span>
-          <span className="ds-visually-hidden">required</span>
-        </label>
-      </div>
-      {fieldIssue('privacyConsent') ? (
-        <p id={fieldErrorId(privacyId)} className="ds-sans ds-room-field__error" role="alert">
-          {fieldIssue('privacyConsent')!.message}
-        </p>
-      ) : null}
-
-      <div className="ds-corrections-send">
-        <Button type="submit" disabled={state.status === 'submitting'}>
-          {state.status === 'submitting' ? 'Sending…' : 'Send the correction'}
-        </Button>
-        <span>You will get a receipt code on the next screen.</span>
-      </div>
     </form>
   );
 }

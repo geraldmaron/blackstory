@@ -3,8 +3,18 @@ import type { ExploreViewportFrame } from '../../lib/map-experience/url-state';
 export type MapStageEvents = {
   select: [entityId: string];
   overlap: [entityIds: readonly string[]];
-  /** Clears an open record selection when the reader drills into a cluster aggregate. */
+  /** Clears an open record selection when the reader drills into a place token. */
   deselect: [];
+  /** A place token was opened (`?place=` key, `place-map.ts`). `frame` is its extent, so the
+   * subscriber that owns the camera (the stage moves only when nobody subscribes) can frame it. */
+  placeSelect: [
+    placeKey: string,
+    frame?: {
+      readonly level: 'state' | 'county' | 'city' | 'square';
+      readonly bounds: readonly [number, number, number, number];
+      readonly openZoom?: number;
+    },
+  ];
   stateSelect: [postalCode: string];
   edgeSelect: [edgeId: string];
   /** Fired on a background click when nothing else (state, edge) was hit — the
@@ -43,6 +53,7 @@ export function makeListenerStore(): {
     select: new Set(),
     overlap: new Set(),
     deselect: new Set(),
+    placeSelect: new Set(),
     stateSelect: new Set(),
     edgeSelect: new Set(),
     activate: new Set(),

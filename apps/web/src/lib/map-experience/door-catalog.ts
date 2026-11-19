@@ -143,6 +143,20 @@ async function fetchDoorPinPlateCache(): Promise<DoorPinPlateCache> {
 /** Cross-request cached pin plate + redirect table (shared by `/` and `/door/pin/*`). */
 export const loadDoorPinPlate = cache(fetchDoorPinPlateCache);
 
+/**
+ * The address the plate resolved for every record it draws, by record id. The one id-to-href
+ * source for any list of records (the register's rows, a record page's prev/next pager): an
+ * address guessed from a slim catalog row can be a dead `/place` link.
+ */
+export const loadDrawnRecordHrefs = cache(
+  async (): Promise<ReadonlyMap<string, string>> =>
+    new Map(
+      (await loadDoorPinPlate()).features.map(
+        (feature) => [feature.properties.entityId, feature.properties.href] as const,
+      ),
+    ),
+);
+
 /** Resolve an opaque `/door/pin/pin-N` id without rebuilding the feature collection. */
 export async function resolveDoorPinRedirect(pinId: string): Promise<string | null> {
   const index = parseFirstPaintPinId(decodeURIComponent(pinId));

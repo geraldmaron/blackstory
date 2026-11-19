@@ -3,24 +3,23 @@
  */
 import { LedgerRow, NavIcon } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
-import type { ContentEntry } from '@/features/content';
+import type { StoryListItemV1 } from '@repo/public-contracts/v1/story';
 
 export interface StoryCompactRowProps {
-  readonly entry: ContentEntry;
+  readonly story: StoryListItemV1;
   readonly onPress: () => void;
   readonly showDivider?: boolean;
   readonly indexLabel?: string;
 }
 
 export function StoryCompactRow({
-  entry,
+  story: page,
   onPress,
   showDivider = true,
   indexLabel,
 }: StoryCompactRowProps) {
-  const { page } = entry;
   const era = page.eraLabel ? plainRangeText(page.eraLabel) : '';
-  const place = page.placeLabel ?? '';
+  const place = page.collection?.positionLabel ?? page.placeLabel;
   const slug = [era, place].filter(Boolean).join(' · ');
 
   return (

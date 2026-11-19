@@ -4,6 +4,8 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
+import { integritySatisfiesRateLimitGate } from '@/lib/request-integrity/server';
 import {
   createQuarantinedSubmission,
   createSubmissionCampaignDetector,
@@ -29,19 +31,10 @@ import {
   createPostgresCorrectionSubmissionStore,
   saveQuarantinedRecord,
 } from '../../../lib/public-data/corrections-store';
+import { notify as defaultNotify, recipientFrom, type Notifier } from '../../../lib/notify/notify';
+import { CORRECTION_CATEGORY_LABELS } from '../categories';
 import type { CorrectionRequestIntegrityGuard } from '../request-integrity-guard';
 import type { createCorrectionRateLimitGuard } from '../rate-limit-guard';
-
-/**
- * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
- * `clientAttested` field name on rate-limit requests).
- */
-function integritySatisfiesRateLimitGate(decision: {
-  readonly verified: boolean;
-  readonly mode: 'monitor' | 'enforce';
-}): boolean {
-  return decision.verified || decision.mode === 'monitor';
-}
 
 export type CorrectionRouteDependencies = {
   readonly integrityGuard: CorrectionRequestIntegrityGuard;
@@ -57,16 +50,12 @@ export type CorrectionRouteDependencies = {
    * `store` for the in-memory one, rather than reaching the network.
    */
   readonly saveAbuseReport?: (record: QuarantinedSubmissionRecord) => Promise<void>;
+  /** Defaults to real (env-gated) email; tests pass a recorder. */
+  readonly notify?: Notifier;
 };
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 function networkTokenFor(clientIp: string, pepper: string): string {
@@ -82,6 +71,7 @@ function toPublicStatus(stored: StoredCorrection) {
     updatedAt: stored.updatedAt,
     classificationDispute: stored.classificationDispute,
     ...(stored.closureReason ? { closureReason: stored.closureReason } : {}),
+    ...(stored.publicReason ? { publicReason: stored.publicReason } : {}),
     appealCount: stored.appeals.length,
   });
 }
@@ -172,6 +162,28 @@ export async function handleCorrectionSubmitRequest(
     });
     await deps.store.save(stored);
 
+    const send = deps.notify ?? defaultNotify;
+    const contact = recipientFrom(validation.payload.submitterContact);
+    if (contact) {
+      send({
+        event: 'correction.received',
+        to: contact,
+        data: { receiptCode: stored.receiptCode },
+        idempotencyKey: `correction.received:${stored.record.id}`,
+      });
+    }
+    send({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: {
+        kind: 'correction',
+        headline: `${CORRECTION_CATEGORY_LABELS[validation.metadata.category]} on “${(body as CorrectionSubmissionInput).targetRecordId.trim().slice(0, 80)}”, receipt ${stored.receiptCode}`,
+        statement: (body as CorrectionSubmissionInput).statement,
+        id: stored.record.id,
+      },
+      idempotencyKey: `owner.new_submission:${stored.record.id}`,
+    });
+
     return NextResponse.json(
       {
         accepted: true,
@@ -260,6 +272,30 @@ export async function handleCorrectionAppealRequest(
     });
     if (!attached) return jsonError(409, 'appeal_not_available');
 
+    const send = deps.notify ?? defaultNotify;
+    const contact =
+      recipientFrom(input.contact) ??
+      recipientFrom(stored.record.original.payload.submitterContact);
+    if (contact) {
+      send({
+        event: 'appeal.received',
+        to: contact,
+        data: { receiptCode: stored.receiptCode },
+        idempotencyKey: `appeal.received:${appealRecord.id}`,
+      });
+    }
+    send({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: {
+        kind: 'appeal',
+        headline: `Appeal on correction ${stored.receiptCode}`,
+        statement: input.statement,
+        id: stored.record.id,
+      },
+      idempotencyKey: `owner.new_submission:${appealRecord.id}`,
+    });
+
     return NextResponse.json(
       {
         accepted: true,
@@ -308,6 +344,19 @@ export async function handleCorrectionAbuseReportRequest(
     // Abuse reports have no receipt/status scheme (nothing for a submitter to check later), so
     // they use the same durable intake writer without receipt metadata.
     await (deps.saveAbuseReport ?? saveQuarantinedRecord)(result.record);
+    (deps.notify ?? defaultNotify)({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: {
+        kind: 'abuse report',
+        headline: (body as AbuseReportInput).receiptCode?.trim()
+          ? `Report about correction ${(body as AbuseReportInput).receiptCode?.trim()}`
+          : 'Report about correction activity',
+        statement: (body as AbuseReportInput).statement,
+        id: result.record.id,
+      },
+      idempotencyKey: `owner.new_submission:${result.record.id}`,
+    });
 
     return NextResponse.json(
       {

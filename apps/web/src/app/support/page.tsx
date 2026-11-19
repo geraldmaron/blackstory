@@ -1,6 +1,7 @@
 /**
- * Public support page for BlackStory. Primary path is the corrections lane;
- * methodology, errata, and a contact address sit beside it.
+ * `/support`: how to get an answer. A question about a record is a correction; anything else is
+ * an email to the person who reads the mailbox. One primary action, the address, then where the
+ * answers that already exist live.
  *
  * The contact block speaks as Gerald Dagher, because that is who reads the mailbox.
  * `SUPPORT_CONTACT` is his own address by decision (lib/config/contact.ts), and a
@@ -10,22 +11,12 @@ import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import {
-  Room,
-  ReadingEntry,
-  Prose,
-  CardGrid,
-  RoomCard,
-  RoomSection,
-  roomSectionTone,
-  KeepGoing,
-  RoomJump,
-} from '../../components/room';
-import { DestinationIcon } from '../../components/patterns/DestinationIcon';
-import { WalkOffRamp } from '../walk-off-ramp';
+import { Button, PageHeader } from '@repo/ui';
+import { parentCrumb, Room, RoomSection } from '../../components/room';
+import { TrustLinks, TrustMast, TrustSheet } from '../../components/trust';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
-import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import '../utility.css';
+import '../../components/trust/trust.css';
 import './support.css';
 
 void React;
@@ -37,120 +28,72 @@ export const metadata: Metadata = buildStaticPageMetadata({
     'How to report a correction, read the BlackStory trust documentation, and reach the person who runs it.',
 });
 
-const SUPPORT_PATHS: readonly {
-  readonly href: string;
-  readonly label: string;
-  readonly icon: DestinationIconId;
-  readonly detail: string;
-}[] = [
-  {
-    href: '/corrections',
-    label: 'Report a correction',
-    icon: 'correction',
-    detail:
-      'Say a published record is wrong, or point at evidence it is missing. Submissions enter moderated review, and nothing changes publicly until a person accepts it. You get a receipt code.',
-  },
-  {
-    href: '/methodology',
-    label: 'Read the methodology',
-    icon: 'methodology',
-    detail:
-      'Definitions, source rules, confidence grades, map dignity limits, and how corrections are handled.',
-  },
-  {
-    href: '/errata',
-    label: 'Browse the errata log',
-    icon: 'errata',
-    detail: 'Corrections, clarifications, updates, and editor notes already applied, newest first.',
-  },
-];
-
 export default function SupportPage() {
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/support"
-        title={
-          <>
-            How to get an <em>answer</em>.
-          </>
-        }
-        lede="BlackStory is one person's archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted."
-      />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast art={['weave']} tone="copper">
+          <PageHeader
+            display
+            crumb={parentCrumb('/support')}
+            linkAs={Link}
+            title="How to get an answer"
+            dek="One person runs BlackStory and reads everything that comes in."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <div className="ds-support__pair">
+          <RoomSection id="record" title="Something in a record is wrong">
+            <p className="ds-trust-lead">
+              File it as a correction. A person reads it against the published sources, and you get
+              a receipt code to check the outcome.
+            </p>
+            <div className="ds-support__action">
+              <Button href="/corrections">Report a correction</Button>
+            </div>
+          </RoomSection>
 
-      <RoomJump
-        sections={[
-          { id: 'paths', label: 'The fastest ways in', icon: 'correction' },
-          { id: 'contact', label: 'Reach me', icon: 'support' },
-          { id: 'keep-going', label: 'Keep going', icon: 'rooms' },
-        ]}
-      />
-
-      <RoomSection
-        id="paths"
-        icon="correction"
-        kicker="Start here"
-        title="The fastest ways in"
-        tone={roomSectionTone(0)}
-        className="ds-support__section-paths"
-      >
-        <Prose>
-          <p className="ds-support__section-intro">
-            A question about one specific record is best filed as a correction, because that puts
-            what you wrote next to the published sources when someone reads it.
-          </p>
-        </Prose>
-        <CardGrid>
-          {SUPPORT_PATHS.map((path) => (
-            <RoomCard
-              key={path.href}
-              href={path.href}
-              kind="OPTION"
-              title={
-                <>
-                  <DestinationIcon id={path.icon} size="md" />
-                  {path.label}
-                </>
-              }
-              description={path.detail}
-            />
-          ))}
-        </CardGrid>
-      </RoomSection>
-
-      <RoomSection
-        id="contact"
-        icon="support"
-        kicker="Mailbox"
-        title="Reach me"
-        tone={roomSectionTone(1)}
-        className="ds-support__section-contact"
-      >
-        <Prose>
-          <p className="ds-support__contact-intro">
-            For anything the corrections form has no field for (how the archive is run, a privacy
-            request, an accessibility barrier that keeps you out of a page), write to me directly.
-          </p>
-        </Prose>
-
-        <div className="ds-support__contact">
-          <p className="ds-support__contact-label">Email</p>
-          <p className="ds-support__contact-value">
-            <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>
-          </p>
+          <RoomSection id="contact" title="Anything else">
+            <p className="ds-trust-lead">
+              Write to me directly about how the archive is run, a privacy request, or an
+              accessibility barrier that keeps you out of a page.
+            </p>
+            <p className="ds-support__email">
+              <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>
+            </p>
+            <p className="ds-trust-note">
+              A reply can take a few days. Most privacy questions are already answered in the{' '}
+              <Link href="/privacy">privacy policy</Link>.
+            </p>
+          </RoomSection>
         </div>
 
-        <p className="ds-support__follow">
-          Most privacy questions are already answered on the{' '}
-          <Link href="/privacy">privacy policy</Link> page. One person builds and runs BlackStory,
-          so a reply can take a few days. I read everything that comes in, and I'll keep this
-          running for as long as I can.
-        </p>
-      </RoomSection>
-
-      <KeepGoing paths={['/faq', '/submit']} />
-
-      <WalkOffRamp>Saying a record is wrong is the fastest way to change what it says.</WalkOffRamp>
+        <RoomSection id="answers" title="Answers that already exist">
+          <TrustLinks
+            links={[
+              {
+                href: '/faq',
+                title: 'Questions',
+                line: 'Who runs this, how AI is used, and why coverage is uneven.',
+              },
+              {
+                href: '/methodology',
+                title: 'Methodology',
+                line: 'How a record gets in, what its grade means, and the rules about place.',
+              },
+              {
+                href: '/errata',
+                title: 'Errata',
+                line: 'Every correction already published, newest first.',
+              },
+            ]}
+          />
+        </RoomSection>
+      </TrustSheet>
     </Room>
   );
 }

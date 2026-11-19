@@ -56,7 +56,7 @@
 
 .ds-annotation__label {
   font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   fill: var(--ds-ink);
@@ -73,7 +73,7 @@
 
 /* Origin is where the stream left. Destination is the claim, so it carries the stronger mark. */
 .ds-annotation__label--origin {
-  font-size: 0.5625rem;
+  font-size: var(--ds-text-micro);
   fill: var(--ds-ink-muted);
 }
 

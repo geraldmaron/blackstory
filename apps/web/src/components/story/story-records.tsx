@@ -1,24 +1,26 @@
 /**
- * "Records linked to this chapter": the story's small evidence collection.
+ * "Records in this chapter": the archive records a story links to directly, each a link to its
+ * record page, named with its kind, place and first documented decade.
  *
  * The linked set is exactly what `storyCitedEntities(doc)` returns (records pinned on a map inset
  * are "mapped in"; records in the story's related list are "referenced in"). Nothing is inferred
  * from names, packet ids or the bibliography, so the list says what is linked, never that it is
- * everything the chapter draws on.
+ * everything the story draws on.
  *
  * Resolution is honest about what the read returned:
  *  - complete: every linked id resolved to a public record;
  *  - partial: some did; the rest are counted, never named, never invented;
- *  - unavailable: linked ids exist but none resolved (read unavailable or records not released);
- *  - empty: nothing is linked. That is a statement about links, not about source material.
+ *  - unavailable: linked ids exist but none resolved (read failed or records not released);
+ *  - empty: nothing is linked, and the block renders nothing.
  */
 import React from 'react';
 import Link from 'next/link';
 import type { CitesRelation } from '../../lib/release/build-cites-edge';
-import { recordsHref } from '../../lib/records/records-query';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
 import { buildExploreHref, defaultExploreOverlayState } from '../../lib/map-experience/url-state';
 import { storyCollectionToken } from '../../lib/discovery/story-collection';
+import { kindLabelForMark } from '../entity/record-mark';
+import { decadeLabel, documentedDecades } from '../../lib/discovery/collection-period';
 
 void React;
 
@@ -26,12 +28,19 @@ export type StoryRecordsState = 'empty' | 'complete' | 'partial' | 'unavailable'
 
 export type StoryRecordsProps = {
   readonly noun: string;
-  /** Published slug. Enables the Records / Map / Chronology handoff for exactly the linked set. */
+  /** Published slug. Enables the map handoff for exactly the linked set. */
   readonly slug?: string;
   /** Output of `storyCitedEntities(doc)`: entity id to its strongest relation. */
   readonly linked: ReadonlyMap<string, CitesRelation>;
   /** Resolved public records for (a subset of) the linked ids. */
-  readonly records: readonly { readonly id: string; readonly displayName: string }[];
+  readonly records: readonly {
+    readonly id: string;
+    readonly displayName: string;
+    readonly kind?: string;
+    readonly locationLabel?: string;
+    readonly locationPrecision?: string;
+    readonly eraBuckets?: readonly string[];
+  }[];
   /** `source` from `listPublicEntityViewsByIds`. */
   readonly source: 'live' | 'none' | 'failed';
 };
@@ -46,90 +55,75 @@ export function storyRecordsState(
   return resolvedCount < linkedCount ? 'partial' : 'complete';
 }
 
+const plural = (count: number) => (count === 1 ? 'record' : 'records');
+
+/** "Case · Washington, D.C. · 1850s": kind, a place only where one is public, first decade. */
+export function storyRecordMeta(record: StoryRecordsProps['records'][number]): string {
+  const decade = documentedDecades(record.eraBuckets ?? [])[0];
+  // A place label's trailing note ("(county seat: Columbiana)") belongs on the record page.
+  const place =
+    record.locationPrecision === 'none'
+      ? ''
+      : (record.locationLabel ?? '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+  return [kindLabelForMark(record.kind), place, decade === undefined ? '' : decadeLabel(decade)]
+    .filter(Boolean)
+    .join(' · ');
+}
+
 export function StoryRecords({ noun, slug, linked, records, source }: StoryRecordsProps) {
-  // Hrefs go through the shared codecs, never string concatenation.
+  const byId = new Map(records.map((record) => [record.id, record] as const));
+  // Linked order comes from the derivation; only the display fields come from the read.
+  const resolved = [...linked.keys()].flatMap((id) => {
+    const record = byId.get(id);
+    return record ? [{ ...record, id }] : [];
+  });
+  const missing = linked.size - resolved.length;
+  const state = storyRecordsState(linked.size, resolved.length, source);
+  if (state === 'empty') return null;
+
   const token = slug === undefined ? '' : storyCollectionToken(slug);
   const exploreHref = buildExploreHref({
     filters: DEFAULT_EXPLORE_FILTERS,
     ...defaultExploreOverlayState(),
     ...(token === '' ? {} : { collection: token }),
   });
-  const byId = new Map(records.map((record) => [record.id, record] as const));
-  // Linked order and relation come from the derivation; only the display name comes from the read.
-  const resolved = [...linked].flatMap(([id, relation]) => {
-    const record = byId.get(id);
-    return record ? [{ id, relation, displayName: record.displayName }] : [];
-  });
-  const missing = linked.size - resolved.length;
-  const state = storyRecordsState(linked.size, resolved.length, source);
 
   return (
-    <section
-      className="ds-reading-appx__records"
-      aria-labelledby="records-behind"
-      data-state={state}
-    >
-      <h3 id="records-behind">Records linked to this {noun}</h3>
-      {state === 'empty' ? (
-        <p>
-          No archive records are linked to this {noun} yet. That says nothing about the sources it
-          was written from; those are under References.
-        </p>
-      ) : (
-        <p>
-          Records this {noun} links to directly, as the archive holds them. Other sources informed
-          the text; those are under References. Open a record to read its evidence, or find it on
-          the Atlas from there.
-        </p>
-      )}
-      {state === 'unavailable' && source === 'failed' ? (
-        <p className="ds-reading-appx__records-note">
-          The linked records could not be retrieved. Reload to try again.
-        </p>
-      ) : state === 'unavailable' ? (
-        <p className="ds-reading-appx__records-note">
-          {linked.size} linked {linked.size === 1 ? 'record' : 'records'} could not be loaded right
-          in this public release. Their availability could not be confirmed.
-        </p>
-      ) : null}
+    <section className="ds-story-records" aria-labelledby="story-records" data-state={state}>
+      <h2 className="ds-section-heading ds-story-end__heading" id="story-records">
+        Records in this {noun}
+      </h2>
       {resolved.length > 0 ? (
-        <ul className="ds-reading-appx__record-list">
+        <ul className="ds-story-records__list">
           {resolved.map((record) => (
             <li key={record.id}>
-              <Link href={`/entity/${record.id}`}>{record.displayName}</Link>
-              <span className="ds-reading-appx__record-relation ds-mono">
-                {record.relation} this {noun}
-              </span>
+              <Link className="ds-story-records__link" href={`/entity/${record.id}`}>
+                <span className="ds-story-records__name">{record.displayName}</span>
+                <span className="ds-story-records__meta">{storyRecordMeta(record)}</span>
+              </Link>
             </li>
           ))}
         </ul>
       ) : null}
-      {state === 'partial' ? (
-        <p className="ds-reading-appx__records-note">
-          {missing} more linked {missing === 1 ? 'record' : 'records'} could not be loaded right in
-          this public release. Their availability could not be confirmed.
+      {state === 'unavailable' && source === 'failed' ? (
+        <p className="ds-story-records__note">
+          The linked records could not be retrieved. Reload to try again.
+        </p>
+      ) : state === 'unavailable' ? (
+        <p className="ds-story-records__note">
+          {linked.size} linked {plural(linked.size)} could not be loaded right in this public
+          release. Their availability could not be confirmed.
+        </p>
+      ) : state === 'partial' ? (
+        <p className="ds-story-records__note">
+          {missing} more linked {plural(missing)} could not be loaded right in this public release.
+          Their availability could not be confirmed.
         </p>
       ) : null}
       {slug !== undefined && resolved.length > 0 ? (
-        <nav className="ds-reading-appx__records-explore" aria-label={`Explore the linked records`}>
-          <p className="ds-reading-appx__records-note">
-            Explore exactly the records this {noun} links to. This is not every source the {noun}{' '}
-            drew on.
-          </p>
-          <ul className="ds-reading-appx__record-list">
-            <li>
-              <Link href={recordsHref({ collection: token })}>Records</Link>
-            </li>
-            <li>
-              <Link href={exploreHref}>Map</Link>
-            </li>
-            <li>
-              <Link href={recordsHref({ collection: token, layout: 'chronology' })}>
-                Chronology
-              </Link>
-            </li>
-          </ul>
-        </nav>
+        <Link className="ds-story-records__map" href={exploreHref}>
+          Show {resolved.length === 1 ? 'it' : 'them'} on the map
+        </Link>
       ) : null}
     </section>
   );

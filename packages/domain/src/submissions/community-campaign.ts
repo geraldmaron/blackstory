@@ -23,7 +23,7 @@
  *
  * Self-contained module: does not modify discovery/adapter barrels. The intake payload
  * shape (`CommunitySubmissionPayload`) structurally mirrors `SubmissionInput` from
- * `@repo/security` (see `apps/api-submissions/src/corrections/correction-intake.ts`) so a
+ * `@repo/security` (see `apps/web/src/app/corrections/correction-intake.ts`) so a
  * campaign submission can be quarantined through the existing api-submissions surface.
  */
 import { readFileSync } from 'node:fs';

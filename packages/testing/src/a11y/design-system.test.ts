@@ -22,7 +22,8 @@ import { createElement, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   Button,
-  Card,
+  ShellWordmark,
+  Surface,
   Citation,
   Confidence,
   DataTable,
@@ -60,11 +61,12 @@ const RECORDS: readonly ArchiveRow[] = [
  * slot filled with something no caller would pass, audits markup no reader ever sees.
  */
 const CASES: readonly (readonly [string, ReactElement])[] = [
+  ['ShellWordmark', createElement(ShellWordmark, { lockup: BRAND, symbol: BRAND })],
   ['Button', createElement(Button, { variant: 'primary' }, 'Open the record')],
   [
-    'Card',
+    'Surface',
     createElement(
-      Card,
+      Surface,
       { title: 'Sweet Auburn', meta: 'Atlanta, Georgia' },
       'A commercial district that anchored Black Atlanta.',
     ),
@@ -303,25 +305,6 @@ for (const [name, element] of CASES) {
     );
   });
 }
-
-test('ShellWordmark is still unrenderable outside Next, and so is still unaudited', async () => {
-  // The one gap in the list above, recorded as a test so it cannot be quietly forgotten.
-  //
-  // `ShellWordmark` is the only component in `@repo/ui` without the `import React ... void React;`
-  // line every sibling carries. There is no tsconfig at the repo root, so tsx transpiles JSX with
-  // the classic runtime and the compiled module references a free `React`. Next's own compiler
-  // uses `jsx: preserve`, so the command bar is fine in production — but the mark cannot be
-  // server-rendered in any Node test, which leaves it with no axe coverage.
-  //
-  // The fix is one line in that file, matching the siblings. When it lands, this test fails: move
-  // ShellWordmark into CASES above and delete this.
-  const { ShellWordmark } = await import('@repo/ui');
-  assert.throws(
-    () => renderToStaticMarkup(createElement(ShellWordmark, { lockup: BRAND, symbol: BRAND })),
-    /React is not defined/,
-    'ShellWordmark now renders under Node — audit it in CASES instead of documenting it here',
-  );
-});
 
 test('the lane fails on markup that is actually broken', async () => {
   // A guard on the guard. If the harness ever silently stops evaluating — a jsdom upgrade, an axe

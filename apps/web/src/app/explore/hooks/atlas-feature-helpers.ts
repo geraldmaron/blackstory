@@ -5,10 +5,6 @@ export function decadeStartYear(bucket: string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-export function eraBucketFor(decade: number): string {
-  return `${decade}s`;
-}
-
 export function eraFor(feature: ExploreMapFeature): string {
   return feature.properties.eraBuckets[0] ?? 'Undated';
 }

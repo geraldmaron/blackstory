@@ -89,7 +89,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       },
     ],
     entityIds: [],
-    uncertaintyLabel: 'Juxtaposition only until a gated causal claim is attached.',
+    uncertaintyLabel: 'Shown side by side. No source here says one caused the other.',
   },
   {
     id: '1910-count-great-migration-eve',
@@ -100,7 +100,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     domain: 'count',
     claimType: 'factual',
     heading: 'Urban shares on the eve of the Great Migration',
-    body: 'Table 42 and the 1918 Negro Population bulletin publish urban and rural Negro and white populations by state for 1890–1910. Those shares are region figures when states sum; they aren’t a single city’s rate.',
+    body: 'Table 42 and the 1918 Negro Population bulletin publish urban and rural populations by state, in the census’s own columns “Negro” and “white,” for 1890–1910. Those shares are region figures when states sum; they aren’t a single city’s rate.',
     citations: [
       {
         label: 'Census Bureau, Negro Population 1790–1915 (1918)',
@@ -212,7 +212,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       },
     ],
     entityIds: ['ent_law_national_labor_relations_act_1935'],
-    uncertaintyLabel: 'Juxtaposition only until a gated causal claim is attached.',
+    uncertaintyLabel: 'Shown side by side. No source here says one caused the other.',
   },
   {
     id: '1930-work-unions',
@@ -336,7 +336,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
       },
     ],
     entityIds: [],
-    uncertaintyLabel: 'Juxtaposition only until a gated causal claim is attached.',
+    uncertaintyLabel: 'Shown side by side. No source here says one caused the other.',
   },
   {
     id: '1960-school-brown-aftermath',
@@ -526,7 +526,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     claimType: 'modeled',
     gapState: 'modeled',
     heading: 'Rent against 1969 income when both exist',
-    body: 'Modeled affordance uses same-year published rent or home value against same-year income for the same race slice. 1970 family medians (Table 83) restate with CPI. Same-year contract rent for Total and Negro head comes from HC(1)-A Tables 1 and 6.',
+    body: 'Modeled affordance uses same-year published rent or home value against same-year income for the same race slice. 1970 family medians (Table 83) restate with CPI. Same-year contract rent for the “Total” and “Negro” head-of-household rows comes from HC(1)-A Tables 1 and 6.',
     citations: [
       {
         label: 'Methodology · Lives across the decades',
@@ -555,7 +555,7 @@ export const LIVES_WORLD_BEAT_FIXTURES: readonly LivesWorldBeatInput[] = [
     claimType: 'factual',
     gapState: 'insufficient_evidence',
     heading: 'White contract rent isn’t in HC(1)-A',
-    body: 'HC(1)-A Tables 1 and 6 print Total and Negro-head median contract rent and home value. They don’t print a White median. Lives doesn’t residualize White from Total minus Negro, so the white lens keeps derived income and leaves affordance as a gap until another published White table is opened.',
+    body: 'HC(1)-A Tables 1 and 6 print median contract rent and home value for the “Total” and “Negro” head-of-household rows. They don’t print a White median. Lives doesn’t residualize White from “Total” minus “Negro,” so the white lens keeps derived income and leaves affordance as a gap until another published White table is opened.',
     citations: [
       {
         label: '1970 HC(1)-A Tables 1 and 6',

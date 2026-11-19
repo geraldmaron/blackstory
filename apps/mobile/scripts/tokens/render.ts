@@ -51,6 +51,9 @@ export const statusColors = ${json(tokens.status)} as const;
 
 export const confidenceColors = ${json(tokens.confidence)} as const;
 
+/** Map plate roles, read from the web \`--ds-map-*\` custom properties (tokens.css). */
+export const mapColors = ${json(tokens.map)} as const;
+
 export type ThemeName = keyof typeof themeColors;
 // Widened to plain string per field: the light/dark objects share the same
 // key set but different literal hex values per key, and a type meant to
@@ -139,6 +142,19 @@ export const logoConstraints = ${json(LOGO_CONSTRAINTS)} as const;
   );
 }
 
+export function renderShadows(tokens: BrandTokens): string {
+  return (
+    HEADER +
+    `
+/**
+ * Web \`--ds-shadow-sheet\` / \`-lift\` / \`-float\` (packages/ui/src/styles/tokens.css), layer for
+ * layer, as React Native \`boxShadow\` values.
+ */
+export const shadows = ${json(tokens.shadows)} as const;
+`
+  );
+}
+
 export function renderAll(tokens: BrandTokens): Record<string, string> {
   return {
     'colors.generated.ts': renderColors(tokens),
@@ -147,5 +163,6 @@ export function renderAll(tokens: BrandTokens): Record<string, string> {
     'motion.generated.ts': renderMotion(),
     'typography.generated.ts': renderTypography(tokens),
     'logo.generated.ts': renderLogo(),
+    'shadows.generated.ts': renderShadows(tokens),
   };
 }

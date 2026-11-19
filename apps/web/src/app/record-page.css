@@ -1,97 +1,1515 @@
 /**
- * Record page surface class — the only stylesheet a Record route imports.
+ * The record page (components/patterns/RecordPage.tsx): one anatomy for entity, place, invention,
+ * law and book. The only stylesheet a record route loads besides the shared kit.
  *
- * Design law: docs/ui/patterns-record-page.md, design-direction-v9-surfaces.md §4.
- * A record is scanned, not read, so the measure is narrower than a reading room and the
- * evidence blocks (anatomy, trust, sources, connections) carry the weight instead of prose.
+ * Living archive (docs/ui/patterns-living-archive.md). The page changes ground as it goes down:
+ *
+ *   field   the masthead, a plain ground: the record's name at display weight, the era numeral
+ *           secondary beside the meta line. With the record's own photograph (`data-plate`) the
+ *           photograph leads the field as a toned plate beside the name, credit under it.
+ *   sheet   one paper sheet laid over the field's foot (page bands on its left edge), the field
+ *           dissolving into the table beside it; the citation line is an ink card (the record
+ *           at a glance) that carries the masthead's ground onto the paper
+ *   beats   numbered chapters: copper mono number, copper tab over a hairline, display heading;
+ *           the sources sit in a sunken well under their copper numerals
+ *   sand    the record file across the sheet's foot; prev/next stand on the table under it
+ *
+ * A quiet record (violence-adjacent or sensitive, `data-quiet`) keeps the anatomy with no plate.
+ *
+ * Desktop: the sheet on the wide container, the reading column beside a 300px side column (the
+ * card, then the sticky rail), both inside `.ds-recpage__main` so the rail's sticky run ends above
+ * the record file. Tablet: one column
+ * (media, lede, citation line, body). Phone: the summary first, then media. The rail's actions pin
+ * as a bottom row above the tab bar.
  */
 
 @import '../components/room/room-kit.css';
 
-/* Declared on the room, not the column: the railed grid sizes its first track from this
-   measure so the column-plus-rail pair centers as a unit. The column inherits it. */
-[data-surface='record'] .ds-room {
-  --room-doc-w: 680px;
-
-  /*
-   * THE SHELL. The one horizontal measure every full-bleed block on a record aligns to.
-   *
-   * A record has three blocks wider than the reading column — the masthead, the fact strip and
-   * the apparatus band — and each of them used to pick its own inset: the masthead's text sat on
-   * `--ds-gutter` (24px from the viewport edge), the apparatus centered itself at 1180px, and the
-   * column-plus-rail pair centered at its own intrinsic width. On a 1680px viewport that put the
-   * title at x=24, the apparatus at x=250 and the first line of the record at x=334 — three left
-   * edges down one page, which is what made the surface read as unaligned parts rather than one
-   * document, and what pushed the masthead type out to the bezel.
-   *
-   * The shell is the column-plus-rail pair's own width, so the title, the facts, the prose and
-   * the apparatus all start on the same vertical line and end on the same one. It is derived
-   * from the two measures rather than typed as a third number, so a room that retunes either
-   * cannot leave the blocks above and below it behind.
-   *
-   * Minus two gutters, because the line to align to is where the reader's eye meets TEXT, not
-   * where the column's box begins. `.ds-room__doc` is `border-box` and carries a gutter of its
-   * own padding, so the pair's box spans 334–1346 on a 1680px viewport while the prose inside it
-   * runs 358–1322. Aligning to the box left the masthead title one gutter to the left of the
-   * first paragraph of the record — the same misalignment as before, 24px instead of 310, and
-   * more confusing for being nearly right.
-   */
-  --record-shell-w: calc(
-    var(--room-doc-w) + var(--ds-space-8) + var(--room-rail-w, 300px) - 2 * var(--ds-gutter)
-  );
-  /*
-   * The inset that produces it. `max()` keeps the gutter as the floor, so below the shell's own
-   * width these blocks behave exactly as they did before: full bleed, one gutter in.
-   */
-  --record-shell-pad: max(var(--ds-gutter), calc((100% - var(--record-shell-w)) / 2));
-  /*
-   * THE TEXT MEASURE. The width the reading column's text actually renders at, derived from the
-   * column and not typed. The lede, the photo credit, the section standfirsts and the body prose
-   * all use it, so every line of running text on a record ends on the same vertical line. They used
-   * to cap themselves at 54ch, 54ch and 62ch, three different widths narrower than the column the
-   * prose below them sets in, which left the intro a third shorter than the page around it.
-   */
-  --rec-text-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
+.ds-recpage {
+  /* One pill box for every capsule on the page: masthead tags, decades, grade, topics. */
+  --recpage-pill-h: 1.75rem;
+  --recpage-pill-pad: 0.65rem;
+  padding-block: 0 var(--ds-space-18);
+  color: var(--ds-ink);
 }
 
-[data-surface='record'] .ds-room__mast {
-  background: var(--ds-canvas);
-}
-
-/* The reading column sits on canvas so the page-field grid cannot run through type and beat plates. */
-[data-surface='record'] .ds-room__doc {
-  background: var(--ds-canvas);
+/* —— the masthead field ——————————————————————————————————————————————————— */
+.ds-recpage__mast {
+  --ds-mast-fade: linear-gradient(to bottom, black 55%, transparent);
+  /* The sheet laid over the field's foot overlaps it by this much. */
+  --ds-recpage-overlap: var(--ds-space-12);
+  padding-block: var(--ds-space-12) calc(var(--ds-recpage-overlap) + var(--ds-space-12));
+  /* Band art (contours, when there is no plate) sits behind the head. */
+  position: relative;
+  isolation: isolate;
 }
 
 /*
- * The kit narrows every room's column to a 12px inset below 560px. A record's masthead and fact strip
- * keep the 16px gutter, so on a phone the prose sat 4px left of the title above it. The record column
- * holds the same gutter, and one left edge runs down the page at every width.
+ * The plate: the record's own photograph leading the field. Phone and tablet: a full-bleed band
+ * at the top of the field, the name under it. Desktop: the right of the field, bled off the edge,
+ * beside the name and never under it, so no type ever sits on the photograph. Its credit line is
+ * under it in both.
  */
-@media (max-width: 639px) {
-  [data-surface='record'] .ds-room__doc {
-    --room-doc-pad: var(--ds-gutter);
-    padding-inline: var(--room-doc-pad);
+.ds-recpage__mast[data-plate] {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+.ds-recpage__plate {
+  order: -1;
+  margin-bottom: var(--ds-space-6);
+}
+
+.ds-recpage__plate .ds-plate__tone {
+  aspect-ratio: 3 / 2;
+  max-height: 56svh;
+}
+
+@media (min-width: 40rem) {
+  .ds-recpage__plate .ds-plate__tone {
+    aspect-ratio: 2 / 1;
+    max-height: 48svh;
   }
 }
 
-/*
- * The shell only aligns to the column while the column and rail are side by side. Below the
- * kit's rail breakpoint the rail stacks under the column and the pair's width stops meaning
- * anything, so the shell collapses to the measure the column actually renders at.
- */
-@media (max-width: 67.9375rem) {
-  [data-surface='record'] .ds-room {
-    --record-shell-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
-  }
+.ds-recpage__plate .ds-plate__credit {
+  padding-inline: var(--ds-gutter);
 }
 
-/* The record's own prose is a caption register, not a chapter register. */
-[data-surface='record'] .ds-room-prose {
+/* The grain fades out before the field's foot, so the field meets the table without a seam. */
+.ds-recpage__mast::before {
+  mask-image: var(--ds-mast-fade);
+}
+
+.ds-recpage__desk {
+  position: relative;
+}
+
+/* The sheet is laid over the masthead's foot. */
+.ds-recpage__record .ds-recpage__desk {
+  --ds-recpage-overlap: var(--ds-space-12);
+  margin-top: calc(var(--ds-recpage-overlap) * -1);
+}
+
+/* The record sheet keeps its page bands and edge but casts no drop shadow: on this page depth
+   comes from the plate, the change of ground and the type. */
+.ds-recpage__grid.ds-sheet {
+  box-shadow: var(--ds-sheet-bands);
+}
+
+.ds-recpage__grid {
+  --ds-sheet-pad: var(--ds-space-12);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'media'
+    'lede'
+    'note'
+    'facts'
+    'extra'
+    'body'
+    'file'
+    'actions';
+  align-items: start;
+}
+
+/* Lede to body. A grid of its own only on a desktop, where it bounds the sticky rail. */
+.ds-recpage__main,
+.ds-recpage__side {
+  display: contents;
+}
+
+.ds-recpage__icon {
+  width: 0.875em;
+  height: 0.875em;
+  flex: none;
+}
+
+/* —— 1. crumb, the name leading, then the era numeral beside the meta line —————————— */
+.ds-recpage__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'crumb crumb'
+    'title title'
+    'numeral meta';
+  align-items: end;
+  gap: var(--ds-space-4) var(--ds-space-6);
+  min-width: 0;
+}
+
+.ds-recpage__head--loading {
+  display: grid;
+  grid-template-areas: none;
+  gap: var(--ds-space-3);
+}
+
+.ds-recpage__head > .ds-recpage__crumb {
+  grid-area: crumb;
+}
+
+.ds-recpage__head > .ds-recpage__title {
+  grid-area: title;
+}
+
+/* The meta line and the numeral share one baseline (see .ds-recpage__numeral). */
+.ds-recpage__head > .ds-recpage__meta {
+  grid-area: meta;
+  align-self: last baseline;
+}
+
+/* The era is secondary: a numeral at headline size, soft, on the meta line's baseline. */
+.ds-recpage__numeral {
+  grid-area: numeral;
+  align-self: last baseline;
+  font-size: var(--ds-text-headline);
+}
+
+/* A numeral that needs naming: the caption under it, in mono, on the meta line's floor. */
+.ds-recpage__numeral--captioned {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-1);
+  margin-bottom: 0;
+  font-size: var(--ds-text-headline);
+  line-height: 1;
+}
+
+.ds-recpage__numeral--captioned > .ds-numeral {
+  font-size: inherit;
+  line-height: 0.9;
+}
+
+.ds-recpage__numeral-caption {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-recpage__crumb {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 44px;
+  margin-block: calc(-1 * var(--ds-space-3)) calc(-1 * var(--ds-space-2));
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ds-recpage__crumb:hover {
+  color: var(--ds-ink);
+}
+
+.ds-recpage__crumb .ds-recpage__icon {
+  transition: transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-recpage__crumb:hover .ds-recpage__icon {
+  transform: translateX(-3px);
+}
+
+/* The name leads: display weight, held under the display ceiling so a long name stays legible. */
+.ds-recpage__title {
+  max-width: 20ch;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: clamp(2.25rem, 1rem + 5.5vw, 5.5rem);
+  font-weight: var(--ds-weight-display);
+  line-height: 0.96;
+  letter-spacing: var(--ds-tracking-display);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.ds-recpage__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.4;
+}
+
+/* Each item wraps whole with its glyph, so a wrap never strands punctuation at a line start. */
+.ds-recpage__meta-item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  /* A pill: kind, place and status read as tags on the masthead's ground. Same box as every
+     other pill on the page (see the shared pill spec below). */
+  min-height: var(--recpage-pill-h);
+  padding: 0 var(--recpage-pill-pad);
+  gap: var(--ds-space-1);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-ink) 22%, transparent);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-ink) 9%, transparent);
+  color: var(--ds-ink);
+  backdrop-filter: blur(6px);
+}
+
+.ds-recpage__meta-item .ds-recpage__icon {
+  color: var(--ds-accent-graphic);
+}
+
+/* The shared record pill: a copper-tinted capsule in the meta voice (decades, tags). */
+.ds-recpage__pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-recpage__pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--recpage-pill-h);
+  padding: 0 var(--recpage-pill-pad);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-accent-graphic) 55%, transparent);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-accent-graphic) 18%, transparent);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-recpage__tags {
+  margin: var(--ds-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-recpage__pill--link {
+  position: relative;
+  text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+/* The pill stays compact; its hit area still reaches 44px. */
+.ds-recpage__pill--link::after,
+.ds-recpage__grade::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem 0;
+}
+
+.ds-recpage__pill--link:hover {
+  background: color-mix(in srgb, var(--ds-accent-graphic) 32%, transparent);
+}
+
+.ds-recpage__pill--link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-recpage__pill-join {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+/* —— 2. lede ——————————————————————————————————————————————————————————————— */
+.ds-recpage__lede {
+  grid-area: lede;
+  min-width: 0;
+}
+
+.ds-recpage__lede-text {
+  margin: 0;
+  max-width: 62ch;
+  font-family: var(--ds-font-editorial);
+  /* Smaller than the original lede; it leads by ink and leading, not by size. */
+  font-size: 1.1875rem;
+  line-height: 1.5;
+  color: var(--ds-ink);
+  text-wrap: pretty;
+}
+
+.ds-recpage__lede[data-clamp] .ds-recpage__lede-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
+}
+
+.ds-recpage__lede-toggle:checked ~ .ds-recpage__lede-text {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+.ds-recpage__lede-close,
+.ds-recpage__lede-toggle:checked ~ .ds-recpage__lede-more .ds-recpage__lede-open {
+  display: none;
+}
+
+.ds-recpage__lede-toggle:checked ~ .ds-recpage__lede-more .ds-recpage__lede-close {
+  display: inline;
+}
+
+.ds-recpage__lede-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+
+.ds-recpage__lede-more:hover {
+  text-decoration-color: currentColor;
+}
+
+.ds-recpage__lede-toggle:focus-visible ~ .ds-recpage__lede-more {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+/* A content note: one quiet line, never a warning slab. */
+.ds-recpage__note {
+  grid-area: note;
+  max-width: 62ch;
+  margin-top: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+}
+
+.ds-recpage__note strong {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-recpage__note-more summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.ds-recpage__note-toggle {
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-recpage__note-more summary:hover .ds-recpage__note-toggle {
+  color: var(--ds-ink);
+  text-decoration-color: currentColor;
+}
+
+.ds-recpage__note-more summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-recpage__note-more p {
+  margin: 0 0 var(--ds-space-2);
+}
+
+/* —— 3. the record at a glance: an ink card carrying the masthead's ground into the sheet (the
+   table paper with an edge on the light table, tokens.css), a copper tab at its head like the
+   chapters below. On a desktop it stands beside the lede, at the top of the rail's column. —— */
+.ds-recpage__facts {
+  --ds-facts-pad: var(--ds-space-5);
+  grid-area: facts;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: var(--ds-space-8) 0 0;
+  padding: var(--ds-facts-pad);
+  border-radius: var(--ds-radius-md);
+  background:
+    linear-gradient(var(--ds-accent-graphic), var(--ds-accent-graphic)) var(--ds-facts-pad) 0 /
+      3.5rem 4px no-repeat,
+    radial-gradient(
+      120% 80% at 100% 0,
+      color-mix(in srgb, var(--ds-accent-graphic) 16%, transparent),
+      transparent 62%
+    ),
+    var(--ds-canvas);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge),
+    var(--ds-shadow-sheet);
+  color: var(--ds-ink);
+}
+
+.ds-recpage__fact {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-1);
+  min-width: 0;
+  padding-right: var(--ds-space-4);
+}
+
+.ds-recpage__fact + .ds-recpage__fact {
+  padding-left: var(--ds-space-4);
+  border-left: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* The label is the meta role (mono, small caps-tracked); the value carries the weight. */
+.ds-recpage__fact-label {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-recpage__fact-value,
+.ds-recpage__fact-detail {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ds-recpage__fact-value {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-body);
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.ds-recpage__fact-detail {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.4;
+}
+
+/* The grade link is itself a 44px target; the row absorbs the extra height. */
+.ds-recpage__grade {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  gap: var(--ds-space-1);
+  min-height: var(--recpage-pill-h);
+  padding-inline: var(--recpage-pill-pad);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  border: var(--ds-border-width) solid
+    color-mix(in srgb, var(--grade-hue, var(--ds-ink-muted)) 55%, transparent);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--grade-hue, var(--ds-ink-muted)) 14%, transparent);
+}
+
+/* The glyph carries the tier's hue (evidence-list.css); the word carries the meaning. */
+.ds-recpage__grade .ds-recpage__icon {
+  color: var(--grade-hue, var(--ds-ink-muted));
+}
+
+/* —— 4. the rail: media and actions —————————————————————————————————————— */
+.ds-recpage__rail {
+  display: contents;
+}
+
+.ds-recpage__media {
+  grid-area: media;
+  display: grid;
+  gap: var(--ds-space-4);
+  min-width: 0;
+  margin-top: var(--ds-space-6);
+}
+
+.ds-recpage__photo {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+}
+
+.ds-recpage__photo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 30rem;
+  object-fit: contain;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
+}
+
+/* The map sits in the sheet with an ink edge at the sheet's radius; no shadow. */
+.ds-recpage__media .ds-record-map__frame {
+  border-color: var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-recpage__photo .ds-entity-photo__credit {
+  margin: 0;
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
+.ds-recpage__actions {
+  grid-area: actions;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ds-space-2);
+}
+
+.ds-recpage__action {
+  justify-content: flex-start;
+}
+
+.ds-recpage__action.ds-button--secondary {
+  justify-content: center;
+}
+
+/* The book's affiliate link, with its disclosure directly beneath it. */
+.ds-recpage__extra {
+  grid-area: extra;
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-1);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-recpage__extra .ds-recpage__action {
+  gap: var(--ds-space-2);
+}
+
+.ds-recpage__extra-note {
+  margin: 0;
+  max-width: 40ch;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
+.ds-recpage__phone-only {
+  display: none;
+}
+
+/* —— 5. body beats ———————————————————————————————————————————————————————— */
+.ds-recpage__body {
+  grid-area: body;
+  min-width: 0;
+}
+
+/* Each beat opens as a chapter: its number in copper mono, a copper tab over a hairline, and the
+   heading at display scale. The counter numbers only the beats a record actually has. */
+.ds-recpage__body {
+  counter-reset: beat;
+}
+
+.ds-recpage__beat {
+  counter-increment: beat;
+  margin-top: var(--ds-space-12);
+}
+
+.ds-recpage__beat:first-child {
+  margin-top: var(--ds-space-8);
+}
+
+.ds-recpage__beat .ds-section-heading {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-4);
+  position: relative;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: var(--ds-tracking-title);
+  scroll-margin-top: calc(56px + var(--ds-space-6));
+}
+
+.ds-recpage__beat .ds-section-heading::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--ds-border-width) * -1);
+  left: 0;
+  width: 3.5rem;
+  height: 4px;
+  background: var(--ds-accent-graphic);
+}
+
+.ds-recpage__beat .ds-section-heading::before {
+  content: counter(beat, decimal-leading-zero);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+}
+
+/* The receipts sit in a well of their own: a sunken ground under the copper numerals. */
+.ds-recpage__beat > .ds-evidence {
+  padding: var(--ds-space-2) var(--ds-space-6);
+  border-top: 0;
+  border-radius: var(--ds-radius-md);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ds-accent-graphic) 12%, transparent),
+      transparent 55%
+    ),
+    var(--ds-surface-sunken);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-rule),
+    var(--ds-shadow-lift);
+}
+
+.ds-recpage__beat > .ds-evidence > .ds-evidence__item:last-child {
+  border-bottom: 0;
+}
+
+.ds-recpage__beat > .ds-evidence .ds-evidence__item::before {
+  font-size: var(--ds-text-display-1);
+}
+
+.ds-recpage__prose {
+  max-width: 65ch;
+  color: var(--room-ink-2);
+  font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-subtitle);
-  line-height: 1.65;
+  line-height: 1.62;
 }
 
-[data-surface='record'] .ds-room-anat {
-  margin-block: var(--ds-space-6);
+.ds-recpage__prose p {
+  margin: 0 0 var(--ds-space-4);
+}
+
+.ds-recpage__prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* Typed connections, citing stories, a law's agencies: ruled two-line rows, the whole row the link. */
+.ds-recpage__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__link-row {
+  position: relative;
+  display: grid;
+  gap: var(--ds-space-1);
+  min-height: 44px;
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__link-name {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+/* The row is the hit target; the focus ring still draws on the link itself. */
+.ds-recpage__link-name::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.ds-recpage__link-row:hover .ds-recpage__link-name {
+  color: var(--ds-accent);
+}
+
+.ds-recpage__link-name--external {
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-recpage__link-name--external .ds-recpage__icon {
+  width: 0.75em;
+  height: 0.75em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-recpage__link-relation {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+}
+
+/*
+ * One link style for every link that is not running prose: evidence titles, the citation line's
+ * grade, table cells, record-file values, quiet asides. Ink with a 1px control underline; copper
+ * only on hover. Copper at rest is for links inside prose paragraphs (the lede and body beats).
+ */
+.ds-recpage__grade,
+.ds-recpage__table a,
+.ds-recpage__file a,
+.ds-recpage__aside a,
+.ds-recpage__terms a {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.ds-recpage__grade:hover,
+.ds-recpage__table a:hover,
+.ds-recpage__file a:hover,
+.ds-recpage__aside a:hover,
+.ds-recpage__terms a:hover {
+  color: var(--ds-accent);
+  text-decoration-color: currentColor;
+}
+
+/* A quiet line under a beat: the legal disclaimer, a report's limits. */
+.ds-recpage__aside,
+.ds-recpage__terms {
+  max-width: 62ch;
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+}
+
+/* A book cover: the real art, at its own proportion, never stretched to the rail. */
+.ds-recpage .ds-recpage__cover {
+  justify-self: start;
+  width: min(100%, 180px);
+  margin: 0;
+}
+
+/* A cover that fails to load leaves no typeset stand-in behind on the record page. */
+.ds-recpage .ds-book-cover--typeset {
+  display: none;
+}
+
+.ds-recpage .ds-recpage__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ds-radius-sm);
+}
+
+/* A ruled data table (book challenges). */
+.ds-recpage__table-wrap {
+  overflow-x: auto;
+}
+
+.ds-recpage__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-recpage__table th {
+  padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-2) 0;
+  color: var(--ds-ink-muted);
+  font-weight: 500;
+  font-size: var(--ds-text-caption);
+  text-align: left;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-recpage__table td {
+  padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3) 0;
+  vertical-align: top;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/*
+ * Below 768px a five-column table cannot hold a district name, so each challenge becomes a ruled
+ * two-line row from the same markup: state and district, then school year, status and source.
+ */
+@media (max-width: 47.99rem) {
+  .ds-recpage__table,
+  .ds-recpage__table tbody {
+    display: block;
+  }
+
+  .ds-recpage__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ds-recpage__table tbody {
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__table tr {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'state    district district'
+      'year     status   source';
+    align-items: baseline;
+    gap: var(--ds-space-1) var(--ds-space-3);
+    padding-block: var(--ds-space-3);
+    border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .ds-recpage__cell--state,
+  .ds-recpage__cell--district {
+    font-family: var(--ds-font-display);
+    font-size: var(--ds-text-subtitle);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .ds-recpage__cell--state {
+    grid-area: state;
+  }
+
+  .ds-recpage__cell--district {
+    grid-area: district;
+  }
+
+  .ds-recpage__cell--year {
+    grid-area: year;
+  }
+
+  .ds-recpage__cell--status {
+    grid-area: status;
+    color: var(--ds-ink-muted);
+  }
+
+  .ds-recpage__cell--source {
+    grid-area: source;
+    justify-self: start;
+  }
+}
+
+.ds-recpage__cell--year {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  white-space: nowrap;
+}
+
+.ds-recpage__plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+/* —— 6. the record file: a sand block across the sheet's foot ———————————————————— */
+.ds-recpage__file {
+  grid-area: file;
+  margin: var(--ds-space-12) calc(var(--ds-sheet-pad) * -1) calc(var(--ds-sheet-pad) * -1);
+  padding: var(--ds-space-8) var(--ds-sheet-pad);
+  border-radius: 0 0 calc(var(--ds-radius-md) - 1px) 0;
+}
+
+.ds-recpage__file-title {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
+  font-weight: var(--ds-weight-headline);
+  letter-spacing: var(--ds-tracking-title);
+}
+
+.ds-recpage__file-rows {
+  display: grid;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+}
+
+.ds-recpage__file-row {
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+  gap: var(--ds-space-1) var(--ds-space-4);
+  padding-block: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* The same meta role as the fact labels, so the file reads as the record's index card. */
+.ds-recpage__file-row dt {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-recpage__file-row dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* —— 7. the pager: two blocks on the table's ground under the sheet (ink in the dark theme,
+   outlined paper in the light one), the neighbors' names large ———————— */
+.ds-recpage__pager {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--ds-space-4);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-recpage__step {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-2);
+  min-height: 44px;
+  padding: var(--ds-space-6) var(--ds-space-8);
+  border-radius: var(--ds-radius-md);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge);
+  color: var(--ds-ink);
+  text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-recpage__step:hover {
+  background: var(--ds-surface-raised);
+}
+
+.ds-recpage__step--next {
+  justify-items: end;
+  text-align: right;
+}
+
+.ds-recpage__step-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-recpage__step-name {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
+}
+
+.ds-recpage__step:hover .ds-recpage__step-name {
+  color: var(--ds-accent);
+}
+
+.ds-recpage__position {
+  align-self: center;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* —— loading geometry ———————————————————————————————————————————————————— */
+.ds-recpage__sk-title {
+  height: 2.75rem;
+  width: 70%;
+}
+
+.ds-recpage__sk-line {
+  height: 1.125rem;
+  margin-block: var(--ds-space-2);
+}
+
+.ds-recpage__sk-media {
+  aspect-ratio: 16 / 10;
+}
+
+/* —— phone and tablet: one column, actions pinned at the bottom ———————— */
+@media (max-width: 63.99rem) {
+  .ds-recpage__grid {
+    --ds-sheet-pad: var(--ds-space-6);
+  }
+
+  .ds-recpage__media:has(.ds-recpage__photo) .ds-record-map {
+    display: none;
+  }
+
+  .ds-recpage__media {
+    max-width: 40rem;
+    margin-bottom: var(--ds-space-6);
+  }
+
+  .ds-recpage__actions {
+    position: sticky;
+    bottom: var(--ds-tabbar-h, 0px);
+    z-index: 5; /* local: above the record body it pins over, inside this page only */
+    flex-direction: row;
+    align-items: center;
+    margin: var(--ds-space-8) calc(-1 * var(--ds-sheet-pad)) 0;
+    padding: var(--ds-space-2) var(--ds-sheet-pad);
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+    background: var(--ds-canvas);
+  }
+
+  /* A long map label ("Georgia records from the 2020s on the map") wraps to two lines rather
+     than pushing Sources off the row; it is never truncated, since the label is the claim. */
+  .ds-recpage__action.ds-button--secondary {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-inline: var(--ds-space-3);
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .ds-recpage__phone-only {
+    display: inline-flex;
+  }
+
+  /* Four actions share 358px: the labeled buttons drop their glyphs so the words fit on one line. */
+  .ds-recpage__actions .ds-button--secondary .ds-recpage__icon {
+    display: none;
+  }
+
+  .ds-recpage__action.ds-recpage__phone-only {
+    flex: 0 0 auto;
+  }
+
+  .ds-recpage__action--icon {
+    flex: none; /* a long map label beside it must not squeeze the 44px target */
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+
+  .ds-recpage__action--icon .ds-recpage__action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ds-recpage__action--icon .ds-recpage__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  /* The sheet runs full-bleed on a phone. */
+  .ds-recpage__desk {
+    width: 100%;
+  }
+
+  /* A phone reads the summary first; the map and photo follow it rather than pushing it below
+     the fold. */
+  .ds-recpage__grid {
+    --ds-sheet-pad: var(--ds-space-4);
+    grid-template-areas:
+      'lede'
+      'note'
+      'media'
+      'extra'
+      'facts'
+      'body'
+      'file'
+      'actions';
+  }
+
+  .ds-recpage__mast {
+    --ds-recpage-overlap: var(--ds-space-6);
+    padding-block: var(--ds-space-6) calc(var(--ds-recpage-overlap) + var(--ds-space-8));
+  }
+
+  .ds-recpage__record .ds-recpage__desk {
+    --ds-recpage-overlap: var(--ds-space-6);
+  }
+
+  .ds-recpage__head {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'crumb'
+      'title'
+      'numeral'
+      'meta';
+    gap: var(--ds-space-3);
+  }
+
+  .ds-recpage__numeral {
+    margin: 0;
+  }
+
+  .ds-recpage__pager {
+    padding-inline: var(--ds-gutter);
+  }
+}
+
+@media (max-width: 39.9375rem) {
+  .ds-recpage__facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds-recpage__fact {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    column-gap: var(--ds-space-3);
+    padding: var(--ds-space-3) 0;
+  }
+
+  .ds-recpage__fact + .ds-recpage__fact {
+    padding-left: 0;
+    border-left: 0;
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__fact-label {
+    grid-row: span 2;
+  }
+
+  .ds-recpage__fact-detail {
+    grid-column: 2;
+  }
+
+  .ds-recpage__file-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds-recpage__pager {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  /* Two steps share one phone row: the 32px desktop padding left no room for a long name. */
+  .ds-recpage__step {
+    padding: var(--ds-space-4);
+  }
+
+  .ds-recpage__step-name {
+    overflow-wrap: break-word;
+  }
+
+  .ds-recpage__position {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    text-align: center;
+  }
+}
+
+/* —— desktop: column plus sticky rail ———————————————————————————————— */
+@media (min-width: 64rem) {
+  .ds-recpage__mast {
+    padding-top: var(--ds-space-16);
+  }
+
+  /* Desktop: the name keeps the left of the field; the plate takes the right, bled off the edge
+     and fading into the field along its inner edge. */
+  .ds-recpage__mast[data-plate] {
+    display: block;
+    min-height: min(30rem, 56svh);
+    padding-top: var(--ds-space-16);
+  }
+
+  /* The head stops a gap short of the plate: plate width less the wrap's own right margin. */
+  .ds-recpage__mast[data-plate] .ds-recpage__head {
+    padding-right: max(
+      0px,
+      min(46vw, 44rem) - max(var(--ds-gutter), (100vw - var(--ds-width-wide)) / 2) +
+        var(--ds-space-8)
+    );
+  }
+
+  .ds-recpage__mast[data-plate] .ds-recpage__title {
+    font-size: clamp(2.25rem, 1rem + 3.6vw, 4.25rem);
+  }
+
+  .ds-recpage__plate {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: var(--ds-recpage-overlap);
+    z-index: -1; /* local: inside the field's own stacking context, under the head */
+    width: min(46vw, 44rem);
+    margin: 0;
+  }
+
+  .ds-recpage__plate .ds-plate {
+    height: 100%;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .ds-recpage__plate .ds-plate__tone {
+    aspect-ratio: auto;
+    max-height: none;
+    mask-image: linear-gradient(to right, transparent, black 22%);
+  }
+
+  .ds-recpage__plate .ds-plate__credit {
+    padding-inline: 22% var(--ds-gutter);
+    text-align: right;
+  }
+
+  .ds-recpage__grid {
+    grid-template-areas:
+      'main'
+      'file';
+  }
+
+  /* The rail sticks inside this box, so its run ends with the body, above the record file. */
+  .ds-recpage__main {
+    grid-area: main;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      'lede side'
+      'note side'
+      'body side';
+    align-items: start;
+    column-gap: var(--ds-space-12);
+  }
+
+  /* In the rail's column the card stacks its facts, each ruled from the next. */
+  .ds-recpage__facts {
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+  }
+
+  .ds-recpage__fact,
+  .ds-recpage__fact + .ds-recpage__fact {
+    padding: var(--ds-space-2) 0;
+    border-left: 0;
+  }
+
+  .ds-recpage__fact + .ds-recpage__fact {
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-recpage__fact:first-child {
+    padding-top: var(--ds-space-2);
+  }
+
+  .ds-recpage__fact:last-child {
+    padding-bottom: 0;
+  }
+
+  /* The card, then the rail, which sticks inside this column and so stops where the body ends. */
+  .ds-recpage__side {
+    grid-area: side;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-8);
+  }
+
+  .ds-recpage__beat:first-child {
+    margin-top: var(--ds-space-8);
+  }
+
+  .ds-recpage__rail {
+    grid-area: rail;
+    position: sticky;
+    top: calc(56px + var(--ds-space-6));
+    display: grid;
+    gap: var(--ds-space-6);
+  }
+
+  .ds-recpage__rail > * {
+    grid-area: auto;
+  }
+
+  .ds-recpage__media,
+  .ds-recpage__extra {
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-recpage__crumb .ds-recpage__icon {
+    transition: none;
+  }
+}
+
+/* —— the plate as the map's ground (`data-grounded`) ———————————————————————————————————————
+   The home tour's treatment (door-tour.css, `.ds-door__echo`) on the record's own masthead. The
+   record's map sits where the plate stood (a band at the top on a phone and tablet, the right of
+   the field on a desktop); the photograph covers the whole field over it, clear over the record's
+   point at the map's center and deepening outward, so the map reads through it everywhere and
+   plainly at the record. The name and meta sit on the photograph over a soft wash, not a box.
+   The map keeps its cooperative gestures (one finger scrolls the page) and its place token; the
+   photograph takes no pointer events. A quiet record never gets here: it has no plate. */
+.ds-recpage__mast[data-grounded] {
+  /* Phone and tablet: the map band's height, and the record's point at its middle. */
+  --ds-recpage-band: clamp(15rem, 46svh, 26rem);
+  --ds-recpage-clear: min(22vw, 7.5rem);
+  --ds-recpage-hole-x: 50%;
+  --ds-recpage-hole-y: calc(var(--ds-recpage-band) / 2);
+}
+
+.ds-recpage__ground-map {
+  position: relative;
+  order: -2;
+  height: var(--ds-recpage-band);
+}
+
+/* Only the map's drawing goes under the photograph. Its place token and attribution stay above
+   it, so they read at full strength and keep their hit areas; nothing between here and the field
+   may form a stacking context (no z-index, no fading opacity), or they would sink with it. */
+.ds-recpage__ground-map .ds-record-map__frame[data-ground] {
+  background: transparent;
+}
+
+.ds-recpage__ground-map .ds-record-map__canvas {
+  transition: none;
+}
+
+.ds-recpage__ground-map .maplibregl-canvas {
+  z-index: -2; /* local: under the photograph, inside the field's own stacking context */
+}
+
+.ds-recpage__ground-map .ds-record-map,
+.ds-recpage__ground-map .ds-record-map__frame[data-ground],
+.ds-recpage__ground-map .ds-record-map__frame[data-ground]:not([data-status='ready']) {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* The plate stays in flow for its credit (under the band); its photograph covers the field. */
+.ds-recpage__mast[data-grounded] .ds-recpage__plate {
+  margin-bottom: var(--ds-space-6);
+  pointer-events: none;
+}
+
+.ds-recpage__mast[data-grounded] .ds-recpage__plate .ds-plate__tone {
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* local: over the map, under the words */
+  aspect-ratio: auto;
+  max-height: none;
+  opacity: 0.66;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--ds-recpage-hole-x) var(--ds-recpage-hole-y),
+    transparent 0 var(--ds-recpage-clear),
+    rgb(0 0 0 / 0.6) calc(var(--ds-recpage-clear) * 1.7),
+    #000 calc(var(--ds-recpage-clear) * 2.8)
+  );
+  mask-image: radial-gradient(
+    circle at var(--ds-recpage-hole-x) var(--ds-recpage-hole-y),
+    transparent 0 var(--ds-recpage-clear),
+    rgb(0 0 0 / 0.6) calc(var(--ds-recpage-clear) * 1.7),
+    #000 calc(var(--ds-recpage-clear) * 2.8)
+  );
+}
+
+/* On paper the plate's lights are the paper itself; only its shadows carry the photograph. */
+:root:not([data-theme='dark']) .ds-recpage__mast[data-grounded] .ds-plate__tone {
+  opacity: 0.92;
+}
+
+.ds-recpage__mast[data-grounded] .ds-plate__credit {
+  pointer-events: auto;
+}
+
+/* The wash under the words: from the band's foot down on a phone, from the left on a desktop. */
+.ds-recpage__wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* local: over the photograph, under the words */
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent calc(var(--ds-recpage-band) - var(--ds-space-8)),
+    color-mix(in srgb, var(--ds-canvas) 86%, transparent)
+      calc(var(--ds-recpage-band) + var(--ds-space-10)),
+    color-mix(in srgb, var(--ds-canvas) 90%, transparent)
+  );
+}
+
+@media (min-width: 64rem) {
+  .ds-recpage__mast[data-grounded] {
+    --ds-recpage-map-w: min(46vw, 44rem);
+    --ds-recpage-map-foot: calc(var(--ds-recpage-overlap) + var(--ds-space-10));
+    --ds-recpage-clear: min(10vw, 18svh);
+    --ds-recpage-hole-x: calc(100% - var(--ds-recpage-map-w) / 2);
+    --ds-recpage-hole-y: calc((100% - var(--ds-recpage-map-foot)) / 2);
+    min-height: min(34rem, 64svh);
+  }
+
+  .ds-recpage__ground-map {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: var(--ds-recpage-map-foot);
+    width: var(--ds-recpage-map-w);
+    height: auto;
+  }
+
+  /* No longer a box at the right: the photograph spans the field, its credit under the map. */
+  .ds-recpage__mast[data-grounded] .ds-recpage__plate {
+    position: static;
+    width: auto;
+  }
+
+  /* The credit sits on the photograph here, so it carries a little of the field's ground to
+     stay readable over light and dark passages alike. */
+  .ds-recpage__mast[data-grounded] .ds-plate__credit {
+    position: absolute;
+    right: var(--ds-gutter);
+    bottom: calc(var(--ds-recpage-overlap) + var(--ds-space-3));
+    max-width: calc(var(--ds-recpage-map-w) - var(--ds-space-6));
+    padding: var(--ds-space-1) var(--ds-space-2);
+    border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, var(--ds-canvas) 86%, transparent);
+    color: var(--ds-ink);
+    text-align: right;
+  }
+
+  /* The field dissolves into the table at its foot, so the photograph never ends on a line
+     beside the sheet. */
+  .ds-recpage__wash {
+    background:
+      linear-gradient(180deg, transparent 55%, var(--ds-canvas) 100%),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--ds-canvas) 92%, transparent) 0,
+        color-mix(in srgb, var(--ds-canvas) 86%, transparent) calc(100% - var(--ds-recpage-map-w)),
+        transparent calc(100% - var(--ds-recpage-map-w) + 10rem)
+      );
+  }
 }

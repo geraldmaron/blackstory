@@ -24,17 +24,19 @@ export const brandCore = {
 
 export const themeColors = {
   "light": {
-    "canvas": "#F4EFE5",
+    "canvas": "#F8F4EC",
     "surface": "#FBF8F2",
-    "surfaceRaised": "#FDFBF8",
+    "surfaceRaised": "#FFFDF8",
     "surfacePressed": "#F4EFE5",
+    "surfaceSunken": "#EDE7DA",
     "ink": "#0A0A0A",
     "inkMuted": "#6D675F",
-    "inkSubtle": "#726C64",
+    "inkSubtle": "#6D675F",
     "border": "#D7D0C4",
+    "borderControl": "#878073",
     "borderStrong": "#0A0A0A",
     "focusRing": "#0A0A0A",
-    "focusRingOffset": "#F4EFE5",
+    "focusRingOffset": "#F8F4EC",
     "inverse": "#0A0A0A",
     "inverseInk": "#F4EFE5",
     "overlay": "rgba(10, 10, 10, 0.55)",
@@ -43,17 +45,19 @@ export const themeColors = {
     "accentMuted": "#D8A178"
   },
   "dark": {
-    "canvas": "#0A0A0A",
-    "surface": "#161616",
-    "surfaceRaised": "#1C1B18",
-    "surfacePressed": "#0A0A0A",
+    "canvas": "#131110",
+    "surface": "#1B1917",
+    "surfaceRaised": "#232019",
+    "surfacePressed": "#0C0B0A",
+    "surfaceSunken": "#0C0B0A",
     "ink": "#F4EFE5",
     "inkMuted": "#BDB5A9",
-    "inkSubtle": "#8B857D",
-    "border": "#34302C",
+    "inkSubtle": "#BDB5A9",
+    "border": "#2C2823",
+    "borderControl": "#746E65",
     "borderStrong": "#F4EFE5",
     "focusRing": "#F4EFE5",
-    "focusRingOffset": "#0A0A0A",
+    "focusRingOffset": "#131110",
     "inverse": "#F4EFE5",
     "inverseInk": "#0A0A0A",
     "overlay": "rgba(0, 0, 0, 0.72)",
@@ -68,7 +72,7 @@ export const statusColors = {
     "warning": {
       "fg": "#6B4A17",
       "bg": "#F3E4C6",
-      "border": "#B87A2A",
+      "border": "#AD7226",
       "cue": "Warning"
     },
     "dispute": {
@@ -117,7 +121,7 @@ export const confidenceColors = {
     "medium": {
       "fg": "#6B6A17",
       "bg": "#EBEBC6",
-      "border": "#8B8A2E",
+      "border": "#83822A",
       "cue": "Medium confidence"
     },
     "low": {
@@ -146,6 +150,30 @@ export const confidenceColors = {
       "border": "#B86B2A",
       "cue": "Low confidence"
     }
+  }
+} as const;
+
+/** Map plate roles, read from the web `--ds-map-*` custom properties (tokens.css). */
+export const mapColors = {
+  "light": {
+    "land": "#fbf8f2",
+    "water": "#cbbfad",
+    "line": "#a2957c",
+    "line2": "#6d675f",
+    "road": "#ebe4d6",
+    "label": "#6d675f",
+    "labelHi": "#2e2a24",
+    "halo": "#fbf8f2"
+  },
+  "dark": {
+    "land": "#38332d",
+    "water": "#0a0a0a",
+    "line": "#7d7468",
+    "line2": "#a39885",
+    "road": "#4a443c",
+    "label": "#b8ad9b",
+    "labelHi": "#f4efe5",
+    "halo": "#38332d"
   }
 } as const;
 

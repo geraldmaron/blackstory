@@ -53,7 +53,7 @@ test('a violence-constrained lens refuses spotlight and trace even with nothing 
 
 test('a violence-constrained lens does not refuse geography moves', () => {
   const lens: LensSubject = { topicId: 'lynching', topicLabel: 'Lynching' };
-  for (const move of ['wide', 'push', 'orbit', 'tilt', 'flyToRecord'] as const) {
+  for (const move of ['wide', 'push', 'orbit', 'tilt', 'frameRecord'] as const) {
     assert.equal(lensPermitsUnselectedMove(move, lens), true, move);
   }
 });

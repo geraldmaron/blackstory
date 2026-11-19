@@ -869,3 +869,4 @@ export * from './learning-index/index.js';
 // safe-combination validators (disjoint-geography sums, MOE propagation, growth significance).
 export * from './statistics/index.js';
 export * from './demographics/index.js';
+export * from './geography/earned-precision.js';

@@ -15,29 +15,48 @@ export const EXPLORE_HISTORY_EDGES_SOURCE_ID = 'explore-history-edges';
 /** Dual-buffer incoming relationship lines for decade crossdissolve. */
 export const EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID = 'explore-history-edges-incoming';
 
+/** The 51 state abbreviations, as a symbol layer in the same collision pass as the group counts. */
+export const EXPLORE_STATE_LABELS_SOURCE_ID = 'explore-state-labels';
+export const EXPLORE_STATE_LABEL_LAYER_ID = 'explore-state-label';
+export const EXPLORE_STATE_LABEL_SELECTED_LAYER_ID = 'explore-state-label-selected';
+
+/** Place tokens (`place-map.ts`): a state, county or city with its record count. The ids keep
+ * their old "cluster" names because every hit test and transition table addresses them. */
 export const EXPLORE_CLUSTER_LAYER_ID = 'explore-clusters';
 export const EXPLORE_CLUSTER_INCOMING_LAYER_ID = 'explore-clusters-incoming';
 
 export const EXPLORE_CLUSTER_COUNT_LAYER_ID = 'explore-cluster-count';
 export const EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID = 'explore-cluster-count-incoming';
-/** Precision-radius affordance circle (geoPrecisionTier / radiusMeters) — the shaded circle the
- * Size legend and `NarrativeCard`'s `radiusAffordanceLabel` describe, painted under the halo/point
- * so it reads as ground the marker sits on, not another marker. Renders only for features
- * carrying a resolved `radiusMeters` (`resolveDisplayRadiusMeters`'s fail-closed `ok: false`
- * tiers get no ring at all, never a guessed one). */
-export const EXPLORE_PRECISION_RADIUS_LAYER_ID = 'explore-point-precision-radius';
-export const EXPLORE_UNCLUSTERED_HALO_LAYER_ID = 'explore-point-halo';
-export const EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID = 'explore-point-halo-incoming';
+/** The place's name under a county or city token. */
+export const EXPLORE_PLACE_NAME_LAYER_ID = 'explore-place-name';
+/** Thin leaders from a spread site back to the true point it shares (`place-map.ts`). */
+export const EXPLORE_PLACE_LEADERS_SOURCE_ID = 'explore-place-leaders';
+export const EXPLORE_PLACE_LEADER_LAYER_ID = 'explore-place-leader';
+/** Every drawn record: a dot at the site, a hollow ring at the neighborhood or city. */
 export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';
 export const EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID = 'explore-point-incoming';
-/** the `event` kind's "diamond" glyph approximation — a second thin, unfilled ring
- * offset around the point marker (see kind-encoding.ts's module doc for why this is an
- * approximation rather than literal diamond geometry). */
-export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID = 'explore-point-event-glyph';
-export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID =
-  'explore-point-event-glyph-incoming';
-/** Copper orientation ring for the currently selected entity (not a heat signal). */
+/** The hovered pin, lifted 2px. */
+export const EXPLORE_HOVER_POINT_LAYER_ID = 'explore-point-hover';
+/** Records the lens matches but the brushed decades exclude: a sand ghost, never hittable. */
+export const EXPLORE_GHOSTS_SOURCE_ID = 'explore-ghosts';
+export const EXPLORE_GHOST_POINT_LAYER_ID = 'explore-ghost-point';
+/** The lower-48 one paper step off its neighbors, so the country reads on the chart. */
+export const EXPLORE_US_LAND_LAYER_ID = 'plate-us-land';
+/** Area precision shown as an area: a flat copper tint over states holding state-precision records. */
+export const EXPLORE_JURISDICTION_HATCH_LAYER_ID = 'explore-jurisdiction-hatch';
+/** The same tint over a county holding county-precision records (`county-hatch.ts`). */
+export const EXPLORE_COUNTY_HATCH_LAYER_ID = 'explore-jurisdiction-county-hatch';
+/** Atlas waterlines: offset hairlines inside every coast and lake shore, innermost first. */
+export const PLATE_WATERLINE_LAYER_IDS = ['plate-waterline-1', 'plate-waterline-2'] as const;
+/** Record names beside site pins: an invisible collision layer the DOM labels read (`place-labels.ts`). */
+export const EXPLORE_SITE_NAME_LAYER_ID = 'explore-site-name';
+/** The selected record: the same shape, 1.6x, copper with an ink ring. */
 export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
+/** County- and state-precision records, counted at the state's label point ("3 statewide"). */
+export const EXPLORE_JURISDICTION_TAGS_SOURCE_ID = 'explore-jurisdiction-tags';
+export const EXPLORE_JURISDICTION_TAG_LAYER_ID = 'explore-jurisdiction-tag';
+/** The tag that counts the selected record, in copper. */
+export const EXPLORE_SELECTED_TAG_LAYER_ID = 'explore-jurisdiction-tag-selected';
 export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';
 export const EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID = 'explore-state-density-fill-incoming';
 /**

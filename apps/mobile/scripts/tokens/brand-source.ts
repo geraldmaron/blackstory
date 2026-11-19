@@ -28,9 +28,22 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { contrastRatio, ensureContrast, mix } from './color-math';
+import { contrastRatio, ensureContrast } from './color-math';
 
 const BRAND_TOKENS_DIR = join(__dirname, '..', '..', '..', '..', 'brand', 'tokens');
+/** Web source of truth for the roles that have no `brand/tokens` file (map plate, shadows). */
+const UI_TOKENS_CSS = join(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '..',
+  'packages',
+  'ui',
+  'src',
+  'styles',
+  'tokens.css',
+);
 
 /** Canonical palette keys from brand/tokens/colors.json (docs/ui/brand.md). */
 export type BrandPaletteColors = {
@@ -70,10 +83,14 @@ export type ThemeRole = {
   surfaceRaised: string;
   /** One step down from Surface / surfaceRaised for press feedback (Archive Paper ladder). */
   surfacePressed: string;
+  /** The well a plate or inset list sits in; one value step below canvas. */
+  surfaceSunken: string;
   ink: string;
   inkMuted: string;
   inkSubtle: string;
   border: string;
+  /** Form-control edge; 3:1 on every surface step (WCAG 1.4.11). */
+  borderControl: string;
   borderStrong: string;
   focusRing: string;
   focusRingOffset: string;
@@ -91,6 +108,22 @@ export type ThemeRole = {
 export type StatusRole = { fg: string; bg: string; border: string; cue: string };
 export type ConfidenceRole = Record<'high' | 'medium' | 'low', StatusRole>;
 
+/** Map plate roles, one per `--ds-map-*` custom property in tokens.css. */
+export type MapRole = Record<
+  'land' | 'water' | 'line' | 'line2' | 'road' | 'label' | 'labelHi' | 'halo',
+  string
+>;
+
+/** One layer of a web box-shadow, in React Native's `boxShadow` object form. */
+export type ShadowLayer = {
+  offsetX: number;
+  offsetY: number;
+  blurRadius: number;
+  spreadDistance: number;
+  color: string;
+};
+export type ShadowRole = Record<'sheet' | 'lift' | 'float', ShadowLayer[]>;
+
 export type BrandTokens = {
   core: BrandCoreColors;
   typography: BrandTypographyFamilies;
@@ -100,7 +133,73 @@ export type BrandTokens = {
     dark: Record<'warning' | 'dispute' | 'error', StatusRole>;
   };
   confidence: { light: ConfidenceRole; dark: ConfidenceRole };
+  map: { light: MapRole; dark: MapRole };
+  shadows: { light: ShadowRole; dark: ShadowRole };
 };
+
+/**
+ * tokens.css declares each themed role exactly twice: the light value first, then the
+ * `[data-theme='dark']` one. Anything else means the file changed shape, so fail loudly.
+ */
+function readThemedCssVar(css: string, name: string): { light: string; dark: string } {
+  const found = [...css.matchAll(new RegExp(`--${name}:\\s*([^;]+);`, 'g'))].map((match) =>
+    match[1].trim().replace(/\s+/g, ' '),
+  );
+  if (found.length !== 2) {
+    throw new Error(
+      `generate-brand-tokens: expected a light and a dark --${name} in tokens.css, found ${found.length}.`,
+    );
+  }
+  return { light: found[0], dark: found[1] };
+}
+
+const MAP_ROLE_CSS_NAMES: Record<keyof MapRole, string> = {
+  land: 'land',
+  water: 'water',
+  line: 'line',
+  line2: 'line-2',
+  road: 'road',
+  label: 'label',
+  labelHi: 'label-hi',
+  halo: 'halo',
+};
+
+function parseShadow(name: string, value: string): ShadowLayer[] {
+  const layers = [
+    ...value.matchAll(
+      /(-?\d+)(?:px)? (-?\d+)px (-?\d+)px(?: (-?\d+)px)? rgb\((\d+) (\d+) (\d+) \/ (\d+)%\)/g,
+    ),
+  ].map(([, x, y, blur, spread, r, g, b, alpha]) => ({
+    offsetX: Number(x),
+    offsetY: Number(y),
+    blurRadius: Number(blur),
+    spreadDistance: Number(spread ?? 0),
+    color: `rgba(${r}, ${g}, ${b}, ${Number(alpha) / 100})`,
+  }));
+  if (layers.length === 0 || layers.length !== value.split('rgb(').length - 1) {
+    throw new Error(`generate-brand-tokens: could not parse every layer of --${name}: "${value}".`);
+  }
+  return layers;
+}
+
+/** Reads the map plate roles and the sheet/lift/float shadows from the web tokens.css. */
+function loadWebTokens(): Pick<BrandTokens, 'map' | 'shadows'> {
+  const css = readFileSync(UI_TOKENS_CSS, 'utf8');
+  const map = { light: {} as MapRole, dark: {} as MapRole };
+  for (const [role, cssName] of Object.entries(MAP_ROLE_CSS_NAMES) as [keyof MapRole, string][]) {
+    const value = readThemedCssVar(css, `ds-map-${cssName}`);
+    map.light[role] = value.light;
+    map.dark[role] = value.dark;
+  }
+  const shadows = { light: {} as ShadowRole, dark: {} as ShadowRole };
+  for (const level of ['sheet', 'lift', 'float'] as const) {
+    const name = `ds-shadow-${level}`;
+    const value = readThemedCssVar(css, name);
+    shadows.light[level] = parseShadow(name, value.light);
+    shadows.dark[level] = parseShadow(name, value.dark);
+  }
+  return { map, shadows };
+}
 
 function readBrandCssVars(css: string): Record<string, string> {
   const vars: Record<string, string> = {};
@@ -190,7 +289,6 @@ export function buildBrandTokens(): BrandTokens {
   const { colors, palette, typography } = loadBrandCoreSource();
   const {
     blackInk,
-    charcoal,
     archivePaper,
     surface,
     copperPin,
@@ -212,26 +310,23 @@ export function buildBrandTokens(): BrandTokens {
     blackInk,
   );
 
-  // Light surface ladder (Archive Paper → Surface → raised near-white). Surface is already
-  // lighter than canvas; "raised" continues upward via a warm white mix, not a duplicate of
-  // Surface. Press states step down to canvas (surfacePressed), never opacity fades.
-  const lightSurfaceRaised = mix(surface, '#FFFFFF', 0.45);
-  // inkSubtle: tertiary meta (mono indexes, panel kickers) — softer than Stone (lower contrast
-  // on canvas) while still clearing 4.5:1 for caption/code sizes. Distinct from inkMuted.
-  const lightInkSubtle = mix(stone, rule, 0.05);
-
+  // Surface steps and tertiary ink are the web's own values (packages/ui/src/tokens/colors.ts
+  // lightTheme / darkTheme, which mirror tokens.css): canvas and the raised plate sit one value
+  // step either side of the Archive Paper swatch, so they are literals rather than swatches.
   const light: ThemeRole = {
-    canvas: archivePaper,
+    canvas: '#F8F4EC',
     surface,
-    surfaceRaised: lightSurfaceRaised,
+    surfaceRaised: '#FFFDF8',
     surfacePressed: archivePaper,
+    surfaceSunken: '#EDE7DA',
     ink: blackInk,
     inkMuted: stone,
-    inkSubtle: lightInkSubtle,
+    inkSubtle: stone,
     border: rule,
+    borderControl: '#878073',
     borderStrong: blackInk,
     focusRing: blackInk,
-    focusRingOffset: archivePaper,
+    focusRingOffset: '#F8F4EC',
     inverse: blackInk,
     inverseInk: archivePaper,
     overlay: 'rgba(10, 10, 10, 0.55)',
@@ -245,22 +340,22 @@ export function buildBrandTokens(): BrandTokens {
       ? copperTextDark
       : ensureContrast(copperTextDark, blackInk, MIN_TEXT_CONTRAST, archivePaper);
 
-  // Dark inkSubtle: recess inkMuted toward Charcoal for tertiary meta while keeping ≥4.5:1 on canvas.
   const darkInkMuted = '#BDB5A9';
-  const darkInkSubtle = mix(darkInkMuted, charcoal, 0.3);
 
   const dark: ThemeRole = {
-    canvas: blackInk,
-    surface: charcoal,
-    surfaceRaised: '#1C1B18',
-    surfacePressed: blackInk,
+    canvas: '#131110',
+    surface: '#1B1917',
+    surfaceRaised: '#232019',
+    surfacePressed: '#0C0B0A',
+    surfaceSunken: '#0C0B0A',
     ink: archivePaper,
     inkMuted: darkInkMuted,
-    inkSubtle: darkInkSubtle,
-    border: '#34302C',
+    inkSubtle: darkInkMuted,
+    border: '#2C2823',
+    borderControl: '#746E65',
     borderStrong: archivePaper,
     focusRing: archivePaper,
-    focusRingOffset: blackInk,
+    focusRingOffset: '#131110',
     inverse: archivePaper,
     inverseInk: blackInk,
     overlay: 'rgba(0, 0, 0, 0.72)',
@@ -274,7 +369,7 @@ export function buildBrandTokens(): BrandTokens {
   // green -> olive -> orange, as on web since 6fbfcaf2 reconciled colors.ts with tokens.css.
   const status = {
     light: {
-      warning: { fg: '#6B4A17', bg: '#F3E4C6', border: '#B87A2A', cue: 'Warning' },
+      warning: { fg: '#6B4A17', bg: '#F3E4C6', border: '#AD7226', cue: 'Warning' },
       dispute: { fg: '#7A1F3D', bg: '#F1DCE3', border: '#B8395F', cue: 'Disputed' },
       error: { fg: '#7A1F1F', bg: '#F3DCD2', border: '#B83A2A', cue: 'Error' },
     },
@@ -287,7 +382,7 @@ export function buildBrandTokens(): BrandTokens {
   const confidence = {
     light: {
       high: { fg: '#2F6B3C', bg: '#DCEBDD', border: '#3E8B54', cue: 'High confidence' },
-      medium: { fg: '#6B6A17', bg: '#EBEBC6', border: '#8B8A2E', cue: 'Medium confidence' },
+      medium: { fg: '#6B6A17', bg: '#EBEBC6', border: '#83822A', cue: 'Medium confidence' },
       low: { fg: '#8E4F2A', bg: '#F3E4C6', border: '#B86B2A', cue: 'Low confidence' },
     },
     dark: {
@@ -297,9 +392,16 @@ export function buildBrandTokens(): BrandTokens {
     },
   };
 
-  assertAccessible({ core: colors, typography, themes: { light, dark }, status, confidence });
-
-  return { core: colors, typography, themes: { light, dark }, status, confidence };
+  const tokens: BrandTokens = {
+    core: colors,
+    typography,
+    themes: { light, dark },
+    status,
+    confidence,
+    ...loadWebTokens(),
+  };
+  assertAccessible(tokens);
+  return tokens;
 }
 
 /** Fails generation outright if a critical text/UI pair does not clear WCAG AA. */
@@ -325,6 +427,9 @@ function assertAccessible(tokens: BrandTokens): void {
     }
     const graphicPairs: [string, string, string][] = [
       ['borderStrong/canvas', theme.borderStrong, theme.canvas],
+      ['borderControl/canvas', theme.borderControl, theme.canvas],
+      ['borderControl/surfaceRaised', theme.borderControl, theme.surfaceRaised],
+      ['borderControl/surfaceSunken', theme.borderControl, theme.surfaceSunken],
       ['focusRing/canvas', theme.focusRing, theme.canvas],
       ['accentGraphic/canvas', theme.accentGraphic, theme.canvas],
     ];

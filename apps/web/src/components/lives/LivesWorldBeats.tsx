@@ -1,5 +1,6 @@
 /**
- * Sourced world beats for one Lives decade. Incomplete domains stay out of the public surface;
+ * Sourced world beats for one Lives decade. The decade's rules section above already carries the
+ * juxtaposition disclaimer, so it is not repeated here. Incomplete domains stay out of the public surface;
  * explicit historical absences belong in authored milestone panels, not generic gap cards.
  */
 import React from 'react';
@@ -12,7 +13,6 @@ import {
   type LivesLens,
   type LivesWorldBeat,
 } from '@repo/domain/statistics/lives';
-import { JUXTAPOSITION_DISCLAIMER } from '@repo/domain/statistics/lives';
 
 void React;
 
@@ -35,7 +35,6 @@ export function LivesWorldBeats({ decade, beats, emphasis }: LivesWorldBeatsProp
   return (
     <section className="lives-world" aria-label="Decade world">
       <h3 className="lives-world__title">What else the archive opens</h3>
-      <p className="lives-world__disclaimer">{JUXTAPOSITION_DISCLAIMER}</p>
       <ul className="lives-world__list">
         {matched.map((beat) => (
           <li key={beat.id} className="lives-world__beat" data-claim={beat.claimType}>

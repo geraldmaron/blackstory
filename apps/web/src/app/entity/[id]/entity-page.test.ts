@@ -1,7 +1,7 @@
 /**
- * `/entity/{id}` renders the record room for non-holding records, and 308s to the record's
+ * `/entity/{id}` renders the record page for non-holding records, and 308s to the record's
  * own family (`/place/{slug}`, or `/invention/{slug}` for an invention) only when that address
- * actually holds. Column rules for `EntityRoomSections` still apply on first paint.
+ * actually holds. Rendered behavior lives in `EntityRecordPage.test.tsx`.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,25 +11,18 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
-// The room moved out of the route file: Next lets a page export only its own known members,
-// and `/invention/{slug}` renders the same room.
-const roomSource = readFileSync(join(here, 'EntityRecordRoom.tsx'), 'utf8');
-const sectionsSource = readFileSync(join(here, 'EntityRoomSections.tsx'), 'utf8');
-const placeSource = readFileSync(
-  join(here, '../../../components/patterns/RecordPlacePreview.tsx'),
-  'utf8',
-);
-const mediaSource = readFileSync(
-  join(here, '../../../components/entity/EntityMastMedia.tsx'),
-  'utf8',
-);
+// The page body lives outside the route file: Next lets a page export only its own known
+// members, and `/place/{slug}` and `/invention/{slug}` render the same body.
+const roomSource = readFileSync(join(here, 'EntityRecordPage.tsx'), 'utf8');
+const placeSource = readFileSync(join(here, '../../../components/map-embed/RecordMap.tsx'), 'utf8');
+const imageSource = readFileSync(join(here, '../../../components/entity/RecordImage.tsx'), 'utf8');
 
 test('standable records 308 to /place; non-standable records still render here', () => {
   // The address itself is computed by `publicAddressOf`, shared with the merge-redirect path.
   assert.match(pageSource, /return publicRecordHref\(entity, collisions\)/);
   assert.match(pageSource, /permanentRedirect\(withQuery\(address, arrivalQuery\)\)/);
   assert.match(pageSource, /canStandHere/);
-  assert.match(roomSource, /<Room/);
+  assert.match(roomSource, /<RecordPage/);
   assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);
   assert.doesNotMatch(roomSource, /getSharedPublicEntities|listPublicEntityViews\(/);
 });
@@ -49,32 +42,6 @@ test('a merged-away id forwards to its survivor instead of 404ing', () => {
   assert.match(miss, /if \(survivor\.data\)/);
 });
 
-test('a beat renders only when the record has that content', () => {
-  assert.match(sectionsSource, /hasContext \?/);
-  assert.match(sectionsSource, /evidenceClaims\.length > 0 \?/);
-  assert.match(sectionsSource, /entity\.timeline\.length > 0 \?/);
-  assert.doesNotMatch(sectionsSource, /<RecordGapNotice/);
-});
-
-test('a related record states its relation in words', () => {
-  assert.match(sectionsSource, /relationPhrase/);
-  assert.match(sectionsSource, /RelationshipTree/);
-  // The flat-list fallback is still what a record with fewer than two graph nodes renders,
-  // so both its headings must survive the map landing.
-  assert.match(sectionsSource, /Worth investigating next/);
-  assert.match(sectionsSource, /Nearby on the map is not the same as related/);
-  assert.match(sectionsSource, /toSuggestedConnections/);
-  assert.doesNotMatch(
-    sectionsSource,
-    /firstPaintRelatedHeading\(\[\s*\.\.\.\(entity\.relatedNeighbors/,
-  );
-});
-
-test('neighbor hrefs stay off internal entity paths', () => {
-  assert.match(sectionsSource, /neighborHref/);
-  assert.doesNotMatch(sectionsSource, /`\/entity\/\$\{neighbor\.id\}`/);
-});
-
 test('entity page stays CDN-cacheable and prerenders nothing', () => {
   assert.match(pageSource, /export const revalidate = 3600/);
   assert.match(pageSource, /export const dynamicParams = true/);
@@ -85,80 +52,42 @@ test('entity page stays CDN-cacheable and prerenders nothing', () => {
   assert.doesNotMatch(body, /getPublicSearchIndex/);
 });
 
-test('entity media fail-closed: mark fallback on photo exhaustion', () => {
-  assert.match(mediaSource, /EntityRecordMark/);
-  assert.match(mediaSource, /reason: 'exhausted'/);
-  assert.match(mediaSource, /onError/);
+test('a record photo fails closed to nothing, never a placeholder plate', () => {
+  assert.match(imageSource, /onError/);
+  assert.match(imageSource, /if \(src === undefined\) return null/);
+  assert.doesNotMatch(imageSource, /EntityRecordMark/);
 });
 
 test('entity map fail-closed: the place block still makes its point with no plate', () => {
-  assert.match(placeSource, /<figcaption className="ds-record-anatomy__place-caption">\{label\}/);
+  // The place and its precision in words are HTML outside the canvas (the plate ground, and the
+  // caption where a page asks for one); when WebGL fails the canvas is hidden and the ground stays.
+  assert.match(placeSource, /<figcaption className="ds-record-map__caption">/);
+  assert.match(placeSource, /precisionInWords\(precision\)/);
+  assert.match(placeSource, /<p className="ds-record-map__ground">/);
+  assert.match(
+    readFileSync(join(here, '../../../components/map-embed/record-map.css'), 'utf8'),
+    /\[data-status='failed'\] \.ds-record-map__canvas \{\s*display: none;/,
+  );
   assert.doesNotMatch(placeSource, /idle=/);
   assert.doesNotMatch(placeSource, /^import .*MapsExternalLink/m);
   assert.doesNotMatch(placeSource, /<MapsExternalLink/);
 });
 
-test('entity page renders visit handoff for geo-anchored records', () => {
-  assert.match(roomSource, /RecordVisitBlock/);
-  assert.match(roomSource, /buildEntityAnatomyInputs/);
-  assert.match(roomSource, /whereLabel/);
-  assert.match(roomSource, /shouldShowVisitBlock/);
-  assert.match(roomSource, /placeAdvisories/);
-  assert.match(roomSource, /claims: entity\.claims/);
-  assert.match(roomSource, /MapsExternalLink/);
-  assert.match(roomSource, /linkWhereToMaps|whereMapsHref|showVisit/);
-});
-
-test('the record room is shared with the invention family, not copied', () => {
-  // An invention needs a room that carries an inventor, a patent receipt and an impact beat.
-  // Rendering a thinner page there would trade one misrepresentation for another.
-  assert.match(roomSource, /export async function EntityRecordRoom/);
-  assert.match(pageSource, /EntityRecordRoom\(\{ entity, arrival:/);
-  const inventionSource = readFileSync(join(here, '../../invention/[slug]/page.tsx'), 'utf8');
-  assert.match(inventionSource, /EntityRecordRoom\(\{ entity, arrival:/);
-  assert.match(inventionSource, /familyForKind/);
-});
-
-test('impact renders as its own beat and collapses when absent', () => {
-  assert.match(sectionsSource, /entity\.impactStatement \?/);
-  assert.match(sectionsSource, /What it changed/);
-});
-
-test('the rail numbers what the document numbers', () => {
-  // recordSectionIndex builds the "On this record" rail; the beats build the page. A beat present
-  // in one and missing from the other shifts every number after it, which is how the impact beat
-  // first shipped: the document read 01..05 and the rail read 01..04 for the same page.
-  const index = sectionsSource.slice(
-    sectionsSource.indexOf('export function recordSectionIndex'),
-    sectionsSource.indexOf('export function EntityRoomSections'),
-  );
-  const railOrder = [...index.matchAll(/label: (?:'([^']+)'|[^\n]*?'([^']+)')/g)]
-    .map((match) => match[1] ?? match[2])
-    .filter((label): label is string => label !== undefined);
-  const beatOrder = ['The history here', 'What it changed'];
-  assert.deepEqual(
-    railOrder.filter((label) => beatOrder.includes(label)),
-    beatOrder,
-    'impact follows context in the rail, as it does in the document',
-  );
-});
-
-test('entity column renders archived Internet Archive sources when cited', () => {
-  assert.match(sectionsSource, /RecordArchiveSources/);
-  assert.match(sectionsSource, /resolveInternetArchiveSources/);
-  assert.match(sectionsSource, /Archived copies/);
-});
-
-test('entity user-facing copy avoids em dashes on touched surfaces', () => {
-  for (const source of [pageSource, sectionsSource]) {
-    assert.doesNotMatch(source, /—/);
+test('every record family renders the one record page, not a copy', () => {
+  assert.match(roomSource, /export async function EntityRecordPage/);
+  assert.match(pageSource, /EntityRecordPage\(\{ entity, arrival:/);
+  for (const route of ['../../invention/[slug]/page.tsx', '../../place/[slug]/page.tsx']) {
+    const source = readFileSync(join(here, route), 'utf8');
+    assert.match(
+      source,
+      /EntityRecordPage\(\{ entity: \w+, arrival:|EntityRecordPage\(\{ entity, arrival:/,
+    );
+    assert.match(source, /familyForKind/);
   }
 });
 
-test('entity record room links evidence chrome to Methodology anchors', () => {
-  assert.match(roomSource, /methodology#evidence-grades/);
-  assert.match(roomSource, /methodology#how-it-holds-together/);
-  assert.match(roomSource, /METHODOLOGY_SOURCE_LIBRARY_HREF/);
-  assert.match(roomSource, /METHODOLOGY_HOW_RECORD_GETS_IN_HREF/);
-  assert.match(sectionsSource, /METHODOLOGY_EVIDENCE_GRADES_HREF/);
+test('entity user-facing copy avoids em dashes', () => {
+  for (const source of [pageSource, roomSource]) {
+    assert.doesNotMatch(source, /—/);
+  }
 });

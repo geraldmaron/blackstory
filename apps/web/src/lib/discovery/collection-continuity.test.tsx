@@ -274,8 +274,10 @@ test('Records and Map share slim membership and safe actual geometry despite sta
   const records = buildRecordsIndex(
     docs,
     query,
-    new Set(
-      catalog.source.featureCollection.features.map((feature) => feature.properties.entityId),
+    new Map(
+      catalog.source.featureCollection.features.map(
+        (feature) => [feature.properties.entityId, feature.properties.href] as const,
+      ),
     ),
   );
   const { shell } = buildAtlasShell(
@@ -299,7 +301,7 @@ test('Records and Map share slim membership and safe actual geometry despite sta
 
 test('Records counts only eligible matches emitted by the current map plate', () => {
   const query = parseRecordsQuery({ q: 'needle' });
-  const index = buildRecordsIndex(entities, query, new Set());
+  const index = buildRecordsIndex(entities, query, new Map());
   assert.ok(index.totalMatched > 0);
   assert.equal(index.mappableMatched, 0);
   assert.ok(index.rows.every((row) => row.mappable === false));

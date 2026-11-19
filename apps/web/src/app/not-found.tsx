@@ -1,26 +1,23 @@
 /**
  * Global not-found page for unknown public routes and missing entities.
  *
- * v9 Utility room (design-direction-v9-surfaces.md §"/_not-found"): a kicker, the title, one
- * serif line naming the two things that actually go wrong, then four exits.
- *
- * The kicker is a sentence, not the numeral. It was `404` while the register was mono caps and
- * the numeral carried; in the quiet sentence-case sans the kicker now takes, a bare `404` reads
- * as a stray fragment above the title rather than as the name of what happened.
+ * A utility room in the living-archive system: a sand mast with the title at display weight and
+ * one line naming the two things that actually go wrong, then the exits on the table's ground.
  *
  * The exits are the whole point of the page. `/design-system` was one of them, which sent a lost
- * reader to a component gallery; it is gone. The first exit is the record they left. The archive exit
- * points at `/records`, the old board, not a new room. And `PaletteSeed` hands the path the reader
- * mistyped to the bar's search as a sanitised query, so `⌘K` opens holding their best guess
- * instead of an empty field.
+ * reader to a component gallery; it is gone. The first exit is the map the reader came from. The
+ * archive exit points at `/records`, the old board, not a new room. And `PaletteSeed` hands the
+ * path the reader mistyped to the bar's search as a sanitised query, so `⌘K` opens holding their
+ * best guess instead of an empty field.
  */
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { EmptyState } from '@repo/ui';
+import { PageHeader } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
-import { Room, ReadingEntry } from '../components/room';
-import { loadWalkBackPlace } from './walk-back-place';
+import { Room } from '../components/room';
+import { TrustMast, TrustSheet } from '../components/trust';
+import { loadWalkBackPlace, MAP_BACK } from './walk-back-place';
 import './utility.css';
 
 /**
@@ -38,39 +35,55 @@ export const metadata: Metadata = {
 
 export default async function NotFound() {
   const back = await loadWalkBackPlace();
+  // The site's own name says nothing about where the button goes; the map is where it goes.
+  const backLabel =
+    back.displayName === MAP_BACK.displayName ? 'Back to the map' : `Back to ${back.displayName}`;
   return (
-    <Room>
+    <Room
+      width="read"
+      className="ds-trust-room"
+      masthead={
+        // No crumb: the reader is standing on an address that failed, and `/not-found` is not a
+        // place in the archive they could go back up from.
+        <TrustMast art={['contours']} tone="sand">
+          <PageHeader
+            display
+            title="That page is not here"
+            dek="Either the address has a typo in it, or it names a record the archive has not published."
+          />
+        </TrustMast>
+      }
+    >
       <PaletteSeed />
-      <ReadingEntry
-        pathname="/not-found"
-        title="That page is not here"
-        lede="Either the address has a typo in it, or it names a record the archive has not published."
-        /* Every other room prints its own route as a mono fact because readers cite URLs. This
-           room's route is not the reader's route — they are standing on the address that failed,
-           and `/not-found` is a path that does not resolve. Printing it twice, once as a crumb
-           and once as a fact, tells a lost reader where they are not. */
-        showCrumb={false}
-      />
-
-      <EmptyState
-        title="Nothing to show here"
-        action={
-          <div className="ds-row">
+      <TrustSheet>
+        <ul className="ds-utility-exits" aria-label="Where to go next">
+          <li className="ds-utility-exits__row ds-utility-exits__row--primary">
             <Link className="ds-button ds-button--primary" href="/">
-              {back?.displayName ?? 'BlackStory'}
+              {backLabel}
             </Link>
-            <Link className="ds-button ds-button--secondary" href="/records">
+            <p className="ds-utility-exits__line">The map is where the archive starts.</p>
+          </li>
+          <li className="ds-utility-exits__row">
+            <Link className="ds-utility-exits__link" href="/records">
               Find in the archive
             </Link>
-            <Link className="ds-button ds-button--secondary" href="/stories">
+            <p className="ds-utility-exits__line">Every published record, searchable.</p>
+          </li>
+          <li className="ds-utility-exits__row">
+            <Link className="ds-utility-exits__link" href="/stories">
               Read the chapters
             </Link>
-          </div>
-        }
-      >
-        Press <kbd className="ds-kbd">⌘K</kbd> to search. It opens holding what this address was
-        trying to say.
-      </EmptyState>
+            <p className="ds-utility-exits__line">Long reads built from the records.</p>
+          </li>
+        </ul>
+        <p className="ds-utility-exits__search">
+          <span className="ds-utility-exits__keys">
+            Press <kbd className="ds-kbd">⌘K</kbd> to search.
+          </span>
+          <span className="ds-utility-exits__touch">Tap search at the top to look it up.</span> It
+          opens holding what this address was trying to say.
+        </p>
+      </TrustSheet>
     </Room>
   );
 }

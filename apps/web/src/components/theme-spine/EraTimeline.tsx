@@ -14,7 +14,7 @@
  *
  * Fully responsive by construction — text wraps, nothing is positioned absolutely, and
  * there is no horizontal scroll at any width. The chapter's own era band (when it matches
- * one of the packet's `policyEras`) renders as a low-alpha `sand` wash behind the rail.
+ * one of the packet's `policyEras`) renders as a quiet ground behind the rail.
  */
 import React from 'react';
 
@@ -34,7 +34,7 @@ export type EraTimelinePolicyEra = {
 
 export type EraTimelineProps = {
   readonly events: readonly EraTimelineEvent[];
-  /** The packet's policy eras (for the low-alpha `sand` band). */
+  /** The packet's policy eras (for the era band). */
   readonly policyEras?: readonly EraTimelinePolicyEra[];
   /** Which policy era, if any, this chapter belongs to — highlighted as the band. */
   readonly currentEraId?: string;
@@ -44,20 +44,21 @@ export type EraTimelineProps = {
 /** Only call out a gap once it is long enough to be part of the story. */
 const GAP_YEARS_THRESHOLD = 5;
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+/** Abbreviated, so the longest label ("Sep 13, 1988") fits the date column. */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const POINT_DATE = /^(-?\d{1,4})(?:-(\d{2}))?(?:-(\d{2}))?$/;
+
+/**
+ * The events a rail can place: a year, a month or a day. A span ("1900-2024", a chart's whole
+ * range) is not a moment, so it is left out of the sequence and never anchors an elapsed-years
+ * gap. A chart that carries such a span renders inline on its own.
+ */
+export function timelinePoints<T extends EraTimelineEvent>(events: readonly T[]): T[] {
+  return events
+    .filter((event) => POINT_DATE.test(event.date.trim()))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
 
 function yearOf(date: string): number {
   const match = /^-?\d{1,4}/.exec(date.trim());
@@ -66,12 +67,12 @@ function yearOf(date: string): number {
 
 /**
  * Renders the stored date at whatever precision the packet actually carries, so a
- * year-only artifact never gets a fabricated month or day: "1937", "June 1937",
- * "June 12, 1937".
+ * year-only artifact never gets a fabricated month or day: "1937", "Jun 1937",
+ * "Jun 12, 1937".
  */
-function formatDateLabel(date: string): string {
+export function formatDateLabel(date: string): string {
   const trimmed = date.trim();
-  const match = /^(-?\d{1,4})(?:-(\d{2}))?(?:-(\d{2}))?$/.exec(trimmed);
+  const match = POINT_DATE.exec(trimmed);
   if (!match) return trimmed;
   const [, year, month, day] = match;
   if (!month) return year!;
@@ -103,19 +104,13 @@ function gapLabel(years: number): string {
 }
 
 export function EraTimeline({ events, policyEras, currentEraId, className }: EraTimelineProps) {
-  const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date));
+  const sorted = timelinePoints(events);
   if (sorted.length === 0) {
     return null;
   }
 
   const currentEra = policyEras?.find((era) => era.id === currentEraId);
-  const rootClassName = [
-    'ds-era-timeline',
-    currentEra ? 'ds-era-timeline--banded' : null,
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const rootClassName = ['ds-era-timeline', className].filter(Boolean).join(' ');
 
   return (
     <figure className={rootClassName}>

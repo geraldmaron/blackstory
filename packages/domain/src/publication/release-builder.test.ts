@@ -1573,6 +1573,8 @@ test('canonical living_status deceased wins over source hints that would imply l
 test('canonical status_history uses currentStatus for multi-entry histories', () => {
   const entry = baseEntry({
     kind: 'law',
+    // A law has no place claim, so only a coarse precision is earned.
+    locationPrecision: 'state',
     summary:
       'The Civil Rights Act of 1964 outlawed discrimination based on race, color, religion, sex, and national origin in public accommodations and employment nationwide.',
   });

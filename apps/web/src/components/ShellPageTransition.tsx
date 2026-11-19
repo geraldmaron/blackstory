@@ -32,7 +32,6 @@
 import { type ReactNode } from 'react';
 import type { SurfaceClass } from '../lib/nav/surface-classes';
 import { useSurfaceClass } from '../lib/nav/use-surface-class';
-import { PageField, usePageFieldSelection } from './PageField';
 import { ReadingProgress } from './room/ReadingProgress';
 
 export type ShellPageTransitionProps = {
@@ -50,16 +49,9 @@ function ShellPageChrome({
   readonly children: ReactNode;
   readonly surface: SurfaceClass | null;
 }) {
-  const pageField = usePageFieldSelection();
-
   return (
-    <div
-      className="ds-shell-page-transition"
-      {...(surface ? { 'data-surface': surface } : {})}
-      data-page-field={pageField?.motifId ?? 'none'}
-    >
+    <div className="ds-shell-page-transition" {...(surface ? { 'data-surface': surface } : {})}>
       <ReadingProgress surface={surface} />
-      {pageField ? <PageField selection={pageField} /> : null}
       <div className="ds-shell-page-transition__content">{children}</div>
     </div>
   );

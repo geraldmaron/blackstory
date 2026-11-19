@@ -20,8 +20,8 @@ export const BOOKS_BROWSE_SORT_KEYS = [
   'states',
 ] as const satisfies readonly BooksBrowseSortKey[];
 
-/** Titles per catalog page. */
-export const BOOKS_BROWSE_PAGE_SIZE = 12;
+/** The cover wall, or the tile grid of states by challenge count. */
+export type BooksView = 'covers' | 'states';
 
 export type RawBooksBrowseParams = {
   readonly q?: string;
@@ -29,7 +29,7 @@ export type RawBooksBrowseParams = {
   readonly author?: string;
   readonly sort?: string;
   readonly dir?: string;
-  readonly page?: string;
+  readonly view?: string;
 };
 
 export type BooksBrowsePurchaseLink = {
@@ -53,28 +53,26 @@ export type BooksBrowseItem = {
   readonly purchaseLinks: readonly BooksBrowsePurchaseLink[];
 };
 
-export type BooksBrowseSortOption = {
-  readonly key: BooksBrowseSortKey;
+/** One order the Sort menu offers. */
+export type BooksSortPreset = {
+  readonly sort: BooksBrowseSortKey;
+  readonly dir: BooksBrowseSortDir;
   readonly label: string;
-  readonly active: boolean;
-  readonly ariaSort: 'ascending' | 'descending' | 'none';
-  readonly href: string;
 };
 
-export type BooksBrowsePagination = {
-  readonly page: number;
-  readonly pageSize: number;
-  readonly totalPages: number;
-  readonly totalMatched: number;
-  readonly rangeStart: number;
-  readonly rangeEnd: number;
-  readonly previousHref: string | undefined;
-  readonly nextHref: string | undefined;
-  readonly pageHrefs: readonly {
-    readonly page: number;
-    readonly href: string;
-    readonly current: boolean;
-  }[];
+export const BOOKS_SORT_PRESETS: readonly BooksSortPreset[] = [
+  { sort: 'title', dir: 'asc', label: 'Title, A to Z' },
+  { sort: 'author', dir: 'asc', label: 'Author, A to Z' },
+  { sort: 'year', dir: 'desc', label: 'Newest first' },
+  { sort: 'states', dir: 'desc', label: 'Most states' },
+  { sort: 'citations', dir: 'desc', label: 'Most sources' },
+];
+
+/** A state and how many titles carry a cited challenge there, within the other filters. */
+export type BooksStateCount = {
+  readonly code: string;
+  readonly name: string;
+  readonly count: number;
 };
 
 export type BooksBrowseViewModel = {
@@ -83,13 +81,17 @@ export type BooksBrowseViewModel = {
   readonly author: string;
   readonly sort: BooksBrowseSortKey;
   readonly dir: BooksBrowseSortDir;
-  readonly page: number;
+  readonly view: BooksView;
+  /** Every matching title, in order. The catalog is small enough to show whole. */
   readonly items: readonly BooksBrowseItem[];
   readonly totalMatched: number;
-  readonly stateOptions: readonly { readonly value: string; readonly label: string }[];
-  readonly authorOptions: readonly { readonly value: string; readonly label: string }[];
-  readonly sortOptions: readonly BooksBrowseSortOption[];
-  readonly pagination: BooksBrowsePagination;
+  readonly totalAvailable: number;
+  /** States with at least one title, most titles first, counted within the search and author. */
+  readonly stateCounts: readonly BooksStateCount[];
+  /** Authors, by name, with their title counts across the catalog. */
+  readonly authorCounts: readonly { readonly name: string; readonly count: number }[];
+  /** The Sort menu's label for the current order. */
+  readonly sortLabel: string;
 };
 
 export type BooksDetailState = {
@@ -106,6 +108,11 @@ export type BooksDetailViewModel =
     };
 
 const STATE_NAME_BY_CODE = new Map(US_STATES.map((state) => [state.postalCode, state.name]));
+
+/** A postal code's state name, or the code itself for one the domain list does not hold. */
+export function bookStateName(code: string): string {
+  return STATE_NAME_BY_CODE.get(code) ?? code;
+}
 
 function cleanSelectParam(raw: string | undefined): string {
   const trimmed = (raw ?? '').trim();
@@ -150,33 +157,6 @@ function recordToBrowseItem(book: BannedBookRecord): BooksBrowseItem {
   };
 }
 
-function buildFacetOptions(
-  values: readonly string[],
-  allLabel: string,
-): readonly { value: string; label: string }[] {
-  const unique = [...new Set(values)].sort((left, right) => left.localeCompare(right));
-  return [{ value: 'all', label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
-}
-
-function buildStateFacetOptions(
-  books: readonly BannedBookRecord[],
-): readonly { value: string; label: string }[] {
-  const codes = new Set<string>();
-  for (const book of books) {
-    for (const code of bannedBookReportedStates(book)) {
-      codes.add(code);
-    }
-  }
-  const sorted = [...codes].sort((left, right) => left.localeCompare(right));
-  return [
-    { value: 'all', label: 'All states' },
-    ...sorted.map((code) => ({
-      value: code,
-      label: `${STATE_NAME_BY_CODE.get(code) ?? code} (${code})`,
-    })),
-  ];
-}
-
 function parseSortKey(raw: string | undefined): BooksBrowseSortKey {
   const value = (raw ?? '').trim().toLowerCase();
   return (BOOKS_BROWSE_SORT_KEYS as readonly string[]).includes(value)
@@ -186,13 +166,6 @@ function parseSortKey(raw: string | undefined): BooksBrowseSortKey {
 
 function parseSortDir(raw: string | undefined): BooksBrowseSortDir {
   return (raw ?? '').trim().toLowerCase() === 'desc' ? 'desc' : 'asc';
-}
-
-function parsePage(raw: string | undefined, totalPages: number): number {
-  const parsed = Number.parseInt((raw ?? '').trim(), 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return 1;
-  if (totalPages < 1) return 1;
-  return Math.min(parsed, totalPages);
 }
 
 function compareBrowseItems(
@@ -221,7 +194,7 @@ export function buildBooksBrowseHref(params: {
   readonly author: string;
   readonly sort: BooksBrowseSortKey;
   readonly dir: BooksBrowseSortDir;
-  readonly page?: number;
+  readonly view?: BooksView;
 }): string {
   const search = new URLSearchParams();
   if (params.q.trim()) search.set('q', params.q.trim());
@@ -229,91 +202,29 @@ export function buildBooksBrowseHref(params: {
   if (params.author !== 'all') search.set('author', params.author);
   if (params.sort !== 'title') search.set('sort', params.sort);
   if (params.dir !== 'asc') search.set('dir', params.dir);
-  if (params.page !== undefined && params.page > 1) search.set('page', String(params.page));
+  if (params.view === 'states') search.set('view', 'states');
   const query = search.toString();
   return query ? `/books?${query}` : '/books';
 }
 
-function buildSortOptions(params: {
-  readonly q: string;
-  readonly state: string;
-  readonly author: string;
-  readonly sort: BooksBrowseSortKey;
-  readonly dir: BooksBrowseSortDir;
-}): readonly BooksBrowseSortOption[] {
-  const labels: Record<BooksBrowseSortKey, string> = {
-    title: 'Title',
-    author: 'Author',
-    year: 'Year',
-    citations: 'Citations',
-    states: 'States',
-  };
+const SORT_KEY_LABELS: Readonly<Record<BooksBrowseSortKey, string>> = {
+  title: 'Title',
+  author: 'Author',
+  year: 'Year',
+  citations: 'Sources',
+  states: 'States',
+};
 
-  return BOOKS_BROWSE_SORT_KEYS.map((key) => {
-    const active = params.sort === key;
-    const nextDir: BooksBrowseSortDir = active && params.dir === 'asc' ? 'desc' : 'asc';
-    return {
-      key,
-      label: labels[key],
-      active,
-      ariaSort: active ? (params.dir === 'asc' ? 'ascending' : 'descending') : 'none',
-      href: buildBooksBrowseHref({
-        q: params.q,
-        state: params.state,
-        author: params.author,
-        sort: key,
-        dir: active ? nextDir : 'asc',
-        page: 1,
-      }),
-    };
-  });
+/** The preset's label, or for an order only an old link carries, its key and direction. */
+function sortLabelFor(sort: BooksBrowseSortKey, dir: BooksBrowseSortDir): string {
+  const preset = BOOKS_SORT_PRESETS.find((entry) => entry.sort === sort && entry.dir === dir);
+  return preset?.label ?? `${SORT_KEY_LABELS[sort]}, ${dir === 'asc' ? 'ascending' : 'descending'}`;
 }
 
-function buildPagination(params: {
-  readonly q: string;
-  readonly state: string;
-  readonly author: string;
-  readonly sort: BooksBrowseSortKey;
-  readonly dir: BooksBrowseSortDir;
-  readonly page: number;
-  readonly pageSize: number;
-  readonly totalMatched: number;
-}): BooksBrowsePagination {
-  const totalPages = Math.max(1, Math.ceil(params.totalMatched / params.pageSize));
-  const page = Math.min(params.page, totalPages);
-  const rangeStart = params.totalMatched === 0 ? 0 : (page - 1) * params.pageSize + 1;
-  const rangeEnd = Math.min(page * params.pageSize, params.totalMatched);
-
-  const hrefFor = (target: number) =>
-    buildBooksBrowseHref({
-      q: params.q,
-      state: params.state,
-      author: params.author,
-      sort: params.sort,
-      dir: params.dir,
-      page: target,
-    });
-
-  const pageHrefs = Array.from({ length: totalPages }, (_, index) => {
-    const pageNumber = index + 1;
-    return {
-      page: pageNumber,
-      href: hrefFor(pageNumber),
-      current: pageNumber === page,
-    };
-  });
-
-  return {
-    page,
-    pageSize: params.pageSize,
-    totalPages,
-    totalMatched: params.totalMatched,
-    rangeStart,
-    rangeEnd,
-    previousHref: page > 1 ? hrefFor(page - 1) : undefined,
-    nextHref: page < totalPages ? hrefFor(page + 1) : undefined,
-    pageHrefs,
-  };
+function countBy(values: readonly string[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return counts;
 }
 
 export function buildBooksBrowseViewModel(
@@ -321,73 +232,63 @@ export function buildBooksBrowseViewModel(
   raw: RawBooksBrowseParams,
 ): BooksBrowseViewModel {
   const q = (raw.q ?? '').trim().toLowerCase();
-  const state = cleanSelectParam(raw.state);
-  const author = cleanSelectParam(raw.author);
+  // A state or author no title carries (a typo, an old link) is dropped, never echoed back.
+  const rawState = cleanSelectParam(raw.state).toUpperCase();
+  const state = snapshot.books.some((book) => bannedBookReportedStates(book).includes(rawState))
+    ? rawState
+    : 'all';
+  const rawAuthor = cleanSelectParam(raw.author);
+  const author = snapshot.books.some((book) => book.authors.some((a) => a.name === rawAuthor))
+    ? rawAuthor
+    : 'all';
   const sort = parseSortKey(raw.sort);
   const dir = parseSortDir(raw.dir);
-  const qRaw = raw.q ?? '';
+  const view: BooksView = (raw.view ?? '').trim() === 'states' ? 'states' : 'covers';
 
-  const filtered = snapshot.books.filter((book) => {
-    if (state !== 'all' && !bannedBookReportedStates(book).includes(state)) {
-      return false;
-    }
-
-    if (author !== 'all') {
-      const names = book.authors.map((entry) => entry.name);
-      if (!names.includes(author)) return false;
-    }
-
+  // Search and author narrow both views; the state filter narrows the wall. The state view counts
+  // within search and author, so a state's number is what its link will show.
+  const searched = snapshot.books.filter((book) => {
+    if (author !== 'all' && !book.authors.some((entry) => entry.name === author)) return false;
     if (q) {
       const haystack = `${book.title} ${formatAuthorNames(book)} ${book.description}`.toLowerCase();
       if (!haystack.includes(q)) return false;
     }
-
     return true;
   });
+  const filtered =
+    state === 'all'
+      ? searched
+      : searched.filter((book) => bannedBookReportedStates(book).includes(state));
 
-  const sorted = filtered.map(recordToBrowseItem).sort((left, right) => {
+  const items = filtered.map(recordToBrowseItem).sort((left, right) => {
     const primary = compareBrowseItems(left, right, sort);
     const ordered = dir === 'desc' ? -primary : primary;
     if (ordered !== 0) return ordered;
     return left.title.localeCompare(right.title, undefined, { sensitivity: 'base' });
   });
 
-  const totalMatched = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(totalMatched / BOOKS_BROWSE_PAGE_SIZE));
-  const page = parsePage(raw.page, totalPages);
-  const start = (page - 1) * BOOKS_BROWSE_PAGE_SIZE;
-  const items = sorted.slice(start, start + BOOKS_BROWSE_PAGE_SIZE);
-
-  const authorNames = snapshot.books.flatMap((book) => book.authors.map((entry) => entry.name));
+  const stateCounts = [...countBy(searched.flatMap((book) => bannedBookReportedStates(book)))]
+    .map(([code, count]) => ({ code, name: STATE_NAME_BY_CODE.get(code) ?? code, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  const authorCounts = [
+    ...countBy(snapshot.books.flatMap((book) => book.authors.map((entry) => entry.name))),
+  ]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return {
-    q: qRaw,
+    q: raw.q ?? '',
     state,
     author,
     sort,
     dir,
-    page,
+    view,
     items,
-    totalMatched,
-    stateOptions: buildStateFacetOptions(snapshot.books),
-    authorOptions: buildFacetOptions(authorNames, 'All authors'),
-    sortOptions: buildSortOptions({
-      q: qRaw,
-      state,
-      author,
-      sort,
-      dir,
-    }),
-    pagination: buildPagination({
-      q: qRaw,
-      state,
-      author,
-      sort,
-      dir,
-      page,
-      pageSize: BOOKS_BROWSE_PAGE_SIZE,
-      totalMatched,
-    }),
+    totalMatched: items.length,
+    totalAvailable: snapshot.books.length,
+    stateCounts,
+    authorCounts,
+    sortLabel: sortLabelFor(sort, dir),
   };
 }
 
@@ -416,35 +317,24 @@ export function listBooksStaticParams(
   return snapshot.books.map((book) => ({ slug: book.slug }));
 }
 
-/** Related titles for detail depart panel: same author or overlapping challenge states. */
+/**
+ * Other titles by the same author: a typed relationship (shared authorship). Sharing a
+ * challenge state is collection membership, not a connection, so it never qualifies.
+ */
 export function buildBooksRelatedItems(
   snapshot: BannedBooksListingSnapshot,
   book: BannedBookRecord,
   limit = 4,
 ): readonly BooksBrowseItem[] {
   const authorNames = new Set(book.authors.map((entry) => entry.name));
-  const stateCodes = new Set(bannedBookReportedStates(book));
-
-  const scored = snapshot.books
-    .filter((entry) => entry.slug !== book.slug)
-    .map((entry) => {
-      const entryAuthors = entry.authors.map((author) => author.name);
-      const sharedAuthor = entryAuthors.some((name) => authorNames.has(name));
-      const entryStates = bannedBookReportedStates(entry);
-      const sharedStates = entryStates.filter((code) => stateCodes.has(code)).length;
-      const score = (sharedAuthor ? 10 : 0) + sharedStates;
-      return { entry, score };
-    })
-    .filter(({ score }) => score > 0)
-    .sort((left, right) => {
-      if (right.score !== left.score) return right.score - left.score;
-      return left.entry.title.localeCompare(right.entry.title, undefined, { sensitivity: 'base' });
-    });
-
-  return scored.slice(0, limit).map(({ entry }) => recordToBrowseItem(entry));
-}
-
-export function stateLabel(code: string): string {
-  const name = STATE_NAME_BY_CODE.get(code);
-  return name ? `${name} (${code})` : code;
+  return snapshot.books
+    .filter(
+      (entry) =>
+        entry.slug !== book.slug && entry.authors.some((author) => authorNames.has(author.name)),
+    )
+    .sort((left, right) =>
+      left.title.localeCompare(right.title, undefined, { sensitivity: 'base' }),
+    )
+    .slice(0, limit)
+    .map(recordToBrowseItem);
 }

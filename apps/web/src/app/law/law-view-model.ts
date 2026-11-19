@@ -2,10 +2,9 @@
  * Pure view-model for the `/law` browse and detail pages. No Next.js runtime dependency.
  */
 import type { LawStatus } from '@repo/domain/entity-status';
-import { isLawStatus } from '../../components/legal/format';
 import type { LegalCatalogSource, LegalSnapshotDocument } from '../../lib/legal/public-source';
 
-/** A `/law` browse row, as `LawBrowseSections` renders it. */
+/** A `/law` chronology row, as `LawBrowseSections` renders it. */
 export type LegalBrowseItem = {
   readonly id: string;
   readonly slug: string;
@@ -26,16 +25,9 @@ export type RawLawBrowseParams = {
   readonly topic?: string;
   readonly status?: string;
   readonly sort?: string;
-  readonly page?: string;
 };
 
-/**
- * Browse ordering. Chronological is the default: law reads as a sequence, and sorting
- * by title put "42 U.S.C. § 1983" above Brown v. Board purely because of the digit.
- */
-export const LAW_PAGE_SIZE = 24;
-
-/** Canonical public browse address; a new filter starts at page one unless paging explicitly. */
+/** Canonical public browse address. */
 export function lawBrowseHref(params: RawLawBrowseParams): string {
   const search = new URLSearchParams();
   for (const key of ['q', 'kind', 'topic', 'status'] as const) {
@@ -43,10 +35,46 @@ export function lawBrowseHref(params: RawLawBrowseParams): string {
     if (value && value !== 'all') search.set(key, value);
   }
   if (params.sort && params.sort !== 'chronological') search.set('sort', params.sort);
-  const page = Number(params.page);
-  if (Number.isSafeInteger(page) && page > 1) search.set('page', String(Math.min(page, 1000)));
   return search.size > 0 ? `/law?${search}` : '/law';
 }
+
+/**
+ * The periods the chronology groups by. Conventional periodization of Black legal history, with
+ * fixed year bounds (inclusive) so a law's group follows from its effective year alone.
+ */
+export type LawEra = {
+  readonly id: string;
+  readonly name: string;
+  readonly from?: number;
+  readonly to?: number;
+};
+
+export const LAW_ERAS: readonly LawEra[] = [
+  { id: 'before-1865', name: 'Before 1865', to: 1864 },
+  { id: 'reconstruction', name: 'Reconstruction', from: 1865, to: 1877 },
+  { id: 'jim-crow', name: 'Jim Crow', from: 1878, to: 1953 },
+  { id: 'civil-rights', name: 'Civil rights era', from: 1954, to: 1968 },
+  { id: 'since-1969', name: 'Since 1969', from: 1969 },
+];
+
+/** The group for entries with no effective year, always last. */
+export const LAW_UNDATED: LawEra = { id: 'undated', name: 'Year not recorded' };
+
+export function lawEraFor(year: number | undefined): LawEra {
+  if (year === undefined) return LAW_UNDATED;
+  return (
+    LAW_ERAS.find(
+      (era) =>
+        (era.from === undefined || year >= era.from) && (era.to === undefined || year <= era.to),
+    ) ?? LAW_UNDATED
+  );
+}
+
+/** One era of the chronology and the entries in it, in the current order. */
+export type LawGroup = {
+  readonly era: LawEra;
+  readonly items: readonly LegalBrowseItem[];
+};
 
 export const LAW_SORTS = ['chronological', 'recent', 'title'] as const;
 export type LawSort = (typeof LAW_SORTS)[number];
@@ -68,17 +96,23 @@ export type LawBrowseViewModel = {
   readonly status: string;
   readonly sort: LawSort;
   readonly items: readonly LegalBrowseItem[];
+  /**
+   * The items by era, in the current order. Empty eras are absent. A title sort has no time
+   * order to group by, so it yields no groups and the list renders flat.
+   */
+  readonly groups: readonly LawGroup[];
   readonly totalMatched: number;
   readonly totalAvailable: number;
-  readonly page: number;
-  readonly pageCount: number;
-  readonly pageSize: number;
-  /** True when any facet or query narrows the catalog — drives the "showing N of M" copy. */
+  /** True when any facet or query narrows the catalog. */
   readonly isFiltered: boolean;
-  readonly kindOptions: readonly { readonly value: string; readonly label: string }[];
-  readonly topicOptions: readonly { readonly value: string; readonly label: string }[];
-  readonly sortOptions: readonly { readonly value: string; readonly label: string }[];
+  /** Facet values across the whole catalog, with how many entries carry each. */
+  readonly kindOptions: readonly LawFacetOption[];
+  readonly topicOptions: readonly LawFacetOption[];
+  readonly statusOptions: readonly LawFacetOption[];
+  readonly sortOptions: readonly { readonly value: LawSort; readonly label: string }[];
 };
+
+export type LawFacetOption = { readonly value: string; readonly count: number };
 
 /** One end of the detail page's session prev/next, in the browse page's own default order. */
 export type LawNavTarget = {
@@ -98,9 +132,9 @@ export type LawDetailViewModel =
       readonly next?: LawNavTarget;
     };
 
-function cleanSelectParam(raw: string | undefined): string {
+function knownOrAll(raw: string | undefined, options: readonly LawFacetOption[]): string {
   const trimmed = (raw ?? '').trim();
-  return trimmed === '' ? 'all' : trimmed;
+  return options.some((option) => option.value === trimmed) ? trimmed : 'all';
 }
 
 /**
@@ -116,12 +150,26 @@ function firstSentence(text: string): string {
   return text;
 }
 
+/**
+ * Summaries open by restating the law's name ("The Thirteenth Amendment, ratified December 6,
+ * 1865, provides..."), which the row already prints above them. Start after it, so the line
+ * opens on a fact instead.
+ */
+function withoutRestatedTitle(summary: string, title: string): string {
+  const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const rest = summary.replace(new RegExp(`^(?:The\\s+)?${escaped},\\s+`, 'i'), '');
+  if (rest === summary || rest.length === 0) return summary;
+  return rest.charAt(0).toUpperCase() + rest.slice(1);
+}
+
 function snapshotToBrowseItem(
   snapshot: LegalSnapshotDocument,
   source: LegalCatalogSource,
 ): LegalBrowseItem {
   const explainer = source.explainerFor(snapshot.id);
-  const summary = explainer?.whatItSays ? firstSentence(explainer.whatItSays) : undefined;
+  const summary = explainer?.whatItSays
+    ? withoutRestatedTitle(firstSentence(explainer.whatItSays), snapshot.title)
+    : undefined;
   return {
     id: snapshot.id,
     slug: snapshot.slug,
@@ -157,26 +205,43 @@ function sortItems(items: LegalBrowseItem[], sort: LawSort): LegalBrowseItem[] {
   }
 }
 
-function buildFacetOptions(
-  values: readonly string[],
-  allLabel: string,
-): readonly { value: string; label: string }[] {
-  const unique = [...new Set(values)].sort();
-  return [{ value: 'all', label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
+/** Values sorted by name, each with how many entries carry it. */
+function facetOptions(values: readonly string[]): readonly LawFacetOption[] {
+  const counts = new Map<string, number>();
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return [...counts.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([value, count]) => ({ value, count }));
+}
+
+function groupByEra(items: readonly LegalBrowseItem[]): LawGroup[] {
+  const groups: { era: LawEra; items: LegalBrowseItem[] }[] = [];
+  for (const item of items) {
+    const era = lawEraFor(item.effectiveYear);
+    const last = groups.at(-1);
+    if (last?.era.id === era.id) last.items.push(item);
+    else groups.push({ era, items: [item] });
+  }
+  return groups;
 }
 
 export function buildLawBrowseViewModel(
   raw: RawLawBrowseParams,
   source: LegalCatalogSource,
 ): LawBrowseViewModel {
+  const allSnapshots = source.snapshots;
+  const kindOptions = facetOptions(allSnapshots.map((s) => s.kind));
+  const topicOptions = facetOptions(allSnapshots.flatMap((s) => [...s.topics]));
+  const statusOptions = facetOptions(allSnapshots.map((s) => s.lawStatus));
+
   const q = (raw.q ?? '').trim().toLowerCase();
-  const kind = cleanSelectParam(raw.kind);
-  const topic = cleanSelectParam(raw.topic);
-  const status = cleanSelectParam(raw.status);
+  // A value no entry carries (a typo, a retired enum) is dropped, never echoed back as a filter.
+  const kind = knownOrAll(raw.kind, kindOptions);
+  const topic = knownOrAll(raw.topic, topicOptions);
+  const status = knownOrAll(raw.status, statusOptions);
   const rawSort = (raw.sort ?? '').trim();
   const sort: LawSort = isLawSort(rawSort) ? rawSort : 'chronological';
 
-  const allSnapshots = source.snapshots;
   const filtered = allSnapshots.filter((snapshot) => {
     if (kind !== 'all' && snapshot.kind !== kind) return false;
     if (topic !== 'all' && !snapshot.topics.includes(topic as never)) return false;
@@ -189,16 +254,12 @@ export function buildLawBrowseViewModel(
     return true;
   });
 
-  const ordered = sortItems(
+  // shortcut: the whole catalog renders on one page (a few dozen entries); page it by era if it
+  // ever grows past a few hundred.
+  const items = sortItems(
     filtered.map((snapshot) => snapshotToBrowseItem(snapshot, source)),
     sort,
   );
-  const pageCount = Math.max(1, Math.ceil(ordered.length / LAW_PAGE_SIZE));
-  const requestedPage = Number(raw.page);
-  const page =
-    Number.isSafeInteger(requestedPage) && requestedPage > 1
-      ? Math.min(requestedPage, pageCount)
-      : 1;
 
   return {
     q: raw.q ?? '',
@@ -206,21 +267,14 @@ export function buildLawBrowseViewModel(
     topic,
     status,
     sort,
-    items: ordered.slice((page - 1) * LAW_PAGE_SIZE, page * LAW_PAGE_SIZE),
-    page,
-    pageCount,
-    pageSize: LAW_PAGE_SIZE,
+    items,
+    groups: sort === 'title' ? [] : groupByEra(items),
     totalMatched: filtered.length,
     totalAvailable: allSnapshots.length,
     isFiltered: q !== '' || kind !== 'all' || topic !== 'all' || status !== 'all',
-    kindOptions: buildFacetOptions(
-      allSnapshots.map((s) => s.kind),
-      'All kinds',
-    ),
-    topicOptions: buildFacetOptions(
-      allSnapshots.flatMap((s) => [...s.topics]),
-      'All topics',
-    ),
+    kindOptions,
+    topicOptions,
+    statusOptions,
     sortOptions: LAW_SORT_OPTIONS,
   };
 }
@@ -259,5 +313,3 @@ export function listLawStaticParams(
 ): readonly { readonly slug: string }[] {
   return source.snapshots.map((snapshot) => ({ slug: snapshot.slug }));
 }
-
-export { isLawStatus };

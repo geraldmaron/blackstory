@@ -1,0 +1,489 @@
+/**
+ * Public forms: one column, labels above (the room kit's Field), groups divided by a hairline
+ * rather than boxed, one primary button with a loading state, and a "what happens next" aside
+ * beside the form on desktop and after it on phone. Selected radio cards read by a filled mark
+ * and an ink border, never by color alone, and never by a copper wash.
+ *
+ * On the archive table the form sits on a paper sheet; its numbered groups open on copper
+ * numerals, the aside is ruled steps on the same paper (copper numerals, serif text, hairlines
+ * between, no card), and success replaces the form on the sheet. Inside a sheet depth is type
+ * and rules, never a box in a box.
+ */
+
+/* —— layout ————————————————————————————————————————————————————————————————— */
+.ds-form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--ds-space-12);
+}
+
+.ds-form-layout__main {
+  min-width: 0;
+  max-width: 40rem;
+}
+
+@media (min-width: 64rem) {
+  .ds-form-layout {
+    grid-template-columns: minmax(0, 40rem) minmax(0, 22rem);
+    justify-content: space-between;
+    column-gap: var(--ds-space-12);
+  }
+
+  .ds-form-layout__aside {
+    position: sticky;
+    top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+    align-self: start;
+  }
+}
+
+/* —— the form ——————————————————————————————————————————————————————————————— */
+.ds-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+}
+
+.ds-form-note {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-form-required {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+  min-width: 0;
+  margin: 0;
+  padding: var(--ds-space-6) 0 0;
+  border: 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-form-group > legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-form-group > legend + * {
+  clear: both;
+}
+
+.ds-form-group__hint {
+  margin: calc(-1 * var(--ds-space-4)) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+/* Labels are the meta role, the same as the record facts strip's labels. */
+.ds-form .ds-room-field__label {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-form .ds-room-field__error {
+  display: flex;
+  gap: var(--ds-space-2);
+  margin-top: 0;
+  font-weight: 500;
+}
+
+.ds-form .ds-room-field__error::before {
+  content: '';
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: calc(var(--ds-space-1) - 1px);
+  border-radius: 50%;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm-.9 3.5h1.8l-.2 6H7.3l-.2-6Zm.9 9.3a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* —— radio cards ————————————————————————————————————————————————————————————— */
+.ds-form-cards .ds-room-field__choices {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-form-cards .ds-room-field__choice {
+  display: flex;
+  min-width: 0;
+}
+
+/* Ruled rows, not boxes: the mark and the weight say which is chosen. */
+.ds-form-cards .ds-room-field__choice span {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-height: 3.5rem;
+  padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-3)
+    calc(var(--ds-space-6) + var(--ds-space-1));
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.35;
+  color: var(--ds-ink);
+}
+
+.ds-form-cards .ds-room-field__choice span::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: calc(var(--ds-space-2) * -1 - 1px);
+  box-sizing: border-box;
+  border: 1.5px solid var(--ds-ink-muted);
+  border-radius: 50%;
+}
+
+.ds-form-cards .ds-room-field__choice span:hover {
+  color: var(--ds-accent);
+}
+
+.ds-form-cards .ds-room-field__choice input:checked + span {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-form-cards .ds-room-field__choice input:checked + span::before {
+  border: 5px solid var(--ds-ink);
+}
+
+.ds-form-cards[data-invalid='true'] .ds-room-field__choice span::before {
+  border-color: var(--ds-error-border);
+}
+
+/* —— a checkbox and its sentence ————————————————————————————————————————————— */
+.ds-form-check {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  column-gap: var(--ds-space-3);
+  align-items: start;
+}
+
+/* 24px: the smallest box that is still a fair touch target on its own. */
+.ds-form-check input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--ds-ink);
+  cursor: pointer;
+}
+
+.ds-form-check label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink);
+  cursor: pointer;
+}
+
+.ds-form-check small {
+  display: block;
+  margin-top: var(--ds-space-1);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-form-check .ds-room-field__error {
+  grid-column: 2;
+  margin-top: var(--ds-space-2);
+}
+
+.ds-form-check[data-invalid='true'] input {
+  outline: 2px solid var(--ds-error-border);
+  outline-offset: 2px;
+}
+
+/* —— segmented target picker: label above, like every other field —————————————— */
+.ds-form .ds-segmented {
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+/* —— submit ——————————————————————————————————————————————————————————————————— */
+.ds-form-submit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3) var(--ds-space-4);
+  padding-top: var(--ds-space-2);
+}
+
+.ds-form-submit__button[aria-busy='true']::before {
+  content: '';
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-right: var(--ds-space-2);
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ds-form-spin 0.7s linear infinite;
+}
+
+.ds-form-submit__button:disabled {
+  opacity: 1;
+}
+
+.ds-form-submit__note {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+@media (max-width: 39.9375rem) {
+  .ds-form-submit__button {
+    width: 100%;
+  }
+}
+
+@keyframes ds-form-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-form-submit__button[aria-busy='true']::before {
+    animation-duration: 2s;
+  }
+}
+
+/* —— failure ————————————————————————————————————————————————————————————————— */
+.ds-form-failure {
+  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-6);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-form-failure:focus {
+  outline: none;
+}
+
+/* The glyph and the word, as a grade tag has them; color is never the only signal. */
+.ds-form-failure__title {
+  position: relative;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  font-weight: 600;
+  color: var(--ds-error-fg);
+}
+
+.ds-form-failure__title::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--ds-space-6));
+  top: 0.3em;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm-.9 3.5h1.8l-.2 6H7.3l-.2-6Zm.9 9.3a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+.ds-form-failure__body {
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
+.ds-form-failure__body ul {
+  margin: var(--ds-space-2) 0 0;
+  padding-left: var(--ds-space-4);
+}
+
+/* —— success: replaces the form, same column ——————————————————————————————————— */
+.ds-form-done {
+  padding-block: var(--ds-space-4);
+  animation: ds-form-done-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
+}
+
+@keyframes ds-form-done-in {
+  from {
+    transform: translateY(16px);
+  }
+}
+
+.ds-form-done:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 3px;
+}
+
+.ds-form-done:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ds-form-done__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: var(--ds-tracking-display);
+  color: var(--ds-ink);
+}
+
+.ds-form-done__body {
+  max-width: 56ch;
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-form-done__ref {
+  margin: var(--ds-space-6) 0 0;
+  padding-block: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-form-done__ref code {
+  display: block;
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+.ds-form-done__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-6);
+}
+
+/* —— the aside: what happens next ————————————————————————————————————————————— */
+.ds-form-next__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-form-next__steps {
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: next;
+}
+
+.ds-form-next__steps > li {
+  position: relative;
+  min-height: 3.5rem;
+  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-12);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body);
+  line-height: 1.45;
+  color: var(--ds-ink);
+  counter-increment: next;
+}
+
+.ds-form-next__steps > li:last-child {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* The step number is drawn, not read: the list is already ordered. */
+.ds-form-next__steps > li::before {
+  content: counter(next) / '';
+  position: absolute;
+  left: 0;
+  top: var(--ds-space-3);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: var(--ds-weight-numeral);
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  font-variant-numeric: lining-nums;
+  color: var(--ds-numeral-accent);
+}
+
+.ds-form-next__more {
+  margin-top: var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-form-next__more p {
+  margin: 0;
+}
+
+.ds-form-next__more p + p {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-form-next__more a {
+  color: var(--ds-ink);
+}
+
+/* —— on a sheet: numbered groups and a receipt field set as data —————————————————— */
+.ds-trust-sheet .ds-form {
+  counter-reset: form-group;
+}
+
+.ds-trust-sheet .ds-form-group {
+  counter-increment: form-group;
+}
+
+.ds-trust-sheet .ds-form-group > legend::before {
+  content: counter(form-group, decimal-leading-zero) / '';
+  display: block;
+  margin-bottom: var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  color: var(--ds-numeral-accent);
+}
+
+.ds-trust-sheet > .ds-form {
+  max-width: 40rem;
+}
+
+.ds-form input[name='receiptCode'] {
+  min-height: 3.5rem;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-title);
+  letter-spacing: 0.04em;
+}

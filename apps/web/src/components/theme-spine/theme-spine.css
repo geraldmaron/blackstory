@@ -1,182 +1,221 @@
-/**
- * Theme-spine evidence-moment styles (EraTimeline, MapInsetMoment) embedded in
- * /chapters article bodies via StoryBody. Sits on the shared Surface panel
- * convention with a copper accent border/wash — see
- * `apps/web/src/components/patterns/utility-edition` for the panel pattern.
+/*
+ * Story artifacts from the theme spine: EraTimeline and DisputeBlock. Both render open on the
+ * story's wide track (StoryBody places them); neither draws a box of its own.
  */
 
-/* -------------------------------------------------------------------------------------------- *
- * EraTimeline — horizontal event strip moment.
- * -------------------------------------------------------------------------------------------- */
-
+/* —— EraTimeline: a dated rail, date column and title, gap markers between ———————— */
 .ds-era-timeline {
   position: relative;
-  margin: var(--ds-space-5) 0;
-  padding: var(--ds-space-4) var(--ds-space-5);
-  border: var(--ds-border-width) solid
-    color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
-  border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-accent-graphic) 7%, var(--ds-surface-raised));
+  margin: 0;
 }
 
-[data-theme='dark'] .ds-era-timeline {
-  background: color-mix(in srgb, var(--ds-accent-graphic) 8%, var(--ds-surface-raised));
-}
-
-/* Chapter belongs to one of the packet's own policy eras: the rail's accent line steps up
-   from a thin marker to a solid one, so "you are here" reads at a glance and not only from
-   the low-alpha era-band wash underneath the rows. The whole border turns solid accent (no side
-   stripe); overflow: hidden keeps the wash's inherited corners clipped to the card radius. */
-.ds-era-timeline--banded {
-  overflow: hidden;
-  border-color: var(--ds-accent);
-}
-
-/* Chapter's era band — brand `sand` token (pageSand #D8A178) at low alpha. */
+/* Chapter belongs to one of the packet's own policy eras: a quiet band behind the rail. */
 .ds-era-timeline__era-band {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  background: rgba(216, 161, 120, 0.14);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-sunken);
   pointer-events: none;
 }
 
-/*
- * Vertical chronological rail. The continuous hairline is drawn on the list itself so it
- * spans every row without absolute positioning per item; rows lay out with grid, so a long
- * document title wraps under itself instead of colliding with its neighbors.
- */
 .ds-era-timeline__list {
   position: relative;
   margin: 0;
-  padding: 0 0 0 var(--ds-space-4);
+  padding: 0;
   list-style: none;
-  border-left: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-era-timeline__item + .ds-era-timeline__item {
-  margin-top: var(--ds-space-3);
+/* The rail runs down the dot column, right of the date column. The date column fits the longest
+   label EraTimeline formats ("Sep 13, 1988"); EraTimeline.test guards that. */
+.ds-era-timeline__list {
+  --date-col: var(--ds-space-32);
+  --dot-col: var(--ds-space-6);
+}
+
+.ds-era-timeline__list::before {
+  content: '';
+  position: absolute;
+  top: var(--ds-space-3);
+  bottom: var(--ds-space-3);
+  left: calc(var(--date-col) + var(--dot-col) / 2);
+  width: 1px;
+  background: var(--ds-rule);
 }
 
 .ds-era-timeline__row {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 2px var(--ds-space-3);
+  grid-template-columns: var(--date-col) var(--dot-col) minmax(0, 1fr);
   align-items: baseline;
-}
-
-/*
- * The tick straddles the rail. Offset by the list's own left padding so it centers on the
- * border regardless of the space token's value, and nudged down to sit on the date's cap
- * height rather than its baseline.
- */
-.ds-era-timeline__dot {
-  position: absolute;
-  top: 0.42em;
-  left: calc(-1 * var(--ds-space-4));
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--ds-accent-graphic);
-  transform: translateX(-50%);
+  padding-block: var(--ds-space-2);
 }
 
 .ds-era-timeline__date-label {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
   color: var(--ds-ink);
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
+.ds-era-timeline__dot {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--ds-ink);
+  border-radius: 50%;
+  background: var(--ds-canvas);
+}
+
 .ds-era-timeline__event-label {
+  grid-column: 3;
+  grid-row: 1;
   min-width: 0;
-  color: var(--ds-ink-muted, var(--ds-ink));
+  color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: var(--ds-text-body-sm);
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
-/* Elapsed time between two documents — the information the old horizontal axis carried. */
+/* Elapsed time between two documents: the information a scaled axis would carry. */
 .ds-era-timeline__gap {
   display: block;
-  margin-bottom: var(--ds-space-2);
-  color: var(--ds-ink-muted, var(--ds-ink));
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  opacity: 0.7;
-  text-transform: uppercase;
-}
-
-/*
- * Narrow viewports: the date moves onto its own line above the title, so neither column is
- * squeezed. Nothing overflows horizontally at any width.
- */
-@media (max-width: 33rem) {
-  .ds-era-timeline {
-    padding: var(--ds-space-4) var(--ds-space-4);
-  }
-
-  .ds-era-timeline__row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2px;
-  }
+  padding: var(--ds-space-2) 0 var(--ds-space-2) calc(var(--date-col) + var(--dot-col));
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-style: italic;
 }
 
 .ds-era-timeline__caption {
   position: relative;
   margin-top: var(--ds-space-3);
-  color: var(--ds-ink-muted, var(--ds-ink));
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
-/* -------------------------------------------------------------------------------------------- *
- * MapInsetMoment — small static map panel moment.
- * -------------------------------------------------------------------------------------------- */
+/* Narrow: the date sits above its title, the rail moves to the left edge. */
+@media (max-width: 40rem) {
+  .ds-era-timeline__list::before {
+    left: 3px;
+  }
 
-.ds-map-inset-moment {
-  margin: var(--ds-space-5) 0;
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid
-    color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-rule));
-  border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-accent-graphic) 7%, var(--ds-surface-raised));
+  .ds-era-timeline__row {
+    grid-template-columns: var(--dot-col) minmax(0, 1fr);
+    row-gap: 2px;
+  }
+
+  .ds-era-timeline__dot {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .ds-era-timeline__date-label {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .ds-era-timeline__event-label {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .ds-era-timeline__gap {
+    padding-left: var(--dot-col);
+  }
 }
 
-[data-theme='dark'] .ds-map-inset-moment {
-  background: color-mix(in srgb, var(--ds-accent-graphic) 8%, var(--ds-surface-raised));
+/* —— DisputeBlock: two sources, two equal columns, no winner ———————————————————— */
+.ds-dispute {
+  margin: 0;
+  padding-block: var(--ds-space-6);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-map-inset-moment__frame {
-  position: relative;
-  width: 100%;
-  height: 220px;
-  border-radius: var(--ds-radius-sm, var(--ds-radius-md));
-  overflow: hidden;
-  border: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-map-inset-moment__caption {
+.ds-dispute__label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  margin-top: var(--ds-space-3);
-  font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
-}
-
-.ds-map-inset-moment__place {
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-6);
   color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
   font-weight: 600;
+  line-height: 1.3;
 }
 
-.ds-map-inset-moment__link {
-  color: var(--ds-accent);
-  font-weight: 600;
-  white-space: nowrap;
+.ds-dispute__glyph {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-dispute__sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-8);
+}
+
+/* A hairline between the sides; both sides are otherwise identical. */
+.ds-dispute__side + .ds-dispute__side {
+  position: relative;
+}
+
+.ds-dispute__side + .ds-dispute__side::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--ds-space-4) * -1);
+  width: 1px;
+  background: var(--ds-rule);
+}
+
+.ds-dispute__claim {
+  margin: 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.45;
+}
+
+.ds-dispute__source {
+  display: block;
+  margin-top: var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-style: normal;
+}
+
+.ds-dispute__standing {
+  margin: var(--ds-space-6) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+@media (max-width: 40rem) {
+  .ds-dispute__sides {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-6);
+  }
+
+  .ds-dispute__side + .ds-dispute__side {
+    padding-top: var(--ds-space-6);
+    border-top: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-dispute__side + .ds-dispute__side::before {
+    display: none;
+  }
 }

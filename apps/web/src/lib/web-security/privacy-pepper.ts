@@ -7,7 +7,10 @@
  */
 import { randomBytes } from 'node:crypto';
 
-let devPepper: string | undefined;
+/** On globalThis because Next dev loads route handlers and pages as separate module instances:
+ * a module-level value gave each its own pepper, so a receipt issued by the API never matched
+ * on the status page. */
+const shared = globalThis as { __bsDevPrivacyPepper?: string };
 
 export function requirePrivacyPepper(): string {
   const pepper = process.env.SUBMISSION_PRIVACY_PEPPER;
@@ -15,6 +18,6 @@ export function requirePrivacyPepper(): string {
   if (process.env.NODE_ENV === 'production') {
     throw new Error('SUBMISSION_PRIVACY_PEPPER must be set in production');
   }
-  if (!devPepper) devPepper = randomBytes(32).toString('hex');
-  return devPepper;
+  shared.__bsDevPrivacyPepper ??= randomBytes(32).toString('hex');
+  return shared.__bsDevPrivacyPepper;
 }

@@ -11,7 +11,7 @@
  * floors stay honest before the backfill lands.
  */
 import { cache } from 'react';
-import { loadDoorPinPlate } from '../../lib/map-experience/door-catalog';
+import { loadDrawnRecordHrefs } from '../../lib/map-experience/door-catalog';
 import { loadRecordsCatalog } from '../../lib/records/records-catalog';
 import { resolveStoryCollectionSource } from '../../lib/stories/source';
 import {
@@ -56,13 +56,12 @@ export const loadRecordsIndex = cache(async function loadRecordsIndex(
 ): Promise<RecordsPageModel> {
   const { query } = loadRecordsIndexFromKey(queryKey);
   const slug = storyCollectionSlug(query.collection);
-  const [{ data, catalogSource }, { features }, storySource] = await Promise.all([
+  const [{ data, catalogSource }, drawnHrefs, storySource] = await Promise.all([
     loadRecordsCatalog(),
-    loadDoorPinPlate(),
+    loadDrawnRecordHrefs(),
     // Only a well-formed `story:<slug>` reads the story cache; sentinels need no read.
     slug === undefined ? Promise.resolve(undefined) : resolveStoryCollectionSource(slug),
   ]);
-  const drawableIds = new Set(features.map((feature) => feature.properties.entityId));
   // Membership resolves over the released bibliography only: linked ids that are not in this
   // catalog are counted by the descriptor, never listed.
   const collection: CollectionDescriptor =
@@ -74,7 +73,7 @@ export const loadRecordsIndex = cache(async function loadRecordsIndex(
       : (collectionDescriptorWithoutRead(query.collection) ?? NO_COLLECTION);
   return {
     query,
-    model: buildRecordsIndex(data, query, drawableIds, collection),
+    model: buildRecordsIndex(data, query, drawnHrefs, collection),
     catalogSource,
     collection,
   };

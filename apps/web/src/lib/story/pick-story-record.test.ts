@@ -84,6 +84,18 @@ test('a record with no evidence and a record with no summary are both refused', 
   );
 });
 
+test('a county or state record is refused, because the map draws no point for it', () => {
+  const features = [
+    feature({ entityId: 'county', precision: 'county' }),
+    feature({ entityId: 'state', precision: 'state' }),
+    feature({ entityId: 'site', precision: 'site' }),
+  ];
+  assert.deepEqual(
+    eligibleStoryRecords(features).map((entry) => entry.properties.entityId),
+    ['site'],
+  );
+});
+
 test('the draw carries the record own published fields, not a written description', () => {
   const spotlight = pickStoryRecord(
     [
@@ -104,6 +116,7 @@ test('the draw carries the record own published fields, not a written descriptio
   assert.equal(spotlight.place, 'Washington, D.C.');
   assert.equal(spotlight.era, '1870s');
   assert.equal(spotlight.evidenceCount, 5);
+  assert.equal(spotlight.precision, 'city');
 });
 
 test('the draw reaches every eligible record and survives a bad roll', () => {
@@ -119,4 +132,45 @@ test('the draw reaches every eligible record and survives a bad roll', () => {
 test('a release with nothing eligible returns null rather than an unusable record', () => {
   assert.equal(pickStoryRecord([], 0.5), null);
   assert.equal(pickStoryRecord([feature({ entityId: 'x', mapTone: 'massacre' })], 0.5), null);
+});
+
+test('a record whose era contradicts the year its own summary names is refused', () => {
+  const features = [
+    feature({
+      entityId: 'bethel-plymouth',
+      eraBuckets: ['1790s'],
+      oneLineStory: 'Organized by Black residents of Plymouth, Massachusetts in 1866.',
+    }),
+    feature({
+      entityId: 'agrees',
+      eraBuckets: ['1860s'],
+      oneLineStory: 'Organized by Black residents of Plymouth, Massachusetts in 1866.',
+    }),
+    // A summary with no year has nothing to contradict.
+    feature({ entityId: 'undated-line', eraBuckets: ['1790s'] }),
+  ];
+  assert.deepEqual(
+    eligibleStoryRecords(features).map((entry) => entry.properties.entityId),
+    ['agrees', 'undated-line'],
+  );
+});
+
+test('a summary that only restates the name and kind is refused', () => {
+  const features = [
+    feature({
+      entityId: 'tautology',
+      displayName: 'Building at 500-502 East Main',
+      oneLineStory: 'Building at 500-502 East Main is a building in Waxahachie, Ellis County.',
+    }),
+    feature({
+      entityId: 'story',
+      displayName: 'Joshua Chapel AME Church',
+      oneLineStory: 'Joshua Chapel AME Church was organized in 1888 by freed families.',
+      eraBuckets: ['1880s'],
+    }),
+  ];
+  assert.deepEqual(
+    eligibleStoryRecords(features).map((entry) => entry.properties.entityId),
+    ['story'],
+  );
 });

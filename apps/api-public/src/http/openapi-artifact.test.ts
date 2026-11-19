@@ -10,6 +10,7 @@ import { test } from 'node:test';
 import { bootstrapResponseV1Schema } from '@repo/public-contracts/v1/bootstrap';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
 import { mapSourceV1Schema } from '@repo/public-contracts/v1/map';
+import { storiesResponseV1Schema, storyV1Schema } from '@repo/public-contracts/v1/story';
 import { searchResponseV1Schema } from '@repo/public-contracts/v1/search';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 
@@ -25,6 +26,8 @@ const ROUTER_PATHS = [
   '/v1/search',
   '/v1/map',
   '/v1/entity/{id}',
+  '/v1/stories',
+  '/v1/stories/{slug}',
 ] as const;
 
 const FORBIDDEN_ENTITY_KEYS = [
@@ -97,6 +100,13 @@ test('redacted map example matches mapSourceV1Schema', () => {
   const body = readJson('map-200.json');
   const parsed = mapSourceV1Schema.safeParse(body);
   assert.equal(parsed.success, true, parsed.success ? '' : JSON.stringify(parsed.error.issues));
+});
+
+test('redacted story examples match the story contract', () => {
+  const list = storiesResponseV1Schema.safeParse(readJson('stories-200.json'));
+  assert.equal(list.success, true, list.success ? '' : JSON.stringify(list.error.issues));
+  const story = storyV1Schema.safeParse(readJson('story-200.json'));
+  assert.equal(story.success, true, story.success ? '' : JSON.stringify(story.error.issues));
 });
 
 test('error envelope examples match publicApiErrorEnvelopeSchema', () => {

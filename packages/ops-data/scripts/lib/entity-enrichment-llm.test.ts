@@ -528,3 +528,31 @@ test('user prompt carries the privacy rule for person subjects and omits it for 
   assert.ok(restrictedPrompt.includes('PRIVACY'));
   assert.ok(!placePrompt.includes('PRIVACY'));
 });
+
+test('rejects Neo never-list language in entity prose, and leaves quotations alone', () => {
+  const summary =
+    'John Doe was a trailblazer who operated a business at this site starting in 1925, ' +
+    'serving Negro customers. ' +
+    LONG_ENOUGH_SUMMARY;
+  const attempt = validateEnrichmentResponse(
+    baseSubject(),
+    ['business'],
+    validResponse({ summary: summary.slice(0, 900) }),
+  );
+  assert.equal(attempt.validation.ok, false);
+  if (attempt.validation.ok) return;
+  assert.ok(attempt.validation.errors.some((error) => error.includes('poster or nomination-form')));
+  assert.ok(attempt.validation.errors.some((error) => error.includes("record keeper's term")));
+
+  const quoted = validateEnrichmentResponse(
+    baseSubject(),
+    ['business'],
+    validResponse({
+      summary: atMinimumSummary(
+        'The nomination calls the shop "a trailblazer among Negro businesses." ' +
+          LONG_ENOUGH_SUMMARY,
+      ).slice(0, 900),
+    }),
+  );
+  assert.equal(quoted.validation.ok, true);
+});

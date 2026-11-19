@@ -14,6 +14,8 @@
  * provides manual place search), not request errors.
  */
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
+import { integritySatisfiesRateLimitGate } from '@/lib/request-integrity/server';
 import type { fetchCensusAddressGeocode, fetchCensusCoordinatesGeocode } from '@repo/domain';
 import {
   geocodeAddress,
@@ -23,17 +25,6 @@ import {
 } from '../../../lib/geocode/pipeline';
 import type { LocateRequestIntegrityGuard } from './request-integrity-guard';
 import type { createLocateRateLimitGuard } from './rate-limit-guard';
-
-/**
- * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
- * `clientAttested` field name on rate-limit requests).
- */
-function integritySatisfiesRateLimitGate(decision: {
-  readonly verified: boolean;
-  readonly mode: 'monitor' | 'enforce';
-}): boolean {
-  return decision.verified || decision.mode === 'monitor';
-}
 
 export type LocateRouteDependencies = {
   readonly integrityGuard: LocateRequestIntegrityGuard;
@@ -47,12 +38,6 @@ export type LocateRouteDependencies = {
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 const ZIP_ONLY_PATTERN = /^\d{5}(-\d{4})?$/;

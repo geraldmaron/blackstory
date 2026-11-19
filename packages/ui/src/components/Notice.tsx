@@ -1,5 +1,7 @@
 /**
- * Status notice for warning, dispute, and error with mono cue labels (not color-only).
+ * Notice for notes, warnings, disputes, errors and confirmations: an inline note under a 1px rule,
+ * with a cue word so the tone is never carried by color alone. The one notice on the site; do not
+ * add a route-local variant.
  */
 
 import React, { type ReactNode } from 'react';
@@ -12,11 +14,14 @@ import { cx } from '../utils/cx.js';
 void React;
 
 /**
+ * `note` is for information that is not a problem: a privacy explanation or what happens next.
+ * Drawing those as warnings taught readers to skip the warnings that matter.
+ *
  * `success` exists because a confirmation was being drawn as a warning: the submit lead form
  * announced "Lead received" with `tone="warning"`, so a receipt was cued as a problem. It
  * announces politely like the other non-error tones.
  */
-export type NoticeTone = 'warning' | 'dispute' | 'error' | 'success';
+export type NoticeTone = 'note' | 'warning' | 'dispute' | 'error' | 'success';
 
 export type NoticeProps = {
   readonly tone: NoticeTone;
@@ -26,6 +31,7 @@ export type NoticeProps = {
 };
 
 const CUES: Record<NoticeTone, string> = {
+  note: 'Note',
   warning: 'Warning',
   dispute: 'Disputed',
   error: 'Error',

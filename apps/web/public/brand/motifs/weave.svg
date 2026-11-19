@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <g fill="none" stroke="#000" stroke-width="2">
+    <rect x="3" y="3" width="34" height="34" opacity="0.75"/>
+    <rect x="7" y="7" width="26" height="26" opacity="0.55"/>
+    <rect x="12" y="12" width="16" height="16" opacity="1"/>
+    <rect x="43" y="43" width="34" height="34" opacity="0.7"/>
+    <rect x="47" y="46" width="26" height="26" opacity="0.45"/>
+    <rect x="52" y="51" width="16" height="16" opacity="0.9"/>
+    <rect x="83" y="83" width="34" height="34" opacity="0.8"/>
+    <rect x="87" y="87" width="26" height="26" opacity="0.5"/>
+    <rect x="92" y="92" width="16" height="16" opacity="1"/>
+    <rect x="123" y="123" width="34" height="34" opacity="0.7"/>
+    <rect x="127" y="127" width="26" height="26" opacity="0.5"/>
+    <rect x="132" y="132" width="16" height="16" opacity="0.95"/>
+  </g>
+
+  <g fill="#000" opacity="0.35">
+    <polygon points="42,2 78,2 78,38"/>
+    <polygon points="122,38 158,38 158,2"/>
+    <polygon points="42,78 42,42 78,78"/>
+    <polygon points="82,42 118,42 118,78"/>
+    <polygon points="2,82 38,82 38,118"/>
+    <polygon points="122,82 158,82 122,118"/>
+    <polygon points="42,122 78,122 78,158"/>
+  </g>
+
+  <g fill="none" stroke="#000" stroke-width="1.5">
+    <line x1="42" y1="2" x2="78" y2="38" opacity="0.9"/>
+    <line x1="122" y1="38" x2="158" y2="2" opacity="0.75"/>
+    <line x1="42" y1="78" x2="78" y2="42" opacity="0.85"/>
+    <line x1="82" y1="42" x2="118" y2="78" opacity="0.8"/>
+    <line x1="2" y1="82" x2="38" y2="118" opacity="0.9"/>
+    <line x1="122" y1="118" x2="158" y2="82" opacity="0.7"/>
+    <line x1="42" y1="122" x2="78" y2="158" opacity="0.9"/>
+  </g>
+
+  <g fill="#000">
+    <rect x="83" y="3" width="33" height="5" opacity="0.8"/>
+    <rect x="84" y="10" width="31" height="5" opacity="0.55"/>
+    <rect x="82" y="17" width="34" height="5" opacity="1"/>
+    <rect x="85" y="24" width="29" height="5" opacity="0.4"/>
+    <rect x="3" y="43" width="5" height="33" opacity="0.75"/>
+    <rect x="10" y="42" width="5" height="34" opacity="0.5"/>
+    <rect x="17" y="44" width="5" height="31" opacity="0.9"/>
+    <rect x="24" y="43" width="5" height="33" opacity="0.4"/>
+    <rect x="123" y="43" width="5" height="32" opacity="0.65"/>
+    <rect x="130" y="42" width="5" height="34" opacity="0.95"/>
+    <rect x="137" y="44" width="5" height="31" opacity="0.5"/>
+    <rect x="144" y="43" width="5" height="33" opacity="0.8"/>
+    <rect x="3" y="123" width="33" height="5" opacity="0.65"/>
+    <rect x="4" y="130" width="31" height="5" opacity="0.95"/>
+    <rect x="2" y="137" width="34" height="5" opacity="0.5"/>
+    <rect x="6" y="144" width="29" height="5" opacity="0.8"/>
+    <rect x="82" y="123" width="34" height="5" opacity="0.7"/>
+    <rect x="84" y="130" width="31" height="5" opacity="0.45"/>
+    <rect x="83" y="137" width="33" height="5" opacity="1"/>
+    <rect x="86" y="144" width="29" height="5" opacity="0.55"/>
+  </g>
+
+  <g fill="none" stroke="#000" stroke-width="1.2" stroke-dasharray="3 4">
+    <line x1="4" y1="38.5" x2="35" y2="38.5" opacity="0.6"/>
+    <line x1="44" y1="38.5" x2="75" y2="38.5" opacity="0.45"/>
+    <line x1="84" y1="38.5" x2="115" y2="38.5" opacity="0.7"/>
+    <line x1="124" y1="38.5" x2="155" y2="38.5" opacity="0.5"/>
+    <line x1="38.5" y1="44" x2="38.5" y2="75" opacity="0.55"/>
+    <line x1="78.5" y1="4" x2="78.5" y2="35" opacity="0.7"/>
+    <line x1="118.5" y1="44" x2="118.5" y2="75" opacity="0.45"/>
+    <line x1="4" y1="78.5" x2="35" y2="78.5" opacity="0.5"/>
+    <line x1="84" y1="78.5" x2="115" y2="78.5" opacity="0.65"/>
+    <line x1="124" y1="78.5" x2="155" y2="78.5" opacity="0.45"/>
+    <line x1="38.5" y1="84" x2="38.5" y2="155" opacity="0.6"/>
+    <line x1="78.5" y1="124" x2="78.5" y2="155" opacity="0.5"/>
+    <line x1="118.5" y1="84" x2="118.5" y2="115" opacity="0.7"/>
+  </g>
+</svg>

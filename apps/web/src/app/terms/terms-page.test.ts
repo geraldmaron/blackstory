@@ -33,10 +33,10 @@ const proseLines = sectionsSource
   .filter((line) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'));
 const proseFlat = proseLines.join('\n').replace(/\s+/g, ' ');
 
-test('terms is a room on the walk, with the shared way back', () => {
-  assert.match(pageSource, /WalkOffRamp/);
+test('terms is a room on the walk, and ends without the BlackStory off-ramp card', () => {
+  assert.doesNotMatch(pageSource, /WalkOffRamp/);
   assert.match(pageSource, /<TermsSections \/>/);
-  assert.match(pageSource, /pathname="\/terms"/);
+  assert.match(pageSource, /parentCrumb\('\/terms'\)/);
   assert.doesNotMatch(pageSource, /Open the Atlas|ATLAS_INSTRUMENT/);
   assert.doesNotMatch(pageSource, /['"`]\/design-system/);
 });
@@ -90,8 +90,8 @@ test('the license section states the facts/expression line and carves out third 
 });
 
 test('the copyright window is the modeled one, and no agent is implied', () => {
-  assert.match(sectionsSource, /ACKNOWLEDGEMENT_HOURS = 72/);
-  assert.match(sectionsSource, /RESOLUTION_DAYS = 30/);
+  assert.match(sectionsSource, /ACKNOWLEDGEMENT_HOURS = TAKEDOWN_ACKNOWLEDGEMENT_SLA_HOURS/);
+  assert.match(sectionsSource, /RESOLUTION_DAYS = TAKEDOWN_RESOLUTION_SLA_DAYS/);
   assert.match(flat, /I acknowledge a copyright complaint within \{ACKNOWLEDGEMENT_HOURS\} hours/);
   assert.match(flat, /reach a decision within \{RESOLUTION_DAYS\} days/);
   assert.match(flat, /Material found to be infringing is removed\./);

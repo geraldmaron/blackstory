@@ -6,17 +6,13 @@ import { fileURLToPath } from 'node:url';
 import { readDesignTokens, renderTokensModule } from './design-tokens-lib.mjs';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '../src/design/generated/tokens.ts');
-const raw = renderTokensModule(readDesignTokens());
-writeFileSync(OUT, raw);
-execFileSync('npx', ['prettier', '--write', OUT], { stdio: 'ignore' });
+const tokens = readDesignTokens();
 if (process.argv.includes('--check')) {
-  // Re-render and compare the formatted result with what is on disk.
-  const formatted = readFileSync(OUT, 'utf8');
-  console.log(
-    formatted.includes(readDesignTokens().meta.sourceSha256)
-      ? 'design tokens up to date'
-      : 'design tokens stale',
-  );
-} else {
-  console.log(`wrote ${OUT}`);
+  // Check before writing: the committed file must carry the hash of today's source.
+  const fresh = readFileSync(OUT, 'utf8').includes(tokens.meta.sourceSha256);
+  console.log(fresh ? 'design tokens up to date' : 'design tokens stale');
+  process.exit(fresh ? 0 : 1);
 }
+writeFileSync(OUT, renderTokensModule(tokens));
+execFileSync('npx', ['prettier', '--write', OUT], { stdio: 'ignore' });
+console.log(`wrote ${OUT}`);

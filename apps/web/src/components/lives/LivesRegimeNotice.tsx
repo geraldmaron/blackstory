@@ -19,10 +19,10 @@ export type LivesRegimeNoticeProps = {
 export function LivesRegimeNotice({ decade }: LivesRegimeNoticeProps) {
   const boundary = BOUNDARY_COPY[decade.boundaryFromPrevious];
   return (
-    <aside className="lives-regime" aria-label={`How class is measured in the ${decade.label}`}>
-      <p className="lives-regime__label">{decade.classLabel}</p>
+    <div className="lives-regime">
+      <p className="lives-regime__title">{decade.classLabel}</p>
       <p>{decade.regimeDescription.readerNote}</p>
       {boundary ? <p className="lives-regime__boundary">{boundary}</p> : null}
-    </aside>
+    </div>
   );
 }

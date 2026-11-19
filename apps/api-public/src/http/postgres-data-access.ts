@@ -12,7 +12,9 @@ import {
   storiesCiting,
   type CitesEdgeIndex,
 } from '@repo/domain/publication/cites-edge';
-import type { PublicSearchProjectionDoc } from '@repo/schemas';
+import type { PublicSearchProjectionDoc, PublicStoryProjectionDoc } from '@repo/schemas';
+import { storyV1Schema, type StoryV1 } from '@repo/public-contracts/v1/story';
+import { toStoryV1 } from './story-mapping.js';
 import type { CanonicalSearchQuery } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
 import type { PublicDataAccessReaders, ReleasePointer, SearchPage } from './data-access.js';
@@ -152,6 +154,18 @@ export function createPostgresDataAccessReaders(
     string,
     { readonly value: CitesEdgeIndex; readonly expiresAtMs: number }
   >();
+  // The release's stories, already mapped to the wire contract. Both the cites edge and
+  // `/v1/stories` read this, so one release costs one story scan however it is reached.
+  const storiesCache = new Map<
+    string,
+    {
+      readonly value: {
+        readonly docs: readonly PublicStoryProjectionDoc[];
+        readonly wire: readonly StoryV1[];
+      };
+      readonly expiresAtMs: number;
+    }
+  >();
   let activeReleaseMemo:
     { readonly value: ActiveReleaseResult; readonly expiresAtMs: number } | undefined;
   const singleFlight = createSingleFlight();
@@ -223,6 +237,30 @@ export function createPostgresDataAccessReaders(
    * missing its story links is worse than ideal, a record that 500s because the story table is
    * unreachable is unacceptable — the same posture web's `resolveCitesEdgeIndex` takes.
    */
+  /**
+   * The release's stories, read once per release. Throws when the read fails; callers choose how
+   * to degrade. A story that maps to something the wire contract rejects is left off `wire` (and
+   * logged) rather than costing every reader the list.
+   */
+  async function storiesCached(releaseId: string) {
+    const hit = readReleaseCache(storiesCache, releaseId);
+    if (hit) return hit;
+    return singleFlight(`stories:${releaseId}`, async () => {
+      const raced = readReleaseCache(storiesCache, releaseId);
+      if (raced) return raced;
+      const docs = await listPublicReleaseStories(releaseId, runQuery);
+      const wire: StoryV1[] = [];
+      for (const doc of docs) {
+        const parsed = storyV1Schema.safeParse(toStoryV1(doc));
+        if (parsed.success) wire.push(parsed.data);
+        else console.warn(`[api-public] story ${doc.slug} failed the v1 contract; not served`);
+      }
+      const value = { docs, wire };
+      writeReleaseCache(storiesCache, releaseId, value);
+      return value;
+    });
+  }
+
   async function citesEdgeCached(releaseId: string): Promise<CitesEdgeIndex> {
     const hit = readReleaseCache(citesEdgeCache, releaseId);
     if (hit) return hit;
@@ -231,7 +269,7 @@ export function createPostgresDataAccessReaders(
       if (raced) return raced;
       let value: CitesEdgeIndex = {};
       try {
-        value = buildCitesEdge(await listPublicReleaseStories(releaseId, runQuery));
+        value = buildCitesEdge((await storiesCached(releaseId)).docs);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.warn(
@@ -277,6 +315,10 @@ export function createPostgresDataAccessReaders(
       if (!mapped) return undefined;
       const hydrated = await hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
       return withCitingStories(hydrated, await citesEdgeCached(releaseId));
+    },
+
+    async readStories(releaseId): Promise<readonly StoryV1[]> {
+      return (await storiesCached(releaseId)).wire;
     },
 
     async readEntityRedirect(releaseId, entityId): Promise<string | undefined> {

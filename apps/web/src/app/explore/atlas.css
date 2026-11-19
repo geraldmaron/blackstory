@@ -1,38 +1,25 @@
 /**
- * Explore surface chrome: the layers the instruments float in, and the two small pieces that have
- * no component of their own (the spotlight mask and the camera readout).
+ * Explore's surface layer: how the chrome sits over the persistent map plate, and the two small
+ * pieces with no component of their own (the spotlight mask and the camera readout). The column,
+ * the histogram dock and the sheet are explore-column.css; the controls are map-controls.css.
  *
- * Everything here is `position: fixed` over the persistent map plate. The page itself does not
- * scroll in Explore mode: the map is the document.
+ * Everything here is `position: fixed` over the plate. The page itself does not scroll in Explore:
+ * the map is the document.
  */
 
 /*
  * The shell layers between the plate and Explore.
  *
- * `.ds-map-stage` and the Explore locator underlay sit at `--ds-z-map-plate` (0). `.ds-atlas`
- * sits at `--ds-z-content` (1) so Lens / Record sheet / Records / Timeline / Camera always paint
- * above pins (HTML first-paint discs and MapLibre markers alike). Until `.ds-map-stage` carries
- * `data-plate-ready`, the underlay is the first-paint picture (taps on its pins only). After handoff
- * the underlay is `pointer-events: none` and gaps on this wrapper pass pan/zoom to the plate.
- *
- * `pointer-events` is not inherited. A transparent child still leaves its auto parent as the
- * hit target. `.ds-shell` and `.ds-shell-body` fill the viewport on the instrument, so they
- * swallowed wheel, drag and pinch after only the inner wrappers were made transparent — hover
- * and touch on the map itself did nothing. Every covering ancestor has to pass through.
- *
- * Without the pointer-events pass-through, the route wrapper consumed every click aimed at the
- * map — pins were unselectable and the camera could not be panned by hand.
- *
- * Scoped with `:has(.ds-atlas)` so only Explore makes these wrappers transparent. On the reading
- * and utility rooms the same wrappers carry scrolling text, and explore.css's standing warning
- * applies there: a text column over the live plate must keep its own events, or a swipe pans the
- * map instead of the document.
+ * `.ds-atlas` sits at `--ds-z-content` (1) so the column, histogram and controls always paint above
+ * the pins. `pointer-events` is not inherited, and a transparent child still leaves its parent as
+ * the hit target, so every covering ancestor passes through or the map takes no wheel, drag or
+ * pinch. Scoped with `:has(.ds-atlas)`: on reading rooms the same wrappers carry scrolling text and
+ * must keep their own events.
  */
 .ds-shell:has(.ds-atlas),
 .ds-shell:has(.ds-atlas) .ds-shell-body,
 .ds-shell-page-transition:has(.ds-atlas),
-.ds-shell-page-transition:has(.ds-atlas) .ds-shell-page-transition__content,
-.ds-map-surface:has(.ds-atlas) {
+.ds-shell-page-transition:has(.ds-atlas) .ds-shell-page-transition__content {
   pointer-events: none;
 }
 
@@ -41,7 +28,7 @@
   pointer-events: auto;
 }
 
-/* Door browse morph keeps the room CommandBar; re-enable hits the shell zeroed above. */
+/* The site header on the Door browse posture re-enables hits the shell zeroed above. */
 .ds-shell:has(.ds-atlas--embedded) > .ds-bar,
 .ds-shell:has(.ds-atlas--embedded) .ds-bar {
   pointer-events: auto;
@@ -50,53 +37,25 @@
 .ds-atlas {
   position: relative;
   z-index: var(--ds-z-content);
-  /*
-   * The plate is underneath this element, and this element covers the viewport. Without this the
-   * container itself took every click, drag and wheel event over the map: pins could not be
-   * selected and the camera could not be panned by hand, because nothing the reader aimed at the
-   * map ever reached the canvas. Instruments are `position: fixed` children; the layer passes
-   * everything else through to the plate.
-   */
+  /* The layer covers the viewport and passes everything through to the plate; only its
+     interactive children opt back in. */
   pointer-events: none;
 }
 
-/*
- * Interactive instrument surfaces only. Full-bleed pass-through chrome (annotation, spotlight,
- * camera readout) and the toast stack keep `pointer-events: none` from this parent so map
- * pan/zoom reaches the plate in the gaps. Do not blanket `.ds-atlas > * { auto }` — that
- * overrides toast-stack's none/auto split and any future full-bleed decorative layer.
- */
+/* Interactive chrome only. Do not blanket `.ds-atlas > * { auto }`: it would override the toast
+   stack's own none/auto split and any full-bleed decorative layer. */
 .ds-atlas > .ds-bar,
-.ds-atlas > .ds-lens,
-.ds-atlas > .ds-results,
-.ds-atlas > .ds-sheet,
-.ds-atlas > .ds-time-panel,
-.ds-atlas > .ds-camera,
-.ds-atlas > .ds-atlas__dock,
+.ds-atlas > .ds-xcol,
+.ds-atlas > .ds-xdock,
+.ds-atlas > .ds-map-controls,
 .ds-atlas > .ds-atlas__notice,
-.ds-atlas > .ds-atlas__legend-overlay,
-.ds-atlas > .ds-story,
 .ds-atlas > .ds-palette,
 .ds-atlas > .ds-shortcuts,
-.ds-atlas > .ds-saved,
-.ds-atlas > .ds-sheet-presence > .ds-lens,
-.ds-atlas > .ds-sheet-presence > .ds-results,
-.ds-atlas > .ds-sheet-presence > .ds-sheet,
-.ds-atlas > .ds-sheet-presence > .ds-time-panel,
-.ds-atlas > .ds-sheet-presence > .ds-camera {
+.ds-atlas > .ds-saved {
   pointer-events: auto;
 }
 
-/* `SheetPresence`'s wrapper: no box of its own, so each sheet lays out as a direct child would. */
-.ds-sheet-presence {
-  display: contents;
-}
-
-/*
- * Explicit none for layers drawn over the plate but not aimed at. Redundant with the parent
- * rule; kept so a future blanket child rule cannot silently re-block the map (equal
- * specificity used to let stylesheet order decide, and the blanket auto won).
- */
+/* Layers drawn over the plate but never aimed at. */
 .ds-atlas > .ds-annotation,
 .ds-atlas > .ds-atlas__spotlight,
 .ds-atlas > .ds-atlas__readout,
@@ -104,7 +63,7 @@
   pointer-events: none;
 }
 
-/* Chrome hidden (`\`): the instruments go, the bar stays but recedes. §7. */
+/* Chrome hidden (`\`): the column and controls go, the bar stays but recedes. */
 .ds-atlas[data-chrome='hidden'] .ds-bar {
   opacity: 0.15;
   transition: opacity var(--ds-duration-base) var(--ds-easing);
@@ -115,19 +74,25 @@
   opacity: 1;
 }
 
+/* The map could not start: the notice sits over the map, clear of the column. */
 .ds-atlas__notice {
   position: fixed;
-  top: var(--ds-atlas-top);
-  left: 50%;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-4));
+  right: var(--ds-space-4);
+  left: calc(var(--ds-xcol-w, 380px) + var(--ds-space-4));
   z-index: var(--ds-z-atlas-search);
-  transform: translateX(-50%);
-  width: min(560px, calc(100vw - var(--ds-space-4) * 2));
+  max-width: 560px;
+}
+
+@media (max-width: 63.9375rem) {
+  .ds-atlas__notice {
+    left: var(--ds-space-4);
+  }
 }
 
 /*
- * Spotlight, z 6. A radial mask over a canvas-colored plate: everything outside the focus radius
- * dims. It is not a camera move and does not touch the map, which is why the reader can spotlight
- * a region without losing their bearings.
+ * Spotlight: a radial mask over a canvas-colored plate, so everything outside the focus dims. It is
+ * not a camera move and does not touch the map.
  */
 .ds-atlas__spotlight {
   position: fixed;
@@ -144,622 +109,8 @@
   );
 }
 
-/*
- * Camera readout, bottom-left. Transient, `role="status"`. §5.7.
- *
- * It used to sit centered above the time panel, which is dead center of the plate — the one place
- * a reader is looking. It is plate metadata, so it joins the plate's own metadata corner: stacked
- * above the dock chips and the attribution, all three on the same left gutter.
- */
-.ds-atlas__readout {
-  position: fixed;
-  left: var(--ds-space-4);
-  bottom: calc(var(--ds-space-4) + 86px);
-  z-index: var(--ds-z-atlas-pill);
-  margin: 0;
-  padding: 5px 11px;
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-border);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  color: var(--ds-ink);
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity var(--ds-duration-fast) var(--ds-easing);
-}
-
-/* Empty readout collapses rather than sitting as a blank pill. */
-.ds-atlas__readout:empty {
-  opacity: 0;
-}
-
-/*
- * Dock, bottom left: chips to restore a hidden panel (§5.7). It sits above the attribution rather
- * than beside it — both belong bottom-left, but attribution is a license obligation that has to
- * stay legible, so the dock yields the corner.
- */
-.ds-atlas__dock {
-  position: fixed;
-  left: var(--ds-space-4);
-  bottom: calc(var(--ds-space-4) + 34px);
-  z-index: var(--ds-z-atlas-instruments);
-  display: flex;
-  gap: var(--ds-space-2);
-}
-
-/*
- * 44px, not the 30px this used to be. These chips are the only way back to a hidden instrument,
- * they sit in the bottom corner where a thumb naturally lands, and they are most often reached on
- * the narrow layout that docks both panels by default. A 30px target there is a miss waiting to
- * happen on the one control that undoes the reader's last action.
- */
-.ds-atlas__dock button {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  min-height: 44px;
-  min-width: 44px;
-  padding: var(--ds-space-1) var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-surface);
-  color: var(--ds-ink);
-  font-family: inherit;
-  font-size: 0.75rem;
-  cursor: pointer;
-}
-
-.ds-atlas__dock button:hover {
-  border-color: var(--ds-border-strong);
-}
-
-.ds-atlas__dock button:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-/*
- * A chip whose instrument is on screen. Every dock chip is a toggle now, so the wide layout needs
- * the same pressed reading the narrow switcher has: without it the Filters chip looked identical
- * open and shut and the reader could not tell which way pressing it would go. Copper is doing
- * navigational work here (which instrument am I holding), which is what it is for.
- */
-.ds-atlas__dock:not([data-switcher]) button[aria-pressed='true'] {
-  background: var(--ds-surface-raised);
-  border-color: var(--ds-accent-graphic);
-  color: var(--ds-accent);
-}
-
-.ds-atlas__dock:not([data-switcher]) button[aria-pressed='true'] .ds-atlas__dock-detail {
-  color: inherit;
-}
-
-.ds-atlas__dock-label {
-  line-height: 1;
-}
-
-/* The peek — what a hidden Lens/Results still says about itself while closed: filter and result
-   counts, so the chip is a live instrument reading, not just a label that remembers a name. */
-.ds-atlas__dock-detail {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  line-height: 1;
-  color: var(--ds-ink-muted);
-}
-
-/*
- * The narrow layout's four-way switcher. Not a row of loose chips but one bar holding four
- * segments, because here the dock is not "restore what you hid" — it is the only control that
- * says which instrument the reader is currently holding, so it has to read as a set with one
- * member selected.
- */
-.ds-atlas__dock[data-switcher] {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2px;
-  padding: 4px;
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-}
-
-.ds-atlas__dock[data-switcher] button {
-  min-width: 0;
-  padding: 0 var(--ds-space-2);
-  border: 0;
-  border-radius: calc(var(--ds-radius-md) - 4px);
-  background: transparent;
-  color: var(--ds-ink-muted);
-}
-
-.ds-atlas__dock[data-switcher] button[aria-pressed='true'] {
-  background: var(--ds-surface-raised);
-  color: var(--ds-accent);
-  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent-graphic);
-  font-weight: 500;
-}
-
-.ds-atlas__dock[data-switcher] button[aria-pressed='true'] .ds-atlas__dock-detail {
-  color: inherit;
-}
-
-@media (max-width: 819px), (max-height: 559px) {
-  .ds-atlas__readout {
-    left: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 96px);
-  }
-
-  /* The dock is the narrow layout's instrument switcher, so it takes the bottom edge itself —
-     but still clears the basemap attribution (compact "i"/"N" control) so that control cannot
-     sit on top of Filters and steal the tap. */
-  .ds-atlas__dock {
-    left: var(--ds-space-2);
-    right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 28px);
-  }
-
-  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
-    bottom: 0.35rem;
-    z-index: var(--ds-z-content);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .ds-atlas__readout,
   .ds-atlas[data-chrome='hidden'] .ds-bar {
-    transition-duration: 0.01ms;
-  }
-}
-
-/*
- * "Show the legend" overlay (§5.2, §7 quality-of-life "Color key ... palette and the record
- * sheet"). Sits at the palette/overlays tier (z 90): it is a reader-summoned reference panel over
- * the instruments, not a floating instrument of its own.
- */
-.ds-atlas__legend-overlay {
-  position: fixed;
-  right: var(--ds-space-4);
-  top: var(--ds-atlas-top);
-  bottom: var(--ds-space-4);
-  z-index: var(--ds-z-modal-sheet);
-  width: min(360px, calc(100vw - var(--ds-space-4) * 2));
-  overflow-y: auto;
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  padding: var(--ds-space-4);
-}
-
-@media (max-width: 819px), (max-height: 559px) {
-  .ds-atlas__legend-overlay {
-    left: var(--ds-space-2);
-    right: var(--ds-space-2);
-    width: auto;
-  }
-}
-
-/*
- * The three dead attributes (§7 quality-of-life: Density `⌥D`, Motion `M`). `useCommandContext`
- * already flips `document.documentElement.dataset.density` / `.motion` on keypress; until this
- * rule existed nothing read the attribute back, so the keys changed a DOM property and nothing
- * else. Density rescales instrument spacing and the two rail widths (§5.2/§5.3's compact
- * measurements). Motion kills the ambient camera readout fade and chrome-hidden transition,
- * while leaving functional transitions (panel show/hide, the spotlight mask) intact — the same
- * split `prefers-reduced-motion` already draws, just reader-chosen instead of OS-chosen.
- */
-:root[data-density='compact'] .ds-lens {
-  width: 276px;
-}
-
-:root[data-density='compact'] .ds-results {
-  width: 316px;
-}
-
-:root[data-density='compact'] .ds-lens__group {
-  padding-block: calc(var(--ds-space-3) * 0.75);
-}
-
-:root[data-density='compact'] .ds-results__row {
-  height: 46px;
-}
-
-:root[data-density='compact'] .ds-atlas__dock button {
-  min-height: 38px;
-  min-width: 38px;
-}
-
-:root[data-motion='calm'] .ds-atlas__readout,
-:root[data-motion='calm'] .ds-atlas[data-chrome='hidden'] .ds-bar {
-  transition-duration: 0.01ms;
-}
-
-:root[data-motion='calm'] .ds-atlas__spotlight {
-  transition-duration: 0.01ms;
-}
-
-/*
- * Before the catalog arrives (`AtlasLoader`): the plate is already on screen underneath, so the
- * pending state is one small status pill where the camera readout normally sits, not a blank
- * page. The error state reuses the design-system notice, centered, and is the only interactive
- * child, so it takes its events back the same way every instrument does.
- */
-.ds-atlas--pending .ds-atlas__pending {
-  pointer-events: auto;
-}
-
-.ds-atlas--pending .ds-notice {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--ds-space-4) + 86px);
-  transform: translateX(-50%);
-  z-index: var(--ds-z-atlas-pill);
-  max-width: min(32rem, calc(100vw - 2 * var(--ds-space-4)));
-}
-
-/*
- * Compact polish, shared by every instrument sheet (Filters, Records, When, View, the record).
- *
- * - Sheets rise from the dock, so their dismiss chevrons point down — the direction they leave
- *   in. They used to keep the desktop's left/right arrows while sliding vertically.
- * - The dock and the sheets clear the home indicator on notched phones.
- */
-@media (max-width: 819px), (max-height: 559px) {
-  .ds-lens,
-  .ds-results,
-  .ds-time-panel,
-  .ds-camera,
-  .ds-sheet {
-    /* `backwards`, not `both`: a fill that held `transform: none` after the rise would outrank
-       the inline transform the sheet drag writes, and the sheet would not follow the finger. */
-    animation: ds-compact-sheet-rise var(--ds-duration-base) var(--ds-easing) backwards;
-    box-shadow: 0 -8px 28px rgb(0 0 0 / 0.22);
-  }
-
-  .ds-lens__hide svg {
-    transform: rotate(-90deg);
-  }
-
-  .ds-results__hide svg {
-    transform: rotate(90deg);
-  }
-
-  .ds-atlas__dock {
-    bottom: calc(var(--ds-space-2) + 28px + env(safe-area-inset-bottom, 0px));
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-  }
-}
-
-/*
- * Leaving (`SheetPresence`): the sheet goes the way it came, down past the bottom edge, rather than
- * vanishing in one frame. No `from` keyframe — it starts wherever the sheet is, so a sheet dragged
- * part-way down carries on from under the finger.
- */
-@media (max-width: 819px), (max-height: 559px) {
-  .ds-sheet-presence[data-presence='leaving']
-    > :is(.ds-lens, .ds-results, .ds-time-panel, .ds-camera, .ds-sheet) {
-    animation: ds-compact-sheet-leave calc(var(--ds-duration-base) * 0.75)
-      cubic-bezier(0.4, 0, 1, 1) forwards;
-  }
-}
-
-@keyframes ds-atlas-peek-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes ds-compact-sheet-leave {
-  to {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-}
-
-@keyframes ds-compact-sheet-rise {
-  from {
-    transform: translateY(16px);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-
-/*
- * A phone on its side (short and wide). A bottom sheet would leave a sliver of map, so the one
- * open instrument becomes a left-hand column under the bar instead, the dock stays along the
- * bottom-right, and the map keeps the right ~55%.
- */
-@media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
-  .ds-lens,
-  .ds-results,
-  .ds-time-panel,
-  .ds-camera,
-  .ds-sheet {
-    top: calc(var(--ds-island-clearance, 72px) + var(--ds-space-2));
-    bottom: var(--ds-space-2);
-    left: calc(var(--ds-space-2) + env(safe-area-inset-left, 0px));
-    right: auto;
-    width: min(360px, 45vw);
-    max-height: none;
-    border-radius: var(--ds-radius-md);
-    transform: none;
-    animation-name: ds-compact-sheet-slide;
-  }
-
-  .ds-lens__hide svg {
-    transform: none;
-  }
-
-  .ds-results__hide svg {
-    transform: rotate(180deg);
-  }
-
-  .ds-atlas__dock {
-    left: auto;
-    right: calc(var(--ds-space-2) + env(safe-area-inset-right, 0px));
-    bottom: calc(var(--ds-space-2) + env(safe-area-inset-bottom, 0px));
-    width: auto;
-  }
-
-  .ds-atlas[data-sheet-open='true'] .ds-atlas__dock {
-    left: calc(min(360px, 45vw) + var(--ds-space-4));
-    right: auto;
-  }
-}
-
-@media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
-  .ds-sheet-presence[data-presence='leaving']
-    > :is(.ds-lens, .ds-results, .ds-time-panel, .ds-camera, .ds-sheet) {
-    animation-name: ds-compact-sheet-unslide;
-  }
-}
-
-@keyframes ds-compact-sheet-unslide {
-  to {
-    transform: translateX(-16px);
-    opacity: 0;
-  }
-}
-
-@keyframes ds-compact-sheet-slide {
-  from {
-    transform: translateX(-16px);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-lens,
-  .ds-results,
-  .ds-time-panel,
-  .ds-camera,
-  .ds-sheet {
-    animation: none !important;
-  }
-}
-
-/*
- * Tablet widths (820–1149px): the time panel spans nearly the whole bottom edge, so the dock and the
- * camera readout used to sit on top of its histogram. They ride above it instead whenever it is up.
- */
-@media (min-width: 820px) and (max-width: 1149px) and (min-height: 560px) {
-  /* Right-aligned: the Filters panel runs down the left edge to the same height. */
-  .ds-atlas:has(> .ds-time-panel) .ds-atlas__dock,
-  .ds-atlas:has(> .ds-sheet-presence > .ds-time-panel) .ds-atlas__dock {
-    left: auto;
-    right: var(--ds-space-4);
-    bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3));
-  }
-
-  .ds-atlas:has(> .ds-time-panel) .ds-atlas__readout,
-  .ds-atlas:has(> .ds-sheet-presence > .ds-time-panel) .ds-atlas__readout {
-    bottom: calc(var(--ds-space-4) + 139px + var(--ds-space-3) + 56px);
-  }
-}
-
-/*
- * Draggable sheets (use-compact-sheet-drag.ts), compact portrait only: a grab bar on top, the
- * header is the handle, and a sheet dragged up opens to the full height under the bar.
- */
-@media (max-width: 819px) and (min-height: 560px) {
-  .ds-lens,
-  .ds-results,
-  .ds-time-panel,
-  .ds-camera,
-  .ds-sheet {
-    padding-top: 14px;
-    transition: max-height var(--ds-duration-base) var(--ds-easing);
-  }
-
-  .ds-lens::before,
-  .ds-results::before,
-  .ds-time-panel::before,
-  .ds-camera::before,
-  .ds-sheet::before {
-    content: '';
-    position: absolute;
-    top: 6px;
-    left: 50%;
-    width: 36px;
-    height: 4px;
-    margin-left: -18px;
-    border-radius: var(--ds-radius-full);
-    background: var(--ds-border-strong);
-    pointer-events: none;
-  }
-
-  .ds-lens__head,
-  .ds-results__head,
-  .ds-time-panel__header,
-  .ds-camera__head,
-  .ds-sheet__top {
-    touch-action: none;
-    cursor: grab;
-  }
-
-  .ds-lens[data-detent='full'],
-  .ds-results[data-detent='full'],
-  .ds-time-panel[data-detent='full'],
-  .ds-camera[data-detent='full'],
-  .ds-sheet[data-detent='full'] {
-    max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-dock-clearance) - 32px);
-  }
-}
-
-/*
- * Phone, portrait: the tab bar owns the bottom edge (tab-bar.css, `--ds-tabbar-h`), so Explore's
- * own controls are laid out the way map apps lay them out around a tab bar (Google Maps):
- *
- *   - Filters / When / View are a row of chips under the search bar.
- *   - Records is a peek bar just above the tabs — the closed results sheet showing its count —
- *     and pressing or dragging it opens the sheet over the map.
- *   - Every sheet rises from just above the tabs; the map controls and the attribution sit above
- *     the peek.
- *
- * This replaces a four-way switcher pinned to the bottom edge, which would now sit on top of the
- * tab bar, with a second row of "Records" meaning something different from the Records tab.
- */
-@media (max-width: 819px) and (min-height: 560px) {
-  :root:root {
-    --ds-atlas-dock-clearance: calc(var(--ds-tabbar-h) + var(--ds-space-2));
-    --ds-atlas-top: calc(var(--ds-island-clearance, 72px) + 44px);
-  }
-
-  .ds-atlas__dock[data-switcher] {
-    top: var(--ds-island-clearance, 72px);
-    right: 0;
-    bottom: auto;
-    left: 0;
-    display: flex;
-    gap: var(--ds-space-2);
-    padding: 0 var(--ds-space-3);
-    background: none;
-    border: 0;
-    border-radius: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .ds-atlas__dock[data-switcher]::-webkit-scrollbar {
-    display: none;
-  }
-
-  .ds-atlas__dock[data-switcher] button {
-    flex: 0 0 auto;
-    flex-direction: row;
-    gap: 6px;
-    min-height: 36px;
-    padding: 0 var(--ds-space-3);
-    color: var(--ds-ink);
-    background: var(--ds-surface);
-    border: var(--ds-border-width) solid var(--ds-border);
-    border-radius: var(--ds-radius-full);
-    font-size: 0.8125rem;
-  }
-
-  .ds-atlas__dock[data-switcher] button[aria-pressed='true'] {
-    color: var(--ds-accent);
-    background: var(--ds-surface-raised);
-    border-color: var(--ds-accent-graphic);
-  }
-
-  /* Records: the results sheet's peek, docked above the tabs. Hidden while the sheet is up. */
-  .ds-atlas__dock[data-switcher] button[data-dock='results'] {
-    position: fixed;
-    right: var(--ds-space-2);
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
-    left: var(--ds-space-2);
-    justify-content: center;
-    min-height: 44px;
-    border-radius: var(--ds-radius-md);
-  }
-
-  /* Hidden while any sheet is up: a phone shows one instrument at a time, and the peek would sit
-     on top of that sheet's last rows. */
-  .ds-atlas__dock[data-switcher] button[data-dock='results'][aria-pressed='true'],
-  .ds-atlas[data-sheet-open='true'] .ds-atlas__dock[data-switcher] button[data-dock='results'],
-  .ds-atlas:has(> .ds-sheet-presence[data-presence='leaving'])
-    .ds-atlas__dock[data-switcher]
-    button[data-dock='results'] {
-    display: none;
-  }
-
-  /* …and comes back once the sheet has finished leaving (`SheetPresence`), fading in rather than
-     popping over the space the sheet just left. `data-sheet-open` drops when the sheet starts to
-     leave, so the leaving state above holds the peek back until the sheet is gone. */
-  .ds-atlas__dock[data-switcher] button[data-dock='results'] {
-    animation: ds-atlas-peek-in var(--ds-duration-fast) var(--ds-easing);
-  }
-
-  .ds-map-controls {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-3));
-    /* Open sheet: from above the peek bar to above the sheet's own peek (map-controls.css). */
-    --ds-map-controls-lift: calc(
-      var(--ds-atlas-sheet-peek) + var(--ds-space-2) - 44px - var(--ds-space-3)
-    );
-  }
-
-  .ds-atlas__readout {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-3));
-  }
-
-  .ds-map-stage .maplibregl-ctrl-bottom-left,
-  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 44px + var(--ds-space-2));
-  }
-}
-
-/*
- * A short phone (compact height, under the wide breakpoint) also has the tab bar along its bottom
- * edge (tab-bar.css), slimmed to one row. Everything the compact layouts above anchor to the bottom
- * edge — the dock, the instrument column, the map controls, the readout, the attribution — moves
- * up by the bar's height instead of sitting underneath it.
- */
-@media (max-width: 819px) and (max-height: 559px) {
-  :root:root {
-    --ds-atlas-dock-clearance: calc(var(--ds-tabbar-h) + var(--ds-space-2) * 2 + 28px + 54px);
-  }
-
-  .ds-atlas__dock {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 28px);
-  }
-
-  .ds-atlas__readout {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) + 96px);
-  }
-
-  .ds-map-stage .maplibregl-ctrl-bottom-left,
-  html[data-door-browse='1'] .ds-map-stage .maplibregl-ctrl-bottom-left {
-    bottom: calc(var(--ds-tabbar-h) + 0.35rem);
-  }
-}
-
-@media (max-width: 819px) and (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
-  .ds-lens,
-  .ds-results,
-  .ds-time-panel,
-  .ds-camera,
-  .ds-sheet {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
-  }
-
-  .ds-atlas__dock {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2));
-  }
-
-  /* map-controls.css lifts the controls over the dock; this adds the bar under both. */
-  :root .ds-map-controls {
-    bottom: calc(var(--ds-tabbar-h) + var(--ds-space-2) * 2 + 54px);
+    transition: none;
   }
 }

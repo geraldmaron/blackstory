@@ -7,7 +7,7 @@
  * directly until `@citation-js/core` is wired in `apps/web/package.json`.
  */
 import React from 'react';
-import { Card, Citation } from '@repo/ui';
+import { Citation, Surface } from '@repo/ui';
 import type { FactCitation } from '@repo/domain/facts';
 import { formatIsoDate, humanizeToken } from './format';
 
@@ -43,7 +43,7 @@ export function FactCitationList({ citations, labelledBy }: FactCitationListProp
         const href = citationHref(citation);
         return (
           <li key={citation.csl.id}>
-            <Card
+            <Surface
               title={citationTitle(citation)}
               meta={
                 <span className="ds-mono">
@@ -97,7 +97,7 @@ export function FactCitationList({ citations, labelledBy }: FactCitationListProp
                   </>
                 ) : null}
               </dl>
-            </Card>
+            </Surface>
           </li>
         );
       })}

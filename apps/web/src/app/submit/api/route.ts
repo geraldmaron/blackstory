@@ -7,10 +7,13 @@
  * human-gated step.
  */
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
+import { integritySatisfiesRateLimitGate } from '@/lib/request-integrity/server';
 import { createHash } from 'node:crypto';
 import { createQuarantinedSubmission } from '@repo/security';
 import { saveQuarantinedRecord } from '@/lib/public-data/corrections-store';
 import { requirePrivacyPepper } from '@/lib/web-security';
+import { notify } from '@/lib/notify/notify';
 import { createSubmitLeadRequestIntegrityGuard } from '../request-integrity-guard';
 import { createSubmitLeadRateLimitGuard } from '../rate-limit-guard';
 import { validateLeadSubmission, type LeadSubmissionInput } from '../lead-intake';
@@ -22,12 +25,6 @@ const rateLimitGuard = createSubmitLeadRateLimitGuard();
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 /** Never store a raw client IP as the campaign-detector network token only a keyed hash.  */
@@ -55,9 +52,7 @@ export async function POST(request: Request): Promise<Response> {
   const rateDecision = rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    // Monitor allow-through must satisfy the quota gate; otherwise missing integrity
-    // tokens become fake 429s. Field name remains clientAttested for @repo/security compat.
-    clientAttested: integrityDecision.verified || integrityDecision.mode === 'monitor',
+    clientAttested: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = rateLimitGuard.formatDeniedResponse(rateDecision);
@@ -85,6 +80,18 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     await saveQuarantinedRecord(result.record);
+    // The form promises the email is only for a question about this lead, so only the owner hears.
+    notify({
+      event: 'owner.new_submission',
+      to: 'owner',
+      data: {
+        kind: 'lead',
+        headline: result.record.normalized.title.slice(0, 100),
+        statement: result.record.normalized.statement,
+        id: result.record.id,
+      },
+      idempotencyKey: `owner.new_submission:${result.record.id}`,
+    });
 
     // 202 Accepted: this is a quarantine write, never a confirmation that the lead is public,
     // true, or will ever be researched it only confirms the lead entered the moderated queue.

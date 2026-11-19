@@ -142,8 +142,8 @@ export function publicRecordHref(
 
 /**
  * Explore instrument / search / map pin deep link. Standable records go to Place. Named people open
- * their entity record (the memorial wall is a room, not a substitute for one pin). Statutes go to
- * `/law`, inventions to `/invention`. Door Rest pin walks still use `atlasWalkHref` (stand
+ * their entity record (the memorial wall is a room, not a substitute for one pin). Statutes and
+ * cases open their entity record, inventions go to `/invention`. Door Rest pin walks still use `atlasWalkHref` (stand
  * allowlist) separately.
  */
 export function instrumentRecordHref(
@@ -159,7 +159,9 @@ export function instrumentRecordHref(
   if (isInternalRecordLabel(entity.displayName)) return '';
   if (staysOffPublicMap(entity)) return '';
   if (entity.kind === 'person') return `/entity/${entity.id}`;
-  if (entity.kind === 'law' || entity.kind === 'case') return '/law';
+  // A statute or case has no address of its own on the plate; `/law` is an index, not the record.
+  // `/entity/{id}` always resolves and forwards to the record's own address.
+  if (entity.kind === 'law' || entity.kind === 'case') return `/entity/${entity.id}`;
   // Ahead of `canStandHere`, which admits an invention only because it is not a person and
   // carries a summary. An invention is a work, not a stand.
   if (entity.kind === INVENTION_KIND) return inventionHrefForEntity(entity, collisions);
@@ -207,9 +209,15 @@ export function resolvePlaceSlugFromSearchIndex(
   if (entityId) {
     return docs.some((doc) => doc.id === entityId) ? entityId : undefined;
   }
-  const matches = docs.filter(
+  const named = docs.filter(
     (doc) => !isInternalRecordLabel(doc.displayName) && publicPlaceSlug(doc.displayName) === base,
   );
+  // A renamed record keeps its former name as an alias, so its old address still finds it (the
+  // place page then redirects). A current name always wins the address over a former one.
+  const matches =
+    named.length > 0
+      ? named
+      : docs.filter((doc) => doc.aliases.some((alias) => publicPlaceSlug(alias) === base));
   if (matches.length === 0) return undefined;
   if (matches.length === 1) return matches[0]!.id;
   return [...matches].sort(comparePlaceCandidates)[0]?.id;

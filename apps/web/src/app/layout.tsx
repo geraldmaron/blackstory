@@ -4,7 +4,7 @@
  * Also wires Add to Home Screen metadata (manifest + Apple web app) without a service worker.
  *
  * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Schibsted
- * Grotesk SemiBold for headlines/titles/key statements, Geist for UI and body, Newsreader for
+ * Grotesk for headlines/titles/key statements (800 display, 700 headline, 650 title), Geist for UI and body, Newsreader for
  * editorial longform, Geist Mono for data/citations. All four are variable faces, so no weight
  * list is passed: next/font serves the axis and the type-scale tokens pick weights off it.
  *
@@ -12,12 +12,20 @@
  * from the sans register to the editorial one. An `em` inside a headline still resolves to the
  * editorial italic, which is where real italics live.
  *
- * The wordmark art is unaffected by any of this: the lockup ships as provided and is never
- * retyped in a live face.
+ * The lockup art ships as provided and is never retyped beside the symbol. One exception: the
+ * home headline's last word sets "BlackStory" in the wordmark's type (owner, 2026-11-16). The
+ * art's own face is unknown, so Google Sans Flex, its closest open match, stands in, loaded for
+ * that one word only (no preload).
  */
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { Schibsted_Grotesk, Geist, Newsreader, Geist_Mono } from 'next/font/google';
+import {
+  Schibsted_Grotesk,
+  Geist,
+  Newsreader,
+  Geist_Mono,
+  Google_Sans_Flex,
+} from 'next/font/google';
 import { brandOpenGraph, PRODUCT_NAME } from '@repo/config';
 import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
@@ -43,7 +51,8 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Theme colors for browser chrome and installed home-screen shell.
- * Light/dark follow prefers-color-scheme; site theme toggle is separate.
+ * These are the no-JS values, keyed on prefers-color-scheme; once the shell mounts,
+ * syncThemeColorMeta (SiteShellProviders) repaints them from the site theme on every toggle.
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -77,6 +86,14 @@ const mono = Geist_Mono({
   subsets: ['latin'],
   variable: '--ds-font-mono',
   display: 'swap',
+});
+
+const wordmark = Google_Sans_Flex({
+  subsets: ['latin'],
+  weight: '500',
+  variable: '--ds-font-wordmark',
+  display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -165,7 +182,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${displayFace.variable} ${sans.variable} ${editorial.variable} ${mono.variable}`}
+      className={`${displayFace.variable} ${sans.variable} ${editorial.variable} ${mono.variable} ${wordmark.variable}`}
     >
       <head>
         {/*

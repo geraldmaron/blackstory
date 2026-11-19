@@ -15,12 +15,12 @@
  * silently the moment a paragraph was inserted above them, and inserting paragraphs is what a
  * rewrite of this page does.
  *
- * Contribution cards (`take-part`) are generated from `lib/nav/destination-registry.ts`. The full
- * room catalogue lives on `/rooms`; About hands off there instead of re-listing every room. The
- * previous hardcoded list pointed twice at `/history`, which has been a redirect for months.
+ * About is the hub for the trust pages and forms: both lists (`check`, `take-part`) are generated
+ * from `lib/nav/destination-registry.ts`. The collections live on `/collections`; About hands off
+ * there instead of re-listing them. The previous hardcoded list pointed twice at `/history`,
+ * which has been a redirect for months.
  */
 import { MAKER } from '@repo/config';
-import type { DestinationIconId } from '@repo/public-contracts/destinations';
 import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../methodology/methodology-copy';
 
 /**
@@ -28,7 +28,7 @@ import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../methodology/methodology-copy
  * Do not retype either. Scribe locked the mast; paint imports it.
  */
 export const ABOUT_LINE =
-  'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.';
+  'BlackStory is a place-connected archive of Black history, covering people, places, and events pinned to where they happened, with the source attached to every claim.';
 
 /** Brand support line. Keep on the door under the product name. */
 export const ABOUT_SUPPORT_LINE = 'People. Places. Evidence. Context.';
@@ -37,14 +37,14 @@ export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records a
 
 /** Origin paragraph the door steals. You walk past the place. Do not retype. */
 export const ABOUT_WALK_PAST =
-  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there: a school, a street, a building, a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogs that don't talk to each other.";
+  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there, whether it's a school, a street, a building, or a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogs that don't talk to each other.";
 
 /** Why this exists, in the maker's own voice. Rendered as consecutive paragraphs. */
 export const ABOUT_ORIGIN = [
   "I'm not an institution. I'm one person with a laptop, a stack of evenings, and access to more public records than any generation before mine could have searched in a lifetime.",
   ABOUT_WALK_PAST,
   "I'm not a historian, and I'm not an expert in the software I use to do this. What I have is the means, and enough command of the tools to put history that other people are working to hide in front of more of the people it belongs to. That is the size of the claim, and I would rather state it that small than dress it up.",
-  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I parse and review this in good faith, and I still get things wrong: there is more of it than one person can hold at once. Those mistakes are in the errata with the earlier wording still readable, because a correction you cannot check is just a second assertion.',
+  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I parse and review this in good faith, and I still get things wrong, because there is more of it than one person can hold at once. Those mistakes are in the errata with the earlier wording still readable, because a correction you cannot check is just a second assertion.',
   "This was never going to be finished by one person, and I was never going to be the authority on any of it. I'll do my part for as long as I can. The rest of the work is making this solid enough that somebody else can add to it and trust what they find.",
 ] as const;
 
@@ -72,32 +72,22 @@ export const ABOUT_ON_THE_GROUND =
 
 /** What every record stands on. Rules, stated impersonally. */
 export const ABOUT_PILLARS: readonly {
-  readonly kicker: string;
-  readonly icon: DestinationIconId;
   readonly title: string;
   readonly body: string;
 }[] = [
   {
-    kicker: 'Place',
-    icon: 'place',
     title: 'Every record sits somewhere you can stand',
     body: ABOUT_ON_THE_GROUND,
   },
   {
-    kicker: 'Evidence',
-    icon: 'evidence',
     title: 'Citations, and a grade for how sure the archive is',
-    body: 'An accepted claim carries its citations and one of four grades: established, corroborated, single source, contested. The grade is spelled out in words beside its mark, so reading it never depends on telling two colors apart. Where the sources disagree, the record says so and keeps both of them.',
+    body: 'An accepted claim carries its citations, and every record carries a grade worked out by one published rule. Where the sources disagree, the record says so and keeps both of them.',
   },
   {
-    kicker: 'Precision',
-    icon: 'precision',
     title: 'A point is drawn no sharper than its source',
     body: 'A record known to a county is drawn as a county, and a coarsened point is never labeled as an address.',
   },
   {
-    kicker: 'Living people',
-    icon: 'privacy',
     title: 'The protections are in the code, not in the tone',
     body: 'Public precision stops at a city, a campus or an institution. Current residential addresses for living private people do not appear on public pages, and a record whose living status is unknown is treated as living.',
   },
@@ -109,11 +99,12 @@ export const ABOUT_SOURCE_LIBRARY_HANDOFF = {
   label: 'Where the evidence comes from',
 } as const;
 
-/** Handoff from About to the published room list. The catalogue lives on `/rooms`, not here. */
-export const ABOUT_ROOMS_HANDOFF = {
-  href: '/rooms',
-  label: 'Browse the rooms',
-  lede: 'Law, data, lives across the decades, the source library, the memorial wall, the methods behind each record, and the ways to add what is missing all live on one page. If a room is not on that list, it is not finished.',
+/** Handoff from About to the collections. The list lives on `/collections`, not here. */
+export const ABOUT_COLLECTIONS_HANDOFF = {
+  href: '/collections',
+  label: 'Browse the collections',
+  lede: 'Past the map and the records, the archive keeps sets you read in their own order, from every president on the record to the laws, the data, lives decade by decade, banned books and the memorial wall.',
+  line: 'If a collection is not on that list, it is not finished.',
 } as const;
 
 /**
@@ -130,14 +121,30 @@ export const ABOUT_ROOMS_HANDOFF = {
 export const ABOUT_NEO = {
   heading: 'How the writing is made',
   rules: [
-    'The long-form writing here, the chapters and the articles, is narrated in a single voice. The voice is called Neo. Neo is not a person, not a byline, and signs nothing. It is a written standard, and whoever, or whatever, is doing the writing has to work under it: how a document gets quoted, which sentences have to carry a citation, and which endings are off limits.',
-    'AI drafts that prose. Saying so here is cheaper than letting you find it out. A piece is drafted under the voice document, then read line by line against it for voice and for the dignity of the people in the file, then handed to a separate review whose only job is to attack it: the sentence a specialist would write a letter about, the twelve seconds that travel badly with the paragraph stripped off. A finding from that review is a blocker the writer cannot overrule. After it, the piece still has to clear the code gates on source tiers, citations and length before anything publishes.',
+    'The long-form writing here, the chapters and the articles, is narrated in a single voice. The voice is called Neo. Neo is not a person, not a byline, and signs nothing. It is a written standard, and whoever, or whatever, is doing the writing has to work under it, which covers how a document gets quoted, which sentences have to carry a citation, and which endings are off limits.',
+    'AI drafts that prose. Saying so here is cheaper than letting you find it out. Every piece then goes through the same steps before anything publishes.',
     "None of that can move the evidence bar. Voice never relaxes an evidence gate. Facts are gathered from fetched sources and checked before any prose is written, never from a model's memory, and load-bearing figures need two independent sources. When a detail cannot be sourced, the scene is written without it.",
   ],
   human: [
     "I decide what gets researched, I read every lead and correction, and a release reaches the public site because a person activated it. None of that gets handed to a machine. When the archive is wrong, it's wrong in my name and I fix it where you can see it.",
   ],
+  /** The passes a piece goes through, in order. Was the middle of one long paragraph. */
+  steps: [
+    { title: 'Drafted', body: 'AI drafts the piece under the voice document.' },
+    {
+      title: 'Read',
+      body: 'Line by line against it, for voice and for the dignity of the people in the file.',
+    },
+    {
+      title: 'Attacked',
+      body: 'A separate review hunts the sentence a specialist would write a letter about. A finding is a blocker the writer cannot overrule.',
+    },
+    { title: 'Gated', body: 'Code gates check source tiers, citations and length.' },
+    { title: 'Released', body: 'A person activates the release.' },
+  ],
   hand: 'One part of this is made with a pen and stays that way. The cover plate on an article is a scan of a real drawing: dry felt-tip on cream paper, one weight of line, hatch fills, a sliver of burnt ochre. It is not a generated image and not a stock photo, and that is enforced rather than promised. A plate whose file, link or caption points at a stock library or an image generator cannot publish.',
+  photographs:
+    "A photograph shown large, at the top of a record or beside the map on the front page, is that record's own sourced image, toned to match the page. Its credit and license sit right beside it.",
 } as const;
 
 /**

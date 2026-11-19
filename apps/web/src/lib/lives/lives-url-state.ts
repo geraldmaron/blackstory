@@ -20,7 +20,8 @@ export type LivesViewState = {
 
 export const DEFAULT_LIVES_VIEW: LivesViewState = {
   race: 'black',
-  decade: LIVES_DECADES[0],
+  // The latest decade, so the appendix opens on a published finding, not on an absence.
+  decade: LIVES_DECADES[LIVES_DECADES.length - 1]!,
 };
 
 /** Immersive Lives room. Data Act II still deep-links with `#lives` into a compact entry. */

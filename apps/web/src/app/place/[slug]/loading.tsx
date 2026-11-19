@@ -1,2 +1,2 @@
-/** A place is the same record room as `/entity/{id}`, so it waits behind the same skeleton. */
+/** A place waits behind the one record-page skeleton every family shares. */
 export { default } from '../../entity/[id]/loading';

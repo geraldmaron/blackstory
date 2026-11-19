@@ -42,32 +42,17 @@ import type {
 } from 'maplibre-gl';
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-/** Explore HTML entity markers reuse Door first-paint pin discs (`entity-marker-sync.ts`). */
-import '../../app/first-paint-pin-plate.css';
+import { queryRenderedLayers } from './query-rendered';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
-  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
-  EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
-import {
-  buildExploreMapStyle,
-  ENTITY_SELECTED_PULSE_DURATION_MS,
-  ENTITY_SELECTED_RADIUS_OFFSET,
-  entitySelectedPulseOpacity,
-  entitySelectedPulseRadiusExpression,
-  entitySelectedPulseStaticRadiusExpression,
-  ENTITY_SELECTED_PULSE_STATIC_OPACITY,
-} from '../../app/map/explore-style';
-import { markerRadius, markerRadiusPlusExpression } from '../../lib/map-experience/marker-size';
+import { buildExploreMapStyle } from '../../app/map/explore-style';
 import {
   applyDensityBlendProgress,
   applyDecadeHoldFeatureState,
@@ -83,8 +68,6 @@ import {
   type DecadeMorphAnimationHandle,
   type DensityColorMorphState,
 } from '../../app/map/decade-layer-transition';
-import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
-import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
 import {
   bindMapResizeLifecycle,
   bindWebGlContextRecovery,
@@ -97,15 +80,12 @@ import {
   pointerHitBox,
   resolveEntityPointerHit,
 } from '../../lib/map-experience/entity-pointer-hit';
-import {
-  clampClusterExpansionZoom,
-  clusterExpandDurationMs,
-} from '../../lib/map-experience/cluster-expand';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
 } from '../../lib/map-experience/build-explore-map-source';
 import {
+  CAMERA_EASING_SLOW_OUT,
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
   PLATE_OPENING_PADDING_PX,
@@ -114,6 +94,8 @@ import {
   type CameraPresetName,
 } from '../../lib/map-experience/camera-presets';
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
+import { drawnRecordCollection } from '../../lib/map-experience/record-marks';
+import { placeDrillZoom, SITE_MIN_ZOOM } from '../../lib/map-experience/place-map';
 import type { StateDensityLevel } from '../../lib/map-experience/density';
 import type { CountyChoroplethLevel } from '../../lib/map-experience/county-choropleth';
 import type { StateChoroplethLevel } from '../../lib/map-experience/state-choropleth';
@@ -121,7 +103,6 @@ import {
   joinDensityOntoStatePolygons,
   indexDensityFillColors,
 } from '../../lib/map-experience/join-state-polygons';
-import * as stateLabels from '../../lib/map-experience/state-labels';
 import type { ExploreLayerMode, ExploreViewportFrame } from '../../lib/map-experience/url-state';
 import {
   DEFAULT_POPULATION_GEO,
@@ -136,7 +117,14 @@ import {
   buildExploreSearchCenterMarkerElement,
   type ExploreSearchCenterMarkerInput,
 } from '../../lib/map-experience/explore-search-marker';
-import { readDocumentColorScheme, stateLabelColorFor } from './color-scheme';
+import { readDocumentColorScheme } from './color-scheme';
+import { buildSelectionFlagElement } from './selection-flag';
+import { kindLabelForMark } from '../entity/record-mark';
+import { rowDecadeLabel } from '../../lib/map-experience/explore-rows';
+import { bindPlaceLabels, type PlaceLabelsHandle } from './place-labels';
+import { dropInIncomingPins } from './selection-sync';
+import { EXPLORE_GHOSTS_SOURCE_ID } from '../../app/map/explore-layer-ids';
+import { recordMarkFor } from '../../lib/map-experience/geo-precision';
 import { EMPTY_EDGE_COLLECTION, EMPTY_FEATURE_COLLECTION, type StageConfig } from './stage-config';
 import {
   applyGeographyStyle,
@@ -147,12 +135,15 @@ import {
   setHistoryEdgeData,
   setHistoryEdgesVisibility,
   setSelectedEdgeFilter,
+  setHoveredEntityFilter,
   setSelectedEntityFilter,
 } from './selection-sync';
 import {
+  entitiesSourceData,
   fetchStatePolygons,
   loadStatePolygonsWithDensity,
   requestCountyPolygonLoad,
+  setPlaceLeaderData,
   waitForGeoJsonSourceData,
 } from './geo-source-loaders';
 import { readViewport } from './viewport-geometry';
@@ -171,13 +162,7 @@ import { bindPlateCameraListeners, bindPlateClickListeners } from './event-wirin
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classes';
 import { useSurfaceClass } from '../../lib/nav/use-surface-class';
-import {
-  AMBIENT_CLUSTER_MIN_ZOOM,
-  clusterMarkersVisible,
-  defaultPostureFor,
-  framedClaimAllowed,
-  type PlatePosture,
-} from './plate-posture';
+import { defaultPostureFor, framedClaimAllowed, type PlatePosture } from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
 import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture, type PlateBox } from './plate-frame';
 import {
@@ -234,6 +219,8 @@ type MaplibreModule = typeof MapLibreNamespace;
  * plain re-render props. */
 export type MapStageDataPatch = {
   readonly featureCollection: ExploreMapFeatureCollection;
+  /** Records the lens matches outside the brushed decades, drawn as sand ghosts. */
+  readonly ghostCollection?: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
   readonly layerMode: ExploreLayerMode;
   readonly popGeo?: ExplorePopulationGeo;
@@ -378,13 +365,6 @@ export type MapStageHandle = {
    * confirmed exception to that norm today. `flyPreset` remains the route for preset framing.
    */
   readonly getMap: () => AtlasCameraTarget | null;
-  /**
-   * Where a record's disc is on screen right now, with its name — the anchor for a photo card.
-   * Null below cluster max zoom (the record is inside a cluster there) or when it is off the map.
-   */
-  readonly entityHoverTarget: (
-    entityId: string,
-  ) => { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null;
 };
 
 /** What the camera library needs off the map. Structural, so `MapStage` owes it no import. */
@@ -400,6 +380,8 @@ export type AtlasCameraTarget = {
   getCenter(): { lng: number; lat: number };
   /** The element MapLibre draws in — the box a surface frames its camera against. */
   getContainer(): HTMLElement;
+  /** Screen position of a coordinate — `frameRecord`'s "already visible" test. */
+  project(lngLat: never): { x: number; y: number };
   /** Whether a flight, ease or gesture is in progress — a refit must not cut one short. */
   isMoving(): boolean;
   stop(): unknown;
@@ -415,29 +397,6 @@ export function useMapStage(): MapStageHandle {
   return ctx;
 }
 
-/** The cluster discs and their counts, in the primary buffer and the decade crossfade's incoming one. */
-const CLUSTER_LAYER_IDS = [
-  EXPLORE_CLUSTER_LAYER_ID,
-  EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
-] as const;
-
-/**
- * Holds the cluster layers off the plate below state scale in the ambient posture
- * (`clusterMarkersVisible`) and gives them every zoom back in any other posture. A zoom range
- * rather than a visibility flip, so a Door chapter flying in to state scale brings them back with
- * no zoom listener. Each layer keeps its own max zoom. Re-applied wherever the entity layers can
- * be rebuilt, because a rebuilt layer takes its range from the style again.
- */
-function syncClusterZoomRange(map: MapLibreMap, posture: PlatePosture): void {
-  const minZoom = clusterMarkersVisible(posture, 0) ? 0 : AMBIENT_CLUSTER_MIN_ZOOM;
-  for (const id of CLUSTER_LAYER_IDS) {
-    const layer = map.getLayer(id);
-    if (layer) map.setLayerZoomRange(id, minZoom, layer.maxzoom ?? 24);
-  }
-}
-
 /** Hover-intent delay before a pin's photo card opens (`PinPhotoCard`'s own doc comment). */
 const PIN_HOVER_INTENT_MS = 120;
 
@@ -447,10 +406,12 @@ const ENTITY_ANCHOR_SIZE_PX = 8;
 
 type EntityPoint = {
   readonly name: string;
+  /** The callout's meta line: the record's kind and decade, when it has them. */
+  readonly meta: string;
   readonly lng: number;
   readonly lat: number;
-  readonly evidenceCount: number;
-  readonly confidenceTier: string;
+  /** False for county- and state-precision records, which draw no point. */
+  readonly drawn: boolean;
 };
 
 /** Point records by id, so a hover or a selection finds its record without scanning thousands. */
@@ -465,13 +426,19 @@ function indexEntityPoints(
     const props = feature.properties;
     const entityId = props.entityId;
     if (typeof entityId !== 'string' || byId.has(entityId)) continue;
-    const evidence = Number(props.evidenceCount);
     byId.set(entityId, {
       name: typeof props.displayName === 'string' ? props.displayName : 'Documented record',
+      meta: [
+        kindLabelForMark(props.kind),
+        Array.isArray(props.eraBuckets) && props.eraBuckets.length > 0
+          ? rowDecadeLabel(props.eraBuckets, undefined)
+          : undefined,
+      ]
+        .filter((part) => part && part !== 'Undated')
+        .join(' · '),
       lng,
       lat,
-      evidenceCount: Number.isFinite(evidence) ? evidence : 0,
-      confidenceTier: typeof props.confidenceTier === 'string' ? props.confidenceTier : 'unrated',
+      drawn: recordMarkFor(props.precision) !== 'none',
     });
   }
   return byId;
@@ -588,14 +555,6 @@ export function MapStageProvider({
   }>({ source: null, byId: new Map() });
   const searchCenterMarkerRef = useRef<Marker | null>(null);
   const searchAreaRef = useRef<SearchAreaInput | null>(null);
-  /** Soft opacity pulse on the GL selected ring — canceled when selection clears. */
-  const selectedPulseRafRef = useRef<number | null>(null);
-  const stateLabelMarkersRef = useRef<
-    Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
-  >(new Map());
-  /** The opacity last written to the state labels (2dp), and whether they are on the map. */
-  const stateLabelOpacityRef = useRef<string | null>(null);
-  const stateLabelsAttachedRef = useRef(true);
   const listenersRef = useRef(makeListenerStore());
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
@@ -636,6 +595,7 @@ export function MapStageProvider({
         layerMode: 'off',
       }),
     featureCollection: initialFeatureCollection ?? EMPTY_FEATURE_COLLECTION,
+    ghostCollection: EMPTY_FEATURE_COLLECTION,
     jurisdictionAreaFeatures: initialJurisdictionAreaFeatures ?? [],
     layerMode: 'off',
     popGeo: DEFAULT_POPULATION_GEO,
@@ -716,15 +676,42 @@ export function MapStageProvider({
     return entityIndexRef.current.byId.get(entityId);
   }, []);
 
+  /** The callout on the selected pin (`selection-flag.ts`). */
+  const selectionFlagRef = useRef<{ readonly id: string; readonly marker: Marker } | null>(null);
+  /** Place tokens and site names in the house type (`place-labels.ts`). */
+  const placeLabelsRef = useRef<PlaceLabelsHandle | null>(null);
+  const syncSelectionFlag = useCallback(
+    (map: MapLibreMap, entityId: string | undefined) => {
+      const maplibregl = maplibreglRef.current;
+      const at = entityId ? entityPoint(entityId) : undefined;
+      placeLabelsRef.current?.setSelected(entityId, at ? [at.lng, at.lat] : undefined);
+      if (selectionFlagRef.current?.id === entityId) return;
+      selectionFlagRef.current?.marker.remove();
+      selectionFlagRef.current = null;
+      const point = entityId ? entityPoint(entityId) : undefined;
+      if (!entityId || !point?.drawn || !maplibregl) return;
+      const marker = new maplibregl.Marker({
+        element: buildSelectionFlagElement(point.name, point.meta),
+        anchor: 'bottom',
+        // The leader starts above the grown pin (1.6 x 6px radius), not on its center.
+        offset: [0, -12],
+      })
+        .setLngLat([point.lng, point.lat])
+        .addTo(map);
+      selectionFlagRef.current = { id: entityId, marker };
+    },
+    [entityPoint],
+  );
+
   /**
-   * Where a record's disc is on screen, for a photo card to anchor to. Only past cluster max zoom,
-   * where records draw as individual discs (below it they are inside a cluster), and only when the
-   * disc is inside the map's box.
+   * Where a record's disc is on screen, for a photo card to anchor to. Only from the site level,
+   * where records draw as individual discs (below it they are inside a place token), and only when
+   * the disc is inside the map's box.
    */
   const entityHoverTarget = useCallback(
     (entityId: string) => {
       const map = mapRef.current;
-      if (!map || map.getZoom() <= EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) return null;
+      if (!map || map.getZoom() < SITE_MIN_ZOOM) return null;
       const point = entityPoint(entityId);
       if (!point) return null;
       const { x, y } = map.project([point.lng, point.lat]);
@@ -744,132 +731,6 @@ export function MapStageProvider({
       };
     },
     [entityPoint],
-  );
-
-  const updateStateLabelSelection = useCallback((selectedPostalCode: string | undefined) => {
-    const scheme = readDocumentColorScheme();
-    for (const [postalCode, entry] of stateLabelMarkersRef.current) {
-      const selected = postalCode === selectedPostalCode;
-      entry.element.classList.toggle(stateLabels.STATE_LABEL_SELECTED_CLASS_NAME, selected);
-      entry.element.style.color = stateLabelColorFor(scheme, selected);
-    }
-  }, []);
-
-  const syncStateLabelTheme = useCallback((scheme: MapColorScheme) => {
-    for (const [postalCode, entry] of stateLabelMarkersRef.current) {
-      const selected = postalCode === configRef.current.selectedState;
-      entry.element.classList.toggle(stateLabels.STATE_LABEL_SELECTED_CLASS_NAME, selected);
-      entry.element.style.color = stateLabelColorFor(scheme, selected);
-    }
-  }, []);
-
-  /**
-   * State labels fade with zoom. Written only when the 2dp value changes, and the 51 markers come
-   * off the map entirely while they are invisible (below 2.4 and above 6.2, which is most of a
-   * city-level pinch), so an invisible label is not repositioned on every camera frame.
-   * The 0.2s opacity transition MapLibre gives every marker is off for these (shell.css): the zoom
-   * drives the value continuously, and restarting a transition on every frame only lagged it.
-   */
-  const updateStateLabelOpacity = useCallback((zoom: number) => {
-    const map = mapRef.current;
-    const value = stateLabels.stateLabelOpacityForZoom(zoom);
-    const opacity = value.toFixed(2);
-    if (opacity === stateLabelOpacityRef.current) return;
-    stateLabelOpacityRef.current = opacity;
-    const show = value > 0;
-    for (const [, entry] of stateLabelMarkersRef.current) {
-      // Through the marker, never `element.style.opacity`: a MapLibre marker owns its element's
-      // inline opacity and rewrites it on every map update (terrain occlusion), so a value written
-      // straight to the element would survive for one frame and prevent the fade at every zoom.
-      if (show) entry.marker.setOpacity(opacity);
-      if (!map) continue;
-      if (show && !stateLabelsAttachedRef.current) entry.marker.addTo(map);
-      else if (!show && stateLabelsAttachedRef.current) entry.marker.remove();
-    }
-    if (map) stateLabelsAttachedRef.current = show;
-  }, []);
-
-  const stopSelectedEntityPulse = useCallback(() => {
-    if (selectedPulseRafRef.current !== null) {
-      cancelAnimationFrame(selectedPulseRafRef.current);
-      selectedPulseRafRef.current = null;
-    }
-    const map = mapRef.current;
-    if (map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) {
-      // Reset to the base (un-pulsed) ring — scale 1x, full opacity.
-      map.setPaintProperty(
-        EXPLORE_SELECTED_POINT_LAYER_ID,
-        'circle-radius',
-        markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
-      );
-      map.setPaintProperty(EXPLORE_SELECTED_POINT_LAYER_ID, 'circle-stroke-opacity', 1);
-    }
-  }, []);
-
-  const startSelectedEntityPulse = useCallback(
-    (entityId: string) => {
-      stopSelectedEntityPulse();
-      const map = mapRef.current;
-      if (!map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
-      /*
-       * The ring's size as a plain number, not read from the feature. The layer's own radius reads
-       * each record's evidence and confidence (`['get', …]`), and MapLibre rebuilds a source's
-       * tiles whenever a data-driven paint value changes — so pulsing that expression re-tiled
-       * every record on the map on every animation frame. A zoom-only expression is redrawn from
-       * the GPU buffers it already has.
-       */
-      const point = entityPoint(entityId);
-      const dataRadius = markerRadius(
-        point?.evidenceCount ?? 0,
-        point?.confidenceTier ?? 'unrated',
-      );
-      if (prefersReducedMotion()) {
-        // Reduced motion (patterns-cinematic-map.md §3): no loop — a single static
-        // enlarged ring (scale ~1.35, opacity ~0.85).
-        map.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-radius',
-          entitySelectedPulseStaticRadiusExpression(dataRadius),
-        );
-        map.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-stroke-opacity',
-          ENTITY_SELECTED_PULSE_STATIC_OPACITY,
-        );
-        return;
-      }
-
-      const startedAt = performance.now();
-      const tick = (now: number) => {
-        if (configRef.current.selectedEntity !== entityId || !mapRef.current) {
-          selectedPulseRafRef.current = null;
-          return;
-        }
-        const activeMap = mapRef.current;
-        if (!activeMap.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) {
-          selectedPulseRafRef.current = null;
-          return;
-        }
-        // 1.8s ease-in-out loop — ring scales ~1x -> ~2.1x while fading 0.9 -> 0.12
-        // (patterns-cinematic-map.md §3 "Selection pulse").
-        const progress =
-          ((now - startedAt) % ENTITY_SELECTED_PULSE_DURATION_MS) /
-          ENTITY_SELECTED_PULSE_DURATION_MS;
-        activeMap.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-radius',
-          entitySelectedPulseRadiusExpression(progress, dataRadius),
-        );
-        activeMap.setPaintProperty(
-          EXPLORE_SELECTED_POINT_LAYER_ID,
-          'circle-stroke-opacity',
-          entitySelectedPulseOpacity(progress),
-        );
-        selectedPulseRafRef.current = requestAnimationFrame(tick);
-      };
-      selectedPulseRafRef.current = requestAnimationFrame(tick);
-    },
-    [stopSelectedEntityPulse, entityPoint],
   );
 
   const applyStyleAndData = useCallback(
@@ -914,7 +775,6 @@ export function MapStageProvider({
           ...(options?.preserveDecadeFadeOpacities ? { preserveDecadeFadeOpacities: true } : {}),
           ...(options?.deferPrimaryDecadeData ? { deferPrimaryDecadeData: true } : {}),
         });
-        syncClusterZoomRange(map, postureRef.current);
         setSelectedStateFilter(map, configRef.current.selectedState);
         if (!options?.deferPrimaryDecadeData) {
           setHistoryEdgeData(map, configRef.current.historyEdgeCollection);
@@ -922,12 +782,7 @@ export function MapStageProvider({
         setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
         setSelectedEdgeFilter(map, configRef.current.selectedEdge);
         setSelectedEntityFilter(map, configRef.current.selectedEntity);
-        const selectedId = configRef.current.selectedEntity;
-        if (selectedId && selectedId.length > 0) {
-          startSelectedEntityPulse(selectedId);
-        } else {
-          stopSelectedEntityPulse();
-        }
+        syncSelectionFlag(map, configRef.current.selectedEntity);
         if (!options?.skipPrimaryDensityLoad) {
           void loadStatePolygonsWithDensity(
             map,
@@ -948,22 +803,18 @@ export function MapStageProvider({
         console.error('[MapStage] style/data apply failed', error);
       }
     },
-    [startSelectedEntityPulse, stopSelectedEntityPulse],
+    [syncSelectionFlag],
   );
   applyStyleAndDataRef.current = applyStyleAndData;
 
-  const syncPlatePaintToTheme = useCallback(
-    (map: MapLibreMap, style: StyleSpecification, scheme: MapColorScheme) => {
-      syncLayerPaintFromStyle(map, style, PERSISTENT_PLATE_LAYER_IDS, (update, error) => {
-        console.error(
-          `[MapStage] setPaintProperty ${update.layerId}.${update.paintKey} failed`,
-          error,
-        );
-      });
-      syncStateLabelTheme(scheme);
-    },
-    [syncStateLabelTheme],
-  );
+  const syncPlatePaintToTheme = useCallback((map: MapLibreMap, style: StyleSpecification) => {
+    syncLayerPaintFromStyle(map, style, PERSISTENT_PLATE_LAYER_IDS, (update, error) => {
+      console.error(
+        `[MapStage] setPaintProperty ${update.layerId}.${update.paintKey} failed`,
+        error,
+      );
+    });
+  }, []);
 
   const commitDataPatch = useCallback(
     (
@@ -981,8 +832,10 @@ export function MapStageProvider({
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
       const popGeo = patch.popGeo ?? configRef.current.popGeo;
       const satellite = patch.satellite ?? configRef.current.satellite;
+      const ghostCollection = patch.ghostCollection ?? EMPTY_FEATURE_COLLECTION;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
+        ghostCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         layerMode: patch.layerMode,
         popGeo,
@@ -996,6 +849,7 @@ export function MapStageProvider({
         ...configRef.current,
         style,
         featureCollection: patch.featureCollection,
+        ghostCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
         layerMode: patch.layerMode,
         popGeo,
@@ -1043,9 +897,14 @@ export function MapStageProvider({
       GeoJSONSource | undefined;
     if (entitiesIncoming) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-      entitiesIncoming.setData(cfg.featureCollection as any);
+      entitiesIncoming.setData(entitiesSourceData(cfg) as any);
       await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_INCOMING_SOURCE_ID);
+      dropInIncomingPins(map);
     }
+    // Pins leaving the brushed range become sand ghosts as the new frame arrives.
+    const ghosts = map.getSource(EXPLORE_GHOSTS_SOURCE_ID) as GeoJSONSource | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+    ghosts?.setData(drawnRecordCollection(cfg.ghostCollection) as any);
     const edgesIncoming = map.getSource(EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID) as
       GeoJSONSource | undefined;
     if (edgesIncoming) {
@@ -1101,7 +960,8 @@ export function MapStageProvider({
       const entities = map.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
       if (entities) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-        entities.setData(cfg.featureCollection as any);
+        entities.setData(entitiesSourceData(cfg) as any);
+        setPlaceLeaderData(map, cfg);
         await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_SOURCE_ID);
       }
       if (generation !== decadeFadeGenerationRef.current) return;
@@ -1250,13 +1110,19 @@ export function MapStageProvider({
   useEffect(() => {
     const syncPlateToTheme = () => {
       const map = mapRef.current;
-      if (!map || !map.isStyleLoaded()) return;
+      if (!map) return;
+      // isStyleLoaded() is false while any tile is still loading; a switch made then would be
+      // dropped and leave the plate in the other theme, so wait for the map to settle.
+      if (!map.isStyleLoaded()) {
+        map.once('idle', syncPlateToTheme);
+        return;
+      }
       const cfg = configRef.current;
       const scheme = readDocumentColorScheme();
       const style = buildStyleForScheme(cfg, scheme);
       configRef.current = { ...cfg, style };
       applyStyleAndData();
-      syncPlatePaintToTheme(map, style, scheme);
+      syncPlatePaintToTheme(map, style);
     };
     const observer = new MutationObserver((mutations) => {
       if (mutations.some((mutation) => mutation.attributeName === 'data-theme')) {
@@ -1278,19 +1144,26 @@ export function MapStageProvider({
         selectedEdge: patch.selectedEdge,
         selectedEntity: patch.selectedEntity,
       };
-      updateStateLabelSelection(patch.selectedState);
       const map = mapRef.current;
-      if (!map || !map.isStyleLoaded()) return;
-      setSelectedStateFilter(map, patch.selectedState);
-      setSelectedEdgeFilter(map, patch.selectedEdge);
-      setSelectedEntityFilter(map, patch.selectedEntity);
-      if (patch.selectedEntity && patch.selectedEntity.length > 0) {
-        startSelectedEntityPulse(patch.selectedEntity);
-      } else {
-        stopSelectedEntityPulse();
-      }
+      if (!map) return;
+      const apply = () => {
+        const { selectedState, selectedEdge, selectedEntity } = configRef.current;
+        setSelectedStateFilter(map, selectedState);
+        placeLabelsRef.current?.setSelectedPlace(
+          selectedState ? `state-${selectedState.toLowerCase()}` : undefined,
+        );
+        setSelectedEdgeFilter(map, selectedEdge);
+        setSelectedEntityFilter(map, selectedEntity);
+        syncSelectionFlag(map, selectedEntity);
+      };
+      // A selection made while sources are still loading (the home hand-off lands mid-flight,
+      // as the catalog replaces the first-paint pins) used to be dropped, leaving the record
+      // framed with no copper mark. Apply it as soon as the map settles instead, reading the
+      // latest selection then.
+      if (map.isStyleLoaded()) apply();
+      else map.once('idle', apply);
     },
-    [startSelectedEntityPulse, stopSelectedEntityPulse, updateStateLabelSelection],
+    [syncSelectionFlag],
   );
 
   const runFlyPreset = useCallback(
@@ -1335,6 +1208,9 @@ export function MapStageProvider({
    */
   const syncRotateGestures = useCallback(
     (map: MapLibreMap, posture: PlatePosture, pointerFine: boolean) => {
+      // The plate is aria-hidden, so its canvas is a Tab stop only where the reader steers it
+      // (live); a backdrop or framed map would be a focus stop that announces nothing.
+      map.getCanvas().tabIndex = posture === 'live' ? 0 : -1;
       const container = containerRef.current;
       const current = rotateGesturesRef.current;
       const allowed = container !== null && rotateGestureAllowed(posture, { pointerFine });
@@ -1437,6 +1313,9 @@ export function MapStageProvider({
           },
         } as never);
       }
+      // A theme switch re-runs this with the layers already added: repaint them in the new accent.
+      map.setPaintProperty(SEARCH_AREA_FILL, 'fill-color', accent);
+      map.setPaintProperty(SEARCH_AREA_LINE, 'line-color', accent);
     } catch (error) {
       console.error('[MapStage] search area sync failed', error);
     }
@@ -1540,6 +1419,12 @@ export function MapStageProvider({
         });
 
         mapRef.current = map;
+        placeLabelsRef.current = bindPlaceLabels(map);
+        placeLabelsRef.current.setSelectedPlace(
+          configRef.current.selectedState
+            ? `state-${configRef.current.selectedState.toLowerCase()}`
+            : undefined,
+        );
         if (process.env.NODE_ENV !== 'production') {
           // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
@@ -1548,6 +1433,22 @@ export function MapStageProvider({
         // keeps one control vocabulary (design-direction-v9-atlas.md §5.5). Attribution stays:
         // it is a license obligation, not chrome we get to choose.
         map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+        // Compact attribution opens itself the first time its text arrives. It is a license
+        // obligation, so it stays one tap away, but as one collapsed "i", not a box on the map.
+        // The control turns compact only once its text arrives, on a style or a source event.
+        const collapseAttribution = () => {
+          // Wait for the text: collapsing the still-empty control lets it open again on arrival.
+          const attribution = container.querySelector(
+            '.maplibregl-ctrl-attrib.maplibregl-compact:not(.maplibregl-attrib-empty)',
+          );
+          if (!attribution) return;
+          attribution.classList.remove('maplibregl-compact-show');
+          attribution.removeAttribute('open');
+          map?.off('styledata', collapseAttribution);
+          map?.off('sourcedata', collapseAttribution);
+        };
+        map.on('styledata', collapseAttribution);
+        map.on('sourcedata', collapseAttribution);
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
         });
@@ -1564,29 +1465,12 @@ export function MapStageProvider({
 
       const activeMap = map;
 
-      // State-label markers mount first so, by DOM insertion order, entity markers layer above
-      // them (state-labels.ts's documented belt-and-suspenders stacking guidance).
-      const descriptors = stateLabels.buildStateLabelMarkers(configRef.current.selectedState);
-      for (const descriptor of descriptors) {
-        const element = stateLabels.buildStateLabelElement(descriptor);
-        const marker = new (maplibreglRef.current as MaplibreModule['default']).Marker({
-          element,
-          anchor: 'center',
-        })
-          .setLngLat([descriptor.lngLat[0], descriptor.lngLat[1]])
-          .addTo(activeMap);
-        stateLabelMarkersRef.current.set(descriptor.postalCode, { marker, element });
-      }
-      syncStateLabelTheme(readDocumentColorScheme());
-      updateStateLabelOpacity(activeMap.getZoom());
-
       // MapLibre constructs with every gesture on. Only Live starts fully steered; a plate built
       // on the Door (ambient) hands back drag/zoom-adjust on a precise pointer only, and one built
       // into a moment (framed) starts fully locked — either way, the first wheel over the map
       // must still scroll the document that asked for it.
       applyGesturesForPosture(activeMap, postureRef.current, { pointerFine: prefersFinePointer() });
       syncRotateGestures(activeMap, postureRef.current, prefersFinePointer());
-      syncClusterZoomRange(activeMap, postureRef.current);
 
       lastViewportRef.current = readViewport(activeMap);
       notify(listenersRef.current, 'viewport', lastViewportRef.current);
@@ -1596,9 +1480,12 @@ export function MapStageProvider({
        * the record sheet instead of selecting the state fill underneath.
        */
       function pointerHitAt(point: { x: number; y: number }) {
-        const layers = ENTITY_POINTER_HIT_LAYER_IDS.filter((id) => activeMap.getLayer(id));
-        if (layers.length === 0) return undefined;
-        const features = activeMap.queryRenderedFeatures(pointerHitBox(point), { layers });
+        if (!ENTITY_POINTER_HIT_LAYER_IDS.some((id) => activeMap.getLayer(id))) return undefined;
+        const features = queryRenderedLayers<MapLibreNamespace.MapGeoJSONFeature>(
+          activeMap,
+          pointerHitBox(point),
+          ENTITY_POINTER_HIT_LAYER_IDS,
+        );
         return resolveEntityPointerHit(
           features.map((feature) => ({
             layerId: feature.layer.id,
@@ -1610,40 +1497,51 @@ export function MapStageProvider({
         );
       }
 
-      function expandClusterFromPointerHit(
-        hit: Extract<NonNullable<ReturnType<typeof pointerHitAt>>, { kind: 'cluster' }>,
+      /** A place token opens its place: the camera closes in to the next level, and the surface
+       * (Explore) scopes its list to the place. Never opens a record. A surface that listens for
+       * `placeSelect` owns the move (it knows the chrome the place must clear); otherwise the
+       * stage closes in itself. */
+      function drillIntoPlace(
+        hit: Extract<NonNullable<ReturnType<typeof pointerHitAt>>, { kind: 'place' }>,
       ): void {
         notify(listenersRef.current, 'deselect');
-        const source = activeMap.getSource(hit.sourceId) as GeoJSONSource | undefined;
-        if (!source) return;
-        void source
-          .getClusterExpansionZoom(hit.clusterId)
-          .then((expansionZoom) => {
-            activeMap.easeTo({
-              center: [hit.center[0], hit.center[1]],
-              zoom: clampClusterExpansionZoom(expansionZoom, activeMap.getZoom()),
-              duration: clusterExpandDurationMs(prefersReducedMotion()),
-            });
-          })
-          .catch(() => {
-            // Cluster may have dissolved between click and lookup.
+        if (listenersRef.current.placeSelect.size > 0) {
+          notify(listenersRef.current, 'placeSelect', hit.placeKey, {
+            level: hit.level,
+            bounds: hit.bounds,
+            ...(hit.openZoom === undefined ? {} : { openZoom: hit.openZoom }),
           });
+          return;
+        }
+        const [west, south, east, north] = hit.bounds;
+        const framed = activeMap.cameraForBounds(
+          [
+            [west, south],
+            [east, north],
+          ],
+          { padding: 48 },
+        );
+        activeMap.easeTo({
+          center: framed?.center ?? [(west + east) / 2, (south + north) / 2],
+          zoom: placeDrillZoom(hit.level, framed?.zoom, MAP_MAX_ZOOM, hit.openZoom),
+          duration: prefersReducedMotion() ? 0 : 420,
+          easing: CAMERA_EASING_SLOW_OUT,
+        });
+        notify(listenersRef.current, 'placeSelect', hit.placeKey);
       }
 
       function handleEntityPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
+        // Overlapping records always open a chooser, on every posture: picking the first would
+        // open a record the reader may not have meant.
         if (hit.kind === 'overlap') {
-          if (postureRef.current === 'live') {
-            notify(listenersRef.current, 'overlap', hit.entityIds);
-          } else if (hit.entityIds[0]) {
-            notify(listenersRef.current, 'select', hit.entityIds[0]);
-          }
+          notify(listenersRef.current, 'overlap', hit.entityIds);
           return;
         }
         if (hit.kind === 'entity') {
           notify(listenersRef.current, 'select', hit.entityId);
           return;
         }
-        expandClusterFromPointerHit(hit);
+        drillIntoPlace(hit);
       }
 
       function handleEntityPointerClick(event: MapMouseEvent) {
@@ -1691,7 +1589,6 @@ export function MapStageProvider({
           lastViewportRef.current = viewport;
           notify(listenersRef.current, 'viewport', viewport);
         },
-        applyZoomOpacity: updateStateLabelOpacity,
         onZoomSettled: () => {
           requestCountyPolygonLoad(activeMap, configRef.current);
         },
@@ -1711,9 +1608,6 @@ export function MapStageProvider({
           notify(listenersRef.current, 'interact');
         },
       });
-      activeMap.on('zoom', () => {
-        updateStateLabelOpacity(activeMap.getZoom());
-      });
 
       /*
        * Pin hover, from the map's own hit test. Records used to be HTML buttons past cluster max
@@ -1722,6 +1616,8 @@ export function MapStageProvider({
        * A short intent delay on the way in, none on the way out (`PinPhotoCard`'s contract).
        */
       let hoverWanted: string | null = null;
+      /** The pin drawn lifted under the pointer (`setHoveredEntityFilter`). */
+      let liftedPin: string | undefined;
       let hoverShown = false;
       let hoverTimer: ReturnType<typeof setTimeout> | null = null;
       const hoverTo = (entityId: string | null) => {
@@ -1751,13 +1647,22 @@ export function MapStageProvider({
       activeMap.on('mousemove', (event: MapMouseEvent) => {
         const hit = pointerHitAt(event.point);
         activeMap.getCanvas().style.cursor = hit ? 'pointer' : '';
+        placeLabelsRef.current?.setHovered(hit?.kind === 'place' ? hit.placeKey : undefined);
+        const lifted = hit?.kind === 'entity' ? hit.entityId : undefined;
+        if (lifted !== liftedPin) {
+          liftedPin = lifted;
+          setHoveredEntityFilter(activeMap, lifted);
+        }
         hoverTo(
-          hit?.kind === 'entity' && activeMap.getZoom() > EXPLORE_CLUSTER_CONFIG.clusterMaxZoom
-            ? hit.entityId
-            : null,
+          hit?.kind === 'entity' && activeMap.getZoom() >= SITE_MIN_ZOOM ? hit.entityId : null,
         );
       });
-      activeMap.getCanvas().addEventListener('mouseleave', () => hoverTo(null));
+      activeMap.getCanvas().addEventListener('mouseleave', () => {
+        hoverTo(null);
+        placeLabelsRef.current?.setHovered(undefined);
+        liftedPin = undefined;
+        setHoveredEntityFilter(activeMap, undefined);
+      });
       // The card is placed once, beside the disc; once the camera moves the disc is elsewhere.
       activeMap.on('movestart', () => hoverTo(null));
 
@@ -1794,21 +1699,17 @@ export function MapStageProvider({
       decadeMorphAnimationRef.current?.cancel();
       decadeMorphAnimationRef.current = null;
       mapStyleReadyRef.current = false;
-      if (selectedPulseRafRef.current !== null) {
-        cancelAnimationFrame(selectedPulseRafRef.current);
-        selectedPulseRafRef.current = null;
-      }
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       resizeLifecycleRef.current?.disconnect();
       contextRecoveryRef.current?.disconnect();
       clearSearchCenterMarker();
-      for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
-      stateLabelMarkersRef.current.clear();
       rotateGesturesRef.current.shift?.detach();
       rotateGesturesRef.current.wheel?.detach();
       rotateGesturesRef.current.twist?.detach();
       rotateGesturesRef.current.pageZoom?.detach();
       rotateGesturesRef.current = { shift: null, wheel: null, twist: null, pageZoom: null };
+      placeLabelsRef.current?.dispose();
+      placeLabelsRef.current = null;
       mapRef.current?.remove();
       mapRef.current = null;
       maplibreglRef.current = null;
@@ -1871,7 +1772,6 @@ export function MapStageProvider({
     if (!map) return;
     applyGesturesForPosture(map, posture, { pointerFine: prefersFinePointer() });
     syncRotateGestures(map, posture, prefersFinePointer());
-    syncClusterZoomRange(map, posture);
     // The Door's phone strip may have sunk the zoom floor below the Instrument's national floor
     // (camera.ts, `zoomFloor: 'fit'`); every other posture gets the floor back. Live keeps a floor
     // no higher than the zoom it inherits: browse entered from the Door on a phone starts from the
@@ -1986,6 +1886,7 @@ export function MapStageProvider({
     const map = mapRef.current;
     if (!map) return;
     lockGestures(map);
+    map.getCanvas().tabIndex = -1;
     // Only a real size change needs the drawing buffer re-measured. A scroll no longer produces
     // one at all, which is the point: MapLibre never resizes mid-gesture.
     if (resized) resizeMapInPlace(map);
@@ -2049,7 +1950,6 @@ export function MapStageProvider({
         ensureMap();
         return getMap();
       },
-      entityHoverTarget,
     }),
     [
       ensureMap,
@@ -2064,7 +1964,6 @@ export function MapStageProvider({
       resize,
       setDoorBrowseLive,
       getMap,
-      entityHoverTarget,
     ],
   );
 

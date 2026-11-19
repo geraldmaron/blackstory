@@ -15,7 +15,6 @@ export type NavIconName =
   | 'explore'
   | 'stories'
   | 'records'
-  | 'rooms'
   | 'more'
   | 'search'
   | 'about'
@@ -57,7 +56,6 @@ const OUTLINE: Record<NavIconName, IonName> = {
   explore: 'map-outline',
   stories: 'book-outline',
   records: 'list-outline',
-  rooms: 'grid-outline',
   more: 'ellipsis-horizontal',
   search: 'search-outline',
   about: 'information-circle-outline',

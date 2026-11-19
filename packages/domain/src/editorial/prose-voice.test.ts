@@ -55,6 +55,42 @@ test('publisher self-reference and page pointers are flagged', () => {
   assert.deepEqual(rules('More of this history is on this site.'), ['self-reference']);
   assert.deepEqual(rules('Compare it with the attendance figures below.'), ['page-pointer']);
   assert.deepEqual(rules('Before reading the percentages, look at the chart.'), ['page-pointer']);
+  assert.deepEqual(rules('A congregation has been on this site since 1860.'), []);
+  assert.deepEqual(rules('It opened in 1941 on the site of Chambers Hill.'), []);
   // "above" as plain geography is history, not layout.
   assert.deepEqual(rules('The family lived above the store on Beale Street.'), []);
+});
+
+test('poster and nomination-form language is flagged; plain uses of the same words are not', () => {
+  assert.deepEqual(rules('She was a trailblazer for Black nurses.'), ['stock-phrase']);
+  assert.deepEqual(rules('The church served as headquarters for the Selma campaign.'), [
+    'stock-phrase',
+  ]);
+  assert.deepEqual(rules('The avenue was the cultural heart of Black Indianapolis.'), [
+    'stock-phrase',
+  ]);
+  assert.deepEqual(rules('At the heart of the dispute was the deed.'), []);
+  assert.deepEqual(rules('Indiana Avenue was the heart of the community.'), ['stock-phrase']);
+  assert.deepEqual(rules('He served as mayor from 1868 to 1870.'), []);
+});
+
+test("the record keeper's term is flagged in narration, not in names, titles or quotations", () => {
+  assert.deepEqual(rules('Negro doctors were barred from white hospitals.'), ['source-term']);
+  assert.deepEqual(rules('It was the only high school for Negroes.'), ['source-term']);
+  assert.deepEqual(rules('He pitched in the Negro Leagues.'), []);
+  assert.deepEqual(rules('He pitched in the Negro leagues through the 1920s.'), []);
+  assert.deepEqual(rules("A sign read 'No negroes allowed in this town,' in 1886."), []);
+  assert.deepEqual(rules('N.C. Newbold was the state Director of Negro Education.'), []);
+  assert.deepEqual(rules('The form asked for "Negro - rapid" as the wording.'), []);
+});
+
+test('a split negate-then-correct is flagged', () => {
+  assert.deepEqual(rules('He isn’t asking for relief. He’s naming an asset.'), ['negate-correct']);
+  assert.deepEqual(rules('The bank wasn’t insured, and depositors lost most of it.'), []);
+});
+
+test('a drumbeat of three very short sentences is flagged; initials and abbreviations are not', () => {
+  assert.deepEqual(rules('They clear it. They plant it. They live on it.'), ['staccato-run']);
+  assert.deepEqual(rules('W. H. Williams ran the pen. Dr. J. M. Morton led the school.'), []);
+  assert.deepEqual(rules('Moore, Dr. Isaac E. and Katherine C., House is a building.'), []);
 });

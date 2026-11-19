@@ -1,22 +1,36 @@
 /**
- * Public errata log a plain, reverse-chronological corrections list. Companion feeds at
+ * Public errata log: one dated row per published change, newest first. Companion feeds at
  * /errata/feed.json and /errata/feed.xml, built from the same entry list as this page.
  *
- * Design law: docs/ui/design-direction-v9-surfaces.md §4.2 "/errata". The header carries the
- * two feed links as mono chips; the body is a hairline list, never a set of disclosures.
+ * `?type=` narrows the log to one kind of change through ordinary links, so the filter works
+ * without JavaScript and every narrowing has its own address.
  */
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { Chip, PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
+  TrustLinks,
+  TrustMast,
+  TrustSheet,
 } from '../../components/trust/index';
 import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
+import {
+  ERRATA_CHANGE_TYPES,
+  ERRATA_CHANGE_TYPE_LABELS,
+  isErrataChangeType,
+} from '../../lib/trust/domain-trust';
+import { loadRecordsCatalog } from '../../lib/records/records-catalog';
+import { parentCrumb, Room } from '../../components/room';
 import { ErrataSections } from './ErrataSections';
-import { Room, ReadingEntry, RoomHandoff, RoomSection, RoomStats } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import { errataDate } from './errata-headline';
+import { resolveErrataRecordHrefs, type CatalogName } from './errata-records';
 import '../reading-room.css';
+import '../../components/trust/trust.css';
+import './errata.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/errata',
@@ -25,74 +39,113 @@ export const metadata: Metadata = buildStaticPageMetadata({
     'Reverse-chronological log of corrections, clarifications, updates, and editor notes on published BlackStory records. Every change keeps its date.',
 });
 
-export default function ErrataPage() {
-  const entries = listErrataEntries();
-  const latest = entries
-    .map((entry) => entry.timestamp.slice(0, 10))
-    .sort()
-    .at(-1);
+type ErrataPageProps = {
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+const PLURAL: Readonly<Record<string, string>> = {
+  correction: 'Corrections',
+  clarification: 'Clarifications',
+  update: 'Updates',
+  editors_note: 'Editor’s notes',
+};
+
+const MONTH = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+export default async function ErrataPage({ searchParams }: ErrataPageProps) {
+  const query = await searchParams;
+  const type =
+    typeof query.type === 'string' && isErrataChangeType(query.type) ? query.type : undefined;
+  const all = listErrataEntries();
+  const entries = type === undefined ? all : all.filter((entry) => entry.changeType === type);
+
+  // A catalog outage leaves the log readable, only without record links.
+  const catalog = await loadRecordsCatalog()
+    .then(({ data }) => data as readonly CatalogName[])
+    .catch(() => [] as readonly CatalogName[]);
+  const recordHrefs = resolveErrataRecordHrefs(entries, catalog);
+
+  const latest = all[0];
+  const dek =
+    latest === undefined
+      ? 'Every change to a published record lands here, with its date. Nothing on this site is edited quietly.'
+      : // The count is the mast numeral's (read aloud with its label); the dek gives the date.
+        `The latest landed on ${MONTH.format(new Date(errataDate(latest.timestamp)))}. Nothing on this site is edited quietly.`;
+
+  const present = ERRATA_CHANGE_TYPES.filter((kind) =>
+    all.some((entry) => entry.changeType === kind),
+  );
 
   return (
-    <Room ledger>
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          art={['ledger']}
+          tone="copper"
+          numeral={
+            all.length === 0
+              ? undefined
+              : {
+                  value: all.length.toLocaleString('en-US'),
+                  label: 'published changes, none of them quiet',
+                }
+          }
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/errata')}
+            linkAs={Link}
+            title="Every mistake, published"
+            dek={dek}
+          />
+        </TrustMast>
+      }
+    >
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript pagePath={TRUST_PATHS.errata} pageTitle="Errata" />
-      <ReadingEntry
-        pathname="/errata"
-        title={
-          <>
-            Every mistake, <em>published</em>.
-          </>
-        }
-        lede="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
-      />
-      <RoomStats
-        label="The log at a glance"
-        stats={[
-          {
-            value: entries.length,
-            label: entries.length === 1 ? 'entry in the log' : 'entries in the log',
-          },
-          ...(latest === undefined ? [] : [{ value: latest, label: 'most recent entry' }]),
-        ]}
-      />
+      <TrustSheet>
+        <nav className="ds-errata__kinds" aria-label="Show one kind of change">
+          {/* The total is the dek's; the kinds keep their own counts. */}
+          <Chip href="/errata" selected={type === undefined}>
+            All
+          </Chip>
+          {present.map((kind) => (
+            <Chip key={kind} href={`/errata?type=${kind}`} selected={type === kind}>
+              {PLURAL[kind] ?? ERRATA_CHANGE_TYPE_LABELS[kind]}{' '}
+              {all.filter((entry) => entry.changeType === kind).length}
+            </Chip>
+          ))}
+        </nav>
 
-      <RoomSection id="log" icon="errata" kicker="Log" title="Published corrections" tone="sunk">
-        <p className="ds-errata__feedbar" aria-label="Subscribe to the errata log">
-          <a className="ds-room-chip" href="/errata/feed.json">
-            JSON Feed
-          </a>
-          <a className="ds-room-chip" href="/errata/feed.xml">
-            RSS
-          </a>
+        <ErrataSections entries={entries} recordHrefs={recordHrefs} />
+
+        <p className="ds-errata__feeds">
+          Follow the log by <a href="/errata/feed.xml">RSS</a> or{' '}
+          <a href="/errata/feed.json">JSON Feed</a>.
         </p>
 
-        <ErrataSections entries={entries} />
-
-        <div className="ds-room-handoffs">
-          <RoomHandoff
-            href="/corrections"
-            icon="correction"
-            title="Request a correction"
-            line="A person reads it. You get a receipt code. Nothing publishes on arrival."
-          />
-          <RoomHandoff
-            href="/methodology"
-            icon="methodology"
-            title="How a correction is handled"
-            line="A fix is appended. The earlier reading stays readable."
-          />
-        </div>
-      </RoomSection>
-
-      <WalkOffRamp
-        title="Mistakes, published"
-        extra={[
-          { label: 'Request a correction', href: '/corrections' },
-          { label: 'How a correction is handled', href: '/methodology' },
-        ]}
-      >
-        Each entry keeps its date, the record it changed, and what changed about it.
-      </WalkOffRamp>
+        <TrustLinks
+          links={[
+            {
+              href: '/corrections',
+              title: 'Request a correction',
+              line: 'A person reads it, and you get a receipt code. Nothing publishes on arrival.',
+            },
+            {
+              href: '/methodology#how-a-record-gets-in',
+              title: 'How a correction is handled',
+              line: 'A fix is appended. The earlier reading stays readable.',
+            },
+          ]}
+        />
+      </TrustSheet>
     </Room>
   );
 }

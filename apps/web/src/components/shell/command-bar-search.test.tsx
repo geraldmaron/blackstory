@@ -1,5 +1,5 @@
 /**
- * The bar search off Explore, and the reason ⌘K still works when a segment has thrown.
+ * The bar search, on every route, and the reason ⌘K still works when a segment has thrown.
  *
  * The error boundary renders inside `ds-shell-body`, below the shell header. So the shortcut
  * survives a thrown segment if and only if two things hold: the handler lives in the header's
@@ -46,7 +46,7 @@ describe('bar search', () => {
     assert.match(markup, /value=""/);
   });
 
-  it('submits to /records, so Enter means something on every room off Explore', () => {
+  it('submits to /records, so Enter means something on every route', () => {
     // The regression this locks: the field advertised `enterKeyHint="search"` and sat outside any
     // form, so a reader who typed a phrase and pressed Enter got nothing at all. On the twelve
     // rooms where this is the only search, that was the whole search.
@@ -94,7 +94,7 @@ describe('bar search', () => {
     );
   });
 
-  it('owns the palette chord off Explore', () => {
+  it('owns the palette chord', () => {
     const source = read('components/shell/CommandBarSearch.tsx');
     // The same definition the palette's own opener reads. A second literal `⌘K` check here is
     // how the two drift into disagreeing about what opens search.
@@ -107,36 +107,39 @@ describe('bar search', () => {
 });
 
 describe('CommandBar destinations', () => {
-  it('renders the four product axes in Find, and home only as the brand lockup', () => {
+  it('renders the four tabs, and home only as the brand lockup', () => {
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["'`]\/(?:explore)?#journey["'`]/);
     assert.doesNotMatch(source, /href=["'`]\/journey["'`]/);
-    assert.match(source, /primaryNavDestinations/);
-    assert.match(source, /syncCommandBarClearance/);
+    assert.match(source, /SHELL_TABS/);
     assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
-    assert.match(source, /aria-label="Find"/);
-    assert.match(source, /<RoomsMenu\b/);
+    assert.match(source, /<Tabs\b[^>]*label="Main"/);
     assert.doesNotMatch(source, />\s*Journey\s*</);
     assert.doesNotMatch(source, /\n\s*Door\n/);
-    assert.doesNotMatch(source, /onModeChange!\('story'\)/);
   });
 
-  it('renders Find and Rooms on every route, including /memorial', () => {
+  it('renders the tabs on every route, including /memorial', () => {
     const source = code('components/shell/CommandBar.tsx');
-    // v9 parked a "quiet bar" on the memorial: brand, search, theme, no Find. That made the
-    // rest of the menu unreachable on the one surface a reader most needs a way out of. The wall
+    // v9 parked a "quiet bar" on the memorial: brand, search, theme, no nav. That made the
+    // rest of the site unreachable on the one surface a reader most needs a way out of. The wall
     // stays quiet; the shell does not.
     assert.doesNotMatch(source, /QUIET_BAR_PATHS|commandBarIsQuiet/);
     assert.doesNotMatch(source, /pathname === ['"]\/memorial['"]/);
-    assert.match(source, /aria-label="Find"/);
-    assert.match(source, /<RoomsMenu\b/);
   });
 
   it('does not greet with the catalog count', () => {
     const source = code('components/shell/CommandBar.tsx');
-    assert.match(source, /Search records, places, eras/);
+    assert.match(source, /<CommandBarSearch placeholder="Search" /);
     assert.doesNotMatch(source, /toLocaleString/);
     assert.doesNotMatch(source, /Search \$\{/);
+  });
+
+  it('prefills the field from ?q', () => {
+    const markup = renderToStaticMarkup(<CommandBarSearch placeholder="Search" query="church" />);
+    assert.match(markup, /value="church"/);
+    const header = code('components/SiteShellHeader.tsx');
+    assert.match(header, /useSearchParams\(\)\?\.get\('q'\)/);
+    assert.match(header, /<CommandBar query=\{query\} \/>/);
   });
 });
 
@@ -168,7 +171,7 @@ describe('the shell above the error boundary', () => {
 });
 
 describe('Journey is not advertised as a room', () => {
-  it('the off-Explore bar does not link to /journey or /#journey', () => {
+  it('the bar does not link to /journey or /#journey', () => {
     // Journey is not a published room, so shell navigation must not advertise it.
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["']\/journey["']/);

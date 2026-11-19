@@ -1,6 +1,6 @@
 /**
  * Open Library cover URL helpers for banned-books browse and detail surfaces.
- * Fail-closed: callers treat missing ISBN or load errors as placeholder cover art.
+ * Fail-closed: callers treat a missing ISBN or a load error as a typeset cover.
  */
 import type { BannedBookRecord } from '@repo/domain';
 
@@ -15,14 +15,7 @@ export function coverIsbnForBook(book: Pick<BannedBookRecord, 'identifiers'>): s
 
 export function openLibraryCoverUrl(isbn: string, size: 'S' | 'M' | 'L' = 'M'): string {
   const normalized = isbn.replace(/[^0-9Xx]/g, '');
-  // default=false → HTTP 404 when no cover exists (fires img onError → initials placeholder)
+  // default=false → HTTP 404 when no cover exists (fires img onError, which swaps in the typeset cover)
   // instead of Open Library's tiny placeholder JPEG that would otherwise render blank.
   return `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(normalized)}-${size}.jpg?default=false`;
-}
-
-export function coverInitialsForTitle(title: string): string {
-  const words = title.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return '?';
-  if (words.length === 1) return words[0]!.slice(0, 2).toUpperCase();
-  return `${words[0]!.charAt(0)}${words[1]!.charAt(0)}`.toUpperCase();
 }

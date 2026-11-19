@@ -17,8 +17,6 @@ import { buildExploreMapStyle } from './explore-style';
 import {
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   SATELLITE_LAYER_ID,
 } from './explore-layer-ids';
@@ -129,8 +127,8 @@ test('both schemes declare the same raster channels, so a theme toggle leaves no
   );
 });
 
-test('the flat land and water fills come off, so imagery is not painted over', () => {
-  for (const id of ['plate-landcover', 'plate-water']) {
+test('the flat water fill comes off, so imagery is not painted over', () => {
+  for (const id of ['plate-water']) {
     assert.equal(visibility(layerById(build(false), id)), 'visible', `${id} belongs on flat plate`);
     assert.equal(visibility(layerById(build(true), id)), 'none', `${id} would hide the imagery`);
   }
@@ -187,13 +185,11 @@ test('the presence tint backs off over imagery instead of erasing it', () => {
 /* ---- the line the basemap must not cross --------------------------------------------------- */
 
 test('record encoding is identical with and without imagery', () => {
-  // The dignity rule this file must not quietly break: a record's color and size encode evidence
-  // and kind. If they moved with the basemap, the same pin would mean two different things
+  // The dignity rule this file must not quietly break: a record's mark encodes its stored
+  // precision. If they moved with the basemap, the same pin would mean two different things
   // depending on a toggle, and the legend would be wrong on one of them.
   const encodingLayers = [
     EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-    EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-    EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
     EXPLORE_SELECTED_POINT_LAYER_ID,
     EXPLORE_CLUSTER_LAYER_ID,
   ];

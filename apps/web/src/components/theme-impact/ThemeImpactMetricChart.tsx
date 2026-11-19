@@ -2,9 +2,14 @@
  * Groups a packet's own cited observations by `metricId` into time series and
  * renders each series with >=2 periods as a small SVG line chart. Two series
  * sharing the same reference-period set (e.g. Black/white rates for one
- * indicator) are drawn on one shared chart, styled solid vs. dashed. No data
- * is fetched separately — the chart is built entirely from what the packet
- * already cites, so it never diverges from the provenance the reader sees below.
+ * indicator) are drawn on one shared chart, solid vs. dashed. No data is fetched
+ * separately — the chart is built entirely from what the packet already cites,
+ * so it never diverges from the provenance the reader sees below.
+ *
+ * Series are drawn in ink, labeled directly at the line end (no legend), and every
+ * observation is marked with a dot: the data are benchmark years, and the line
+ * between two dots is a reading aid, not data. The title above the plot states the
+ * finding from the first and last observations.
  */
 import React from 'react';
 import type { ThemeImpactObservationView } from '@repo/domain';
@@ -35,6 +40,31 @@ function parseYear(period: string): number | undefined {
   return match ? Number(match[0]) : undefined;
 }
 
+/**
+ * One name for the whole series. A row label often carries that row's own year or note
+ * ("…, 1860 (last pre-war benchmark)"); those belong to the observation, not the series, so
+ * they are stripped and the most common remainder wins.
+ */
+export function seriesLabel(
+  rows: readonly Pick<ThemeImpactObservationView, 'label'>[],
+  fallback: string,
+): string {
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    const label = (row.label ?? '')
+      .replace(/\s*\([^)]*\)\s*$/, '')
+      .replace(/,?\s*\d{4}\s*$/, '')
+      .trim();
+    if (label) counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  let best = fallback;
+  let bestCount = 0;
+  for (const [label, count] of counts) {
+    if (count > bestCount) [best, bestCount] = [label, count];
+  }
+  return best;
+}
+
 function buildSeries(observations: readonly ThemeImpactObservationView[]): Series[] {
   const byMetric = new Map<string, ThemeImpactObservationView[]>();
   for (const obs of observations) {
@@ -58,8 +88,7 @@ function buildSeries(observations: readonly ThemeImpactObservationView[]): Serie
 
     if (points.length < 2) continue;
 
-    const label = (rows[0]!.label ?? metricId).replace(/,?\s*\d{4}\s*$/, '').trim();
-    series.push({ metricId, label, unit: rows[0]!.unit, points });
+    series.push({ metricId, label: seriesLabel(rows, metricId), unit: rows[0]!.unit, points });
   }
   return series;
 }
@@ -89,11 +118,22 @@ function groupSeries(series: readonly Series[]): ChartGroup[] {
 }
 
 const WIDTH = 480;
-const HEIGHT = 160;
+const HEIGHT = 180;
 const PAD_LEFT = 34;
 const PAD_RIGHT = 12;
-const PAD_TOP = 12;
+const PAD_TOP = 26;
 const PAD_BOTTOM = 22;
+
+/** Round y ticks from zero: a 1, 2 or 5 step, so the axis reads 0, 20, 40, 60. */
+export function niceTicks(max: number, target = 3): number[] {
+  if (!(max > 0)) return [0];
+  const raw = max / target;
+  const magnitude = 10 ** Math.floor(Math.log10(raw));
+  const step = ([1, 2, 5, 10].find((m) => m * magnitude >= raw) ?? 10) * magnitude;
+  const ticks: number[] = [];
+  for (let tick = 0; tick < max + step; tick += step) ticks.push(Number(tick.toPrecision(12)));
+  return ticks;
+}
 
 function formatTick(estimate: number, unit: string): string {
   const normalized = unit.trim().toLowerCase();
@@ -112,10 +152,9 @@ function ChartFigure({ group }: { readonly group: ChartGroup }) {
   const values = allPoints.map((p) => p.estimate);
   const minYear = Math.min(...years);
   const maxYear = Math.max(...years);
-  const minValue = Math.min(...values, 0);
-  const maxValueRaw = Math.max(...values);
-  const pad = (maxValueRaw - minValue || 1) * 0.1;
-  const maxValue = maxValueRaw + pad;
+  const minValue = 0;
+  const yTicks = niceTicks(Math.max(...values));
+  const maxValue = yTicks[yTicks.length - 1]!;
 
   const xScale = (year: number) =>
     maxYear === minYear
@@ -126,7 +165,6 @@ function ChartFigure({ group }: { readonly group: ChartGroup }) {
     PAD_BOTTOM -
     ((value - minValue) / (maxValue - minValue || 1)) * (HEIGHT - PAD_TOP - PAD_BOTTOM);
 
-  const yTicks = [minValue, (minValue + maxValue) / 2, maxValue];
   const xTicks =
     maxYear === minYear
       ? [minYear]
@@ -140,8 +178,14 @@ function ChartFigure({ group }: { readonly group: ChartGroup }) {
     })
     .join('; ');
 
+  const lead = group.series[0]!;
+  const leadFirst = lead.points[0]!;
+  const leadLast = lead.points[lead.points.length - 1]!;
+  const finding = `From ${formatTick(leadFirst.estimate, lead.unit)} in ${leadFirst.year} to ${formatTick(leadLast.estimate, lead.unit)} in ${leadLast.year}`;
+
   return (
     <figure className="ds-theme-impact-chart">
+      <p className="ds-theme-impact-chart__finding">{finding}</p>
       <svg
         className="ds-theme-impact-chart__svg"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -187,32 +231,35 @@ function ChartFigure({ group }: { readonly group: ChartGroup }) {
             )
             .join(' ');
           const last = s.points[s.points.length - 1]!;
+          const variant = index === 0 ? 'a' : 'b';
+          // Direct label at the line end: the first series above its last point, the second below.
+          const labelY = yScale(last.estimate) + (index === 0 ? -9 : 14);
           return (
             <g key={s.metricId}>
               <path
-                className={`ds-theme-impact-chart__line ds-theme-impact-chart__line--${index === 0 ? 'a' : 'b'}`}
+                className={`ds-theme-impact-chart__line ds-theme-impact-chart__line--${variant}`}
                 d={path}
               />
-              <circle
-                className={`ds-theme-impact-chart__dot ds-theme-impact-chart__dot--${index === 0 ? 'a' : 'b'}`}
-                cx={xScale(last.year)}
-                cy={yScale(last.estimate)}
-                r={2.5}
-              />
+              {s.points.map((p) => (
+                <circle
+                  key={p.year}
+                  className={`ds-theme-impact-chart__dot ds-theme-impact-chart__dot--${variant}`}
+                  cx={xScale(p.year)}
+                  cy={yScale(p.estimate)}
+                  r={2.5}
+                />
+              ))}
+              <text
+                className="ds-theme-impact-chart__label"
+                x={xScale(last.year)}
+                y={Math.max(PAD_TOP - 4, labelY)}
+              >
+                {s.label}
+              </text>
             </g>
           );
         })}
       </svg>
-      <figcaption className="ds-theme-impact-chart__legend">
-        {group.series.map((s, index) => (
-          <span
-            key={s.metricId}
-            className={`ds-theme-impact-chart__legend-item ds-theme-impact-chart__legend-item--${index === 0 ? 'a' : 'b'}`}
-          >
-            {s.label}
-          </span>
-        ))}
-      </figcaption>
     </figure>
   );
 }

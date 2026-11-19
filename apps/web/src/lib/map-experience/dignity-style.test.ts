@@ -96,6 +96,7 @@ function contrastRatio(fg: string, bg: string): number {
 test('history relationship edge plate colors meet WCAG 1.4.11 (≥3:1) on both themes', () => {
   const light = plateForScheme('light');
   const dark = plateForScheme('dark');
+  // Each theme draws edges in its own copper text step: paper by day, charcoal by night.
   assert.equal(light.historyEdge, brandPalette.copperTextLight);
   assert.equal(dark.historyEdge, brandPalette.copperDark);
   assert.notEqual(light.historyEdge, DIGNITY_PALETTE.pointHalo);
@@ -108,6 +109,9 @@ test('history relationship edge plate colors meet WCAG 1.4.11 (≥3:1) on both t
     contrastRatio(dark.historyEdge, dark.ocean) >= 3,
     `dark historyEdge ${dark.historyEdge} on ${dark.ocean} must be ≥3:1`,
   );
+  for (const plate of [light, dark]) {
+    assert.ok(contrastRatio(plate.historyEdge, plate.land) >= 3, 'edges on the lower 48');
+  }
   assert.ok(
     contrastRatio(DIGNITY_PALETTE.pointHalo, light.ocean) < 3,
     'pageSand must fail on white',
@@ -168,7 +172,7 @@ test('no status or skin framing in kind labels or legend prose', () => {
   }
 
   const legendSource = readFileSync(
-    path.join(__dirname, '../../components/map-experience/MapExperienceLegend.tsx'),
+    path.join(__dirname, '../../components/map-experience/MapKey.tsx'),
     'utf8',
   );
   const jsxTextLines = legendSource
@@ -178,13 +182,12 @@ test('no status or skin framing in kind labels or legend prose', () => {
   assert.doesNotMatch(
     renderedProse,
     bannedPattern,
-    'MapExperienceLegend.tsx JSX copy must not use status/skin framing',
+    'the map key (MapKey.tsx) must not use status/skin framing',
   );
-  assert.match(
-    renderedProse,
-    /kind groups/i,
-    'the legend must state that color encodes kind groups (and historical tones)',
-  );
+  // The key says what a mark claims about place, never more: a site, a city, or no point at all.
+  assert.match(renderedProse, /Exact site/);
+  assert.match(renderedProse, /Within a city or area/);
+  assert.match(renderedProse, /County or state/);
 });
 
 test('no density-tier fill is red-hued — never a crime-heat gradient', () => {

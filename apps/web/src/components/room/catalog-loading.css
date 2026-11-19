@@ -1,24 +1,14 @@
 /*
- * The wait for public catalog routes: the room's masthead over a blank ruled ledger, one copper
+ * The wait for public catalog routes: the room's PageHeader over a blank ruled ledger, one copper
  * pin travelling the top rule. No filled placeholder blocks, glow, gradient or bounce
  * (docs/ui/brand.md). The rules draw in once on arrival, then hold; only the pin keeps moving.
  * Reduced motion shows the finished ledger with the pin parked at the start.
  */
 
-/* A wait is not the page: the masthead keeps its frame but drops from hero scale, so the real
-   title arriving does not read as the same shout twice. */
-.ds-room--ledger .ds-wait .ds-entry__title {
-  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
-  line-height: 1.05;
-}
-
-.ds-room--ledger .ds-wait .ds-entry--reading {
-  padding-bottom: var(--ds-space-6);
-}
-
 .ds-wait__ledger {
   display: grid;
   margin-top: 0;
+  border-top: var(--ds-border-width, 1px) solid var(--ds-rule);
 }
 
 .ds-wait__rule {
@@ -29,7 +19,7 @@
   animation: ds-wait-draw 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* The pin rides the masthead's own ink rule, which sits directly above the ledger. */
+/* The pin rides the ledger's top rule. */
 .ds-wait__rule--lead {
   height: 0;
   margin-top: -1px;

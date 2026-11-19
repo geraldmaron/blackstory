@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import {
   DOOR_FRAME_MARGIN_MAX_PX,
   DOOR_FRAME_MARGIN_MIN_PX,
+  doorDrillPadding,
   doorFrameMargin,
   doorFrameOffset,
   doorFramePadding,
@@ -113,4 +114,17 @@ test('sub-pixel jitter is not a resize', () => {
   assert.ok(!sameDoorFrameBox(DESKTOP_WINDOW, { ...DESKTOP_WINDOW, width: 1000 }));
   assert.ok(sameDoorFrameBox(null, null));
   assert.ok(!sameDoorFrameBox(DESKTOP_WINDOW, null));
+});
+
+test('a drill keeps more air than the national frame, on every side', () => {
+  const base = doorFramePadding(DESKTOP_WINDOW, DESKTOP_PLATE)!;
+  const drill = doorDrillPadding(DESKTOP_WINDOW, DESKTOP_PLATE)!;
+  for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+    assert.ok(drill[side] > base[side], side);
+  }
+});
+
+test('a drill falls back to the plain padding when the extra air leaves no room', () => {
+  const tiny = { top: 0, left: 0, width: 120, height: 120 };
+  assert.deepEqual(doorDrillPadding(tiny, tiny), doorFramePadding(tiny, tiny));
 });

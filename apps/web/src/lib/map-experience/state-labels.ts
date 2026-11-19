@@ -1,29 +1,17 @@
 /**
- * State abbreviation label markers for the `/explore` national map.
+ * State abbreviation label points for the explore map.
  *
- * Rendered as HTML markers, not a MapLibre `symbol` layer — a deliberate choice, not a font/sprite
- * gap: the style does supply a `glyphs` URL (`OPENFREEMAP_GLYPHS_URL` in `dignity-style.ts`), and
- * `explore-style.ts`'s `plate-place-city` layer already renders city/town names as symbols off
- * that same font server. State names stay off a symbol layer for two reasons a `text-field` layer
- * can't replicate: (1) a label's ink is keyed to live selection state (`selected` below drives
- * `stateLabelColors`), redrawn from app state on every selection change rather than from tile
- * data; (2) a second symbol layer carrying the same 51 names would collide with
- * `plate-place-city` in their shared 4.2-6.2 zoom band — see that layer's own comment in
- * `explore-style.ts` for the recorded decision. DOM markers sidestep both, at the cost of the
- * residual collision risk documented on `buildStateLabelElement` below.
- *
- * This module is pure data + a DOM-element factory; it never touches a live `maplibregl.Map`
- * instance mounting/positioning markers against a real map is the consuming surface's job (see
- * the integration contract in `buildStateLabelMarkers`'s doc comment below). That keeps this
- * module unit-testable in plain Node, the same split `marker-size.ts` and `kind-encoding.ts` use.
+ * Drawn by the `explore-state-label` symbol layers in `app/map/explore-style.ts`, not as DOM
+ * markers: a symbol layer sits in MapLibre's one collision pass, so a label beneath the group
+ * circles in the style yields to a group count instead of printing across it, and city labels
+ * no longer collide with state labels they could not see. This module is pure data so it stays
+ * unit-testable in plain Node.
  */
 // Subpath import (not the package barrel): the barrel re-exports ./publication, which pulls in
-// `node:crypto` at module scope. This module is imported by MapStage.tsx ('use client'), so
+// `node:crypto` at module scope. This module reaches MapStage.tsx ('use client') through the style, so
 // barrel-importing here would drag a Node-only module into the browser bundle.
 import { US_STATES, type UsStateInfo } from '@repo/domain/map/geography';
-import { brandPalette, mapPalettes } from '@repo/ui';
 import { MAP_MIN_ZOOM } from './camera-presets';
-import { type MapColorScheme } from './dignity-style';
 
 export type StateLabelPoint = {
   readonly postalCode: string;
@@ -53,6 +41,9 @@ const LABEL_POINT_OVERRIDES: Readonly<Record<string, readonly [lng: number, lat:
   // Michigan's two peninsulas straddle Lake Michigan/Huron; the bbox centroid lands in open
   // water between them. Pin to the Lower Peninsula (the state's population center).
   MI: [-84.5, 43.3],
+  // Maryland's bbox centroid (~-77.3, 38.8) lands in Fairfax County, Virginia: the western
+  // panhandle and the Eastern Shore pull the box around the Potomac. Pin to central Maryland.
+  MD: [-76.8, 39.2],
 };
 
 function bboxCentroid(bbox: UsStateInfo['bbox']): readonly [lng: number, lat: number] {
@@ -69,7 +60,8 @@ export function stateLabelPoints(): readonly StateLabelPoint[] {
 }
 
 /** Zoom band the labels are visible in (design-direction-v3.md "State labels": visible at
- * zoom <= 6.2, opacity fade starting at 5.6). */
+ * zoom <= 6.2, opacity fade starting at 5.6). The symbol layers' `text-opacity` interpolates
+ * between these stops. */
 export const STATE_LABEL_FADE_START_ZOOM = 5.6;
 export const STATE_LABEL_FADE_END_ZOOM = 6.2;
 
@@ -82,157 +74,3 @@ export const STATE_LABEL_FADE_END_ZOOM = 6.2;
  */
 export const STATE_LABEL_APPEAR_START_ZOOM = 2.4;
 export const STATE_LABEL_APPEAR_END_ZOOM = MAP_MIN_ZOOM;
-
-/** 0 below the appear band, 1 across the visible band, 0 above the fade band, linear in the two
- * ramps. Shaped like MapLibre `interpolate` stops so the same curve could drive a `text-opacity`
- * paint property directly if this ever migrates off HTML markers onto a symbol layer. */
-export function stateLabelOpacityForZoom(zoom: number): number {
-  if (zoom <= STATE_LABEL_APPEAR_START_ZOOM) return 0;
-  if (zoom < STATE_LABEL_APPEAR_END_ZOOM) {
-    const span = STATE_LABEL_APPEAR_END_ZOOM - STATE_LABEL_APPEAR_START_ZOOM;
-    return (zoom - STATE_LABEL_APPEAR_START_ZOOM) / span;
-  }
-  if (zoom <= STATE_LABEL_FADE_START_ZOOM) return 1;
-  if (zoom >= STATE_LABEL_FADE_END_ZOOM) return 0;
-  const span = STATE_LABEL_FADE_END_ZOOM - STATE_LABEL_FADE_START_ZOOM;
-  return 1 - (zoom - STATE_LABEL_FADE_START_ZOOM) / span;
-}
-
-export type StateLabelMarkerDescriptor = {
-  readonly postalCode: string;
-  readonly name: string;
-  readonly lngLat: readonly [lng: number, lat: number];
-  readonly text: string;
-  readonly selected: boolean;
-};
-
-/**
- * Pure descriptor list for all 51 state labels. Selecting a state only changes `selected`
- * (color); position and text never move, so a caller can key markers by `postalCode` and reuse
- * the same 51 `maplibregl.Marker` instances across re-renders instead of tearing them down.
- */
-export function buildStateLabelMarkers(
-  selectedPostalCode?: string,
-): readonly StateLabelMarkerDescriptor[] {
-  return stateLabelPoints().map((point) => ({
-    postalCode: point.postalCode,
-    name: point.name,
-    lngLat: [point.lng, point.lat] as const,
-    text: point.postalCode,
-    selected: point.postalCode === selectedPostalCode,
-  }));
-}
-
-export const STATE_LABEL_CLASS_NAME = 'ds-state-label';
-export const STATE_LABEL_SELECTED_CLASS_NAME = 'ds-state-label--selected';
-
-/** Resolves light/dark from an explicit scheme or `document.documentElement.dataset.theme`. */
-export function resolveStateLabelColorScheme(colorScheme?: MapColorScheme): MapColorScheme {
-  if (colorScheme) return colorScheme;
-  if (typeof document !== 'undefined' && document.documentElement.dataset.theme === 'light') {
-    return 'light';
-  }
-  return 'dark';
-}
-
-/**
- * Theme-aware ink for HTML state abbreviation markers (testable without DOM).
- *
- * `default` is `mapPalettes[scheme].label`: design law's own "State labels" role,
- * ΔL*-contrast-held against `land` by `map-contrast.test.ts`, the same token symbol-layer text
- * would use for `text-color` if this label set were ever a `text-field` layer instead of a DOM
- * marker (see the module doc comment above). `selected` stays the brand accent: it is an
- * interaction highlight, not part of the plate's §3 token table.
- */
-export function stateLabelColors(colorScheme?: MapColorScheme): {
-  readonly default: string;
-  readonly selected: string;
-} {
-  const scheme = resolveStateLabelColorScheme(colorScheme);
-  if (scheme === 'light') {
-    return {
-      default: mapPalettes.light.label,
-      selected: brandPalette.copperTextLight,
-    };
-  }
-  return {
-    default: mapPalettes.dark.label,
-    selected: brandPalette.copperDark,
-  };
-}
-
-/** MapStage integration alias — `{ muted, selected }` shape for theme observer sync. */
-export function stateLabelColorsForScheme(colorScheme: MapColorScheme): {
-  readonly muted: string;
-  readonly selected: string;
-} {
-  const colors = stateLabelColors(colorScheme);
-  return { muted: colors.default, selected: colors.selected };
-}
-
-/**
- * Builds a label's DOM element: mono-register caps, theme-aware muted ink, copper when selected, never
- * interactive. Browser-only (calls `document.createElement`) callers must not invoke this in a
- * non-DOM context (SSR/Node tests); `stateLabelPoints`/`buildStateLabelMarkers` above are this
- * module's SSR/test-safe surface.
- *
- * Collision policy (design-direction-v3.md "never colliding with markers"): these labels get NO
- * automatic collision avoidance MapLibre's built-in symbol-layer collision detection does not
- * apply to `Marker` DOM elements, and true per-frame collision avoidance against the entity
- * layer is out of scope here. Mitigation is structural instead: `pointer-events: none` (a label
- * never blocks a click reaching a marker or cluster beneath it), a modest fixed font size/line
- * box (small footprint), and the fact that these labels are only visible at national/regional
- * zoom (<= 6.2), where entities are still clustered (see `EXPLORE_CLUSTER_CONFIG.clusterMaxZoom`
- * = 12) rather than rendered as dense individual points. The mounting surface should stack these
- * markers' DOM nodes below the entity/cluster marker layer (e.g. a lower z-index or insertion
- * order) as a further belt-and-suspenders measure.
- *
- * Residual risk this policy does NOT cover: `plate-place-city` (`explore-style.ts`)
- * draws city/town symbol labels from `minzoom: 4.2`, inside this label's own visible band
- * (<= 6.2, `STATE_LABEL_FADE_END_ZOOM`). In that shared 4.2-6.2 window a state marker and a city
- * label can occupy overlapping screen space: MapLibre's placement engine keeps city labels from
- * colliding with each other, but has no visibility into these DOM markers, so it cannot keep a
- * city label from colliding with one. This is accepted as a documented residual risk of keeping
- * state labels on DOM markers (see the module doc comment above) rather than solved — the only
- * complete fix is retiring this file for a `plate-place-state` symbol layer, which was decided
- * against for the reasons given there.
- */
-export function buildStateLabelElement(
-  descriptor: StateLabelMarkerDescriptor,
-  options?: { readonly colorScheme?: MapColorScheme },
-): HTMLDivElement {
-  const el = document.createElement('div');
-  el.className = descriptor.selected
-    ? `${STATE_LABEL_CLASS_NAME} ${STATE_LABEL_SELECTED_CLASS_NAME}`
-    : STATE_LABEL_CLASS_NAME;
-  el.textContent = descriptor.text;
-  // Decorative echo of the state boundary already selectable via the app's own state-select
-  // affordance (SynchronizedResultList / URL state); screen reader users get 51 scattered
-  // two-letter text nodes with no additional context, so this is hidden rather than announced.
-  el.setAttribute('aria-hidden', 'true');
-  el.style.pointerEvents = 'none';
-  el.style.userSelect = 'none';
-  el.style.whiteSpace = 'nowrap';
-  el.style.fontFamily = 'var(--ds-font-mono)';
-  el.style.textTransform = 'uppercase';
-  el.style.letterSpacing = '0.08em';
-  el.style.fontSize = '0.6875rem';
-  el.style.fontWeight = '500';
-  const colors = stateLabelColors(options?.colorScheme);
-  el.style.color = descriptor.selected ? colors.selected : colors.default;
-  // These sit directly on the canvas with no MapLibre `text-halo-*` to fall back on (DOM
-  // markers, not a symbol layer — see the module doc comment). Ink alone reads fine against the
-  // flat `background` fill but washes out over the satellite basemap and the state-density-fill
-  // overlay, both of which vary in luminance under a fixed-position label. `mapPalettes[...].halo`
-  // is the same token symbol-layer labels use for `text-halo-color`; replicated here as a
-  // multi-directional text-shadow, the DOM equivalent of a paint-time halo.
-  const halo = mapPalettes[resolveStateLabelColorScheme(options?.colorScheme)].halo;
-  el.style.textShadow = [
-    `0 0 3px ${halo}`,
-    `1px 1px 1px ${halo}`,
-    `-1px -1px 1px ${halo}`,
-    `1px -1px 1px ${halo}`,
-    `-1px 1px 1px ${halo}`,
-  ].join(', ');
-  return el;
-}

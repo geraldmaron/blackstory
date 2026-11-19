@@ -190,3 +190,20 @@ const nameYearByKey: ReadonlyMap<string, number> = (() => {
 export function memorialNameYear(name: string): number | undefined {
   return nameYearByKey.get(normalizeNameKey(name));
 }
+
+const namePlaceByKey: ReadonlyMap<string, string> = (() => {
+  const map = new Map<string, string>();
+  for (const entry of MEMORIAL_ARCHIVE_ENTRIES) {
+    const key = normalizeNameKey(entry.name);
+    const place = entry.place?.trim();
+    if (place && !map.has(key)) {
+      map.set(key, place);
+    }
+  }
+  return map;
+})();
+
+/** Place of record for a memorial name, when the archive has one. Text only, never a map point. */
+export function memorialNamePlace(name: string): string | undefined {
+  return namePlaceByKey.get(normalizeNameKey(name));
+}

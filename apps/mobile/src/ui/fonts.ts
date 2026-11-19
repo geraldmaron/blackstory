@@ -1,8 +1,9 @@
 /**
  * Brand font loading via `expo-font` + `@expo-google-fonts/*`.
  *
- * brand/tokens/typography.json specifies Schibsted Grotesk SemiBold
- * (display), Geist (UI/body), Newsreader (editorial), and Geist Mono
+ * brand/tokens/typography.json specifies Schibsted Grotesk (display, with
+ * weight as the contrast axis: 800 display, 700 headline, 650 title; mobile
+ * uses the static 800/700/600 files), Geist (UI/body), Newsreader (editorial), and Geist Mono
  * (data/citations) — see tokens/generated/typography.generated.ts. This
  * matches apps/web/src/app/layout.tsx's next/font/google set; web loads
  * these as variable faces, mobile needs one static file per weight since
@@ -24,7 +25,11 @@
  */
 import { useFonts } from 'expo-font';
 import { Geist_400Regular, Geist_500Medium, Geist_600SemiBold } from '@expo-google-fonts/geist';
-import { SchibstedGrotesk_600SemiBold } from '@expo-google-fonts/schibsted-grotesk';
+import {
+  SchibstedGrotesk_600SemiBold,
+  SchibstedGrotesk_700Bold,
+  SchibstedGrotesk_800ExtraBold,
+} from '@expo-google-fonts/schibsted-grotesk';
 import { Newsreader_400Regular } from '@expo-google-fonts/newsreader';
 import { GeistMono_500Medium } from '@expo-google-fonts/geist-mono';
 
@@ -34,12 +39,14 @@ import { GeistMono_500Medium } from '@expo-google-fonts/geist-mono';
  * tokens/generated/typography.generated.ts's `typeScale` needs its own
  * registered key; `resolveFontFamily` below maps a type-scale entry to the
  * matching key. `fontFamilies` (the generated brand-name strings, e.g.
- * "Schibsted Grotesk SemiBold") is documentation of what the brand calls
+ * "Schibsted Grotesk") is documentation of what the brand calls
  * each role, not literally the RN `fontFamily` value — RN needs the
  * registered key.
  */
 const REGISTERED_FONTS = {
   'SchibstedGrotesk-SemiBold': SchibstedGrotesk_600SemiBold,
+  'SchibstedGrotesk-Bold': SchibstedGrotesk_700Bold,
+  'SchibstedGrotesk-ExtraBold': SchibstedGrotesk_800ExtraBold,
   'Geist-Regular': Geist_400Regular,
   'Geist-Medium': Geist_500Medium,
   'Geist-SemiBold': Geist_600SemiBold,
@@ -48,7 +55,7 @@ const REGISTERED_FONTS = {
 } as const;
 
 /**
- * Loads the brand's four type families (six weight-specific files). Returns
+ * Loads the brand's four type families (eight weight-specific files). Returns
  * `[fontsLoaded, error]` exactly like the underlying `useFonts` — render a
  * loading state (or simply defer rendering brand-typeset screens) until
  * `fontsLoaded` is true, per Expo's documented pattern.
@@ -62,11 +69,16 @@ export function resolveFontFamily(
   familyRole: 'display' | 'uiBody' | 'editorial' | 'dataMono',
   weight: string,
 ): keyof typeof REGISTERED_FONTS {
-  if (familyRole === 'display') return 'SchibstedGrotesk-SemiBold';
+  const numericWeight = Number(weight);
+  // Display weight is a contrast axis on web (800 display, 700 headline); static files per weight.
+  if (familyRole === 'display') {
+    if (numericWeight >= 800) return 'SchibstedGrotesk-ExtraBold';
+    if (numericWeight >= 700) return 'SchibstedGrotesk-Bold';
+    return 'SchibstedGrotesk-SemiBold';
+  }
   if (familyRole === 'editorial') return 'Newsreader-Regular';
   if (familyRole === 'dataMono') return 'GeistMono-Medium';
   // uiBody (Geist): pick the closest loaded static weight.
-  const numericWeight = Number(weight);
   if (numericWeight >= 600) return 'Geist-SemiBold';
   if (numericWeight >= 500) return 'Geist-Medium';
   return 'Geist-Regular';

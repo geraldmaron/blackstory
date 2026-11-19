@@ -11,15 +11,26 @@
 #
 # Env loading (first match wins for DATABASE_URL if already unset):
 #   1. Existing process env
-#   2. apps/web/.env.local
-#   3. $BLACKSTORY_DATABASE_ENV_FILE (optional path to a migrate/local env file)
-#   4. Sibling ~/Developer/Projects/blackstory/.env.migrate.local (when present)
+#   2. 1Password, by reference via `op run`, when the op CLI is installed. A copy in
+#      apps/web/.env.local goes stale when the password is rotated (2026-11-11 broke every page);
+#      the reference never does. BLACKSTORY_DEV_NO_OP=1 skips this step.
+#   3. apps/web/.env.local (refresh its copy with `pnpm env:local:op`)
+#   4. $BLACKSTORY_DATABASE_ENV_FILE (optional path to a migrate/local env file)
+#   5. Sibling ~/Developer/Projects/blackstory/.env.migrate.local (when present)
 #
 # Never prints DATABASE_URL.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+# Same item as scripts/env-local-op.sh. A rotation changes the value, never this reference.
+DATABASE_URL_OP_REF="op://orsmn55mjwru7jkycit6p3cmne/3vvt7hah7xe5s6nclzyf5gdkvm/connection_string"
+if [[ -z "${DATABASE_URL:-}" && -z "${BLACKSTORY_DEV_NO_OP:-}" ]] && command -v op >/dev/null 2>&1; then
+  echo "dev-web: DATABASE_URL from 1Password (BLACKSTORY_DEV_NO_OP=1 uses apps/web/.env.local)"
+  # op run resolves the reference into the child's env, so the re-run takes step 1.
+  DATABASE_URL="$DATABASE_URL_OP_REF" exec op run -- "$0" "$@"
+fi
 
 load_env_file() {
   local file="$1"

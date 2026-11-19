@@ -3,7 +3,8 @@
  */
 
 /**
- * Flat system: no shadows hairline borders (Rule) carry separation.
+ * Flat system: no elevation ramp; hairline borders (Rule) carry separation. The one exception is
+ * the contact shadow (--ds-contact-* in tokens.css), allowed only where a layer overlaps another.
  * The object shape is kept for call-site stability; every value is 'none'.
  */
 export const elevation = {
@@ -27,7 +28,7 @@ export const borders = {
 } as const;
 
 export const focus = {
-  outlineWidth: '2px',
+  outlineWidth: '3px',
   outlineOffset: '2px',
   outlineStyle: 'solid',
 } as const;

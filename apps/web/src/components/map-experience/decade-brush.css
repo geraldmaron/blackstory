@@ -1,0 +1,219 @@
+/*
+ * The decade histogram strip. 56px tall. Where it sits is the caller's (explore-column.css docks
+ * it on the map's bottom edge on a wide screen, and sets it inside the filter state on a phone).
+ * The home walk's histogram idiom (door-home.css): bars in a rule tone on an ink baseline, the
+ * bars inside the brushed range in the plate's type color, the range's edges copper, decade
+ * labels in mono capitals. The map's key sits in the leading cell on a wide screen.
+ */
+.ds-xbrush {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--ds-space-4);
+  height: 56px;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  color: var(--ds-ink);
+}
+
+.ds-xbrush__lead {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-xbrush__label {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+
+/* The key needs a line of its own and room for all three marks: only the dock on a wide screen
+   has it. On a narrower screen the Filters view carries the key (explore-refine.css). */
+.ds-xbrush__key {
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .ds-xdock .ds-xbrush {
+    grid-template-columns: 22rem minmax(0, 1fr);
+  }
+
+  .ds-xdock .ds-xbrush__key {
+    display: flex;
+  }
+
+  /* One 20px line for the range, so the key fits under it inside the strip's 56px; the clear
+     button keeps its 44px target by reaching into the strip's padding. */
+  .ds-xdock .ds-xbrush__label {
+    height: 20px;
+  }
+
+  .ds-xdock .ds-xbrush__clear {
+    margin-block: calc(var(--ds-space-3) * -1);
+  }
+}
+
+.ds-xbrush__range {
+  overflow: hidden;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ds-tracking-meta);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-xbrush__range--all {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+}
+
+.ds-xbrush__clear {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: calc(var(--ds-space-2) * -1);
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-xbrush__clear:hover {
+  color: var(--ds-ink);
+}
+
+.ds-xbrush__clear:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-xbrush__plot {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-xbrush__track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  min-height: 0;
+  isolation: isolate;
+  border-bottom: var(--ds-border-width) solid var(--ds-ink);
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.ds-xbrush__bar {
+  position: relative;
+  z-index: 1; /* local: bars above the brushed wash */
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 2px;
+  /* With no range every decade is on the plate: bars in the muted ink, as the walk's walked
+     decades. A set range sends the rest back to the rule tone. */
+  background: var(--ds-ink-muted);
+  pointer-events: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-xbrush--active .ds-xbrush__bar {
+  background: var(--ds-rule);
+}
+
+/* The brushed range: the plate's type color (never color alone: the handles and the range label
+   say it too). */
+.ds-xbrush--active .ds-xbrush__bar--in {
+  background: var(--ds-map-label-hi);
+}
+
+/* The brushed span only positions the range; its edges are the copper handles. */
+.ds-xbrush__span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 0; /* local: under the bars */
+  pointer-events: none;
+}
+
+/* Handles: a 2px rule with a grip. The visible mark is narrow and spans the track; the hit area
+   is 44px wide and reaches into the strip's padding and the axis row, so it is at least 44px tall
+   (the track alone is about 28px). Neutral at rest, copper once a range is set. */
+.ds-xbrush__handle {
+  position: absolute;
+  z-index: 2; /* local: handles above the bars */
+  top: calc(var(--ds-space-2) * -1);
+  bottom: calc(var(--ds-space-4) * -1);
+  width: 44px;
+  margin-left: calc(var(--ds-space-5) * -1 - 2px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.ds-xbrush__handle::before,
+.ds-xbrush__handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  background: var(--ds-border-control);
+  transform: translateX(-50%);
+}
+
+.ds-xbrush__handle::before {
+  top: var(--ds-space-2);
+  bottom: var(--ds-space-4);
+  width: 2px;
+}
+
+.ds-xbrush__handle::after {
+  /* Centered on the track, not on the taller hit box. */
+  top: calc(50% - var(--ds-space-1));
+  width: 8px;
+  height: 16px;
+  border-radius: var(--ds-radius-sm);
+  transform: translate(-50%, -50%);
+}
+
+.ds-xbrush:not(.ds-xbrush--active) .ds-xbrush__handle {
+  opacity: 0;
+}
+
+.ds-xbrush:not(.ds-xbrush--active):hover .ds-xbrush__handle,
+.ds-xbrush__handle:focus-visible {
+  opacity: 1;
+}
+
+.ds-xbrush--active .ds-xbrush__handle::before,
+.ds-xbrush--active .ds-xbrush__handle::after {
+  background: var(--ds-accent-graphic);
+}
+
+.ds-xbrush__handle:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 0;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-xbrush__axis {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ds-tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+}

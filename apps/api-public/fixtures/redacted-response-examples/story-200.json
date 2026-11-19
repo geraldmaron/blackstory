@@ -1,0 +1,69 @@
+{
+  "slug": "abraham-lincoln",
+  "title": "Abraham Lincoln",
+  "summary": "Lincoln signed the District of Columbia Compensated Emancipation Act on April 16, 1862, issued the Emancipation Proclamation effective January 1, 1863, and approved the joint resolution sending the Thirteenth Amendment to the states on February 1, 1865.",
+  "format": "entry",
+  "eraLabel": "1861–1865",
+  "placeLabel": "United States",
+  "publishedAt": "2026-08-07",
+  "collection": {
+    "id": "presidents",
+    "label": "The presidents on the record",
+    "position": 16,
+    "positionLabel": "16th president"
+  },
+  "heroImage": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+    "alt": "Photographic portrait of Abraham Lincoln, head and shoulders",
+    "credit": "Alexander Gardner studio, February 1865 (O-77 sitting), via Wikimedia Commons."
+  },
+  "webPath": "/presidents/abraham-lincoln",
+  "releaseId": "rel_2026_07_19_001",
+  "body": [
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "The record"
+    },
+    {
+      "type": "list",
+      "style": "bullet",
+      "items": [
+        [
+          {
+            "t": "text",
+            "text": "April 16, 1862: signed the District of Columbia Compensated Emancipation Act."
+          },
+          {
+            "t": "cite",
+            "n": 1,
+            "refId": "nara-dc-emancipation"
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "runs": [
+        {
+          "t": "text",
+          "text": "None of the sources cited here shows that Lincoln ever enslaved anyone."
+        }
+      ]
+    }
+  ],
+  "references": [
+    {
+      "id": "nara-dc-emancipation",
+      "label": "National Archives — The District of Columbia Emancipation Act",
+      "url": "https://www.archives.gov/exhibits/featured-documents/dc-emancipation-act"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Neo",
+      "kind": "editorial",
+      "roles": ["author"]
+    }
+  ]
+}

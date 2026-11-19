@@ -1,7 +1,7 @@
 /**
- * Edition Surface panel — flat matte card with optional hairline border.
- * Mobile counterpart of web `.ds-surface` / browse edition panels. No shadows,
- * gradients, or elevation wash; siblings pass `shadow="none"` (the default).
+ * Record sheet: paper standing off the canvas with the web sheet shadow and an optional
+ * hairline border. Mobile counterpart of web `.ds-sheet`
+ * (`docs/ui/patterns-living-archive.md`). Pass `shadow="none"` for a panel that sits flush.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';
@@ -22,13 +22,7 @@ export type LiftedSurfaceProps = Omit<ViewProps, 'style'> & {
   radiusKey?: RadiusKey;
   paddingKey?: SpaceKey;
   bordered?: boolean;
-  /**
-   * Shadow tier — defaults to `none` (flat matte). Map floating chrome may pass
-   * `sm` under the narrow exception in `docs/ui/design-direction-v6-mobile.md`
-   * ("map floating instruments only"); browse surfaces must leave the default.
-   * Nothing passes `sm` today, and this was never an ADR-013 rule; see
-   * `docs/decisions-carryover.md`, "Map stack" (ADR-013 does not exist).
-   */
+  /** Plane: `sheet` (default), `lift` while pressed, `float` for chrome over the map. */
   shadow?: ShadowLevel;
   style?: ViewProps['style'];
   contentStyle?: ViewProps['style'];
@@ -40,7 +34,7 @@ export function LiftedSurface({
   radiusKey = 'md',
   paddingKey,
   bordered = true,
-  shadow = 'none',
+  shadow = 'sheet',
   style,
   contentStyle,
   children,
@@ -57,7 +51,6 @@ export function LiftedSurface({
           borderRadius: radius[radiusKey],
           borderWidth: bordered ? StyleSheet.hairlineWidth : 0,
           borderColor: bordered ? theme.border : undefined,
-          overflow: 'hidden',
           backgroundColor: theme[tone],
         },
         style,
@@ -67,6 +60,8 @@ export function LiftedSurface({
       <View
         style={[
           styles.content,
+          // Clip here, not on the outer view: clipping the outer view cuts off its own shadow.
+          { borderRadius: radius[radiusKey] },
           paddingKey ? { padding: space[paddingKey] } : undefined,
           contentStyle,
         ]}
@@ -80,5 +75,6 @@ export function LiftedSurface({
 const styles = StyleSheet.create({
   content: {
     position: 'relative',
+    overflow: 'hidden',
   },
 });

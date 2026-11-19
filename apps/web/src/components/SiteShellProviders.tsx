@@ -19,7 +19,8 @@
  * surrounding markup (the plate's own inert `<div>`, the header, the footer) render up front.
  */
 
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
+import { syncThemeColorMeta } from '@repo/ui';
 import { MapMomentStage } from './room/MapMoment';
 import { MapStageProvider } from './map-stage/MapStage';
 import { OfflineNotice } from './OfflineNotice';
@@ -31,6 +32,8 @@ export type SiteShellProvidersProps = {
 };
 
 export function SiteShellProviders({ children }: SiteShellProvidersProps) {
+  // The browser chrome follows the site's theme, not the OS one the viewport tags are keyed on.
+  useEffect(() => syncThemeColorMeta(), []);
   return (
     <MapMomentStage>
       <MapStageProvider>

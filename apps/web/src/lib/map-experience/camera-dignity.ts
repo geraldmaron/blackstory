@@ -58,7 +58,7 @@ const VIOLENCE_ADJACENT_TOPIC_TERMS: readonly string[] = [
 ];
 
 /** Moves permitted on a violence-adjacent record: plain arrival and framing, no drama. */
-const DIGNIFIED_MOVES: readonly CameraMove[] = ['wide', 'flyToRecord', 'tilt'];
+const DIGNIFIED_MOVES: readonly CameraMove[] = ['wide', 'frameRecord', 'tilt'];
 
 export const ALL_CAMERA_MOVES: readonly CameraMove[] = [
   'wide',
@@ -67,7 +67,7 @@ export const ALL_CAMERA_MOVES: readonly CameraMove[] = [
   'tilt',
   'spotlight',
   'trace',
-  'flyToRecord',
+  'frameRecord',
 ];
 
 function toneFor(record: RecordLike): string | undefined {
@@ -94,7 +94,7 @@ export function isViolenceAdjacent(record: RecordLike): boolean {
  * The moves this record permits.
  *
  * Two rules compose:
- *   1. a violence-adjacent record permits only `wide`, `flyToRecord` and `tilt`
+ *   1. a violence-adjacent record permits only `wide`, `frameRecord` and `tilt`
  *   2. `spotlight` is refused for any person record regardless of tone, because the spotlight
  *      isolates, and isolating an individual human being is not something this archive does
  */

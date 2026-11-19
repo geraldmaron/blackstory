@@ -15,7 +15,6 @@ import {
   buildLivesMilestonePanels,
   parseLivesMilestone,
   livesMilestonePeriod,
-  livesMilestoneSpanLabel,
 } from './lives-milestones';
 import { RACE_ETHNICITY_DEFINITION_LABELS } from '@repo/domain/statistics/lives';
 
@@ -232,18 +231,6 @@ test('an era label names decades, so a rule from the last decade sits inside its
     ['Plessy v. Ferguson'],
   );
   for (const era of LIVES_ERAS) assert.match(era.label, /^\d{4}s–\d{4}s$/);
-});
-
-test('the header span is the visible panels, not a fixed range', () => {
-  const panels = buildLivesMilestonePanels(
-    bundle([
-      decade(1980, 'unemployed', { black: 12, white: 6 }),
-      decade(2020, 'unemployed', { black: 9, white: 4 }),
-    ]),
-    LIVES_MILESTONES.find((milestone) => milestone.key === 'work')!,
-  );
-  assert.equal(livesMilestoneSpanLabel(panels), '1970s to 2020s');
-  assert.equal(livesMilestoneSpanLabel([]), null);
 });
 
 function account(id: string, domain: LivesWorldBeat['domain']): LivesWorldBeat {

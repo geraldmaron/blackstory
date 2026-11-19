@@ -1,17 +1,25 @@
 /**
- * `/methodology` — how a record gets in. See `MethodologySections.tsx` for grade and citation
- * components drawn from the live record-page kit.
+ * `/methodology`: how a record gets in, and the one place the evidence grades are defined.
  */
 import type { Metadata } from 'next';
+import React from 'react';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
 import {
   PublishingPrinciplesJsonLdScript,
+  TrustMast,
   TrustSiteJsonLdScript,
 } from '../../components/trust/index';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { MethodologySections } from './MethodologySections';
-import { Room } from '../../components/room';
+import { parentCrumb, Room } from '../../components/room';
+import { ADMISSION_STEPS, METHODOLOGY_INTRO_LEDE } from './methodology-copy';
 import '../reading-room.css';
+import '../../components/trust/trust.css';
+import './methodology.css';
+
+void React;
 
 export const revalidate = 3600;
 
@@ -24,7 +32,28 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function MethodologyPage() {
   return (
-    <Room ledger>
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="sand"
+          art={['ledger']}
+          numeral={{
+            value: String(ADMISSION_STEPS.length),
+            label: 'steps from a lead to a public page',
+          }}
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/methodology')}
+            linkAs={Link}
+            title="How the archive works"
+            dek={METHODOLOGY_INTRO_LEDE}
+          />
+        </TrustMast>
+      }
+    >
       <TrustSiteJsonLdScript />
       <PublishingPrinciplesJsonLdScript
         pagePath={TRUST_PATHS.methodology}

@@ -72,11 +72,9 @@ export function defaultPostureFor(surface: SurfaceClass | null): PlatePosture {
 /**
  * Whether a Framed slot claim may be granted on this surface at all.
  *
- * False on Instrument for a reason that is easy to miss: `RecordAnatomyPanel` is shared between
- * the record page and Explore's record sheet, so the same `RecordPlacePreview` that borrows the
- * plate on `/entity/[id]` also renders inside a sheet floating OVER the live plate. A sheet cannot
- * borrow the plate it is floating over. Refusing the claim here is what makes that case fall back
- * to a static block with no extra prop and no caller having to know which surface it is on.
+ * False on Instrument: a panel floating over the live plate cannot borrow the plate it is
+ * floating over, so a moment rendered there falls back to its caption with no extra prop and no
+ * caller having to know which surface it is on.
  *
  * False on Utility because a parked plate on a task surface should stay unbuilt, not be woken by
  * a stray moment.
@@ -85,20 +83,4 @@ export function framedClaimAllowed(surface: SurfaceClass | null): boolean {
   if (surface === null) return false;
   // The Door's plate is already painted full-bleed; a moment has nothing to borrow it into.
   return surface === 'reading' || surface === 'record';
-}
-
-/**
- * Below this zoom the ambient Door holds its cluster markers off the plate.
- *
- * The Door fits the whole country into its window, which sinks a phone's zoom to about 1.7. At
- * that scale a cluster folds a region into one disc at a centroid that is not a place: the West
- * Coast became a "202" over Nevada. A map pinned to place should not draw that. The state presence
- * tint already says where the record is thick at national scale, and the clusters come back as
- * soon as a chapter flies in to state scale. The Instrument keeps them at every zoom.
- */
-export const AMBIENT_CLUSTER_MIN_ZOOM = 3;
-
-/** Whether cluster markers belong on the plate in this posture at this zoom. */
-export function clusterMarkersVisible(posture: PlatePosture, zoom: number): boolean {
-  return posture !== 'ambient' || zoom >= AMBIENT_CLUSTER_MIN_ZOOM;
 }

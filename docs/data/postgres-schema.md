@@ -3,7 +3,7 @@
 **Status:** Supabase is the deployed canonical database. This document describes the storage
 model; versioned SQL and live catalog inspection establish the actual schema. The last inspected deployment used `bb_*` schema
 prefixes. Their replacement is implemented locally; production cutover is unverified.
-See [architecture](../architecture.md) and the [research audit](../research/framework-audit.md).
+See [architecture](../architecture.md) and the [research audit](../research/archive/framework-audit.md).
 
 ## Principles
 

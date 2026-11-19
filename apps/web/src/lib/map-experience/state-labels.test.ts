@@ -1,28 +1,19 @@
 /**
- * Confirms the state-label data layer: all 51 states + D.C. get a label point, the
- * documented AK/HI/FL/MI overrides are actually applied (not silently ignored), the zoom-fade
- * curve matches design-direction-v3.md's band (visible <= 5.6, gone >= 6.2), and selection
- * toggles exactly one descriptor without moving any label.
- *
- * `buildStateLabelElement` (browser-only, calls `document.createElement`) is intentionally not
- * exercised here plain Node has no DOM; see that function's doc comment in `state-labels.ts`.
+ * Confirms the state-label data: all 51 states + D.C. get a label point, the documented
+ * AK/HI/FL/MI/MD overrides are actually applied (not silently ignored), and the zoom band matches
+ * design-direction-v3.md (visible from the national floor, gone by 6.2). How the labels draw is
+ * covered in `app/map/explore-style.test.ts`.
  */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { US_STATES } from '@repo/domain/map/geography';
 import {
-  STATE_LABEL_FADE_END_ZOOM,
-  STATE_LABEL_FADE_START_ZOOM,
-  buildStateLabelMarkers,
-  stateLabelColors,
-  stateLabelOpacityForZoom,
-  stateLabelPoints,
   STATE_LABEL_APPEAR_END_ZOOM,
   STATE_LABEL_APPEAR_START_ZOOM,
+  STATE_LABEL_FADE_END_ZOOM,
+  STATE_LABEL_FADE_START_ZOOM,
+  stateLabelPoints,
 } from './state-labels';
-import { brandPalette, mapPalettes } from '@repo/ui';
 
 test('every one of the 51 states/D.C. gets exactly one label point', () => {
   const points = stateLabelPoints();
@@ -38,9 +29,9 @@ test('every one of the 51 states/D.C. gets exactly one label point', () => {
 test('every label point falls within its own state bbox (bbox centroid by default)', () => {
   const points = new Map(stateLabelPoints().map((point) => [point.postalCode, point] as const));
   for (const state of US_STATES) {
-    // AK/HI/FL/MI use a documented override that may sit outside the coarse bbox (that's the
+    // AK/HI/FL/MI/MD use a documented override that may sit outside the coarse bbox (that's the
     // point of overriding them); every other state's point must be the literal bbox centroid.
-    if (['AK', 'HI', 'FL', 'MI'].includes(state.postalCode)) continue;
+    if (['AK', 'HI', 'FL', 'MI', 'MD'].includes(state.postalCode)) continue;
     const [west, south, east, north] = state.bbox;
     const point = points.get(state.postalCode)!;
     assert.equal(point.lng, (west + east) / 2);
@@ -48,9 +39,9 @@ test('every label point falls within its own state bbox (bbox centroid by defaul
   }
 });
 
-test('the documented AK/HI/FL/MI overrides are actually applied, not the raw bbox centroid', () => {
+test('the documented AK/HI/FL/MI/MD overrides are actually applied, not the raw bbox centroid', () => {
   const points = new Map(stateLabelPoints().map((point) => [point.postalCode, point] as const));
-  for (const postalCode of ['AK', 'HI', 'FL', 'MI'] as const) {
+  for (const postalCode of ['AK', 'HI', 'FL', 'MI', 'MD'] as const) {
     const state = US_STATES.find((s) => s.postalCode === postalCode)!;
     const [west, south, east, north] = state.bbox;
     const rawCentroid = [(west + east) / 2, (south + north) / 2];
@@ -73,75 +64,10 @@ test('the documented AK/HI/FL/MI overrides are actually applied, not the raw bbo
   }
 });
 
-test('opacity is fully visible at/below the fade-start zoom and fully hidden at/above the fade-end zoom', () => {
-  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_APPEAR_END_ZOOM), 1);
-  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_FADE_START_ZOOM), 1);
-  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_FADE_END_ZOOM), 0);
-  assert.equal(stateLabelOpacityForZoom(12), 0);
-});
-
-test('opacity fades linearly between the start and end zoom', () => {
-  const midpoint = (STATE_LABEL_FADE_START_ZOOM + STATE_LABEL_FADE_END_ZOOM) / 2;
-  assert.ok(Math.abs(stateLabelOpacityForZoom(midpoint) - 0.5) < 1e-9);
-  const quarter =
-    STATE_LABEL_FADE_START_ZOOM + (STATE_LABEL_FADE_END_ZOOM - STATE_LABEL_FADE_START_ZOOM) * 0.25;
-  assert.ok(Math.abs(stateLabelOpacityForZoom(quarter) - 0.75) < 1e-9);
-});
-
-test('buildStateLabelMarkers marks exactly the selected postal code, leaving text/position untouched', () => {
-  const markers = buildStateLabelMarkers('NY');
-  assert.equal(markers.length, 51);
-  const ny = markers.find((marker) => marker.postalCode === 'NY')!;
-  assert.equal(ny.selected, true);
-  assert.equal(ny.text, 'NY');
-  const others = markers.filter((marker) => marker.postalCode !== 'NY');
-  assert.ok(others.every((marker) => marker.selected === false));
-
-  const noSelection = buildStateLabelMarkers();
-  assert.ok(noSelection.every((marker) => marker.selected === false));
-});
-
-test('buildStateLabelMarkers position/text are identical regardless of selection (selection only recolors)', () => {
-  const unselected = buildStateLabelMarkers();
-  const selected = buildStateLabelMarkers('CA');
-  for (let i = 0; i < unselected.length; i += 1) {
-    assert.equal(unselected[i]!.postalCode, selected[i]!.postalCode);
-    assert.deepEqual(unselected[i]!.lngLat, selected[i]!.lngLat);
-    assert.equal(unselected[i]!.text, selected[i]!.text);
-  }
-});
-
-test('stateLabelColors default ink comes from the design-law `label` plate role, not a local literal', () => {
-  // The shared label token keeps both themes aligned with the contrast-tested plate palette.
-  const light = stateLabelColors('light');
-  assert.equal(light.default, mapPalettes.light.label);
-  assert.equal(light.selected, brandPalette.copperTextLight);
-
-  const dark = stateLabelColors('dark');
-  assert.equal(dark.default, mapPalettes.dark.label);
-  assert.equal(dark.selected, brandPalette.copperDark);
-});
-
-test('labels fade out under the national floor, where the plate is at continental scale', () => {
-  // The Door's phone strip fits the whole country into a strip; abbreviations
-  // overlap there, and no mature map draws region names at that scale.
+test('the band opens at the national floor and closes before city names take over', () => {
+  assert.ok(STATE_LABEL_APPEAR_START_ZOOM < STATE_LABEL_APPEAR_END_ZOOM);
   assert.equal(STATE_LABEL_APPEAR_END_ZOOM, 3);
-  assert.equal(stateLabelOpacityForZoom(0), 0);
-  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_APPEAR_START_ZOOM), 0);
-  assert.equal(stateLabelOpacityForZoom(2.15), 0);
-  const midpoint = (STATE_LABEL_APPEAR_START_ZOOM + STATE_LABEL_APPEAR_END_ZOOM) / 2;
-  assert.ok(Math.abs(stateLabelOpacityForZoom(midpoint) - 0.5) < 1e-9);
-  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_APPEAR_END_ZOOM), 1);
-  assert.equal(stateLabelOpacityForZoom(3.5), 1);
-});
-
-test('MapStage applies the fade through the marker, which owns its element’s inline opacity', () => {
-  const mapStage = readFileSync(
-    fileURLToPath(new URL('../../components/map-stage/MapStage.tsx', import.meta.url)),
-    'utf8',
-  );
-  assert.match(mapStage, /entry\.marker\.setOpacity\(opacity\)/);
-  // A MapLibre marker rewrites `element.style.opacity` on every update, so writing it directly
-  // would survive for one frame and prevent the label from fading.
-  assert.doesNotMatch(mapStage, /entry\.element\.style\.opacity/);
+  assert.ok(STATE_LABEL_APPEAR_END_ZOOM < STATE_LABEL_FADE_START_ZOOM);
+  assert.equal(STATE_LABEL_FADE_START_ZOOM, 5.6);
+  assert.equal(STATE_LABEL_FADE_END_ZOOM, 6.2);
 });

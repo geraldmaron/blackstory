@@ -47,7 +47,7 @@ export type CommandContext = {
 
   /* View */
   readonly setMode: (mode: 'atlas' | 'story') => void;
-  /** Leaves the instrument for Rooms. A navigation, not a mode change. */
+  /** Leaves the instrument for Collections. A navigation, not a mode change. */
   readonly openLibrary: () => void;
   /** Leaves the instrument for the Door Journey on `/`. */
   readonly openDoor: () => void;
@@ -68,7 +68,7 @@ export type Command = {
 };
 
 /**
- * Every camera move a reader can invoke by key. `flyToRecord` is deliberately absent: it needs a
+ * Every camera move a reader can invoke by key. `frameRecord` is deliberately absent: it needs a
  * record, so it is reached by selecting one, not by pressing a key with nothing in hand.
  */
 export const KEYED_CAMERA_MOVES = ['wide', 'push', 'orbit', 'tilt', 'spotlight', 'trace'] as const;
@@ -214,7 +214,7 @@ export const COMMANDS: readonly Command[] = [
   },
   {
     id: 'view.library',
-    title: 'Open Rooms',
+    title: 'Open Collections',
     // `L` alone, which does not collide with `⌘L` (copy share link): `chordKey` compares the
     // full chord, and the duplicate check in `bindings.test.ts` proves it.
     section: 'View',

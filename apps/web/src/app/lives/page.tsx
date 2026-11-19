@@ -1,17 +1,16 @@
 /** `/lives`: one life question across time, using only publishable and cited comparisons. */
 import type { Metadata } from 'next';
 import React from 'react';
-import { LIVES_NATIONAL } from '@repo/domain/statistics/lives';
+import { LIVES_NATIONAL, LIVES_REGIONS } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import { PageHeader } from '@repo/ui';
+import Link from 'next/link';
+import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
+import { livesDecadeNumeral } from '../../components/lives/lives-mast';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../lib/lives/lives-source';
-import type { RawLivesSearchParams } from '../../lib/lives/lives-url-state';
-import {
-  buildLivesMilestonePanels,
-  livesMilestoneSpanLabel,
-  parseLivesMilestone,
-} from '../../lib/lives/lives-milestones';
+import { LIVES_EXPLORER_PATH, type RawLivesSearchParams } from '../../lib/lives/lives-url-state';
+import { parseLivesMilestone } from '../../lib/lives/lives-milestones';
 import { LivesSourceNotice } from '../../components/lives/LivesSourceNotice';
 import { LivesMilestoneExperience } from '../../components/lives/LivesMilestoneExperience';
 import { resolveStoryCollection } from '../../lib/stories/source';
@@ -51,34 +50,50 @@ export default async function LivesIndexPage({
   const narratives = renumberLivesNarrativeReferences(mapping.byEraId);
 
   return (
-    <Room>
-      <ReadingEntry
-        pathname="/lives"
-        title="Lives across the decades"
-        lede="Follow one ordinary question through changing counts, rules, and accounts of lived experience. Every visible figure is sourced."
-        showCrumb={false}
-      />
-      <DocumentColophon
-        facts={[
-          'United States',
-          livesMilestoneSpanLabel(buildLivesMilestonePanels(bundle, milestone, narratives)) ??
-            '1870s to 2020s',
-          'Published comparisons only',
-        ]}
-      />
-
-      <LivesSourceNotice
-        source={loaded?.source ?? 'unreadable'}
-        areaName={bundle.areaName}
-        retryHref="/lives"
-      />
-      <LivesMilestoneExperience bundle={bundle} milestone={milestone} narratives={narratives} />
-
-      <WalkOffRamp>
-        Every figure names its table. Rules sit beside the numbers, not as their cause. Method on{' '}
-        <a href="/methodology#lives-across-decades">Methodology</a>. Compact census spine on{' '}
-        <a href="/data#lives">Data</a>.
-      </WalkOffRamp>
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          tone="sand"
+          numeral={livesDecadeNumeral(bundle)}
+          art={['tools', 'grain']}
+          tools={
+            // The page reads the nation; each region's own tables live in the appendix. Without
+            // this row the only way there was a link at the foot of a very long page.
+            <nav className="lives-regions" aria-label="By region">
+              <span className="lives-regions__label">By region</span>
+              {LIVES_REGIONS.map((region) => (
+                <Link
+                  key={region.slug}
+                  className="ds-room-chip"
+                  href={`${LIVES_EXPLORER_PATH}?area=${region.slug}`}
+                  title={region.summary}
+                >
+                  {region.name}
+                </Link>
+              ))}
+            </nav>
+          }
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/lives')}
+            linkAs={Link}
+            title="Lives across the decades"
+            dek="One ordinary question, followed through the census, the rules in force and the words of the people who lived it."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <LivesSourceNotice
+          source={loaded?.source ?? 'unreadable'}
+          areaName={bundle.areaName}
+          retryHref="/lives"
+        />
+        <LivesMilestoneExperience bundle={bundle} milestone={milestone} narratives={narratives} />
+      </TrustSheet>
     </Room>
   );
 }

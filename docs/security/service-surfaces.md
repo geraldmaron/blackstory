@@ -42,23 +42,12 @@ enforced by `apps/web/src/admin/canonical-write-boundary.test.ts`.
 - **Runtime guards:** `apps/api-public/src/posture.ts`
 - **Health contract:** `health()` returns `surface`, `networkPosture`, `allowedOperations`
 
-### Submissions API (`apps/api-submissions`)
+### Submissions and internal surfaces
 
-- **Hosting:** Public submission surface; current provider deployment must be verified separately.
-  The repository enforces the quarantine-only capability contract and rate-limit policy; optional
-  Cloud Run/Armor files are not live deployment evidence.
-- **Posture:** `public-rate-limited` — quarantine writes + submission metadata only
-- **Invariant:** cannot call `publish:projection` or `promote:release` (typed deny)
-- **Runtime guards:** `apps/api-submissions/src/posture.ts`
-
-### Internal publication API (`apps/api-internal`)
-
-- **Hosting:** No live deployment or private-network isolation is asserted by this repository. The
-  code contract accepts service identity only; optional node-service/Cloud Run manifests describe a
-  possible deployment and must not be treated as provisioned.
-- **Posture:** `service-authenticated` — publication and promotion
-- **Auth:** `service-identity` only; **rejects** `end-user-token` and `anonymous`
-- **Runtime guards:** `apps/api-internal/src/posture.ts`
+The standalone `apps/api-submissions` and `apps/api-internal` apps were never deployed and were
+removed on 2026-11-18. Public intake runs as `apps/web` routes (`/corrections/api`, `/submit/api`)
+that write to quarantine only; publication runs from `/admin` and the operator scripts. The
+`api-submissions` and `api-internal` surface ids stay in `packages/config` as policy vocabulary.
 
 ### Admin console (`/admin` inside `apps/web`)
 
@@ -102,10 +91,9 @@ accepts a forbidden auth mode.
 
 | Criterion | Evidence |
 |-----------|----------|
-| Submissions cannot publish | `packages/config/src/surfaces.test.ts`, `apps/api-submissions/src/index.test.ts` |
+| Submissions cannot publish | `packages/config/src/surfaces.test.ts`, `apps/web/src/app/corrections/api/route.test.ts` |
 | Public API cannot write canonical data | `packages/config/src/surfaces.test.ts`, `apps/api-public/src/index.test.ts` |
 | Admin write-capable credential scoped to `/admin` code only | `apps/web/src/admin/canonical-write-boundary.test.ts`, `apps/web/src/proxy.ts` matcher |
-| Internal API rejects end-user tokens | `packages/config/src/surfaces.test.ts`, `apps/api-internal/src/index.test.ts` |
 
 ## Related docs
 

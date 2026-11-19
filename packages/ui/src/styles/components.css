@@ -6,22 +6,20 @@
  * stamps) use Geist Mono per the data register.
  */
 
-.ds-card {
+/* Surface: the one panel recipe. One bordered level per surface; inside it, rules. */
+.ds-surface {
   background: var(--ds-surface-raised);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  padding: var(--ds-space-5);
+  padding: var(--ds-space-6);
 }
 
-.ds-card--interactive {
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+/* Floating layers over the map get the one soft shadow. Nothing else casts one. */
+.ds-surface--floating {
+  box-shadow: var(--ds-contact-plate);
 }
 
-.ds-card--interactive:hover {
-  border-color: var(--ds-border-strong);
-}
-
-.ds-card__title {
+.ds-surface__title {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-size: 1.25rem;
@@ -30,9 +28,9 @@
   letter-spacing: -0.01em;
 }
 
-.ds-card__meta {
+.ds-surface__meta {
   margin: 0 0 var(--ds-space-3);
-  color: var(--ds-ink-subtle);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.02em;
@@ -66,11 +64,9 @@
 }
 
 .ds-citation__label {
-  font-family: var(--ds-font-mono);
+  font-family: var(--ds-font-sans);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.6875rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-subtle);
 }
 
@@ -90,7 +86,7 @@
 }
 
 .ds-citation--compact .ds-citation__label {
-  font-size: 0.625rem;
+  font-size: var(--ds-text-micro);
 }
 
 .ds-confidence {
@@ -101,7 +97,7 @@
   border: var(--ds-border-width) solid transparent;
   border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-weight: 500;
   line-height: 1.4;
 }
@@ -170,7 +166,7 @@
 
 .ds-timeline__title {
   margin: 0 0 var(--ds-space-1);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 600;
 }
 
@@ -178,7 +174,7 @@
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-map {
@@ -199,7 +195,7 @@
   position: absolute;
   width: 0.5rem;
   height: 0.5rem;
-  margin: -0.25rem 0 0 -0.25rem;
+  margin: calc(var(--ds-space-1) * -1) 0 0 calc(var(--ds-space-1) * -1);
   border-radius: 50%;
   background: var(--ds-accent-muted);
   outline: 2px solid var(--ds-surface-raised);
@@ -210,7 +206,7 @@
   margin: 0;
   color: var(--ds-ink-subtle);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 /**
@@ -258,7 +254,7 @@
 .ds-map-explorer__legend-title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
 }
 
 .ds-map-explorer__legend-subtitle {
@@ -272,7 +268,7 @@
   margin: 0;
   color: var(--ds-ink-subtle);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-map-explorer__feature-list,
@@ -285,7 +281,7 @@
   max-height: 16rem;
   overflow-y: auto;
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
 }
 
 .ds-map-explorer__feature-name {
@@ -324,7 +320,7 @@
 .ds-result-list__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.35;
@@ -372,11 +368,9 @@
 .ds-filters__legend {
   padding: 0;
   margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 
@@ -396,7 +390,7 @@
 
 .ds-filters__label {
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   font-weight: 600;
   color: var(--ds-ink);
 }
@@ -412,7 +406,7 @@
   font: inherit;
   font-family: var(--ds-font-sans);
   /* >=16px avoids iOS zoom-on-focus. */
-  font-size: 1rem;
+  font-size: var(--ds-text-body);
 }
 
 .ds-filters__actions {
@@ -421,76 +415,401 @@
   flex-wrap: wrap;
 }
 
-/* Action vocabulary (design-direction-v5 §5): `.ds-button` (form buttons)
-   and shell.css's `.ds-cta` (links) share ONE recipe — sans 13px, no caps,
-   PILL radius. Weights: --primary = copper (THE orientation action, max one
-   per view), --secondary = quiet hairline. Height is the one exception:
-   `.ds-button` is 44px, the WCAG 2.5.5 target size, while apps/web's
-   `.ds-cta` still holds the comps' 40px.
-
-   Both comments here and in shell.css have claimed "ONE recipe" for several
-   cycles while the two rules actually diverged: `.ds-cta` dropped the caps
-   and moved to 14px under the Ink direction, `.ds-button` was left at 12px
-   uppercase with 0.08em tracking. A form's submit button and a room's link
-   action sat side by side looking like two different components. They are
-   now genuinely the same recipe, at the size the comps draw. */
+/*
+ * Button: the one action recipe (`Button`, `buttonClassName`). 44px, radius 8, Geist 14/600.
+ * primary = copper fill, one per screen; secondary = 1px control border; quiet = text only.
+ * A bare `.ds-button` with no variant (admin forms) renders as secondary.
+ */
 .ds-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--ds-space-2);
   min-height: 2.75rem;
-  padding: 0 var(--ds-space-5);
-  border: var(--ds-border-width) solid transparent;
-  border-radius: var(--ds-radius-full);
+  padding: 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 13px;
+  font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: normal;
   text-transform: none;
+  text-decoration: none;
   line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     background-color var(--ds-duration-fast) var(--ds-easing),
     color var(--ds-duration-fast) var(--ds-easing),
     border-color var(--ds-duration-fast) var(--ds-easing),
-    opacity var(--ds-duration-fast) var(--ds-easing);
+    text-decoration-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-button:disabled {
+.ds-button:hover:not(:disabled) {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-button:disabled,
+.ds-button[aria-disabled='true'] {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-/* Copper plate carries dark ink text in BOTH themes (accessible-pairs
-   table: #0A0A0A on #B86B2A — raw copper never carries light body text). */
+.ds-button[aria-busy='true'] {
+  cursor: progress;
+}
+
+/* Copper plate carries dark ink text in BOTH themes (accessible-pairs table: #0A0A0A on
+   #B86B2A; raw copper never carries light body text). */
 .ds-button--primary {
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink);
+  border-color: var(--ds-primary-bg);
+  background: var(--ds-primary-bg);
+  color: var(--ds-primary-ink);
 }
 
+/* Hover: the plate steps away from its label's value (`--ds-primary-hover`, contrast-tested on
+   every ground), and a 2px rule under it in the label's color marks hover without the color. */
 .ds-button--primary:hover:not(:disabled) {
-  opacity: 0.88;
-}
-
-.ds-button--secondary {
-  background: transparent;
-  color: var(--ds-ink);
-  border-color: var(--ds-border-strong);
+  border-color: var(--ds-primary-hover);
+  background: var(--ds-primary-hover);
+  box-shadow: inset 0 -2px 0 var(--ds-primary-ink);
 }
 
 .ds-button--secondary:hover:not(:disabled) {
   background: var(--ds-surface-raised);
 }
 
-/* Compact instrument controls — map chrome, dense toolbars. Still ≥44px
-   touch target; radius-sm (not capsule) for explore-side panels. */
+/* Text only. The underline is the affordance; the 44px box is still the hit area. */
+.ds-button--quiet {
+  padding-inline: var(--ds-space-1);
+  border-color: transparent;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.25em;
+}
+
+.ds-button--quiet:hover:not(:disabled) {
+  border-color: transparent;
+  text-decoration-color: currentColor;
+}
+
+/* Map chrome's dense control (instrument panels). Still 44px; owned by the map surfaces. */
 .ds-button--compact {
+  padding: 0 var(--ds-space-3);
+  font-size: 0.75rem;
+}
+
+/* —— Chip: filter values and active-filter echoes only ———————————————————————— */
+.ds-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  height: 2rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  /* A long value (a story title echo) truncates instead of pushing past its row. */
+  max-width: 100%;
+}
+
+.ds-chip__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 44px hit area around the 32px chip (the inset is measured from inside its 1px border). */
+.ds-chip::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
+}
+
+.ds-chip:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-chip--selected {
+  border-color: var(--ds-ink);
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+}
+
+.ds-chip--removable {
+  padding-right: var(--ds-space-2);
+}
+
+.ds-chip__glyph {
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* —— FilterButton: secondary button + caret + optional count ————————————————— */
+.ds-filter-button__caret {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-filter-button__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 var(--ds-space-1);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-filter-button[aria-expanded='true'] {
+  border-color: var(--ds-border-strong);
+}
+
+/* —— Tabs: navigation between places ———————————————————————————————————————— */
+.ds-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: var(--ds-space-1);
+}
+
+.ds-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   min-height: 2.75rem;
   padding: 0 var(--ds-space-4);
+  border: 0;
+  background: none;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--ds-duration-fast) var(--ds-easing),
+    background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-tabs__tab:hover {
+  color: var(--ds-ink);
+}
+
+.ds-tabs__tab:not([aria-current='page']):hover {
+  text-decoration: underline;
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 0.45em;
+}
+
+/* The page you are on: ink at a heavier weight, and the site's pin, a small solid copper dot,
+   under the label. Weight and shape carry it, not the hue; no fill, no box. */
+.ds-tabs__tab[aria-current='page'] {
+  color: var(--ds-ink);
+  font-weight: 650;
+}
+
+.ds-tabs__tab[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  bottom: var(--ds-space-1);
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  transform: translateX(-50%);
+}
+
+/* The page you are on, with nowhere to go: not a control. */
+span.ds-tabs__tab {
+  cursor: default;
+}
+
+/* —— Segmented: options on the same data —————————————————————————————————————— */
+/* More options than one row holds wrap inside the control; they are never cut off. */
+.ds-segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  max-width: 100%;
+  padding: 2px;
+  border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
+}
+
+.ds-segmented__option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border-radius: 6px;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ds-segmented__option:hover {
+  color: var(--ds-ink);
+}
+
+/* Selected: an inverse thumb (ink on paper grounds, paper on ink) with heavier weight. */
+.ds-segmented__option[aria-current='page'],
+.ds-segmented__option:has(> .ds-segmented__input:checked) {
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-weight: 650;
+}
+
+.ds-segmented__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ds-segmented__option:has(> .ds-segmented__input:focus-visible) {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* —— Containers: read 680, record 964, wide 1152 ———————————————————————————— */
+.ds-wrap {
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
+  margin-inline: auto;
+}
+
+.ds-wrap--read {
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-read));
+}
+
+.ds-wrap--record {
+  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-record));
+}
+
+/* —— PageHeader and SectionHeading ——————————————————————————————————————————— */
+.ds-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-space-4) var(--ds-space-6);
+  padding-block: var(--ds-space-12) var(--ds-space-8);
+}
+
+.ds-page-header__text {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  max-width: var(--ds-width-read);
+}
+
+/* A 44px target that keeps its 20px line's place: the negative block margin gives back the
+   extra height, so the title does not move. */
+.ds-page-header__crumb {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 2.75rem;
+  margin-block: calc(var(--ds-space-3) * -1);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.25rem;
+  text-decoration: none;
+}
+
+/* A 44px hit area around the one-line crumb, without moving it. */
+.ds-page-header__crumb::before {
+  content: '';
+  position: absolute;
+  inset: calc(50% - 1.375rem) -0.5rem;
+}
+
+.ds-page-header__crumb:hover {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ds-page-header__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 650;
+  line-height: 1.06;
+  letter-spacing: var(--ds-tracking-display);
+  text-wrap: balance;
+}
+
+/* —— PageTitle: the display-scale title (56-120px) ——————————————————————————— */
+.ds-page-title,
+.ds-page-header--display .ds-page-header__title {
+  margin: 0;
+  /* Schibsted's ascenders rise above a 0.9 line box; this keeps them off a block's top edge. */
+  padding-top: 0.04em;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-title);
+  /* The display role: Schibsted at 800, the record page's name weight (patterns-living-archive). */
+  font-weight: var(--ds-weight-display);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  font-kerning: normal;
+}
+
+.ds-page-header--display .ds-page-header__text {
+  max-width: none;
+}
+
+.ds-page-header__dek {
+  /* 8px grid gap + 4 = 12 under the title, so the dek reads as the title's own line. */
+  margin: var(--ds-space-1) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-subtitle);
+  line-height: var(--ds-leading-body);
+}
+
+.ds-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+}
+
+.ds-section-heading {
+  margin: var(--ds-space-12) 0 var(--ds-space-4);
+  font-family: var(--ds-font-display);
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
 }
 
 .ds-dialog::backdrop {
@@ -501,10 +820,23 @@
   width: min(100% - 2rem, 32rem);
   margin: auto;
   padding: 0;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-lg);
-  background: var(--ds-surface-raised);
+  border: 0;
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-dialog {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .ds-dialog__header,
@@ -552,60 +884,73 @@
   line-height: 1;
 }
 
+/*
+ * Notice: an inline note in the flow of the page, not a box. A 1px rule in the tone's edge color
+ * sits above it, the cue word names the tone (so it is never carried by color alone), and the
+ * title and body stay in ink: a paragraph set entirely in a status color reads as an alarm.
+ */
 .ds-notice {
+  --ds-notice-fg: var(--ds-ink-muted);
+  --ds-notice-edge: var(--ds-rule);
+
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--ds-space-3);
-  align-items: flex-start;
-  padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid transparent;
-  border-radius: var(--ds-radius-md);
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: var(--ds-space-3) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-notice-edge);
+  color: var(--ds-ink);
   font-family: var(--ds-font-sans);
 }
 
 .ds-notice--warning {
-  color: var(--ds-warning-fg);
-  background: var(--ds-warning-bg);
-  border-color: var(--ds-warning-border);
+  --ds-notice-fg: var(--ds-warning-fg);
+  --ds-notice-edge: var(--ds-warning-border);
 }
 
 .ds-notice--dispute {
-  color: var(--ds-dispute-fg);
-  background: var(--ds-dispute-bg);
-  border-color: var(--ds-dispute-border);
+  --ds-notice-fg: var(--ds-dispute-fg);
+  --ds-notice-edge: var(--ds-dispute-border);
 }
 
 .ds-notice--error {
-  color: var(--ds-error-fg);
-  background: var(--ds-error-bg);
-  border-color: var(--ds-error-border);
+  --ds-notice-fg: var(--ds-error-fg);
+  --ds-notice-edge: var(--ds-error-border);
 }
 
 /* Success reuses the confidence-high family: the palette already carries a settled green in
    both themes, so a confirmation does not need a new colour pair invented for it. */
 .ds-notice--success {
-  color: var(--ds-confidence-high-fg);
-  background: var(--ds-confidence-high-bg);
-  border-color: var(--ds-confidence-high-border);
+  --ds-notice-fg: var(--ds-confidence-high-fg);
+  --ds-notice-edge: var(--ds-confidence-high-border);
 }
 
 .ds-notice__cue {
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  color: var(--ds-notice-fg);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .ds-notice__title {
-  margin: 0 0 var(--ds-space-1);
-  font-size: 1rem;
+  margin: 0;
+  font-size: var(--ds-text-body);
   font-weight: 600;
+  line-height: var(--ds-leading-title);
 }
 
 .ds-notice__body {
   margin: 0;
-  font-size: 0.9375rem;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+}
+
+.ds-notice__body > :first-child {
+  margin-top: 0;
+}
+
+.ds-notice__body > :last-child {
+  margin-bottom: 0;
 }
 
 /* Collapsed-by-default locate disclosure: quiet summary, not a warning card. */
@@ -618,7 +963,7 @@
   list-style: none;
   padding: 0;
   color: var(--ds-ink-muted);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.4;
 }
 
@@ -640,7 +985,7 @@
   padding: var(--ds-space-3) 0 0;
   border-top: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink-muted);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   line-height: 1.45;
 }
 
@@ -648,23 +993,27 @@
   display: grid;
   gap: var(--ds-space-3);
   justify-items: start;
-  padding: var(--ds-space-8) var(--ds-space-5);
-  border: var(--ds-border-width) dashed var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface);
+  padding: var(--ds-space-5) 0 var(--ds-space-2);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-empty__title {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.75rem;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
 }
 
 .ds-empty__body {
   margin: 0;
   max-width: 36rem;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.55;
 }
 
 /* Icon-only theme toggle (v5 §5 chrome): 44px square, glyph + accessible
@@ -739,8 +1088,351 @@
   align-items: center;
 }
 
+/* A checkbox or radio and its label are one control. Left to wrap, a long label drops under the
+   box and the box sits alone on its own line. */
+.ds-row:has(> input:is([type='checkbox'], [type='radio'])) {
+  flex-wrap: nowrap;
+  gap: var(--ds-space-1);
+  align-items: flex-start;
+}
+
+.ds-row > input:is([type='checkbox'], [type='radio']) {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--ds-accent-graphic);
+}
+
+.ds-row > input:is([type='checkbox'], [type='radio']) + label {
+  flex: 1 1 0;
+  min-width: 0;
+  line-height: var(--ds-leading-body);
+  cursor: pointer;
+}
+
 @media (min-width: 48rem) {
   :root {
     --ds-gutter: var(--ds-space-6);
+  }
+}
+
+/* —— Sheet: reading paper on the table (the sheet plane) ——————————————————————— */
+/* Paper with a 1px edge, radius 14, a real layered shadow under it (--ds-shadow-sheet), and three
+   page bands (sand, copper, ink, 4px each) along one edge: a pattern echoing the logo's page
+   bands, never the book or pin shape. The bands are inset fills, so they follow the radius
+   without clipping the sheet's popovers. A sheet that is one link (`.ds-sheet--lift`) rises on
+   hover. */
+.ds-sheet {
+  --ds-sheet-pad: var(--ds-space-8);
+  --ds-sheet-bands:
+    inset var(--ds-band-w) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
+  position: relative;
+  padding: var(--ds-sheet-pad);
+  padding-left: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  box-shadow: var(--ds-sheet-bands), var(--ds-shadow-sheet);
+  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
+}
+
+.ds-sheet--lift {
+  transition:
+    transform var(--ds-duration-base) var(--ds-ease-entrance),
+    box-shadow var(--ds-duration-base) var(--ds-ease-entrance);
+}
+
+.ds-sheet--lift:hover,
+.ds-sheet--lift:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--ds-sheet-bands), var(--ds-shadow-lift);
+}
+
+.ds-sheet--bands-end {
+  --ds-sheet-bands:
+    inset calc(var(--ds-band-w) * -1) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * -2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * -3) 0 0 var(--ds-band-3);
+  padding-left: var(--ds-sheet-pad);
+  padding-right: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
+}
+
+.ds-sheet--bands-none {
+  --ds-sheet-bands: 0 0 0 transparent;
+  padding-left: var(--ds-sheet-pad);
+}
+
+/* Sheets slide up onto the table from where they already are: no fade, so nothing is ever
+   invisible if the animation does not run. Collapses with --ds-duration-sheet. */
+@keyframes ds-sheet-in {
+  from {
+    transform: translateY(16px);
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-sheet {
+    --ds-sheet-pad: var(--ds-space-4);
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+
+/* —— Block: a full-bleed color band that breaks a page into chapters ————————————— */
+.ds-block {
+  position: relative;
+  padding-block: var(--ds-section-md);
+}
+
+/* Bands wipe in once as they scroll into view, where the browser can tie motion to scroll. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ds-block--wipe {
+      animation: ds-block-wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+@keyframes ds-block-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* —— DisplayNumeral: dates, decades and counts as graphic elements ———————————— */
+.ds-numeral {
+  display: block;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-numeral);
+  font-weight: var(--ds-weight-numeral);
+  font-variant-numeric: lining-nums;
+  font-kerning: normal;
+  line-height: var(--ds-leading-numeral);
+  letter-spacing: var(--ds-tracking-numeral);
+  white-space: nowrap;
+  color: var(--ds-numeral-accent);
+  animation: ds-numeral-settle var(--ds-duration-slow) var(--ds-ease-entrance) both;
+}
+
+.ds-numeral--soft {
+  color: var(--ds-numeral-soft);
+}
+
+.ds-numeral--ink {
+  color: var(--ds-ink);
+}
+
+.ds-numeral--title {
+  font-size: var(--ds-text-display-title);
+}
+
+@keyframes ds-numeral-settle {
+  from {
+    transform: translateY(0.08em);
+  }
+}
+
+/* —— Field: the ground a masthead's plate stands in ————————————————————————————— */
+/* A plain ground with its own stacking context, so a plate can sit under the head. No lamplight,
+   vignette or grain: a glow that carries no information is decoration (owner, 2026-11-15). */
+.ds-field {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--ds-canvas);
+}
+
+/* —— Float: glass chrome over the map ———————————————————————————————————————— */
+.ds-float {
+  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ds-float {
+    background: var(--ds-canvas);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-float {
+    background: var(--ds-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* —— Reveal: one entrance primitive ———————————————————————————————————————————— */
+/* Content is visible by default. Where the browser can tie motion to scroll, a revealed element
+   slides up into place once as it enters. A whole band slides in with `<Block wipe>`. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ds-reveal {
+      animation: ds-reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@keyframes ds-reveal-rise {
+  from {
+    transform: translateY(2rem);
+  }
+}
+
+/* —— Plate: a real photograph toned to the page ————————————————————————————————— */
+/* A record's own sourced photograph shown large, toned in two inks so it belongs to the page:
+   the shadows in --ds-plate-lo, the lights in --ds-plate-hi (a duotone by blend modes; no new
+   file, no server processing). It still reads as a photograph. The credit line (`.ds-plate__credit`)
+   is never on the photograph and never altered. Only real, sourced photographs; never generated
+   imagery, never the memorial or a sensitive record. Forced colors show the photograph as it is. */
+.ds-plate {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  margin: 0;
+}
+
+.ds-plate__tone {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  overflow: hidden;
+  width: 100%; /* explicit, so a max-height trims the box's height and never its width */
+  aspect-ratio: 3 / 2; /* a default box; each placement sets its own */
+  background: var(--ds-plate-hi);
+}
+
+.ds-plate__img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.12);
+  mix-blend-mode: multiply;
+}
+
+/* A portrait keeps the face in a cover crop: the crop favors the top of the frame. */
+.ds-plate--upper .ds-plate__img {
+  object-position: 50% 18%;
+}
+
+.ds-plate__tone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ds-plate-lo);
+  mix-blend-mode: lighten;
+  pointer-events: none;
+}
+
+.ds-plate__credit {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
+@media (forced-colors: active) {
+  .ds-plate__img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  .ds-plate__tone::after {
+    content: none;
+  }
+}
+
+/* —— Print: public pages on white paper ————————————————————————————————————————— */
+/* Ink on white. Site chrome, maps, floating layers and controls are left off; a sheet runs the full
+   page width without its shadow, spine bands or radius; grounds lose their fills; a plate prints
+   untoned with its credit; external links print their address after the text. */
+@media print {
+  :root,
+  body,
+  [data-ground] {
+    --ds-canvas: white;
+    --ds-ink: black;
+    --ds-ink-muted: dimgray;
+    background: white;
+    color: black;
+  }
+
+  .ds-bar,
+  .ds-tabbar,
+  .ds-shell-footer,
+  .ds-map-stage,
+  .ds-record-map__frame,
+  .ds-float,
+  .ds-dialog,
+  .ds-command-palette,
+  .ds-toast-stack,
+  .ds-records-menu,
+  .ds-records-sheet,
+  button {
+    display: none !important;
+  }
+
+  .ds-block {
+    background: none;
+    padding-block: var(--ds-space-6);
+  }
+
+  .ds-sheet {
+    --ds-sheet-bands: 0 0 0 transparent;
+    width: auto;
+    max-width: none;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .ds-plate__tone {
+    background: none;
+  }
+
+  .ds-plate__img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  .ds-plate__tone::after {
+    content: none;
+  }
+
+  a[href^='http']:not([href*='blackstory'])::after {
+    content: ' (' attr(href) ')';
+    overflow-wrap: anywhere;
+    font-size: smaller;
+  }
+
+  .ds-evidence__item,
+  li {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
   }
 }

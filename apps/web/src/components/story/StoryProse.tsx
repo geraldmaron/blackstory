@@ -25,11 +25,13 @@ export type StoryProseProps = {
   readonly as?: 'p' | 'span';
 };
 
+/** One superscript per citation run: each reference once, in ascending order. */
 export function StoryCitationMarks({ numbers }: { readonly numbers: readonly number[] }) {
-  if (numbers.length === 0) return null;
+  const unique = [...new Set(numbers)].sort((a, b) => a - b);
+  if (unique.length === 0) return null;
   return (
     <sup className="ds-reading-cite">
-      {numbers.map((number, index) => (
+      {unique.map((number, index) => (
         <React.Fragment key={number}>
           {index > 0 ? <span aria-hidden="true">,</span> : null}
           <a href={`#ref-${number}`} aria-label={`Reference ${number}`}>
@@ -41,53 +43,88 @@ export function StoryCitationMarks({ numbers }: { readonly numbers: readonly num
   );
 }
 
+/**
+ * Adjacent citations ("[ref:a] [ref:b]", or two ids that resolve to one source) are one run: they
+ * render as one superscript, so a source never prints twice in a row.
+ */
+function citeRunEnd(nodes: readonly StoryInlineNode[], start: number): number {
+  let end = start;
+  for (let i = start + 1; i < nodes.length; i += 1) {
+    const node = nodes[i]!;
+    if (node.type === 'cite') end = i;
+    else if (!(node.type === 'text' && node.text.trim() === '')) break;
+  }
+  return end;
+}
+
 function renderNodes(
   nodes: readonly StoryInlineNode[],
   refNumberById: ReadonlyMap<string, number>,
 ): React.ReactNode[] {
-  return nodes.map((node, index) => {
-    switch (node.type) {
-      case 'text':
-        return <React.Fragment key={index}>{node.text}</React.Fragment>;
-      case 'break':
-        return <React.Fragment key={index}>{'\n'}</React.Fragment>;
-      case 'cite': {
-        const number = refNumberById.get(node.refId);
-        return number === undefined ? null : <StoryCitationMarks key={index} numbers={[number]} />;
-      }
-      case 'entity': {
-        const entityId = node.entityId.trim();
-        if (!entityId) return null;
-        return (
-          <EntityLink key={index} entityId={entityId}>
-            {node.label.trim() || humanizeEntityId(entityId)}
-          </EntityLink>
-        );
-      }
-      case 'strong':
-        return <strong key={index}>{renderNodes(node.children, refNumberById)}</strong>;
-      case 'em':
-        return <em key={index}>{renderNodes(node.children, refNumberById)}</em>;
-      case 'link':
-        return (
-          <a
-            key={index}
-            className="ds-reading__extlink"
-            href={node.href}
-            rel="noopener noreferrer external"
-            target="_blank"
-          >
-            {renderNodes(node.children, refNumberById)}
-            <span className="ds-visually-hidden"> (opens in a new tab)</span>
-            <FontAwesomeIcon
-              icon={faArrowUpRightFromSquare}
-              className="ds-reading__extlink-icon"
-              aria-hidden="true"
-            />
-          </a>
-        );
+  const out: React.ReactNode[] = [];
+  for (let index = 0; index < nodes.length; index += 1) {
+    const node = nodes[index]!;
+    if (node.type === 'cite') {
+      const end = citeRunEnd(nodes, index);
+      const numbers = nodes
+        .slice(index, end + 1)
+        .flatMap((n) => (n.type === 'cite' ? [refNumberById.get(n.refId)] : []))
+        .filter((n): n is number => n !== undefined);
+      out.push(<StoryCitationMarks key={index} numbers={numbers} />);
+      index = end;
+      continue;
     }
-  });
+    // A cite hugs the word before it: "the wall²⁵", not "the wall ²⁵".
+    const next = nodes[index + 1];
+    const hugged =
+      node.type === 'text' && next?.type === 'cite' ? { ...node, text: node.text.trimEnd() } : node;
+    out.push(renderNode(hugged, index, refNumberById));
+  }
+  return out;
+}
+
+function renderNode(
+  node: Exclude<StoryInlineNode, { readonly type: 'cite' }>,
+  index: number,
+  refNumberById: ReadonlyMap<string, number>,
+): React.ReactNode {
+  switch (node.type) {
+    case 'text':
+      return <React.Fragment key={index}>{node.text}</React.Fragment>;
+    case 'break':
+      return <React.Fragment key={index}>{'\n'}</React.Fragment>;
+    case 'entity': {
+      const entityId = node.entityId.trim();
+      if (!entityId) return null;
+      return (
+        <EntityLink key={index} entityId={entityId}>
+          {node.label.trim() || humanizeEntityId(entityId)}
+        </EntityLink>
+      );
+    }
+    case 'strong':
+      return <strong key={index}>{renderNodes(node.children, refNumberById)}</strong>;
+    case 'em':
+      return <em key={index}>{renderNodes(node.children, refNumberById)}</em>;
+    case 'link':
+      return (
+        <a
+          key={index}
+          className="ds-reading__extlink"
+          href={node.href}
+          rel="noopener noreferrer external"
+          target="_blank"
+        >
+          {renderNodes(node.children, refNumberById)}
+          <span className="ds-visually-hidden"> (opens in a new tab)</span>
+          <FontAwesomeIcon
+            icon={faArrowUpRightFromSquare}
+            className="ds-reading__extlink-icon"
+            aria-hidden="true"
+          />
+        </a>
+      );
+  }
 }
 
 /** The same rendering with no wrapping element, for callers that already own the tag. */

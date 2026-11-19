@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { StoryProse } from './StoryProse';
+import { StoryCitationMarks, StoryProse } from './StoryProse';
 
 const NO_REFS = new Map<string, number>();
 
@@ -94,4 +94,35 @@ test('StoryProse leaves an http link and snake_case literal', () => {
   );
   assert.doesNotMatch(html, /<a |<em>/);
   assert.match(html, /ent_a_b \[x\]\(http:\/\/example\.org\)/);
+});
+
+test('StoryCitationMarks prints a repeated source number once', () => {
+  const html = renderToStaticMarkup(createElement(StoryCitationMarks, { numbers: [3, 3] }));
+  assert.equal(html.match(/href="#ref-3"/g)?.length, 1);
+});
+
+test('adjacent citations that resolve to one source render one mark', () => {
+  const html = renderToStaticMarkup(
+    createElement(StoryProse, {
+      text: 'The Quasi-War began [ref:a] [ref:b][ref:c].',
+      refNumberById: new Map([
+        ['a', 3],
+        ['b', 3],
+        ['c', 1],
+      ]),
+    }),
+  );
+  assert.equal(html.match(/<sup/g)?.length, 1);
+  assert.equal(html.match(/href="#ref-3"/g)?.length, 1);
+  assert.ok(html.indexOf('#ref-1') < html.indexOf('#ref-3'));
+});
+
+test('StoryProse sets a citation flush against the word before it', () => {
+  const html = renderToStaticMarkup(
+    createElement(StoryProse, {
+      text: 'The ratio stalled after 1980 [ref:dkks-wealth-of-two-nations].',
+      refNumberById: new Map([['dkks-wealth-of-two-nations', 1]]),
+    }),
+  );
+  assert.match(html, /1980<sup/);
 });

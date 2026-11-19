@@ -75,7 +75,7 @@ function doorPlaceHref(href: string): string {
 }
 
 /**
- * Door Journey link for one pin. Public `/place/` and `/law` ride the first document. `/entity/…`
+ * Door Journey link for one pin. Public `/place/` hrefs ride the first document. `/entity/…`
  * stays server-side — the pin links to `/door/pin/{pinId}` instead.
  */
 function doorRecordHref(
@@ -88,8 +88,6 @@ function doorRecordHref(
 
   const href = sourceHref.trim();
   if (href.length === 0) return '';
-
-  if (href === '/law') return href;
 
   const placeHref = doorPlaceHref(href);
   if (placeHref.length > 0) return placeHref;
@@ -115,7 +113,6 @@ export function resolveDoorPinTarget(
 
   const href = feature.properties.href.trim();
   if (href.length === 0) return null;
-  if (href === '/law') return href;
   if (href.startsWith('/entity/')) return href;
 
   const placeHref = doorPlaceHref(href);
@@ -154,6 +151,7 @@ function firstPaintProperties(
     eraBuckets: [],
     ...(earliestDecade !== null ? { earliestDecade } : {}),
     evidenceCount: 0,
+    sourceCount: 0,
     confidenceTier: 'unrated',
     topicTags: [],
     shade: properties.shade,

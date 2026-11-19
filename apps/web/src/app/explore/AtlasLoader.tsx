@@ -5,24 +5,18 @@
  * The catalog is ~15 MB (see `atlas-catalog.ts`) and must not ride every
  * `/explore` request as RSC. The plate cannot wait for it either: first paint
  * is the Door pin field (or morph-from-home plate), then instruments fill in when
- * the catalog arrives — from the CDN on a warm path, from the browser cache on a
- * client-side return to browse.
- *
- * The last catalog is also kept in module memory: navigating away and back within
- * one session re-mounts this component, and a 1 MB re-parse for bytes already in
- * hand is not a cost worth paying. Keyed by URL so a future versioned path cannot
- * serve a stale shape. First-paint pins are never stored as that catalog.
+ * the catalog arrives (`atlas-catalog-fetch.ts`, which the Door starts before this
+ * chunk has even loaded). First-paint pins are never stored as that catalog.
  */
 'use client';
 
-import { decodeCollectionCatalog } from '../../lib/discovery/collection-catalog-wire';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Notice } from '@repo/ui';
-import { hasMaintenanceBypassHint } from '../../lib/maintenance/maintenance-bypass-hint';
+import { Button } from '@repo/ui';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import { AtlasExperience } from './AtlasExperience';
 import { recordsHref } from '../../lib/records/records-query';
 import { recordsQueryFromExplore } from '../../lib/discovery/explore-collection';
+import { cachedAtlasCatalog, fetchAtlasCatalog } from './atlas-catalog-fetch';
 import {
   ATLAS_CATALOG_PATH,
   assembleExploreViewModel,
@@ -32,24 +26,6 @@ import {
 } from './explore-view-model-wire';
 
 void React;
-
-let lastCatalog: { readonly url: string; readonly payload: AtlasCatalogPayload } | undefined;
-
-async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<AtlasCatalogPayload> {
-  if (lastCatalog?.url === url) return lastCatalog.payload;
-  // `omit` is the normal path: the catalog is public, CDN-cached, and has no business seeing a
-  // cookie. The one exception is an operator holding a maintenance bypass, whose credential has
-  // to ride along or the wall answers this fetch with a 503 and Explore comes up empty behind
-  // its own bypass. The hint cookie only exists while the wall is up.
-  const credentials = hasMaintenanceBypassHint() ? 'same-origin' : 'omit';
-  const response = await fetch(url, { signal, credentials });
-  if (!response.ok) {
-    throw new Error(`atlas catalog ${response.status}`);
-  }
-  const payload = decodeCollectionCatalog(await response.json());
-  lastCatalog = { url, payload };
-  return payload;
-}
 
 export type AtlasLoaderProps = {
   readonly shell: AtlasShellModel;
@@ -75,21 +51,15 @@ export function AtlasLoader({
     [pins, shell.dataSource],
   );
   const [catalog, setCatalog] = useState<AtlasCatalogPayload | undefined>(() =>
-    lastCatalog?.url === catalogUrl ? lastCatalog.payload : undefined,
+    cachedAtlasCatalog(catalogUrl),
   );
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (lastCatalog?.url === catalogUrl) {
-      setCatalog(lastCatalog.payload);
-      setError(false);
-      return;
-    }
-    const controller = new AbortController();
     let canceled = false;
     setError(false);
-    fetchAtlasCatalog(catalogUrl, controller.signal).then(
+    fetchAtlasCatalog(catalogUrl).then(
       (payload) => {
         if (!canceled) {
           setCatalog(payload);
@@ -102,7 +72,6 @@ export function AtlasLoader({
     );
     return () => {
       canceled = true;
-      controller.abort();
     };
   }, [catalogUrl, attempt]);
 
@@ -110,43 +79,31 @@ export function AtlasLoader({
   const matchingRecordsHref = recordsHref(recordsQueryFromExplore(shell.viewState));
 
   if (error && !catalog?.collectionFacts) {
+    // The column, in its error state: the map stays visible beside it.
     return (
-      <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
-        <Notice
-          tone="error"
-          title="Map browse could not load its records"
-          className="ds-atlas__pending"
-        >
-          <p>The record catalog did not arrive. Check your connection and try again.</p>
-          <p>
-            <button
-              type="button"
-              className="ds-button ds-button--secondary ds-button--compact"
-              onClick={() => setAttempt((n) => n + 1)}
-            >
-              Try again
-            </button>{' '}
-            <a href={matchingRecordsHref}>Open matching records</a>
-          </p>
-        </Notice>
+      <div className="ds-atlas" data-atlas-catalog="error">
+        <aside className="ds-xcol" aria-label="Records on the map">
+          <div className="ds-xcol__head">
+            <h2 className="ds-xcol__count">Records did not load</h2>
+          </div>
+          <div className="ds-xcol__error" role="alert">
+            <p>
+              The list of records for the map did not arrive. Check your connection and try again.
+            </p>
+            <p>
+              <Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>
+                Try again
+              </Button>{' '}
+              <Button variant="quiet" href={matchingRecordsHref}>
+                Open the same records in Records
+              </Button>
+            </p>
+          </div>
+        </aside>
       </div>
     );
   }
 
-  return (
-    <>
-      {!catalog?.collectionFacts ? (
-        <div role="status" className="ds-atlas__notice ds-collection">
-          <span>Loading map records.</span>
-          <a
-            className="ds-button ds-button--secondary ds-button--compact"
-            href={matchingRecordsHref}
-          >
-            Open matching records
-          </a>
-        </div>
-      ) : null}
-      <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />
-    </>
-  );
+  // Until the catalog arrives the column shows its own loading rows (AtlasExperience).
+  return <AtlasExperience initial={assembleExploreViewModel(shell, active)} embedded={embedded} />;
 }

@@ -408,7 +408,7 @@ Metro should log `[blackstory] apiBaseUrl=…` and
 
 ## Client attestation & observability (MOB-010 / MOB-018)
 
-The app attests to `apps/api-public` and `apps/api-submissions` via the
+The app attests to `apps/api-public` via the
 `X-BlackStory-Client: mobile/<version>; api=<major>` header on every request.
 Server-side validation is a stateless format check
 (`packages/security/src/client-attestation.ts`) — there is **no** database
@@ -425,7 +425,7 @@ emit nothing from that layer.
 | Env var (read by `app.config.ts`) | Purpose | Secret? |
 |---|---|---|
 | `APP_VARIANT` | `development` \| `preview` \| `production` identity tier | no |
-| `API_BASE_URL` / `SUBMISSIONS_BASE_URL` | public API origins (→ `extra.apiBaseUrl`) | no |
+| `API_BASE_URL` | public API origin (→ `extra.apiBaseUrl`) | no |
 | `OBSERVABILITY_ENABLED` / `PERFORMANCE_SAMPLE_RATE` | MOB-018 kill switch + sampling | no |
 
 All are validated at config-eval time — a bad URL or an out-of-range sample rate

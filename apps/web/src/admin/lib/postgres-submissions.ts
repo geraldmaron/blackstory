@@ -14,6 +14,9 @@ import { StaffPermissionDeniedError, assertStaffPermission } from '../auth/staff
 import { queryPostgres } from './canonical-postgres-client.js';
 import { commitWithAuditPostgres } from './postgres-commit.js';
 import { writeResearchCasePostgres } from './postgres-research-cases.js';
+import { notify, recipientFrom, type Notifier } from '../../lib/notify/notify';
+import { isAppealEligible } from '../../app/corrections/public-status';
+import { assertPublicProjectionSafe } from '@repo/security';
 
 export const INTAKE_STATUSES = ['quarantined', 'promoted', 'rejected', 'spam'] as const;
 export type IntakeStatus = (typeof INTAKE_STATUSES)[number];
@@ -255,6 +258,13 @@ export function isSubmissionDecision(value: unknown): value is SubmissionDecisio
   return typeof value === 'string' && (SUBMISSION_DECISIONS as readonly string[]).includes(value);
 }
 
+/** A correction with a receipt: its submitter can see the outcome, so a decline needs a public reason. */
+export function submissionHasReceipt(submission: Pick<SubmissionDetail, 'payload'>): boolean {
+  return typeof asRecord(submission.payload)?.receiptDigest === 'string';
+}
+
+export const PUBLIC_REASON_MAX_LENGTH = 1000;
+
 /** A promoted correction can be closed after staff verify the outcome of its research. */
 export function submissionDecisionOptions(
   submission: SubmissionDetail,
@@ -301,6 +311,12 @@ export type CommitSubmissionDecisionRequest = {
   readonly decision: SubmissionDecision;
   /** Operator-supplied justification. Required, like every other audited admin write here. */
   readonly reason: string;
+  /**
+   * What the submitter sees when a correction is declined: on their receipt page and in the
+   * outcome email. Required to reject a correction with a receipt; ignored otherwise. The
+   * audit `reason` above stays internal.
+   */
+  readonly publicReason?: string;
 };
 
 export type SubmissionDecisionResult =
@@ -431,6 +447,7 @@ export type SubmissionDecisionDependencies = {
   ) => Promise<{ readonly eventId: string; readonly replayed: boolean }>;
   readonly newId: () => string;
   readonly now: () => string;
+  readonly notify: Notifier;
 };
 
 /**
@@ -447,7 +464,43 @@ const defaultDependencies: SubmissionDecisionDependencies = {
   commit: commitWithAuditPostgres,
   newId: () => randomUUID(),
   now: () => new Date().toISOString(),
+  notify,
 };
+
+/**
+ * Tells the corrector their receipt closed. Only receipts (corrections) are mailed, and never on
+ * 'spam': confirming receipt to a spammer is the one email that only helps them.
+ */
+function notifyCorrectionOutcome(
+  payload: unknown,
+  decision: SubmissionDecision,
+  eventId: string,
+  send: Notifier,
+  publicReason?: string,
+): void {
+  const fields = asRecord(payload);
+  const receiptCode = typeof fields?.receiptCode === 'string' ? fields.receiptCode : undefined;
+  const outcome = decision === 'resolve' ? 'resolved' : decision === 'reject' ? 'rejected' : null;
+  const contact = recipientFrom(asRecord(asRecord(fields?.original)?.payload)?.submitterContact);
+  if (!receiptCode || !outcome || !contact) return;
+  const appealAvailable = isAppealEligible({
+    phase: 'closed',
+    closureReason: outcome,
+    classificationDispute: fields?.classificationDispute === true,
+    appealCount: Array.isArray(fields?.appeals) ? fields.appeals.length : 0,
+  });
+  send({
+    event: 'correction.closed',
+    to: contact,
+    data: {
+      receiptCode,
+      outcome,
+      appealAvailable,
+      ...(publicReason ? { reason: publicReason } : {}),
+    },
+    idempotencyKey: `correction.closed:${eventId}`,
+  });
+}
 
 /** Thrown inside the transaction to roll it back without writing an audit row for a no-op. */
 class SubmissionAlreadyProcessedError extends Error {}
@@ -503,6 +556,40 @@ export async function commitSubmissionDecision(
     return { status: 'already_processed' };
   }
 
+  const publicReason = request.publicReason?.trim() ?? '';
+  const needsPublicReason = request.decision === 'reject' && submissionHasReceipt(current);
+  if (needsPublicReason) {
+    if (!publicReason) {
+      return {
+        status: 'invalid',
+        message:
+          'Add the reason the submitter sees. It goes on their receipt page and in the email.',
+      };
+    }
+    if (publicReason.length > PUBLIC_REASON_MAX_LENGTH) {
+      return {
+        status: 'invalid',
+        message: `Keep the submitter's reason under ${PUBLIC_REASON_MAX_LENGTH} characters.`,
+      };
+    }
+    try {
+      // The receipt page refuses to render anything this guard rejects, so check it here.
+      assertPublicProjectionSafe({ outcomeReason: publicReason });
+    } catch {
+      return {
+        status: 'invalid',
+        message:
+          "The submitter's reason can't include a street address. Describe the place instead.",
+      };
+    }
+  }
+  const payloadPatch =
+    request.decision === 'resolve'
+      ? { closureReason: 'resolved', moderationState: 'resolved' }
+      : needsPublicReason
+        ? { publicReason }
+        : null;
+
   const existingResearchCaseId =
     request.decision === 'promote' ? await deps.readResearchCaseId(intakeItemId) : null;
   const plan = prepareSubmissionDecisionPlan({
@@ -532,12 +619,8 @@ export async function commitSubmissionDecision(
             intakeItemId,
             current.status,
             JSON.stringify(current.payload),
-            request.decision === 'resolve',
-            JSON.stringify({
-              closureReason: 'resolved',
-              moderationState: 'resolved',
-              updatedAt: plan.auditEvent.occurredAt,
-            }),
+            payloadPatch !== null,
+            JSON.stringify({ ...payloadPatch, updatedAt: plan.auditEvent.occurredAt }),
           ],
         );
         if (updated.rowCount === 0) {
@@ -568,6 +651,14 @@ export async function commitSubmissionDecision(
     );
     return { status: 'failed', message: error instanceof Error ? error.message : String(error) };
   }
+
+  notifyCorrectionOutcome(
+    current.payload,
+    request.decision,
+    plan.auditEvent.id,
+    deps.notify,
+    needsPublicReason ? publicReason : undefined,
+  );
 
   return {
     status: 'ok',

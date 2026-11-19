@@ -343,7 +343,6 @@ describe('/records · place hrefs and map continuity', () => {
     assert.equal(byId.get('ent_school_b')?.href, '/place/union-school--ent_school_b?from=list');
     assert.equal(byId.get('ent_person_a')?.href, '/entity/ent_person_a?from=list');
     assert.equal(typeof model.mappableMatched, 'number');
-    assert.match(model.atlasReason, /records match/i);
   });
 
   it('findRecordsNeighbors steps within the same narrowing and keeps arrival query', () => {
@@ -382,6 +381,28 @@ describe('/records · place hrefs and map continuity', () => {
     assert.equal(neighbors?.next?.id, 'ent_b');
     assert.match(neighbors?.next?.href ?? '', /from=list/);
     assert.match(neighbors?.next?.href ?? '', /state=DC/);
+  });
+
+  it('findRecordsNeighbors links the address the plate resolved, never a guessed /place', () => {
+    const entities = [
+      entity({ id: 'ent_a', kind: 'place', displayName: 'Alpha Place', summary: 'First.' }),
+      entity({ id: 'ent_b', kind: 'place', displayName: 'Beta Place', summary: 'Second.' }),
+      entity({ id: 'ent_c', kind: 'place', displayName: 'Gamma Place', summary: 'Third.' }),
+    ];
+    const drawn = new Map([['ent_b', '/place/beta-place--2']]);
+    const neighbors = findRecordsNeighbors(
+      entities,
+      EMPTY_RECORDS_QUERY,
+      'ent_b',
+      'from=list',
+      undefined,
+      drawn,
+    );
+    const hrefs = [neighbors?.previous?.href, neighbors?.next?.href];
+    // Off the plate, `/entity/{id}` always resolves and forwards to the record's own address.
+    assert.ok(hrefs.every((href) => href?.startsWith('/entity/ent_')));
+    const back = findRecordsNeighbors(entities, EMPTY_RECORDS_QUERY, 'ent_a', '', undefined, drawn);
+    assert.equal(back?.next?.href, '/place/beta-place--2');
   });
 
   it('builds from search_index docs when evidenceInputs is projected', () => {
@@ -495,5 +516,124 @@ describe('/records · crawl-trap guard', () => {
       era: other.id,
     });
     assert.equal(both.indexable, false);
+  });
+});
+
+describe('/records · order and decade jumps', () => {
+  const entities = [
+    entity({ id: 'late', displayName: 'Union Church', era: '1950s', summary: 'A school.' }),
+    entity({ id: 'early', displayName: 'Old Meeting House', era: '1790s', summary: 'A church.' }),
+    entity({ id: 'name', displayName: 'Church Street', era: '1880s', summary: 'A street.' }),
+  ];
+
+  it('reads earliest first with no search, and best match first with one', () => {
+    const plain = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      plain.rows.map((row) => row.id),
+      ['early', 'name', 'late'],
+    );
+    const searched = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, q: 'church' });
+    // A leading name match, then a later word in the name, then a summary-only match.
+    assert.deepEqual(
+      searched.rows.map((row) => row.id),
+      ['name', 'late', 'early'],
+    );
+  });
+
+  it('offers a jump to every decade while the order is by time, and none otherwise', () => {
+    const plain = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      plain.decadeJumps.map((jump) => [jump.label, jump.page, jump.href]),
+      [
+        ['1790s', 1, '/records#decade-1790'],
+        ['1880s', 1, '/records#decade-1880'],
+        ['1950s', 1, '/records#decade-1950'],
+      ],
+    );
+    const byName = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, sort: 'name' });
+    assert.deepEqual(byName.decadeJumps, []);
+  });
+
+  it('a decade jump lands on the page where that decade starts', () => {
+    const many = [
+      ...Array.from({ length: 150 }, (_, index) => entity({ id: `a${index}`, era: '1880s' })),
+      entity({ id: 'z', era: '1950s' }),
+    ];
+    const model = buildRecordsIndex(many, EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      model.decadeJumps.map((jump) => [jump.label, jump.page]),
+      [
+        ['1880s', 1],
+        ['1950s', 2],
+      ],
+    );
+    assert.equal(model.decadeJumps[1]?.href, '/records?page=2#decade-1950');
+  });
+
+  it('a seeded visit opens on a shuffle that pages stably and stays out of the canonical', () => {
+    const many = Array.from({ length: 150 }, (_, index) =>
+      entity({ id: `r${String(index).padStart(3, '0')}`, era: `${1800 + (index % 20) * 10}s` }),
+    );
+    const ids = (seed: string, page = 1) =>
+      buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, seed, page }).rows.map((row) => row.id);
+    const earliest = buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, sort: 'era' });
+    assert.deepEqual(ids('abc'), ids('abc'), 'one seed, one order');
+    assert.notDeepEqual(ids('abc'), ids('xyz'), 'another visit, another order');
+    assert.notDeepEqual(
+      ids('abc'),
+      earliest.rows.map((row) => row.id),
+    );
+    assert.equal(new Set([...ids('abc', 1), ...ids('abc', 2)]).size, 150, 'no row repeats');
+    const seeded = buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, seed: 'abc' });
+    assert.equal(seeded.canonicalPath, '/records');
+    assert.equal(seeded.nextHref, '/records?seed=abc&page=2');
+    assert.deepEqual(seeded.decadeJumps, [], 'a shuffle has no decade to jump to');
+    assert.equal(earliest.canonicalPath, '/records?sort=era');
+  });
+});
+
+describe('/records · rows state only what the record supports', () => {
+  it('a Green Book 1956 listing never sorts earlier than the 1930s', () => {
+    const listing = entity({
+      id: 'greenbook-1956-0683',
+      displayName: 'Collins Restaurant',
+      summary: '',
+      // What releases built before the street-number fix stored: the house number as a decade.
+      eraBuckets: ['1510s', '1950s'],
+    });
+    const colonial = entity({ id: 'fort', displayName: 'Fort Mose', eraBuckets: ['1730s'] });
+    const model = buildRecordsIndex([listing, colonial], EMPTY_RECORDS_QUERY);
+    assert.deepEqual(
+      model.rows.map((row) => [row.name, row.era]),
+      [
+        ['Fort Mose', '1730s'],
+        ['Collins Restaurant', '1950s'],
+      ],
+    );
+  });
+
+  it('takes the address the map plate resolved, and /entity off the plate, so no row is dead', () => {
+    const doc = {
+      id: 'greenbook-1956-0001',
+      displayName: 'Liberty Hotel',
+      kind: 'place',
+      summary: 'A hotel listed in the Green Book.',
+      jurisdictionLabel: 'New Jersey',
+      locationLabel: '',
+      topicTags: [],
+      eraBuckets: ['1950s'],
+      confidenceTier: 'low',
+      mappable: true,
+    } as const;
+    const bare = { ...doc, id: 'bare', displayName: 'Bare Record', summary: '' };
+    const offPlate = { ...doc, id: 'off', displayName: 'Off Plate' };
+    const drawn = new Map([['greenbook-1956-0001', '/entity/greenbook-1956-0001']]);
+    const hrefs = buildRecordsIndex([doc, bare, offPlate], EMPTY_RECORDS_QUERY, drawn).rows.map(
+      (row) => row.href.split('?')[0],
+    );
+    assert.deepEqual(hrefs.sort(), ['/entity/bare', '/entity/greenbook-1956-0001', '/entity/off']);
+    // Without a plate (record-page neighbors) the summary rule still holds: no summary, no /place.
+    const guessed = buildRecordsIndex([bare], EMPTY_RECORDS_QUERY).rows[0]?.href.split('?')[0];
+    assert.equal(guessed, '/entity/bare');
   });
 });

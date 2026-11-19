@@ -1,6 +1,6 @@
 /**
  * Shareable URL state for `/explore`: filters + selected entity + map layer model
- * + optional point grouping + selected state + optional relationship lines decade
+ * + selected state + optional relationship lines decade
  * selected edge. Pure parse/serialize so the server-rendered page and the client
  * orchestrator read and write the exact same shape.
  *
@@ -24,6 +24,7 @@
 import { parseRecordsQuery, type RecordsSort } from '../records/records-query';
 import { isPopulationDecade } from '@repo/domain/demographics/population-decades';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
+import { PLACE_KEY_PATTERN } from '@repo/domain/map/place-groups';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
 import {
   coercePopulationGeoForDecade,
@@ -69,6 +70,12 @@ export type ExploreViewState = {
   readonly selected?: string;
   /** USPS state DC postal code when a state shape is selected on the map.  */
   readonly state?: string;
+  /**
+   * The place the map and list are scoped to (`state-ga`, `county-13121`, `city-ga-atlanta`;
+   * `docs/ui/patterns-place-map.md`). A focus instruction like `selected`: it frames the camera
+   * on arrival, and the list shows exactly that place's records.
+   */
+  readonly place?: string;
   /** Map overlay model — `off` hides all choropleth/density fills. */
   readonly layerMode: ExploreLayerMode;
   /** Geography for population layers — state (1790–2020) or county (2000–2020 only). */
@@ -80,14 +87,9 @@ export type ExploreViewState = {
   /** To-decade for `blackChange`. */
   readonly popTo?: string;
   /**
-   * When true, nearby points aggregate while zoomed out. On by default; pass `group=0` to
-   * disable. Omitted from shareable URLs when on (the default).
-   */
-  readonly group: boolean;
-  /**
    * Aerial imagery under the archive instead of the flat plate (opt-in via `sat=1`). Shareable
-   * for the same reason `group` is: it changes what the reader is looking at, so a link that
-   * drops it hands the recipient a different map than the sender was reading.
+   * because it changes what the reader is looking at, so a link that drops it hands the
+   * recipient a different map than the sender was reading.
    */
   readonly sat: boolean;
   /** Draw evidence-backed History relationship lines between entity anchors.  */
@@ -113,7 +115,7 @@ export type ExploreViewState = {
   readonly floor?: EvidenceGrade;
   /**
    * A focus instruction, not a filter — the same class as `selected`:
-   * `find=place` opens `PlaceFinder`'s place sheet once on arrival (`/locate` 308s here carrying
+   * `find=place` opens the Explore filters with the place field focused (`/locate` 308s here carrying
    * it). It narrows nothing in `filtered`/`sorted`, so unlike every key above it never renders as
    * a clearable Lens constraint chip. The only value read today is `'place'`; typed as a bare
    * `string` rather than a literal union so an unrecognized value round-trips instead of being
@@ -166,7 +168,7 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'zoom',
   'selected',
   'state',
-  'group',
+  'place',
   'sat',
   'lines',
   'decade',
@@ -267,9 +269,10 @@ function parseLayerMode(raw: RawExploreSearchParams): ExploreLayerMode {
   // Explicit density=0 / false keeps the overlay off (legacy deep links).
   if (densityRaw === '0' || densityRaw === 'false') return 'off';
 
-  // Default: Record presence — entity pins always paint; this shades geography by
-  // documented-record count so the map opens with archive presence visible.
-  return 'presence';
+  // Default: no area shading. Record density by state is an opt-in layer, never the resting map:
+  // a copper choropleth read as "where Black history happened" when it only says where the
+  // archive has reached so far.
+  return 'off';
 }
 
 export type { ExplorePopulationGeo } from './explore-population';
@@ -373,7 +376,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const selectedRaw = matchOrUndefined(firstValue(raw.selected)?.trim(), RECORD_ID);
   const stateCandidate = firstValue(raw.state)?.trim().toUpperCase();
   const stateRaw = matchOrUndefined(stateCandidate, STATE_POSTAL);
-  const groupRaw = firstValue(raw.group);
+  const placeRaw = matchOrUndefined(firstValue(raw.place)?.trim(), PLACE_KEY_PATTERN);
   const satRaw = firstValue(raw.sat);
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = matchOrUndefined(firstValue(raw.decade)?.trim(), DECADE);
@@ -395,10 +398,6 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   });
   const chronologyLayout = firstValue(raw.layout)?.trim().toLowerCase() === 'chronology';
 
-  const groupOn =
-    groupRaw === '0' || groupRaw === 'false'
-      ? false
-      : groupRaw === undefined || groupRaw === '1' || groupRaw === 'true';
   const satOn = satRaw === '1' || satRaw === 'true';
 
   const popGeoBase = parseExplorePopulationGeo(popGeoRaw, DEFAULT_POPULATION_GEO);
@@ -446,12 +445,12 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
       : {}),
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
+    ...(placeRaw ? { place: placeRaw } : {}),
     layerMode,
     ...(popGeo ? { popGeo } : {}),
     ...(popDecade ? { popDecade } : {}),
     ...(popFrom ? { popFrom } : {}),
     ...(popTo ? { popTo } : {}),
-    group: groupOn,
     sat: satOn,
     lines: linesRaw === '1' || linesRaw === 'true',
     ...(decadeRaw ? { decade: decadeRaw } : {}),
@@ -494,7 +493,8 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   }
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
-  if (state.layerMode !== 'presence') params.set('layerMode', state.layerMode);
+  if (state.place) params.set('place', state.place);
+  if (state.layerMode !== 'off') params.set('layerMode', state.layerMode);
   if (
     (state.layerMode === 'blackShare' || state.layerMode === 'blackChange') &&
     state.popGeo &&
@@ -520,7 +520,6 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
       params.set('popTo', state.popTo);
     }
   }
-  if (!state.group) params.set('group', '0');
   if (state.sat) params.set('sat', '1');
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
@@ -553,14 +552,25 @@ export function buildExploreHref(state: ExploreViewState): string {
   return qs ? `/explore?${qs}` : '/explore';
 }
 
+/**
+ * The one hand-off from a record to the map: `/explore?selected=<id>`. Explore frames the record
+ * through the same `frameRecord` contract a click uses, at the zoom its precision allows.
+ */
+export function exploreRecordHref(entityId: string): string {
+  return buildExploreHref({
+    filters: DEFAULT_EXPLORE_FILTERS,
+    ...defaultExploreOverlayState(),
+    selected: entityId,
+  });
+}
+
 /** Default overlay + toggle state for callers building explore links without a full view model. */
 export function defaultExploreOverlayState(): Pick<
   ExploreViewState,
-  'layerMode' | 'group' | 'sat' | 'lines' | 'showFilters' | 'showResults' | 'showKey'
+  'layerMode' | 'sat' | 'lines' | 'showFilters' | 'showResults' | 'showKey'
 > {
   return {
-    layerMode: 'presence',
-    group: true,
+    layerMode: 'off',
     sat: false,
     lines: false,
     ...DEFAULT_PANEL_VISIBILITY,

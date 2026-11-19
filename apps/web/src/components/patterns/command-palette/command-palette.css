@@ -72,10 +72,8 @@
 
 .ds-palette__section {
   padding: var(--ds-space-3) var(--ds-space-5) var(--ds-space-1);
-  font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-subtle);
 }
 

@@ -10,6 +10,7 @@ import { Platform, useColorScheme, type ColorSchemeName, type ViewStyle } from '
 import {
   brandCore,
   confidenceColors,
+  mapColors,
   statusColors,
   themeColors,
   type ConfidenceLevel,
@@ -32,6 +33,7 @@ import { getShadowStyle, type ShadowLevel } from './elevation';
 export {
   brandCore,
   confidenceColors,
+  mapColors,
   statusColors,
   themeColors,
   radius,
@@ -93,7 +95,7 @@ export function useThemeName(): ThemeName {
   return resolveThemeName(useColorScheme());
 }
 
-/** Shadow style for the active theme — default to `none` (flat matte). */
+/** Shadow style for the active theme: `sheet`, `lift` or `float`; `none` for a flush surface. */
 export function useShadowStyle(level: ShadowLevel): ViewStyle {
   return getShadowStyle(level, useThemeName());
 }

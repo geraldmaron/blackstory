@@ -49,8 +49,8 @@ const family = (name: DestinationFamily): readonly ShellNavItem[] =>
     .map(toItem);
 
 /**
- * Overflow routes: desktop "More" disclosure + mobile drawer. The supporting rooms, grouped the
- * way Rooms and the footer group them — read deeper, then trust, then take part.
+ * Overflow routes: desktop "More" disclosure + mobile drawer. Grouped the way the footer groups
+ * them: collections, then trust, then take part.
  */
 export const OVERFLOW_NAV: readonly ShellNavItem[] = [
   ...family('read'),
@@ -72,7 +72,7 @@ export type FooterNavColumn = {
  */
 export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
   { title: 'Find', items: PRIMARY_NAV },
-  { title: 'Read deeper', items: family('read') },
+  { title: 'Collections', items: family('read') },
   { title: 'How it decides', items: family('trust') },
   { title: 'Add to it', items: family('participate') },
 ];

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import { nationalFieldPatch } from '../../../lib/map-experience/national-field';
+import type { ExploreLayerMode } from '../../../lib/map-experience/url-state';
 import type { ExploreViewModel } from '../explore-view-model';
 import {
   NO_POPULATION_CHOROPLETH,
@@ -13,63 +14,52 @@ export function useMapSync(
   stage: MapStageHandle,
   view: ExploreViewModel,
   filtered: readonly ExploreMapFeature[],
-  showPins: boolean,
-  satellite: boolean,
+  layers: { readonly pins: boolean; readonly satellite: boolean },
+  /** The reader's own area shading (the column's layer chips), not the URL-seeded value. */
+  layerMode: ExploreLayerMode,
   selectedId: string | undefined,
   stateCode: string,
-  /**
-   * Crossdissolve the next data patch instead of snapping to it.
-   *
-   * Set for one frame by the story's decade sweep, when it empties the plate before filling it
-   * back up. Removing features from a GeoJSON source is otherwise instant, and a country's worth
-   * of pins vanishing between frames reads as a rendering fault rather than as the archive being
-   * rewound. Held in a ref so raising and lowering the flag does not itself re-patch the plate:
-   * it is read at the moment the data changes, which is the only moment it means anything.
-   */
-  fadeNextPatch = false,
-  /**
-   * The Black-population choropleth tiers for the active layer model (from
-   * `usePopulationChoropleth`, keyed on the Lens's own `layerMode` rather than the URL-seeded
-   * `view.viewState.layerMode`). Defaults to empty so a caller mid-migration onto this hook still
-   * gets the presence-only patch this effect always built. Empty levels are a no-op for
-   * `nationalFieldPatch` — `MapStage` falls back to its density join whenever the choropleth list
-   * is empty, so passing `NO_POPULATION_CHOROPLETH` here is exactly the resting behavior before
-   * this parameter existed.
-   */
+  /** The Black-population choropleth tiers for `layerMode` (`usePopulationChoropleth`). */
   populationLevels: PopulationChoroplethLevels = NO_POPULATION_CHOROPLETH,
-  grouping = view.viewState.group,
+  /** Lens matches outside the brushed decades, drawn as sand ghosts. */
+  ghosts: readonly ExploreMapFeature[] = [],
+  /** The brushed range as a key; a change of range alone fades and drops the pins in. */
+  periodKey = '',
 ) {
-  const fadeNextPatchRef = useRef(fadeNextPatch);
-  fadeNextPatchRef.current = fadeNextPatch;
-
-  /** Keep the plate showing exactly what the rail shows. One lens, two renderings of it. The
+  const lastPeriodKey = useRef(periodKey);
+  /** Keep the plate showing exactly what the list shows. One lens, two renderings of it. The
    * base is the same national field the Door paints; the lens only adds to it. */
   useEffect(() => {
+    const brushed = lastPeriodKey.current !== periodKey;
+    lastPeriodKey.current = periodKey;
     stage.patchData(
       nationalFieldPatch(
-        { type: 'FeatureCollection', features: showPins ? filtered : [] },
+        { type: 'FeatureCollection', features: layers.pins ? filtered : [] },
         {
-          layerMode: view.viewState.layerMode,
+          layerMode,
+          ghostCollection: { type: 'FeatureCollection', features: layers.pins ? ghosts : [] },
           densityLevels: view.densityLevels,
-          clusteringEnabled: grouping,
-          satellite,
+          satellite: layers.satellite,
           historyEdgeCollection: view.edgeLineCollection,
           stateChoroplethLevels: populationLevels.stateChoroplethLevels,
           countyChoroplethLevels: populationLevels.countyChoroplethLevels,
           ...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {}),
         },
       ),
-      fadeNextPatchRef.current ? { fade: true } : undefined,
+      // Brushing the decade strip morphs: leaving pins ghost, arriving pins drop in. Every other
+      // lens change snaps, as before.
+      { fade: brushed },
     );
   }, [
+    periodKey,
     filtered,
-    showPins,
-    satellite,
+    ghosts,
+    layers.pins,
+    layers.satellite,
+    layerMode,
     stage,
     view.densityLevels,
     view.edgeLineCollection,
-    grouping,
-    view.viewState.layerMode,
     populationLevels,
   ]);
 

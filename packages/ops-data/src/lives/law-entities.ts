@@ -36,10 +36,9 @@
  * whose landscape rows show `lat: null` are republishes, which inherit the point their live row
  * already carries — a path a new record has no access to.) So the question is not whether to
  * carry a point but which point is honest:
- *   - Federal records take the Washington, District of Columbia point the two already-published
- *     law-editorial rows use (ent_law_anti_drug_abuse_act_1986, ent_law_fair_sentencing_act_2010).
- *     A Supreme Court ruling takes the Supreme Court Building point the catalog already uses for
- *     ent_case_bolling_v_sharpe_1954.
+ *   - Federal records keep the authored point but are built at `country` precision, which the map
+ *     draws as no point (see `effectiveLawPlace`). A Supreme Court ruling takes the place the case
+ *     arose from `origin` when the record carries one, never the Supreme Court Building.
  *   - State records take their own state at `state` precision — the coarsest tier that still says
  *     something true. A capital-city point would read as a claim about a city the packet never
  *     names, and for the 1907 Oklahoma statute it would name the wrong one: Oklahoma's capital in
@@ -130,6 +129,17 @@ export type AuthoredLawEntity = {
     readonly precision: string;
     readonly city?: string;
     readonly historicAddress?: string;
+  };
+  /**
+   * Where a Supreme Court case arose (the trial or lower-court place), at the precision its source
+   * supports. Read for `case` records only; without it a federal case is placed at `country`.
+   */
+  readonly origin?: {
+    readonly state: string;
+    readonly lat: number;
+    readonly lng: number;
+    readonly precision: string;
+    readonly city?: string;
   };
   readonly summary: string;
   readonly historicalContext: string;
@@ -396,6 +406,12 @@ export function validateLawEntity(
       'place.lat/place.lng must both be finite; the publisher skips a coordinate-less new record',
     );
   }
+  if (
+    record.origin !== undefined &&
+    (!Number.isFinite(record.origin.lat) || !Number.isFinite(record.origin.lng))
+  ) {
+    errors.push('origin.lat/origin.lng must both be finite');
+  }
   if (record.place.state.trim().length === 0) errors.push('place.state is empty');
 
   validateEvidence(record, errors, warnings);
@@ -404,6 +420,19 @@ export function validateLawEntity(
 
   if (errors.length > 0) return { ok: false, id: record.id, errors };
   return { ok: true, row: buildLawEntityRow(record, options), warnings };
+}
+
+/**
+ * The place the row carries. A federal enactment or ruling is not located at the seat of the body
+ * that made it (that drew an exact-site dot on the Capitol or the Supreme Court Building), so it
+ * takes `country` precision, which the map draws as no point. A case with a sourced `origin`
+ * takes that place instead. State records keep their authored state place.
+ */
+export function effectiveLawPlace(record: AuthoredLawEntity): AuthoredLawEntity['place'] {
+  if (record.kind === 'case' && record.origin !== undefined) return record.origin;
+  if (record.scope.level !== 'federal') return record.place;
+  const { state, lat, lng } = record.place;
+  return { state, lat, lng, precision: 'country' };
 }
 
 /**
@@ -416,21 +445,22 @@ export function buildLawEntityRow(
   record: AuthoredLawEntity,
   options: { readonly runId: string },
 ): LawEntityDbRow {
+  const place = effectiveLawPlace(record);
   const provenance: Record<string, unknown> = {
     generatedBy: options.runId,
     sourceCategory: LAW_ENTITY_SOURCE_CATEGORY,
-    sourceState: record.place.state,
+    sourceState: place.state,
     // A law has no street address. `historicAddress` is set only where the catalog already places
     // a record at a named building (the Supreme Court), never invented for a statute.
-    ...(record.place.city !== undefined ? { sourceCity: record.place.city } : {}),
-    ...(record.place.historicAddress !== undefined
-      ? { historicAddress: record.place.historicAddress }
-      : {}),
+    ...(place.city !== undefined ? { sourceCity: place.city } : {}),
+    ...(place.historicAddress !== undefined ? { historicAddress: place.historicAddress } : {}),
     sourceUrl: record.canonicalSource.url,
     locationBasis:
-      record.place.precision === 'state'
+      place.precision === 'state'
         ? 'the enacting state, at state precision; the packet names no city and none is invented'
-        : 'the seat of the enacting or deciding body, following the catalog rows already published for this kind',
+        : place.precision === 'country'
+          ? 'a federal record is not located at a building; country precision, which the map draws as no point'
+          : 'where the case arose, at the precision its source supports',
     packet: 'docs/research/lives-missing-laws-packet.md',
     packetItem: record.packetItem,
   };
@@ -441,7 +471,7 @@ export function buildLawEntityRow(
     provenance: { ...provenance },
     canonicalUrl: record.canonicalSource.url,
     sourceUrls: [record.canonicalSource.url, ...record.evidence.map((c) => c.sourceUrl)],
-    geocode: { precision: record.place.precision },
+    geocode: { precision: place.precision },
     historicalContext: record.historicalContext,
     impactStatement: record.impactStatement,
     ...(record.topicIds !== undefined ? { topicIds: record.topicIds } : {}),
@@ -477,8 +507,8 @@ export function buildLawEntityRow(
     display_name: record.displayName,
     kind: record.kind,
     summary: record.summary.trim(),
-    lat: record.place.lat,
-    lng: record.place.lng,
+    lat: place.lat,
+    lng: place.lng,
     canonical_url: record.canonicalSource.url,
     research_lane_only: true,
     status: 'pending',

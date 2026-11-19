@@ -35,6 +35,9 @@ import React, {
  */
 const UNAVAILABLE_NOTE = 'Suggestions are unavailable right now. Press Enter to search.';
 
+/** Shown when a settled lookup found nothing, with the way forward that still works. */
+const NO_MATCH_NOTE = 'No suggestions match. Press Enter to search every record.';
+
 /** Shown while a remote lookup is outstanding, so a slow answer is not mistaken for none. */
 const SEARCHING_NOTE = 'Searching…';
 
@@ -220,6 +223,14 @@ export function TypeaheadCombobox({
 
   const showUnavailable = unavailable && suggestions.length === 0;
   const showSearching = pending && suggestions.length === 0 && !showUnavailable;
+  // Settled means the lookup for exactly this text has answered, so a keystroke in flight never
+  // flashes "no match" before its own request starts.
+  const showNoMatch =
+    query.trim().length >= minChars &&
+    deferredQuery === query &&
+    !pending &&
+    !showUnavailable &&
+    suggestions.length === 0;
 
   const statusMessage =
     deferredQuery.trim().length < minChars
@@ -233,7 +244,18 @@ export function TypeaheadCombobox({
             : `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'} available`;
 
   return (
-    <div className={className ?? 'ds-typeahead'} ref={rootRef}>
+    <div
+      className={className ?? 'ds-typeahead'}
+      ref={rootRef}
+      // Tabbing on closes the list; left open it sat over the page's own controls. A press on an
+      // option never moves focus (see its onMouseDown), so this only fires on a real departure.
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setOpen(false);
+          setActiveIndex(-1);
+        }
+      }}
+    >
       <label
         className={hideLabel ? 'ds-visually-hidden' : (labelClassName ?? undefined)}
         htmlFor={id}
@@ -274,6 +296,11 @@ export function TypeaheadCombobox({
           {SEARCHING_NOTE}
         </p>
       ) : null}
+      {showNoMatch && open ? (
+        <p className="ds-typeahead__note" aria-hidden="true">
+          {NO_MATCH_NOTE}
+        </p>
+      ) : null}
       {showUnavailable && open ? (
         <p className="ds-typeahead__note" role="status">
           {UNAVAILABLE_NOTE}
@@ -300,6 +327,10 @@ export function TypeaheadCombobox({
                   }
                   role="option"
                   aria-selected={selected}
+                  // The arrow keys walk the options (aria-activedescendant); Tab leaves the field.
+                  tabIndex={-1}
+                  // Keep focus in the field, so a press on an option is not also a blur.
+                  onMouseDown={(event) => event.preventDefault()}
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => pick(suggestion)}
                 >

@@ -90,6 +90,14 @@ describe('a failed lookup is not an empty one', () => {
     );
   });
 
+  it('shows a visible no-match note only once the lookup for this exact text has settled', () => {
+    assert.match(code, /deferredQuery === query &&\s*!pending &&\s*!showUnavailable/);
+    assert.match(
+      code,
+      /showNoMatch && open \? \(\s*<p className="ds-typeahead__note" aria-hidden="true">/,
+    );
+  });
+
   it('keeps the note out of the listbox', () => {
     // A note is not an option: inside `role="listbox"` it would be arrowable and would announce
     // itself as one available suggestion.

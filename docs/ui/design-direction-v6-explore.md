@@ -2,6 +2,8 @@
 
 # BlackStory design direction v6 — explore edition
 
+> Superseded by patterns-place-map.md (2026-11-13) for grouping, and by patterns-map-entity-encoding.md for point marks. The kind chips, Color key tab, kind-family shade and cluster size steps below no longer describe the web map.
+
 **Status:** binding layout pattern for `/explore` only (2026-07-23).  
 **Parent:** `design-direction-v6-home.md` (shared edition vocabulary).  
 **Supersedes:** `design-direction-v5.md` §6 `/explore` cockpit (ink-fixed instruments, blur panels).  

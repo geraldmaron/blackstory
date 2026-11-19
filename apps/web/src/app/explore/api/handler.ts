@@ -7,6 +7,8 @@
  * navigation.
  */
 import { NextResponse } from 'next/server';
+import { clientIpFrom } from '@/lib/web-security/client-ip';
+import { integritySatisfiesRateLimitGate } from '@/lib/request-integrity/server';
 import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
 import {
   applyExploreFilters,
@@ -17,17 +19,6 @@ import { exploreMapSourceFor } from '../../../lib/map-experience/build-explore-m
 import { listPublicEntityViews } from '../../../lib/public-data/source';
 import type { ExploreRequestIntegrityGuard } from './request-integrity-guard';
 import type { createExploreRateLimitGuard } from './rate-limit-guard';
-
-/**
- * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
- * `clientAttested` field name on rate-limit requests).
- */
-function integritySatisfiesRateLimitGate(decision: {
-  readonly verified: boolean;
-  readonly mode: 'monitor' | 'enforce';
-}): boolean {
-  return decision.verified || decision.mode === 'monitor';
-}
 
 export type ExploreRouteDependencies = {
   readonly integrityGuard: ExploreRequestIntegrityGuard;
@@ -41,12 +32,6 @@ export type ExploreRouteDependencies = {
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
   return NextResponse.json({ error, ...extra }, { status });
-}
-
-function clientIpFrom(request: Request): string | undefined {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const first = forwarded?.split(',')[0]?.trim();
-  return first || undefined;
 }
 
 const GUARDRAIL_FILTER_KEYS = ['kind', 'era'] as const;

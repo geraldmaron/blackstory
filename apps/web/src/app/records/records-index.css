@@ -1,268 +1,488 @@
 /**
- * `/records` — the only styles this room adds on top of the shared kit.
+ * `/records` — the register: research rows and pager. The toolbar, menus, sheet, active-filter
+ * row, outcome block and wait placeholder are shared with /law and /books in room-kit.css. The
+ * page frame, buttons, chips and Segmented come from @repo/ui; the timeline bands are
+ * records-chronology.css.
  *
- * Everything structural (the column, the chip, the hairline row, the rail, the off-ramp) comes
- * from `components/room/room-kit.css`. What is left here is what the index has that no other
- * room does: the control line, the facet disclosures, the grade dot and the pager. The GET find
- * field and the active-constraint row used to live here too; /law renders both, so they moved
- * into the kit. Anything a second room renders moves there the same way rather than being copied.
+ * Spacing uses the shared scale only (4, 8, 12, 16, 24, 32, 48, 72).
  */
 
-/* —— the compact header ——————————————————————————————————————————————————————
-   The ledger masthead is built for a reading room: hero-scale title, wide lede, a 2px rule under
-   a tall block. Here the reader came to narrow a collection, so the header is a short editorial
-   line and the workbench sits in the first viewport. Scoped by `ds-records-entry`; the shared
-   Reading posture is untouched. */
-.ds-room--ledger .ds-entry--reading.ds-records-entry {
-  row-gap: var(--ds-space-2);
-  padding-bottom: var(--ds-space-4);
-}
-
-.ds-room--ledger .ds-records-entry .ds-entry__title {
-  margin: 0;
-  font-size: var(--ds-text-display-3);
-  line-height: 1.02;
-}
-
-.ds-room--ledger .ds-records-entry .ds-entry__lede {
-  margin: 0;
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
-}
-
-/* —— the workbench ————————————————————————————————————————————————————————————
-   Collection heading and view choice, then find and facets, as one unit under the header. The
-   collection strip drops its own box here (`ds-collection--flat`) so there is one panel edge, not
-   a card inside a card. */
-.ds-records-workbench {
-  display: grid;
-  gap: var(--ds-space-3);
-  margin-block: var(--ds-space-4) var(--ds-space-5);
-  padding-bottom: var(--ds-space-4);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-records-workbench > .ds-find {
-  margin: 0;
-}
-
-/* —— the control line: find field and facets, side by side ————————————————————
-   The room used to open on a panel of six labeled chip rows, which cost most of a screen before
-   the first record. One line instead: a GET search field that takes the spare width, then one
-   disclosure per facet. Both halves work with JavaScript off. */
-/* The tray below is positioned against this row, so it needs to be the containing block. */
-.ds-records-controls {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
-  /* Sits inside the kit's FindBar, which owns the spacing around the whole bar. */
-  margin: 0;
-}
-
-/* —— facets: one pill each, opening onto its own vocabulary ————————————————————
-   A native `<details>`, so the menu is markup rather than a script: the pill states the group and
-   the value currently narrowing it, and opening it lists the chips that change that value. */
-/*
- * Deliberately not `position: relative`. The tray below spans the whole control row, so its
- * containing block has to be `.ds-records-controls`; making the disclosure a containing block
- * is what pinned each tray to its own 80px pill in the first place.
- */
-.ds-records-facet {
-  flex: none;
-}
-
-.ds-records-facet__pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-full);
-  color: var(--ds-ink);
-  font-size: var(--ds-text-caption);
-  list-style: none;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-/* Safari draws its own disclosure triangle from a pseudo-element `list-style: none` misses. */
-.ds-records-facet__pill::-webkit-details-marker {
+/* The shell draws a copper reading-progress bar on reading surfaces. A register is not read
+   front to back, and copper is for the current thing, so the bar stays off here. */
+body:has(.ds-records) .ds-reading-progress {
   display: none;
 }
 
-.ds-records-facet__pill:hover {
-  border-color: var(--ds-border-strong);
+.ds-records {
+  /* The sticky toolbar's height, which the timeline's sticky decade labels and every jump
+     target clear. 44px controls plus 12px above and below. */
+  --records-bar-h: 68px;
 }
 
-.ds-records-facet__pill[data-active] {
-  background: var(--room-copper-wash);
-  border-color: var(--ds-accent-graphic);
+/* The register's own action in the active-filter row. */
+.ds-records-active__map {
+  margin-left: auto;
+}
+
+/* —— header: the title at display scale, the count as a giant copper numeral ———————— */
+.ds-records-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title count'
+    'dek count';
+  align-items: end;
+  column-gap: var(--ds-space-8);
+  padding-block: var(--ds-space-12) var(--ds-space-8);
+}
+
+.ds-records-head__title {
+  grid-area: title;
+}
+
+.ds-records-head__count {
+  grid-area: count;
+  align-self: end;
+  /* Crop the numeral's descender space so it sits on the same floor as the dek. */
+  margin-bottom: -0.06em;
+}
+
+.ds-records-head__dek {
+  grid-area: dek;
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* —— the list: one paper sheet on the table ——————————————————————————————————— */
+.ds-records-paper {
+  margin-top: var(--ds-space-6);
+  padding-block: var(--ds-space-2);
+}
+
+.ds-records-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-record {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  scroll-margin-top: calc(var(--records-bar-h) + var(--ds-space-4));
+}
+
+.ds-record:last-child {
+  border-bottom: 0;
+}
+
+.ds-record__link {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'mark name decade'
+    'mark place place'
+    'mark summary summary'
+    'mark foot foot';
+  align-items: start;
+  gap: var(--ds-space-1) var(--ds-space-5);
+  padding: var(--ds-space-5) var(--ds-space-3);
+  margin-inline: calc(var(--ds-space-3) * -1);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-record__link:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-record__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+/* The mark: the record's own photograph as a plate, or its kind tile. Every row has one, so every
+   title starts on one edge and no row opens on an empty column. */
+.ds-record__mark {
+  grid-area: mark;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--ds-radius-sm);
+  background: color-mix(in oklab, var(--kind-shade) 26%, var(--ds-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--kind-shade) 50%, transparent);
+}
+
+.ds-record__mark.ds-plate__tone {
+  box-shadow: none;
+}
+
+.ds-record__kind {
+  display: grid;
+  justify-items: center;
+  gap: var(--ds-space-1);
+  color: color-mix(in oklab, var(--kind-shade) 58%, var(--ds-ink));
+}
+
+.ds-record__kind-icon {
+  width: 1.625rem;
+  height: 1.625rem;
+}
+
+.ds-plate__tone > .ds-record__kind .ds-record__kind-icon {
+  width: 0.6875rem;
+  height: 0.6875rem;
+}
+
+.ds-record__kind-word {
+  max-width: 100%;
+  overflow: hidden;
+  color: color-mix(in oklab, var(--kind-shade) 35%, var(--ds-ink));
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  font-weight: 600;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* On a photograph the kind rides as a chip in the plate's corner, on the paper's own ground. */
+.ds-plate__tone > .ds-record__kind {
+  position: absolute;
+  bottom: 0.3125rem;
+  left: 0.3125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  padding: 0.1875rem 0.375rem 0.1875rem 0.25rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ds-surface) 92%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 18%);
+}
+
+.ds-plate__tone > .ds-record__kind .ds-record__kind-word {
+  color: var(--ds-ink);
+}
+
+.ds-record__name {
+  grid-area: name;
+  min-width: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: pretty;
+}
+
+.ds-record__link:hover .ds-record__name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-record__name b,
+.ds-record__summary b {
+  font-weight: 700;
+  color: var(--ds-ink);
+}
+
+.ds-record__decade {
+  grid-area: decade;
+  justify-self: end;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-title);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* No decade is a fact, not a headline: it reads at caption weight, out of the accent. */
+.ds-record__decade[data-undated] {
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.75rem;
+  text-transform: uppercase;
+}
+
+.ds-record__icon {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
   color: var(--ds-accent);
 }
 
-.ds-records-facet__value::before {
-  content: '· ';
-  opacity: 0.6;
-}
-
-/*
- * One tray, the width of the control row, under all of the pills.
- *
- * It used to be six trays, each anchored to its own pill with `width: max-content` and a
- * 28rem cap. A pill is about 80px wide and a vocabulary is not, so every tray ran far past its
- * pill and straight across its neighbors. With the disclosures independent, all six could be
- * open at once, and the row became a stack of half-legible panels with their labels cut off.
- *
- * Spanning the row fixes both halves. Nothing overlaps, because only one facet opens at a time
- * now; nothing is clipped at the right edge, because the tray starts and ends where the controls
- * do rather than where one pill happens to sit.
- *
- * Still over the list rather than shoving it down: an open facet is one click, and reflowing the
- * index underneath would move the rows the reader came to read.
- */
-.ds-records-facet__menu {
-  position: absolute;
-  z-index: var(--ds-z-atlas-pill);
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
+.ds-record__place {
+  grid-area: place;
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: var(--ds-space-3);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 500;
+  line-height: 1.25rem;
 }
 
-/*
- * The fallback for a browser without exclusive `<details>` (name=). There, more than one can be
- * open, and without this the last one in the DOM would win on paint order alone. Raising the
- * one the reader just opened is not possible in CSS, so they simply stack in a readable order
- * instead of overlapping at the same depth.
- */
-.ds-records-facet[open] .ds-records-facet__menu {
-  z-index: calc(var(--ds-z-atlas-pill) + 1);
+.ds-record__place .ds-record__icon {
+  align-self: center;
 }
 
-/* One step tighter than a chip standing on its own: inside the panel there are six rows of them
-   and the height of a single chip is multiplied by every row. */
-.ds-records-facet__menu .ds-room-chip {
-  height: 26px;
-  padding: 0 8px;
-  gap: 5px;
-  font-size: var(--ds-text-caption);
-}
-
-/* —— the grade dot ——————————————————————————————————————————————————————————
-   Grade is never color alone: the tier word sits beside the dot in mono, which is what makes
-   the row readable to a screen reader and to a reader who cannot separate the hues. */
-/*
- * The evidence mark: the shared three-segment meter plus the letter, the same pairing the Explore
- * results rail, the record sheet and the record page draw. This index used to own a third grade
- * treatment whose A was copper — the accent color, not the confidence scale — so the same record
- * carried a different grade language on every surface a reader could meet it.
- */
-.ds-records-grade {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+/* The state as the map prints it: a mono postal code on a copper-ruled chip. */
+.ds-record__state {
+  flex: none;
+  align-self: center;
+  padding: 0.0625rem 0.3125rem;
+  border: var(--ds-border-width) solid color-mix(in oklab, var(--ds-accent) 45%, transparent);
+  border-radius: 0.25rem;
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  color: var(--room-ink-4, var(--ds-ink-subtle));
-}
-
-.ds-records-grade__meter .ds-rec-meter__seg {
-  width: 7px;
-  height: 3px;
-  border-radius: 1px;
-}
-
-.ds-records-grade__letter {
-  min-width: 0.5rem;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.ds-records-grade__letter[data-grade='high'] {
-  color: var(--ds-confidence-high-fg);
-}
-
-.ds-records-grade__letter[data-grade='medium'] {
-  color: var(--ds-confidence-medium-fg);
-}
-
-.ds-records-grade__letter[data-grade='low'] {
-  color: var(--ds-confidence-low-fg);
-}
-
-/* —— the pager: real anchors, never a client-side page counter ————————————————— */
-.ds-records-pager {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  margin-top: var(--ds-space-6);
-  padding-top: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-records-pager__link {
-  font-size: var(--ds-text-caption);
-  font-weight: 550;
-  color: var(--ds-ink);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.1rem;
   text-decoration: none;
 }
 
-.ds-records-pager__link:hover {
-  color: var(--ds-accent);
+.ds-record__summary {
+  grid-area: summary;
+  display: -webkit-box;
+  min-width: 0;
+  margin-top: var(--ds-space-1);
+  overflow: hidden;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* The foot: the evidence, set off by a hairline so it reads as the record's receipt line. */
+.ds-record__foot {
+  grid-area: foot;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-5);
+  margin-top: var(--ds-space-2);
+  padding-top: var(--ds-space-2);
+  border-top: var(--ds-border-width) dashed var(--ds-rule);
+}
+
+.ds-record__sources {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.25rem;
+}
+
+.ds-record__sources .ds-record__icon {
+  color: var(--ds-ink-muted);
+}
+
+.ds-record__sources-count {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* The timeline's row: the band states the decade, so the row is a small tile, the name with its
+   place under it, and the grade at the right. The kind tile shows the glyph alone; its word stays
+   for screen readers. */
+.ds-record__link--compact {
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  grid-template-areas:
+    'mark name'
+    'mark place'
+    'mark foot';
+  align-items: center;
+  gap: 0.125rem var(--ds-space-4);
+  padding-block: var(--ds-space-3);
+}
+
+.ds-record__link--compact .ds-record__kind-word {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ds-record__link--compact .ds-plate__tone > .ds-record__kind {
+  padding: 0.1875rem;
+}
+
+.ds-record__link--compact .ds-record__name {
+  font-size: var(--ds-text-subtitle);
+}
+
+.ds-record__link--compact .ds-record__foot {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* —— pager ———————————————————————————————————————————————————————————————— */
+.ds-records-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-8);
+}
+
+.ds-records-pager__arrow {
+  width: 1rem;
+  height: 1rem;
 }
 
 .ds-records-pager__at {
+  margin: 0 var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-records-pager__num {
+  color: var(--ds-ink);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-variant-numeric: tabular-nums;
 }
 
-.ds-records-pager__spacer {
-  flex: 0 0 1px;
-}
-
-/* A long facet's tray holds one native select across the tray: every value, one picker. */
-.ds-records-facet__form {
+.ds-records-jump {
   display: flex;
-  flex: 1 1 100%;
-  flex-wrap: wrap;
-  align-items: center;
   gap: var(--ds-space-2);
-  margin: 0;
+  margin: 0 0 0 auto;
 }
 
-.ds-records-facet__form .ds-pill-select {
-  flex: 1 1 16rem;
+.ds-records-jump__field {
+  position: relative;
+  display: inline-flex;
 }
 
-.ds-records-facet__form .ds-pill-select__control {
-  flex: 1 1 auto;
-  width: 100%;
+.ds-records-jump__select {
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-8) 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
 }
 
-/* Facet pills and the chips inside their trays are touch targets on a phone or a tablet. */
-@media (max-width: 64rem), (pointer: coarse) {
-  .ds-records-facet__pill {
-    height: 44px;
+.ds-records-jump__select:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-records-jump__select option {
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+}
+
+.ds-records-jump__caret {
+  position: absolute;
+  top: 50%;
+  right: var(--ds-space-3);
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--ds-ink-muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* —— phone ————————————————————————————————————————————————————————————————— */
+@media (max-width: 47.9375rem) {
+  .ds-records-head {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'title'
+      'count'
+      'dek';
+    padding-block: var(--ds-space-8) var(--ds-space-4);
   }
 
-  .ds-records-facet__menu .ds-room-chip {
-    height: auto;
-    min-height: 44px;
-    padding-inline: 14px;
+  .ds-records-head__count {
+    justify-self: start;
+    margin: var(--ds-space-2) 0 0;
   }
+
+  .ds-records-paper {
+    margin-inline: calc(var(--ds-gutter) * -1);
+  }
+
+  /* The mark and the name share the first lines; the summary and the evidence foot take the
+     card's full width under them. */
+  .ds-record__link {
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      'mark name decade'
+      'mark place place'
+      'summary summary summary'
+      'foot foot foot';
+    gap: var(--ds-space-1) var(--ds-space-3);
+    padding-block: var(--ds-space-4);
+  }
+
+  .ds-record__mark {
+    align-self: start;
+  }
+
+  .ds-record__kind-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .ds-record__decade {
+    font-size: var(--ds-text-subtitle);
+  }
+
+  .ds-record__link--compact {
+    grid-template-columns: 3rem minmax(0, 1fr);
+  }
+
+  /* Under the chips, flush to the gutter. */
+  .ds-records-active__map {
+    margin-left: 0;
+  }
+
+  .ds-records-pager__at {
+    order: -1;
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .ds-records-jump {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .ds-records-jump__field,
+  .ds-records-jump__select {
+    width: 100%;
+  }
+}
+
+/* —— the wait: placeholder rows keep still under the pointer ———————————————————— */
+.ds-records-list--waiting .ds-record__link:hover {
+  background: none;
 }

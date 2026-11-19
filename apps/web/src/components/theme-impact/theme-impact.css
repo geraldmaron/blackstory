@@ -47,6 +47,15 @@
   text-anchor: middle;
 }
 
+.ds-theme-impact-chart__finding {
+  margin: 0 0 var(--ds-space-2);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+}
+
+/* Series in ink: copper is for a focus point, and no single point here is the focus. */
 .ds-theme-impact-chart__line {
   fill: none;
   stroke-width: 1.75;
@@ -55,7 +64,7 @@
 }
 
 .ds-theme-impact-chart__line--a {
-  stroke: var(--ds-accent-graphic);
+  stroke: var(--ds-ink);
 }
 
 .ds-theme-impact-chart__line--b {
@@ -64,48 +73,17 @@
 }
 
 .ds-theme-impact-chart__dot--a {
-  fill: var(--ds-accent-graphic);
+  fill: var(--ds-ink);
 }
 
 .ds-theme-impact-chart__dot--b {
   fill: var(--ds-ink-muted);
 }
 
-.ds-theme-impact-chart__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-1) 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  color: var(--ds-ink-muted);
-}
-
-.ds-theme-impact-chart__legend-item {
-  position: relative;
-  padding-left: 1rem;
-}
-
-.ds-theme-impact-chart__legend-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.45em;
-  width: 0.75rem;
-  height: 2px;
-}
-
-.ds-theme-impact-chart__legend-item--a::before {
-  background: var(--ds-accent-graphic);
-}
-
-.ds-theme-impact-chart__legend-item--b::before {
-  background: var(--ds-ink-muted);
-  background-image: repeating-linear-gradient(
-    to right,
-    var(--ds-ink-muted) 0,
-    var(--ds-ink-muted) 3px,
-    transparent 3px,
-    transparent 5.5px
-  );
+/* The direct label sits at the line end, right-aligned to it. */
+.ds-theme-impact-chart__label {
+  fill: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 9px;
+  text-anchor: end;
 }

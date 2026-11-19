@@ -23,8 +23,8 @@ function archiveProse(): Authored[] {
     { where: `${key}.notice`, text: reading.notice },
     { where: `${key}.question`, text: reading.question },
     ...reading.connections.map((link, index) => ({
-      where: `${key}.connections[${index}].line`,
-      text: link.line,
+      where: `${key}.connections[${index}].title`,
+      text: link.title,
     })),
     ...(reading.companion
       ? [

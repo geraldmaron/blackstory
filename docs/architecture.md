@@ -33,8 +33,6 @@ or in the owning contract. Update existing authoritative prose instead of adding
 |---|---|
 | `apps/web` | Next.js public web and staff-gated `/admin` console on Vercel |
 | `apps/api-public` | Released public read/search/location API and mobile data boundary |
-| `apps/api-submissions` | Quarantined contributions and corrections |
-| `apps/api-internal` | Internal publication and control operations |
 | `apps/mobile` | Expo native app, its own npm graph and verification path |
 | `apps/docs` | Public documentation source, exported to GitHub Pages |
 | `packages/research-kernel` | Generic schemas, profiles, validation, priority and stopping rules |
@@ -87,7 +85,7 @@ Any agent can challenge a load-bearing choice without creating an ADR or PRD:
 3. Define the smallest decisive experiment. Use realistic data and the actual interface. For a
    database or authorization change, include production-shaped migration and denial tests.
 4. Record **accepted**, **accepted with controls**, **needs validation**, or **rejected**, with the
-   evidence and the condition that would change the decision. Put work and dependencies in Beads.
+   evidence and the condition that would change the decision.
 5. Change the implementation, tests, and owning document together. Remove superseded paths and
    claims. Do not retain compatibility wrappers unless the user explicitly changes that goal.
 6. Run the applicable project gates and observe the outcome. Report what remains unproven and

@@ -5,6 +5,9 @@
  */
 const TOPIC_IDS = new Set(require('./topic-ids.json'));
 
+/** The page calls the layout "Timeline"; hand-typed `view=` and `layout=` spellings land on it. */
+const TIMELINE_SPELLINGS = new Set(['chronology', 'timeline']);
+
 const EMPTY_RECORDS_QUERY = Object.freeze({
   q: '',
   kind: '',
@@ -18,6 +21,7 @@ const EMPTY_RECORDS_QUERY = Object.freeze({
   periodEnd: '',
   includeUndated: false,
   sort: 'discovery',
+  seed: '',
   layout: 'index',
   page: 1,
 });
@@ -31,7 +35,10 @@ const RECORDS_PAGE_PARAM_ALLOWLIST = Object.freeze([
   'periodEnd',
   'includeUndated',
   'sort',
+  'seed',
   'layout',
+  // Read only as a spelling of `layout` (`?view=timeline`); the canonical URL never emits it.
+  'view',
   'page',
 ]);
 
@@ -75,6 +82,7 @@ const STATE_POSTAL = /^[A-Z]{2}$/;
 const EVIDENCE_GRADES = new Set(['A', 'B', 'C']);
 const MAX_QUERY_LENGTH = 120;
 const MAX_PAGE = 1000;
+const SEED = /^[a-z0-9]{1,8}$/;
 
 function slugOrEmpty(value) {
   return FACET_SLUG.test(value) ? value : '';
@@ -102,7 +110,11 @@ function parseRecordsQuery(raw) {
     periodStart: period.start,
     periodEnd: period.end,
     includeUndated: period.includeUndated,
-    layout: one('layout').toLowerCase() === 'chronology' ? 'chronology' : 'index',
+    layout:
+      TIMELINE_SPELLINGS.has(one('layout').toLowerCase()) ||
+      TIMELINE_SPELLINGS.has(one('view').toLowerCase())
+        ? 'chronology'
+        : 'index',
     q: one('q').replace(/\s+/g, ' ').slice(0, MAX_QUERY_LENGTH).trim(),
     kind: slugOrEmpty(one('kind').toLowerCase()),
     era: slugOrEmpty(one('era').toLowerCase()),
@@ -110,7 +122,10 @@ function parseRecordsQuery(raw) {
     topic: topic.length > 0 && TOPIC_IDS.has(topic) ? topic : '',
     status: slugOrEmpty(one('status').toLowerCase()),
     evidence: EVIDENCE_GRADES.has(evidence) ? evidence : '',
-    sort: RECORDS_SORTS.includes(one('sort').toLowerCase()) ? one('sort').toLowerCase() : 'discovery',
+    sort: RECORDS_SORTS.includes(one('sort').toLowerCase())
+      ? one('sort').toLowerCase()
+      : 'discovery',
+    seed: SEED.test(one('seed').toLowerCase()) ? one('seed').toLowerCase() : '',
     page: Number.isFinite(rawPage) && rawPage > 1 ? Math.min(rawPage, MAX_PAGE) : 1,
   };
 }
@@ -128,6 +143,9 @@ function recordsQueryString(query) {
   if (period.end.length > 0) params.set('periodEnd', period.end);
   if (period.includeUndated) params.set('includeUndated', '1');
   if (merged.sort !== 'discovery') params.set('sort', merged.sort);
+  if (merged.seed.length > 0 && merged.sort === 'discovery' && merged.q.length === 0) {
+    params.set('seed', merged.seed);
+  }
   if (merged.layout === 'chronology') params.set('layout', 'chronology');
   if (merged.page > 1) params.set('page', String(merged.page));
   return params.toString();

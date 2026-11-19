@@ -16,19 +16,22 @@ import {
   DOOR_PIN_REDIRECT_CACHE_CONTROL,
   loadDoorPinPlate,
 } from '../../../lib/map-experience/door-catalog';
-import { buildDoorPinPhotoIndex } from '../../../lib/map-experience/entity-photo-index';
+import {
+  buildDoorPinPhotoIndex,
+  pickPhotoIds,
+} from '../../../lib/map-experience/entity-photo-index';
 import { firstPaintPinId } from '../../../lib/map-experience/first-paint-pins';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   const [{ data: entities }, { features }] = await Promise.all([
     getSharedPublicEntities(),
     loadDoorPinPlate(),
   ]);
   const index = buildDoorPinPhotoIndex(entities, features, firstPaintPinId);
 
-  return new Response(JSON.stringify(index), {
+  return new Response(JSON.stringify(pickPhotoIds(index, request.url)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',

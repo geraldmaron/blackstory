@@ -40,8 +40,6 @@ Public clients read released projections only. Anonymous clients never write can
 |------|------|
 | `apps/web` | Public Next.js app on **Vercel** (live at blackstory.app); private admin/research console at `/admin`, staff-gated |
 | `apps/api-public` | Public read, search, and location API (in-repo; Cloud Run deploy unverified) |
-| `apps/api-submissions` | Corrections and contribution intake (in-repo; Cloud Run deploy unverified) |
-| `apps/api-internal` | Publication and internal control API (in-repo; Cloud Run deploy unverified) |
 | `apps/docs` | Public docs site (GitHub Pages export) |
 | `apps/mobile` | Expo mobile app (isolated npm lockfile) |
 | `workers/*` | Python research, publication, and security workers |
@@ -119,8 +117,6 @@ Independent deployable builds:
 ```bash
 pnpm --filter @repo/web build
 pnpm --filter @repo/api-public build
-pnpm --filter @repo/api-submissions build
-pnpm --filter @repo/api-internal build
 ```
 
 Internal `@repo/*` packages expose a `development` export condition that points at TypeScript source, so tests run against source without a prior build. `pnpm build` writes `dist/`; `pnpm typecheck` resolves cross-package types from those declarations.

@@ -20,7 +20,7 @@ describe('SubmitScreen', () => {
     mockPush.mockClear();
   });
 
-  it('offers native corrections as the primary path', async () => {
+  it('routes corrections to the web hand-off screen', async () => {
     const { getByText } = await render(<SubmitScreen />);
     expect(getByText('Submit')).toBeTruthy();
     expect(getByText('Two different lanes')).toBeTruthy();

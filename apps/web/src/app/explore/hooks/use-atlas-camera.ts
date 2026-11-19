@@ -8,12 +8,10 @@ import {
   type SetStateAction,
 } from 'react';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
-import { createCamera, type CameraMove } from '../../../lib/map-experience/camera-moves';
+import { createCamera } from '../../../lib/map-experience/camera-moves';
 import { chromePadding } from '../../../lib/map-experience/chrome-padding';
 import { useReducedMotion } from '../../../lib/motion/use-reduced-motion';
-import { MIGRATION_CORRIDORS } from '../../../lib/map-experience/migration-corridors';
-import type { LensLayers } from '../../../components/map-experience/LensPanel';
-import type { PanelVisibility } from './use-panel-visibility';
+import type { LensLayers } from './use-lens-filters';
 
 /** A beat between the plate being revealed and the establishing shot starting on it. */
 const ESTABLISHING_SHOT_DELAY_MS = 400;
@@ -27,10 +25,18 @@ const ESTABLISHING_SHOT_DELAY_MS = 400;
  */
 export function useAtlasCamera(
   stage: MapStageHandle,
-  panels: PanelVisibility,
-  chromeHidden: boolean,
-  sheetOpen: boolean,
+  /**
+   * How far up the viewport the phone sheet reaches now, and once a selection opens it (0 on a
+   * wide screen, where the column is fixed and the inspector replaces the list in place).
+   */
+  sheetReach: { readonly now: number; readonly selected: number },
   setLayers: Dispatch<SetStateAction<LensLayers>>,
+  /**
+   * True once a record is selected or about to be (a home pin hand-off, a deep link). The
+   * establishing shot never runs over a selection: it used to fire 400ms after a home pin click
+   * and throw the reader back to the national view with the inspector open.
+   */
+  hasSelection: () => boolean,
 ) {
   const [readout, setReadout] = useState('');
   const [spotlight, setSpotlight] = useState<{ x: number; y: number; radius: number } | null>(null);
@@ -39,24 +45,36 @@ export function useAtlasCamera(
   const [bearing, setBearing] = useState(0);
   useEffect(() => stage.subscribe('rotate', setBearing), [stage]);
 
-  const paddingRef = useRef({ lens: false, results: false, sheet: false });
-  paddingRef.current = {
-    lens: panels.lens && !chromeHidden,
-    results: panels.results && !chromeHidden,
-    sheet: sheetOpen,
-  };
+  const reachRef = useRef(sheetReach);
+  reachRef.current = sheetReach;
 
   /**
    * Live for the session: a preference flip mid-session must change camera
    * behaviour without a reload. `camera` below is a stable `useMemo` (deps `[stage, setLayers]`,
    * not rebuilt on every render), so its `reducedMotion` callback reads this ref rather than
-   * closing over the hook's own render-time boolean directly — the same pattern `paddingRef`
-   * already uses just above for the same reason (a stable closure that still needs the latest
+   * closing over the hook's own render-time boolean directly — the same pattern `reachRef`
+   * already uses for the same reason (a stable closure that still needs the latest
    * value at call time, not the value from whenever the memo happened to last rebuild).
    */
   const reducedMotion = useReducedMotion();
   const reducedMotionRef = useRef(reducedMotion);
   reducedMotionRef.current = reducedMotion;
+
+  const padFor = useCallback(
+    (sheetHeight: number) =>
+      chromePadding({
+        viewportWidth: typeof window === 'undefined' ? 1440 : window.innerWidth,
+        viewportHeight: typeof window === 'undefined' ? 900 : window.innerHeight,
+        sheetHeight,
+      }),
+    [],
+  );
+  /**
+   * The chrome visible AFTER a selection: on a phone the sheet rises to show the inspector.
+   * Passed to `frameRecord` explicitly, because the sheet only reaches that height on the next
+   * render, which framed the first selection as if nothing covered it.
+   */
+  const selectionPadding = useCallback(() => padFor(reachRef.current.selected), [padFor]);
 
   const camera = useMemo(
     () =>
@@ -74,15 +92,11 @@ export function useAtlasCamera(
           getPitch: () => stage.getMap()?.getPitch() ?? 0,
           getCenter: () => stage.getMap()?.getCenter() ?? { lng: -96.5, lat: 38.6 },
           stop: () => stage.getMap()?.stop(),
+          // Off-canvas when the map is not alive yet: the record is framed rather than skipped.
+          project: (lngLat) => stage.getMap()?.project(lngLat as never) ?? { x: -1, y: -1 },
+          getContainer: () => stage.getMap()?.getContainer() ?? { clientWidth: 0, clientHeight: 0 },
         },
-        padding: () =>
-          chromePadding({
-            viewportWidth: typeof window === 'undefined' ? 1440 : window.innerWidth,
-            viewportHeight: typeof window === 'undefined' ? 900 : window.innerHeight,
-            lensOpen: paddingRef.current.lens,
-            resultsOpen: paddingRef.current.results,
-            sheetOpen: paddingRef.current.sheet,
-          }),
+        padding: () => padFor(reachRef.current.now),
         reducedMotion: () => reducedMotionRef.current,
         announce: setReadout,
         setRoutes: (visible) => setLayers((current) => ({ ...current, routes: visible })),
@@ -102,7 +116,7 @@ export function useAtlasCamera(
           );
         },
       }),
-    [stage, setLayers],
+    [padFor, stage, setLayers],
   );
 
   /** The camera readout clears itself, so a stale "Orbit" does not sit under the map forever. */
@@ -114,21 +128,25 @@ export function useAtlasCamera(
 
   /**
    * The establishing shot. Start wide, then go deep (§4.2 rule 2) — once the plate has been
-   * revealed, not once the canvas has size. The first-paint board is drawn at the plate's opening
-   * frame (explore-map-underlay.css), so the handoff is two identical pictures crossfading; a
-   * shot that started before the reveal was seen mid-flight through that fade, and on a cold load
-   * a mount-timed shot can fire before MapLibre exists and never run. `ready` replays for a plate
+   * revealed, not once the canvas has size. On a cold load a mount-timed shot can fire before
+   * MapLibre exists and never run. `ready` replays for a plate
    * revealed on an earlier page, so arriving from the
    * Door still gets the shot. Under reduced motion the shot is a cut and takes no beat.
    */
   const framed = useRef(false);
+  const hasSelectionRef = useRef(hasSelection);
+  hasSelectionRef.current = hasSelection;
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const unsubscribe = stage.subscribe('ready', () => {
       if (framed.current) return;
       framed.current = true;
+      if (hasSelectionRef.current()) return;
       const delay = reducedMotionRef.current ? 0 : ESTABLISHING_SHOT_DELAY_MS;
-      timer = setTimeout(() => camera.wide({ trigger: 'ambient' }), delay);
+      timer = setTimeout(() => {
+        // Checked again at fire time: a selection made during the beat wins.
+        if (!hasSelectionRef.current()) camera.wide({ trigger: 'ambient' });
+      }, delay);
     });
     return () => {
       unsubscribe();
@@ -136,19 +154,5 @@ export function useAtlasCamera(
     };
   }, [camera, stage]);
 
-  const runMove = useCallback(
-    (move: CameraMove) => {
-      const options = { trigger: 'reader' as const };
-      if (move === 'wide') camera.wide(options);
-      else if (move === 'push') camera.push(options);
-      else if (move === 'orbit') camera.orbit(options);
-      else if (move === 'tilt') camera.tilt(options);
-      else if (move === 'spotlight') camera.spotlight(options);
-      else if (move === 'trace')
-        camera.trace({ ...options, corridorCount: MIGRATION_CORRIDORS.length });
-    },
-    [camera],
-  );
-
-  return { camera, readout, spotlight, setSpotlight, runMove, bearing } as const;
+  return { camera, readout, spotlight, setSpotlight, bearing, selectionPadding } as const;
 }

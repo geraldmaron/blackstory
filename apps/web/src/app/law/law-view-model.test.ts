@@ -3,12 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  buildLawBrowseViewModel,
-  buildLawDetailViewModel,
-  LAW_PAGE_SIZE,
-  lawBrowseHref,
-} from './law-view-model';
+import { buildLawBrowseViewModel, buildLawDetailViewModel, lawBrowseHref } from './law-view-model';
 import { seedLegalCatalog } from '../../lib/legal/public-source';
 
 // Seed-backed source keeps these deterministic and off postgres; the Supabase path
@@ -68,12 +63,24 @@ test('browse items carry a plain-language summary trimmed to one sentence', () =
   const view = buildLawBrowseViewModel({}, source);
   const brown = view.items.find((item) => item.slug === 'brown-v-board-of-education');
   assert.ok(brown?.summary);
-  // "347 U.S. 483 (1954)" must not be mistaken for a sentence break.
-  assert.match(brown.summary, /^Brown v\. Board of Education, 347 U\.S\. 483 \(1954\),/);
+  // "347 U.S. 483 (1954)" must not be mistaken for a sentence break, and the row already prints
+  // the name, so the line starts after it.
+  assert.match(brown.summary, /^347 U\.S\. 483 \(1954\),/);
   assert.ok(brown.summary.endsWith('.'));
+  const thirteenth = view.items.find((item) => item.slug === 'thirteenth-amendment');
+  assert.match(thirteenth?.summary ?? '', /^Ratified December 6, 1865,/);
 });
 
-test('isFiltered drives the "N of M" count only when a facet narrows the catalog', () => {
+test('a facet value no entry carries is dropped, not echoed back as a filter', () => {
+  const view = buildLawBrowseViewModel({ kind: 'state-law', topic: 'zzz', status: ' ' }, source);
+  assert.equal(view.kind, 'all');
+  assert.equal(view.topic, 'all');
+  assert.equal(view.status, 'all');
+  assert.equal(view.isFiltered, false);
+  assert.equal(view.totalMatched, view.totalAvailable);
+});
+
+test('isFiltered drives the "N of M" dek only when a facet narrows the catalog', () => {
   const all = buildLawBrowseViewModel({}, source);
   assert.equal(all.isFiltered, false);
   assert.equal(all.totalMatched, all.totalAvailable);
@@ -96,29 +103,34 @@ test('buildLawDetailViewModel returns not_found for unknown slug', () => {
   assert.equal(view.kind, 'not_found');
 });
 
-test('law paging preserves ordering, clamps stale pages and keeps detail neighbors across page boundaries', () => {
-  const snapshots = Array.from({ length: LAW_PAGE_SIZE + 3 }, (_, i) => ({
+test('the whole catalog renders at once, grouped by era in the current order', () => {
+  const snapshots = [1868, 1964, 1865, 2013].map((year, i) => ({
     ...source.snapshots[0]!,
     id: `fixture-${i}`,
     slug: `fixture-${i}`,
-    title: `Fixture ${String(i).padStart(3, '0')}`,
-    effectiveYear: 1800 + i,
+    title: `Fixture ${year}`,
+    effectiveYear: year,
   }));
   const catalog = { snapshots, explainerFor: () => undefined };
-  const first = buildLawBrowseViewModel({}, catalog);
-  const second = buildLawBrowseViewModel({ page: '2' }, catalog);
-  assert.equal(first.items.length, LAW_PAGE_SIZE);
-  assert.equal(second.items.length, 3);
-  assert.equal(second.items[0]?.id, `fixture-${LAW_PAGE_SIZE}`);
-  assert.equal(second.totalMatched, LAW_PAGE_SIZE + 3);
-  assert.equal(buildLawBrowseViewModel({ page: '99999' }, catalog).page, 2);
-  assert.equal(buildLawBrowseViewModel({ page: 'bad' }, catalog).page, 1);
-  const detail = buildLawDetailViewModel(`fixture-${LAW_PAGE_SIZE}`, catalog);
-  assert.equal(detail.kind, 'ok');
-  if (detail.kind === 'ok') {
-    assert.equal(detail.previous?.slug, `fixture-${LAW_PAGE_SIZE - 1}`);
-    assert.equal(detail.next?.slug, `fixture-${LAW_PAGE_SIZE + 1}`);
-  }
+  const oldest = buildLawBrowseViewModel({}, catalog);
+  assert.equal(oldest.items.length, 4);
+  assert.deepEqual(
+    oldest.groups.map((group) => [group.era.id, group.items.map((item) => item.effectiveYear)]),
+    [
+      ['reconstruction', [1865, 1868]],
+      ['civil-rights', [1964]],
+      ['since-1969', [2013]],
+    ],
+  );
+  const newest = buildLawBrowseViewModel({ sort: 'recent' }, catalog);
+  assert.deepEqual(
+    newest.groups.map((group) => group.era.id),
+    ['since-1969', 'civil-rights', 'reconstruction'],
+  );
+  // A title order has no time to group by.
+  assert.deepEqual(buildLawBrowseViewModel({ sort: 'title' }, catalog).groups, []);
+  // Facet options count across the whole catalog.
+  assert.deepEqual(oldest.kindOptions, [{ value: snapshots[0]!.kind, count: 4 }]);
   assert.equal(
     lawBrowseHref({
       q: 'voting',
@@ -126,8 +138,17 @@ test('law paging preserves ordering, clamps stale pages and keeps detail neighbo
       topic: 'voting',
       status: 'in_force',
       sort: 'recent',
-      page: '2',
     }),
-    '/law?q=voting&kind=statute&topic=voting&status=in_force&sort=recent&page=2',
+    '/law?q=voting&kind=statute&topic=voting&status=in_force&sort=recent',
   );
+  assert.equal(lawBrowseHref({ kind: 'all', sort: 'chronological' }), '/law');
+});
+
+test('detail neighbors follow the index default order', () => {
+  const view = buildLawDetailViewModel('fourteenth-amendment', source);
+  assert.equal(view.kind, 'ok');
+  if (view.kind === 'ok') {
+    assert.equal(view.previous?.slug, 'thirteenth-amendment');
+    assert.equal(view.next?.slug, 'fifteenth-amendment');
+  }
 });

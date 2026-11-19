@@ -72,7 +72,7 @@ Room stylesheets size type from `packages/ui/src/styles/tokens.css` only; a lite
 
 ## Adopters
 
-Methodology, Sources, About, FAQ, Rooms, Law, Privacy, Terms, Errata, Support, Submit, Corrections. Data keeps its own section rail (already a sticky running head) and uses the kit's chapter head for its acts. Memorial list uses `MemorialLetterJump` rather than `RoomJump` because the spine is letters, not destinations. `/books` uses the kit around the catalog (how to read, jump, handoffs); catalog rows stay `ds-room-idx` with a cover and gloss, not HairlineIndex, because a title is artwork rather than a 16px kind glyph.
+Methodology, Sources, About, FAQ, Rooms, Law, Privacy, Terms, Errata, Support, Submit, Corrections. Data keeps its own section rail (already a sticky running head) and uses the kit's chapter head for its acts. Memorial list uses `MemorialNameFinder` (a letter jump plus a "Find a name" field) rather than `RoomJump` because the spine is letters, not destinations. `/books` uses the kit around the catalog (how to read, jump, handoffs); catalog rows stay `ds-room-idx` with a cover and gloss, not HairlineIndex, because a title is artwork rather than a 16px kind glyph.
 
 ---
 

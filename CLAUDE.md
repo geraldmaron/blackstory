@@ -1,41 +1,24 @@
 # Project Instructions for AI Agents
 
-This file provides instructions and context for AI coding agents working on this project.
-
 ## Running subagents that edit files
 
-**Concurrent agents must not share one git working tree.** Spawn them with
-`isolation: "worktree"` (the Agent tool's own flag) so each gets its own checkout, or run them one
-at a time.
+**Concurrent agents must not share one git working tree.** Non-overlapping files are not
+enough: agents also share the git index and stash, and one agent's `git checkout` has reverted
+another's verified edits.
 
-This is not a style preference. On 2026-08-05 three agents were dispatched at once on
-non-overlapping _files_, which looked safe. One of them ran a broad `git checkout` to undo its own
-work and silently reverted another agent's already-verified, already-reviewed edits. Non-
-overlapping files are not enough; they also share a git index, a stash, and a working tree, and any
-agent that touches git destroys the others' work.
-
-Rules for any file-editing subagent:
-
-- Give it `isolation: "worktree"`, or run it alone.
-- Worktrees are cut from `main`, not the working branch (170+ commits behind `staging` today). Make
-  the agent's first command `git reset --hard <staging tip sha>` or its whole analysis runs on stale code.
-- Tell it explicitly not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore` —
-  the orchestrator owns version control.
-- Review the actual `git diff` before believing the report. In that same run, one agent reported
-  "no non-comment modifications" while having edited a test assertion, and another reported success
-  on an edit that introduced a user-visible regression.
+- Give each file-editing subagent `isolation: "worktree"` (the Agent tool's own flag), or run it
+  alone.
+- Worktrees are cut from `main`, not the working branch. Make the agent's first command
+  `git reset --hard <staging tip sha>` or it works on stale code.
+- Tell it not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore`; the
+  orchestrator owns version control.
+- Review the actual `git diff` before believing the report. Reports have claimed no changes
+  while editing a test assertion.
 - Check `git status` for files nobody was asked to touch (generated files like `next-env.d.ts`
   reappear this way).
-
-Small models are fine for genuinely mechanical work, but "mechanical" is a claim to verify, not
-assume. A one-line regex widening in that run would have rendered "pre-Columbian" as
-"pre to Columbian" in production.
+- Small models are fine for mechanical work, but verify that the work is mechanical.
 
 ## Session Completion
-
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
-
-**MANDATORY WORKFLOW:**
 
 1. **Record remaining work** - Name anything that needs follow-up in your final report
    1a. **Then work the follow-ups you just recorded.** A follow-up that is bounded data or
@@ -46,25 +29,15 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
    (policy, scope, an irreversible change) or lies outside the epic, and say which. The
    operator should never have to reply "now do the follow-ups".
 2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **PUSH TO REMOTE** - This is MANDATORY. Push to `staging`, never directly to `main`
-   (see **Branching & Release Policy** below):
+3. **Commit and push to `staging`**, never `main` (see **Branching & Release Policy** below),
+   unless the owner has said to hold pushes:
 
    ```bash
-   git pull --rebase origin staging
    git push origin HEAD:staging
-   git status  # MUST show local branch is up to date with what you pushed
    ```
 
-4. **Clean up** - Clear stashes, prune remote branches
-5. **Verify** - All changes committed AND pushed
-6. **Hand off** - Provide context for next session
-
-**CRITICAL RULES:**
-
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
+   If the push is rejected, rebase onto `origin/staging` and retry. Do not report work as pushed
+   until `git status` confirms it.
 
 **Before opening a staging → main PR**, run `fnm exec --using=22 -- ./scripts/ci-local.sh`.
 `pnpm test` is not equivalent: CI decides which lanes run from the changed paths, and two of
@@ -90,6 +63,9 @@ create --base main --head staging` then `gh pr merge`), only when `staging` is i
 
 ## Republishing the CDN catalog after a published write
 
+Direct writes to `published.*` are only for in-place corrections to records that are already
+published; new records go through the publisher.
+
 A direct write to `published.release_entities` / `published.search_index` leaves the published
 `entities.json` / `search-index.json` stale — the read-side guard only compares `releaseId`, which
 an in-place correction does not change. Rebuild the graph, then republish **locally**:
@@ -103,21 +79,25 @@ in-place correction"): public documents are edge-cached for an hour, so a correc
 its old HTML at Cloudflare until purged. Vercel's own CDN copy refreshes within five minutes by
 itself.
 
-**Then stop. Do not run `gh workflow run publish-release-catalog-artifacts.yml` afterwards.** The
-workflow runs that same script against the same watermark
-(`published.release_catalog_publish_watermark`), so once the local run has consumed it the
-dispatch reports `up to date — skipping`: CI minutes spent to reach a no-op. On 2026-09-12 there
-were eight such dispatches in one day, several of them no-ops.
+**Then stop. Do not run `gh workflow run publish-release-catalog-artifacts.yml` afterwards.** It
+runs the same script against the same watermark (`published.release_catalog_publish_watermark`),
+so the dispatch is a no-op that spends CI minutes. It has no cron, so a forgotten mutation does
+not self-heal.
 
-The workflow is the right entry point only when there is no local environment to run it from. Its
-daily cron is off as of 2026-09-16; a forgotten mutation no longer self-heals.
+**If the local upload fails** (`fetch failed (EPIPE: write EPIPE)` on `entities.json`; uploads
+over about 5 MB from the owner's Mac have been cut off since 2026-11-08), or there is no local
+environment, dispatch the workflow instead and confirm its log says `uploaded`:
+
+```bash
+gh workflow run publish-release-catalog-artifacts.yml --ref main -f force=true
+```
 
 ## BlackStory research skills
 
 Research playbooks are shared across harnesses in `.agents/skills/<skill-name>/SKILL.md`.
 The flat `.claude/skills/` entries are symlinks to that source. Edit the canonical files;
 do not create a Claude-specific copy. See `docs/research/README.md#skills-and-harness-portability`
-for explicit file loading and capability requirements. CLI pointers load a verb from
+for explicit file loading and capability requirements. Command verbs live in
 `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
 `claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
 `neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`,
@@ -145,13 +125,8 @@ The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets
 **A running server does not see a record you RENAME under it.** Entity routes resolve through
 `record-first-paint.tsx`'s slug path, which reads process-cached shared sources, so after an
 in-place `display_name` change the record's own page returns "Place not found" until the server
-restarts — even with the column, `projection.displayName`, `projection.nameLower` and
-`search_index.name` all correct and `parseEntityProjection` accepting the row. On 2026-09-12 that
-cost a long diagnosis before a restart proved the data had been right the whole time
-(repo-iejg8). Other edits do not behave this way: a republish through the incremental publisher,
-and a direct summary or topic write, were all picked up live in the same session. So a 404 on a
-just-renamed record is the cache, not your write — verify the row, then restart before hunting
-further.
+restarts. Other edits (an incremental republish, a direct summary or topic write) are picked up
+live. A 404 on a just-renamed record is the cache, not your write: verify the row, then restart.
 
 To run a one-off script against the same data, source the env and use the dev export condition —
 without `--conditions development` the workspace packages fail to resolve:
@@ -169,28 +144,3 @@ cd apps/web && set -a && . ./.env.local && set +a && node --conditions developme
 - Never claim mobile healthy from `127.0.0.1:8081` alone if the dev client may target another port
 
 Details: `AGENTS.md` and `apps/mobile/README.md`.
-
-## Build & Test
-
-_Add your build and test commands here_
-
-```bash
-# Example:
-# npm install
-# npm test
-```
-
-## Architecture Overview
-
-_Add a brief overview of your project architecture_
-
-## Conventions & Patterns
-
-_Add your project-specific conventions here_
-
-## Agent coordination (Claude Code ↔ Codex)
-
-Cross-agent roles, rules, and handoff protocol for this repo are the single source of
-truth in `COORDINATION.md` (imported below). Read `HANDOFF.md` for live session state.
-
-@COORDINATION.md

@@ -1,10 +1,13 @@
 /**
- * Same way back from every archive room: BlackStory at `/`, then any extra quiet
- * links. Explore and Banned books are not rooms on this walk. The library's name
- * holds on the library's own place page, not as the site back.
+ * The memorial wall's closing card: BlackStory at `/`.
+ *
+ * Every other room lost this card in the 2026-11 rebuild (it repeated the logo and the Map tab).
+ * The memorial is a protected experience (docs/ui/PROTECTED-EXPERIENCES.md) and is not part of
+ * that rebuild, so its card stays, drawn here and nowhere else. Do not add a second call site.
  */
 import React from 'react';
-import { OffRamp, type OffRampAction } from '../components/room';
+import Link from 'next/link';
+import { buttonClassName } from '@repo/ui';
 import { loadWalkBackPlace } from './walk-back-place';
 
 void React;
@@ -14,43 +17,38 @@ export function WalkOffRampView({
   href = '/',
   title,
   children,
-  extra = [],
 }: {
   readonly placeName: string;
   readonly href?: string;
   readonly title?: React.ReactNode;
   readonly children: React.ReactNode;
-  readonly extra?: readonly OffRampAction[];
 }) {
-  const extras = extra.map((action) => ({
-    ...action,
-    emphasis: 'quiet' as const,
-  }));
   return (
-    <OffRamp
-      title={title ?? placeName}
-      actions={[{ label: placeName, href, emphasis: 'copper' }, ...extras]}
-    >
-      {children}
-    </OffRamp>
+    <aside className="ds-room-offramp" aria-label="Where to go next">
+      <h2 className="ds-room-offramp__title">{title ?? placeName}</h2>
+      <p>{children}</p>
+      <div className="ds-room-offramp__acts">
+        {/* Secondary, in ink: the memorial takes no copper accent, and this card is drawn only here. */}
+        <Link className={buttonClassName('secondary')} href={href}>
+          {placeName}
+        </Link>
+      </div>
+    </aside>
   );
 }
 
 export async function WalkOffRamp({
   title,
   children,
-  extra = [],
 }: {
   readonly title?: React.ReactNode;
   readonly children: React.ReactNode;
-  readonly extra?: readonly OffRampAction[];
 }) {
   const place = await loadWalkBackPlace();
   return (
     <WalkOffRampView
       placeName={place.displayName}
       href={place.href}
-      extra={extra}
       {...(title === undefined ? {} : { title })}
     >
       {children}

@@ -1,130 +1,67 @@
-# Map entity encoding (Explore)
+# Map entity encoding
 
-**Status:** binding for `/explore` entity circles, Color key tab, and Kind filter facet.  
-**Code:** `apps/web/src/lib/map-experience/kind-encoding.ts`, `marker-size.ts`, `explore-style.ts`, `MapExperienceLegend.tsx`.
+**Status:** binding for how a single record is drawn on any BlackStory map, and for what kind and confidence mean on the map versus in lists. Rewritten 2026-11-13 for the place map. The earlier version (kind-family shade, evidence-sized pins, dominant-kind cluster color, four cluster steps, the Color key tab, the Group nearby toggle) no longer describes the web map.
+**Code:** `apps/web/src/lib/map-experience/geo-precision.ts` (`recordMarkFor`, `precisionInWords`), `apps/web/src/lib/map-experience/record-marks.ts`, `apps/web/src/app/map/explore-style.ts`.
 
 ---
 
-## Intent
+## Grouping lives elsewhere
 
-Readers should decode the map in three channels that never contradict the Color key:
+How records group into state, county and city tokens, the zoom thresholds, anchors, coincident-site spreading and the `?place=` URL are specified in [`patterns-place-map.md`](./patterns-place-map.md). This document does not restate them.
 
-| Channel | What it encodes | Count on map |
+---
+
+## The mark is decided by stored precision alone
+
+`recordMarkFor(precision)` maps the stored public precision to one of three marks. Kind, confidence and evidence count never change the mark.
+
+| Mark | Precisions | Meaning | Words (`precisionInWords`) |
+|---|---|---|---|
+| Dot (solid) | address, site, institution | The archive holds the site | "Exact site" |
+| Ring (hollow) | campus, neighborhood, city | The archive holds an area, not a street corner | "Campus-level location, not an exact address", "Neighborhood-level location", "City-level location" |
+| None | county, state, country | No point is drawn. The record is counted in its jurisdiction tag | "County-level location", "State-level location" |
+
+An unclassified precision fails soft to a ring. Every surface that prints a precision (record pages, the inspector, `RecordMap`) uses `precisionInWords`, so the wording is the same everywhere. Map camera zoom for a framed record follows the same precision (`zoomForLocationPrecision`).
+
+---
+
+## What kind and confidence encode
+
+| Signal | On the map | In lists, cards and record pages |
 |---|---|---|
-| **Shade (primary)** | Kind **family** or historical **tone** | 5 families + 3 tone overrides |
-| **Shape (secondary)** | Micro-kind **glyph** (rim/fill signature) | 4 glyphs |
-| **Size** | Evidence depth (single pin) or record count (cluster) | Continuous / 4 cluster steps |
-| **Confidence** | Claim strength | Glyph + green→orange (never size alone) |
+| Kind | Nothing. Dots and rings are one ink regardless of kind | `KindGlyph` (shape icon) in record rows, the Door chapters and saved drawers. `KindBadge` (icon plus kind name) in the Explore result list |
+| Confidence | Nothing | `ConfidenceMark` beside each result row. `GradeDot` (A filled, B ringed, C outline) for an evidence grade named in the abstract, such as the evidence-floor chips |
+| Precision | Mark shape (dot, ring, none) and the words above | The same words, in the scoped list note and on each row |
 
-Map paint and the instrument Color key list the **same** families, tones, size scales, and confidence tiers.
-
----
-
-## Kind families (map color)
-
-Six groups share one shade each. Micro-kinds remain in data, badges, and spotlight copy.
-
-| Family | Label | Micro-kinds | Shade token | Representative glyph |
-|---|---|---|---|---|
-| `people` | People | person | `kindPerson` | circle |
-| `places` | Places | place, school | `kindPlace` | circle |
-| `organizations` | Organizations | organization, institution, movement | `kindOrganization` | ring |
-| `events` | Events | event, case | `kindEvent` | diamond |
-| `sources` | Sources | law, publication, artifact, other | `kindLaw` | square |
-| `inventions` | Inventions | invention | `kindInvention` | diamond |
-
-**Paint:** `displayEncodingFor()` writes `properties.shade` from family (or tone override).  
-**Glyph:** still per micro-kind (`properties.glyph`) for WCAG non-color channel.
-
----
-
-## Historical tones (shade-only)
-
-When `mapTone` is massacre, plantation, or epicenter, **shade** follows the tone table; **glyph** stays with the micro-kind. Tones never claim a shape. Massacre red is a controlled semantic tone, not an alarm / crime-heat layer.
-
-Filter facet: **Tone** (unchanged).
-
----
-
-## Size
-
-### Single records
-
-```
-radius = clamp(MIN, MAX, (BASE + log2(1 + evidenceCount) × COEFF) × confidenceModifier) × zoomScale
-```
-
-- `evidenceCount`: count of accepted claims on the record (public, not a hidden score).
-- `confidenceModifier`: high 1.0, medium 0.9, low/unrated 0.8 (secondary only).
-- Defaults: MIN 4px, MAX 11px at locality zoom (`marker-size.ts`).
-
-Color key shows three sample diameters at MIN / mid / MAX.
-
-### Clusters (`Group nearby`)
-
-Step radii from `CLUSTER_RADIUS_BY_COUNT` at locality zoom, scaled down at national zoom:
-
-| Records in cluster | Radius (px @ z≥9) |
-|---|---|
-| 2–9 | 10 |
-| 10–49 | 14 |
-| 50–199 | 18 |
-| 200+ | 22 |
-
-Dominant kind-family shade (same palette as single pins); count label inside. Mixed-kind
-clusters pick the family with the most records; ties break events → sources → organizations →
-places → people. Color key lists cluster **size** steps only (radius grows with count).
-
----
-
-## Confidence
-
-High / medium / low / unrated: Unicode glyph + tier color in list rows and spotlight facts. **Not** encoded in circle radius as the primary signal.
-
-Color key includes all four tiers beside the size sections.
+Color is never the only signal. Copper and ink only, with no red or alarm hues. Copper is for selection and active chrome, not for filling records.
 
 ---
 
 ## Filters
 
-**Kind** facet uses the five **family** slugs (`people`, `places`, …), not twelve micro-kinds.
-Micro-kind deep links (`?kind=place`) still filter that kind until re-shared as a family slug.
+The Kind facet and the other facets still filter which records appear. They do not restyle the marks that remain.
 
-Other facets (Tone, Era, Theme, Status, Confidence, Where) unchanged.
+---
+
+## Mobile still runs the older encoding
+
+`apps/mobile` has not adopted this spec. It still paints kind-family shade, evidence-sized pins and its own pixel clustering. Mobile must switch to the shared `@repo/domain/map/place-groups` module for grouping and to the precision marks above. Files to change:
+
+- `apps/mobile/src/features/map/entity-paint.ts`
+- `apps/mobile/src/features/map/kind-encoding.ts`
+- `apps/mobile/src/features/map/marker-size.ts`
+- `apps/mobile/src/features/explore/MapColorKey.tsx` (the Color key has no counterpart on the web map any more)
+- `apps/mobile/src/features/explore/clustering.ts` (grouping, per `patterns-place-map.md` open item 3)
+
+Until then, [`../mobile/design-direction-v6-explore.md`](../mobile/design-direction-v6-explore.md) describes what mobile actually ships.
 
 ---
 
 ## Map dignity (non-negotiable)
 
-- No alarm hues for violence-adjacent records beyond the documented massacre **tone** (not crime heat).
-- Color never the only signal: glyph + confidence glyph + labels.
-- Points render at stored precision; coarsened points never labeled as exact addresses.
-- Copper ~10–15%: selection ring, active chrome, not entity fill wash.
-
----
-
-## First-paint pin plate (Explore bootstrap)
-
-Before MapLibre paints, `/explore` renders an HTML pin plate (`FirstPaintPinPlate`, `first-paint-pin-plate.css`) over the Web Mercator CONUS board (`conus-mercator.ts`), at the plate's own opening frame and with the plate's own clusters (`first-paint-clusters.ts`). This is **not** the kind-encoded Explore stack; it is the national field the plate settles into, and it is also what a reader without JavaScript or WebGL keeps.
-
-`/` (the Door) does not render it. The Door's only map is the live plate, framed to the Door's own map window (`door-field-frame.ts`); a static Albers board under a Mercator plate read as a second, older map on every load (repo-18ma2).
-
-| Role | Visual | Token |
-|---|---|---|
-| Record disc | Page Sand disc | `--ds-first-paint-pin-ink` (`--ds-accent-muted`) / `--ds-first-paint-pin-size` |
-| Holding walk | Copper disc, and the plate's only link | `--ds-accent-graphic` / `--ds-first-paint-pin-size-walk` |
-| Grouped record | Hidden; a copper count disc stands in | `--ds-first-paint-cluster-ink` / `--ds-first-paint-cluster-size` |
-
-Rem values are exported from `first-paint-pin-tokens.ts` for drift tests.
-
-**Related but distinct:**
-
-| Surface | Marker | Notes |
-|---|---|---|
-| Explore live map | Kind-shaded GL circles + `.ds-map-entity-marker` hit targets | See tables above; `ENTITY_POINT_FILL_OPACITY` = 52% |
-| Place search | `.ds-map-search-center-marker` copper head + stem | Orientation only, not an entity |
-| Record anatomy | `.ds-locator__pin` copper ring | City-precision honesty; ring not filled disc |
-| `@repo/ui` `MapFrame` | `.ds-map__pin` Page Sand disc | Static inset, not live map |
+- Points render at stored precision. A coarsened point is never labeled or drawn as an exact address.
+- No alarm hues for violence-adjacent records, and no crime-heat treatment.
+- Living-person protection is upstream of the map (`redactLocationForPublic`) and unchanged.
 
 ---
 
@@ -132,57 +69,6 @@ Rem values are exported from `first-paint-pin-tokens.ts` for drift tests.
 
 | Module | File |
 |---|---|
-| Family + tone encoding | `kind-encoding.test.ts` |
-| Family facet filter | `filters.test.ts` |
-| Legend contract | `MapExperienceLegend.test.ts` |
-| Cluster dominant-family paint | `cluster-encoding.test.ts`, `cluster-expand.test.ts` |
+| Precision marks and wording | `geo-precision.ts` tests, `record-marks.test.ts` |
 | MapLibre paint | `explore-style.test.ts` |
 | Feature denormalization | `build-explore-map-source.test.ts` |
-| First-paint pin tokens | `first-paint-pin-tokens.test.ts` |
-| First-paint payload | `first-paint-pins.test.ts` |
-
-## Reader control and overlapping pins
-
-The live browse map exposes the existing **Group nearby** toggle beside its map controls.
-Grouping defaults on for broad exploration and is shareable through `group=0` or `group=1`.
-A successful device-location request turns grouping off; denied or failed requests leave it
-unchanged. The reader can turn grouping back on afterward. Device coordinates stay out of URLs.
-
-Clusters expand on tap. With individual pins, a tap that hits several records opens those
-records in the existing Records panel, with a clearable **overlapping pins** constraint.
-Deduplicate halo and crossfade hits by entity identity. Retain names, kinds, dates and place
-labels in the list. Panning or selecting another map target clears the overlap selection.
-The chooser does not alter the map filter or imply that the records share a historical relation.
-Never move stored coordinates to make a stack appear to contain distinct documented sites.
-
-Research checked 2026-10-08: [MapLibre cluster expansion](https://maplibre.org/maplibre-gl-js/docs/examples/create-and-style-clusters/),
-[Google marker clustering](https://developers.google.com/maps/documentation/javascript/marker-clustering),
-and [Leaflet overlap handling](https://leaflet.github.io/Leaflet.markercluster/).
-These establish clustering and overlap disclosure patterns. Turning grouping off after Near me
-is BlackStory's explicit product choice, not a universal platform requirement. A named list
-fits this archive's geographic precision constraints better than displacing markers.
-
-### Validation of the control change
-
-Checked locally on 2026-10-08 with the published catalog: Chrome at desktop width and
-390 × 844, both themes. Grouping on/off changed the map and URL. Tapping an overlapping area
-opened 24 individually selectable records on desktop and 53 at the compact viewport's current
-scale. These are screen hit groups, not claims that every record occupies one exact address.
-The clearable chooser retains place/date labels and leaves stored coordinates unchanged.
-
-`fnm exec --using=22 -- ./scripts/ci-local.sh --base bcfc457f --skip mobile` passed all selected
-lanes. PR 287 hosted checks passed. Native release and actual device geolocation were not run.
-The existing E2E harness has no external base URL here; manual browser observations supply the
-surface evidence rather than treating that harness's successful invocation as a browser test.
-
-Adversarial disposition: **accepted with controls**. Ungrouping alone leaves hidden pins;
-the named chooser addresses that failure. A spiderfier is a reasonable alternative for precise
-POIs but risks implying distinct historic coordinates here. The chooser uses existing UI and
-no new dependency. External route resolution and verified provider Place IDs remain separate
-from grouping and are not claimed by these checks.
-
-Production verification: PR 287 deployed as `15b9fb9e`. On the actual live `/explore` page,
-turning grouping off wrote `group=0`; tapping an overlapping area opened 24 records. Selecting
-Macedonia Church opened its detail sheet. Its Apple directions `daddr` and Google directions
-`destination` both contained **Macedonia Church, Burlington, Ohio**, without the combined
-coordinate suffix. The public catalog count remained 4,198 displayed records of 4,202 map features.

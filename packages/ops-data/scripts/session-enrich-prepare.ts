@@ -14,7 +14,7 @@
  *     packages/ops-data/scripts/session-enrich-prepare.ts --entity-ids=id1,id2,...
  *
  * Prints one JSON object per line to stdout:
- *   { entityId, displayName, systemPrompt, userPrompt }
+ *   { entityId, displayName, evidenceDigest, systemPrompt, userPrompt }
  * Pair with session-enrich-apply.ts, which takes back { entityId, rawContent } answers.
  */
 import pg from 'pg';
@@ -56,6 +56,7 @@ async function main(): Promise<void> {
       `${JSON.stringify({
         entityId: subject.entityId,
         displayName: subject.displayName,
+        evidenceDigest: subject.evidenceDigest,
         systemPrompt: ENTITY_ENRICHMENT_SYSTEM_PROMPT,
         userPrompt: buildEnrichmentUserPrompt(subject, ALLOWED_TOPIC_IDS),
       })}\n`,

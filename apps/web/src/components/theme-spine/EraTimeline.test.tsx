@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { EraTimeline } from './EraTimeline';
+import { EraTimeline, formatDateLabel } from './EraTimeline';
 
 void React;
 
@@ -47,7 +47,7 @@ describe('EraTimeline', () => {
     const dateMatches = [...html.matchAll(/ds-era-timeline__date-label[^>]*>([^<]+)</g)].map(
       (match) => match[1],
     );
-    assert.deepEqual(dateMatches, ['1937', 'February 1938', 'May 3, 1948']);
+    assert.deepEqual(dateMatches, ['1937', 'Feb 1938', 'May 3, 1948']);
   });
 
   it('names the elapsed years between distant documents, and stays quiet between close ones', () => {
@@ -62,6 +62,29 @@ describe('EraTimeline', () => {
     );
     assert.match(html, /55 years later/);
     assert.doesNotMatch(html, /2 years later/);
+  });
+
+  it('leaves a date span out of the sequence, so no gap is ever counted from a range start', () => {
+    const html = renderToStaticMarkup(
+      <EraTimeline
+        events={[
+          { label: 'Homeownership by race, 1900 to 2024', date: '1900-2024' },
+          { label: 'First', date: '1911' },
+          { label: 'Later', date: '1968' },
+        ]}
+      />,
+    );
+    assert.doesNotMatch(html, /1900/);
+    assert.doesNotMatch(html, /11 years later/);
+    assert.match(html, /aria-label="Timeline: 2 events, 1911 to 1968"/);
+  });
+
+  it('keeps the longest date label inside the 8rem date column', () => {
+    // Widest stored form: an abbreviated month, two-digit day, four-digit year.
+    const longest = formatDateLabel('1988-09-13');
+    assert.equal(longest, 'Sep 13, 1988');
+    // The column is 8rem (128px, --ds-space-32); the 13px mono face sets about 8px a character.
+    assert.ok(longest.length * 8 <= 128);
   });
 
   it('marks up the rail as an ordered list of times, for assistive technology', () => {

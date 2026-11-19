@@ -24,7 +24,10 @@ An optional hosted adapter has separate requirements documented in
 [management operations](research-operations.md#account-owned-management-work).
 
 Existing gitignored `apps/web/.env.local` files are a compatibility path, not the recommended
-way to provision new credentials. They have not been removed or rotated. The existing wrapper
+way to provision new credentials. The database password in them goes stale when 1Password
+rotates it (the symptom is `password authentication failed for user "postgres"`, then
+`ECONNREFUSED` once Supabase bans the address); `pnpm env:local:op` rewrites that one line from
+1Password without printing it. `pnpm dev:web` reads 1Password directly. The existing wrapper
 `packages/ops-data/scripts/run-enrichment-with-local-env.sh` reads that file and runs only
 `enrichment-run`; it is not a generic session research launcher. `LOCAL_ENV_FILE` can select an
 existing compatibility file. Never print its contents or assume its database role is suitable

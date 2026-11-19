@@ -13,7 +13,7 @@
 
 import React, { useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
-import { usePhotoIndex } from '../../lib/map-experience/use-photo-index';
+import { usePhotos } from '../../lib/map-experience/use-photo-index';
 import { PinPhotoCard } from './PinPhotoCard';
 
 void React;
@@ -52,18 +52,17 @@ function anchoredStyle(rect: DOMRect): CSSProperties {
 
 export type PinPhotoLayerProps = {
   readonly target: PinPhotoHoverTarget | null;
-  /** `/atlas/photos` or `/door/photos` — fetched once, lazily, on the first non-null target. */
+  /** `/atlas/photos` or `/door/photos`, asked only for the hovered pin's id (`usePhotos`). */
   readonly photosUrl: string;
 };
 
 export function PinPhotoLayer({ target, photosUrl }: PinPhotoLayerProps) {
-  // One shared, lazy fetch per surface (`use-photo-index.ts`): the record sheet's mast reads the
-  // same index, so the hover card and the sheet never request it twice. Fails closed to no card.
-  const photos = usePhotoIndex(photosUrl, target !== null);
+  // One cached answer per id per surface (`use-photo-index.ts`). Fails closed to no card.
+  const photos = usePhotos(photosUrl, target ? [target.key] : []);
   const [exhaustedKey, setExhaustedKey] = useState<string | null>(null);
 
   if (typeof document === 'undefined') return null;
-  if (!target || !photos) return null;
+  if (!target) return null;
   if (target.key === exhaustedKey) return null;
   const photo = photos[target.key];
   if (!photo) return null;

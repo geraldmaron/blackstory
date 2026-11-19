@@ -19,7 +19,7 @@
   /* `--room-ink-4` is scoped to `.ds-room`; the fallback keeps this correct for callers outside
      a room wrapper too (the record sheet renders as a standalone aside, not inside `.ds-room`). */
   font-family: var(--ds-font-mono);
-  font-size: 10.5px;
+  font-size: var(--ds-text-micro);
   line-height: 1.55;
   color: var(--room-ink-4, var(--ds-ink-subtle));
 }

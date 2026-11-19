@@ -2,7 +2,7 @@
 
 Use the [threat model](../threat-model.md) and [abuse cases](../abuse-cases.md) to choose checks.
 A test of a policy function establishes that function's behavior, not deployed middleware, provider
-configuration or production authorization. The [framework audit](../../research/framework-audit.md)
+configuration or production authorization. The [framework audit](../../research/archive/framework-audit.md)
 records the executed checks and their limits.
 
 ## Repository checks

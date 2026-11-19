@@ -75,15 +75,21 @@ export function RecordPhotoCredit({
         </span>
       ) : null}
       {sourceLine ? (
-        <a
-          href={sourceLine.url}
-          className="ds-entity-photo__source-link ds-mono"
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-        >
-          {caption.creditText || caption.showRightsLabel ? ' · ' : ''}
-          {sourceLine.label}
-        </a>
+        <>
+          {caption.creditText || caption.showRightsLabel ? (
+            <span className="ds-mono" aria-hidden="true">
+              {' · '}
+            </span>
+          ) : null}
+          <a
+            href={sourceLine.url}
+            className="ds-entity-photo__source-link ds-mono"
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            {sourceLine.label}
+          </a>
+        </>
       ) : null}
     </Tag>
   );

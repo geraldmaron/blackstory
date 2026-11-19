@@ -1,13 +1,19 @@
 /**
- * `/sources` — the public source library: publisher kinds, the citation chain, and where
- * sources already appear on the site. Profiles and live counts stay on the operator desk.
+ * `/sources`: the public source library. Every publisher the released catalog cites, with how
+ * many records cite it, read from the same lineage keys the grade rule counts.
  */
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Room } from '../../components/room';
-import { SourcesSections } from './SourcesSections';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
+import { loadSourceLibrary } from './load-source-library';
+import { SourcesSections, sourcesDek } from './SourcesSections';
 import '../reading-room.css';
+import '../../components/trust/trust.css';
+import './sources.css';
 
 void React;
 
@@ -17,13 +23,42 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/sources',
   title: 'Source library',
   description:
-    'The kinds of publishers BlackStory cites, how a URL becomes a citation on a record, and where sources already appear on the public site.',
+    'Every publisher BlackStory cites, with how many published records cite each one, and how a URL becomes a citation on a record.',
 });
 
-export default function SourcesPage() {
+export default async function SourcesPage() {
+  const library = await loadSourceLibrary();
   return (
-    <Room ledger>
-      <SourcesSections />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          art={['mapline']}
+          tone="sand"
+          numeral={
+            library === undefined
+              ? undefined
+              : {
+                  value: library.rows.length.toLocaleString('en-US'),
+                  label: 'publishers the archive cites',
+                  decorative: true,
+                }
+          }
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/sources')}
+            linkAs={Link}
+            title="Where the evidence comes from"
+            dek={sourcesDek(library)}
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <SourcesSections library={library} />
+      </TrustSheet>
     </Room>
   );
 }

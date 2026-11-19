@@ -5,9 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { CatalogLoading } from './catalog-loading';
 
 test('catalog loading makes one announcement and hides placeholder content', () => {
-  const html = renderToStaticMarkup(
-    <CatalogLoading pathname="/books" label="Taking the books off the shelf…" />,
-  );
+  const html = renderToStaticMarkup(<CatalogLoading label="Taking the books off the shelf…" />);
   assert.equal((html.match(/role="status"/g) ?? []).length, 1);
   assert.match(html, /aria-busy="true"/);
   assert.match(html, /aria-hidden="true"/);

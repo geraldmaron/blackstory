@@ -155,7 +155,7 @@ evidence-passage retrieval:
   --max-items 600 --max-cost-usd 1
 ```
 
-Skill: `.agents/skills/blackstory-editorial-enrichment/SKILL.md`.
+Commands: [editorial-enrichment](./research-operations.md#editorial-enrichment-editorial-run--enrichment-run).
 
 ## Deferred (not this bead)
 

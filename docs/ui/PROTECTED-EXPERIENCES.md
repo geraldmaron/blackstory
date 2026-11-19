@@ -16,7 +16,7 @@ These constraints are non-negotiable for BlackStory v10 and later. Implementatio
 - `apps/web/src/app/memorial/page.tsx`
 - `apps/web/src/components/patterns/memorial-wall/MemorialWallAtmosphere.tsx`
 - `apps/web/src/app/memorial/MemorialSections.tsx`
-- `apps/web/src/app/memorial/MemorialListContrastZone.tsx`
+- `apps/web/src/components/patterns/memorial-wall/memorial-wall-field.ts`
 
 **Immutable visible experience:**
 
@@ -99,6 +99,19 @@ Respect the BlackStory brand kit (`brand/`, `docs/ui/brand.md`).
 Visual richness comes primarily from historical material and information, not decoration.
 
 ---
+
+## Amendment, 2026-11-12 (owner decision)
+
+The owner opened P-01 for a redesign: the memorial may be rebuilt, on the condition that it is
+thoughtful. The handwritten names fading in and out stay (the owner named that as the part to
+keep) and may become more immersive. Everything under "Dignity framing", "No gamification",
+"No score-like statistics" and "No harm imagery" still binds, names are still never map pins, and
+the accessible names list remains the non-canvas path. The "Forbidden redesigns" row "Making the
+wall more interactive without a verified a11y/perf defect" is lifted for this redesign only.
+
+Owner decisions on the rebuilt wall (2026-11-12): a pressed name holds until the visitor releases
+it; wall names carry no year, which appears only when a name comes forward or is pressed; and
+entries such as "Unidentified Man" come forward like any other name.
 
 ## Change control
 

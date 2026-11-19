@@ -5,7 +5,7 @@ import type { ConfidenceTier } from '../map-experience/build-explore-map-source'
 import { kindMatchesPublicFilter } from '../map-experience/filters';
 import { meetsEvidenceFloor, type EvidenceFloor } from '../map-experience/evidence-grade';
 import { isInternalRecordLabel } from '../place/public-place-path';
-import { matchesPeriod } from '../discovery/collection-period';
+import { documentedDecades, matchesPeriod } from '../discovery/collection-period';
 import { COLLECTION_INVALID, COLLECTION_MISSING } from '../discovery/story-collection';
 
 export type RecordFacts = {
@@ -137,4 +137,67 @@ function compareDiscoveryOrder(a: CollectionFacts, b: CollectionFacts): number {
   const eraB = earliestEraYear(b);
   if (eraA !== eraB) return eraA - eraB;
   return a.row.name.localeCompare(b.row.name);
+}
+
+/** FNV-1a, 32-bit: a stable shuffle key for a record under a seed. */
+function shuffleKey(seed: string, id: string): number {
+  let hash = 0x811c9dc5;
+  for (const char of `${seed}:${id}`) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * The ordering the Records register reads, which resolves the URL's default (`discovery`) by
+ * context: relevance when the reader searched, a shuffle by `seed` otherwise, so a visit opens on
+ * records from across the archive. Without a seed (a record page's previous/next, the home and
+ * about figures) there is no shuffle a reader saw, so the default reads earliest first. An
+ * explicit sort is the sort. Explore keeps `comparatorFor`, where the default means best evidence.
+ */
+export function recordsComparator(
+  query: Pick<RecordsQuery, 'sort' | 'q' | 'seed'>,
+): (a: CollectionFacts, b: CollectionFacts) => number {
+  if (query.sort !== 'discovery') return comparatorFor(query.sort);
+  const needle = query.q.trim().toLowerCase();
+  if (needle.length === 0) {
+    if (query.seed.length === 0) return comparatorFor('era');
+    return (a, b) =>
+      internalLast(a, b) ||
+      shuffleKey(query.seed, a.row.id) - shuffleKey(query.seed, b.row.id) ||
+      a.row.id.localeCompare(b.row.id);
+  }
+  const byEvidence = comparatorFor('evidence');
+  const byEra = comparatorFor('era');
+  return (a, b) =>
+    internalLast(a, b) ||
+    relevanceRank(a, needle) - relevanceRank(b, needle) ||
+    byEvidence(a, b) ||
+    byEra(a, b);
+}
+
+/** True when the register is read in time order, so a decade can be jumped to. */
+export function recordsOrderIsChronological(
+  query: Pick<RecordsQuery, 'sort' | 'q' | 'seed'>,
+): boolean {
+  return (
+    query.sort === 'era' ||
+    (query.sort === 'discovery' && query.q.trim().length === 0 && query.seed.length === 0)
+  );
+}
+
+/** Name hits outrank summary and place hits; a whole-name or leading match outranks the rest. */
+function relevanceRank(facts: CollectionFacts, needle: string): number {
+  const name = facts.row.name.toLowerCase();
+  if (name === needle) return 0;
+  if (name.startsWith(needle)) return 1;
+  if (` ${name}`.includes(` ${needle}`)) return 2;
+  if (name.includes(needle)) return 3;
+  return 4;
+}
+
+/** Earliest documented decade of a record, or `null` when the archive knows none. */
+export function earliestDecade(facts: Pick<CollectionFacts, 'eraBuckets'>): number | null {
+  return documentedDecades(facts.eraBuckets)[0] ?? null;
 }

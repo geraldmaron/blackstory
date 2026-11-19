@@ -133,7 +133,7 @@ describe('buildBasemapStyle', () => {
       'source-layer': string;
     };
     expect(line['source-layer']).toBe('boundaries');
-    expect(line.paint['line-color']).toBe(DIGNITY_PALETTE.pointHalo);
+    expect(line.paint['line-color']).toBe(DIGNITY_PALETTE.stateBounds);
     expect(style.layers.some((l) => (l as { id: string }).id === 'coastline')).toBe(true);
     const bg = style.layers[0] as { paint: Record<string, string> };
     expect(bg.paint['background-color']).toBe(DIGNITY_PALETTE.land);

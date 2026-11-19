@@ -15,7 +15,7 @@
 
 /** Brand type-family names, from brand/tokens/typography.json. */
 export const fontFamilies = {
-  "display": "Schibsted Grotesk SemiBold",
+  "display": "Schibsted Grotesk",
   "uiBody": "Geist",
   "editorial": "Newsreader",
   "dataMono": "Geist Mono"
@@ -26,13 +26,13 @@ export const typeScale = {
   "display": {
     "size": 34,
     "lineHeight": 40,
-    "weight": "600",
+    "weight": "800",
     "family": "display"
   },
   "title": {
     "size": 26,
     "lineHeight": 32,
-    "weight": "600",
+    "weight": "700",
     "family": "display"
   },
   "subtitle": {

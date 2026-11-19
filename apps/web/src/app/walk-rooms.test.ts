@@ -1,6 +1,7 @@
 /**
- * Archive rooms on the walk share one way back to the map.
- * Explore is not a room. `/banned-books` is not a path. Shop leaks stay off the copy.
+ * Archive rooms end on their own content: the BlackStory off-ramp card survives only on the
+ * protected memorial wall. Explore is not a room. `/banned-books` is not a path. Shop leaks stay
+ * off the copy.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,7 +12,6 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 
 const WALK_ROOMS = [
-  // About's off-ramp lives in its sections file, the same split data/privacy/law already use.
   'about/AboutSections.tsx',
   'data/page.tsx',
   'methodology/MethodologySections.tsx',
@@ -22,7 +22,7 @@ const WALK_ROOMS = [
   'submit/page.tsx',
   'corrections/CorrectionsSections.tsx',
   'support/page.tsx',
-  'rooms/page.tsx',
+  'collections/page.tsx',
   'privacy/page.tsx',
 ] as const;
 
@@ -33,10 +33,14 @@ const WALK_COPY = [
   'law/LawBrowseSections.tsx',
 ] as const;
 
-test('each walk room comes back to the map and does not sell Explore or a missing path', () => {
+test('each walk room ends without the off-ramp card and does not sell Explore or a missing path', () => {
   for (const relative of WALK_ROOMS) {
     const source = readFileSync(join(here, relative), 'utf8');
-    assert.match(source, /WalkOffRamp/, `${relative} uses the shared way back`);
+    if (relative === 'memorial/page.tsx') {
+      assert.match(source, /WalkOffRamp/, 'the protected memorial keeps its card');
+    } else {
+      assert.doesNotMatch(source, /WalkOffRamp/, `${relative} must not end on the off-ramp card`);
+    }
     assert.doesNotMatch(
       source,
       /Open the Atlas|ATLAS_INSTRUMENT|href=["'`]\/explore|href: ['"`]\/explore/,

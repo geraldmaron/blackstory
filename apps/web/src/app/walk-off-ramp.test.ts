@@ -13,7 +13,7 @@ import { WalkOffRampView } from './walk-off-ramp';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('the copper back control is BlackStory', () => {
+test('the back control is BlackStory', () => {
   const html = renderToStaticMarkup(
     createElement(WalkOffRampView, {
       placeName: MAP_BACK.displayName,
@@ -44,7 +44,7 @@ test('walk rooms do not hardcode The place or door-back protocol copy', () => {
     'submit/page.tsx',
     'corrections/CorrectionsSections.tsx',
     'support/page.tsx',
-    'rooms/page.tsx',
+    'collections/page.tsx',
     'privacy/page.tsx',
     'privacy/PrivacySections.tsx',
     'books/page.tsx',

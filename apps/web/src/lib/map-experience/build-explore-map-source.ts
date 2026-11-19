@@ -26,6 +26,7 @@ import { recordConfidenceTier, type ConfidenceTier } from '@repo/public-contract
 import { visitContactClaimsForMap } from '../geography/public-visit-contact';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { resolveEntityEraBuckets } from './entity-era-facts';
+import { countClaimSources } from './evidence-grade';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
 import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
 import { staysOffPublicMap, atlasWalkHref } from '../place/public-place-path';
@@ -74,6 +75,8 @@ export type ExploreMapFeatureProperties = {
   /** Count of this record's own already-publicly-enumerated accepted claims (see the entity
    * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */
   readonly evidenceCount: number;
+  /** Distinct sources behind those claims (`countClaimSources`). */
+  readonly sourceCount?: number;
   readonly confidenceTier: ConfidenceTier;
   /**
    * Uncontrolled search tags; do not treat them as controlled theme identifiers.
@@ -226,7 +229,9 @@ function toMapSourceInput(entity: PublicEntityView, anchor: EntityGeoAnchor): Ma
     // None of the active release's kinds (place/school/event/institution) are `person`; this is
     // inert for them, but explicit rather than omitted so a future person-kind addition to this
     // table can't silently skip the living-person redaction path by relying on an unset default.
-    livingStatus: 'unknown',
+    // The projection's own status; a record without one still fails safe to 'unknown'. Hard-coding
+    // 'unknown' re-coarsened every published person (deceased included) to city on the map.
+    livingStatus: entity.livingStatus ?? 'unknown',
     // Prefer curated jurisdiction over bbox state attribution (Manhattan must not become NJ).
     ...(entity.jurisdictionLabel.trim().length > 0
       ? { jurisdictionLabel: entity.jurisdictionLabel.trim() }
@@ -297,6 +302,7 @@ function enrichFeature(
       // `notabilityLabels` deliberately not carried: nothing on a map surface reads it, and the
       // labels are full rubric sentences repeated per record (1.8 MB across the catalog).
       evidenceCount: entity.claims.length,
+      sourceCount: countClaimSources(entity.claims),
       confidenceTier: recordConfidenceTier(entity.claims),
       topicTags: entity.topicTags,
       ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),

@@ -10,11 +10,11 @@
  * continuous `1880 to 2000` span: sparse buckets stay sparse and nothing is invented between them.
  *
  * Order is dated decades ascending, then undated; inside a group the collection's own sort
- * applies, with the record id as the last tie-break so the order is stable. Previous/next on a
+ * applies (`recordsComparator`), with the record id as the last tie-break so the order is stable. Previous/next on a
  * record page follows this displayed order (`chronologyOrder`), and paging slices it as the index
  * slices its rows.
  */
-import { comparatorFor, type CollectionFacts } from '../records/records-matching';
+import { recordsComparator, type CollectionFacts } from '../records/records-matching';
 import type { RecordsQuery } from '../records/records-query';
 import { decadeLabel, decadesWithinPeriod } from './collection-period';
 
@@ -33,7 +33,7 @@ export function chronologyOrder<T extends CollectionFacts>(
     end: query.periodEnd,
     includeUndated: query.includeUndated,
   };
-  const compare = comparatorFor(query.sort);
+  const compare = recordsComparator(query);
   return matched
     .map((facts): ChronologyEntry<T> => ({
       facts,

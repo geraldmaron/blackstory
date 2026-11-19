@@ -5,10 +5,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  formatDisplayRadiusSpan,
   geoPrecisionTierForPublicPrecision,
-  radiusAffordanceLabel,
   resolveDisplayRadiusMeters,
+  precisionInWords,
+  precisionsWithMark,
+  recordMarkFor,
   zoomForLocationPrecision,
 } from './geo-precision';
 
@@ -19,15 +20,44 @@ test('institution/site/address precisions map to the finest geo tier; campus to 
   assert.equal(geoPrecisionTierForPublicPrecision('campus'), 'block');
 });
 
-test('zoomForLocationPrecision: address is the closest zoom, site next, then institution/campus', () => {
-  assert.equal(zoomForLocationPrecision('address'), 16);
-  assert.equal(zoomForLocationPrecision('site'), 15);
-  assert.equal(zoomForLocationPrecision('institution'), 13);
+test('zoomForLocationPrecision: exact 14, campus 13, neighborhood 12, city 10, county 8, state 6', () => {
+  for (const exact of ['address', 'site', 'institution']) {
+    assert.equal(zoomForLocationPrecision(exact), 14);
+  }
+  // A campus is an area: framed short of the site zoom.
   assert.equal(zoomForLocationPrecision('campus'), 13);
   assert.equal(zoomForLocationPrecision('neighborhood'), 12);
   assert.equal(zoomForLocationPrecision('city'), 10);
   assert.equal(zoomForLocationPrecision('county'), 8);
   assert.equal(zoomForLocationPrecision('state'), 6);
+  // Unclassified never sharpens past city.
+  assert.equal(zoomForLocationPrecision('unknown_future_value'), 10);
+});
+
+test('recordMarkFor: dot for exact or site, ring for campus, neighborhood or city, none for county or state', () => {
+  for (const exact of ['address', 'site', 'institution']) {
+    assert.equal(recordMarkFor(exact), 'dot');
+  }
+  // Block precision is never drawn as a site.
+  assert.equal(recordMarkFor('campus'), 'ring');
+  assert.equal(recordMarkFor('neighborhood'), 'ring');
+  assert.equal(recordMarkFor('city'), 'ring');
+  assert.equal(recordMarkFor('county'), 'none');
+  assert.equal(recordMarkFor('state'), 'none');
+  assert.equal(recordMarkFor('country'), 'none');
+  // An unknown precision is never drawn as a sharp dot.
+  assert.equal(recordMarkFor('unknown_future_value'), 'ring');
+  assert.deepEqual(precisionsWithMark('none').sort(), ['country', 'county', 'state']);
+});
+
+test('precisionInWords names where the archive can place a record', () => {
+  assert.equal(precisionInWords('site'), 'Exact site');
+  assert.equal(precisionInWords('campus'), 'Campus-level location, not an exact address');
+  assert.doesNotMatch(precisionInWords('campus'), /^Exact/);
+  assert.equal(precisionInWords('city'), 'City-level location');
+  assert.equal(precisionInWords('neighborhood'), 'Neighborhood-level location');
+  assert.equal(precisionInWords('county'), 'County-level location');
+  assert.equal(precisionInWords('state'), 'State-level location');
 });
 
 test('city/neighborhood precisions map to locality; state/country map to state', () => {
@@ -77,29 +107,4 @@ test('state tier fails closed when the state postal code is unresolvable', () =>
 test('county tier fails closed — no county-bbox reference data is wired yet', () => {
   const result = resolveDisplayRadiusMeters('county', { statePostalCode: 'GA' });
   assert.equal(result.ok, false);
-});
-
-test('formatDisplayRadiusSpan uses feet below 0.25 mi and quarter-mile steps at/above', () => {
-  assert.equal(formatDisplayRadiusSpan(30), '100 ft');
-  assert.equal(formatDisplayRadiusSpan(200), '660 ft');
-  // Just under 0.25 mi stays in feet (~1310 ft).
-  assert.equal(formatDisplayRadiusSpan(399), '1310 ft');
-  assert.equal(formatDisplayRadiusSpan(402.336), '0.25 mi');
-  assert.equal(formatDisplayRadiusSpan(800), '0.5 mi');
-  assert.equal(formatDisplayRadiusSpan(1200), '0.75 mi');
-  assert.equal(formatDisplayRadiusSpan(1609.344), '1 mi');
-  assert.equal(formatDisplayRadiusSpan(2000), '1.25 mi');
-  assert.equal(formatDisplayRadiusSpan(120_000), '74.5 mi');
-});
-
-test('radiusAffordanceLabel uses feet for block-tier affordances and avoids em dashes', () => {
-  assert.equal(
-    radiusAffordanceLabel('block', 200),
-    'Shown at block precision. The marker represents a ±660 ft area, not an exact address.',
-  );
-  assert.doesNotMatch(radiusAffordanceLabel('block', 200), /—/);
-  assert.equal(
-    radiusAffordanceLabel('locality', undefined),
-    'Shown at locality precision (radius affordance unavailable).',
-  );
 });

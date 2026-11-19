@@ -26,6 +26,8 @@ export type NrhpArcgisAttributes = {
   readonly resType: string | null;
   readonly lat: number | null;
   readonly lng: number | null;
+  /** Longest bbox side in km; set only for polygon-layer features (lat/lng are then the bbox center). */
+  readonly extentKm?: number | null;
 };
 
 export type NrhpAddressOutcome =
@@ -87,12 +89,11 @@ export function classifyNrhpAddressOutcome(input: {
  * Reuses this lane's own already-published precision vocabulary (see the orchestrating script's
  * module doc) — 'site' for a parcel-level address, a high-confidence coordinates_only hit, or an
  * entity_locations row this script is not allowed to touch (restricted, current tier held as-is);
- * 'city' for a vicinity description; 'neighborhood' for a coordinates_only hit whose own SRC_ACCU
- * says it isn't parcel-accurate.
+ * 'neighborhood' for a coordinates_only or vicinity hit whose own SRC_ACCU says it isn't
+ * parcel-accurate. A vicinity row is tiered by its point's accuracy, not by its address text.
  */
 export const NRHP_ADDRESS_TIER_TABLE = {
   addressFound: 'site',
-  vicinity: 'city',
   coordinatesOnlyAccuracyThresholdMeters: 30,
   coordinatesOnlyWithinThreshold: 'site',
   coordinatesOnlyBeyondThreshold: 'neighborhood',
@@ -119,10 +120,9 @@ export function proposeNrhpTier(
   if (outcome === 'address_found') {
     return { tier: NRHP_ADDRESS_TIER_TABLE.addressFound, flagged: false, flagReason: null };
   }
-  if (outcome === 'vicinity') {
-    return { tier: NRHP_ADDRESS_TIER_TABLE.vicinity, flagged: false, flagReason: null };
-  }
-  if (outcome === 'coordinates_only') {
+  // A vicinity row has no street address, but its point is NPS's own map of the property, so
+  // its accuracy decides the tier exactly as for coordinates_only.
+  if (outcome === 'vicinity' || outcome === 'coordinates_only') {
     const within =
       accuracyMeters !== null &&
       accuracyMeters <= NRHP_ADDRESS_TIER_TABLE.coordinatesOnlyAccuracyThresholdMeters;
@@ -135,4 +135,84 @@ export function proposeNrhpTier(
     };
   }
   return { tier: null, flagged: false, flagReason: null }; // no_match
+}
+
+// ---------------------------------------------------------------------------------------------
+// Polygon-layer fallback (NRHP Polygons, MapServer layer 1) for county-precision records
+// ---------------------------------------------------------------------------------------------
+
+const EARTH_RADIUS_KM = 6371;
+/** A polygon's bbox spanning more than this is an area (neighborhood), not a single property. */
+export const POLYGON_NEIGHBORHOOD_EXTENT_KM = 1.5;
+/** Geometry farther than this from the record's county centroid is flagged, never applied. */
+export const MAX_KM_FROM_COUNTY_CENTROID = 60;
+
+export function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const h =
+    Math.sin(rad(bLat - aLat) / 2) ** 2 +
+    Math.cos(rad(aLat)) * Math.cos(rad(bLat)) * Math.sin(rad((bLng - aLng) / 2)) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
+}
+
+/** Bbox center and longest side of an ArcGIS polygon's rings (outSR 4326). Null when empty. */
+export function polygonCenterAndExtent(
+  rings: readonly (readonly (readonly number[])[])[] | undefined,
+): { lat: number; lng: number; extentKm: number } | null {
+  const pts = (rings ?? []).flat();
+  if (pts.length === 0) return null;
+  const lngs = pts.map((p) => p[0]!);
+  const lats = pts.map((p) => p[1]!);
+  const w = Math.min(...lngs);
+  const e = Math.max(...lngs);
+  const s = Math.min(...lats);
+  const n = Math.max(...lats);
+  const lat = (s + n) / 2;
+  const lng = (w + e) / 2;
+  return { lat, lng, extentKm: Math.max(haversineKm(lat, w, lat, e), haversineKm(s, lng, n, lng)) };
+}
+
+const TRINOMIAL = /^\d{2}[A-Z]{1,2}\d+$/iu;
+/** Burial grounds and Smithsonian-trinomial archaeological sites are never sharpened. */
+export function isExcludedNrhpName(name: string): boolean {
+  const n = name.trim();
+  return /african burial ground|drake park/iu.test(n) || TRINOMIAL.test(n);
+}
+
+export type NrhpBackfillDecision = {
+  /** Precision to write, or null when the row is left alone (see flags). */
+  readonly toPrecision: 'address' | 'neighborhood' | 'city' | null;
+  readonly flags: readonly string[];
+};
+
+/** Decision for a county-precision record from its polygon-layer feature (joined by refnum). */
+export function decideCountyBackfill(input: {
+  readonly displayName: string;
+  readonly restricted: boolean;
+  /** Caller-supplied exclusion (e.g. records tied to persons of unknown living status). */
+  readonly excluded: boolean;
+  readonly feature: NrhpArcgisAttributes | null;
+  readonly countyCentroid: { readonly lat: number; readonly lng: number } | null;
+}): NrhpBackfillDecision {
+  const none = (flag: string): NrhpBackfillDecision => ({ toPrecision: null, flags: [flag] });
+  const { feature } = input;
+  if (input.excluded || isExcludedNrhpName(input.displayName)) return none('excluded');
+  if (input.restricted) return none('restricted');
+  if (!feature || feature.lat === null || feature.lng === null) return none('no_source');
+  if (
+    input.countyCentroid &&
+    haversineKm(input.countyCentroid.lat, input.countyCentroid.lng, feature.lat, feature.lng) >
+      MAX_KM_FROM_COUNTY_CENTROID
+  ) {
+    return none('far_from_county');
+  }
+  if ((feature.vicinity ?? '').trim().toLowerCase() === 'true') {
+    return feature.city ? { toPrecision: 'city', flags: ['vicinity'] } : none('vicinity_no_city');
+  }
+  const isDistrict = /district/iu.test(`${feature.resname ?? ''} ${input.displayName}`);
+  if (isDistrict || (feature.extentKm ?? 0) > POLYGON_NEIGHBORHOOD_EXTENT_KM) {
+    return { toPrecision: 'neighborhood', flags: [] };
+  }
+  if (/^\d+/u.test((feature.address ?? '').trim())) return { toPrecision: 'address', flags: [] };
+  return { toPrecision: 'neighborhood', flags: ['no_street_number'] };
 }

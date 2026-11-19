@@ -1,207 +1,762 @@
-/**
- * `/stories` index: the lead story and the collection shelves. The narrowing controls are the
- * room kit's FindBar and carry no CSS here.
+/*
+ * /stories: the lead chapter edge to edge with its title on an ink panel, the other chapters as
+ * ruled lead rows, then one paper sheet of stories under a display head.
+ * Type sizes come from the --ds-text-* scale (room-kit.test guards this file).
  */
 
-/* —— Shelves: the /stories default browse state ——————————————————————————
-   Lead story, then one shelf per collection, then the "Everything else" hairline list (the
-   list itself reuses CardGrid/RoomCard's index shape from the kit — no new CSS needed there).
-   Ink direction, README §2. */
-.ds-stories-lead {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: var(--ds-space-8);
-  align-items: center;
-  margin: var(--ds-space-6) 0 var(--ds-space-12);
+.ds-stories .ds-room__doc {
+  padding-block: var(--ds-space-12) var(--ds-space-18);
 }
 
-.ds-stories-lead__meta {
-  margin: 0;
+/* —— Lead: the cover edge to edge, the title on an ink panel over its foot ————————————— */
+.ds-stories-lead {
+  position: relative;
+}
+
+.ds-stories-lead__media {
+  height: clamp(20rem, 52vh, 36rem);
+  overflow: hidden;
+  background: var(--ds-material-ink);
+}
+
+/* Covers and row thumbnails are plates: the same duotone as `.ds-plate` (shadows in
+   --ds-plate-lo, lights in --ds-plate-hi), so one photo language runs from home to the stories.
+   Each cover prints its credit in its caption. Forced colors show the image as it is. */
+.ds-stories-lead__media,
+.ds-stories-cover__media,
+.ds-stories-row__thumb[data-media='photo'] {
+  position: relative;
+  isolation: isolate;
+  background: var(--ds-plate-hi);
+}
+
+.ds-stories-lead__media .ds-story-img,
+.ds-stories-cover__media .ds-story-img,
+.ds-stories-row__thumb .ds-story-img {
+  background: transparent;
+}
+
+.ds-stories-lead__media img,
+.ds-stories-cover__media img,
+.ds-stories-row__thumb img {
+  filter: grayscale(1) contrast(1.12);
+  mix-blend-mode: multiply;
+}
+
+.ds-stories-lead__media::after,
+.ds-stories-cover__media::after,
+.ds-stories-row__thumb[data-media='photo']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ds-plate-lo);
+  mix-blend-mode: lighten;
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  .ds-stories-lead__media img,
+  .ds-stories-cover__media img,
+  .ds-stories-row__thumb img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  .ds-stories-lead__media::after,
+  .ds-stories-cover__media::after,
+  .ds-stories-row__thumb[data-media='photo']::after {
+    content: none;
+  }
+}
+
+.ds-stories-lead__credit {
+  grid-area: credit;
+}
+
+.ds-stories-cover__credit,
+.ds-stories-lead__credit {
+  margin: var(--ds-space-3) 0 0;
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.1em;
+  font-size: var(--ds-text-meta);
+  letter-spacing: var(--ds-tracking-meta);
   text-transform: uppercase;
-  color: var(--ds-accent);
+}
+
+/* The chapter images are archive scans with paper borders; a cover crops inside the document, at
+   its head, never on its edge. --crop is the inset zoom, and hover adds to it. */
+.ds-stories-lead__media,
+.ds-stories-cover__media {
+  --crop: 1.06;
+}
+
+.ds-stories-lead__media .ds-story-img,
+.ds-stories-cover__media .ds-story-img {
+  height: 100%;
+}
+
+.ds-stories-lead__media img,
+.ds-stories-cover__media img {
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 8%;
+  transform: scale(var(--crop));
+  transition: transform var(--ds-duration-slow) var(--ds-ease-entrance);
+}
+
+.ds-stories-lead:hover .ds-stories-lead__media img,
+.ds-stories-cover:hover .ds-stories-cover__media img {
+  transform: scale(calc(var(--crop) + 0.02));
+}
+
+.ds-stories-lead__wrap {
+  position: relative;
+  margin-top: calc(var(--ds-space-24) * -1);
+}
+
+/* The table's ground: ink in the dark theme, paper in the light one. The years line carries the
+   date, so the panel prints no numeral. */
+.ds-stories-lead__panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'years'
+    'title'
+    'dek'
+    'cta'
+    'credit';
+  justify-items: start;
+  column-gap: var(--ds-space-12);
+  row-gap: var(--ds-space-4);
+  overflow: hidden;
+  padding: var(--ds-space-10) var(--ds-space-12);
+  /* A sheet's lift: in the light theme the table's ground is paper, and the shadow is what keeps
+     the panel from dissolving into the page. */
+  box-shadow: var(--ds-shadow-sheet);
+  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
+}
+
+.ds-stories-lead__page {
+  margin-right: var(--ds-space-3);
+  padding-right: var(--ds-space-3);
+  border-right: var(--ds-border-width) solid currentColor;
+  color: var(--ds-ink);
+}
+
+.ds-stories-lead__years {
+  grid-area: years;
+  margin: 0;
+  /* Meta, not a tag: the years in copper mono capitals over the title, the way home's cover
+     and the record masthead print an era. */
+  color: var(--ds-numeral-soft-text);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-stories-lead__title {
-  margin: var(--ds-space-3) 0 0;
+  grid-area: title;
+  margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: var(--ds-text-display-2);
-  line-height: 1;
+  font-size: var(--ds-text-display-title);
+  /* Headline weight: the page's h1 holds the display role, once per surface. */
+  font-weight: 700;
+  line-height: 0.9;
   letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
-.ds-stories-lead__title a {
-  color: var(--ds-ink);
+.ds-stories-lead__link {
+  color: inherit;
   text-decoration: none;
 }
 
-.ds-stories-lead__title a:hover {
-  color: var(--ds-accent);
+/* The whole cover is the link; the button stays the visible affordance on top of it. */
+.ds-stories-lead__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* local: the stretched link over the panel, under the button */
 }
 
-.ds-stories-lead__summary {
-  margin: var(--ds-space-4) 0 0;
-  max-width: 44em;
+.ds-stories-lead__link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 4px;
+  text-underline-offset: 0.08em;
+}
+
+.ds-stories-lead__panel:has(.ds-stories-lead__link:focus-visible) {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-stories-lead__link:focus-visible {
+  outline: none;
+}
+
+.ds-stories-lead__dek {
+  grid-area: dek;
+  max-width: 38rem;
+  margin: 0;
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial-lede);
-  line-height: 1.5;
-  color: var(--room-ink-2, var(--ds-ink-muted));
+  font-style: italic;
+  line-height: 1.4;
+  text-wrap: pretty;
 }
 
-.ds-stories-lead__copy .ds-cta {
-  margin-top: var(--ds-space-6);
+.ds-stories-lead__cta {
+  grid-area: cta;
+  position: relative;
+  z-index: 1; /* local: the button above the stretched link, inside this panel only */
+  margin-top: var(--ds-space-2);
 }
 
-.ds-stories-lead__plate {
-  display: block;
-  aspect-ratio: 4 / 3;
+/* No picture: the panel opens the page on its own. */
+.ds-stories-lead[data-media='none'] .ds-stories-lead__media {
+  display: none;
+}
+
+.ds-stories-lead[data-media='none'] .ds-stories-lead__wrap {
+  margin-top: var(--ds-space-8);
+}
+
+/* —— Chapter lead rows: ruled, a plate beside the title block ——————————————————————— */
+.ds-stories-covers {
+  display: grid;
+  border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
+}
+
+.ds-stories-cover {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--ds-space-8);
+  padding-block: var(--ds-space-8);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+}
+
+.ds-stories-cover__media {
+  aspect-ratio: 16 / 10;
   overflow: hidden;
-  background: var(--ds-surface-raised);
-  border-radius: var(--ds-radius-md);
 }
 
-.ds-stories-lead__plate img {
+.ds-stories-cover__blank {
   display: block;
-  width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center top;
+  background: var(--ds-plate-hi);
 }
 
-@media (max-width: 56rem) {
-  .ds-stories-lead {
-    grid-template-columns: 1fr;
+.ds-stories-cover__caption {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--ds-space-3);
+}
+
+.ds-stories-cover__years {
+  margin: 0;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-stories-cover__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.ds-stories-cover__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-stories-cover__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.ds-stories-cover:hover .ds-stories-cover__link {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.1em;
+}
+
+.ds-stories-cover:has(.ds-stories-cover__link:focus-visible) {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-stories-cover__link:focus-visible {
+  outline: none;
+}
+
+.ds-stories-cover__dek {
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* —— The list head: a display title and the count as a copper numeral ——————————————— */
+.ds-stories-browse {
+  margin-top: var(--ds-space-18);
+}
+
+.ds-stories-browse[data-first] {
+  margin-top: 0;
+}
+
+.ds-stories-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title count'
+    'dek count';
+  align-items: end;
+  column-gap: var(--ds-space-8);
+  padding-bottom: var(--ds-space-8);
+}
+
+.ds-stories-head__title {
+  grid-area: title;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-1);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ds-stories-browse[data-first] .ds-stories-head__title {
+  font-size: var(--ds-text-display-title);
+}
+
+.ds-stories-head__count {
+  grid-area: count;
+  margin-bottom: -0.06em;
+}
+
+.ds-stories-head__dek {
+  grid-area: dek;
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* —— Toolbar ——————————————————————————————————————————————————————————————— */
+.ds-stories-toolbar {
+  padding-bottom: var(--ds-space-4);
+}
+
+.ds-stories-toolbar__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+}
+
+.ds-stories-toolbar__sort {
+  anchor-name: --stories-sort;
+}
+
+.ds-stories-toolbar__sort > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-stories-toolbar__glyph {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* The sort menu is a small paper sheet. */
+.ds-stories-sort {
+  width: min(100% - var(--ds-space-8), 18rem);
+  margin: auto;
+  padding: var(--ds-space-2);
+  border: 0;
+  color: var(--ds-ink);
+}
+
+.ds-stories-sort::backdrop {
+  background: transparent;
+}
+
+@supports (anchor-name: --a) {
+  .ds-stories-sort {
+    position-anchor: --stories-sort;
+    inset: auto;
+    top: anchor(bottom);
+    right: anchor(right);
+    margin: var(--ds-space-2) 0 0;
   }
 }
 
-.ds-stories-shelf {
-  margin-top: var(--ds-space-12);
+.ds-stories-sort__title {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
 }
 
-.ds-stories-shelf__head {
+.ds-stories-sort__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-stories-sort__option {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  text-decoration: none;
+}
+
+.ds-stories-sort__option:hover {
+  background: var(--ds-surface-sunken);
+}
+
+/* The current sort: a check and weight, never color alone. */
+.ds-stories-sort__option[aria-current='true'] {
+  font-weight: 700;
+}
+
+.ds-stories-sort__check {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-accent);
+}
+
+/* —— Narrowing echoes, notice, pager ——————————————————————————————————————— */
+.ds-stories-echoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding-bottom: var(--ds-space-4);
+}
+
+.ds-stories-echoes__clear {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  text-underline-offset: 0.2em;
+}
+
+.ds-stories-notice {
+  display: grid;
+  justify-items: start;
   gap: var(--ds-space-4);
-  padding-bottom: var(--ds-space-3);
+  padding-block: var(--ds-space-4);
+}
+
+.ds-stories-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-8);
+}
+
+.ds-stories-pager__at {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* —— The list: one paper sheet ———————————————————————————————————————————————— */
+.ds-stories-paper {
+  padding-block: var(--ds-space-2);
+}
+
+.ds-stories-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-stories-row {
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-stories-shelf__title {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: var(--ds-text-display-3);
-  letter-spacing: -0.025em;
-  color: var(--ds-ink);
+.ds-stories-row:last-child {
+  border-bottom: 0;
 }
 
-.ds-stories-shelf__title .ds-room-num {
-  margin-left: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  font-weight: 400;
-  color: var(--ds-ink-muted);
-}
-
-.ds-stories-shelf__all {
-  flex: none;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.ds-stories-shelf__all:hover {
-  text-decoration: underline;
-}
-
-.ds-stories-shelf__grid {
+.ds-stories-row__link {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  margin-top: var(--ds-space-5);
-}
-
-.ds-stories-shelf__entry {
-  display: flex;
-  flex-direction: column;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'thumb title years'
+    'thumb kind years'
+    'thumb summary summary';
+  align-items: start;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  margin-inline: calc(var(--ds-space-2) * -1);
+  padding: var(--ds-space-4) var(--ds-space-2);
   color: var(--ds-ink);
   text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-standard);
 }
 
-.ds-stories-shelf__plate {
-  display: block;
+.ds-stories-row__link:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-stories-row__link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+/* A 72px plate, or the plate's ground with the initial in ink; both sit on the one title edge. */
+.ds-stories-row__thumb {
+  grid-area: thumb;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: var(--ds-surface-raised);
-  border-radius: var(--ds-radius-md);
+  background: var(--ds-plate-hi);
+  color: var(--ds-material-ink);
 }
 
-.ds-stories-shelf__plate img {
-  display: block;
+.ds-stories-row__thumb .ds-story-img {
   width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.ds-stories-row__thumb img {
   height: 100%;
   object-fit: cover;
   object-position: center top;
 }
 
-.ds-stories-shelf__index {
-  margin-top: var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--ds-text-micro);
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
-}
-
-.ds-stories-shelf__entry-title {
-  margin-top: 6px;
+.ds-stories-row__initial {
   font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-3);
   font-weight: 600;
+}
+
+.ds-stories-row__title {
+  grid-area: title;
+  font-family: var(--ds-font-display);
   font-size: var(--ds-text-title);
-  letter-spacing: -0.02em;
+  font-weight: 650;
   line-height: 1.2;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
 }
 
-.ds-stories-shelf__entry:hover .ds-stories-shelf__entry-title {
+.ds-stories-row__link:hover .ds-stories-row__title {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+.ds-stories-row__years {
+  grid-area: years;
+  justify-self: end;
   color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.ds-stories-shelf__entry-summary {
-  margin-top: 4px;
-  font-family: var(--ds-font-editorial);
+.ds-stories-row__kind {
+  grid-area: kind;
+  font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
-  line-height: 1.5;
+  font-weight: 600;
+}
+
+.ds-stories-row__summary {
+  grid-area: summary;
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-@media (max-width: 56rem) {
-  .ds-stories-shelf__grid {
-    grid-template-columns: repeat(2, 1fr);
+/* —— Phone ————————————————————————————————————————————————————————————————— */
+@media (max-width: 47.9375rem) {
+  .ds-stories .ds-room__doc {
+    padding-top: var(--ds-space-8);
+  }
+
+  .ds-stories-lead__media {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* The panel runs edge to edge and rises over the picture's foot by a band. */
+  .ds-stories-lead__wrap {
+    width: 100%;
+    margin-top: calc(var(--ds-space-12) * -1);
+  }
+
+  .ds-stories-lead__panel {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'years'
+      'title'
+      'dek'
+      'cta'
+      'credit';
+    padding: var(--ds-space-6) var(--ds-gutter) var(--ds-space-8);
+    border-radius: 0;
+  }
+
+  .ds-stories-cover {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--ds-space-4);
+    padding-block: var(--ds-space-6);
+  }
+
+  .ds-stories-browse {
+    margin-top: var(--ds-space-12);
+  }
+
+  .ds-stories-head {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'count'
+      'title'
+      'dek';
+  }
+
+  .ds-stories-head__count {
+    margin: 0 0 var(--ds-space-2);
+  }
+
+  /* The sheet runs full-bleed on a phone (the kit drops its side edges). */
+  .ds-stories-paper {
+    margin-inline: calc(var(--ds-gutter) * -1);
+  }
+
+  .ds-stories-row__link {
+    grid-template-columns: 4rem minmax(0, 1fr);
+    grid-template-areas:
+      'thumb title'
+      'thumb years'
+      'thumb kind'
+      'summary summary';
+    column-gap: var(--ds-space-4);
+  }
+
+  .ds-stories-row__thumb {
+    width: 4rem;
+  }
+
+  .ds-stories-row__years {
+    justify-self: start;
+    font-size: var(--ds-text-body);
+  }
+
+  /* Sort opens as a bottom sheet within thumb reach. */
+  .ds-stories-sort.ds-stories-sort {
+    inset: auto 0 0 0;
+    width: 100%;
+    margin: 0;
+    padding: var(--ds-space-2) var(--ds-space-2)
+      calc(var(--ds-space-4) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ds-stories-sort::backdrop {
+    background: var(--ds-overlay);
   }
 }
 
-@media (max-width: 30rem) {
-  .ds-stories-shelf__grid {
-    grid-template-columns: 1fr;
+@media (prefers-reduced-motion: reduce) {
+  .ds-stories-lead__media img,
+  .ds-stories-cover__media img {
+    transition: none;
+  }
+
+  .ds-stories-lead:hover .ds-stories-lead__media img,
+  .ds-stories-cover:hover .ds-stories-cover__media img {
+    transform: scale(var(--crop));
   }
 }
 
-/* The pill over the lead: what the current sort put at the top. */
-.ds-stories-lead__flag {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  margin: 0 0 var(--ds-space-4);
-  padding: 0 10px;
-  border-radius: var(--ds-radius-full);
-  background: color-mix(in oklab, var(--ds-accent) 14%, transparent);
-  color: var(--ds-accent);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
+/* A thumbnail or a cover has no room for the failure sentence (and sits inside a link, so the
+   sentence could not link out); a failed one shows its ground. */
+.ds-stories-row__thumb .ds-story-img__failed,
+.ds-stories-lead .ds-story-img__failed,
+.ds-stories-cover .ds-story-img__failed {
+  display: none;
+}
+
+/* —— Loading: the front's shape, held still ———————————————————————————————————— */
+.ds-stories-wait {
+  display: grid;
+  gap: var(--ds-space-8);
+}
+
+.ds-stories-wait__lead {
+  display: block;
+  height: clamp(20rem, 52vh, 36rem);
+  background: var(--ds-material-ink);
+}
+
+.ds-stories-wait__covers {
+  display: grid;
+  gap: var(--ds-space-8);
+}
+
+.ds-stories-wait__covers > span {
+  display: block;
+  height: 10rem;
+  background: var(--ds-surface-sunken);
+}
+
+.ds-stories-wait__rows {
+  display: grid;
+  gap: var(--ds-space-4);
+}
+
+.ds-stories-wait__rows > span {
+  display: block;
+  height: 5.5rem;
+  background: var(--ds-surface-sunken);
 }

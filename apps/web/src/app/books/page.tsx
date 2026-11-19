@@ -1,21 +1,25 @@
 /**
- * Banned-books catalog at `/books`: a reading room with a how-to-read chapter, a searchable
- * catalog, and named handoffs. The list is national. It does not invent a join to a place.
+ * `/books`: the challenged titles as a cover wall, with the states by challenge count one
+ * switch away. The list is national; a state is where a cited report places a challenge.
  */
 import type { Metadata } from 'next';
-import React from 'react';
 import Link from 'next/link';
+import React from 'react';
+import { DisplayNumeral, PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { Notice } from '@repo/ui';
-import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
-import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
+import { parentCrumb, Room } from '../../components/room';
+import { Outcome } from '../records/RecordsIndex';
+import {
+  bookStateName,
+  buildBooksBrowseViewModel,
+  type RawBooksBrowseParams,
+} from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
-import { booksCatalogPulseMeta, booksCatalogStats } from './BooksCatalogPulse';
-import { BOOKS_INDEX_LEDE, BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import { DocumentColophon, ReadingEntry, Room, RoomStats } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import { isbnsKnownWithoutCovers } from './books-cover-availability';
+import { BOOKS_PAGE_DESCRIPTION } from './books-copy';
 import '../reading-room.css';
+import './books.css';
 
 void React;
 
@@ -29,51 +33,72 @@ type BooksPageProps = {
   readonly searchParams: Promise<RawBooksBrowseParams>;
 };
 
+function dek(view: ReturnType<typeof buildBooksBrowseViewModel>): string {
+  const states = view.stateCounts.length;
+  const titles =
+    view.totalMatched === view.totalAvailable
+      ? `${view.totalAvailable.toLocaleString('en-US')} titles`
+      : `${view.totalMatched.toLocaleString('en-US')} of ${view.totalAvailable.toLocaleString('en-US')} titles`;
+  const where =
+    view.state === 'all'
+      ? `across ${states} ${states === 1 ? 'state' : 'states'}`
+      : `in ${bookStateName(view.state)}`;
+  return `${titles} challenged in schools and libraries ${where}, cited from public reports.`;
+}
+
 export default async function BooksPage({ searchParams }: BooksPageProps) {
   const params = await searchParams;
   const snapshot = await loadBannedBooksListing();
+  const header = {
+    crumb: parentCrumb('/books'),
+    linkAs: Link,
+    title: 'Banned books',
+    display: true,
+    className: 'ds-books-head',
+  } as const;
 
   if (snapshot.books.length === 0) {
     return (
-      <Room ledger>
-        <ReadingEntry
-          pathname="/books"
-          title={
-            <>
-              The books someone asked to <em>remove</em>.
-            </>
-          }
-        />
-        <Notice tone="warning" title="The catalog snapshot is unavailable">
-          The challenged-books catalog did not load. Nothing documented here is lost. Check back
-          shortly, or read the <Link href="/methodology">methodology</Link> for how this catalog is
-          built.
-        </Notice>
-        <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
+      <Room width="wide" className="ds-books">
+        <PageHeader {...header} />
+        <Outcome title="The catalog did not load" action={{ href: '/books', label: 'Try again' }}>
+          The titles and their reports are kept, only this page failed to read them.
+        </Outcome>
       </Room>
     );
   }
 
-  const view = buildBooksBrowseViewModel(snapshot, params);
-  const suggestCorpus = snapshot.books.map(bannedBookToSuggestCorpusItem);
+  const built = buildBooksBrowseViewModel(snapshot, params);
+  // A title known to have no cover upstream gets no ISBN, so it renders typeset without a failing
+  // request. Unchecked titles render as usual and are checked in the background.
+  const uncovered = isbnsKnownWithoutCovers(
+    built.items.map((item) => item.coverIsbn),
+    'L',
+  );
+  const view = {
+    ...built,
+    items: built.items.map((item) =>
+      item.coverIsbn && uncovered.has(item.coverIsbn) ? { ...item, coverIsbn: undefined } : item,
+    ),
+  };
 
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/books"
-        title={
-          <>
-            The books someone asked to <em>remove</em>.
-          </>
-        }
-        lede={BOOKS_INDEX_LEDE}
+    <Room width="wide" className="ds-books">
+      {/* The title count as a giant numeral; the dek states it in words, so it is not read twice. */}
+      <PageHeader
+        {...header}
+        dek={dek(view)}
+        {...(view.totalMatched > 0
+          ? {
+              actions: (
+                <DisplayNumeral decorative className="ds-books-head__count">
+                  {view.totalMatched.toLocaleString('en-US')}
+                </DisplayNumeral>
+              ),
+            }
+          : {})}
       />
-      <RoomStats label="The catalog at a glance" stats={booksCatalogStats(snapshot)} />
-      <DocumentColophon facts={booksCatalogPulseMeta(snapshot).slice(-1)} />
-
-      <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} snapshot={snapshot} />
-
-      <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
+      <BooksBrowseSections view={view} />
     </Room>
   );
 }

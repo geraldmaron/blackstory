@@ -20,6 +20,7 @@ import {
   listingClaim,
   listingCitation,
   listingFactsFromRow,
+  requiresPrimaryScanReview,
   listingQuotes,
   listingSummary,
   type ListingFacts,
@@ -101,6 +102,10 @@ async function main(): Promise<void> {
     for (const row of rows) {
       if (picked.length >= limit) break;
       const p = row.provenance;
+      if (requiresPrimaryScanReview(p)) {
+        skip('primary scan correction requires independent review');
+        continue;
+      }
       const facts = listingFactsFromRow(row.display_name, p);
       if (!THIN_STATES.has(facts.state)) {
         skip('state');

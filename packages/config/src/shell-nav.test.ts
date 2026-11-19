@@ -34,11 +34,11 @@ const everyShellItem = [
 test('primary nav is the four product axes', () => {
   assert.deepEqual(
     PRIMARY_NAV.map((item) => item.href),
-    ['/explore', '/stories', '/records', '/rooms'],
+    ['/explore', '/stories', '/records', '/collections'],
   );
   assert.deepEqual(
     PRIMARY_NAV.map((item) => item.label),
-    ['Map', 'Stories', 'Records', 'Rooms'],
+    ['Map', 'Stories', 'Records', 'Collections'],
   );
 });
 
@@ -70,10 +70,11 @@ test('the retired surfaces cannot reappear in shell chrome', () => {
   }
 });
 
-test('overflow holds the supporting rooms, grouped read then trust then take part', () => {
+test('overflow holds the supporting pages, grouped collections then trust then take part', () => {
   assert.deepEqual(
     OVERFLOW_NAV.map((item) => item.href),
     [
+      '/presidents',
       '/law',
       '/data',
       '/lives',
@@ -101,13 +102,13 @@ test('overflow never duplicates a primary axis', () => {
 test('footer columns lead with Find and carry the three room families', () => {
   assert.deepEqual(
     FOOTER_NAV_COLUMNS.map((column) => column.title),
-    ['Find', 'Read deeper', 'How it decides', 'Add to it'],
+    ['Find', 'Collections', 'How it decides', 'Add to it'],
   );
   const find = FOOTER_NAV_COLUMNS[0];
   assert.ok(find);
   assert.deepEqual(
     find.items.map((item) => item.href),
-    ['/explore', '/stories', '/records', '/rooms'],
+    ['/explore', '/stories', '/records', '/collections'],
   );
   assert.deepEqual(
     FOOTER_NAV_COLUMNS[2]?.items.map((item) => item.href),

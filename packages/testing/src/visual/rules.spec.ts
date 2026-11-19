@@ -2,13 +2,13 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { MIN_TARGET_PX, VISUAL_ROUTES } from './routes.ts';
+import { MIN_TARGET_PX, RULE_ONLY_ROUTES, VISUAL_ROUTES } from './routes.ts';
 import { collectErrors, openStable } from './page.ts';
 
 /**
  * Rendered-page rules, run in every viewport/theme project:
  *   hard   no horizontal overflow; exactly the SEO head (title, canonical, og:title);
- *          at most one <h1>.
+ *          at most one <h1>; images, tables and figures stay inside the sheet they sit on.
  *   ratchet  count of interactive targets under 44px per route+project may not rise above
  *          src/visual/rules-baseline.json. Update with VISUAL_UPDATE=1 after paying debt down.
  */
@@ -19,7 +19,7 @@ const baseline: Record<string, number> = existsSync(BASELINE_PATH)
   : {};
 const measured: Record<string, number> = {};
 
-for (const route of VISUAL_ROUTES) {
+for (const route of [...VISUAL_ROUTES, ...RULE_ONLY_ROUTES]) {
   test(`rules ${route.name}`, async ({ page }, testInfo) => {
     const errors = collectErrors(page);
     await openStable(page, testInfo, route.path);
@@ -40,9 +40,31 @@ for (const route of VISUAL_ROUTES) {
           const r = el.getBoundingClientRect();
           return r.height < min || r.width < min;
         });
+      // The page clips sideways overflow, so `overflow` below cannot see content that leaves its
+      // sheet. A chapter photo once ran 47px past the paper at every desktop width.
+      const spill = [...document.querySelectorAll('.ds-sheet')].flatMap((sheet) => {
+        const edge = sheet.getBoundingClientRect();
+        return [...sheet.querySelectorAll('img, video, table, pre, figure')]
+          .filter(rendered)
+          .filter((el) => {
+            // A scroller or a cropping frame between the element and the sheet holds its overflow.
+            for (let p = el.parentElement; p && p !== sheet; p = p.parentElement) {
+              if (getComputedStyle(p).overflowX !== 'visible') return false;
+            }
+            const r = el.getBoundingClientRect();
+            return r.left < edge.left - 1 || r.right > edge.right + 1;
+          })
+          .map((el) => `${el.tagName.toLowerCase()}.${el.className}`.slice(0, 80));
+      });
       return {
+        spill,
         overflow: document.documentElement.scrollWidth - window.innerWidth,
-        h1: document.querySelectorAll('h1').length,
+        // Headings a reader can reach. The map page keeps the home journey mounted under
+        // `visibility: hidden` for the morph back to it; that heading is outside the
+        // accessibility tree and is not a second <h1>.
+        h1: [...document.querySelectorAll('h1')].filter(
+          (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden',
+        ).length,
         title: document.title,
         canonical: document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href ?? '',
         ogTitle:
@@ -54,6 +76,7 @@ for (const route of VISUAL_ROUTES) {
     }, MIN_TARGET_PX);
 
     expect(facts.overflow, 'horizontal overflow (px)').toBeLessThanOrEqual(0);
+    expect(facts.spill, 'images, tables or figures outside their sheet').toEqual([]);
     expect(facts.title, 'document title').not.toBe('');
     expect(facts.canonical, 'canonical href').toMatch(/^https?:\/\//);
     expect(facts.canonicalCount, 'canonical count').toBe(1);

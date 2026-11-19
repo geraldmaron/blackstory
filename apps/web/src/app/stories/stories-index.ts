@@ -1,12 +1,12 @@
 /**
  * The `/stories` index's pure logic: query parsing, href building, filtering, sorting,
- * windowing, header facts, the rail groups and the three notice states.
+ * windowing, the editorial front and the three notice states.
  *
- * A story is one long-form publication, and `format` says under which editorial contract:
- * `chapter` (era-immersion, prose floor) or `entry` (a short entry — a paragraph of
- * context plus individually cited call-outs). Both live in one index because a reader
- * looking for what the archive says about a subject should not have to know which
- * contract the answer was written under.
+ * A story is one authored piece with an argument: a chapter, a standalone feature, or a member
+ * of a story series. `format` is the editorial contract it was written under and decides which
+ * review gates apply; it is not shown to readers as a filter. Collections of uniform entries (the
+ * presidents) are not stories: they live at their own path (`lib/stories/story-routes.ts`) and
+ * the page filters them out before any of this logic runs.
  *
  * Filtering, sorting and search are all URL state — no client-side store. Every control
  * is a link or a form GET, so a narrowed view is bookmarkable, shareable, crawlable, and
@@ -27,7 +27,6 @@
  */
 import type { PublicStoryListItemDoc } from '@repo/schemas';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
-import type { RailEntry } from '../../components/room';
 
 /**
  * Sort keys. `collection` is the default whenever a collection is being viewed, because a
@@ -217,131 +216,9 @@ export function paginateStories(
   };
 }
 
-/** Published count and place count for the document colophon. Publication-year spans that
- * collapse to one year (e.g. "2026 to 2026") are omitted; place grammar is singular-aware. */
-export function computeStoriesFacts(items: readonly PublicStoryListItemDoc[]): {
-  readonly publishedCount: number;
-  readonly eraSpanLabel: string | undefined;
-  readonly placeCount: number;
-  readonly placeLabel: string;
-} {
-  const publishedCount = items.length;
-  const years = items
-    .map((item) => Number.parseInt(item.publishedAt.slice(0, 4), 10))
-    .filter((year) => Number.isFinite(year));
-  const minYear = years.length === 0 ? undefined : Math.min(...years);
-  const maxYear = years.length === 0 ? undefined : Math.max(...years);
-  const eraSpanLabel =
-    minYear === undefined || maxYear === undefined || minYear === maxYear
-      ? undefined
-      : `${minYear} to ${maxYear}`;
-  const placeCount = new Set(
-    items.map((item) => item.placeLabel).filter((label) => label.trim().length > 0),
-  ).size;
-  const placeLabel = placeCount === 1 ? '1 place' : `${placeCount.toLocaleString('en-US')} places`;
-  return { publishedCount, eraSpanLabel, placeCount, placeLabel };
-}
-
-function buildGroups(
-  items: readonly PublicStoryListItemDoc[],
-  label: (item: PublicStoryListItemDoc) => string,
-  hrefFor: (label: string) => string,
-): readonly RailEntry[] {
-  const counts = new Map<string, number>();
-  for (const item of items) {
-    const key = label(item);
-    if (key.length === 0) continue;
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([entryLabel, count]) => ({ label: entryLabel, href: hrefFor(entryLabel), count }));
-}
-
-// Rail links (era/place/collection/tag) group across both editorial kinds — a collection like
-// "The presidency" is entirely `entry` — so they carry the default format and emit no `format`
-// param at all. They used to need an explicit override, because the default was `chapter` and an
-// all-entry grouping resolved to an empty result.
-
-export function buildEraGroups(items: readonly PublicStoryListItemDoc[]): readonly RailEntry[] {
-  return buildGroups(
-    items,
-    (item) => item.eraLabel,
-    (era) => storiesHref({ era }),
-  );
-}
-
-export function buildPlaceGroups(items: readonly PublicStoryListItemDoc[]): readonly RailEntry[] {
-  return buildGroups(
-    items,
-    (item) => item.placeLabel,
-    (place) => storiesHref({ place }),
-  );
-}
-
-/** Collections, for the rail: one entry per distinct collection, ordered by size. */
-export function buildCollectionGroups(
-  items: readonly PublicStoryListItemDoc[],
-): readonly RailEntry[] {
-  const labels = new Map<string, string>();
-  for (const item of items) {
-    if (item.collection) labels.set(item.collection.id, item.collection.label);
-  }
-  const counts = new Map<string, number>();
-  for (const item of items) {
-    if (!item.collection) continue;
-    counts.set(item.collection.id, (counts.get(item.collection.id) ?? 0) + 1);
-  }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([id, count]) => ({
-      label: labels.get(id) ?? id,
-      href: storiesHref({ collection: id }),
-      count,
-    }));
-}
-
-export type StoriesShelf = {
-  readonly id: string;
-  readonly label: string;
-  readonly count: number;
-  readonly href: string;
-  readonly members: readonly PublicStoryListItemDoc[];
-};
-
-/**
- * One shelf per collection, ordered by size (largest first, same order as
- * `buildCollectionGroups`), each carrying its own first `membersPerShelf` entries in the
- * collection's own order. Reuses `sortItems(..., 'collection')` for member order rather than
- * inventing a second sort.
- */
-export function buildCollectionShelves(
-  items: readonly PublicStoryListItemDoc[],
-  membersPerShelf = 4,
-): readonly StoriesShelf[] {
-  const labels = new Map<string, string>();
-  const byCollection = new Map<string, PublicStoryListItemDoc[]>();
-  for (const item of items) {
-    if (!item.collection) continue;
-    labels.set(item.collection.id, item.collection.label);
-    const list = byCollection.get(item.collection.id);
-    if (list) list.push(item);
-    else byCollection.set(item.collection.id, [item]);
-  }
-  return [...byCollection.entries()]
-    .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
-    .map(([id, members]) => ({
-      id,
-      label: labels.get(id) ?? id,
-      count: members.length,
-      href: storiesHref({ collection: id }),
-      members: sortItems(members, 'collection').slice(0, membersPerShelf),
-    }));
-}
-
 /**
  * The next entry in a collection after `afterPosition`, for the story page's "Next in this
- * collection" rail block. `undefined` when the given collection has no later member (its own
+ * collection" end block. `undefined` when the given collection has no later member (its own
  * `sortItems(..., 'collection')` order applies, so a tie on position falls back to slug like
  * everywhere else collection order is computed).
  */
@@ -362,7 +239,7 @@ export function nextInCollection(
  *
  * The mirror of {@link nextInCollection}, and it reads the sorted list backwards rather than
  * filtering and taking the last: `sortItems(_, 'collection')` is the ordering a reader sees on
- * the shelf, so "previous" has to mean previous in THAT order, not the smallest position number.
+ * the index, so "previous" has to mean previous in THAT order, not the smallest position number.
  * A collection with a gap in its positions (the presidents collection leaves 24 vacant, because
  * Cleveland holds one entry for two terms) would otherwise skip.
  */
@@ -383,28 +260,12 @@ export function prevInCollection(
   return undefined;
 }
 
-/** Stories with no collection — the "Everything else" list beneath the shelves. */
-export function uncollectedItems(
-  items: readonly PublicStoryListItemDoc[],
-): readonly PublicStoryListItemDoc[] {
-  return items.filter((item) => !item.collection);
-}
-
 /**
- * The one story that leads the shelves page at full width: the most recently published
- * story in view. Deterministic and reads from data already on hand — no new field, no
- * editorial "featured" flag to maintain.
- */
-/**
- * The "Start here" piece: the newest Chapter, falling back to the newest item of any format.
+ * The lead: the newest Chapter, falling back to the newest item of any format.
  *
  * Deterministic, and deliberately format-aware. Straight newest-first made the flagship of the
- * whole publication whichever short Entry happened to be published last — with 45 Entries and 3
- * Chapters in the release, a reader's first impression of a long-form archive was a single
- * presidential summary. A Chapter is the deep narrative form, so it leads when one exists.
- *
- * `items` arrives already filtered, so a reader who narrows to Entries still gets an Entry lead:
- * there is no Chapter in that set to prefer.
+ * whole publication whichever short Entry happened to be published last. A Chapter is the deep
+ * narrative form, so it leads when one exists.
  */
 export function pickLeadStory(
   items: readonly PublicStoryListItemDoc[],
@@ -413,71 +274,40 @@ export function pickLeadStory(
   return newest.find((item) => (item.format ?? 'chapter') === 'chapter') ?? newest[0];
 }
 
-export function buildTagGroups(items: readonly PublicStoryListItemDoc[]): readonly RailEntry[] {
-  const counts = new Map<string, number>();
-  for (const item of items) {
-    for (const tag of item.tags ?? []) counts.set(tag, (counts.get(tag) ?? 0) + 1);
-  }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([tag, count]) => ({ label: tag, href: storiesHref({ tag }), count }));
-}
+export type StoriesFront = {
+  /** The full-width cover. */
+  readonly lead: PublicStoryListItemDoc | undefined;
+  /** The row of covers under it: the other Chapters, newest first, at most `maxCovers`. */
+  readonly covers: readonly PublicStoryListItemDoc[];
+  /** Everything else, in the order given: the ruled list. */
+  readonly rest: readonly PublicStoryListItemDoc[];
+};
 
-/** Kind chips, with live counts, so a reader can see both contracts exist. */
-export function buildKindChips(
+/**
+ * Splits the index into its editorial front and the list beneath it. Every item lands in exactly
+ * one of the three parts, so no story is ever shown twice on the page.
+ */
+export function buildStoriesFront(
   items: readonly PublicStoryListItemDoc[],
-  query: StoriesQuery,
-): readonly {
-  readonly label: string;
-  readonly href: string;
-  readonly count: number;
-  readonly active: boolean;
-}[] {
-  const countOf = (format: string) =>
-    items.filter((item) => (item.format ?? 'chapter') === format).length;
-  const base = { ...query, page: 1 };
-  return [
-    {
-      label: 'All',
-      href: storiesHref({ ...base, format: '' }),
-      count: items.length,
-      active: query.format === '',
-    },
-    {
-      label: 'Chapters',
-      href: storiesHref({ ...base, format: 'chapter' }),
-      count: countOf('chapter'),
-      active: query.format === 'chapter',
-    },
-    {
-      // Not "Records": `/records` is the unrelated whole-archive entity index, and reusing its
-      // name here sent a reader clicking this chip expecting that list.
-      label: 'Entries',
-      href: storiesHref({ ...base, format: 'entry' }),
-      count: countOf('entry'),
-      active: query.format === 'entry',
-    },
-  ].filter((chip) => chip.count > 0 || chip.active);
+  maxCovers = 3,
+): StoriesFront {
+  const lead = pickLeadStory(items);
+  const covers = sortItems(
+    items.filter((item) => item !== lead && (item.format ?? 'chapter') === 'chapter'),
+    'newest',
+  ).slice(0, maxCovers);
+  const shown = new Set([lead, ...covers]);
+  return { lead, covers, rest: items.filter((item) => !shown.has(item)) };
 }
 
 export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
-  collection: 'Collection order',
+  collection: 'Series order',
   newest: 'Newest first',
   oldest: 'Oldest first',
   title: 'Title A–Z',
 };
 
-/**
- * True whenever a search, a collection/tag/era/place narrowing, or a non-default sort is
- * engaged — the field-level narrowing that makes shelf browsing dishonest about what changed
- * (shelves have their own count order and per-collection position order). Deliberately excludes
- * the format chip: a collection like the presidents is entirely `entry`, so gating shelf mode on
- * `format === 'chapter'` (the old behavior) meant its shelf could never render at all — the
- * default view filtered every one of its members out before the shelf builder ever saw them, and
- * clicking the "Entries" chip to actually find them dropped into the flat grid instead, since any
- * format other than the default counted as "narrowed". A reader could see "The presidents on the
- * record (45)" advertised in the rail and never once reach a browsable shelf for it.
- */
+/** A search or a collection, tag, era or place narrowing: anything beyond format and sort. */
 function hasFieldNarrowing(query: StoriesQuery): boolean {
   return (
     query.q.length > 0 ||
@@ -489,20 +319,16 @@ function hasFieldNarrowing(query: StoriesQuery): boolean {
 }
 
 /**
- * True in the page's unnarrowed browse state for whichever format is in view — the state the
- * shelves layout renders in. `filtered` (built from the same query) is already scoped to the
- * active format chip, so shelves, the lead and "Everything else" all inherit that scoping for
- * free; this only has to say whether shelf mode applies at all.
+ * True only on bare `/stories`: every format, collection order, nothing narrowed. That is the one
+ * state the editorial front (lead cover and chapter covers) renders in; any choice in the toolbar
+ * turns the page into the flat list of what matches, so the covers never hide a match.
  */
-export function showsShelves(query: StoriesQuery): boolean {
-  return !hasFieldNarrowing(query) && query.sort === 'collection';
+export function showsFront(query: StoriesQuery): boolean {
+  return query.format === '' && query.sort === 'collection' && !hasFieldNarrowing(query);
 }
 
-/** True when any narrowing control is engaged — drives the "clear" affordance. */
+/** True when any narrowing control is engaged: drives the "Clear all" affordance. */
 export function hasActiveNarrowing(query: StoriesQuery): boolean {
-  // '' (all Stories) is the default view, not a narrowing; either named format is. Broader than
-  // `hasFieldNarrowing` on purpose: the Clear affordance resets the format chip too, even though
-  // the format chip does not gate shelf mode.
   return query.format !== '' || hasFieldNarrowing(query);
 }
 
@@ -522,7 +348,7 @@ export function storiesNotice(
   if (source === 'unavailable') {
     return {
       title: 'Stories are temporarily unavailable',
-      body: 'Stories are temporarily unavailable while we reconnect to the live record. Nothing here is lost; please check back shortly.',
+      body: 'The live record could not be reached, so the stories cannot be listed right now. Nothing is lost. Reload or check back shortly.',
     };
   }
   if (totalCount === 0) {
@@ -533,8 +359,8 @@ export function storiesNotice(
   }
   if (filteredCount === 0) {
     return {
-      title: 'No stories match this narrowing',
-      body: `Nothing in the release matches this narrowing. Clear it to see all ${totalCount.toLocaleString('en-US')} stories.`,
+      title: 'No stories match',
+      body: `Nothing published matches these choices. Clear them to see all ${totalCount.toLocaleString('en-US')} stories.`,
     };
   }
   return { title: '', body: '' };

@@ -40,3 +40,32 @@ export function evidenceCountPhrase(evidenceLabel: string): string | undefined {
   const tail = evidenceLabel.split(' · ').slice(1).join(' · ').trim();
   return tail.length > 0 ? tail : undefined;
 }
+
+/*
+ * The evidence count, one wording on every surface (record page, Explore inspector): every
+ * accepted claim on the record and the distinct sources behind them, "5 claims from 5 sources".
+ * `evidenceCount` and `sourceCount` on the map feature carry the same two numbers.
+ */
+
+type CitedClaim = {
+  readonly citationHref?: string | undefined;
+  readonly citationSource?: string | undefined;
+  readonly citationLabel?: string | undefined;
+};
+
+/** The identity of the source a claim cites; empty when the claim names none. */
+export function claimSourceKey(claim: CitedClaim): string {
+  return (claim.citationHref ?? claim.citationSource ?? claim.citationLabel ?? '').trim();
+}
+
+export function countClaimSources(claims: readonly CitedClaim[]): number {
+  return new Set(claims.map(claimSourceKey).filter((key) => key.length > 0)).size;
+}
+
+export function evidenceCountWords(claimCount: number, sourceCount: number): string {
+  const noun = (count: number, word: string) =>
+    `${count.toLocaleString('en-US')} ${word}${count === 1 ? '' : 's'}`;
+  return sourceCount > 0
+    ? `${noun(claimCount, 'claim')} from ${noun(sourceCount, 'source')}`
+    : noun(claimCount, 'claim');
+}

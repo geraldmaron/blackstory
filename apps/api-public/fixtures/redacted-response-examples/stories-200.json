@@ -1,0 +1,26 @@
+{
+  "releaseId": "rel_2026_07_19_001",
+  "stories": [
+    {
+      "slug": "abraham-lincoln",
+      "title": "Abraham Lincoln",
+      "summary": "Lincoln signed the District of Columbia Compensated Emancipation Act on April 16, 1862, issued the Emancipation Proclamation effective January 1, 1863, and approved the joint resolution sending the Thirteenth Amendment to the states on February 1, 1865.",
+      "format": "entry",
+      "eraLabel": "1861–1865",
+      "placeLabel": "United States",
+      "publishedAt": "2026-08-07",
+      "collection": {
+        "id": "presidents",
+        "label": "The presidents on the record",
+        "position": 16,
+        "positionLabel": "16th president"
+      },
+      "heroImage": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+        "alt": "Photographic portrait of Abraham Lincoln, head and shoulders",
+        "credit": "Alexander Gardner studio, February 1865 (O-77 sitting), via Wikimedia Commons."
+      },
+      "webPath": "/presidents/abraham-lincoln"
+    }
+  ]
+}

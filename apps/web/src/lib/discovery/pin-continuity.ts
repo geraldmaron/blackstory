@@ -1,7 +1,6 @@
 /**
- * Pin continuity across map → record handoff.
- * Stores the last focused pin and camera hint in sessionStorage so a return trip can restore
- * the same view. Keyboard and pointer paths share one writer.
+ * The home → map hand-off. The Door saves the pin (or the overlapping pins) a reader chose in
+ * sessionStorage, enters browse, and Explore restores it through the one selection contract.
  */
 
 const STORAGE_KEY = 'bs.pin-continuity.v1';
@@ -10,8 +9,13 @@ export type PinContinuityState = {
   readonly entityId: string;
   readonly lng: number;
   readonly lat: number;
-  readonly zoom?: number;
   readonly label?: string;
+  /** Overlapping pins under one click: Explore opens the chooser, never the first record. */
+  readonly overlap?: readonly {
+    readonly pinId: string;
+    readonly lng: number;
+    readonly lat: number;
+  }[];
   readonly savedAt: number;
 };
 

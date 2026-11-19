@@ -53,8 +53,7 @@ describe('StoryRecords', () => {
     assert.match(markup, /data-state="complete"/);
     assert.ok(markup.includes('href="/entity/ent-school"'));
     assert.ok(markup.includes('href="/entity/ent-map"'));
-    assert.match(markup, /referenced in this chapter/);
-    assert.match(markup, /mapped in this chapter/);
+    assert.ok(!/referenced in|mapped in/.test(markup));
   });
 
   it('keeps the derivation order, not the read order', () => {
@@ -86,29 +85,51 @@ describe('StoryRecords', () => {
     assert.ok(!markup.includes('in this public release'));
   });
 
-  it('empty: a statement about links, not about source material', () => {
+  it('empty: renders nothing rather than an apology', () => {
     const markup = render({ linked: new Map(), records: [], source: 'none' });
-    assert.match(markup, /data-state="empty"/);
-    assert.match(markup, /No archive records are linked to this chapter yet/);
-    assert.match(markup, /says nothing about the sources/);
-    assert.ok(!markup.includes('<ul'));
+    assert.equal(markup, '');
+  });
+
+  it('names the kind, a public place and the first decade the read carries', () => {
+    const markup = render({
+      linked: new Map([['ent-school', 'referenced in' as CitesRelation]]),
+      records: [
+        {
+          ...school,
+          kind: 'school',
+          locationLabel: 'Tulsa, Oklahoma (Greenwood)',
+          locationPrecision: 'exact',
+          eraBuckets: ['1920s', '1910s'],
+        },
+      ],
+    });
+    assert.match(markup, /School · Tulsa, Oklahoma · 1910s/);
+    assert.ok(markup.includes('href="/entity/ent-school"'));
+  });
+
+  it('never names a place the record does not make public', () => {
+    const markup = render({
+      linked: new Map([['ent-school', 'referenced in' as CitesRelation]]),
+      records: [{ ...school, kind: 'school', locationLabel: 'Hidden', locationPrecision: 'none' }],
+    });
+    assert.ok(!markup.includes('Hidden'));
   });
 
   it('never claims to be every record the chapter draws on', () => {
     for (const markup of [render(), render({ records: [] })]) {
       assert.ok(!/Every record/.test(markup));
       assert.ok(!/records behind/i.test(markup));
-      assert.match(markup, /Other sources informed|References/);
+      assert.match(markup, /Records in this chapter/);
     }
   });
 
   it('uses the entry noun on short pieces', () => {
-    assert.match(render({ noun: 'entry' }), /Records linked to this entry/);
+    assert.match(render({ noun: 'entry' }), /Records in this entry/);
   });
 });
 
 describe('page wiring', () => {
-  const page = readFileSync(new URL('../../app/stories/[slug]/page.tsx', import.meta.url), 'utf8');
+  const page = readFileSync(new URL('./StoryDetail.tsx', import.meta.url), 'utf8');
 
   it('derives links only from storyCitedEntities and captures the read source', () => {
     assert.match(page, /storyCitedEntities\(doc\)/);
@@ -119,7 +140,7 @@ describe('page wiring', () => {
   it('leaves numbered reference anchors to StoryReferences', () => {
     assert.match(
       page,
-      /<StoryReferences references=\{story\.references\} headingId="about-this-chapter" \/>/,
+      /<StoryReferences references=\{story\.references\} headingId="sources-heading" \/>/,
     );
     const refs = readFileSync(new URL('./StoryReferences.tsx', import.meta.url), 'utf8');
     assert.match(refs, /id=\{`ref-\$\{ref\.number\}`\}/);

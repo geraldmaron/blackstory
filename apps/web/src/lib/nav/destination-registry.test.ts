@@ -4,18 +4,17 @@
  * The coverage suite is the acceptance criterion "a registry test fails when a public route is
  * absent" and "a registry test fails when a public reading room, record class or utility route
  * has no card here". It reads the classified-route list from `surface-classes.ts` rather than
- * restating it, so adding a route to the site and forgetting Rooms fails here.
+ * restating it, so adding a route to the site and forgetting the footer fails here.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { CLASSIFIED_PATHS, ENDPOINT_ROUTES, surfaceClassFor } from './surface-classes';
+import { CLASSIFIED_PATHS, ENDPOINT_ROUTES } from './surface-classes';
 import {
   DESTINATION_GROUPS,
-  ROOMS_CARD_GROUPS,
+  BROWSE_GROUPS,
   allDestinations,
   browsableDestinations,
   cardTitleFor,
-  classLabelFor,
   destinationById,
   destinationFor,
   destinationsInGroup,
@@ -67,25 +66,23 @@ describe('destination registry · coverage', () => {
     }
   });
 
-  it('the four product axes parent to the door, not to each other or to Rooms', () => {
-    // Stories and Records used to parent through Rooms, which was the old Library hierarchy
+  it('the four product axes parent to the door, not to each other', () => {
+    // Stories and Records used to parent through the old hub, which was the old Library hierarchy
     // surviving a rename: it told a reader that the archive index was a supporting page rather
     // than one of the four ways into the product.
-    for (const path of ['/explore', '/stories', '/records', '/rooms']) {
+    for (const path of ['/explore', '/stories', '/records', '/collections']) {
       assert.equal(destinationFor(path)?.parent, '/', `${path} is an axis and parents to the door`);
     }
   });
 
-  it('/rooms exists and is the parent of every supporting room', () => {
-    assert.notEqual(destinationFor('/rooms'), undefined);
+  it('/collections and /about are the two hubs every supporting page hangs off', () => {
+    assert.notEqual(destinationFor('/collections'), undefined);
+    assert.equal(destinationFor('/rooms'), undefined);
 
+    for (const path of ['/presidents', '/books', '/law', '/data', '/lives', '/memorial']) {
+      assert.equal(destinationFor(path)?.parent, '/collections', `${path} is a collection`);
+    }
     for (const path of [
-      '/books',
-      '/law',
-      '/data',
-      '/lives',
-      '/memorial',
-      '/about',
       '/faq',
       '/methodology',
       '/sources',
@@ -95,12 +92,9 @@ describe('destination registry · coverage', () => {
       '/support',
       '/privacy',
     ]) {
-      assert.equal(
-        destinationFor(path)?.parent,
-        '/rooms',
-        `${path} should resolve up through Rooms`,
-      );
+      assert.equal(destinationFor(path)?.parent, '/about', `${path} should hang off About`);
     }
+    assert.equal(destinationFor('/about')?.parent, '/');
   });
 
   it('a record goes up to the catalog that lists it', () => {
@@ -111,39 +105,21 @@ describe('destination registry · coverage', () => {
     assert.equal(parentPathFor('/books/beloved'), '/books');
     assert.equal(parentPathFor('/law/plessy'), '/law');
     assert.equal(parentPathFor('/stories/redlining'), '/stories');
+    assert.equal(parentPathFor('/presidents/abraham-lincoln'), '/presidents');
     assert.equal(parentPathFor('/corrections/status/ABC123'), '/corrections');
   });
 });
 
 describe('destination registry · card content', () => {
   it('every carded destination carries the kind tag and description a card needs', () => {
-    for (const group of ROOMS_CARD_GROUPS) {
+    for (const group of BROWSE_GROUPS) {
       const destinations = destinationsInGroup(group);
       assert.ok(destinations.length > 0, `group "${group}" would render an empty card grid`);
       for (const destination of destinations) {
-        assert.ok(destination.kind, `${destination.path} has no mono kind tag`);
+        assert.ok(destination.kind, `${destination.path} has no kind`);
         assert.ok(destination.description, `${destination.path} has no card description`);
       }
     }
-  });
-
-  it('the class label is read from the surface class, not stored beside it', () => {
-    // Reclassifying a route must change what its card advertises. Asserting the two agree is the
-    // only way a stale `READING ROOM` on a route the shell now renders as Utility gets caught.
-    for (const destination of browsableDestinations()) {
-      const label = classLabelFor(destination);
-      const surfaceClass = surfaceClassFor(destination.path);
-      assert.notEqual(surfaceClass, null, `${destination.path} resolves to no surface class`);
-      if (surfaceClass === 'reading') assert.match(label, /^READING ROOM/);
-      if (surfaceClass === 'utility') assert.match(label, /^UTILITY/);
-      if (surfaceClass === 'instrument') assert.match(label, /^INSTRUMENT/);
-    }
-  });
-
-  it('the modifier is appended to the class rather than replacing it', () => {
-    assert.equal(classLabelFor(destinationFor('/law')!), 'READING ROOM · PLAIN LANGUAGE');
-    assert.equal(classLabelFor(destinationFor('/memorial')!), 'READING ROOM · STILL');
-    assert.equal(classLabelFor(destinationFor('/stories')!), 'READING ROOM');
   });
 
   it('a card title may be a verb where the breadcrumb label cannot be', () => {
@@ -173,12 +149,12 @@ describe('destination registry · the footer is derived, not authored', () => {
     }
   });
 
-  it('the room groups render in family order', () => {
-    // Stories is not here: it is a product axis, and listing an axis as an ordinary room card is
+  it('the groups render in family order', () => {
+    // Stories is not here: it is a product axis, and listing an axis as an ordinary row is
     // what made Records read as a supporting page.
     assert.deepEqual(
       destinationsInGroup('read').map((destination) => destination.path),
-      ['/law', '/data', '/lives', '/books', '/memorial'],
+      ['/presidents', '/law', '/data', '/lives', '/books', '/memorial'],
     );
     assert.deepEqual(
       destinationsInGroup('check').map((destination) => destination.path),
@@ -190,14 +166,14 @@ describe('destination registry · the footer is derived, not authored', () => {
     );
   });
 
-  it('puts Find in the footer; Rooms palette stays editorial without Explore or records', () => {
+  it('puts Find in the footer; the palette stays editorial without Explore or records', () => {
     const columns = footerColumns();
     const find = columns.find((column) => column.title === 'Find');
     assert.ok(find);
     // The door is not a Find item: the footer wordmark already links home, on every surface.
     assert.deepEqual(
       find.items.map((item) => item.href),
-      ['/explore', '/stories', '/records', '/rooms'],
+      ['/explore', '/stories', '/records', '/collections'],
     );
     const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
     const palette = browsableDestinations().map((destination) => destination.path);
@@ -214,7 +190,7 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(!hrefs.includes('/how-it-works'));
     assert.ok(!palette.includes('/explore'));
     assert.ok(!palette.includes('/records'));
-    assert.ok(!palette.includes('/rooms'));
+    assert.ok(!palette.includes('/collections'));
     for (const path of palette) {
       assert.ok(hrefs.includes(path), `${path} missing from footer`);
     }
@@ -224,7 +200,6 @@ describe('destination registry · the footer is derived, not authored', () => {
     const home = destinationFor('/');
     assert.ok(home);
     assert.equal(home.description, undefined);
-    assert.equal(home.menuLine, undefined);
     const explore = destinationFor('/explore');
     assert.equal(explore?.label, 'Map');
     assert.equal(explore?.description, 'The map.');
@@ -242,7 +217,7 @@ describe('destination registry · the footer is derived, not authored', () => {
   it('lists every carded destination exactly once', () => {
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
     assert.equal(new Set(hrefs).size, hrefs.length, 'a destination is listed twice in the footer');
-    for (const group of ROOMS_CARD_GROUPS) {
+    for (const group of BROWSE_GROUPS) {
       for (const destination of destinationsInGroup(group)) {
         assert.ok(
           hrefs.includes(destination.path),
@@ -252,12 +227,12 @@ describe('destination registry · the footer is derived, not authored', () => {
     }
   });
 
-  it('carries the catalog icon on every footer item', () => {
+  it('links only catalog destinations, labeled as the catalog labels them', () => {
     for (const column of footerColumns()) {
       for (const item of column.items) {
         const destination = destinationFor(item.href);
         assert.ok(destination, `${item.href} must be a catalog destination`);
-        assert.equal(item.icon, destination.icon);
+        assert.equal(item.label, destination.label);
       }
     }
   });

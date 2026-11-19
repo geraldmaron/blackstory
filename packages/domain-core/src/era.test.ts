@@ -239,3 +239,34 @@ test('an authored bucket that is entirely in the future is not treated as docume
     state: 'undocumented',
   });
 });
+
+test('a street number in a claim is not a year', () => {
+  const listing = (address: string) => ({
+    predicate: 'listed_in',
+    object: `Listed in the 1956 edition of the Negro Motorist Green Book as a restaurant at ${address}, Philadelphia, Pennsylvania.`,
+  });
+  for (const address of [
+    '1510 South St.',
+    '1700 N. Arctic Ave',
+    '1910 W. 25th Street',
+    '1540 Broadway',
+  ]) {
+    assert.deepEqual(
+      resolveEraBucketsFromEvidence({ claims: [listing(address)] }),
+      ['1950s'],
+      address,
+    );
+  }
+  // A year beside a capitalized noun stays a year.
+  assert.deepEqual(
+    resolveEraBucketsFromEvidence({
+      claims: [
+        {
+          predicate: 'event',
+          object: 'In 1863 the Court ruled; by 1870 Main Street had a church.',
+        },
+      ],
+    }),
+    ['1860s', '1870s'],
+  );
+});

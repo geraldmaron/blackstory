@@ -1,6 +1,6 @@
 /**
- * `/data`: the reference ledger. Census counts, a compact door into Lives, and published
- * indicator series. Every figure names the series behind it.
+ * `/data`: the reference ledger. Census counts, a door into Lives, and published indicator
+ * series, with a sticky contents list on desktop. Every figure names the series behind it.
  *
  * Primary arrivals (Rooms, footer, bare `/data`) must paint at the top. Deep links into the
  * Lived act use `/data#lives`. Legacy `?s=lives` hops once to the immersive `/lives` room.
@@ -9,8 +9,10 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { permanentRedirect } from 'next/navigation';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { DocumentColophon, ReadingEntry, Room } from '../../components/room';
-import { WalkOffRamp } from '../walk-off-ramp';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../components/room';
+import { TrustMast } from '../../components/trust';
 import {
   buildLivesHref,
   parseLivesAreaSlug,
@@ -18,9 +20,8 @@ import {
   type RawLivesSearchParams,
 } from '../../lib/lives/lives-url-state';
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
-import { DataSections } from './DataSections';
+import { DataSections, millionsFigure } from './DataSections';
 import { loadDataPageModel } from './load-data-page-model';
-import '../../components/data/data-charts.css';
 import '../reading-room.css';
 import './data-page.css';
 
@@ -50,24 +51,38 @@ export default async function DataPage({
 
   const dataModel = await loadDataPageModel();
 
+  const latest = dataModel.sections.timelineRows.at(-1);
+
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/data"
-        title={
-          <>
-            What the numbers <em>show</em>, and what they leave out.
-          </>
-        }
-        lede={DATA_INTRO.lede}
-      />
-      <DocumentColophon facts={dataModel.colophonFacts} />
-
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast
+          art={['decades', 'grain']}
+          tone="copper"
+          numeral={
+            latest === undefined
+              ? undefined
+              : {
+                  // The figure the population chart's finding states ("41.3 million in 2020"), with
+                  // the census category the chart's table scopes it to.
+                  value: `${millionsFigure(latest.blackPopulation)}M`,
+                  label: `${latest.raceCategoryLabel}, counted in ${latest.decade}`,
+                }
+          }
+        >
+          <PageHeader
+            display
+            crumb={parentCrumb('/data')}
+            linkAs={Link}
+            title="What the numbers show, and what they leave out"
+            dek={DATA_INTRO.lede}
+          />
+        </TrustMast>
+      }
+    >
       <DataSections {...dataModel.sections} />
-
-      <WalkOffRamp>
-        Every series here is published by the agency named beneath its figure.
-      </WalkOffRamp>
     </Room>
   );
 }

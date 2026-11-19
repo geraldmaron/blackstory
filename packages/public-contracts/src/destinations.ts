@@ -13,7 +13,7 @@
  *
  * WHAT DOES NOT LIVE HERE. Anything a platform decides for itself: menu position, tab order,
  * desktop versus phone presentation, React or React Native components, Expo Router or Next.js
- * route files, CSS classes, card copy, crawl priorities. Web composes primary nav, Rooms, the
+ * route files, CSS classes, card copy, crawl priorities. Web composes primary nav, Collections, the
  * footer, breadcrumbs, the palette and the sitemap from this table; native composes tabs, More
  * and deep-link normalization from it; admin composes public links from it. A field that only
  * one platform can act on is that platform's business, not this table's.
@@ -30,17 +30,19 @@
  * - `explore` — what happened where, traversed spatially.
  * - `stories` — evidence-supported historical narrative.
  * - `records` — the archive as a findable catalog, no geography required.
- * - `rooms` — the other kinds of knowledge, the trust surfaces, and how to take part.
+ * - `collections` — bounded sets of like things a reader browses by their own key (term number,
+ *   year, decade, title, name). The test for membership: every item has the same shape and the
+ *   set has a natural order. A page that fails it (About, a form) is not a collection.
  */
-export const PRODUCT_AXES = ['door', 'explore', 'stories', 'records', 'rooms'] as const;
+export const PRODUCT_AXES = ['door', 'explore', 'stories', 'records', 'collections'] as const;
 export type ProductAxis = (typeof PRODUCT_AXES)[number];
 
 /**
- * What sort of destination this is. Families group Rooms and native More; they are the reader's
+ * What sort of destination this is. Families group Collections, the footer and native More; they are the reader's
  * question, not the CMS's taxonomy.
  *
  * - `axis` — a top-level product axis (the five above).
- * - `read` — another way to read the archive: law, data, lives, banned books, and the memorial wall.
+ * - `read` — a collection: presidents, law, data, lives, banned books, and the memorial wall.
  * - `trust` — how the archive decides, the source library, and what it got wrong.
  * - `participate` — how a reader adds to it or corrects it.
  * - `policy` — BlackStory's own product policy. Never historical Law; see `/law` versus
@@ -73,7 +75,6 @@ export const DESTINATION_ICON_IDS = [
   'explore',
   'stories',
   'records',
-  'rooms',
   'more',
   'search',
   'filter',
@@ -98,7 +99,7 @@ export const DESTINATION_ICON_IDS = [
   'movement',
   'publication',
   'artifact',
-  // rooms
+  // collections and supporting pages
   'data',
   'books',
   'memorial',
@@ -140,12 +141,11 @@ export type SemanticDestination = {
 };
 
 /**
- * Every public destination, in product order: the axes first, then the rooms by family.
+ * Every public destination, in product order: the axes first, then the rest by family.
  *
  * PARENTS ENCODE THE PRODUCT, NOT THE OLD MENU. Stories and Records are top-level axes, so they
- * parent to the door and not to Rooms — modeling them as Rooms children was the old Library
- * hierarchy surviving inside a renamed surface, and it told a reader that the archive index was
- * a supporting page.
+ * parent to the door. Collections parent to `/collections`. The trust pages and forms parent to
+ * About, which is where a reader asking "who runs this and how do I correct it" already goes.
  */
 const DESTINATIONS: readonly SemanticDestination[] = [
   /* ---------- the axes ---------- */
@@ -198,24 +198,36 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     description: 'The archive as a list.',
   },
   {
-    id: 'rooms',
-    label: 'Rooms',
-    path: '/rooms',
+    id: 'collections',
+    label: 'Collections',
+    path: '/collections',
     parent: '/',
     family: 'axis',
-    axis: 'rooms',
-    icon: 'rooms',
+    axis: 'collections',
+    icon: 'collection',
     isPublic: true,
     browsable: true,
-    description: 'The rooms.',
+    description: 'Sets of like things, read in their own order.',
   },
 
-  /* ---------- read deeper ---------- */
+  /* ---------- collections ---------- */
+  {
+    id: 'presidents',
+    label: 'Presidents',
+    path: '/presidents',
+    parent: '/collections',
+    family: 'read',
+    icon: 'institution',
+    isPublic: true,
+    browsable: true,
+    description:
+      'Every president, in order, on slavery, civil rights and Black Americans, with the sources for each line.',
+  },
   {
     id: 'law',
     label: 'Law',
     path: '/law',
-    parent: '/rooms',
+    parent: '/collections',
     family: 'read',
     icon: 'law',
     isPublic: true,
@@ -227,7 +239,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'data',
     label: 'Data',
     path: '/data',
-    parent: '/rooms',
+    parent: '/collections',
     family: 'read',
     icon: 'data',
     isPublic: true,
@@ -239,7 +251,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'lives',
     label: 'Lives',
     path: '/lives',
-    parent: '/rooms',
+    parent: '/collections',
     family: 'read',
     icon: 'person',
     isPublic: true,
@@ -251,7 +263,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'books',
     label: 'Banned books',
     path: '/books',
-    parent: '/rooms',
+    parent: '/collections',
     family: 'read',
     icon: 'books',
     isPublic: true,
@@ -262,7 +274,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'memorial',
     label: 'Memorial',
     path: '/memorial',
-    parent: '/rooms',
+    parent: '/collections',
     family: 'read',
     icon: 'memorial',
     isPublic: true,
@@ -275,7 +287,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'about',
     label: 'About',
     path: '/about',
-    parent: '/rooms',
+    parent: '/',
     family: 'trust',
     icon: 'about',
     isPublic: true,
@@ -286,7 +298,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'faq',
     label: 'Questions',
     path: '/faq',
-    parent: '/rooms',
+    parent: '/about',
     family: 'trust',
     icon: 'questions',
     isPublic: true,
@@ -298,7 +310,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'methodology',
     label: 'Methodology',
     path: '/methodology',
-    parent: '/rooms',
+    parent: '/about',
     family: 'trust',
     icon: 'methodology',
     isPublic: true,
@@ -310,7 +322,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'sources',
     label: 'Source library',
     path: '/sources',
-    parent: '/rooms',
+    parent: '/about',
     family: 'trust',
     icon: 'source',
     isPublic: true,
@@ -322,7 +334,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'errata',
     label: 'Errata',
     path: '/errata',
-    parent: '/rooms',
+    parent: '/about',
     family: 'trust',
     icon: 'errata',
     isPublic: true,
@@ -336,7 +348,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'submit',
     label: 'Submit',
     path: '/submit',
-    parent: '/rooms',
+    parent: '/about',
     family: 'participate',
     icon: 'submit',
     isPublic: true,
@@ -348,7 +360,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'corrections',
     label: 'Corrections',
     path: '/corrections',
-    parent: '/rooms',
+    parent: '/about',
     family: 'participate',
     icon: 'correction',
     isPublic: true,
@@ -359,7 +371,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'support',
     label: 'Support',
     path: '/support',
-    parent: '/rooms',
+    parent: '/about',
     family: 'participate',
     icon: 'support',
     isPublic: true,
@@ -376,7 +388,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'privacy',
     label: 'Privacy',
     path: '/privacy',
-    parent: '/rooms',
+    parent: '/about',
     family: 'policy',
     icon: 'privacy',
     isPublic: true,
@@ -387,7 +399,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'terms',
     label: 'Terms',
     path: '/terms',
-    parent: '/rooms',
+    parent: '/about',
     family: 'policy',
     icon: 'terms',
     isPublic: true,
@@ -410,7 +422,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     id: 'design-system',
     label: 'Design system',
     path: '/design-system',
-    parent: '/rooms',
+    parent: '/about',
     family: 'utility',
     icon: 'design',
     isPublic: false,
@@ -479,8 +491,15 @@ export const LEGACY_ALIASES: readonly {
   },
   {
     from: '/library',
-    to: '/rooms',
-    because: 'Library was the old name for the Rooms hub.',
+    to: '/collections',
+    because: 'Library was the first name for the hub that became Rooms and then Collections.',
+    subtree: false,
+  },
+  {
+    from: '/rooms',
+    to: '/collections',
+    because:
+      'Rooms mixed collections with trust pages and forms. The collections kept the hub; the trust pages and forms hang off About and the footer.',
     subtree: false,
   },
   {
@@ -576,7 +595,7 @@ export function semanticDestinationsInFamily(
  * room is how the last generation of this menu grew an About tab.
  */
 export function primaryAxes(): readonly SemanticDestination[] {
-  return (['explore', 'stories', 'records', 'rooms'] as const).map((axis) => {
+  return (['explore', 'stories', 'records', 'collections'] as const).map((axis) => {
     const found = DESTINATIONS.find((destination) => destination.axis === axis);
     /* istanbul ignore next -- the table above is exhaustive; this is a load-bearing assert. */
     if (!found) throw new Error(`primaryAxes: no destination for axis "${axis}"`);
@@ -610,4 +629,25 @@ export function canonicalPathForLegacy(pathname: string): string | null {
 /** True when a path is a legacy alias rather than a canonical destination. */
 export function isLegacyPath(pathname: string): boolean {
   return canonicalPathForLegacy(pathname) !== null;
+}
+
+/**
+ * Story collections that are their own destination rather than part of Stories, keyed by the
+ * story projection's `collection.id`. A set of uniform entries with a natural order (the
+ * presidents, by term) is browsed, not read start to finish, so its entries live under the
+ * collection's own path. Web routing, the public API's `webPath` and native routing all read this
+ * one table. The slug namespace is shared, so a member has exactly one canonical address.
+ */
+export const STORY_COLLECTION_PATHS: Readonly<Record<string, string>> = Object.freeze({
+  presidents: '/presidents',
+});
+
+/** The base path a story lives under: its collection's own path, or `/stories`. */
+export function storyBasePathFor(collectionId: string | undefined): string {
+  return (collectionId !== undefined && STORY_COLLECTION_PATHS[collectionId]) || '/stories';
+}
+
+/** The one canonical site path for a story or collection entry. */
+export function storyPath(slug: string, collectionId?: string): string {
+  return `${storyBasePathFor(collectionId)}/${slug}`;
 }

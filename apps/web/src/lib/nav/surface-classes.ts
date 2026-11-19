@@ -41,9 +41,10 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/explore', 'door'],
 
   // Reading room — one scrolling, measure-limited column on paper.
-  // `/rooms` is the hub the rest of this list hangs off: it renders cards, not records, but it
-  // is the same measure-limited column on paper, so it is a Reading room and not a fifth class.
-  ['/rooms', 'reading'],
+  // `/collections` is the hub the collections hang off: it renders rows, not records, but it is
+  // the same measure-limited column on paper, so it is a Reading room and not a fifth class.
+  ['/collections', 'reading'],
+  ['/presidents', 'reading'],
   ['/records', 'reading'],
   ['/stories', 'reading'],
   ['/books', 'reading'],
@@ -84,6 +85,7 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // inside the receipt status page, so classifying the directory paths would advertise chrome for
   // URLs that return 404.
   ['/stories/', 'reading'],
+  ['/presidents/', 'reading'],
   ['/lives/', 'reading'],
   ['/place/', 'record'],
   ['/invention/', 'record'],

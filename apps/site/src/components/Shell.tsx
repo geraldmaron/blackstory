@@ -7,7 +7,7 @@ const AXES = [
   { path: '/', label: 'Map' },
   { path: '/stories', label: 'Stories' },
   { path: '/records', label: 'Records' },
-  { path: '/methodology', label: 'Rooms' },
+  { path: '/collections', label: 'Collections' },
 ] as const;
 
 /** Placeholder shell proving the layout pattern; the real header and tab bar land with repo-8vkuz. */

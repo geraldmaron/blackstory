@@ -12,6 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { uninvertFiledName } from './lib/uninvert-leading-article.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -95,7 +96,7 @@ const RELISTING_PAREN =
 const RELISTING_BARE =
   /\s+(?:boundary\s+(?:increase|decrease|expansion)(?:\s+and\s+additional\s+documentation)?|and\s+additional\s+documentation|additional\s+documentation)\s*$/iu;
 
-export function baseListingName(name: string): string {
+function withoutRelistingSuffix(name: string): string {
   return name
     .replace(RELISTING_PAREN, ' ')
     .replace(RELISTING_BARE, '')
@@ -103,17 +104,28 @@ export function baseListingName(name: string): string {
     .trim();
 }
 
-export function isRelistingName(name: string): boolean {
-  return baseListingName(name) !== name.trim();
+export function baseListingName(name: string): string {
+  return uninvertFiledName(withoutRelistingSuffix(name));
 }
 
+export function isRelistingName(name: string): boolean {
+  return withoutRelistingSuffix(name) !== name.trim();
+}
+
+/**
+ * Word order is dropped: the Register files "Evers, Medgar, House" and stored records may carry
+ * either that or "Medgar Evers House"; both must match or a re-run stages duplicates.
+ */
 export function normalizeNameForDiff(name: string): string {
   return name
     .toLowerCase()
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/gu, '')
+    .replace(/[\u0300-\u036f]/gu, '')
     .replace(/[^a-z0-9]+/gu, ' ')
-    .trim();
+    .trim()
+    .split(' ')
+    .sort()
+    .join(' ');
 }
 
 function titleCase(word: string): string {

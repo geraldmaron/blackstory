@@ -1,19 +1,17 @@
 /**
- * `/` is the Door Immersive Journey: scroll chapters zoom the national pin field.
+ * `/` is the Door: the national map uncovered and a column beside it that leads with one real
+ * record, shown the way its record page shows it (name, plate with credit, one claim with its
+ * source and grade), while the map points at the same record. The walk is the decade histogram:
+ * decade by decade it fills the map and brings up one record from that decade.
  *
- * Chapter order, rotating facts, and the evidence spotlight are rolled once per request
- * (same pickers as Explore StoryMode) so visits vary without loading MapLibre. Pins with
- * public hrefs are clickable. Browse morphs in place onto the same plate (filters / rail);
- * `/explore` is the same Door already armed (deep link / share / cold load).
+ * The records are rolled once per request so visits vary without loading MapLibre. Pins with public hrefs are clickable. Browse morphs in place onto the
+ * same plate; `/explore` is the same Door already armed (deep link / share / cold load).
  */
 import React from 'react';
 import { loadDoorPinPlate } from '../lib/map-experience/door-catalog';
 import { resolveDoorFocusPinId } from '../lib/map-experience/first-paint-pins';
-import { KIND_FAMILY_ENTRIES, kindFamilyFor } from '../lib/map-experience/kind-encoding';
 import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
 import { loadRecordsCatalog } from '../lib/records/records-catalog';
-import { pickStoryChapters } from '../lib/story/pick-story-chapters';
-import { pickStoryRecord } from '../lib/story/pick-story-record';
 import { redirect } from 'next/navigation';
 import { buildExploreHref, parseExploreSearchParams } from '../lib/map-experience/url-state';
 import { resolveStoryCollectionSource } from '../lib/stories/source';
@@ -26,9 +24,25 @@ import {
   type CollectionDescriptor,
 } from '../lib/discovery/story-collection';
 import { buildAtlasShell } from './explore/explore-view-model';
-import { DoorImmersive, type DoorOpenLedgerRow } from './door-immersive';
+import { DoorImmersive } from './door-immersive';
+import { DoorChapters } from './door-chapters';
+import { loadRecordsIndex, recordsQueryCacheKey } from './records/load-records-index';
+import { listPublicStoryListItems } from '../lib/stories/source';
+import { buildStoriesFront } from './stories/stories-index';
 import { DoorNoscript } from './door-noscript';
+import {
+  decadeBars,
+  decadeCaption,
+  doorRecords,
+  pickDecadeStops,
+  pickDoorOpening,
+  pickDoorOpeningCandidates,
+  type DoorJourneyRecord,
+  type DoorRecord,
+} from './door-decade-walk';
+import { pickTourRecords } from './door-tour';
 import './door-home.css';
+import './door-tour.css';
 import './explore/explore.css';
 
 void React;
@@ -36,25 +50,8 @@ void React;
 /** Bound both fallback markup and the client-boundary payload; the full index is at /records. */
 const NOSCRIPT_ROW_CAP = 20;
 
-/** Kind-family census for the opening masthead, stable order from KIND_FAMILY_ENTRIES. */
-function buildOpenLedger(
-  features: ReadonlyArray<{
-    readonly properties: { readonly kind: string; readonly kindFamily?: string };
-  }>,
-): DoorOpenLedgerRow[] {
-  const counts = new Map<string, number>();
-  for (const feature of features) {
-    const family =
-      feature.properties.kindFamily && feature.properties.kindFamily.length > 0
-        ? feature.properties.kindFamily
-        : kindFamilyFor(feature.properties.kind);
-    counts.set(family, (counts.get(family) ?? 0) + 1);
-  }
-  return KIND_FAMILY_ENTRIES.flatMap(([family, entry]) => {
-    const count = counts.get(family) ?? 0;
-    return count > 0 ? [{ family, label: entry.label, count }] : [];
-  });
-}
+/** How many records "Another record" can cycle through; each rides in the client payload. */
+const OPENING_CHOICES = 8;
 
 export type DoorHomeProps = {
   /** Deep-link / share filters (`?state=DC`, etc.). Empty on the journey `/`. */
@@ -100,24 +97,11 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
     collectionCatalog,
     collection,
   );
-  const placeCount = pins.features.length.toLocaleString('en-US');
-  const openLedger = buildOpenLedger(features);
 
-  const orderRoll = Math.random();
-  const recordRoll = Math.random();
-  const { chapters, factByChapterId } = pickStoryChapters(orderRoll);
-  const spotlight = pickStoryRecord(features, recordRoll);
-  const spotlightFeature = spotlight
-    ? features.find((feature) => feature.properties.entityId === spotlight.entityId)
-    : undefined;
-  const spotlightLngLat = spotlightFeature
-    ? ([
-        spotlightFeature.geometry.coordinates[0],
-        spotlightFeature.geometry.coordinates[1],
-      ] as const)
-    : null;
-  const spotlightPinId = resolveDoorFocusPinId(spotlight?.entityId ?? null, features);
-
+  // One roll per visit: which record the opening leads with and which record each decade shows.
+  // A record shown here is never a quiet one (door-decade-walk.ts).
+  const roll = Math.random();
+  const journey = initialBrowse ? null : await loadDoorJourney(features, entities, pins, roll);
   const noscriptView = initialBrowse
     ? { ...shell, filteredFeatures: noscriptFeatures.slice(0, NOSCRIPT_ROW_CAP) }
     : null;
@@ -132,15 +116,69 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
         pins={pins}
         densityLevels={densityLevels}
         browseShell={shell}
-        chapters={chapters}
-        factByChapterId={factByChapterId}
-        spotlight={spotlight}
-        spotlightLngLat={spotlightLngLat}
-        spotlightPinId={spotlightPinId}
-        placeCount={placeCount}
-        openLedger={openLedger}
+        opening={journey?.opening ?? null}
+        openingChoices={journey?.openingChoices ?? []}
+        story={journey?.story ?? null}
+        stops={journey?.stops ?? []}
+        bars={journey?.bars ?? []}
+        barsCaption={journey?.barsCaption ?? ''}
         initialBrowse={initialBrowse}
       />
+      {journey ? (
+        <DoorChapters lead={journey.lead} grades={journey.grades} tour={journey.tour} />
+      ) : null}
     </main>
   );
+}
+
+/**
+ * The journey under the opening: the record it leads with, one record per decade for the walk,
+ * the register's decade histogram and grades, and the lead story. Every count comes from the
+ * same records index `/records` builds, so the Door and the register cannot disagree.
+ */
+async function loadDoorJourney(
+  features: Parameters<typeof doorRecords>[0],
+  entities: Parameters<typeof doorRecords>[1],
+  pins: {
+    readonly features: readonly {
+      readonly properties: { readonly entityId: string; readonly href: string };
+    }[];
+  },
+  roll: number,
+) {
+  const [{ model }, stories] = await Promise.all([
+    loadRecordsIndex(recordsQueryCacheKey({})),
+    listPublicStoryListItems().catch(() => ({ items: [] as const })),
+  ]);
+  const records = doorRecords(features, entities);
+  // The plate's pins are opaque `pin-N` ids on the client (the catalog stays off `/`); each record
+  // rides with its pin id in place of its catalog id, and the pin's own public href.
+  const hrefByPin = new Map(
+    pins.features.map((pin) => [pin.properties.entityId, pin.properties.href] as const),
+  );
+  const withPin = ({ entityId, ...record }: DoorRecord): DoorJourneyRecord => {
+    const pinId = resolveDoorFocusPinId(entityId, features);
+    const href = (pinId ? hrefByPin.get(pinId) : undefined) || record.href;
+    return { ...record, href, pinId };
+  };
+  const opening = pickDoorOpening(records, roll);
+  const openingChoices = pickDoorOpeningCandidates(records, roll, OPENING_CHOICES);
+  const lead = stories.items.length > 0 ? buildStoriesFront(stories.items).lead : undefined;
+  // The tour never repeats the front door's records or the lead story's subject.
+  const tour = pickTourRecords(records, {
+    excludeIds: new Set(openingChoices.map((choice) => choice.entityId)),
+    ...(lead ? { leadStoryText: `${lead.title} ${lead.summary}` } : {}),
+  });
+  const bars = decadeBars(model.facets.era);
+  return {
+    opening: opening ? withPin(opening) : null,
+    openingChoices: openingChoices.map(withPin),
+    tour: tour.map(withPin),
+    story: lead ? { title: lead.title, slug: lead.slug } : null,
+    stops: pickDecadeStops(records, roll).map(withPin),
+    bars,
+    barsCaption: decadeCaption(bars),
+    lead,
+    grades: model.facets.evidence,
+  };
 }

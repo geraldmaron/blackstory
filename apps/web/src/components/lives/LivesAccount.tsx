@@ -77,7 +77,7 @@ export function LivesAccount({ beat }: { readonly beat: LivesWorldBeat }) {
         </div>
       ) : null}
       {beat.citations.length > 0 ? (
-        <ul className="lives-milestone__sources" aria-label="Sources for this account">
+        <ul className="lives-sources" aria-label="Sources for this account">
           {beat.citations.map((source) => (
             <li key={`${source.url}|${source.label}`}>
               <a href={source.url} rel="noopener noreferrer">

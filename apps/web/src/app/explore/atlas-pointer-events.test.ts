@@ -32,12 +32,9 @@ describe('Explore pointer-events', () => {
   it('re-enables hits only on interactive instrument surfaces', () => {
     for (const selector of [
       '.ds-bar',
-      '.ds-lens',
-      '.ds-results',
-      '.ds-sheet',
-      '.ds-time-panel',
-      '.ds-camera',
-      '.ds-atlas__dock',
+      '.ds-xcol',
+      '.ds-xdock',
+      '.ds-map-controls',
       '.ds-palette',
       '.ds-shortcuts',
       '.ds-saved',
@@ -61,7 +58,7 @@ describe('Explore pointer-events', () => {
       assert.match(
         atlasCss,
         new RegExp(
-          `\\.ds-atlas\\s*>\\s*${selector.replace(/\./g, '\\.')}[\\s\\S]*?pointer-events:\\s*none`,
+          `\\.ds-atlas\\s*>\\s*${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?pointer-events:\\s*none`,
         ),
         `missing pass-through for ${selector}`,
       );

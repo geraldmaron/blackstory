@@ -1,23 +1,17 @@
 /**
- * Public law reference browse surface at `/law`.
+ * `/law`: the statutes, amendments and court decisions as a chronology.
  */
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import React from 'react';
+import { DisplayNumeral, PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { WalkOffRamp } from '../walk-off-ramp';
-import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
-import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from './law-view-model';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
+import { parentCrumb, Room } from '../../components/room';
+import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from './law-view-model';
 import { LawBrowseSections } from './LawBrowseSections';
-import { humanizeLegalKind, humanizeLegalTopic } from '../../components/legal';
-import {
-  DocumentPlate,
-  OrientationInstrument,
-  ReadingEntry,
-  Room,
-  RoomStats,
-} from '../../components/room';
 import '../reading-room.css';
+import './law.css';
 
 void React;
 
@@ -29,7 +23,7 @@ export async function generateMetadata({ searchParams }: LawPageProps): Promise<
   const view = buildLawBrowseViewModel(await searchParams, await loadLegalCatalog());
   return {
     ...buildStaticPageMetadata({
-      path: lawBrowseHref({ ...view, page: String(view.page) }),
+      path: lawBrowseHref(view),
       title: 'Law',
       description:
         'Plain-language statutes, regulations, and court decisions that shaped what could be built, owned, attended and voted for.',
@@ -40,96 +34,45 @@ export async function generateMetadata({ searchParams }: LawPageProps): Promise<
   };
 }
 
+/** "12 laws, 1865 to 2023": the one count on the page, and the span the chronology covers. */
+function dek(view: ReturnType<typeof buildLawBrowseViewModel>): string | undefined {
+  if (view.totalAvailable === 0) return undefined;
+  const count = view.isFiltered
+    ? `${view.totalMatched.toLocaleString('en-US')} of ${view.totalAvailable.toLocaleString('en-US')} laws`
+    : `${view.totalAvailable.toLocaleString('en-US')} ${view.totalAvailable === 1 ? 'law' : 'laws'}`;
+  const years = view.items.flatMap((item) => (item.effectiveYear ? [item.effectiveYear] : []));
+  if (years.length < 2) return count;
+  const first = Math.min(...years);
+  const last = Math.max(...years);
+  return first === last ? `${count}, ${first}` : `${count}, ${first} to ${last}`;
+}
+
 export default async function LawPage({ searchParams }: LawPageProps) {
-  const params = await searchParams;
   const source = await loadLegalCatalog();
-  const catalog = source.snapshots;
-  const view = buildLawBrowseViewModel(params, source);
-
-  const kindCounts = new Map<string, number>();
-  for (const snapshot of catalog) {
-    kindCounts.set(snapshot.kind, (kindCounts.get(snapshot.kind) ?? 0) + 1);
-  }
-  const stats = [
-    { value: catalog.length, label: catalog.length === 1 ? 'law entry' : 'law entries' },
-    ...[...kindCounts.entries()]
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3)
-      .map(([kind, count]) => ({
-        value: count,
-        label: `${humanizeLegalKind(kind).toLowerCase()}${count === 1 ? '' : 's'}`,
-      })),
-  ];
-
-  /*
-   * The plate sets words the catalog already quotes: the earliest entry whose plain-language
-   * summary carries the operative text in quotation marks. Nothing is written for the plate, and
-   * with no quoted entry there is no plate.
-   */
-  const plateSource = [...catalog]
-    .sort((a, b) => (a.effectiveYear ?? 9999) - (b.effectiveYear ?? 9999))
-    .flatMap((snapshot) => {
-      const said = source.explainerFor(snapshot.id)?.whatItSays ?? '';
-      const quote = /["“]([^"”]{80,})["”]/.exec(said)?.[1];
-      return quote === undefined
-        ? []
-        : [{ quote, citation: snapshot.citation.canonicalCitation, slug: snapshot.slug }];
-    })[0];
-
-  const topicCounts = new Map<string, number>();
-  for (const snapshot of catalog) {
-    for (const topic of snapshot.topics) {
-      topicCounts.set(topic, (topicCounts.get(topic) ?? 0) + 1);
-    }
-  }
-  const topTopics = [...topicCounts.entries()]
-    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
-    .slice(0, 2)
-    .map(([topic, count]) => ({
-      label: humanizeLegalTopic(topic),
-      href: `/law?topic=${encodeURIComponent(topic)}#browse`,
-      note: `${count.toLocaleString('en-US')} entries`,
-      icon: 'law' as const,
-    }));
-
-  const rail = (
-    <OrientationInstrument
-      where="Statutes and rulings, in plain language"
-      moves={[
-        ...topTopics,
-        { label: 'How this catalog is built', href: '/methodology', icon: 'methodology' as const },
-      ].slice(0, 3)}
-    />
-  );
+  const view = buildLawBrowseViewModel(await searchParams, source);
 
   return (
-    <Room ledger rail={rail}>
-      <ReadingEntry
-        pathname="/law"
-        title={
-          <>
-            What the law actually <em>said</em>.
-          </>
-        }
-        lede={LAW_EDITION_BROWSE_LEDE}
-        plate={
-          plateSource === undefined ? undefined : (
-            <DocumentPlate
-              label="Operative text"
-              quote={plateSource.quote}
-              citation={plateSource.citation}
-              href={`/law/${plateSource.slug}`}
-            />
-          )
-        }
+    <Room width="wide" className="ds-law">
+      {/* The count beside the title as a giant numeral; the dek states it in words, so the
+          numeral is not read twice. */}
+      <PageHeader
+        display
+        className="ds-law-head"
+        crumb={parentCrumb('/law')}
+        linkAs={Link}
+        title="Law"
+        dek={dek(view)}
+        {...(view.totalMatched > 0
+          ? {
+              actions: (
+                <DisplayNumeral decorative className="ds-law-head__count">
+                  {view.totalMatched.toLocaleString('en-US')}
+                </DisplayNumeral>
+              ),
+            }
+          : {})}
       />
-      <RoomStats label="The catalog at a glance" stats={stats} />
-
-      <LawBrowseSections view={view} catalog={catalog} />
-
-      <WalkOffRamp>
-        This catalog is jurisdictional. It does not invent a documented join to a record.
-      </WalkOffRamp>
+      <LawBrowseSections view={view} catalog={source.snapshots} />
     </Room>
   );
 }

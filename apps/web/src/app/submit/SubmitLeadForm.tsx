@@ -1,52 +1,68 @@
 'use client';
 
 /**
- * The public "submit a lead" form. Posts to `./api/route.ts`, which is the only place
- * this lane ever writes into quarantine, create-only. Nothing submitted here is ever
- * public: it enters a moderated queue and only advances via independent-reviewer consensus
- * (`packages/domain/src/consensus-review/`) and, after that, the standard research
- * pipeline.
+ * The public "submit a lead" form. Posts to `./api/route.ts`, which is the only place this lane
+ * ever writes into quarantine, create-only. Nothing submitted here is ever public: it enters a
+ * moderated queue and only advances via independent-reviewer consensus
+ * (`packages/domain/src/consensus-review/`) and, after that, the standard research pipeline.
+ *
+ * Checked as the reader goes (`lead-form.ts`); the server still decides. On success the form is
+ * replaced by the receipt; on failure everything typed stays in place.
  */
-import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import { Button, Notice } from '@repo/ui';
+import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { Button, buttonClassName } from '@repo/ui';
 import { Field, fieldControlProps } from '../../components/room';
+import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
+import { useFieldErrors } from '../../components/forms/use-field-errors';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+import { leadIssueField, validateLeadForm } from './lead-form';
+
+void React;
+
+const LEAD_FIELDS = new Set(['url', 'description', 'whyItMatters', 'location', 'era', 'contact']);
 
 type SubmitState =
   | { readonly status: 'idle' }
   | { readonly status: 'submitting' }
-  | { readonly status: 'success'; readonly submissionId: string }
-  | {
-      readonly status: 'error';
-      readonly message: string;
-      readonly fieldIssues?: readonly { field: string; message: string }[];
-    };
+  | { readonly status: 'success'; readonly submissionId: string | undefined }
+  | { readonly status: 'failed'; readonly title: string; readonly detail: string };
 
-const DEFAULT_ERROR_MESSAGE =
-  'Something went wrong submitting this lead. Please try again in a moment.';
-
-export function SubmitLeadForm() {
+export function SubmitLeadForm({ contact }: { readonly contact: string }) {
   const [state, setState] = useState<SubmitState>({ status: 'idle' });
-  const urlId = useId();
-  const descriptionId = useId();
-  const whyId = useId();
-  const locationId = useId();
-  const eraId = useId();
-  const attestationId = useId();
-  const contactId = useId();
+  const fields = useFieldErrors(validateLeadForm);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const doneRef = useRef<HTMLDivElement | null>(null);
+  const failureRef = useRef<HTMLDivElement | null>(null);
+  const id = useId();
+  const ids = {
+    url: `${id}-url`,
+    description: `${id}-description`,
+    why: `${id}-why`,
+    location: `${id}-location`,
+    era: `${id}-era`,
+    contact: `${id}-contact`,
+    attestation: `${id}-attestation`,
+  };
+
+  useEffect(() => {
+    if (state.status === 'success') doneRef.current?.focus();
+    if (state.status === 'failed') failureRef.current?.focus();
+  }, [state.status]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
+    if (!fields.validateAll(form)) return;
     const data = new FormData(form);
+    const text = (name: string) => String(data.get(name) ?? '').trim();
     const payload = {
-      url: String(data.get('url') ?? '').trim() || undefined,
-      description: String(data.get('description') ?? '').trim() || undefined,
-      whyItMatters: String(data.get('whyItMatters') ?? '').trim(),
-      location: String(data.get('location') ?? '').trim() || undefined,
-      era: String(data.get('era') ?? '').trim() || undefined,
+      url: text('url') || undefined,
+      description: text('description') || undefined,
+      whyItMatters: text('whyItMatters'),
+      location: text('location') || undefined,
+      era: text('era') || undefined,
       attestation: data.get('attestation') === 'on',
-      contact: String(data.get('contact') ?? '').trim() || undefined,
+      contact: text('contact') || undefined,
     };
 
     setState({ status: 'submitting' });
@@ -64,187 +80,218 @@ export function SubmitLeadForm() {
         const submissionId =
           body && typeof body === 'object' && 'submissionId' in body
             ? String((body as { submissionId: unknown }).submissionId)
-            : 'unknown';
+            : undefined;
         setState({ status: 'success', submissionId });
-        form.reset();
         return;
       }
-
       if (response.status === 429) {
         setState({
-          status: 'error',
-          message: 'Too many submissions from this connection. Please try again shortly.',
+          status: 'failed',
+          title: 'Too many leads from this connection just now.',
+          detail: 'Wait a few minutes, then send it again. Nothing you typed has been lost.',
         });
         return;
       }
-
       if (response.status === 400 && body && typeof body === 'object' && 'issues' in body) {
-        const issues = (body as { issues?: readonly { field: string; message: string }[] }).issues;
-        setState({
-          status: 'error',
-          message: 'Please fix the highlighted fields and resubmit.',
-          ...(issues ? { fieldIssues: issues } : {}),
-        });
+        const issues = (
+          (body as { issues?: readonly { field: string; message: string }[] }).issues ?? []
+        ).map((issue) => ({ ...issue, field: leadIssueField(issue.field) }));
+        const onFields = issues.filter((issue) => LEAD_FIELDS.has(issue.field));
+        const elsewhere = issues.filter((issue) => !LEAD_FIELDS.has(issue.field));
+        fields.showIssues(formRef.current, onFields);
+        setState(
+          elsewhere.length === 0
+            ? { status: 'idle' }
+            : {
+                status: 'failed',
+                title: 'The lead was not accepted.',
+                detail: elsewhere.map((issue) => issue.message).join(' '),
+              },
+        );
         return;
       }
-
-      setState({ status: 'error', message: DEFAULT_ERROR_MESSAGE });
+      throw new Error(`lead intake answered ${response.status}`);
     } catch {
-      setState({ status: 'error', message: DEFAULT_ERROR_MESSAGE });
+      setState({
+        status: 'failed',
+        title: 'The lead was not sent.',
+        detail: `Nothing you typed has been lost. Try again in a moment, or email it to ${contact}.`,
+      });
     }
   }
 
-  const successRef = useRef<HTMLDivElement | null>(null);
-  const formRef = useRef<HTMLFormElement | null>(null);
-  useEffect(() => {
-    if (state.status === 'success') {
-      successRef.current?.focus();
-      return;
-    }
-    if (state.status !== 'error') return;
-    /* Submit-wide: only the form knows which field failed first in reading order. */
-    formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
-  }, [state]);
+  function another() {
+    fields.reset();
+    setState({ status: 'idle' });
+  }
 
   if (state.status === 'success') {
     return (
-      /*
-       * Success, not a warning: `tone="warning"` announced this as an alert and coloured a
-       * receipt like a problem. The panel also replaces the whole form, so focus moves to it
-       * for the same reason the correction receipt does.
-       */
-      <div ref={successRef} tabIndex={-1}>
-        <Notice tone="success" title="Lead received">
-          Thank you. This lead (reference <code>{state.submissionId}</code>) has entered a review
-          queue. It&apos;s not public, and it seeds research only if I judge it worth pursuing.
-          Nobody but the people doing that review sees what you sent.
-        </Notice>
+      <div className="ds-form-done" ref={doneRef} tabIndex={-1}>
+        <h2 className="ds-form-done__title">Lead received.</h2>
+        <p className="ds-form-done__body">
+          It is in the review queue, not on the site. If it is worth pursuing it becomes a private
+          research candidate, and nothing about it is published until it clears the same checks as
+          every record.
+        </p>
+        {state.submissionId ? (
+          <p className="ds-form-done__ref">
+            Reference
+            <code>{state.submissionId}</code>
+          </p>
+        ) : null}
+        <div className="ds-form-done__actions">
+          <Button variant="secondary" onClick={another}>
+            Send another lead
+          </Button>
+          <a className={buttonClassName('quiet')} href="/records">
+            Browse the records
+          </a>
+        </div>
       </div>
     );
   }
 
-  const fieldIssue = (field: string) =>
-    state.status === 'error'
-      ? state.fieldIssues?.find((issue) => issue.field === field)
-      : undefined;
+  const error = (name: string) => fields.errors[name];
+  const errorProps = (name: string) => (error(name) ? { error: error(name) } : {});
 
   return (
-    <form className="ds-stack" onSubmit={handleSubmit} ref={formRef} noValidate>
-      {state.status === 'error' && !state.fieldIssues ? (
-        <Notice tone="error" title="Submission failed">
-          {state.message}
-        </Notice>
-      ) : null}
-      {state.status === 'error' && state.fieldIssues ? (
-        <Notice tone="error" title="Check the following">
-          <ul>
-            {state.fieldIssues.map((issue) => (
-              <li key={issue.field}>{issue.message}</li>
-            ))}
-          </ul>
-        </Notice>
-      ) : null}
+    <form
+      className="ds-form"
+      onSubmit={handleSubmit}
+      onBlur={fields.onBlur}
+      onChange={fields.onChange}
+      ref={formRef}
+      noValidate
+      aria-busy={state.status === 'submitting' || undefined}
+    >
+      <RequiredNote />
 
-      <Field
-        label="Link (article, archived post, group page, or anywhere this lives online)"
-        htmlFor={urlId}
-        {...(fieldIssue('url') ? { error: fieldIssue('url')!.message } : {})}
-      >
-        <input
-          {...fieldControlProps({ htmlFor: urlId, error: fieldIssue('url') })}
-          name="url"
-          type="url"
-          placeholder="https://…"
-        />
-      </Field>
-
-      <Field
-        label="Description (for something you know firsthand, or anything with no single link)"
-        htmlFor={descriptionId}
-        {...(fieldIssue('description') ? { error: fieldIssue('description')!.message } : {})}
-      >
-        <textarea
-          {...fieldControlProps({ htmlFor: descriptionId, error: fieldIssue('description') })}
-          name="description"
-          rows={4}
-          placeholder="What is this lead? Where does it come from?"
-        />
-      </Field>
-
-      <Field
-        label={
-          <>
-            Why it matters <span aria-hidden="true">*</span>
-            <span className="ds-visually-hidden">required</span>
-          </>
-        }
-        htmlFor={whyId}
-        {...(fieldIssue('whyItMatters') ? { error: fieldIssue('whyItMatters')!.message } : {})}
-      >
-        <textarea
-          {...fieldControlProps({ htmlFor: whyId, error: fieldIssue('whyItMatters') })}
-          name="whyItMatters"
-          rows={3}
-          required
-          minLength={10}
-          placeholder="Why should this be researched? What would it help document?"
-        />
-      </Field>
-
-      <div className="ds-room-field-pair">
+      <fieldset className="ds-form-group">
+        <legend>The lead</legend>
         <Field
-          label="Location (optional)"
-          htmlFor={locationId}
-          {...(fieldIssue('location') ? { error: fieldIssue('location')!.message } : {})}
+          label={
+            <>
+              Link
+              <RequiredMark />
+            </>
+          }
+          htmlFor={ids.url}
+          hint="Where this lives online, such as an article, an archived post or a group page."
+          {...errorProps('url')}
         >
           <input
-            {...fieldControlProps({ htmlFor: locationId, error: fieldIssue('location') })}
+            {...fieldControlProps({ htmlFor: ids.url, hint: true, error: error('url') })}
+            name="url"
+            type="url"
+            inputMode="url"
+            autoComplete="url"
+            required
+            placeholder="https://"
+          />
+        </Field>
+
+        <Field
+          label="What you know"
+          htmlFor={ids.description}
+          hint="Plain language is fine. Say where it comes from."
+          {...errorProps('description')}
+        >
+          <textarea
+            {...fieldControlProps({
+              htmlFor: ids.description,
+              hint: true,
+              error: error('description'),
+            })}
+            name="description"
+            rows={4}
+          />
+        </Field>
+
+        <Field
+          label={
+            <>
+              Why it matters
+              <RequiredMark />
+            </>
+          }
+          htmlFor={ids.why}
+          hint="What would it help document?"
+          {...errorProps('whyItMatters')}
+        >
+          <textarea
+            {...fieldControlProps({ htmlFor: ids.why, hint: true, error: error('whyItMatters') })}
+            name="whyItMatters"
+            rows={3}
+            required
+            minLength={10}
+          />
+        </Field>
+
+        <Field
+          label="Where"
+          htmlFor={ids.location}
+          hint="A town, county or state, if you know it."
+          {...errorProps('location')}
+        >
+          <input
+            {...fieldControlProps({ htmlFor: ids.location, hint: true, error: error('location') })}
             name="location"
             type="text"
           />
         </Field>
+
         <Field
-          label="Era (optional)"
-          htmlFor={eraId}
-          {...(fieldIssue('era') ? { error: fieldIssue('era')!.message } : {})}
+          label="When"
+          htmlFor={ids.era}
+          hint="A year or a decade is enough."
+          {...errorProps('era')}
         >
           <input
-            {...fieldControlProps({ htmlFor: eraId, error: fieldIssue('era') })}
+            {...fieldControlProps({ htmlFor: ids.era, hint: true, error: error('era') })}
             name="era"
             type="text"
           />
         </Field>
-      </div>
+      </fieldset>
 
-      <Field
-        label="Contact (optional, reaches the reviewers only, never shown publicly)"
-        htmlFor={contactId}
-        {...(fieldIssue('contact') ? { error: fieldIssue('contact')!.message } : {})}
-      >
-        <input
-          {...fieldControlProps({ htmlFor: contactId, error: fieldIssue('contact') })}
-          name="contact"
-          type="email"
-        />
-      </Field>
-
-      <div className="ds-row" style={{ alignItems: 'flex-start' }}>
-        <input id={attestationId} name="attestation" type="checkbox" />
-        <label
-          htmlFor={attestationId}
-          className="ds-sans"
-          style={{ marginLeft: 'var(--ds-space-2)' }}
+      <fieldset className="ds-form-group">
+        <legend>About you</legend>
+        <Field
+          label="Email"
+          htmlFor={ids.contact}
+          hint="Only for a question about this lead. Never shown publicly."
+          {...errorProps('contact')}
         >
-          I believe this information is accurate to the best of my knowledge (optional attestation;
-          leads are reviewed either way).
-        </label>
-      </div>
+          <input
+            {...fieldControlProps({ htmlFor: ids.contact, hint: true, error: error('contact') })}
+            name="contact"
+            type="email"
+            autoComplete="email"
+          />
+        </Field>
 
-      <div>
-        <Button type="submit" disabled={state.status === 'submitting'}>
-          {state.status === 'submitting' ? 'Submitting…' : 'Submit lead'}
-        </Button>
-      </div>
+        <div className="ds-form-check">
+          <input id={ids.attestation} name="attestation" type="checkbox" />
+          <label htmlFor={ids.attestation}>
+            I believe this is accurate to the best of my knowledge.
+            <small>Optional. Every lead is reviewed either way.</small>
+          </label>
+        </div>
+      </fieldset>
+
+      {state.status === 'failed' ? (
+        <div ref={failureRef} tabIndex={-1}>
+          <FormFailure title={state.title}>{state.detail}</FormFailure>
+        </div>
+      ) : null}
+
+      <SubmitRow
+        pending={state.status === 'submitting'}
+        label="Send the lead"
+        pendingLabel="Sending"
+        note="Nothing you send is published as sent."
+      />
     </form>
   );
 }

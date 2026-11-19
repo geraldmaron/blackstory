@@ -618,7 +618,7 @@
   min-width: 200px;
   height: var(--adm-h);
   padding: 0 10px;
-  border: 1px solid var(--ds-border);
+  border: 1px solid var(--ds-border-control);
   border-radius: var(--adm-radius);
   background: var(--ds-canvas);
   color: var(--ds-ink-subtle);
@@ -654,7 +654,7 @@
 .admin-base-controls input[type='date'] {
   height: var(--adm-h);
   padding: 0 8px;
-  border: 1px solid var(--ds-border);
+  border: 1px solid var(--ds-border-control);
   border-radius: var(--adm-radius);
   background: var(--ds-canvas);
   color: var(--ds-ink);

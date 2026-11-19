@@ -1,33 +1,20 @@
 /**
- * `/stories/[slug]` — one published Story.
- *
- * The slug is validated against the catalog before any lookup happens, so an unknown slug
- * redirects to Explore rather than reaching a lookup with an unvalidated string
- * (`docs/mobile/security/threat-model.md` T4, deep-link injection — the same convention
- * `entity/[id].tsx` follows).
- *
- * There is no `[section]` segment any more. The address used to be
- * `/learn/{history|topics|myths}/{slug}`, which put the editorial partition in the URL and made
- * three parallel content trees out of one publication surface.
+ * `/stories/[slug]`: one published story, from the live story read. A collection entry asked for
+ * here (a president, say) is sent to its own address, the same rule the site follows. The slug is
+ * checked against the slug grammar before any request (threat model T4, deep-link injection).
  */
 import { Redirect, useLocalSearchParams } from 'expo-router';
-
-import { ContentPageScreen, parseSectionParam, parseSlugParam } from '@/features/content';
+import { StoryScreen } from '@/features/stories';
+import { parseStorySlugParam } from '@/features/stories/story-params';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 
 export default function StoryPageScreen() {
   const { slug } = useLocalSearchParams<{ slug?: string | string[] }>();
-  const row = parseSectionParam('stories');
-  const safeSlug = row ? parseSlugParam(slug, row) : undefined;
-
+  const safeSlug = parseStorySlugParam(slug);
   useEditionStackBack({
     fallbackHref: '/stories',
     accessibilityHint: 'Returns to Stories when there is no previous screen',
   });
-
-  if (!row || !safeSlug) {
-    return <Redirect href="/explore" />;
-  }
-
-  return <ContentPageScreen section="stories" slug={safeSlug} />;
+  if (!safeSlug) return <Redirect href="/stories" />;
+  return <StoryScreen slug={safeSlug} base="/stories" />;
 }

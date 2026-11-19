@@ -1,0 +1,206 @@
+/*
+ * One claims language wherever a claim is shown (EvidenceList.tsx): the record page's sources
+ * beat and the home page's opening and decade walk. A copper numeral, the statement in the
+ * editorial serif, its source as a link, then the grade as a glyph and a word.
+ */
+.ds-evidence {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: evidence;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-evidence__item {
+  position: relative;
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-6) 0 var(--ds-space-6) var(--ds-space-18);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  counter-increment: evidence;
+  scroll-margin-top: calc(56px + var(--ds-space-6));
+}
+
+/* Each statement's number in a large copper numeral (3.5:1 at this size on paper). */
+.ds-evidence__item::before {
+  content: counter(evidence);
+  position: absolute;
+  top: var(--ds-space-4);
+  left: 0;
+  width: var(--ds-space-12);
+  color: var(--ds-numeral-accent);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: var(--ds-weight-numeral);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-align: right;
+  font-variant-numeric: lining-nums;
+}
+
+.ds-evidence__item:target {
+  background: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
+}
+
+.ds-evidence__statement {
+  margin: 0;
+  max-width: 62ch;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-subtitle); /* 1.0625rem, same as .ds-recpage__prose */
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.ds-evidence__source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+}
+
+.ds-evidence__publisher {
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence__title {
+  color: var(--ds-ink);
+  font-weight: 500;
+}
+
+/* A source link is one line of type; padding paid back in margin makes it a 44px target without
+   moving the row. */
+a.ds-evidence__title,
+.ds-evidence__archive {
+  display: inline-block;
+  margin-block: calc(var(--ds-space-3) * -1);
+  padding-block: var(--ds-space-3);
+}
+
+.ds-evidence__archive {
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence__date,
+.ds-evidence__note {
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-evidence__date {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-grade-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+.ds-evidence__flag {
+  max-width: 62ch;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-dispute-bg);
+  color: var(--ds-dispute-fg);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+}
+
+.ds-evidence__flag--retracted {
+  background: var(--ds-error-bg);
+  color: var(--ds-error-fg);
+}
+
+.ds-evidence__alternates {
+  margin: var(--ds-space-2) 0 0;
+  padding-left: var(--ds-space-4);
+}
+
+/* A source link is not running prose: ink with a 1px control underline, copper only on hover. */
+a.ds-evidence__title,
+.ds-evidence__archive {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a.ds-evidence__title:hover,
+.ds-evidence__archive:hover {
+  color: var(--ds-accent);
+  text-decoration-color: currentColor;
+}
+
+/* The glyph carries the tier's hue; the word carries the meaning. */
+.ds-grade-tag__glyph {
+  color: var(--grade-hue, var(--ds-ink-muted));
+}
+
+.ds-grade-tag--high {
+  --grade-hue: var(--ds-confidence-high-fg);
+}
+
+.ds-grade-tag--medium {
+  --grade-hue: var(--ds-confidence-medium-fg);
+}
+
+.ds-grade-tag--low {
+  --grade-hue: var(--ds-confidence-low-fg);
+}
+
+/* —— the grade as a meter: three rising bars, filled to the grade, then the word ————————————— */
+.ds-grade-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--grade-hue, var(--ds-ink-muted));
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.ds-grade-meter__bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 1rem;
+}
+
+.ds-grade-meter__bar {
+  width: 0.375rem;
+  border-radius: 1.5px;
+  background: var(--ds-rule);
+}
+
+.ds-grade-meter__bar:nth-child(1) {
+  height: 45%;
+}
+
+.ds-grade-meter__bar:nth-child(2) {
+  height: 72%;
+}
+
+.ds-grade-meter__bar:nth-child(3) {
+  height: 100%;
+}
+
+.ds-grade-meter__bar[data-on] {
+  background: currentColor;
+}
+
+.ds-grade-tag--unrated.ds-grade-meter {
+  color: var(--ds-ink-muted);
+  font-weight: 500;
+}

@@ -1,4 +1,4 @@
-# Design system & UI patterns
+| **How it works hub** | [`patterns-registry.md`](./patterns-registry.md) (the `/how-it-works` rows; `patterns-how-it-works.md` was never written) |# Design system & UI patterns
 
 **Start here** for any agent or human shipping public UI. This file is the living pattern index; keep it updated when patterns are added or superseded.
 
@@ -12,6 +12,7 @@ v10 is the authoritative product architecture. It amends the door-tip implementa
 
 | Document | Governs | Status |
 |---|---|---|
+| [`experience-standard.md`](./experience-standard.md) | Pillars, critical user journeys, and the type, spacing, icon, pattern, theme and state rules every public surface follows; source library and policy-page gaps. Checked with `scripts/surface-audit.mjs`. | Binding (2026-11-16) |
 | [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md) | Memorial, evidence honesty, precision, dignity, public access, brand integrity. Overrides aesthetics. | Binding (2026-08-31) |
 | [`design-direction-v10.md`](./design-direction-v10.md) | Product thesis, visual models, surface law, KEEP AS IS, authority order. | Binding (2026-08-31) |
 | [`brand.md`](./brand.md) | Signature, palette, type, dignity law. Where this doc and the brand pack disagree, the pack wins. | Binding |
@@ -51,7 +52,8 @@ Staff intake uses [Admin intake](./patterns-admin-intake.md) for queue navigatio
 |---|---|---|---|
 | **Source library** | [`patterns-source-library.md`](./patterns-source-library.md) | `app/admin/sources/collection-guidance.tsx`, existing `story-review` primitives | Staff collection guidance, separate from publisher usage |
 | **Record anatomy layout** | [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) | `RecordAnatomyPanel`, `record-anatomy.css`, mobile `AnatomySection` | Reusable |
-| **Map entity encoding** | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `MapExperienceLegend.tsx`, `explore-style.ts` | Binding (map surfaces) |
+| **Map entity encoding** | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `geo-precision.ts`, `record-marks.ts`, `explore-style.ts` | Binding (point marks by precision; mobile not yet adopted) |
+| **Place map** | [`patterns-place-map.md`](./patterns-place-map.md) | `place-groups.ts`, `place-map.ts`, `explore-style.ts` | Binding (`/explore` grouping, Door plate) |
 | **Map canvas lifecycle** | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | Binding (cross-browser WebGL) |
 | **Edition fact icon** | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
 | **Destination icon** | [`patterns-destination-icon.md`](./patterns-destination-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
@@ -119,11 +121,11 @@ Where this doc and `@repo/ui` disagree on tokens, **the kit wins**. Where a patt
 
 ### What shipped
 
-- **Palette (v3):** Archive Paper `#F4EFE5` canvas + Surface `#FBF8F2` / Black Ink primary; Copper Pin accent with copper text pairs `#8E4F2A` (light) and `#D07A32` (dark); light and dark themes via `data-theme`; radii 8/16/28px (sm/md/lg). Bevels, shadows, gradients and glows stay banned, with one v9 carve-out: a single soft tinted shadow on panels that float over the map plate, for z-order only.
+- **Palette:** paper and ink in four surface value steps per theme, Copper Pin accent with text-safe copper per theme, light and dark via `data-theme`; radii 8/14/28px (sm/md/lg). Values are in `packages/ui/src/styles/tokens.css`; roles and rules are in [`brand.md`](./brand.md). Bevels, gradients, glows and elevation shadows stay banned; the one exception is the `--ds-contact-*` contact shadow where a layer overlaps another.
 - **Map plate roles (v9):** `--ds-map-*` land, water, green, line, line-2, road, label, label-hi, halo, contract-tested for CIE L\* separation in both themes.
 - **Status colors:** warning, confidence, dispute, error only, re-derived to harmonize with the accent palette, always with a text or mono cue and never color-alone.
-- **Typography (v3):** Sora + Inter + Source Serif 4 + IBM Plex Mono, all free and open source.
-- **Tokens:** grid, spacing, elevation, border, icon, motion, focus, pigment-anchored data-viz.
+- **Typography:** Schibsted Grotesk (display), Geist (UI), Newsreader (editorial), Geist Mono (data), all free and open source, on the `--ds-text-*` scale.
+- **Tokens:** type scale, spacing and section rhythm, borders (divider and control edge), icon, motion, focus, z-index ladder, pigment-anchored data-viz. `pnpm lint:tokens` ratchets raw values out of stylesheets.
 - **Components:** Card, Citation, Confidence, Timeline, MapFrame, ResultList, FilterBar, Dialog, Notice, EmptyState, Button, ThemeToggle, Toast, skeletons.
 - **Fixtures:** public route `/design-system`.
 
@@ -138,7 +140,7 @@ In Next apps, add `@repo/ui` to `transpilePackages` and prefer `next/font` varia
 
 ### Accessibility
 
-- WCAG 2.2 AA contrast validated in `packages/ui` token tests (AAA for primary ink on canvas)
+- WCAG 2.2 AA contrast validated in `packages/ui` token tests on all four surface steps (AAA for primary ink); measured ratios and the rules that follow are in [`brand.md`](./brand.md) § Accessibility floor
 - Visible `:focus-visible` rings; skip link becomes visible on focus
 - `prefers-reduced-motion` collapses animation and transition durations
 - Dialog uses native `<dialog>` (modal focus + Escape)

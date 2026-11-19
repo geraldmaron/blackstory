@@ -18,6 +18,12 @@ export const VISUAL_ROUTES = [
 
 export type VisualRoute = (typeof VISUAL_ROUTES)[number];
 
+/**
+ * Checked by the rendered-page rules only, never screenshotted: a chapter carries remote archive
+ * images, so its pixels are not stable, but its layout rules are.
+ */
+export const RULE_ONLY_ROUTES = [{ path: '/stories/the-count', name: 'chapter' }] as const;
+
 export const VIEWPORTS = {
   mobile: { width: 375, height: 812 },
   tablet: { width: 768, height: 1024 },

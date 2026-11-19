@@ -1,14 +1,19 @@
 /**
- * Public corrections entry point. v9 utility room for quarantine-only intake
- * tied to entity/claim/source/location targets, with privacy notice and receipt codes.
+ * Public corrections entry point: quarantine-only intake tied to entity, claim, source or
+ * location targets, with a privacy notice and receipt codes.
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { CorrectionsSections } from './CorrectionsSections';
-import { Room, ReadingEntry } from '../../components/room';
+import Link from 'next/link';
+import { PageHeader } from '@repo/ui';
+import { parentCrumb, Room } from '../../components/room';
+import { TrustMast, TrustSheet } from '../../components/trust';
 import { resolvePublicEntityView } from '../../lib/public-data/source';
 import { isCorrectionTargetType } from './categories';
 import '../utility.css';
+import '../../components/forms/form-kit.css';
+import './corrections.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/corrections',
@@ -39,22 +44,29 @@ export default async function CorrectionsPage({ searchParams }: CorrectionsPageP
       ? await resolvePublicEntityView(initialTarget).catch(() => undefined)
       : undefined;
   return (
-    <Room ledger>
-      <ReadingEntry
-        pathname="/corrections"
-        title={
-          <>
-            Tell the archive it&apos;s <em>wrong</em>.
-          </>
-        }
-        lede="You get a receipt code and a tracked outcome. A person reads every correction, and nothing you send publishes on arrival."
-      />
-      <CorrectionsSections
-        key={`${initialTargetType}:${initialTarget}`}
-        initialTarget={initialTarget}
-        initialTargetType={initialTargetType}
-        {...(record?.data ? { targetName: record.data.displayName } : {})}
-      />
+    <Room
+      width="wide"
+      className="ds-trust-room"
+      masthead={
+        <TrustMast art={['tools']} tone="copper">
+          <PageHeader
+            display
+            crumb={parentCrumb('/corrections')}
+            linkAs={Link}
+            title="Tell the archive it's wrong"
+            dek="A person reads every correction, and you get a receipt code to track the outcome."
+          />
+        </TrustMast>
+      }
+    >
+      <TrustSheet>
+        <CorrectionsSections
+          key={`${initialTargetType}:${initialTarget}`}
+          initialTarget={initialTarget}
+          initialTargetType={initialTargetType}
+          {...(record?.data ? { targetName: record.data.displayName } : {})}
+        />
+      </TrustSheet>
     </Room>
   );
 }

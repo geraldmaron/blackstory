@@ -1,556 +1,1203 @@
 /**
- * The Data Figure (`.ds-datafig`) and the marks inside it. Flat matte fills, hairline rules,
- * mono axis labels, brand series colors only (ink, copper, stone, sand via `--ds-viz-*`).
+ * The figure (`.ds-datafig`) and the chart kit inside it (`components/data/chart-kit.tsx`).
  *
- * A figure is not a card. It sits on the page ground with one hairline above it, the way a
- * figure sits in a printed report: the frame is the rule, the title and the source line. A
- * boxed panel per chart, inside a boxed panel per section, is what this file replaced.
+ * Imported by DataChartFrame itself, so every page that renders a figure gets this sheet on a
+ * direct load. (/lives once rendered its class chart as solid black bars because only /data
+ * imported it.)
+ *
+ * Series wear the brand's materials, read from the ground the figure sits on (a paper sheet on
+ * /data and /lives): `hi`, the Black series a figure is about, is copper; `lo`, the comparison, is
+ * ink; `mid`, a part of a whole, is stone. Copper-to-ink and stone-to-ink separate well for every
+ * color vision type (checked with the dataviz validator against #f4efe5); copper beside stone is
+ * the close pair (normal-vision delta 14), so the two only meet with a 2px gap between them and a
+ * direct label on each. Identity is never color alone: every series is named by a direct label,
+ * in the tooltip and in the table.
  */
+
+.ds-datafig,
+.ds-plot,
+.ds-hbars {
+  --fig-hi: var(--ds-accent-graphic);
+  --fig-mid: var(--ds-ink-muted);
+  --fig-lo: var(--ds-ink);
+  --fig-grid: var(--ds-viz-grid);
+  --fig-hatch: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ds-ink) 26%, transparent) 0 1px,
+    transparent 1px 6px
+  );
+  --fig-break: color-mix(in srgb, var(--ds-ink) 5%, transparent);
+}
 
 /* —— the figure ————————————————————————————————————————————————————————————— */
 
-/* The explicit minmax(0, 1fr) track matters: an implicit grid track sizes to its widest child's
-   min-content, so opening "Show the numbers" on a wide table grew the whole figure past the
-   viewport, where the shell's overflow clip cut it off. The table scrolls inside its own body. */
+/* The explicit minmax(0, 1fr) track keeps an open table from widening the figure past the
+   viewport: the table scrolls inside its own panel. */
 .ds-datafig {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ds-space-4);
-  margin: 0;
-  padding-top: var(--ds-space-5);
   min-width: 0;
   max-width: 100%;
+  margin: 0;
+  padding-top: var(--ds-space-6);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  scroll-margin-top: 112px;
+  container-type: inline-size;
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
 }
 
 .ds-datafig__head {
   display: grid;
-  gap: var(--ds-space-2);
-  max-width: 60ch;
-}
-
-.ds-datafig__label {
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
+  gap: var(--ds-space-1);
+  max-width: 44rem;
 }
 
 .ds-datafig__title {
+  margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.1875rem;
+  font-size: var(--ds-text-title);
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  line-height: var(--ds-leading-title);
+  letter-spacing: var(--ds-tracking-title);
   color: var(--ds-ink);
   text-wrap: balance;
 }
 
-.ds-datafig__reading {
+.ds-datafig__subtitle {
+  margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--ds-ink);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
 }
 
 .ds-datafig__viz {
   min-width: 0;
   max-width: 100%;
-  /* Nested chart scroll only: the figure must never widen the page. */
-  overflow-x: auto;
 }
 
-.ds-datafig__caption {
+/* —— the footer row: source, Limits, Numbers ———————————————————————————————— */
+.ds-datafig__foot {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-datafig__foot-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-1) var(--ds-space-4);
+  min-height: 2.75rem;
+}
+
+.ds-datafig__source {
+  flex: 1 1 18rem;
+  min-width: 0;
   margin: 0;
-  max-width: 62ch;
-  font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  padding: var(--ds-space-2) 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
   color: var(--ds-ink-muted);
 }
 
-.ds-datafig__caption .ds-data-chart__meta {
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+.ds-datafig__source-label {
   color: var(--ds-ink-muted);
 }
 
-.ds-datafig__source.ds-citation--compact {
-  margin-top: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+.ds-datafig__source a {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
-.ds-datafig__source.ds-citation--compact .ds-citation__label {
-  font-size: 0.625rem;
+.ds-datafig__source a:hover {
+  text-decoration-color: currentColor;
 }
 
-/* The numbers: a native disclosure, closed by default. The summary reads like the source line
-   above it so the figure's foot is one quiet mono register, with the copper mark the only cue. */
-.ds-datafig__numbers {
-  margin: 0;
+.ds-datafig__toggles {
+  display: flex;
+  gap: var(--ds-space-1);
+  margin-left: auto;
 }
 
-.ds-datafig__numbers-summary {
+.ds-datafig__toggle {
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-space-2);
-  padding: 6px 0;
+  gap: var(--ds-space-1);
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-2);
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: none;
+  color: var(--ds-ink-muted);
+  font: inherit;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
   cursor: pointer;
-  list-style: none;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+}
+
+.ds-datafig__toggle svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  transition: transform var(--ds-duration-fast, 120ms) ease-out;
+}
+
+.ds-datafig__toggle:hover {
+  color: var(--ds-ink);
+  background: var(--ds-surface-sunken);
+}
+
+.ds-datafig__toggle[aria-expanded='true'] {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-datafig__toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.ds-datafig__toggle:focus-visible,
+.ds-datafig__numbers:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.ds-datafig__panel {
+  padding: var(--ds-space-3) 0 var(--ds-space-4);
+}
+
+.ds-datafig__limits {
+  max-width: 62ch;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
   color: var(--ds-ink-muted);
 }
 
-.ds-datafig__numbers-summary::-webkit-details-marker {
-  display: none;
-}
-
-.ds-datafig__numbers-summary::before {
-  content: '+';
-  color: var(--ds-accent);
-  font-size: 0.875rem;
-}
-
-.ds-datafig__numbers[open] > .ds-datafig__numbers-summary::before {
-  content: '–';
-}
-
-.ds-datafig__numbers-summary:hover {
-  color: var(--ds-ink);
-}
-
-.ds-datafig__numbers-summary:focus-visible {
-  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
-  outline-offset: 2px;
+.ds-datafig__numbers {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
   border-radius: var(--ds-radius-sm);
 }
 
-.ds-datafig__numbers-body {
-  margin-top: var(--ds-space-3);
-  overflow-x: auto;
-}
-
-/* —— the marks —————————————————————————————————————————————————————————————— */
-
-.ds-data-chart__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.ds-data-chart__svg--wide {
-  max-width: 100%;
-}
-
-/* 24 decades in a 960-wide viewBox: let the spine render close to 1:1 so the mono labels stay
-   legible instead of downscaling to six pixels. */
-.ds-data-chart__svg--spine {
-  max-width: 100%;
-}
-
-/* The state ledger is a 640-wide viewBox of 28px rows; stretched across a 900px measure the
-   rows read as a poster. Cap it near 1:1. */
-.ds-data-chart__svg--ledger {
-  max-width: min(100%, 44rem);
-}
-
-.ds-data-chart__axis-label {
-  fill: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 11px;
-}
-
-.ds-data-chart__grid-line {
-  stroke: var(--ds-viz-grid);
-  stroke-width: 1;
-}
-
-/* Hover layer: the SVG marks carry a native `<title>`; on pointer hover the mark lifts a step
-   so the reader can see which bar the tooltip names. */
-.ds-data-chart__mark {
-  transition: opacity var(--ds-duration-fast, 120ms) var(--ds-easing, ease);
-}
-
-.ds-data-chart__svg:hover .ds-data-chart__mark {
-  opacity: 0.72;
-}
-
-.ds-data-chart__svg .ds-data-chart__mark:hover {
-  opacity: 1;
-}
-
-.ds-data-chart__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
-  margin: var(--ds-space-3) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ds-data-chart__legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  color: var(--ds-ink-muted);
-}
-
-.ds-data-chart__legend-swatch {
-  flex: 0 0 auto;
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 2px;
-}
-
-/* The table inside the numbers disclosure. */
+/* —— the numbers table ————————————————————————————————————————————————————— */
 .ds-data-chart__table {
   width: 100%;
   border-collapse: collapse;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-variant-numeric: tabular-nums;
 }
 
 .ds-data-chart__table caption {
   padding-bottom: var(--ds-space-2);
   text-align: left;
-  font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
 .ds-data-chart__table th,
 .ds-data-chart__table td {
-  padding: 6px var(--ds-space-3);
+  padding: var(--ds-space-2) var(--ds-space-3);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  text-align: left;
+  text-align: right;
   white-space: nowrap;
 }
 
-.ds-data-chart__table td,
-.ds-data-chart__table tbody th {
-  text-align: right;
-}
-
-.ds-data-chart__table tbody th:first-child,
+.ds-data-chart__table th:first-child,
 .ds-data-chart__table td:first-child {
+  padding-left: 0;
   text-align: left;
 }
 
 .ds-data-chart__table thead th {
-  color: var(--ds-ink-muted);
   font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 0.625rem;
-}
-
-.ds-data-chart__table thead th:not(:first-child) {
-  text-align: right;
-}
-
-.ds-data-chart__meta {
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-}
-
-/* —— the race pair: two horizontal bars and a ratio ————————————————————————— */
-
-.ds-data-chart__pair-bars {
-  display: grid;
-  gap: var(--ds-space-3);
-}
-
-.ds-data-chart__pair-row {
-  display: grid;
-  grid-template-columns: minmax(7rem, 11rem) 1fr minmax(5.5rem, 7rem);
-  gap: var(--ds-space-3);
-  align-items: center;
-}
-
-@media (max-width: 36rem) {
-  .ds-data-chart__pair-row {
-    grid-template-columns: 1fr;
-    gap: var(--ds-space-1);
-  }
-
-  /*
-   * Axis labels are 11px inside the viewBox, so they scale with the SVG: a 960-wide spine on a
-   * 343px screen drew them at about four pixels. The comment on `--spine` above already said
-   * the labels must stay legible "instead of downscaling to six pixels", but `max-width: 100%`
-   * with no floor could not hold that.
-   *
-   * Below this width the chart keeps a legible size and its frame scrolls sideways instead,
-   * which is the same answer the numbers table already uses. The table remains the non-scrolling
-   * route to every value, so nothing is only reachable by dragging.
-   */
-  .ds-datafig__viz {
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-  }
-
-  .ds-data-chart__svg {
-    min-width: 30rem;
-  }
-
-  .ds-data-chart__svg--spine {
-    min-width: 45rem;
-  }
-
-  /* The pair bars and the sight figures are CSS, not a viewBox, so they reflow and must not
-     be given a floor that would make them scroll for no reason. */
-  .ds-data-chart__pair-row,
-  .ds-data-chart__sight {
-    min-width: 0;
-  }
-}
-
-.ds-data-chart__pair-label {
-  font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
-  color: var(--ds-ink);
-  line-height: 1.35;
-}
-
-.ds-data-chart__pair-track {
-  min-height: 1.5rem;
-  background: var(--ds-surface-raised, var(--ds-surface));
-  border-radius: 2px;
-}
-
-.ds-data-chart__pair-bar {
-  display: block;
-  min-height: 1.5rem;
-  border-radius: 2px;
-}
-
-.ds-data-chart__pair-value {
-  font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--ds-ink);
-  text-align: right;
-}
-
-.ds-data-chart__ratio {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-2);
-  margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
   color: var(--ds-ink-muted);
 }
 
-.ds-data-chart__ratio-value {
-  font-family: var(--ds-font-display);
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+.ds-data-chart__table tbody th {
+  font-weight: 500;
   color: var(--ds-ink);
 }
 
-.ds-data-page__theme-link {
-  color: var(--ds-accent);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
+.ds-data-chart__table td {
+  font-family: var(--ds-font-mono);
+  color: var(--ds-ink);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ds-data-chart__mark {
-    transition-duration: 0.01ms;
+/* —— the plot ——————————————————————————————————————————————————————————————— */
+.ds-plot {
+  --plot-h: 15rem;
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.ds-plot--sm {
+  --plot-h: 7.5rem;
+}
+
+.ds-plot--lg {
+  --plot-h: 19rem;
+}
+
+@container (max-width: 34rem) {
+  .ds-plot--md {
+    --plot-h: 13rem;
+  }
+
+  .ds-plot--lg {
+    --plot-h: 16rem;
   }
 }
 
-/* —— decade spine (Counted) ——————————————————————————————————————————————— */
-
-.ds-data-spine__area {
-  fill: var(--ds-viz-1);
-  fill-opacity: 0.12;
-}
-
-.ds-data-spine__line {
-  stroke: var(--ds-viz-1);
-  stroke-width: 2.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.ds-data-spine__dot {
-  fill: var(--ds-viz-1);
-}
-
-.ds-data-spine__boundary {
-  stroke: var(--ds-ink-muted);
-  stroke-width: 1;
-  stroke-dasharray: 4 4;
-}
-
-.ds-data-spine__tick,
-.ds-data-spine__axis,
-.ds-lives-arc__tick,
-.ds-lives-arc__axis {
-  font-family: var(--ds-font-mono);
-  font-size: 11px;
-  fill: var(--ds-ink-muted);
-}
-
-/* —— gap magnitude sight —————————————————————————————————————————————————— */
-
-.ds-gap-sight {
-  display: grid;
-  gap: var(--ds-space-4);
-  padding: var(--ds-space-2) 0 var(--ds-space-4);
-}
-
-.ds-gap-sight__ratio {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-2);
-  margin: 0;
-}
-
-.ds-gap-sight__value {
-  font-family: var(--ds-font-display);
-  font-size: clamp(2.5rem, 1.5rem + 3vw, 3.75rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--ds-ink);
-}
-
-.ds-gap-sight__unit {
-  font-family: var(--ds-font-mono);
-  font-size: 0.875rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-.ds-gap-sight__marks {
+.ds-plot__unit {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  align-items: stretch;
-  min-height: 1.75rem;
-}
-
-.ds-gap-sight__mark {
-  width: 0.85rem;
-  min-height: 1.75rem;
-  border-radius: 2px;
-  background: var(--ds-viz-2);
-}
-
-.ds-gap-sight__mark[data-tone='primary'] {
-  background: var(--ds-viz-1);
-}
-
-.ds-gap-sight__mark--partial {
-  width: auto;
-  min-width: 0.35rem;
-}
-
-.ds-gap-sight__pair {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  gap: var(--ds-space-1) var(--ds-space-4);
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   color: var(--ds-ink-muted);
 }
 
-/* —— Lives class arc —————————————————————————————————————————————————————— */
-
-.ds-lives-arc__line {
-  stroke-width: 2;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  opacity: 0.45;
+.ds-plot__frame {
+  display: grid;
+  grid-template-columns: var(--plot-y-w) minmax(0, 1fr) var(--plot-end-w);
+  grid-template-rows: var(--plot-h) auto;
+  column-gap: var(--ds-space-2);
 }
 
-.ds-lives-arc__line[data-emphasis='true'] {
-  stroke-width: 3;
-  opacity: 1;
+.ds-plot__y {
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
 }
 
-.ds-lives-arc__line--black {
-  stroke: var(--ds-viz-1);
+.ds-plot__ytick {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
 }
 
-.ds-lives-arc__line--white {
-  stroke: var(--ds-viz-2);
+.ds-plot__area {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
 }
 
-.ds-lives-arc__line--hispanic {
-  stroke: var(--ds-viz-3, var(--ds-ink-muted));
+.ds-plot__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.ds-lives-arc__dot {
-  fill: var(--ds-viz-1);
+.ds-plot__gridline {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-top: var(--ds-border-width) solid var(--fig-grid);
 }
 
-.ds-lives-arc__dot[data-emphasis='true'] {
-  fill: var(--ds-accent-graphic, var(--ds-accent));
+.ds-plot__gridline[data-zero='true'] {
+  border-top-color: var(--fig-lo);
 }
 
-.ds-lives-arc__hit {
-  fill: transparent;
+.ds-plot__x {
+  position: relative;
+  grid-column: 2;
+  grid-row: 2;
+  height: 1.75rem;
+}
+
+.ds-plot__xtick {
+  position: absolute;
+  top: var(--ds-space-2);
+  transform: translateX(-50%);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
+}
+
+@container (max-width: 34rem) {
+  .ds-plot__xtick[data-minor='true'] {
+    display: none;
+  }
+}
+
+/* —— marks ——————————————————————————————————————————————————————————————————— */
+
+/* A data position: a full-height band. It is the hit target and the tooltip's anchor. */
+.ds-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  transform: translateX(-50%);
+  outline: none;
+}
+
+button.ds-mark {
   cursor: pointer;
 }
 
-.ds-lives-arc__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-3) var(--ds-space-5);
-  margin: var(--ds-space-3) 0 0;
-  padding: 0;
-  list-style: none;
+.ds-mark:focus-visible {
+  box-shadow: inset 0 0 0 var(--ds-focus-width) var(--ds-focus-ring);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-mark--crosshair::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  border-left: var(--ds-border-width) solid var(--fig-hi);
+  opacity: 0;
+}
+
+.ds-mark--crosshair:hover::before,
+.ds-mark--crosshair:focus-visible::before {
+  opacity: 0.5;
+}
+
+/* The hovered column stays at full strength while its neighbors step back. */
+.ds-plot__area:has(.ds-mark:hover, .ds-mark:focus-visible)
+  .ds-mark:not(:hover, :focus-visible)
+  .ds-fig-bar {
+  opacity: 0.45;
+}
+
+.ds-fig-bar {
+  --bar-w: min(24px, 64%);
+  --bar-shift: 0%;
+  position: absolute;
+  left: calc(50% + var(--bar-shift));
+  width: var(--bar-w);
+  border-radius: 0;
+  background: var(--fig-hi);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.ds-fig-bar[data-top='stacked'] {
+  border-bottom: 2px solid var(--ds-canvas);
+}
+
+.ds-fig-bar[data-tone='lo'] {
+  background: var(--fig-lo);
+}
+
+.ds-fig-bar[data-tone='mid'] {
+  background: var(--fig-mid);
+}
+
+.ds-fig-bar[data-hatched='true'] {
+  background: var(--fig-hatch), color-mix(in srgb, var(--fig-mid) 30%, transparent);
+  box-shadow: inset 0 0 0 1px var(--fig-mid);
+}
+
+/* Lines */
+.ds-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ds-lines__line {
+  fill: none;
+  stroke: var(--fig-hi);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ds-lines__line[data-tone='lo'] {
+  stroke: var(--fig-lo);
+  stroke-width: 2px;
+}
+
+.ds-lines__line[data-tone='mid'] {
+  stroke: var(--fig-mid);
+  stroke-width: 2px;
+}
+
+.ds-lines__line[data-dashed='true'] {
+  stroke-dasharray: 5 4;
+}
+
+.ds-lines__area {
+  fill: color-mix(in srgb, var(--fig-hi) 9%, transparent);
+  stroke: none;
+}
+
+.ds-dot {
+  --dot: 8px;
+  position: absolute;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  background: var(--fig-hi);
+  box-shadow: 0 0 0 2px var(--ds-canvas);
+  transform: translate(-50%, 50%);
+  pointer-events: none;
+}
+
+.ds-dot[data-size='sm'] {
+  --dot: 6px;
+}
+
+.ds-dot[data-size='lg'] {
+  --dot: 12px;
+}
+
+.ds-dot[data-tone='lo'] {
+  background: var(--fig-lo);
+}
+
+.ds-dot[data-tone='mid'] {
+  background: var(--fig-mid);
+}
+
+.ds-dot[data-hollow='true'] {
+  background: var(--ds-canvas);
+  box-shadow:
+    inset 0 0 0 2px var(--fig-lo),
+    0 0 0 2px var(--ds-canvas);
+}
+
+.ds-mark:hover .ds-dot,
+.ds-mark:focus-visible .ds-dot {
+  --dot: 12px;
+}
+
+/* Labels on the plot */
+.ds-point-label {
+  position: absolute;
+  z-index: 2; /* local: like annotation labels, sits on a canvas halo over any rule it meets */
+  padding: 0 2px;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
   color: var(--ds-ink-muted);
+  white-space: nowrap;
+  transform: translate(-50%, calc(-1 * var(--ds-space-2)));
+  pointer-events: none;
 }
 
-.ds-lives-arc__legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
+.ds-point-label[data-strong='true'] {
+  font-weight: 600;
+  color: var(--ds-ink);
 }
 
-.ds-lives-arc__legend li[data-emphasis='true'] {
+.ds-point-label[data-place='below'] {
+  transform: translate(-50%, calc(100% + var(--ds-space-2)));
+}
+
+.ds-point-label[data-place='right'] {
+  transform: translate(var(--ds-space-2), 50%);
+}
+
+.ds-point-label[data-place='left'] {
+  transform: translate(calc(-100% - var(--ds-space-2)), 50%);
+}
+
+.ds-point-label[data-place='above'][data-side='start'] {
+  transform: translate(-4px, calc(-1 * var(--ds-space-2)));
+}
+
+.ds-point-label[data-place='above'][data-side='end'] {
+  transform: translate(calc(-100% + 4px), calc(-1 * var(--ds-space-2)));
+}
+
+.ds-end-label {
+  position: absolute;
+  left: calc(100% + var(--ds-space-3));
+  display: grid;
+  width: max-content;
+  max-width: calc(var(--plot-end-w) - var(--ds-space-3));
+  transform: translateY(50%);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.2;
+  color: var(--ds-ink-muted);
+  pointer-events: none;
+}
+
+.ds-end-label::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(-1 * var(--ds-space-3) + 2px);
+  width: calc(var(--ds-space-3) - 4px);
+  border-top: var(--ds-border-width) solid var(--fig-lo);
+}
+
+.ds-end-label[data-tone='hi'] {
   color: var(--ds-ink);
   font-weight: 600;
 }
 
-.ds-lives-arc__swatch {
-  width: 0.85rem;
-  height: 0.2rem;
-  border-radius: 1px;
-  background: currentColor;
+.ds-end-label__value {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
-.ds-lives-arc__swatch.ds-lives-arc__line--black {
-  background: var(--ds-viz-1);
+/* Annotations */
+.ds-fig-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
 }
 
-.ds-lives-arc__swatch.ds-lives-arc__line--white {
-  background: var(--ds-viz-2);
+.ds-fig-band[data-kind='gap'] {
+  background: var(--fig-hatch);
+  box-shadow:
+    inset 1px 0 0 var(--fig-grid),
+    inset -1px 0 0 var(--fig-grid);
 }
 
-.ds-lives-arc__swatch.ds-lives-arc__line--hispanic {
-  background: var(--ds-viz-3, var(--ds-ink-muted));
+.ds-fig-band[data-kind='break'] {
+  background: var(--fig-break);
+  border-left: var(--ds-border-width) solid var(--fig-lo);
 }
 
-/* Matches the SVG hatch on the free series: colour is never the only signal (brand.md). */
-.ds-data-chart__legend-swatch--hatched {
-  background-image: repeating-linear-gradient(45deg, transparent 0 2px, var(--ds-canvas) 2px 4.2px);
+.ds-fig-band__label,
+.ds-rule__label {
+  position: absolute;
+  z-index: 2; /* local: annotation labels sit above the rules that cross them, on a canvas halo */
+  top: calc(-1 * var(--ds-space-1));
+  left: 50%;
+  padding: 2px var(--ds-space-1);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-micro);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
+  transform: translate(-50%, -100%);
+}
+
+.ds-fig-band[data-kind='break'] .ds-fig-band__label {
+  left: 0;
+  transform: translate(0, -100%);
+}
+
+.ds-fig-band[data-side='end'] .ds-fig-band__label,
+.ds-rule[data-side='end'] .ds-rule__label {
+  right: 0;
+  left: auto;
+  transform: translate(0, -100%);
+}
+
+.ds-fig-band[data-kind='gap'][data-wide='true'] .ds-fig-band__label {
+  top: 50%;
+  right: auto;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ds-fig-band[data-side='start'] .ds-fig-band__label,
+.ds-rule[data-side='start'] .ds-rule__label {
+  left: 0;
+  transform: translate(0, -100%);
+}
+
+/* A gap too narrow for its label stands the label on end, so two neighboring gaps never write
+   over each other. The band measures itself, whatever width the plot is drawn at. */
+.ds-fig-band[data-kind='gap'][data-wide='true'] {
+  container-type: inline-size;
+}
+
+@container (max-width: 6rem) {
+  .ds-fig-band[data-kind='gap'][data-wide='true'] .ds-fig-band__label {
+    writing-mode: vertical-rl;
+    transform: translate(-50%, -50%) rotate(180deg);
+  }
+}
+
+.ds-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: var(--ds-border-width) solid var(--fig-lo);
+  pointer-events: none;
+}
+
+.ds-rule[data-kind='current'] {
+  border-left: 2px solid var(--ds-accent-graphic);
+}
+
+.ds-rule[data-kind='current'] .ds-rule__label {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+/* A plot with annotations above its top edge needs room for their labels. */
+.ds-plot:has(.ds-fig-band__label, .ds-rule__label) .ds-plot__frame {
+  margin-top: var(--ds-space-6);
+}
+
+/* Tooltip: on hover and on keyboard focus, no script. */
+.ds-tip {
+  position: absolute;
+  bottom: calc(var(--tip-y) + var(--ds-space-3));
+  left: 50%;
+  z-index: 3; /* local: the tooltip sits above its neighbor columns inside one plot */
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  max-width: 16rem;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-contact-overlap);
+  text-align: left;
+  white-space: normal;
+  transform: translateX(-50%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Phone: a narrower tip, so a centered one near the plot edge stays inside the viewport. */
+@media (max-width: 47.99rem) {
+  .ds-tip {
+    max-width: 11rem;
+  }
+}
+
+.ds-mark[data-side='start'] .ds-tip {
+  left: 0;
+  transform: none;
+}
+
+.ds-mark[data-side='end'] .ds-tip {
+  right: 0;
+  left: auto;
+  transform: none;
+}
+
+.ds-mark:hover .ds-tip,
+.ds-mark:focus-visible .ds-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ds-tip__title {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  color: var(--ds-ink-muted);
+}
+
+.ds-tip__row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--ds-space-2);
+}
+
+.ds-tip__row:not(:has(.ds-tip__key)) {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.ds-tip__key {
+  width: 0.75rem;
+  height: 0;
+  align-self: center;
+  border-top: 2px solid var(--fig-hi);
+}
+
+.ds-tip__key[data-tone='lo'] {
+  border-top-color: var(--fig-lo);
+}
+
+.ds-tip__key[data-tone='mid'] {
+  border-top-color: var(--fig-mid);
+}
+
+.ds-tip__value {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+}
+
+.ds-tip__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+/* —— horizontal bar rows: label | track | value ————————————————————————————— */
+.ds-hbars {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-hbar {
+  --hbar-label-w: minmax(6rem, 12rem);
+  display: grid;
+  grid-template-columns: var(--hbar-label-w) minmax(0, 1fr) minmax(4.5rem, auto);
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: 2rem;
+}
+
+.ds-hbar__label {
+  min-width: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.3;
+  color: var(--ds-ink);
+}
+
+.ds-hbar__label small {
+  display: block;
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-hbar__track {
+  position: relative;
+  height: 1rem;
+}
+
+.ds-hbar__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  max-width: 100%;
+  border-radius: 0;
+  background: var(--fig-hi);
+}
+
+.ds-hbar__fill[data-tone='lo'] {
+  background: var(--fig-lo);
+}
+
+.ds-hbar__fill[data-tone='mid'] {
+  background: var(--fig-mid);
+}
+
+/* No figure published: a hatched empty track, with the reason in words beside it. */
+.ds-hbar__track[data-absent='true'] {
+  border-radius: 0;
+  background: var(--fig-hatch);
+  box-shadow: inset 0 0 0 1px var(--fig-grid);
+}
+
+.ds-hbar__value {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ds-hbar__value[data-absent='true'] {
+  font-family: var(--ds-font-sans);
+  color: var(--ds-ink-muted);
+}
+
+@container (max-width: 30rem) {
+  .ds-hbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label value'
+      'track track';
+    gap: var(--ds-space-1) var(--ds-space-3);
+  }
+
+  .ds-hbar__label {
+    grid-area: label;
+  }
+
+  .ds-hbar__track {
+    grid-area: track;
+  }
+
+  .ds-hbar__value {
+    grid-area: value;
+  }
+}
+
+/* —— the ratio figure: N equal units, one of them the primary group ———————————— */
+.ds-ratio {
+  display: grid;
+  gap: var(--ds-space-4);
+}
+
+.ds-ratio__number {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  margin: 0;
+}
+
+.ds-ratio__value {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display-2);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: var(--ds-tracking-display);
+  color: var(--ds-ink);
+}
+
+.ds-ratio__unit {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  color: var(--ds-ink-muted);
+}
+
+.ds-ratio__rows {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-ratio__row {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-ratio__name {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-ratio__name strong {
+  font-family: var(--ds-font-mono);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-ratio__units {
+  display: grid;
+  grid-template-columns: repeat(var(--units), minmax(0, 1fr));
+  gap: 2px;
+  height: 1.25rem;
+}
+
+.ds-ratio__unit-mark {
+  width: calc(var(--part, 1) * 100%);
+  border-radius: 0;
+  background: var(--fig-lo);
+}
+
+.ds-ratio__unit-mark[data-tone='hi'] {
+  background: var(--fig-hi);
+}
+
+/* —— the change ledger: three census-to-census deltas ———————————————————————— */
+.ds-deltas {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-delta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ds-space-1) var(--ds-space-4);
+  padding: var(--ds-space-3) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-delta:first-child {
+  padding-top: 0;
+}
+
+.ds-delta:last-child {
+  border-bottom: 0;
+}
+
+.ds-delta__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  color: var(--ds-ink);
+}
+
+.ds-delta__value {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  text-align: right;
+}
+
+.ds-delta__note {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+/* —— the state movers: a sorted diverging bar ———————————————————————————————— */
+.ds-diverge {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-diverge__head,
+.ds-diverge__row {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 10rem) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--ds-space-3);
+}
+
+.ds-diverge__head {
+  padding-bottom: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-diverge__head span:nth-child(2) {
+  text-align: right;
+  padding-right: var(--ds-space-2);
+}
+
+.ds-diverge__head span:nth-child(3) {
+  padding-left: var(--ds-space-2);
+}
+
+.ds-diverge__row {
+  position: relative;
+  min-height: 1.75rem;
+  border-radius: var(--ds-radius-sm);
+  outline: none;
+}
+
+.ds-diverge__row:hover,
+.ds-diverge__row:focus-visible {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-diverge__row:focus-visible {
+  box-shadow: inset 0 0 0 var(--ds-focus-width) var(--ds-focus-ring);
+}
+
+.ds-diverge__name {
+  overflow: hidden;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-diverge__side {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 1.75rem;
+}
+
+.ds-diverge__side--loss {
+  justify-content: flex-end;
+  border-right: var(--ds-border-width) solid var(--fig-lo);
+}
+
+.ds-diverge__bar {
+  /* The longest bar leaves room at its end for its printed value. */
+  flex: none;
+  width: calc(var(--len) * var(--bar-max, 72%));
+  height: 0.875rem;
+  min-width: 2px;
+}
+
+.ds-diverge__side--gain .ds-diverge__bar {
+  border-radius: 0;
+  background: var(--fig-hi);
+}
+
+.ds-diverge__side--loss .ds-diverge__bar {
+  border-radius: 0;
+  background: var(--fig-lo);
+}
+
+.ds-diverge__value {
+  flex: none;
+  padding: 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  white-space: nowrap;
+}
+
+.ds-diverge__side--loss .ds-diverge__value {
+  color: var(--ds-ink-muted);
+}
+
+@container (max-width: 30rem) {
+  .ds-diverge__head,
+  .ds-diverge__row {
+    grid-template-columns: 6rem minmax(0, 1fr) minmax(0, 1.4fr);
+    column-gap: var(--ds-space-2);
+  }
+
+  .ds-diverge {
+    --bar-max: 48%;
+  }
+
+  /* A long name ("District of Columbia") takes a second line here instead of an ellipsis. */
+  .ds-diverge__name {
+    overflow: visible;
+    line-height: 1.2;
+    white-space: normal;
+  }
+}
+
+.ds-diverge__row:hover .ds-tip,
+.ds-diverge__row:focus-visible .ds-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ds-hbar[data-mark] {
+  border-radius: var(--ds-radius-sm);
+  outline: none;
+}
+
+.ds-hbar[data-mark]:focus-visible {
+  box-shadow: 0 0 0 var(--ds-focus-width) var(--ds-focus-ring);
+}
+
+.ds-pair-gap {
+  margin: var(--ds-space-4) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-pair-gap strong {
+  font-family: var(--ds-font-mono);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-plot__key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+.ds-plot__swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 0;
+  background: var(--fig-hi);
+}
+
+.ds-plot__swatch[data-tone='mid'] {
+  background: var(--fig-mid);
+}
+
+.ds-plot__swatch[data-tone='lo'] {
+  background: var(--fig-lo);
+}
+
+.ds-plot__swatch[data-hatched='true'] {
+  background: var(--fig-hatch), color-mix(in srgb, var(--fig-mid) 30%, transparent);
+  box-shadow: inset 0 0 0 1px var(--fig-mid);
+}
+
+.ds-datafig__more {
+  position: relative;
+  min-height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+/* A 44px hit area around the inline text, without moving the source line. */
+.ds-datafig__more::before {
+  content: '';
+  position: absolute;
+  inset: -0.625rem 0;
+}
+
+.ds-datafig__more:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
+
+.ds-datafig__source-list {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
+.ds-datafig__source-list a {
+  color: var(--ds-ink);
+  text-underline-offset: 0.2em;
+}
+
+@container (max-width: 34rem) {
+  .ds-rule[data-minor='true'] .ds-rule__label {
+    display: none;
+  }
 }

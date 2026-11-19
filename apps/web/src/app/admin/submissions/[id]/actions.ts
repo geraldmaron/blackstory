@@ -19,6 +19,7 @@ export async function decideSubmission(
   const intakeItemId = String(formData.get('intakeItemId') ?? '').trim();
   const decisionRaw = String(formData.get('decision') ?? '');
   const reason = String(formData.get('reason') ?? '');
+  const publicReason = String(formData.get('publicReason') ?? '');
 
   if (!intakeItemId) {
     return { status: 'error', message: 'Missing submission id.' };
@@ -27,7 +28,12 @@ export async function decideSubmission(
     return { status: 'error', message: 'Choose a valid submission decision.' };
   }
 
-  const result = await commitSubmissionDecision({ intakeItemId, decision: decisionRaw, reason });
+  const result = await commitSubmissionDecision({
+    intakeItemId,
+    decision: decisionRaw,
+    reason,
+    publicReason,
+  });
 
   switch (result.status) {
     case 'ok':

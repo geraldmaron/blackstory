@@ -1,45 +1,45 @@
 /**
- * The Data Figure: the one anatomy every chart on `/data` renders through.
+ * The figure: the one anatomy every chart on `/data`, `/lives` and `/lives/explorer` renders
+ * through.
  *
- * In order, top to bottom: a mono figure label, the title, one plain sentence saying what the
- * figure shows (the reading, carrying the headline number in words so the figure is legible
- * without the graphic), the graphic, the caption stating the figure's limits, the source line,
- * and a native "Show the numbers" disclosure holding the full table.
+ * Top to bottom: the finding as the title (a sentence carrying the headline number), one quiet
+ * line naming what is plotted, the graphic with its direct labels, then one footer row: the
+ * source, and Limits and Numbers, which open the caption and the full table under the row.
  *
- * The table is a disclosure, not a visually hidden block: a reader checking a figure wants the
- * numbers, and a screen reader is served better by the reading sentence plus a table they can
- * open than by a hidden table they cannot find. The disclosure is a `<details>` so it works
- * before hydration and with JavaScript off.
- *
- * Multi-source figures pass `sources`; single-source figures may pass `sourceLabel` and
- * `sourceUrl`. The figure never renders without a source line: a chart with no named series
- * behind it is not a figure this page publishes.
+ * The figure imports the chart stylesheet itself, so any page that renders a figure is styled on a
+ * direct load. A figure never renders without a source: a chart with no named series behind it is
+ * not a figure this site publishes.
  */
 import React, { type ReactNode } from 'react';
 import { cx } from '@repo/ui';
-import { SourceFootnote, type DataSourceRef } from './SourceFootnote';
+import { FigureFoot } from './FigureFoot';
+import type { DataSourceRef } from './SourceFootnote';
+import './data-charts.css';
 
 void React;
 
 export type DataChartFrameProps = {
+  /** What is plotted, plainly: "Black share of the U.S. population, 1790 to 2020". */
   readonly title: string;
-  /** One sentence, sans face, saying what the figure shows. Carries the headline number. */
+  /** The finding, one sentence with its number. Becomes the figure's heading when present. */
   readonly reading?: ReactNode;
   /** The figure's limits: what the series does and does not measure. */
   readonly caption: ReactNode;
   readonly children: ReactNode;
   readonly ariaLabel?: string;
-  /** The full table. Rendered inside the numbers disclosure. */
+  /** The full table, behind Numbers. */
   readonly textAlternative: ReactNode;
   readonly sourceLabel?: string;
   readonly sourceUrl?: string;
   readonly sources?: readonly DataSourceRef[];
-  /** Mono label above the title: "Figure 1". Supplied by the section, which owns the count. */
-  readonly figureLabel?: string;
-  /** `wide` spans the section's full measure; `half` shares a row with a sibling. */
+  /** `wide` spans the section's full measure; `half` shares a row with its pair. */
   readonly span?: 'wide' | 'half';
   /** Anchor for the figure, so a reader can cite one figure and not the page. */
   readonly id?: string;
+  readonly chapterHref?: string;
+  /** Heading level of the finding: 2 straight under the page title, 3 under a page section, 4
+   *  inside a nested panel. */
+  readonly headingLevel?: 2 | 3 | 4;
   readonly className?: string;
 };
 
@@ -53,9 +53,10 @@ export function DataChartFrame({
   children,
   ariaLabel,
   textAlternative,
-  figureLabel,
   span = 'wide',
   id,
+  chapterHref,
+  headingLevel = 3,
   className,
 }: DataChartFrameProps) {
   const resolvedSources: readonly DataSourceRef[] =
@@ -63,32 +64,26 @@ export function DataChartFrame({
     (sourceLabel !== undefined && sourceUrl !== undefined
       ? [{ label: sourceLabel, url: sourceUrl }]
       : []);
+  const Heading = `h${headingLevel}` as const;
 
   return (
     <figure
       className={cx('ds-datafig', span === 'half' && 'ds-datafig--half', className)}
       {...(id ? { id } : {})}
-      {...(ariaLabel ? { 'aria-label': ariaLabel } : {})}
+      aria-label={ariaLabel ?? title}
     >
       <figcaption className="ds-datafig__head">
-        {figureLabel ? <span className="ds-datafig__label">{figureLabel}</span> : null}
-        <span className="ds-datafig__title">{title}</span>
-        {reading ? <span className="ds-datafig__reading">{reading}</span> : null}
+        <Heading className="ds-datafig__title">{reading ?? title}</Heading>
+        {reading ? <p className="ds-datafig__subtitle">{title}</p> : null}
       </figcaption>
       <div className="ds-datafig__viz">{children}</div>
-      <p className="ds-datafig__caption">{caption}</p>
-      <SourceFootnote sources={resolvedSources} density="compact" className="ds-datafig__source" />
-      <details className="ds-datafig__numbers">
-        <summary className="ds-datafig__numbers-summary">Show the numbers</summary>
-        <div
-          className="ds-datafig__numbers-body"
-          role="region"
-          aria-label={`Numbers for ${title}`}
-          tabIndex={0}
-        >
-          {textAlternative}
-        </div>
-      </details>
+      <FigureFoot
+        title={title}
+        sources={resolvedSources}
+        limits={caption}
+        numbers={textAlternative}
+        {...(chapterHref ? { chapterHref } : {})}
+      />
     </figure>
   );
 }

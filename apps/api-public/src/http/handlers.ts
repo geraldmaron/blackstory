@@ -28,6 +28,11 @@ import {
 import { bootstrapResponseV1Schema } from '@repo/public-contracts/v1/bootstrap';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
 import { mapSourceV1Schema } from '@repo/public-contracts/v1/map';
+import {
+  storiesResponseV1Schema,
+  storyListItemV1Schema,
+  storyV1Schema,
+} from '@repo/public-contracts/v1/story';
 import { searchResponseV1Schema, type SearchResponseV1 } from '@repo/public-contracts/v1/search';
 import { evaluateCompatibility } from '@repo/public-contracts/v1/compatibility';
 import {
@@ -322,6 +327,95 @@ export async function handleMap(request: ApiRequest, deps: HandlerDeps): Promise
     });
 
     const parsed = mapSourceV1Schema.safeParse(body);
+    if (!parsed.success) {
+      return internalContractError(request);
+    }
+    return jsonRead(parsed.data, {
+      requestId: request.requestId,
+      cacheControl: CACHE_CONTROL.releasedCatalog,
+      ifNoneMatch: request.headers['if-none-match'],
+    });
+  } finally {
+    rateLimited.release();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GET /v1/stories and /v1/stories/{slug}
+// ---------------------------------------------------------------------------
+
+const STORY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** Every published story in the active release, as list items (no body), newest first. */
+export async function handleStories(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
+  const floor = enforceClientFloor(request);
+  if (floor) return floor;
+
+  const attestation = await deps.clientAttestationGuard({ headers: request.headers });
+  const rateLimited = await runRateLimit(request, '/v1/stories', deps, attestation);
+  if (rateLimited.limitResponse) return rateLimited.limitResponse;
+
+  try {
+    const pointer = await deps.dataAccess.getReleasePointer();
+    if (!pointer) {
+      return errorResponse('UPSTREAM_UNAVAILABLE', 'No active release is available yet.', {
+        requestId: request.requestId,
+      });
+    }
+    const releaseId = pointer.activeRelease.releaseId;
+    const stories = await deps.dataAccess.listStories(releaseId);
+    // `storyListItemV1Schema` strips the body, sources and byline: the list is for choosing.
+    const parsed = storiesResponseV1Schema.safeParse({
+      releaseId,
+      stories: stories.map((story) => storyListItemV1Schema.parse(story)),
+    });
+    if (!parsed.success) {
+      return internalContractError(request);
+    }
+    return jsonRead(parsed.data, {
+      requestId: request.requestId,
+      cacheControl: CACHE_CONTROL.releasedCatalog,
+      ifNoneMatch: request.headers['if-none-match'],
+    });
+  } finally {
+    rateLimited.release();
+  }
+}
+
+/** One published story by slug. Unknown and unpublished slugs share one 404. */
+export async function handleStory(
+  request: ApiRequest,
+  slug: string,
+  deps: HandlerDeps,
+): Promise<ApiResponse> {
+  const floor = enforceClientFloor(request);
+  if (floor) return floor;
+
+  if (slug.length > 200 || !STORY_SLUG_PATTERN.test(slug)) {
+    return errorResponse('INVALID_REQUEST', 'Malformed story slug.', {
+      requestId: request.requestId,
+    });
+  }
+
+  const attestation = await deps.clientAttestationGuard({ headers: request.headers });
+  const rateLimited = await runRateLimit(request, '/v1/stories/' + slug, deps, attestation);
+  if (rateLimited.limitResponse) return rateLimited.limitResponse;
+
+  try {
+    const pointer = await deps.dataAccess.getReleasePointer();
+    if (!pointer) {
+      return errorResponse('UPSTREAM_UNAVAILABLE', 'No active release is available yet.', {
+        requestId: request.requestId,
+      });
+    }
+    const stories = await deps.dataAccess.listStories(pointer.activeRelease.releaseId);
+    const story = stories.find((candidate) => candidate.slug === slug);
+    if (!story) {
+      return errorResponse('NOT_FOUND', 'No such story in the active release.', {
+        requestId: request.requestId,
+      });
+    }
+    const parsed = storyV1Schema.safeParse(story);
     if (!parsed.success) {
       return internalContractError(request);
     }

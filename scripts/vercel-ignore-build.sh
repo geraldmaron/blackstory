@@ -63,8 +63,6 @@ SHARED_SKIP=(
   'infra/'
   'apps/mobile/'
   'apps/docs/'
-  'apps/api-internal/'
-  'apps/api-submissions/'
   'packages/ops-data/'
   'packages/operator-cli/'
   'packages/operator-mcp/'

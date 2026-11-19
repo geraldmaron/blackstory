@@ -24,7 +24,6 @@ export type LivesArchiveReading = {
   };
   readonly connections: readonly {
     readonly title: string;
-    readonly line: string;
     readonly href: string;
     readonly icon: DestinationIconId;
   }[];
@@ -32,7 +31,6 @@ export type LivesArchiveReading = {
 
 const duBois = {
   title: 'W. E. B. Du Bois',
-  line: 'The scholar behind the exhibit. Open the person record.',
   href: '/entity/ent_web_du_bois_001',
   icon: 'person',
 } as const;
@@ -91,7 +89,6 @@ const cityReading: LivesArchiveReading = {
     duBois,
     {
       title: 'Nicodemus, Kansas',
-      line: 'A different rural history: Black settlement and community institutions.',
       href: '/place/nicodemus',
       icon: 'place',
     },
@@ -118,7 +115,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     rights: LOC_RIGHTS,
     paragraphs: [
       'W. E. B. Du Bois chose land ownership as one way to show economic life after emancipation. The historical object keeps the act of making that case visible: lettering, color, and the decision to compare years on one sheet.',
-      'The value of land and the share of households owning a home answer different questions. A total value can grow while ownership remains uneven. Neither measure, on its own, tells us about a tenant’s rent, an owner’s debt, or who could inherit the property.',
+      'The value of land and the share of households owning a home answer different questions. A total value can grow while ownership remains uneven. Neither measure, on its own, says anything about a tenant’s rent, an owner’s debt, or who could inherit the property.',
     ],
     transcription:
       'The heading reads “Value of land owned by Georgia Negroes.” Labels on the six money bags: 1875, $1,263,902; 1880, $1,522,173; 1885, $2,362,889; 1890, $3,425,176; 1895, $4,158,960; 1899, $4,220,120. These are the exhibit’s historical dollar figures, not inflation-adjusted values or household ownership rates.',
@@ -130,7 +127,6 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       duBois,
       {
         title: 'Buying a Home',
-        line: 'Continue into the chapter on housing rules, credit, and ownership.',
         href: '/stories/buying-a-home',
         icon: 'stories',
       },
@@ -166,13 +162,11 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     connections: [
       {
         title: 'Tuskegee University',
-        line: 'Follow the institution’s place record and sources.',
         href: '/place/tuskegee-university',
         icon: 'school',
       },
       {
         title: 'Finishing school',
-        line: 'Follow the next life question: attendance isn’t the same as a diploma.',
         href: '/lives?milestone=education',
         icon: 'publication',
       },
@@ -208,13 +202,11 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     connections: [
       {
         title: 'School desegregation records',
-        line: 'Find the documented cases, schools, and places behind the legal change.',
         href: '/records?q=school%20desegregation',
         icon: 'records',
       },
       {
         title: 'Law',
-        line: 'Follow statutes and decisions beyond one opinion.',
         href: '/law',
         icon: 'law',
       },
@@ -249,13 +241,11 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     connections: [
       {
         title: 'The March on Washington Movement of 1941',
-        line: 'Open the record for the campaign behind the order.',
         href: '/place/march-on-washington-movement-of-1941',
         icon: 'movement',
       },
       {
         title: 'The Gap That Never Closed',
-        line: 'Continue into the chapter on wealth and economic inequality.',
         href: '/stories/the-gap-that-never-closed',
         icon: 'stories',
       },
@@ -277,7 +267,6 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
       duBois,
       {
         title: 'The Count',
-        line: 'Read the chapter on census categories and the power to classify.',
         href: '/stories/the-count',
         icon: 'stories',
       },

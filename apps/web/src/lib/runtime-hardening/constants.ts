@@ -116,6 +116,9 @@ export const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'] as cons
 
 export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[number];
 
+/** `/errata?type=` narrows the log to one kind of change through plain links. */
+export const ERRATA_PAGE_PARAM_ALLOWLIST = ['type'] as const;
+
 /**
  * Allowed arrival keys on public place, invention and entity record URLs.
  *

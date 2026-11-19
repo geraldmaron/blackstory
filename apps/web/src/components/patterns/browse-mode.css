@@ -20,11 +20,9 @@
   border-right: var(--ds-border-width) solid var(--ds-rule);
   background: transparent;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   cursor: pointer;
 }
 

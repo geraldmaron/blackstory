@@ -22,13 +22,14 @@
  */
 
 /** Logical partitions of the cache. Each is release-coupled EXCEPT `meta`. */
-export type CacheNamespace = 'entity' | 'search' | 'map' | 'artifact';
+export type CacheNamespace = 'entity' | 'search' | 'map' | 'artifact' | 'story';
 
 export const RELEASE_COUPLED_NAMESPACES: readonly CacheNamespace[] = [
   'entity',
   'search',
   'map',
   'artifact',
+  'story',
 ];
 
 /** One persisted cache row. `value` is opaque already-safe JSON text — the

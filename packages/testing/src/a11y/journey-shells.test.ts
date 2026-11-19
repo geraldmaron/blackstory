@@ -25,7 +25,7 @@ import { test } from 'node:test';
 import { createElement as h, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
-  Card,
+  Surface,
   Citation,
   Confidence,
   FacetRail,
@@ -139,7 +139,7 @@ const ENTITY_RECORD = () =>
       'section',
       { 'aria-labelledby': 'record-story' },
       h('h2', { id: 'record-story' }, 'What happened here'),
-      h(Card, { title: 'The corridor', meta: 'Manhattan, New York' }, 'Documented from 1926.'),
+      h(Surface, { title: 'The corridor', meta: 'Manhattan, New York' }, 'Documented from 1926.'),
       h(Timeline, {
         labelledBy: 'record-story',
         items: [{ id: '1', time: '1926', title: 'First documented lease' }],

@@ -13,13 +13,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
-  buildCollectionGroups,
-  buildCollectionShelves,
-  buildEraGroups,
-  buildKindChips,
-  buildPlaceGroups,
-  buildTagGroups,
-  computeStoriesFacts,
+  buildStoriesFront,
   filterItems,
   hasActiveNarrowing,
   nextInCollection,
@@ -27,11 +21,10 @@ import {
   paginateStories,
   parseStoriesQuery,
   pickLeadStory,
-  showsShelves,
+  showsFront,
   sortItems,
   storiesHref,
   storiesNotice,
-  uncollectedItems,
 } from './stories-index';
 import type { PublicStoryListItemDoc } from '@repo/schemas';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
@@ -261,59 +254,7 @@ describe('/stories · sorting', () => {
   });
 });
 
-describe('/stories · rail groups and chips', () => {
-  const items = [
-    item({ id: 'c1', slug: 'c1', format: 'chapter', eraLabel: '1911–present', placeLabel: 'US' }),
-    item({
-      id: 'p1',
-      slug: 'p1',
-      format: 'entry',
-      eraLabel: '1789–1797',
-      placeLabel: 'US',
-      tags: ['Founding era'],
-      collection: { id: 'presidents', label: 'Presidential records', position: 1 },
-    }),
-  ];
-
-  it('counts each format, and drops a chip with no entries behind it', () => {
-    const chips = buildKindChips(items, EMPTY);
-    assert.deepEqual(
-      chips.map((chip) => [chip.label, chip.count]),
-      [
-        ['All', 2],
-        ['Chapters', 1],
-        ['Entries', 1],
-      ],
-    );
-    // EMPTY is the All view, so All is the engaged chip.
-    assert.equal(chips[0]?.active, true);
-    assert.equal(chips[1]?.active, false);
-  });
-
-  it('marks the engaged chip as current for assistive technology', () => {
-    const chips = buildKindChips(items, { ...EMPTY, format: 'entry' });
-    assert.equal(chips.find((chip) => chip.label === 'Entries')?.active, true);
-    assert.equal(chips.find((chip) => chip.label === 'All')?.active, false);
-  });
-
-  it('builds collection, era, tag and place groups that link back into the index across both kinds', () => {
-    // These rail links carry no format at all now: the default view is every format, so a grouping
-    // that is entirely `entry` (like "Presidential records") resolves correctly without an
-    // override. They used to need an explicit `format=all`.
-    assert.deepEqual(buildCollectionGroups(items), [
-      { label: 'Presidential records', href: '/stories?collection=presidents', count: 1 },
-    ]);
-    assert.deepEqual(buildTagGroups(items), [
-      { label: 'Founding era', href: '/stories?tag=Founding+era', count: 1 },
-    ]);
-    assert.equal(buildEraGroups(items).length, 2);
-    assert.deepEqual(buildPlaceGroups(items), [
-      { label: 'US', href: '/stories?place=US', count: 2 },
-    ]);
-  });
-});
-
-describe('/stories · shelves', () => {
+describe('/stories · the editorial front', () => {
   const chapter1 = item({
     id: 'p1',
     slug: 'p1',
@@ -331,22 +272,31 @@ describe('/stories · shelves', () => {
   const uncollected = item({ id: 'u1', slug: 'u1', format: 'chapter', publishedAt: '2024-01-01' });
   const items = [chapter1, chapter2, uncollected];
 
-  it('groups members by collection in the collection order, largest shelf first', () => {
-    const shelves = buildCollectionShelves(items);
+  it('splits into a lead cover, chapter covers and the list, with no story shown twice', () => {
+    const entry = item({ id: 'e1', slug: 'e1', format: 'entry', publishedAt: '2026-01-01' });
+    const front = buildStoriesFront([...items, entry]);
+    assert.equal(front.lead?.slug, 'u1');
     assert.deepEqual(
-      shelves.map((shelf) => [shelf.id, shelf.label, shelf.count]),
-      [['presidents', 'Presidential records', 2]],
+      front.covers.map((cover) => cover.slug),
+      ['p2', 'p1'],
     );
     assert.deepEqual(
-      shelves[0]?.members.map((member) => member.slug),
-      ['p1', 'p2'],
+      front.rest.map((row) => row.slug),
+      ['e1'],
     );
+    const seen = [front.lead, ...front.covers, ...front.rest].map((row) => row?.slug);
+    assert.equal(new Set(seen).size, seen.length);
   });
 
-  it('uncollected items are exactly the ones with no collection', () => {
+  it('caps the chapter covers and sends the overflow to the list in its given order', () => {
+    const front = buildStoriesFront(items, 1);
     assert.deepEqual(
-      uncollectedItems(items).map((entry) => entry.slug),
-      ['u1'],
+      front.covers.map((cover) => cover.slug),
+      ['p2'],
+    );
+    assert.deepEqual(
+      front.rest.map((row) => row.slug),
+      ['p1'],
     );
   });
 
@@ -371,19 +321,16 @@ describe('/stories · shelves', () => {
     assert.equal(pickLeadStory([]), undefined);
   });
 
-  it('shelves show in the unnarrowed, collection-sorted browse state, for any format chip', () => {
-    assert.equal(showsShelves(EMPTY), true);
-    assert.equal(showsShelves({ ...EMPTY, q: 'lincoln' }), false);
-    assert.equal(showsShelves({ ...EMPTY, sort: 'newest' }), false);
-    // The format chip alone must not gate shelf mode: a collection can be entirely `entry`
-    // (the presidents), so tying shelves to the chapters-only default meant its shelf could
-    // never render under any chip a reader could actually reach.
-    assert.equal(showsShelves({ ...EMPTY, format: 'entry' }), true);
-    assert.equal(showsShelves({ ...EMPTY, format: '' }), true);
+  it('the front shows only on bare /stories; any toolbar choice turns it into the flat list', () => {
+    assert.equal(showsFront(EMPTY), true);
+    assert.equal(showsFront({ ...EMPTY, q: 'lincoln' }), false);
+    assert.equal(showsFront({ ...EMPTY, sort: 'newest' }), false);
+    assert.equal(showsFront({ ...EMPTY, format: 'entry' }), false);
+    assert.equal(showsFront({ ...EMPTY, collection: 'presidents' }), false);
   });
 });
 
-describe('/stories · shelves, the uncollected remainder and collection navigation', () => {
+describe('/stories · collection navigation', () => {
   const items = [
     item({ id: 'c1', slug: 'lone-chapter', format: 'chapter' }),
     item({
@@ -408,22 +355,6 @@ describe('/stories · shelves, the uncollected remainder and collection navigati
       collection: { id: 'presidents', label: 'Presidential records', position: 3 },
     }),
   ];
-
-  it('builds one shelf per collection, largest first, each carrying its own members in order', () => {
-    const shelves = buildCollectionShelves(items, 2);
-    assert.deepEqual(
-      shelves.map((shelf) => [shelf.id, shelf.count, shelf.members.map((m) => m.slug)]),
-      [['presidents', 3, ['washington', 'adams']]],
-    );
-    assert.equal(shelves[0]?.href, '/stories?collection=presidents');
-  });
-
-  it('the uncollected list is everything with no collection, and nothing else', () => {
-    assert.deepEqual(
-      uncollectedItems(items).map((i) => i.slug),
-      ['lone-chapter'],
-    );
-  });
 
   it('finds the next member of a collection after the given position', () => {
     const next = nextInCollection(items, 'presidents', 1);
@@ -464,27 +395,7 @@ describe('/stories · shelves, the uncollected remainder and collection navigati
   });
 });
 
-describe('/stories · facts and pagination', () => {
-  it('summarizes the published count, year span and place count', () => {
-    const facts = computeStoriesFacts([
-      item({ id: '1', slug: '1', publishedAt: '2019-01-01', placeLabel: 'A' }),
-      item({ id: '2', slug: '2', publishedAt: '2024-01-01', placeLabel: 'B' }),
-    ]);
-    assert.equal(facts.publishedCount, 2);
-    assert.equal(facts.eraSpanLabel, '2019 to 2024');
-    assert.equal(facts.placeCount, 2);
-    assert.equal(facts.placeLabel, '2 places');
-  });
-
-  it('omits a collapsed publication-year span and singularizes one place', () => {
-    const facts = computeStoriesFacts([
-      item({ id: '1', slug: '1', publishedAt: '2026-01-01', placeLabel: 'United States' }),
-      item({ id: '2', slug: '2', publishedAt: '2026-06-01', placeLabel: 'United States' }),
-    ]);
-    assert.equal(facts.eraSpanLabel, undefined);
-    assert.equal(facts.placeLabel, '1 place');
-  });
-
+describe('/stories · pagination', () => {
   it('never emits page=1 in the previous link, and clamps an out-of-range page', () => {
     // Sized off the shared page constant so this never re-breaks if /records retunes it.
     const many = Array.from({ length: RECORDS_PAGE_SIZE * 2 + 1 }, (_, index) =>

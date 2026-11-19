@@ -33,6 +33,14 @@ export const CORRECTION_TARGET_LABELS: Readonly<Record<CorrectionTargetType, str
   location: 'Location or geography',
 };
 
+/** The target picker's labels: short enough to sit side by side in one Segmented control. */
+export const CORRECTION_TARGET_SHORT_LABELS: Readonly<Record<CorrectionTargetType, string>> = {
+  entity: 'Record',
+  claim: 'Claim',
+  source: 'Source',
+  location: 'Place',
+};
+
 export function isCorrectionCategory(value: string): value is CorrectionCategory {
   return (CORRECTION_CATEGORIES as readonly string[]).includes(value);
 }

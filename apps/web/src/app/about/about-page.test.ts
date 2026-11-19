@@ -17,7 +17,7 @@ import {
   ABOUT_ORIGIN,
   ABOUT_PILLARS,
   ABOUT_REFUSALS,
-  ABOUT_ROOMS_HANDOFF,
+  ABOUT_COLLECTIONS_HANDOFF,
   ABOUT_SOURCE_LIBRARY_HANDOFF,
   ABOUT_STANCE,
 } from './about-copy';
@@ -59,12 +59,15 @@ test('the page states what the archive refuses to do', () => {
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
 });
 
-test('contribution cards come from the registry; the room catalogue hands off to /rooms', () => {
+test('trust and contribution links come from the registry; collections hand off to /collections', () => {
   assert.match(sectionsSource, /destinationsInGroup\('take-part'\)/);
+  assert.match(sectionsSource, /destinationsInGroup\('check'\)/);
   assert.match(sectionsSource, /cardTitleFor/);
-  assert.match(sectionsSource, /DestinationIcon/);
-  assert.match(sectionsSource, /ABOUT_ROOMS_HANDOFF/);
-  assert.equal(ABOUT_ROOMS_HANDOFF.href, '/rooms');
+  // Flat link rows: no icon plates and no cards.
+  assert.doesNotMatch(sectionsSource, /DestinationIcon|CardGrid|RoomCard|RoomHandoff/);
+  assert.match(sectionsSource, /TrustLinks/);
+  assert.match(sectionsSource, /ABOUT_COLLECTIONS_HANDOFF/);
+  assert.equal(ABOUT_COLLECTIONS_HANDOFF.href, '/collections');
   assert.doesNotMatch(sectionsSource, /readRooms|checkRooms|\[\.\.\.readRooms/);
   // The old page hardcoded six links, two of them into `/history`, which is a redirect endpoint.
   assert.doesNotMatch(sectionsSource, /href="\/history"/);
@@ -77,9 +80,22 @@ test('no list is numbered: neither the pillars nor the refusals are a sequence',
 });
 
 test('every multi-column rule is inside a min-width query', () => {
-  // Guards the defect this rewrite fixed: three columns of prose held down to 375px.
-  const beforeFirstQuery = cssSource.split('@media')[0] ?? '';
+  // Guards the defect this rewrite fixed: three columns of prose held down to 375px. The state
+  // tile map is the one exception: it is a fixed 11-column figure, not columns of text.
+  const withoutTileGrid = cssSource.replace(/\.ds-about-states__grid \{[^}]*\}/, '');
+  const beforeFirstQuery = withoutTileGrid.split('@media')[0] ?? '';
   assert.doesNotMatch(beforeFirstQuery, /grid-template-columns:\s*repeat\(/);
+});
+
+test('the map placeholder is gone, replaced by a figure drawn from the register', () => {
+  assert.doesNotMatch(sectionsSource, /MapMoment/);
+  assert.match(sectionsSource, /<RecordsByState/);
+});
+
+test('grade definitions are linked, never restated', () => {
+  const pillars = ABOUT_PILLARS.map((pillar) => pillar.body).join(' ');
+  assert.doesNotMatch(pillars, /established, corroborated/);
+  assert.match(sectionsSource, /\/methodology#evidence-grades/);
 });
 
 test('about links to the source library room', () => {
@@ -89,7 +105,7 @@ test('about links to the source library room', () => {
   assert.doesNotMatch(sectionsSource, /href="\/methodology#where-the-evidence-comes-from"/);
 });
 
-test('about sections are deep-linkable through a jump nav', () => {
+test('about sections are deep-linkable through a contents list', () => {
   assert.match(sectionsSource, /RoomJump/);
   assert.match(sectionsSource, /id: 'stance'/);
   assert.match(sectionsSource, /id: 'pillars'/);
@@ -99,13 +115,10 @@ test('about sections are deep-linkable through a jump nav', () => {
   assert.match(sectionsSource, /RoomSection/);
 });
 
-test('about pillars and jump nav carry orientation glyphs', () => {
-  for (const pillar of ABOUT_PILLARS) {
-    assert.ok(pillar.icon, `${pillar.kicker} carries a pillar glyph`);
-  }
+test('about sections carry no kicker or icon plate', () => {
   assert.match(sectionsSource, /RoomFactList/);
-  assert.match(sectionsSource, /RoomJump/);
-  assert.match(sectionsSource, /icon="source"/);
+  assert.doesNotMatch(sectionsSource, /kicker[=:]/);
+  assert.doesNotMatch(sectionsSource, /<RoomSection[^>]*icon=/);
 });
 
 test('about is a room on the walk, not the old board', () => {
@@ -114,7 +127,7 @@ test('about is a room on the walk, not the old board', () => {
   assert.doesNotMatch(sectionsSource, /Banned books/);
   assert.doesNotMatch(sectionsSource, /['"`]\/banned-books/);
   assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
-  assert.match(sectionsSource, /WalkOffRamp/);
+  assert.doesNotMatch(sectionsSource, /WalkOffRamp/);
   assert.match(sectionsSource, /ABOUT_ORIGIN/);
   assert.match(sectionsSource, /ABOUT_PILLARS/);
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
@@ -125,7 +138,12 @@ test('the page discloses how the long-form writing is made, including the AI use
   // is drafted with AI has been misled by this page's silence. It also has to state the limit,
   // because "AI writes it" without "AI cannot lower the evidence bar" is the wrong half.
   assert.match(sectionsSource, /ABOUT_NEO/);
-  const neo = [...ABOUT_NEO.rules, ...ABOUT_NEO.human, ABOUT_NEO.hand].join(' ');
+  const neo = [
+    ...ABOUT_NEO.rules,
+    ...ABOUT_NEO.steps.map((step) => step.body),
+    ...ABOUT_NEO.human,
+    ABOUT_NEO.hand,
+  ].join(' ');
   assert.match(neo, /\bAI\b/, 'the section says plainly that AI is used');
   assert.match(neo, /written standard/, 'the writing standard is mentioned');
   assert.doesNotMatch(neo, /\.md\b|docs\//, 'no internal file path reaches a reader');
@@ -168,11 +186,12 @@ test('nothing on this page speaks as an institutional "we"', () => {
     ...ABOUT_NEO.rules,
     ...ABOUT_NEO.human,
     ABOUT_NEO.hand,
+    ABOUT_NEO.photographs,
     ABOUT_CONTRIBUTE.lede,
     ABOUT_CONTRIBUTE.terms,
     ABOUT_CONTRIBUTE.direct,
-    ABOUT_ROOMS_HANDOFF.lede,
-    ABOUT_ROOMS_HANDOFF.label,
+    ABOUT_COLLECTIONS_HANDOFF.lede,
+    ABOUT_COLLECTIONS_HANDOFF.label,
     ...ABOUT_PILLARS.map((pillar) => pillar.body),
   ];
   for (const value of strings) {
@@ -188,17 +207,18 @@ test('user-facing copy avoids em dashes', () => {
     ...ABOUT_NEO.human,
     ABOUT_NEO.heading,
     ABOUT_NEO.hand,
+    ABOUT_NEO.photographs,
     ABOUT_CONTRIBUTE.heading,
     ABOUT_CONTRIBUTE.lede,
     ABOUT_CONTRIBUTE.terms,
     ABOUT_CONTRIBUTE.direct,
-    ABOUT_ROOMS_HANDOFF.lede,
-    ABOUT_ROOMS_HANDOFF.label,
+    ABOUT_COLLECTIONS_HANDOFF.lede,
+    ABOUT_COLLECTIONS_HANDOFF.label,
     ABOUT_STANCE.heading,
     ...ABOUT_STANCE.paragraphs,
     ABOUT_STANCE.maker.lead,
     ABOUT_STANCE.maker.label,
-    ...ABOUT_PILLARS.flatMap((pillar) => [pillar.kicker, pillar.title, pillar.body]),
+    ...ABOUT_PILLARS.flatMap((pillar) => [pillar.title, pillar.body]),
   ];
   for (const value of strings) {
     assert.doesNotMatch(value, /—/);

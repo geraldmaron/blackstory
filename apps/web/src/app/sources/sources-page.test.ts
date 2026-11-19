@@ -1,5 +1,6 @@
 /**
- * `/sources` wiring: the public source library is its own room, not a buried Methodology hash.
+ * `/sources` wiring: the public source library is its own room, and it lists real publishers
+ * from the released catalog rather than describing a list it does not show.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -18,7 +19,7 @@ test('/sources is a registered reading room in the trust group', () => {
   assert.equal(surfaceClassFor('/sources'), 'reading');
   const destination = destinationFor('/sources');
   assert.ok(destination, '/sources has no registry entry, so it is in no reader-facing list');
-  assert.equal(destination.parent, '/rooms');
+  assert.equal(destination.parent, '/about');
   assert.equal(destination.group, 'check');
   assert.equal(destination.label, 'Source library');
   assert.equal(destination.browsable, true);
@@ -28,14 +29,17 @@ test('the public source-library href is the room, not a methodology fragment', (
   assert.equal(METHODOLOGY_SOURCE_LIBRARY_HREF, '/sources');
 });
 
-test('the page renders lineage, publisher kinds, and existing surfaces', () => {
-  assert.match(pageSource, /SourcesSections/);
+test('the page lists publishers from the catalog, then the chain and the kinds', () => {
+  assert.match(pageSource, /loadSourceLibrary\(\)/);
+  assert.match(sectionsSource, /<SourcesTable/);
   assert.match(sectionsSource, /SOURCE_LINEAGE_STAGES/);
   assert.match(sectionsSource, /SOURCE_PUBLISHER_KINDS/);
-  assert.match(sectionsSource, /SOURCE_LIBRARY_SURFACES/);
-  assert.match(sectionsSource, /SourceLineageDiagram/);
-  assert.match(sectionsSource, /WalkOffRamp/);
   assert.match(sectionsSource, /RoomJump/);
-  assert.match(sectionsSource, /RoomHandoff/);
+  assert.doesNotMatch(sectionsSource, /WalkOffRamp|RoomHandoff/);
   assert.doesNotMatch(sectionsSource, /—/);
+});
+
+test('a catalog outage reads as an outage, never as an empty library', () => {
+  assert.match(sectionsSource, /could not be loaded/);
+  assert.match(sectionsSource, /No published record cites a source yet/);
 });

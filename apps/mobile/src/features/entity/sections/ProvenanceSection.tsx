@@ -12,7 +12,7 @@ import { StyleSheet, View } from 'react-native';
 import { RecordMeter, Text, space } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import { RecordBeatRow } from '../RecordBeatRow';
-import { formatIsoDate, humanizeToken } from '../format';
+import { formatIsoDate, humanizeToken, recordMaturityLabel } from '../format';
 import type { Entity } from '../types';
 
 const COVERAGE_LEVELS = ['minimal', 'partial', 'substantial'] as const;
@@ -44,8 +44,8 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
     >
       <View style={styles.rows}>
         <RecordBeatRow
-          label="Maturity"
-          value={humanizeToken(entity.recordMaturity || 'unknown')}
+          label="Research"
+          value={recordMaturityLabel(entity.recordMaturity)}
           testID="entity-provenance-maturity"
         />
         <RecordBeatRow

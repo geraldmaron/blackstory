@@ -8,18 +8,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
 import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
-import { DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG, plateForScheme } from '../../lib/map-experience';
+import { DIGNITY_PALETTE, plateForScheme } from '../../lib/map-experience';
 import { brandPalette, lightnessDelta, mapPalettes } from '@repo/ui';
-import { KIND_FAMILY_ENTRIES } from '../../lib/map-experience/kind-encoding';
-import {
-  markerHaloRadiusExpression,
-  markerRadiusExpression,
-} from '../../lib/map-experience/marker-size';
-import {
-  FIRST_PAINT_MAP_MAX_ZOOM,
-  FIRST_PAINT_RECORD_FILL_OPACITY,
-  firstPaintOrKindRadiusExpression,
-} from '../../lib/map-experience/first-paint-map-paint';
 import {
   COUNTY_LABELS_MIN_ZOOM,
   COUNTY_LINES_MIN_ZOOM,
@@ -27,22 +17,11 @@ import {
 import { STATE_LABEL_FADE_END_ZOOM } from '../../lib/map-experience/state-labels';
 import {
   buildExploreMapStyle,
-  ENTITY_CLUSTER_OPACITY,
-  ENTITY_HALO_OPACITY,
-  ENTITY_POINT_FILL_OPACITY,
-  ENTITY_PRECISION_RADIUS_OPACITY,
-  ENTITY_SELECTED_PULSE_OPACITY_FROM,
-  ENTITY_SELECTED_PULSE_OPACITY_TO,
-  ENTITY_SELECTED_PULSE_SCALE_FROM,
-  ENTITY_SELECTED_PULSE_SCALE_TO,
-  ENTITY_SELECTED_PULSE_STATIC_OPACITY,
-  ENTITY_SELECTED_PULSE_STATIC_SCALE,
-  ENTITY_SELECTED_RADIUS_OFFSET,
-  entitySelectedPulseOpacity,
-  entitySelectedPulseRadiusExpression,
-  entitySelectedPulseStaticRadiusExpression,
-  selectedRingRadiusExpression,
+  EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
+  EXPLORE_PLACE_NAME_LAYER_ID,
+  EXPLORE_JURISDICTION_TAG_LAYER_ID,
+  EXPLORE_SELECTED_TAG_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
   EXPLORE_COUNTY_LINES_LAYER_ID,
@@ -50,20 +29,20 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
-  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  EXPLORE_STATE_LABEL_LAYER_ID,
+  EXPLORE_STATE_LABEL_SELECTED_LAYER_ID,
+  EXPLORE_STATE_LABELS_SOURCE_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  EXPLORE_US_LAND_LAYER_ID,
+  JURISDICTION_TAG_MIN_ZOOM,
   PLATE_BACKGROUND_OPACITY,
   PLATE_STATE_FILL_OPACITY,
   selectedPointFilterExpression,
+  selectedTagFilterExpression,
+  stateLabelFilters,
 } from './explore-style';
-import {
-  MARKER_ZOOM_SCALE_STOPS,
-  markerRadiusPlusScaledExpression,
-} from '../../lib/map-experience/marker-size';
 
 type LayerLike = {
   readonly id: string;
@@ -93,20 +72,6 @@ function matchExpressionOutputs(expression: unknown): readonly unknown[] {
   return outputs;
 }
 
-/** Stroke widths are zoom-scaled: `['*', match, scale]`, either bare (the value at one stop of a
- * folded first-paint blend, see `blendFirstPaintWithKindExpression`) or at the first stop of a
- * top-level zoom `interpolate`. */
-function strokeWidthMatchOutputs(expression: unknown): readonly unknown[] {
-  const arr = expression as unknown[];
-  if (arr[0] === 'match') return matchExpressionOutputs(expression);
-  if (arr[0] === '*') return matchExpressionOutputs(arr[1]);
-  assert.equal(arr[0], 'interpolate', 'expected zoom-scaled stroke width');
-  assert.deepEqual(arr[2], ['zoom']);
-  const firstScaled = arr[4] as unknown[];
-  assert.equal(firstScaled[0], '*');
-  return matchExpressionOutputs(firstScaled[1]);
-}
-
 function buildStyleFixture(
   layerMode: 'off' | 'presence' | 'blackShare' | 'blackChange',
   popGeo: 'state' | 'county' = 'county',
@@ -120,21 +85,26 @@ function buildStyleFixture(
   });
 }
 
-test('the entities source clusters with per-family counters for dominant shade paint', () => {
+test('the entities source groups records by place, never by pixel clustering', () => {
   const style = buildStyleFixture('presence');
   const entitiesSource = style.sources['explore-entities'] as {
     cluster?: boolean;
-    clusterRadius?: number;
-    clusterMaxZoom?: number;
-    clusterProperties?: Record<string, unknown>;
+    data: { features: { properties: Record<string, unknown> }[] };
   };
-  assert.equal(entitiesSource.cluster, true);
-  assert.equal(entitiesSource.clusterRadius, EXPLORE_CLUSTER_CONFIG.clusterRadius);
-  assert.equal(entitiesSource.clusterMaxZoom, EXPLORE_CLUSTER_CONFIG.clusterMaxZoom);
-  assert.equal((entitiesSource.clusterProperties?.people_n as unknown[] | undefined)?.[0], '+');
+  assert.equal(entitiesSource.cluster, undefined);
+  const tokens = entitiesSource.data.features.filter((f) => 'point_count' in f.properties);
+  assert.ok(tokens.length > 0, 'place tokens are in the source');
+  for (const token of tokens) {
+    assert.match(String(token.properties.placeKey), /^(state|county|city|square)-/);
+    assert.ok(Number(token.properties.minZoom) < Number(token.properties.maxZoom));
+  }
+  // Every token, record mark and count layer is cut to its zoom band.
+  for (const id of [EXPLORE_CLUSTER_LAYER_ID, EXPLORE_UNCLUSTERED_POINT_LAYER_ID]) {
+    assert.match(JSON.stringify((layerById(style, id) as { filter?: unknown }).filter), /"zoom"/);
+  }
 });
 
-test('clusteringEnabled: false disables GeoJSON clustering on the entities source', () => {
+test('clusteringEnabled: false draws every record as its own mark with no tokens', () => {
   const source = buildExploreMapSource(listPublicEntities());
   const style = buildExploreMapStyle({
     featureCollection: source.featureCollection,
@@ -142,63 +112,21 @@ test('clusteringEnabled: false disables GeoJSON clustering on the entities sourc
     layerMode: 'off',
     clusteringEnabled: false,
   });
-  const entitiesSource = style.sources['explore-entities'] as { cluster?: boolean };
-  assert.equal(entitiesSource.cluster, false);
+  const entitiesSource = style.sources['explore-entities'] as {
+    data: { features: { properties: Record<string, unknown> }[] };
+  };
+  assert.ok(entitiesSource.data.features.every((f) => !('point_count' in f.properties)));
 });
 
-function localityZoomBranch(expression: unknown): unknown[] {
-  assert.ok(Array.isArray(expression));
-  assert.equal(expression[0], 'interpolate');
-  assert.equal(expression[3], FIRST_PAINT_MAP_MAX_ZOOM);
-  // interpolate stops are [zoom, value, zoom, value]; locality kind branch is the final value.
-  return expression[6] as unknown[];
-}
-
-test('unclustered point fill and halo use first-paint opacity nationally, kind opacity locally', () => {
-  const style = buildStyleFixture('presence');
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const haloLayer = layerById(style, EXPLORE_UNCLUSTERED_HALO_LAYER_ID);
-  const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
-  assert.equal(clusterLayer.paint?.['circle-opacity'], ENTITY_CLUSTER_OPACITY);
-  const haloOpacity = haloLayer.paint?.['circle-opacity'] as unknown[];
-  assert.equal(haloOpacity[0], 'interpolate');
-  assert.deepEqual(haloOpacity[4], ['literal', 0]);
-  assert.deepEqual(haloOpacity[6], ['literal', ENTITY_HALO_OPACITY]);
-  const pointOpacity = pointLayer.paint?.['circle-opacity'] as unknown[];
-  assert.equal(pointOpacity[0], 'interpolate');
-  const nationalOpacity = pointOpacity[4] as unknown[];
-  assert.equal(nationalOpacity[0], 'case');
-  assert.equal(nationalOpacity[3], FIRST_PAINT_RECORD_FILL_OPACITY);
-  const localityOpacityOutputs = matchExpressionOutputs(localityZoomBranch(pointOpacity));
-  assert.ok(localityOpacityOutputs.includes(ENTITY_POINT_FILL_OPACITY));
-});
-
-test('GL entity discs draw at every zoom: no HTML markers take over past cluster max zoom', () => {
-  // Past zoom 12 every record used to become a DOM marker (thousands of elements repositioned on
-  // every camera frame). The map's own circle layers now draw the individual records at street
-  // level too, so none of them may stop at a max zoom.
-  const style = buildStyleFixture('presence');
-  for (const layerId of [
-    EXPLORE_PRECISION_RADIUS_LAYER_ID,
-    EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-    EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-    EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-    EXPLORE_SELECTED_POINT_LAYER_ID,
-  ] as const) {
-    const layer = layerById(style, layerId) as { maxzoom?: number };
-    assert.equal(layer.maxzoom, undefined, `${layerId} must keep drawing past cluster max zoom`);
-  }
-});
-
-test('selected-entity ring layer exists and starts with an empty filter', () => {
+test('selected-entity layer exists and starts with an empty filter', () => {
   const style = buildStyleFixture('presence');
   const selected = style.layers.find((layer) => layer.id === EXPLORE_SELECTED_POINT_LAYER_ID) as {
     filter?: unknown;
     paint?: Record<string, unknown>;
   };
-  assert.ok(selected, 'expected selected point ring layer');
+  assert.ok(selected, 'expected selected point layer');
   assert.deepEqual(selected.filter, ['==', ['get', 'entityId'], '']);
-  assert.equal(selected.paint?.['circle-color'], 'rgba(0,0,0,0)');
+  assert.equal((selected.paint?.['circle-color'] as unknown[])[2], DIGNITY_PALETTE.point);
 });
 
 test('selectedPointFilterExpression matches only the selected feature, never all/none ambiguously', () => {
@@ -211,60 +139,6 @@ test('selectedPointFilterExpression matches only the selected feature, never all
   assert.deepEqual(selectedPointFilterExpression(undefined), ['==', ['get', 'entityId'], '']);
 });
 
-test('entitySelectedPulseRadiusExpression scales the ring from 1x to ~2.1x over the loop (patterns-cinematic-map.md §3)', () => {
-  assert.deepEqual(
-    entitySelectedPulseRadiusExpression(0),
-    markerRadiusPlusScaledExpression(
-      ENTITY_SELECTED_RADIUS_OFFSET,
-      ENTITY_SELECTED_PULSE_SCALE_FROM,
-    ),
-  );
-  assert.deepEqual(
-    entitySelectedPulseRadiusExpression(1),
-    markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, ENTITY_SELECTED_PULSE_SCALE_TO),
-  );
-  // Ease-in-out is monotonic-ish across the loop midpoint — not asserting the exact eased value,
-  // just that mid-loop sits strictly between the two endpoints.
-  const midExpression = entitySelectedPulseRadiusExpression(0.5) as unknown[];
-  assert.notDeepEqual(midExpression, entitySelectedPulseRadiusExpression(0));
-  assert.notDeepEqual(midExpression, entitySelectedPulseRadiusExpression(1));
-});
-
-test('the animated selection ring reads no feature data, so MapLibre does not re-tile on every frame', () => {
-  // A data-driven paint value (one that `['get', …]`s a feature property) makes MapLibre rebuild
-  // the source's tiles whenever it changes; the pulse changes it every frame. With the selected
-  // record's radius folded in as a number, the per-frame value is zoom-only.
-  for (const expression of [
-    entitySelectedPulseRadiusExpression(0.37, 7),
-    entitySelectedPulseStaticRadiusExpression(7),
-  ]) {
-    assert.doesNotMatch(JSON.stringify(expression), /"get"/);
-    assert.deepEqual((expression as unknown[]).slice(0, 3), ['interpolate', ['linear'], ['zoom']]);
-  }
-  // Same ring as the data-driven form at the loop's start, for a record of that radius.
-  const ring = selectedRingRadiusExpression(7, ENTITY_SELECTED_PULSE_SCALE_FROM) as unknown[];
-  assert.equal(ring[4], (7 + ENTITY_SELECTED_RADIUS_OFFSET) * MARKER_ZOOM_SCALE_STOPS[0]![1]);
-});
-
-test('entitySelectedPulseOpacity fades from 0.9 to 0.12 over the loop (patterns-cinematic-map.md §3)', () => {
-  assert.equal(entitySelectedPulseOpacity(0), ENTITY_SELECTED_PULSE_OPACITY_FROM);
-  assert.equal(entitySelectedPulseOpacity(1), ENTITY_SELECTED_PULSE_OPACITY_TO);
-  const mid = entitySelectedPulseOpacity(0.5);
-  assert.ok(mid < ENTITY_SELECTED_PULSE_OPACITY_FROM && mid > ENTITY_SELECTED_PULSE_OPACITY_TO);
-});
-
-test('entitySelectedPulseStaticRadiusExpression matches the reduced-motion static ring (scale ~1.35)', () => {
-  assert.deepEqual(
-    entitySelectedPulseStaticRadiusExpression(),
-    markerRadiusPlusScaledExpression(
-      ENTITY_SELECTED_RADIUS_OFFSET,
-      ENTITY_SELECTED_PULSE_STATIC_SCALE,
-    ),
-  );
-  assert.equal(ENTITY_SELECTED_PULSE_STATIC_SCALE, 1.35);
-  assert.equal(ENTITY_SELECTED_PULSE_STATIC_OPACITY, 0.85);
-});
-
 test('selection touches only the dedicated ring layer — main entity layers never filter/paint on entityId', () => {
   const style = buildStyleFixture('presence');
   // Selecting/deselecting must remain single-feature: the shared point/halo/cluster layers that
@@ -273,10 +147,8 @@ test('selection touches only the dedicated ring layer — main entity layers nev
   // re-encode the layers/source neighboring pins render from (patterns-cinematic-map.md §2 rule 5).
   const neighborLayerIds = [
     EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-    EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-    EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
     EXPLORE_CLUSTER_LAYER_ID,
-    EXPLORE_PRECISION_RADIUS_LAYER_ID,
+    EXPLORE_JURISDICTION_TAG_LAYER_ID,
   ];
   for (const id of neighborLayerIds) {
     const layer = layerById(style, id) as LayerLike & { filter?: unknown };
@@ -407,16 +279,18 @@ test('the jurisdiction-area layer renders fill geometry (never a point layer) an
 
 test('every paint color used is one of the dignity-palette values (no new hue introduced at render time)', () => {
   const style = buildStyleFixture('presence');
-  const allowed = new Set<string>(Object.values(DIGNITY_PALETTE));
+  const allowed = new Set<string>([
+    ...Object.values(DIGNITY_PALETTE),
+    ...Object.values(plateForScheme('dark')),
+  ]);
   // The state-bounds line/background/text layers also draw from the dignity palette or the
   // shared brand tokens; the cluster/point/halo/event-glyph layers below are the ones the
   // dignity rule is specifically about (plain string paint values here; kind-keyed `match`
   // expressions are validated separately below, since `typeof value !== 'string'` skips arrays).
   const dignityGatedLayerIds = [
     EXPLORE_CLUSTER_LAYER_ID,
-    EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
     EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-    EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+    EXPLORE_SELECTED_POINT_LAYER_ID,
   ];
   for (const layer of style.layers) {
     if (!dignityGatedLayerIds.includes(layer.id)) continue;
@@ -446,25 +320,27 @@ test('the state-selected fill and density fallback tints are relocated DIGNITY_P
   const restingColor = colorAExpr[2] as unknown[];
   const tierFallback = restingColor[2] as unknown[];
   const tierOutputs = matchExpressionOutputs(tierFallback);
-  assert.ok(tierOutputs.includes(DIGNITY_PALETTE.densityUnknownFill));
+  assert.ok(tierOutputs.includes(plateForScheme('dark').densityUnknown));
+  assert.ok(Object.values(DIGNITY_PALETTE).includes(plateForScheme('dark').densityUnknown));
 
   // With no data to show, this layer is simply the landmass.
   const densityLayerOff = layerById(off, EXPLORE_STATE_DENSITY_LAYER_ID);
   assert.equal(densityLayerOff.paint?.['fill-color'], plateForScheme('dark').land);
 });
 
-test('OpenFreeMap street layers are present for casing, fill, and labels', () => {
+test('the land stays one flat value: no landcover fill, and streets are one quiet line', () => {
   const style = buildStyleFixture('presence');
   assert.ok(style.sources['openfreemap'], 'expected openfreemap vector source');
-  assert.ok(style.layers.some((layer) => layer.id === 'explore-street-casing'));
+  assert.ok(!style.layers.some((layer) => layer.id === 'plate-landcover'));
+  assert.ok(!style.layers.some((layer) => layer.id === 'explore-street-casing'));
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-fill'));
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-label'));
 });
 
 test('plate-road paints the design-law `road` role and hands off to the local street layers at z8', () => {
   // `plate.road` (design-direction-v9-atlas.md's "Motorway/trunk/primary, minzoom: 6")
-  // had zero consumers: the local street layers use their own, separately-tuned `streetCasing`/
-  // `street` literals, not this token.
+  // had zero consumers: the local street layer uses its own, separately-tuned `street` literal,
+  // not this token.
   const source = buildExploreMapSource(listPublicEntities());
   for (const colorScheme of ['light', 'dark'] as const) {
     const style = buildExploreMapStyle({
@@ -486,7 +362,7 @@ test('plate-road paints the design-law `road` role and hands off to the local st
     assert.equal(roadLayer.source, 'openfreemap');
     assert.equal(roadLayer['source-layer'], 'transportation');
     assert.equal(roadLayer.minzoom, 6);
-    // Must not overlap explore-street-casing/-fill's own minzoom: 8, or the same roads paint twice.
+    // Must not overlap explore-street-fill's own minzoom: 8, or the same roads paint twice.
     assert.equal(roadLayer.maxzoom, 8);
     assert.deepEqual(roadLayer.filter, [
       'match',
@@ -518,56 +394,32 @@ function widthForClass(matchExpr: unknown[], roadClass: string): number {
   return matchExpr[index + 1] as number;
 }
 
-test('street casing and fill use muted zoom stops with motorway→minor class hierarchy', () => {
+test('streets keep a motorway-to-minor width hierarchy at a third of the ink at most', () => {
   const style = buildStyleFixture('presence');
-  const casing = layerById(style, 'explore-street-casing');
   const fill = layerById(style, 'explore-street-fill');
-  const casingZ14 = streetWidthMatchAtZoom(casing.paint?.['line-width'], 14);
   const fillZ14 = streetWidthMatchAtZoom(fill.paint?.['line-width'], 14);
-  const casingZ12 = streetWidthMatchAtZoom(casing.paint?.['line-width'], 12);
   const fillZ12 = streetWidthMatchAtZoom(fill.paint?.['line-width'], 12);
-
-  assert.equal(widthForClass(casingZ14, 'motorway'), 4);
-  assert.equal(widthForClass(casingZ14, 'trunk'), 3.5);
-  assert.equal(widthForClass(casingZ14, 'primary'), 3);
-  assert.equal(widthForClass(casingZ14, 'secondary'), 2.2);
-  assert.equal(widthForClass(casingZ14, 'tertiary'), 1.6);
-  assert.equal(widthForClass(casingZ14, 'minor'), 1.2);
-  assert.equal(casingZ14[casingZ14.length - 1], 0.8);
-
-  assert.equal(widthForClass(casingZ12, 'trunk'), 1.8);
   assert.equal(widthForClass(fillZ12, 'trunk'), 1.0);
   assert.equal(widthForClass(fillZ14, 'trunk'), 2.0);
-
-  // Fill stays thinner than casing at every named class (and the fallback).
-  for (const roadClass of [
-    'motorway',
-    'trunk',
-    'primary',
-    'secondary',
-    'tertiary',
-    'minor',
-  ] as const) {
+  const order = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'] as const;
+  for (let i = 0; i < order.length - 1; i++) {
     assert.ok(
-      widthForClass(fillZ14, roadClass) < widthForClass(casingZ14, roadClass),
-      `${roadClass} fill must be thinner than casing at z14`,
-    );
-    assert.ok(
-      widthForClass(fillZ12, roadClass) < widthForClass(casingZ12, roadClass),
-      `${roadClass} fill must be thinner than casing at z12`,
+      widthForClass(fillZ14, order[i]!) > widthForClass(fillZ14, order[i + 1]!),
+      `z14 ${order[i]} must exceed ${order[i + 1]}`,
     );
   }
-  assert.ok((fillZ14[fillZ14.length - 1] as number) < (casingZ14[casingZ14.length - 1] as number));
-
-  // Hierarchy: motorway > trunk > primary > secondary > tertiary > minor > fallback
-  const casingOrder = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'] as const;
-  for (let i = 0; i < casingOrder.length - 1; i++) {
-    assert.ok(
-      widthForClass(casingZ14, casingOrder[i]!) > widthForClass(casingZ14, casingOrder[i + 1]!),
-      `casing z14 ${casingOrder[i]} must exceed ${casingOrder[i + 1]}`,
-    );
+  // Major roads are one step stronger than the rest, nothing more.
+  assert.deepEqual(fill.paint?.['line-opacity'], [
+    'match',
+    ['get', 'class'],
+    ['motorway', 'trunk', 'primary'],
+    1,
+    0.72,
+  ]);
+  for (const scheme of ['light', 'dark'] as const) {
+    const alpha = Number(/,\s*([\d.]+)\)$/.exec(plateForScheme(scheme).street)?.[1]);
+    assert.ok(alpha <= 0.35, `${scheme} street ink is ${alpha}`);
   }
-  assert.ok(widthForClass(casingZ14, 'minor') > (casingZ14[casingZ14.length - 1] as number));
 });
 
 test('the plate reads as a map: land, water and boundaries come from the tokens', () => {
@@ -588,22 +440,37 @@ test('the plate reads as a map: land, water and boundaries come from the tokens'
   // over it. That is what produces a real coastline: the previous pairing (water background,
   // state polygons as the only landmass) drew the United States floating with no continent
   // around it, no Great Lakes and no Gulf.
+  // The background is the land around the lower 48; the lower 48 itself (the token's land) is
+  // its own fill from the state polygons, one paper step off, so the country reads.
   const darkBg = layerById(dark, 'background').paint?.['background-color'];
   const lightBg = layerById(light, 'background').paint?.['background-color'];
-  assert.equal(darkBg, mapPalettes.dark.land);
-  assert.equal(lightBg, mapPalettes.light.land);
-  assert.notEqual(darkBg, lightBg);
+  assert.equal(darkBg, plateForScheme('dark').ocean);
+  assert.equal(lightBg, plateForScheme('light').ocean);
+  assert.equal(
+    layerById(dark, EXPLORE_US_LAND_LAYER_ID).paint?.['fill-color'],
+    mapPalettes.dark.land,
+  );
+  assert.equal(
+    layerById(light, EXPLORE_US_LAND_LAYER_ID).paint?.['fill-color'],
+    mapPalettes.light.land,
+  );
+  for (const scheme of ['light', 'dark'] as const) {
+    const plate = plateForScheme(scheme);
+    assert.ok(lightnessDelta(plate.ocean, plate.land) >= 3, `${scheme} lower 48 must read`);
+  }
 
   // The water fill is the coastline. Without this layer the plate has no sea.
   assert.equal(layerById(dark, 'plate-water').paint?.['fill-color'], mapPalettes.dark.water);
-  assert.equal(layerById(light, 'plate-water').paint?.['fill-color'], mapPalettes.light.water);
+  assert.equal(
+    layerById(light, 'plate-water').paint?.['fill-color'],
+    plateForScheme('light').water,
+  );
   assert.equal(
     layerById(light, 'plate-boundary-country').paint?.['line-color'],
     mapPalettes.light.line2,
   );
-  assert.equal(layerById(light, 'plate-landcover').paint?.['fill-color'], mapPalettes.light.green);
-
   const lightPlate = plateForScheme('light');
+  // Light water is the token's sand tint.
   assert.equal(lightPlate.water, mapPalettes.light.water);
   assert.equal(lightPlate.land, mapPalettes.light.land);
   assert.equal(lightPlate.stateBounds, mapPalettes.light.line);
@@ -688,6 +555,7 @@ test('history relationship edge lines use theme-aware copper and toggle visibili
   assert.equal(lightEdge.paint?.['line-opacity'], 0.9);
   assert.equal(lightIncoming.paint?.['line-opacity'], 0);
 
+  // The night atlas is charcoal, so dark draws edges in the dark-theme copper step.
   assert.equal(darkEdge.paint?.['line-color'], darkPlate.historyEdge);
   assert.equal(darkEdge.paint?.['line-color'], brandPalette.copperDark);
   assert.notEqual(darkEdge.paint?.['line-color'], DIGNITY_PALETTE.pointHalo);
@@ -710,13 +578,14 @@ test('county label symbol layer reads name from GeoJSON and sits above county li
   };
   assert.equal(labelLayer.type, 'symbol');
   assert.equal(labelLayer.source, 'explore-county-lines');
-  assert.deepEqual(labelLayer.layout?.['text-field'], ['get', 'name']);
+  // Atlas convention: county names in spaced capitals.
+  assert.deepEqual(labelLayer.layout?.['text-field'], ['upcase', ['get', 'name']]);
   assert.deepEqual(labelLayer.layout?.['text-font'], ['Noto Sans Regular']);
 
   const lineIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_COUNTY_LINES_LAYER_ID);
   const labelIndex = style.layers.findIndex((layer) => layer.id === EXPLORE_COUNTY_LABEL_LAYER_ID);
   const entityIndex = style.layers.findIndex(
-    (layer) => layer.id === EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+    (layer) => layer.id === EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   );
   assert.ok(
     lineIndex >= 0 && labelIndex > lineIndex,
@@ -767,7 +636,7 @@ test('dark plate draws its water and boundaries from the dark token set', () => 
     colorScheme: 'dark',
   });
   const darkPlate = plateForScheme('dark');
-  assert.equal(layerById(dark, 'background').paint?.['background-color'], mapPalettes.dark.land);
+  assert.equal(layerById(dark, 'background').paint?.['background-color'], darkPlate.ocean);
   assert.equal(layerById(dark, 'plate-water').paint?.['fill-color'], mapPalettes.dark.water);
   assert.equal(darkPlate.water, mapPalettes.dark.water);
   assert.equal(
@@ -822,260 +691,186 @@ test('no memorial name is painted on the plate — the layer id is absent from t
   }
 });
 
-/** Collect string color outputs nested inside case/match paint expressions. */
-function collectColorLeaves(expression: unknown, into: string[] = []): readonly string[] {
-  if (typeof expression === 'string' && expression.startsWith('#')) {
-    into.push(expression);
-    return into;
-  }
-  if (!Array.isArray(expression)) return into;
-  for (const item of expression) collectColorLeaves(item, into);
-  return into;
-}
-
-test('the point layer blends first-paint pins nationally and kind shades past locality zoom', () => {
-  const style = buildStyleFixture('presence');
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const colorExpr = pointLayer.paint?.['circle-color'] as unknown[];
-  assert.equal(colorExpr[0], 'interpolate');
-  assert.equal(colorExpr[3], FIRST_PAINT_MAP_MAX_ZOOM);
-  const localityColor = localityZoomBranch(colorExpr);
-  assert.equal(localityColor[0], 'case');
-  assert.deepEqual(localityColor[1], ['has', 'shade']);
-  const colorOutputs = collectColorLeaves(localityColor);
-  const expectedShades = KIND_FAMILY_ENTRIES.map(([, entry]) => entry.shade);
-  for (const shade of expectedShades) {
-    assert.ok(colorOutputs.includes(shade), `expected kind shade ${shade} in circle-color`);
-  }
-  assert.ok(colorOutputs.includes(DIGNITY_PALETTE.kindMassacre));
-  assert.ok(colorOutputs.includes(DIGNITY_PALETTE.kindPlantation));
-  assert.ok(colorOutputs.includes(DIGNITY_PALETTE.kindEpicenter));
-  const allowed = new Set<string>(Object.values(DIGNITY_PALETTE));
-  for (const output of colorOutputs) {
-    assert.ok(
-      allowed.has(output),
-      `circle-color output "${output}" must come from DIGNITY_PALETTE`,
-    );
-  }
-});
-
-test('halo and event-glyph layers use the same kind color expression as the point fill', () => {
-  const style = buildStyleFixture('presence');
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const haloLayer = layerById(style, EXPLORE_UNCLUSTERED_HALO_LAYER_ID);
-  const eventGlyphLayer = layerById(style, EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID);
-  assert.deepEqual(
-    haloLayer.paint?.['circle-color'],
-    pointLayer.paint?.['circle-color'],
-    'halo must share kind shade with the point (not a flat sand wash)',
-  );
-  assert.deepEqual(
-    eventGlyphLayer.paint?.['circle-stroke-color'],
-    pointLayer.paint?.['circle-color'],
-    'event glyph stroke must share kind shade with the point',
-  );
-  assert.notEqual(haloLayer.paint?.['circle-color'], DIGNITY_PALETTE.pointHalo);
-});
-
-test("the point layer's fill/stroke signature (the non-color glyph channel) differs across kinds past locality zoom", () => {
-  const style = buildStyleFixture('presence');
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const opacityOutputs = matchExpressionOutputs(
-    localityZoomBranch(pointLayer.paint?.['circle-opacity'] as unknown[]),
-  );
-  const strokeWidthOutputs = strokeWidthMatchOutputs(
-    localityZoomBranch(pointLayer.paint?.['circle-stroke-width'] as unknown[]),
-  );
-  // At least one kind (institution, the "ring" glyph) must differ from the others on both
-  // opacity (mostly hollow) and stroke-width (thick) proof the glyph channel is real, not
-  // decorative filler that happens to be identical everywhere.
-  assert.ok(
-    new Set(opacityOutputs).size > 1,
-    'circle-opacity must differ across kinds (fill vs. mostly-hollow)',
-  );
-  assert.ok(
-    new Set(strokeWidthOutputs).size > 1,
-    'circle-stroke-width must differ across kinds (thin vs. thick rim)',
-  );
-});
-
-test('point and cluster stroke widths are zoom-scaled so national rims do not outgrow fills', () => {
-  const style = buildStyleFixture('presence');
-  const pointStroke = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID).paint?.[
-    'circle-stroke-width'
-  ] as unknown[];
-  const clusterStroke = layerById(style, EXPLORE_CLUSTER_LAYER_ID).paint?.[
-    'circle-stroke-width'
-  ] as unknown[];
-  assert.equal(pointStroke[0], 'interpolate');
-  assert.deepEqual(pointStroke[2], ['zoom']);
-  assert.equal(clusterStroke[0], 'interpolate');
-  assert.deepEqual(clusterStroke[2], ['zoom']);
-});
-
-test('the institution "ring" glyph is mostly hollow with a thick Stone-sourced stroke past locality zoom', () => {
-  const style = buildStyleFixture('presence');
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const opacityExpr = localityZoomBranch(pointLayer.paint?.['circle-opacity'] as unknown[]);
-  const strokeColorExpr = pointLayer.paint?.['circle-stroke-color'] as unknown[];
-  assert.equal(opacityExpr[0], 'match');
-  const institutionIndex = opacityExpr.indexOf('institution');
-  assert.ok(institutionIndex > 0, 'expected "institution" as a match case in circle-opacity');
-  assert.ok(
-    (opacityExpr[institutionIndex + 1] as number) < 1,
-    'institution fill must be less than fully opaque (a ring, not a solid dot)',
-  );
-  assert.equal(strokeColorExpr[0], 'match');
-  const strokeInstitutionIndex = strokeColorExpr.indexOf('institution');
-  assert.equal(strokeColorExpr[strokeInstitutionIndex + 1], DIGNITY_PALETTE.kindInstitutionStroke);
-});
-
-test('the event kind gets a second, unfilled glyph-ring layer filtered to kind === "event"', () => {
-  const style = buildStyleFixture('presence');
-  const eventGlyphLayer = layerById(style, EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID);
-  assert.equal(
-    eventGlyphLayer.paint?.['circle-opacity'],
-    0,
-    'the event glyph ring must be unfilled (stroke only)',
-  );
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  assert.deepEqual(
-    eventGlyphLayer.paint?.['circle-stroke-color'],
-    pointLayer.paint?.['circle-color'],
-  );
-  const layerSpec = style.layers.find(
-    (layer) => layer.id === EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  ) as {
-    filter?: unknown;
-  };
-  assert.deepEqual(layerSpec.filter, [
-    'all',
-    ['!', ['has', 'point_count']],
-    ['==', ['get', 'kind'], 'event'],
-  ]);
-});
-
-test('point and halo radii blend first-paint sizes nationally with marker-size.ts locally', () => {
-  const style = buildStyleFixture('presence');
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const haloLayer = layerById(style, EXPLORE_UNCLUSTERED_HALO_LAYER_ID);
-  assert.deepEqual(
-    pointLayer.paint?.['circle-radius'],
-    firstPaintOrKindRadiusExpression(markerRadiusExpression()),
-  );
-  assert.deepEqual(
-    haloLayer.paint?.['circle-radius'],
-    firstPaintOrKindRadiusExpression(markerHaloRadiusExpression()),
-  );
-});
-
-test('precision-radius layer paints under the halo, gated to features with a resolved radius', () => {
-  const style = buildStyleFixture('presence');
-  const layerIndex = style.layers.findIndex(
-    (layer) => layer.id === EXPLORE_PRECISION_RADIUS_LAYER_ID,
-  );
-  const haloIndex = style.layers.findIndex(
-    (layer) => layer.id === EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-  );
-  const pointIndex = style.layers.findIndex(
-    (layer) => layer.id === EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-  );
-  assert.ok(layerIndex >= 0, 'expected a precision-radius layer');
-  assert.ok(
-    layerIndex < haloIndex && layerIndex < pointIndex,
-    'the radius affordance must paint under the halo/point, as ground the marker sits on',
-  );
-
-  const layerSpec = style.layers.find(
-    (layer) => layer.id === EXPLORE_PRECISION_RADIUS_LAYER_ID,
-  ) as { filter?: unknown; maxzoom?: number };
-  // Clusters carry no per-feature radiusMeters, and a precision-tier that failed closed
-  // (`resolveDisplayRadiusMeters`'s `ok: false`) must draw no ring at all, never a guessed one.
-  assert.deepEqual(layerSpec.filter, [
-    'all',
-    ['!', ['has', 'point_count']],
-    ['has', 'radiusMeters'],
-  ]);
-  assert.equal(layerSpec.maxzoom, undefined);
-});
-
-test('precision-radius fill shares kind shade with the point, and fades in past national zoom like the halo', () => {
-  const style = buildStyleFixture('presence');
-  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
-  const precisionLayer = layerById(style, EXPLORE_PRECISION_RADIUS_LAYER_ID);
-  assert.deepEqual(
-    precisionLayer.paint?.['circle-color'],
-    pointLayer.paint?.['circle-color'],
-    'the radius affordance must share kind shade with the point (not a flat sand wash)',
-  );
-  const opacity = precisionLayer.paint?.['circle-opacity'] as unknown[];
-  assert.equal(opacity[0], 'interpolate');
-  assert.deepEqual(opacity[4], ['literal', 0]);
-  assert.deepEqual(opacity[6], ['literal', ENTITY_PRECISION_RADIUS_OPACITY]);
-});
-
-test("precision-radius circle-radius is a single top-level exponential(2) zoom interpolate reading the feature's own radiusMeters", () => {
-  const style = buildStyleFixture('presence');
-  const precisionLayer = layerById(style, EXPLORE_PRECISION_RADIUS_LAYER_ID);
-  const radius = precisionLayer.paint?.['circle-radius'] as unknown[];
-  // Zoom may only ever be the direct input of a top-level step/interpolate (MapLibre style
-  // spec) — this is the two-stop base-2 exponential-interpolate idiom that reproduces
-  // `radiusMeters * 2^zoom / metersPerPixelAtZoom0` without nesting `['zoom']` inside
-  // arithmetic (`explore-style-spec.test.ts` proves this against the real validator/evaluator).
-  assert.equal(radius[0], 'interpolate');
-  assert.deepEqual(radius[1], ['exponential', 2]);
-  assert.deepEqual(radius[2], ['zoom']);
-  assert.equal(radius[3], 0);
-  assert.equal(radius[4], 0);
-  const atReferenceZoom = radius[6] as unknown[];
-  assert.deepEqual(atReferenceZoom[0], '/');
-  const numerator = atReferenceZoom[1] as unknown[];
-  assert.deepEqual(numerator[0], '*');
-  assert.deepEqual(numerator[1], ['coalesce', ['get', 'radiusMeters'], 0]);
-});
-
-test('clusters inherit dominant kind-family shade instead of Page Sand / copper chrome', () => {
-  const style = buildStyleFixture('presence');
-  const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
-  const fill = clusterLayer.paint?.['circle-color'] as unknown[];
-  const stroke = clusterLayer.paint?.['circle-stroke-color'] as unknown[];
-  assert.equal(fill[0], 'case');
-  assert.equal(stroke[0], 'case');
-  assert.notEqual(fill, DIGNITY_PALETTE.pointHalo);
-  assert.notEqual(stroke, DIGNITY_PALETTE.point);
-});
-
-test('clusters use zoom-scaled count-step radii from CLUSTER_RADIUS_BY_COUNT', () => {
-  const style = buildStyleFixture('presence');
-  const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
-  const radius = clusterLayer.paint?.['circle-radius'] as unknown[];
-  assert.equal(radius[0], 'interpolate');
-  assert.deepEqual(radius[2], ['zoom']);
-  assert.equal(radius[3], 3);
-  assert.equal(radius[5], 5.5);
-  assert.equal(radius[7], 9);
-  const nationalStep = (radius[4] as unknown[])[1] as unknown[];
-  assert.equal(nationalStep[0], 'step');
-  assert.deepEqual(nationalStep.slice(2), [10, 10, 14, 50, 18, 200, 22]);
-});
-
 test('both entity buffers promote entityId, so the decade morph can address records by id', () => {
   /*
    * `setFeatureState` addresses a feature by its id, and a GeoJSON source has none
    * unless one is promoted from the properties. Both buffers need it, because the hold marks are
    * written to each: rest on the current buffer, zero on the incoming one.
    *
-   * Safe alongside clustering, and this is the part worth stating rather than assuming. MapLibre's
-   * own `getId` (maplibre-gl 5.24, GeoJSONSource) reads the promoted property first and falls back
-   * to `cluster_id` only when that property is absent — which is exactly the cluster case, since a
-   * cluster carries no `entityId`. So leaves are addressable by record id and clusters keep their
-   * generated ids and go on animating, which is correct: a cluster is a different shape in each
-   * decade.
+   * A place token carries no `entityId`, so it has no promoted id and is never held: a token is
+   * a different count in each decade.
    */
   const style = buildStyleFixture('presence');
   for (const sourceId of ['explore-entities', 'explore-entities-incoming']) {
-    const source = style.sources[sourceId] as { promoteId?: string; cluster?: boolean };
+    const source = style.sources[sourceId] as { promoteId?: string };
     assert.equal(source.promoteId, 'entityId', `${sourceId} must promote entityId`);
-    assert.equal(source.cluster, true, `${sourceId} still clusters`);
+  }
+});
+
+function sourceFeatures(style: ReturnType<typeof buildStyleFixture>, id: string) {
+  return (style.sources[id] as { data: { features: { properties: Record<string, unknown> }[] } })
+    .data.features;
+}
+
+test('county- and state-precision records never reach the map as points', () => {
+  const style = buildStyleFixture('off');
+  for (const row of sourceFeatures(style, 'explore-entities')) {
+    assert.ok(
+      !['county', 'state', 'country'].includes(String(row.properties.precision)),
+      `${String(row.properties.entityId)} is drawn sharper than its stored precision`,
+    );
+  }
+});
+
+test('the mark is a dot for site precision and a hollow ring for neighborhood or city', () => {
+  const style = buildStyleFixture('off');
+  const point = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
+  const radius = point.paint?.['circle-radius'] as unknown[];
+  assert.equal(radius[0], 'case');
+  const match = radius[1] as unknown[];
+  assert.equal(match[0], 'match');
+  assert.deepEqual(match[1], ['get', 'precision']);
+  // Campus is block precision: a ring, never a site dot.
+  assert.deepEqual([...(match[2] as string[])].sort(), ['address', 'institution', 'site']);
+  assert.equal(radius[2], 6, '12px pin head');
+  assert.equal(radius[3], 7, '14px ring');
+  const fill = point.paint?.['circle-color'] as unknown[];
+  assert.equal(fill[3], 'rgba(0,0,0,0)', 'the ring is hollow');
+  // The pin is copper with a ring opposite the plate (paper on the night atlas); the ring is a
+  // copper stroke.
+  assert.equal(fill[2], brandPalette.copperPin);
+  const stroke = point.paint?.['circle-stroke-color'] as unknown[];
+  assert.deepEqual(
+    [stroke[2], stroke[3]],
+    [plateForScheme('dark').markRing, brandPalette.copperPin],
+  );
+  // No contact shadow: the plate has no shadow layer at all.
+  assert.equal(
+    style.layers.some((layer) => /shadow/.test(layer.id)),
+    false,
+  );
+  assert.ok(!JSON.stringify(point.paint).includes('kind'), 'kind is never encoded on the mark');
+});
+
+test('a place token is an invisible hit and collision layer the DOM labels print, never a precision shape', () => {
+  for (const scheme of ['light', 'dark'] as const) {
+    const source = buildExploreMapSource(listPublicEntities());
+    const style = buildExploreMapStyle({
+      featureCollection: source.featureCollection,
+      jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+      layerMode: 'off',
+      colorScheme: scheme,
+    });
+    // The circle is the hit target in three sizes; the copper chip and name are DOM
+    // (`place-labels.ts`), so nothing GL paints a token.
+    const group = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
+    assert.equal(group.paint?.['circle-opacity'], 0);
+    const steps = group.paint?.['circle-radius'] as unknown[];
+    assert.equal(steps[0], 'step');
+    assert.equal(steps.length, 7, 'three size steps');
+    // A count always draws (overlap allowed), so every record stays counted at every zoom.
+    const count = layerById(style, EXPLORE_CLUSTER_COUNT_LAYER_ID) as LayerLike & {
+      layout?: Record<string, unknown>;
+    };
+    assert.equal(count.layout?.['text-allow-overlap'], true);
+    assert.equal(count.paint?.['text-opacity'], 0);
+    const name = layerById(style, EXPLORE_PLACE_NAME_LAYER_ID) as LayerLike & {
+      layout?: Record<string, unknown>;
+    };
+    assert.equal(name.paint?.['text-opacity'], 0);
+    assert.notEqual(
+      name.layout?.['text-allow-overlap'],
+      true,
+      'a name yields rather than overprints',
+    );
+  }
+});
+
+test('a selected pin grows in copper with an ink ring, a selected ring stays hollow; the tag is copper', () => {
+  const style = buildStyleFixture('off');
+  const selected = layerById(style, EXPLORE_SELECTED_POINT_LAYER_ID);
+  // `['case', <is dot>, dot value, ring value]`: selection never fills a ring into a site.
+  const [op, , dotColor, ringColor] = selected.paint?.['circle-color'] as unknown[];
+  assert.equal(op, 'case');
+  assert.equal(dotColor, DIGNITY_PALETTE.point);
+  assert.equal(ringColor, 'rgba(0,0,0,0)');
+  const stroke = selected.paint?.['circle-stroke-color'] as unknown[];
+  assert.equal(stroke[2], plateForScheme('dark').markRing);
+  assert.equal(stroke[3], DIGNITY_PALETTE.point);
+  const width = selected.paint?.['circle-stroke-width'] as unknown[];
+  assert.deepEqual([width[2], width[3]], [2, 4]);
+  // Larger than the resting mark (1.6x), so selection never reads by color alone.
+  const radius = selected.paint?.['circle-radius'] as unknown[];
+  assert.deepEqual([radius[2], radius[3]], [6 * 1.6, 7 * 1.6]);
+  const tag = layerById(style, EXPLORE_SELECTED_TAG_LAYER_ID);
+  assert.equal(tag.paint?.['text-color'], brandPalette.copperTextLight);
+  assert.deepEqual(selectedTagFilterExpression('ent_a'), ['in', '|ent_a|', ['get', 'ids']]);
+});
+
+test('record density is off by default: no copper state choropleth at rest', () => {
+  const style = buildStyleFixture('off');
+  const density = layerById(style, EXPLORE_STATE_DENSITY_LAYER_ID);
+  assert.equal(density.paint?.['fill-opacity'], 0);
+});
+
+test('jurisdiction tags stay off the national view and give way to group counts', () => {
+  const style = buildStyleFixture('off');
+  const ids = style.layers.map((layer) => layer.id);
+  const tag = layerById(style, EXPLORE_JURISDICTION_TAG_LAYER_ID) as LayerLike & {
+    minzoom?: number;
+  };
+  // National scale is about z3.5 to z4.5; tags begin at regional zoom, one per state.
+  assert.ok((tag.minzoom ?? 0) >= 5, 'tags must not draw at national scale');
+  assert.equal(JURISDICTION_TAG_MIN_ZOOM, 5.5);
+  // MapLibre places symbols top layer first. The counts sit above the tags, so they claim their
+  // place first and a tag that would touch a group is dropped instead of drawn over it.
+  assert.ok(
+    ids.indexOf(EXPLORE_JURISDICTION_TAG_LAYER_ID) < ids.indexOf(EXPLORE_CLUSTER_COUNT_LAYER_ID),
+  );
+  assert.ok(
+    ids.indexOf(EXPLORE_JURISDICTION_TAG_LAYER_ID) <
+      ids.indexOf(EXPLORE_UNCLUSTERED_POINT_LAYER_ID),
+  );
+  const count = layerById(style, EXPLORE_CLUSTER_COUNT_LAYER_ID);
+  // Counts always draw (legible) and keep a small margin in the collision index; the numeral has
+  // no chip, and a wide margin would collide every name with its own numeral.
+  assert.equal(count.layout?.['text-allow-overlap'], true);
+  const padding = Number(count.layout?.['text-padding']);
+  assert.ok(padding >= 1 && padding <= 3);
+  assert.notEqual(count.layout?.['text-ignore-placement'], true);
+  assert.notEqual(tag.layout?.['text-allow-overlap'], true);
+});
+
+test('state labels are a symbol layer under the groups, so a label yields to a count', () => {
+  const style = buildStyleFixture('off');
+  const ids = style.layers.map((layer) => layer.id);
+  for (const id of [EXPLORE_STATE_LABEL_LAYER_ID, EXPLORE_STATE_LABEL_SELECTED_LAYER_ID]) {
+    const label = layerById(style, id) as LayerLike & { type?: string; maxzoom?: number };
+    assert.equal(label.type, 'symbol');
+    // Below every record mark, group circle and count: MapLibre places top layers first.
+    assert.ok(ids.indexOf(id) < ids.indexOf(EXPLORE_UNCLUSTERED_POINT_LAYER_ID));
+    assert.ok(ids.indexOf(id) < ids.indexOf(EXPLORE_CLUSTER_LAYER_ID));
+    assert.ok(ids.indexOf(id) < ids.indexOf(EXPLORE_CLUSTER_COUNT_LAYER_ID));
+    assert.notEqual(label.layout?.['text-allow-overlap'], true);
+    assert.equal(label.maxzoom, STATE_LABEL_FADE_END_ZOOM);
+  }
+  // Selection swaps two filters; nothing else about the labels changes.
+  assert.deepEqual(stateLabelFilters('NY'), {
+    rest: ['!=', ['get', 'postalCode'], 'NY'],
+    selected: ['==', ['get', 'postalCode'], 'NY'],
+  });
+  const source = style.sources[EXPLORE_STATE_LABELS_SOURCE_ID] as {
+    data: { features: readonly unknown[] };
+  };
+  assert.equal(source.data.features.length, 51);
+});
+
+test('the place-name offset is one flat match: a nested match silently drops every name', () => {
+  const style = buildStyleFixture('off');
+  const name = layerById(style, EXPLORE_PLACE_NAME_LAYER_ID) as LayerLike & {
+    layout: Record<string, unknown>;
+  };
+  for (const output of matchExpressionOutputs(name.layout['text-offset'])) {
+    assert.equal((output as unknown[])[0], 'literal');
   }
 });

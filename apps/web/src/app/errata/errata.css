@@ -1,0 +1,290 @@
+/**
+ * `/errata`: the dated log. Each day opens on its date set as a copper display numeral, and each
+ * change under it is the record in display type, its kind as an ink or sand block tag, what
+ * changed as a Newsreader line, and a two-line note.
+ */
+/* 12px between rows: each 32px chip keeps its own 44px hit area when the group wraps. */
+.ds-errata__kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3) var(--ds-space-2);
+  margin-bottom: var(--ds-space-6);
+}
+
+.ds-errata__log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* —— a day: its date, then that day's changes ————————————————————————————————— */
+.ds-errata__day {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding-bottom: var(--ds-space-10);
+  border-top: 2px solid var(--ds-ink);
+}
+
+.ds-errata__date {
+  margin: 0;
+  padding-top: var(--ds-space-5);
+}
+
+.ds-errata__date time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--ds-space-3);
+}
+
+/* Never under the 72px display floor, however narrow the screen. */
+.ds-errata__day-numeral.ds-numeral--title {
+  font-size: var(--ds-text-display-1);
+}
+
+.ds-errata__year {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+}
+
+.ds-errata__entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* —— one change ———————————————————————————————————————————————————————————— */
+.ds-errata__row {
+  padding-block: var(--ds-space-5);
+}
+
+.ds-errata__row + .ds-errata__row {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* The kind holds the top right of every row, however the name wraps. */
+.ds-errata__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--ds-space-4);
+  margin: 0;
+}
+
+.ds-errata__name {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-title);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+  text-wrap: balance;
+}
+
+/* One line of display type as a 44px target: padding paid back in margin. */
+a.ds-errata__name {
+  display: inline-block;
+  margin-block: calc(var(--ds-space-3) * -1);
+  padding-block: var(--ds-space-3);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-rule);
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 4px;
+}
+
+a.ds-errata__name:hover {
+  text-decoration-color: currentColor;
+}
+
+/* A ruled tag, no box: ink rule and ink type for a correction, hairline and muted type for the rest. */
+.ds-errata__type {
+  align-self: start;
+  padding: var(--ds-space-1) 0 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-mono);
+  white-space: nowrap;
+}
+
+.ds-errata__type[data-kind='correction'] {
+  border-top: 2px solid var(--ds-ink);
+  color: var(--ds-ink);
+}
+
+.ds-errata__change {
+  max-width: 52ch;
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--ds-ink);
+  text-wrap: pretty;
+}
+
+.ds-errata__more {
+  max-width: 66ch;
+  margin-top: var(--ds-space-2);
+}
+
+.ds-errata__note {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+/* Two lines until opened. The full note, and any record list, stay in the HTML. */
+.ds-errata__more[data-clamp] .ds-errata__note {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.ds-errata__toggle:checked ~ .ds-errata__note {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+.ds-errata__records {
+  display: none;
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-errata__toggle:checked ~ .ds-errata__records {
+  display: block;
+}
+
+.ds-errata__records > li {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-block: var(--ds-space-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-errata__records a {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  color: var(--ds-ink);
+  text-decoration-color: var(--ds-rule);
+  text-underline-offset: 3px;
+}
+
+.ds-errata__records a:hover {
+  text-decoration-color: currentColor;
+}
+
+.ds-errata__toggle-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: calc(-1 * var(--ds-space-3));
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control, var(--ds-rule));
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+
+.ds-errata__toggle-label:hover {
+  text-decoration-color: currentColor;
+}
+
+.ds-errata__toggle:focus-visible ~ .ds-errata__toggle-label {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-errata__close,
+.ds-errata__toggle:checked ~ .ds-errata__toggle-label .ds-errata__open {
+  display: none;
+}
+
+.ds-errata__toggle:checked ~ .ds-errata__toggle-label .ds-errata__close {
+  display: inline;
+}
+
+.ds-errata__empty {
+  margin: 0;
+  padding-block: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-errata__feeds {
+  margin: var(--ds-space-6) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+
+.ds-errata__feeds a {
+  color: var(--ds-ink);
+}
+
+/* Desktop: the date gets its own column, month over day, and stays in view while its day
+   scrolls past. */
+@media (min-width: 64rem) {
+  .ds-errata__day {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    column-gap: var(--ds-space-8);
+  }
+
+  .ds-errata__date {
+    position: sticky;
+    top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-4));
+    align-self: start;
+  }
+
+  .ds-errata__date time {
+    display: grid;
+    row-gap: var(--ds-space-3);
+  }
+
+  .ds-errata__day-numeral {
+    width: min-content;
+    white-space: normal;
+  }
+}
+
+/* Phone: the tag rides above the name so the name keeps the full measure. */
+@media (max-width: 47.9375rem) {
+  .ds-errata__head {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--ds-space-2);
+  }
+
+  .ds-errata__type {
+    order: -1;
+    justify-self: start;
+  }
+}

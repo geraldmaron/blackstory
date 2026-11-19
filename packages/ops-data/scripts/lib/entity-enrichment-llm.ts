@@ -6,6 +6,7 @@
 import { treatAsLiving } from '@repo/domain';
 import { decadeStartYearFromLabel, isDecadeAtOrBeforeCurrent } from '@repo/domain';
 import { isValidTopicId } from '@repo/domain';
+import { findProseVoiceIssues } from '@repo/domain/editorial';
 import { redactStreetAddresses } from './evidence-collectors/redact-address.ts';
 import { findRawRegistryVocabulary } from './nrhp-area-labels.ts';
 import {
@@ -176,6 +177,14 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT = [
     'history beyond the bare fact of listing, write only what the evidence supports and return ' +
     'null for "historicalContext". A short honest entry is correct; a padded architectural one ' +
     'is not.',
+
+  'VOICE. Neo, the house narrator (docs/content/neo-voice.md).\n' +
+    'Write like a well-read Black American in their early thirties explaining this place or ' +
+    'person to someone they respect: plain words, full sentences, warm but exact. Say what ' +
+    'people did and what happened there. Never use poster or nomination-form language ' +
+    '("trailblazer", "paved the way", "rich history", "testament to", "pivotal role", "served ' +
+    'as the hub/heart/headquarters of"), never use "Negro" or "colored" as your own word outside ' +
+    'a proper name or quotation, no em dashes, use contractions, and no slang, dialect or "we".',
 
   'PRIVACY. A hard safety rule.\n' +
     'Never state a street address, house number, coordinate pair, or other parcel-precise ' +
@@ -453,6 +462,19 @@ function checkNoRawRegistryVocabulary(
   }
 }
 
+/**
+ * The shared word-level voice gate (@repo/domain/editorial); quotations are exempt there. The
+ * self-reference and page-pointer rules are for stories: in a place entry "at this site" is
+ * geography, not the website.
+ */
+function checkNeoVoice(text: string | null, errors: string[], fieldLabel: string): void {
+  if (!text) return;
+  for (const finding of findProseVoiceIssues(text)) {
+    if (finding.rule === 'self-reference' || finding.rule === 'page-pointer') continue;
+    errors.push(`${fieldLabel}: ${finding.label}: …${finding.excerpt}…`);
+  }
+}
+
 export function validateEnrichmentResponse(
   subject: EnrichmentSubject,
   allowedTopicIds: readonly string[],
@@ -552,6 +574,8 @@ export function validateEnrichmentResponse(
 
   const keywords = parseStringArray(payload.keywords, errors, 'keywords');
 
+  checkNeoVoice(summary, errors, 'summary');
+  checkNeoVoice(historicalContext ?? null, errors, 'historicalContext');
   checkNoRawRegistryVocabulary(summary, errors, 'summary');
   checkNoRawRegistryVocabulary(historicalContext ?? null, errors, 'historicalContext');
   checkNoRawRegistryVocabulary(keywords.join('; '), errors, 'keywords');

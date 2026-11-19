@@ -3,6 +3,8 @@ import test from 'node:test';
 import {
   classifyNrhpAddressOutcome,
   classifyVisitability,
+  decideCountyBackfill,
+  polygonCenterAndExtent,
   NRHP_ADDRESS_TIER_TABLE,
   parseSrcAccuMeters,
   proposeNrhpTier,
@@ -137,9 +139,15 @@ test('proposeNrhpTier: address_found proposes the tier table site tier', () => {
   assert.equal(proposal.flagged, false);
 });
 
-test('proposeNrhpTier: vicinity proposes the tier table city tier', () => {
-  const proposal = proposeNrhpTier('vicinity', null, null);
-  assert.equal(proposal.tier, NRHP_ADDRESS_TIER_TABLE.vicinity);
+test('proposeNrhpTier: vicinity is tiered by point accuracy like coordinates_only', () => {
+  assert.equal(
+    proposeNrhpTier('vicinity', 12, null).tier,
+    NRHP_ADDRESS_TIER_TABLE.coordinatesOnlyWithinThreshold,
+  );
+  assert.equal(
+    proposeNrhpTier('vicinity', null, null).tier,
+    NRHP_ADDRESS_TIER_TABLE.coordinatesOnlyBeyondThreshold,
+  );
 });
 
 test('proposeNrhpTier: coordinates_only within the accuracy threshold proposes site', () => {
@@ -170,4 +178,57 @@ test('proposeNrhpTier: no_match proposes no tier and is not flagged', () => {
   const proposal = proposeNrhpTier('no_match', null, null);
   assert.equal(proposal.tier, null);
   assert.equal(proposal.flagged, false);
+});
+
+test('decideCountyBackfill picks precision per rule and leaves risky rows alone', () => {
+  const county = { lat: 39.74, lng: -104.95 };
+  const decide = (
+    over: Partial<NrhpArcgisAttributes> = {},
+    extra: { displayName?: string; restricted?: boolean; excluded?: boolean } = {},
+  ) =>
+    decideCountyBackfill({
+      displayName: 'East High School',
+      restricted: false,
+      excluded: false,
+      countyCentroid: county,
+      feature: feature({ address: '1545 Detroit St.', lat: 39.742, lng: -104.956, ...over }),
+      ...extra,
+    });
+  assert.equal(decide().toPrecision, 'address');
+  assert.equal(decide({ extentKm: 2 }).toPrecision, 'neighborhood');
+  assert.equal(
+    decide({}, { displayName: 'Port Republic Historic District' }).toPrecision,
+    'neighborhood',
+  );
+  assert.deepEqual(decide({ vicinity: 'True' }), { toPrecision: 'city', flags: ['vicinity'] });
+  assert.equal(decide({ vicinity: 'True', city: null }).toPrecision, null);
+  assert.deepEqual(decide({ lat: 40.5 }).flags, ['far_from_county']);
+  assert.deepEqual(decide({}, { restricted: true }).flags, ['restricted']);
+  assert.deepEqual(decide({}, { excluded: true }).flags, ['excluded']);
+  assert.deepEqual(decide({}, { displayName: '45SA123' }).flags, ['excluded']);
+  assert.deepEqual(decide({}, { displayName: 'African Burial Ground' }).flags, ['excluded']);
+  assert.deepEqual(
+    decideCountyBackfill({
+      displayName: 'X',
+      restricted: false,
+      excluded: false,
+      feature: null,
+      countyCentroid: county,
+    }).flags,
+    ['no_source'],
+  );
+});
+
+test('polygonCenterAndExtent returns the bbox center and longest side', () => {
+  const r = polygonCenterAndExtent([
+    [
+      [-100, 40],
+      [-100, 40.01],
+      [-99.99, 40.01],
+      [-99.99, 40],
+      [-100, 40],
+    ],
+  ]);
+  assert.ok(r && Math.abs(r.lat - 40.005) < 1e-9 && Math.abs(r.lng + 99.995) < 1e-9);
+  assert.ok(r.extentKm > 0.8 && r.extentKm < 1.2);
 });

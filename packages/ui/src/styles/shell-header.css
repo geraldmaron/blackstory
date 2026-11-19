@@ -1,95 +1,71 @@
 /**
- * Shell chrome shared by every surface: the island clearance tokens the Atlas command bar
- * measures into, and the brand wordmark's light/dark lockup and symbol swap.
+ * Shell chrome shared by every surface: the header height and the clearance the fixed header
+ * leaves, and the brand wordmark's light/dark lockup and symbol swap.
  *
- * The old `ShellHeader` navbar rules (nav links, overflow menu, drawer, CTA, session chip) are
- * gone with the component; the public bar is `.ds-bar` in apps/web's command-bar.css.
+ * The public header is `.ds-bar` in apps/web's command-bar.css: a flush 52px bar fixed to the top
+ * from 48rem up, and an in-flow 48px bar below that. `--ds-island-clearance` is what anything
+ * fixed or sticky under the header clears. Below 48rem the header scrolls with the page, so the
+ * clearance is 0 there, except on the Door (`/`, `/explore`), where the map sits fixed under it.
  */
 
 :root {
-  --ds-island-offset: env(safe-area-inset-top, 0px);
-  /* Content-bar target height (not the full fixed band). ResizeObserver sets clearance. */
-  --ds-island-height: 4rem;
-  --ds-island-gap: var(--ds-space-3);
-  /* Fallback until the command bar measures its live fixed band (`syncCommandBarClearance`). */
-  --ds-island-clearance: calc(
-    var(--ds-island-offset) + var(--ds-island-height) + var(--ds-island-gap)
-  );
+  --ds-header-h: 52px;
+  --ds-island-clearance: calc(var(--ds-header-h) + env(safe-area-inset-top, 0px));
 }
 
 html {
   scroll-padding-top: var(--ds-island-clearance);
 }
 
+/*
+ * The lockup artwork, theme-swapped by CSS so first paint matches the head bootstrap.
+ *
+ * Both PNGs carry a wide transparent margin, so sizing the image box sizes mostly empty pixels.
+ * `--ds-lockup-size` names the image box height; the negative margins pull the layout box in to
+ * the artwork's own alpha bounds, and the link's `overflow: hidden` clips the overhang so it
+ * cannot swallow clicks meant for the control beside it. Trim ratios are measured from the
+ * 800x450 asset (ink x 114..712, y 136..304) and must be re-measured if it is re-exported; the
+ * inline ratios fold in the 800/450 aspect, since `--ds-lockup-size` names the height.
+ */
 .ds-shell-wordmark {
+  --ds-lockup-size: 4rem;
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  margin-right: var(--ds-space-2);
+  /* The cropped artwork is about 27px tall; the link around it is still a 44px target. */
+  min-height: 2.75rem;
+  overflow: hidden;
   text-decoration: none;
   line-height: 1;
-  border-radius: var(--ds-radius-sm);
-  transition: opacity var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-shell-wordmark:hover {
-  opacity: 0.82;
-}
-
-/*
- * Compact utility-nav sizing: capped by HEIGHT (not width) so the lockup fits
- * a slim ~56px bar without inflating it. brand.md's "≥168px
- * digital minimum" is a marketing/standalone-placement floor; brand.md
- * itself directs squeezed nav contexts to "switch to the symbol alone"
- * rather than render an undersized lockup, and this height cap renders the
- * lockup narrower than 168px (~64px) to keep the header compact. This nav exception intentionally renders the lockup at about 64px; review the brand minimum
- * before changing this value.
- */
 .ds-shell-wordmark__img {
-  display: none;
+  display: block;
+  flex: none;
   width: auto;
-  height: 4.5rem;
+  max-width: none;
+  height: var(--ds-lockup-size);
+  margin-block: calc(var(--ds-lockup-size) * -0.3022) calc(var(--ds-lockup-size) * -0.3222);
+  margin-inline: calc(var(--ds-lockup-size) * -0.2533) calc(var(--ds-lockup-size) * -0.1932);
 }
 
-.ds-shell-wordmark__img--symbol {
-  width: 2.25rem;
-  height: 2.25rem;
+/* The nearest ground picks the artwork (tokens.css `--ds-lockup-on-*`), so a lockup on an ink
+   header in the light theme still shows the dark-canvas artwork. */
+.ds-shell-wordmark__img--theme-light {
+  display: var(--ds-lockup-on-light, block);
 }
 
-.ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-light {
-  display: block;
-}
-
-.ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-dark {
-  display: none;
-}
-
-[data-theme='dark'] .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-light {
-  display: none;
-}
-
-[data-theme='dark'] .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-dark {
-  display: block;
+.ds-shell-wordmark__img--theme-dark {
+  display: var(--ds-lockup-on-dark, none);
 }
 
 @media (max-width: 47.9375rem) {
-  .ds-shell-wordmark__img--lockup {
-    display: none !important;
+  :root {
+    --ds-header-h: 48px;
+    --ds-island-clearance: 0px;
   }
 
-  .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
-    display: block;
-  }
-
-  .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
-    display: none;
-  }
-
-  [data-theme='dark'] .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
-    display: none;
-  }
-
-  [data-theme='dark'] .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
-    display: block;
+  :root:has([data-surface='door']) {
+    --ds-island-clearance: calc(var(--ds-header-h) + env(safe-area-inset-top, 0px));
   }
 }

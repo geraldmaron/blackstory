@@ -1,4 +1,8 @@
-import { deriveHistoricalFraming, historicalFramingLabel } from '../entity-view-model';
+import {
+  deriveHistoricalFraming,
+  historicalFramingLabel,
+  isQuietRecord,
+} from '../entity-view-model';
 import { normalizeEntity } from '../normalize';
 import { fullEntityFixture, minimalEntityFixture } from '../testFixtures';
 
@@ -16,5 +20,13 @@ describe('entity-view-model', () => {
     const minimal = normalizeEntity(minimalEntityFixture('place'))!;
     expect(deriveHistoricalFraming(minimal)).toBe('historical');
     expect(historicalFramingLabel('historical')).toBe('Historical record');
+  });
+
+  it('treats a sensitivity flag or a massacre or plantation tone as a quiet record', () => {
+    const plain = normalizeEntity(minimalEntityFixture('place'))!;
+    expect(isQuietRecord(plain)).toBe(false);
+    expect(isQuietRecord(normalizeEntity(fullEntityFixture('place'))!)).toBe(true);
+    expect(isQuietRecord({ ...plain, topicTags: ['tulsa-race-massacre'] })).toBe(true);
+    expect(isQuietRecord({ ...plain, topicTags: ['plantation'] })).toBe(true);
   });
 });

@@ -1,7 +1,10 @@
 # Lives scene pattern
 
-**Status:** evidence-appendix pattern (amended 2026-09-18).
-**Scope:** hand-drawn street and sourced decade material on `/lives/explorer`, bound to published Lives cells. Not destination wayfinding or the public Lives entry.
+**Status:** retired 2026-11-12. The hand-drawn street (`LivesScene`, its layer model and the sketch
+primitives) was removed from `/lives/explorer` in the web rebuild: it was decoration, not evidence,
+and its caption table restated published figures. It is recoverable from git history if the owner
+wants it back on `/lives`. The rules below still bind any future drawing bound to Lives cells,
+including the unit of analysis it names.
 
 ## Intent
 

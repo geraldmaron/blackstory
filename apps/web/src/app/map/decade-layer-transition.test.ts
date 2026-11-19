@@ -26,23 +26,24 @@ import {
 import {
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
 
-test('decade morph duration is a slow ambient dissolve (~1.6s), not the 480ms UI token', () => {
-  assert.equal(DECADE_LAYER_FADE_MS, 1600);
-  assert.equal(decadeLayerFadeDurationMs(false), 1600);
+test('decade morph is the 400ms drop-in, capped where the art direction caps it', () => {
+  assert.equal(DECADE_LAYER_FADE_MS, 400);
+  assert.equal(decadeLayerFadeDurationMs(false), 400);
   assert.equal(decadeLayerFadeDurationMs(true), 0);
 });
 
-test('Explore must not request the ambient morph on patchData', () => {
-  // The 1.6s dual-buffer dissolve reads as lag on a decade or filter click, which is a direct
-  // interaction. Explore's decade crossfade is the 420ms pin transition in
-  // decade-transition.ts; the ambient morph belongs to surfaces that move the camera on their
-  // own. The helpers below stay exercised by the unit tests in this file.
+test('Explore morphs only on a brushed range, and never longer than 400ms', () => {
+  // A long dual-buffer dissolve read as lag on a filter click. Explore asks for the morph only
+  // when the brushed decade range changes (use-map-sync.ts), where arriving pins drop in and
+  // leaving ones ghost, and the morph is capped at 400ms; every other lens change snaps.
+  assert.ok(DECADE_LAYER_FADE_MS <= 400);
+  const sync = readFileSync(new URL('../explore/hooks/use-map-sync.ts', import.meta.url), 'utf8');
+  assert.match(sync, /\{ fade: brushed \}/);
   const atlasSource = readFileSync(
     new URL('../explore/AtlasExperience.tsx', import.meta.url),
     'utf8',
@@ -114,40 +115,25 @@ test('shouldMorphDecadeDataPatch refuses morph when layerMode changes', () => {
   );
 });
 
-test('crossfade out targets cover pins, edges, and clusters — not density (color lerp)', () => {
+test('crossfade out targets cover pins and edges, not place tokens or density', () => {
   const keys = DECADE_CROSSFADE_OUT_TARGETS.map((target) => `${target.layerId}:${target.paintKey}`);
   assert.ok(!keys.some((key) => key.includes('state-density')));
   assert.ok(keys.some((key) => key.includes('history-edges') && key.endsWith('line-opacity')));
   assert.ok(keys.some((key) => key.includes('explore-point') && key.includes('circle-opacity')));
-  assert.ok(
-    keys.some(
-      (key) => key.includes(EXPLORE_CLUSTER_COUNT_LAYER_ID) && key.endsWith('text-opacity'),
-    ),
-  );
+  // Tokens are invisible GL layers the DOM labels print (`place-labels.ts`); fading them would
+  // paint the hit layers.
+  assert.ok(!keys.some((key) => key.includes(EXPLORE_CLUSTER_COUNT_LAYER_ID)));
   for (const target of DECADE_CROSSFADE_OUT_TARGETS) {
     assert.match(target.paintKey, /opacity/);
     assert.ok(target.restOpacity > 0);
   }
 });
 
-test('the precision-radius affordance fades out with the pin stack, with no incoming counterpart to fade back in on its own', () => {
-  const outLayerIds = new Set(DECADE_CROSSFADE_OUT_TARGETS.map((target) => target.layerId));
-  const inLayerIds = new Set(DECADE_CROSSFADE_IN_TARGETS.map((target) => target.layerId));
-  assert.ok(
-    outLayerIds.has(EXPLORE_PRECISION_RADIUS_LAYER_ID),
-    'a static ring during a decade dissolve would read as a rendering glitch, not chrome',
-  );
-  assert.ok(
-    !inLayerIds.has(EXPLORE_PRECISION_RADIUS_LAYER_ID),
-    'there is no dual-buffer precision-radius layer to fade in — promote restores it from style',
-  );
-});
-
 test('crossfade in targets mirror the pin stack only (density uses feature-state color lerp)', () => {
   const layerIds = new Set(DECADE_CROSSFADE_IN_TARGETS.map((target) => target.layerId));
   assert.ok(!layerIds.has('explore-state-density-fill-incoming'));
   assert.ok(layerIds.has(EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID));
-  assert.ok(layerIds.has(EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID));
+  assert.ok(!layerIds.has(EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID));
   for (const target of DECADE_CROSSFADE_IN_TARGETS) {
     assert.match(target.layerId, /incoming/);
     assert.match(target.paintKey, /opacity/);
@@ -156,8 +142,11 @@ test('crossfade in targets mirror the pin stack only (density uses feature-state
 
 test('isDecadeFadePaintChannel matches pin/edge dissolve channels only', () => {
   assert.equal(isDecadeFadePaintChannel(EXPLORE_STATE_DENSITY_LAYER_ID, 'fill-opacity'), false);
-  assert.equal(isDecadeFadePaintChannel(EXPLORE_CLUSTER_COUNT_LAYER_ID, 'text-opacity'), true);
-  assert.equal(isDecadeFadePaintChannel(EXPLORE_CLUSTER_COUNT_LAYER_ID, 'text-color'), false);
+  assert.equal(
+    isDecadeFadePaintChannel(EXPLORE_UNCLUSTERED_POINT_LAYER_ID, 'circle-opacity'),
+    true,
+  );
+  assert.equal(isDecadeFadePaintChannel(EXPLORE_CLUSTER_COUNT_LAYER_ID, 'text-opacity'), false);
 });
 
 test('decadeCrossfadeOpacities never empties the plate (out+in ≈ rest across the dissolve)', () => {

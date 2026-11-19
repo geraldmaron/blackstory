@@ -44,12 +44,12 @@ describe('map mount contracts', () => {
   });
 
   it('every MapLibre mount goes through the shared lifecycle guards', () => {
-    // Two mounts exist on purpose: the persistent plate (MapStage), and EmbeddedMap — a map that
-    // lives in the document flow on place and record pages. The plate is position: fixed and is
-    // moved onto a slot a frame late, so it cannot track an in-flow box while the page scrolls
-    // (RecordLocator.tsx documents why), which is why the in-page map is its own instance. The
-    // property worth asserting is that every mount uses the same WebGL probe, resize lifecycle
-    // and context-loss recovery, and that no third mount appears unannounced.
+    // Two mounts exist on purpose: the persistent plate (MapStage), and RecordMap — the one map
+    // that lives in the document flow on record pages, place pages and story insets. The plate is
+    // position: fixed and is moved onto a slot a frame late, so it cannot track an in-flow box
+    // while the page scrolls, which is why the in-page map is its own instance. The property
+    // worth asserting is that every mount uses the same WebGL probe, resize lifecycle and
+    // context-loss recovery, and that no third mount appears unannounced.
     const mounts = execFileSync('grep', ['-rl', 'new maplibregl.Map', join(here, '../..')], {
       encoding: 'utf8',
     })
@@ -60,7 +60,7 @@ describe('map mount contracts', () => {
       .filter((path: string) => !/\.test\.[cm]?tsx?$/.test(path))
       .sort();
     assert.deepEqual(mounts, [
-      'src/components/map-embed/EmbeddedMap.tsx',
+      'src/components/map-embed/RecordMap.tsx',
       'src/components/map-stage/MapStage.tsx',
     ]);
     for (const mount of mounts) {

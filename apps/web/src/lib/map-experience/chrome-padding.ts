@@ -1,114 +1,95 @@
 /**
- * Camera padding for the Explore instrument chrome.
+ * Camera padding for the Explore chrome: the part of the canvas that chrome covers, so a framed
+ * record or area lands in the map a reader can actually see.
+ *
+ * Two layouts, one per breakpoint (explore-column.css):
+ *  - Wide (768px and up): the 380px column floating 12px in from the left edge, the 56px decade
+ *    histogram floating 12px above the bottom edge, the zoom and locate stack bottom-right, and
+ *    the header above it all. The map runs under all of it, so the padding is what they cover.
+ *  - Phone: the header on top, the bottom sheet at its current (or about to be) height, and the
+ *    tab bar under the sheet. The sides take only a slim gutter: the controls sit in the corner
+ *    above the sheet, never across the middle of the map.
  *
  * MapLibre throws `Map cannot fit within canvas with the given bounds, padding, and/or offset`
- * when the requested padding leaves no room on the canvas, and that throw kills map init
- * outright. The instrument panels (Lens, Results, Record sheet) are wide enough to trigger it on
- * a laptop viewport once two of them are open, so every inset this returns is clamped to leave at
- * least half the canvas free on each axis.
+ * when the padding leaves no room, and that throw kills map init outright, so every inset is
+ * clamped to leave part of each axis free.
  *
  * Pure and framework-free so the clamp is unit-testable without a WebGL context.
- * See docs/ui/design-direction-v9-atlas.md §4.2 rule 3.
  */
 
 export type ChromeInset = { top: number; right: number; bottom: number; left: number };
 
 export type ChromeState = {
-  viewportWidth: number;
-  viewportHeight: number;
-  lensOpen: boolean;
-  resultsOpen: boolean;
-  sheetOpen: boolean;
+  readonly viewportWidth: number;
+  readonly viewportHeight: number;
+  /** Phone only: the height of the bottom sheet, measured from the viewport's bottom edge
+   * (tab bar included). Ignored on the wide layout. */
+  readonly sheetHeight?: number;
 };
 
-/** Below this width the instruments stack over the map instead of flanking it. */
-export const CHROME_NARROW_MAX_WIDTH = 820;
-/** Mirrors `lib/layout/compact-viewport.ts`: a short viewport is compact whatever its width. */
-const COMPACT_MAX_HEIGHT = 559;
+/**
+ * Up to this width Explore is a full-screen map with a bottom sheet (explore-column.css): phones
+ * and portrait tablets. A 380px floating column on a 768px screen left 364px of map, too narrow
+ * to frame an entered state at its level's zoom, so the column floats only from 1024px.
+ */
+export const EXPLORE_PHONE_MAX_WIDTH = 1023;
 
-/** Panel widths the padding has to clear, including their viewport gutter. */
-const LENS_INSET = 330;
-const RESULTS_INSET = 376;
-const SHEET_INSET = 468;
-const OPEN_EDGE_INSET = 40;
+/** The floating left column. */
+export const EXPLORE_COLUMN_WIDTH = 380;
+/** The gutter every floating plate keeps from the viewport edge (`--ds-xfloat`). */
+export const EXPLORE_FLOAT_GUTTER = 12;
+/** The decade histogram docked on the map's bottom edge. */
+export const EXPLORE_HISTOGRAM_HEIGHT = 56;
 
-/** The compact command bar is two rows (search under the wordmark), ~110px with its offset. */
-const NARROW_TOP = 120;
-/** Tab bar (56px) + the Records bar + attribution band at the bottom of a phone with no sheet open. */
-const NARROW_DOCK_BOTTOM = 120;
-const NARROW_SIDE = 16;
-const NARROW_BOTTOM_MAX = 280;
-const NARROW_BOTTOM_RATIO = 0.38;
-
-const WIDE_TOP = 96;
-const WIDE_BOTTOM_MAX = 160;
-const WIDE_BOTTOM_RATIO = 0.22;
+const WIDE_HEADER = 56;
+const PHONE_HEADER = 48;
+/** Air between the framed thing and the chrome around it. */
+const GAP = 24;
+/** The 44px zoom and locate stack plus its gutter. */
+const CONTROLS = 44 + EXPLORE_FLOAT_GUTTER;
 
 /** Share of each axis the padding may consume before it gets scaled back. */
-const MAX_AXIS_SHARE = 0.5;
-
-/** Symmetric inset used when even the clamped vertical padding would not fit. */
-const VERTICAL_FALLBACK = 40;
+const MAX_HORIZONTAL_SHARE = 0.6;
+/** Where the column floats, the map the reader sees is what is left of it; allow it more room. */
+const MAX_HORIZONTAL_SHARE_WIDE = 0.75;
+const MAX_VERTICAL_SHARE = 0.72;
 
 export function chromePadding(state: ChromeState): ChromeInset {
   const { viewportWidth, viewportHeight } = state;
-  const narrow = viewportWidth < CHROME_NARROW_MAX_WIDTH || viewportHeight <= COMPACT_MAX_HEIGHT;
-  // A phone on its side: compact, but the open instrument docks to the left edge, not the bottom.
-  // Mirrors atlas.css: `(max-height: 559px) and (orientation: landscape) and (min-width: 560px)`.
-  const sideways =
-    viewportHeight <= COMPACT_MAX_HEIGHT && viewportWidth > viewportHeight && viewportWidth >= 560;
-
-  let left: number;
-  let right: number;
   let top: number;
+  let right: number;
   let bottom: number;
+  let left: number;
+  let leftFloor = 0;
+  const wide = viewportWidth > EXPLORE_PHONE_MAX_WIDTH;
 
-  if (sideways) {
-    const anyOpen = state.lensOpen || state.resultsOpen || state.sheetOpen;
-    left = anyOpen
-      ? Math.round(Math.min(360, viewportWidth * 0.45)) + NARROW_SIDE * 2
-      : NARROW_SIDE;
-    right = NARROW_SIDE + 56;
-    top = 72;
-    bottom = 64;
-  } else if (narrow) {
-    left = NARROW_SIDE;
-    // Right edge holds the on-map controls on a phone.
-    right = NARROW_SIDE + 52;
-    top = NARROW_TOP;
-    // Reserve the bottom sheet only while one is up; otherwise just the dock.
-    bottom =
-      state.lensOpen || state.resultsOpen || state.sheetOpen
-        ? Math.round(Math.min(NARROW_BOTTOM_MAX, viewportHeight * NARROW_BOTTOM_RATIO))
-        : NARROW_DOCK_BOTTOM;
+  if (viewportWidth <= EXPLORE_PHONE_MAX_WIDTH) {
+    top = PHONE_HEADER + GAP;
+    // Symmetric and slim: the country fills the phone's width, and a framed record lands on the
+    // center line, clear of the controls stacked at the right edge just above the sheet.
+    right = GAP / 2;
+    left = GAP / 2;
+    bottom = Math.max(0, state.sheetHeight ?? 0) + GAP;
   } else {
-    left = state.lensOpen ? LENS_INSET : OPEN_EDGE_INSET;
-    right = state.sheetOpen ? SHEET_INSET : state.resultsOpen ? RESULTS_INSET : OPEN_EDGE_INSET;
-    top = WIDE_TOP;
-    bottom = Math.round(Math.min(WIDE_BOTTOM_MAX, viewportHeight * WIDE_BOTTOM_RATIO));
+    top = WIDE_HEADER + GAP;
+    right = CONTROLS + GAP / 2;
+    left = EXPLORE_FLOAT_GUTTER + EXPLORE_COLUMN_WIDTH + GAP;
+    // The column and a gutter on each side are never negotiable: a frame under it is unseen.
+    leftFloor = EXPLORE_FLOAT_GUTTER + EXPLORE_COLUMN_WIDTH + EXPLORE_FLOAT_GUTTER;
+    bottom = EXPLORE_FLOAT_GUTTER + EXPLORE_HISTOGRAM_HEIGHT + GAP;
   }
 
-  // Horizontal clamp: scale both sides by the same factor so the camera stays centered on the
-  // free area rather than drifting toward whichever panel happened to be narrower.
-  const maxHorizontal = viewportWidth * MAX_AXIS_SHARE;
+  // Horizontal clamp: scale both sides by one factor so the camera stays centered on the free area.
+  const maxHorizontal = viewportWidth * (wide ? MAX_HORIZONTAL_SHARE_WIDE : MAX_HORIZONTAL_SHARE);
   if (left + right > maxHorizontal) {
     const k = maxHorizontal / (left + right);
-    left = Math.floor(left * k);
+    left = Math.max(leftFloor, Math.floor(left * k));
     right = Math.floor(right * k);
   }
 
-  // Vertical guard. Applied on both branches, not just the wide one: a short narrow viewport
-  // (a landscape phone, or a browser with a large chrome bar) hits this before any desktop size
-  // does, and a throw there is just as fatal.
-  if (top + bottom > viewportHeight * MAX_AXIS_SHARE) {
-    top = VERTICAL_FALLBACK;
-    bottom = VERTICAL_FALLBACK;
-  }
-
-  // Last resort for viewports too small for even the fallback, so the contract
-  // (`top + bottom < viewportHeight`) holds for every input rather than almost every input.
-  if (top + bottom > viewportHeight * MAX_AXIS_SHARE) {
-    const k = (viewportHeight * MAX_AXIS_SHARE) / (top + bottom);
+  const maxVertical = viewportHeight * MAX_VERTICAL_SHARE;
+  if (top + bottom > maxVertical) {
+    const k = maxVertical / (top + bottom);
     top = Math.floor(top * k);
     bottom = Math.floor(bottom * k);
   }
