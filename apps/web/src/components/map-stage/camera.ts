@@ -100,11 +100,13 @@ export function runFlyPreset(
         return undefined;
       }
     })();
-    if (camera?.center && typeof camera.zoom === 'number') {
+    // A map with no size yet (a background tab) fits to a non-finite zoom; fall through.
+    if (camera?.center && typeof camera.zoom === 'number' && Number.isFinite(camera.zoom)) {
       center = lngLatTuple(camera.center);
       zoom = camera.zoom;
       boundsFitted = true;
-      if (options?.zoomFloor === 'fit') map.setMinZoom(Math.min(MAP_MIN_ZOOM, zoom));
+      // MapLibre throws below its own floor of -2.
+      if (options?.zoomFloor === 'fit') map.setMinZoom(Math.max(-2, Math.min(MAP_MIN_ZOOM, zoom)));
     } else {
       center = [(west + east) / 2, (south + north) / 2];
       zoom = 3.4;
