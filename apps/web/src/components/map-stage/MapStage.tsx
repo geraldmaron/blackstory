@@ -354,6 +354,12 @@ export type MapStageHandle = {
    */
   readonly setDoorBrowseLive: (live: boolean) => void;
   /**
+   * Whether place tokens (counts and names) and site names draw. A surface that flies the camera
+   * to one record (the Door's tour) turns them off, so the flight does not pass through every
+   * state, county and city count on the way; the surface turns them back on when it is done.
+   */
+  readonly setPlaceTokens: (shown: boolean) => void;
+  /**
    * The live MapLibre map, or null before it starts and after it fails.
    *
    * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
@@ -544,6 +550,11 @@ export function MapStageProvider({
   const setDoorBrowseLive = useCallback((live: boolean) => {
     doorBrowseLiveRef.current = live;
     setDoorBrowseLiveState(live);
+  }, []);
+  const setPlaceTokens = useCallback((shown: boolean) => {
+    plateRef.current?.toggleAttribute('data-tokens-off', !shown);
+    // The token layer lays out on `render` (place-labels.ts): ask for one so it catches up.
+    if (shown) mapRef.current?.triggerRepaint();
   }, []);
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
@@ -2012,6 +2023,7 @@ export function MapStageProvider({
         resize();
       },
       setDoorBrowseLive,
+      setPlaceTokens,
       getMap: () => {
         ensureMap();
         return getMap();
@@ -2029,6 +2041,7 @@ export function MapStageProvider({
       setSearchArea,
       resize,
       setDoorBrowseLive,
+      setPlaceTokens,
       getMap,
     ],
   );

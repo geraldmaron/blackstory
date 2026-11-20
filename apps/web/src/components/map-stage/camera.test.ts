@@ -31,6 +31,9 @@ function fakeMap(fitZoom = 3.35) {
         calls.push({ kind: 'setMinZoom', options: { value } });
       },
       cameraForBounds: () => ({ center: { lng: -96.5, lat: 38.6 }, zoom: fitZoom }),
+      getZoom: () => fitZoom,
+      getCenter: () => ({ lng: -96.5, lat: 38.6 }),
+      getContainer: () => ({ clientWidth: 1000 }),
     },
   };
 }

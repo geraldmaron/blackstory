@@ -132,6 +132,31 @@ export function cameraPresetFor(name: CameraPresetName, reducedMotion: boolean):
   return reducedMotion ? REDUCED_MOTION_CAMERA_PRESETS[name] : CAMERA_PRESETS[name];
 }
 
+/** How long a flight gets per zoom level it has to cross, and the most any flight may take. */
+const FLIGHT_MS_PER_ZOOM_LEVEL = 300;
+const FLIGHT_MAX_MS = 3200;
+
+/**
+ * A preset's duration is authored for its own tier (`point` is a 1200ms landing from a city).
+ * The same preset now also carries the globe down to a street and one city across the country to
+ * another, eleven zoom levels in the time meant for two: no tile along the way can load, so the
+ * flight read as a blank cut. This stretches a flight to the distance it actually covers:
+ * the zoom levels between the two frames, plus the levels `flyTo` climbs to cross `screensAway`
+ * widths of ground. Never shorter than the preset, never longer than `FLIGHT_MAX_MS`.
+ */
+export function flightDurationFor(
+  presetDuration: number,
+  zoomFrom: number,
+  zoomTo: number,
+  screensAway: number,
+): number {
+  const levels = Math.abs(zoomTo - zoomFrom) + Math.log2(1 + Math.max(0, screensAway));
+  if (!Number.isFinite(levels)) return presetDuration;
+  return Math.round(
+    Math.min(FLIGHT_MAX_MS, Math.max(presetDuration, levels * FLIGHT_MS_PER_ZOOM_LEVEL)),
+  );
+}
+
 /**
  * Explore / hero MapLibre zoom envelope (design-direction-v5 + street-orientation posture).
  * National floor at 3; ceiling stops short of address-invasive rooftop framing while still

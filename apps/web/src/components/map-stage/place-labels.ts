@@ -245,6 +245,9 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
 
   function update(): void {
     frame = 0;
+    // Stood down by the surface (`setPlaceTokens`, shell.css): hidden, so not laid out either.
+    // Three feature queries and a collision pass per frame is the cost a flight cannot spare.
+    if (layer.closest('[data-tokens-off]')) return;
     const zoom = map.getZoom();
     const named = new Set<string>();
     for (const feature of query(EXPLORE_PLACE_NAME_LAYER_ID)) {

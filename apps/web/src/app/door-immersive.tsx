@@ -738,6 +738,8 @@ export function DoorImmersive({
     const onTour = (event: Event) => {
       const target = (event as CustomEvent<DoorTourTarget | null>).detail;
       tourRef.current = target;
+      // The tour is about one record at a time: no place counts on the way there or around it.
+      stage.setPlaceTokens(target === null);
       // The tour flies to its own records; a rail that had dimmed one would hide its pin.
       if (target) setRailDecade(null);
       if (browseModeRef.current) return;
@@ -749,7 +751,13 @@ export function DoorImmersive({
       });
     };
     window.addEventListener(DOOR_TOUR_EVENT, onTour);
-    return () => window.removeEventListener(DOOR_TOUR_EVENT, onTour);
+    // The handle's identity changes when the map loads, which re-runs this mid-tour.
+    stage.setPlaceTokens(tourRef.current === null);
+    return () => {
+      window.removeEventListener(DOOR_TOUR_EVENT, onTour);
+      // The plate outlives this page: never leave the next surface without its tokens.
+      stage.setPlaceTokens(true);
+    };
   }, [applyCamera, stage]);
 
   /** A marker click on the live plate opens the record the pin's href names. */
@@ -963,23 +971,12 @@ export function DoorImmersive({
                 ) : null}
               </div>
               {/* v11 Orbit: the opening is the headline and the ways in. What the lights mean is
-                  said here, once, because unlit ground reads as "nothing happened there". */}
-              {/* The page goes on below the map; say so in words, and make it a way there. */}
-              <a className="ds-door-open__next" href="#door-ch-evidence-band">
-                Below the map, how every record is graded
-              </a>
+                  said here, once, because unlit ground reads as "nothing happened there". The
+                  tour's own cue (door-tour-section.tsx) says the page goes on. */}
               <p className="ds-door-open__coverage">
                 Each light is a record published so far. Unlit places are not yet researched.{' '}
                 <Link href="/methodology">How coverage works</Link>
               </p>
-              <div className="ds-door-open__actions">
-                <Link
-                  className={buttonClassName('quiet', 'ds-door-open__browse-link')}
-                  href="/records"
-                >
-                  Browse all records
-                </Link>
-              </div>
             </section>
           ) : current ? (
             <DoorWalkCard

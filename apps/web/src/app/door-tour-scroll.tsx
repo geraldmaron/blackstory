@@ -1,12 +1,16 @@
 /**
- * The tour's scroll link: which step is in front of the reader, and a visible echo of it.
+ * The tour's scroll link: which stop is in front of the reader, and the rail that says so.
  *
  * Native scroll only. Two IntersectionObservers (no scroll listener, no per-frame state): one on
  * each step with a thin probe line across the screen, one on the whole tour. A step change sets a
  * ref and, once, tells the Door's camera (door-immersive.tsx listens for `DOOR_TOUR_EVENT`; it
  * owns the map window and the framing). Leaving the tour sends `null`, which sends the camera
- * back to the national frame. Focus never moves: the map is decorative, the steps are ordinary
- * headings and links, and the progress mark is aria-hidden.
+ * back to the national frame. The current stop carries `data-current`, which is what shows its
+ * words (door-tour.css). Focus is never moved: the stops are ordinary headings and links, and a
+ * link reached by keyboard in a stop that is not showing scrolls that stop in.
+ *
+ * The rail is the chapter rail: one link per stop on the right edge, the current one named, and a
+ * way past the tour. It stands where the opening's time rail stood.
  *
  * Without JavaScript none of this runs: the steps are a stacked list of records.
  */
@@ -43,7 +47,7 @@ const PROBE_PHONE = 0.5;
 const PROBE_WIDE = 0.45;
 
 export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourStep[] }) {
-  const bandRef = useRef<HTMLDivElement | null>(null);
+  const bandRef = useRef<HTMLElement | null>(null);
   const [current, setCurrent] = useState<number | null>(null);
 
   useEffect(() => {
@@ -51,6 +55,7 @@ export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourSte
     const tour = band?.closest<HTMLElement>('.ds-door-tour');
     if (!band || !tour || typeof IntersectionObserver === 'undefined') return undefined;
 
+    const stepEls = [...tour.querySelectorAll<HTMLElement>('[data-tour-step]')];
     let active = false;
     let index: number | null = null;
     let published: number | null = null;
@@ -59,6 +64,7 @@ export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourSte
       if (next === published) return;
       published = next;
       setCurrent(next);
+      stepEls.forEach((el, at) => el.toggleAttribute('data-current', at === next));
       const step = next === null ? null : steps[next];
       window.dispatchEvent(new CustomEvent(DOOR_TOUR_EVENT, { detail: step ?? null }));
     };
@@ -99,12 +105,12 @@ export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourSte
         },
         { rootMargin: `-${line}px 0px -${Math.max(0, vh - line - 2)}px 0px`, threshold: 0 },
       );
-      tour.querySelectorAll('[data-tour-step]').forEach((el) => stepObserver!.observe(el));
+      stepEls.forEach((el) => stepObserver!.observe(el));
     };
     observeSteps();
 
-    // The tour is "in view" from when its top clears the lower half of the screen until its end
-    // clears the top tenth.
+    // The tour is "in view" from when its top reaches the probe line (so the first stop is
+    // current the moment the opening gives way) until its end clears the top tenth.
     const tourObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
@@ -112,7 +118,7 @@ export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourSte
         tour.dataset.active = active ? 'true' : 'false';
         publish();
       },
-      { rootMargin: '-10% 0px -45% 0px', threshold: 0 },
+      { rootMargin: '-10% 0px -55% 0px', threshold: 0 },
     );
     tourObserver.observe(tour);
 
@@ -125,7 +131,16 @@ export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourSte
       });
     };
     window.addEventListener('resize', onResize);
+    // Only the current stop's words show. A link reached by Tab in another stop brings its stop
+    // in, so focus is never on something the reader cannot see.
+    const onFocusIn = (event: FocusEvent) => {
+      const stepEl = (event.target as HTMLElement).closest<HTMLElement>('[data-tour-step]');
+      if (stepEl && !stepEl.hasAttribute('data-current')) stepEl.scrollIntoView({ block: 'start' });
+    };
+    tour.addEventListener('focusin', onFocusIn);
     return () => {
+      tour.removeEventListener('focusin', onFocusIn);
+      stepEls.forEach((el) => el.removeAttribute('data-current'));
       window.removeEventListener('resize', onResize);
       if (frame !== null) window.cancelAnimationFrame(frame);
       stepObserver?.disconnect();
@@ -137,12 +152,28 @@ export function DoorTourScroll({ steps }: { readonly steps: readonly DoorTourSte
     };
   }, [steps]);
 
-  const step = current === null ? null : steps[current];
   return (
-    <div className="ds-door-tour__band" ref={bandRef} aria-hidden="true">
-      <p className="ds-door-tour__progress" hidden={step === null || step === undefined}>
-        {step ? `${(current ?? 0) + 1} of ${steps.length} · ${step.label}` : null}
-      </p>
-    </div>
+    <nav className="ds-door-tour__rail" ref={bandRef} aria-label="Tour stops">
+      <ol className="ds-door-tour__rail-stops">
+        {steps.map((step, at) => (
+          <li key={step.id}>
+            <a
+              className="ds-door-tour__rail-stop"
+              href={`#${step.id}`}
+              aria-current={current === at ? 'step' : undefined}
+            >
+              <span className="ds-door-tour__rail-label">
+                <span className="ds-visually-hidden">{step.name}, </span>
+                {step.label}
+              </span>
+              <span className="ds-door-tour__rail-dot" aria-hidden="true" />
+            </a>
+          </li>
+        ))}
+      </ol>
+      <a className="ds-door-tour__skip" href="#door-ch-evidence-band">
+        Skip the tour
+      </a>
+    </nav>
   );
 }

@@ -2275,7 +2275,11 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
    count (design-direction-v11.md, "Darkness is not absence"), so they stand down until the camera
    reaches the country. `visibility`, not `display`: the token list for assistive tech is separate
    and the tokens keep their boxes for the return. */
-.ds-map-stage[data-orbit] :is(.ds-place-token, .ds-site-name) {
+.ds-map-stage:is([data-orbit], [data-tokens-off]) :is(.ds-place-token, .ds-site-name) {
+  visibility: hidden;
+}
+/* The tethers from displaced numerals go with them. */
+.ds-map-stage[data-tokens-off] .ds-place-leaders {
   visibility: hidden;
 }
 

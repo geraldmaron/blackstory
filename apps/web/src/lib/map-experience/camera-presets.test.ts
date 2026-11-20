@@ -14,6 +14,7 @@ import {
   MAP_MIN_ZOOM,
   REDUCED_MOTION_CAMERA_PRESETS,
   cameraPresetFor,
+  flightDurationFor,
   type CameraPresetName,
 } from './camera-presets';
 
@@ -105,4 +106,16 @@ test('the point preset lands inside the map zoom envelope', () => {
 
 test('county zoom sits between state resting frame and point framing', () => {
   assert.ok(CAMERA_COUNTY_ZOOM > 6.2 && CAMERA_COUNTY_ZOOM < CAMERA_POINT_ZOOM);
+});
+
+test('a flight is stretched to the distance it covers, within the preset and the cap', () => {
+  const point = CAMERA_PRESETS.point.duration;
+  // A landing from the city it is already over keeps the authored duration.
+  assert.equal(flightDurationFor(point, 11, 13, 0.5), point);
+  // The globe down to a street, and one city to another across the country, get longer.
+  assert.ok(flightDurationFor(point, 1.4, 13, 0) > 3000);
+  assert.ok(flightDurationFor(point, 14, 14, 800) > 2500);
+  // Never past the cap, and a map with no size yet falls back to the preset.
+  assert.equal(flightDurationFor(point, 0, 22, 1e9), 3200);
+  assert.equal(flightDurationFor(point, Number.NaN, 13, 0), point);
 });

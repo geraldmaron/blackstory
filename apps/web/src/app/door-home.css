@@ -143,20 +143,22 @@
     --ds-door-card-w: calc(var(--ds-door-dock-w) + var(--ds-space-6) * 2);
   }
 
-  /* The country frames above the band that rises into the first screen. */
+  /* The globe is the scene, not a figure in a box beside the words: its window reaches under
+     the opening column, so the disc fills the screen's height and the headline stands on its
+     dark limb. */
   .ds-door__window {
-    inset: 0 0 var(--ds-door-peek)
-      calc(var(--ds-door-edge) + var(--ds-door-card-w) + var(--ds-space-3));
+    inset: 0 0 var(--ds-door-peek) calc(var(--ds-door-edge) + var(--ds-door-card-w) * 0.6);
   }
 
-  /* The next band rises a strip into the first screen under the card, so the page shows that
-     it goes on; the card stops above that strip. (`body` outranks the base rule further down.) */
+  /* The first screen is the globe's alone; the tour's cue at its foot says the page goes on
+     (door-tour.css). (`body` outranks the base rule further down.) */
   .ds-door {
-    --ds-door-peek: 11rem;
+    --ds-door-peek: 0rem;
   }
 
+  /* `main` starts under the bar, so the fold is one bar short of the screen. */
   body .ds-door-chapters {
-    margin-top: calc(100dvh - var(--ds-door-peek));
+    margin-top: calc(100dvh - var(--ds-island-clearance) - var(--ds-door-peek));
   }
 
   .ds-door__dock {
@@ -220,6 +222,16 @@
 /* Without JavaScript there is no walk to start; the records link and the notice remain. */
 @media (scripting: none) {
   .ds-door-open__start {
+    display: none;
+  }
+
+  /* The notice that the map needs JavaScript stands at the column's top: the headline starts
+     below it. And nothing is loading, so nothing says so. */
+  .ds-door__dock > .ds-door-open {
+    padding-top: var(--ds-space-16);
+  }
+
+  .ds-door__loading {
     display: none;
   }
 }
@@ -301,10 +313,6 @@
   line-height: 1.45;
 }
 
-.ds-door-open__record {
-  margin-bottom: var(--ds-space-2);
-}
-
 .ds-door-open__headline {
   display: flex;
   flex-direction: column;
@@ -312,8 +320,8 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-display);
-  /* The display role, held to the dock: every phase of the morph fits. */
-  font-size: clamp(2.25rem, min(3.4vw, 6vh), 3.5rem);
+  /* The display role at the scene's scale, held to the dock so every phase of the morph fits. */
+  font-size: clamp(2.75rem, min(6vw, 11vh), 5.75rem);
   letter-spacing: -0.04em;
   line-height: 0.86;
   color: var(--ds-ink);
@@ -339,17 +347,10 @@
   max-width: 30rem;
   margin: 0;
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body);
-  line-height: 1.5;
+  font-size: clamp(var(--ds-text-subtitle), 1.4vw, 1.375rem);
+  line-height: 1.45;
   color: var(--ds-ink);
   text-wrap: pretty;
-}
-
-.ds-door-open__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-3) var(--ds-space-4);
 }
 
 /* —— The walk: the decade histogram, its record, and its controls ————————————————————— */
@@ -758,16 +759,6 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     display: none;
   }
 
-  /* The block scrolls under its actions; the way into the walk never scrolls out of reach. */
-  .ds-door-open__actions {
-    position: sticky;
-    bottom: calc(var(--ds-space-4) * -1);
-    margin: 0 calc(var(--ds-space-5) * -1) calc(var(--ds-space-4) * -1);
-    padding: var(--ds-space-3) var(--ds-space-5) var(--ds-space-4);
-    border-top: var(--ds-border-width) solid var(--ds-rule);
-    background: var(--ds-canvas);
-  }
-
   .ds-door-record__name {
     font-size: 1.25rem;
   }
@@ -832,24 +823,6 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   }
 }
 
-/* The cue that the page goes on: a quiet text link into the first band, 44px tall, at the
-   card's foot on a wide screen. On a phone the band itself rises into the first screen. */
-.ds-door-open__next {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  text-decoration: underline;
-  text-decoration-color: var(--ds-accent-graphic);
-  text-underline-offset: 0.25em;
-}
-
-.ds-door-open__next:hover {
-  color: var(--ds-ink);
-}
-
 /* The lead story, named in the meta role above its action. */
 .ds-door-open__lead {
   margin: 0;
@@ -870,21 +843,6 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
 .ds-door-open__cta > * {
   flex: 0 0 auto;
   width: auto;
-  min-height: 44px;
-}
-
-.ds-door-open__spotlight {
-  display: grid;
-  justify-items: start;
-  gap: var(--ds-space-1);
-  min-width: 0;
-}
-
-.ds-door-open__spotlight .ds-door-record {
-  width: 100%;
-}
-
-.ds-door-open__another {
   min-height: 44px;
 }
 
@@ -914,21 +872,10 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
     align-content: start;
   }
 
-  .ds-door-open__spotlight,
-  .ds-door-open__browse-link,
-  .ds-door-open__next {
-    display: none;
-  }
-
   /* The opening sentence costs about 84px here; the grain edge (decoration), the empty actions
      row and the padding that framed the edge give it back, so the map window keeps its height. */
   .ds-door-open {
     padding-bottom: var(--ds-space-4);
-  }
-
-  .ds-door-open__edge,
-  .ds-door-open__actions {
-    display: none;
   }
 
   /* The map window is sized to the country, not to the screen: it starts under the headline
@@ -1727,9 +1674,14 @@ body:has(.ds-door) .ds-door-journey {
     position: static;
   }
 
+  /* At the middle of the first screen (the dock's own height is measured, door-immersive.tsx),
+     never closer to the bar than a clear step. */
   .ds-door__dock[data-step='open'] {
     position: absolute;
-    top: calc(var(--ds-island-clearance) + var(--ds-space-10));
+    top: max(
+      calc(var(--ds-island-clearance) + var(--ds-space-10)),
+      calc((100dvh - var(--ds-door-dock-h, 24rem)) / 2)
+    );
     bottom: auto;
   }
 
@@ -1739,11 +1691,8 @@ body:has(.ds-door) .ds-door-journey {
 
   body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open']) .ds-door-chapters {
     margin-top: max(
-      calc(100dvh - var(--ds-door-peek)),
-      calc(
-        var(--ds-island-clearance) + var(--ds-space-10) + var(--ds-door-dock-h, 0px) +
-          var(--ds-space-12)
-      )
+      calc(100dvh - var(--ds-island-clearance) - var(--ds-door-peek)),
+      calc(var(--ds-space-10) + var(--ds-door-dock-h, 0px) + var(--ds-space-12))
     );
   }
 }
@@ -1810,7 +1759,8 @@ body:not(:has(.ds-map-stage[data-plate-ready]))
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-10));
   right: var(--ds-space-6);
-  bottom: calc(var(--ds-door-peek, 0px) + var(--ds-space-8));
+  /* Clear of the reader switches in the screen's lower right corner (world-controls.css). */
+  bottom: calc(var(--ds-door-peek, 0px) + 44px + var(--ds-space-10));
   z-index: var(--ds-z-content);
   display: none;
   grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;

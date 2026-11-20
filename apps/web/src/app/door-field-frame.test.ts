@@ -4,13 +4,16 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { ORBIT_LINE_MIN_ZOOM } from './map/explore-style';
 import {
   DOOR_FRAME_MARGIN_MAX_PX,
   DOOR_FRAME_MARGIN_MIN_PX,
+  DOOR_ORBIT_MAX_ZOOM,
   doorDrillPadding,
   doorFrameMargin,
   doorFrameOffset,
   doorFramePadding,
+  doorOrbitZoom,
   sameDoorFrameBox,
 } from './door-field-frame';
 
@@ -127,4 +130,14 @@ test('a drill keeps more air than the national frame, on every side', () => {
 test('a drill falls back to the plain padding when the extra air leaves no room', () => {
   const tiny = { top: 0, left: 0, width: 120, height: 120 };
   assert.deepEqual(doorDrillPadding(tiny, tiny), doorFramePadding(tiny, tiny));
+});
+
+test('Orbit grows with its window but stops short of the zoom where state lines draw', () => {
+  const small = doorOrbitZoom({ top: 0, left: 0, width: 300, height: 300 });
+  const laptop = doorOrbitZoom({ top: 52, left: 440, width: 880, height: 848 });
+  const wall = doorOrbitZoom({ top: 52, left: 600, width: 1900, height: 1500 });
+  assert.ok(small < laptop);
+  assert.equal(wall, DOOR_ORBIT_MAX_ZOOM);
+  // explore-style.ts turns line layers on at ORBIT_LINE_MIN_ZOOM, and the globe tears them there.
+  assert.ok(DOOR_ORBIT_MAX_ZOOM < ORBIT_LINE_MIN_ZOOM);
 });

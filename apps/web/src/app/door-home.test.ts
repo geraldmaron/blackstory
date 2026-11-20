@@ -23,6 +23,15 @@ const immersive = readFileSync(
 const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
 const shellCss = readFileSync(fileURLToPath(new URL('./shell.css', import.meta.url)), 'utf8');
 const walk = readFileSync(fileURLToPath(new URL('./door-walk.tsx', import.meta.url)), 'utf8');
+const tourSection = readFileSync(
+  fileURLToPath(new URL('./door-tour-section.tsx', import.meta.url)),
+  'utf8',
+);
+const tourScroll = readFileSync(
+  fileURLToPath(new URL('./door-tour-scroll.tsx', import.meta.url)),
+  'utf8',
+);
+const tourCss = readFileSync(fileURLToPath(new URL('./door-tour.css', import.meta.url)), 'utf8');
 const records = readFileSync(
   fileURLToPath(new URL('./door-decade-walk.ts', import.meta.url)),
   'utf8',
@@ -51,7 +60,7 @@ test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
 });
 
-test('the opening is the map, one headline column, one primary action and one quiet link', () => {
+test('the opening is the map, one headline column, one primary action and one secondary', () => {
   assert.match(immersive, /'use client'/);
   assert.match(immersive, /HeroHeadlineMorph/);
   assert.match(immersive, />\s*Walk the decades\s*</);
@@ -62,8 +71,10 @@ test('the opening is the map, one headline column, one primary action and one qu
   assert.match(immersive, /className="ds-door-open__lead"/);
   assert.match(css, /\.ds-door-open__cta > \*\s*\{[^}]*width:\s*auto/);
   assert.match(immersive, /buttonClassName\('secondary', 'ds-door-open__start'\)/);
-  assert.match(immersive, /buttonClassName\('quiet', 'ds-door-open__browse-link'\)/);
-  assert.match(immersive, />\s*Browse all records\s*</);
+  // One scene: the header's Records tab is the way to the list, and the tour's cue is the way
+  // down, so the opening carries neither a browse link nor a "below the map" link.
+  assert.doesNotMatch(immersive, /Browse all records|ds-door-open__(browse-link|next|actions)/);
+  assert.doesNotMatch(css, /ds-door-open__(browse-link|next|actions|spotlight|another)/);
   // The header carries the one search; the hero form, its button and the extra browse doors go.
   assert.doesNotMatch(immersive, /<form|Search records|Search names/);
   assert.doesNotMatch(immersive, /Browse the map|Browse the list|ds-door__filters/);
@@ -314,9 +325,10 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
     css,
     /\.ds-door__dock\[data-step='open'\]\s*\{[^}]*top:\s*calc\(var\(--ds-island-clearance\)/,
   );
-  assert.match(css, /\.ds-door-open__browse-link,\s*\.ds-door-open__next\s*\{\s*display:\s*none/);
-  // Something on the opening says the page goes on: a link into the first band.
-  assert.match(immersive, /className="ds-door-open__next" href="#door-ch-evidence-band"/);
+  // Something on the opening screen says the page goes on: the tour's cue, a link to its first
+  // stop, at the foot of the first screen.
+  assert.match(tourSection, /className="ds-door-tour__cue" href=\{`#\$\{steps\[0\]!\.id\}`\}/);
+  assert.match(tourCss, /\.ds-door-tour__cue\s*\{[^}]*bottom:\s*100%/);
   assert.doesNotMatch(css, /\.ds-hero-headline-morph__prefix\s*\{[^}]*min-width:\s*max-content/);
   assert.match(css, /\.ds-map-callout__card,[\s\S]*visibility:\s*hidden !important/);
   assert.match(
@@ -429,4 +441,32 @@ test('a reader without a plate is told so, where the map would be, and sent to t
     /<noscript>[\s\S]*ds-door__noscript[\s\S]*href="\/records"[\s\S]*<\/noscript>/,
   );
   assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);
+});
+
+test('the tour is one pinned scene: a screen of scroll per stop, one stop showing', () => {
+  // Native scroll only. Each stop is a screen tall and draws nothing; its words are pinned and
+  // shown by `data-current`, so stops cross-fade instead of scrolling across the map.
+  assert.doesNotMatch(tourCss + tourScroll, /scroll-snap|preventDefault|addEventListener\('wheel'/);
+  assert.match(tourCss, /\.ds-door-tour__step\s*\{\s*min-height:\s*100dvh/);
+  assert.match(tourCss, /\.ds-door-tour__card\s*\{[^}]*position:\s*fixed;[^}]*opacity:\s*0/s);
+  assert.match(
+    tourCss,
+    /\[data-active='true'\] \.ds-door-tour__step\[data-current\] \.ds-door-tour__card,\s*\.ds-door-tour__card:focus-within\s*\{[^}]*opacity:\s*1/s,
+  );
+  assert.match(tourScroll, /toggleAttribute\('data-current', at === next\)/);
+  // A stop that is not showing stays in the document and the tab order (never `visibility` or
+  // `display`), and a link reached by keyboard brings its stop in.
+  assert.doesNotMatch(tourCss, /\.ds-door-tour__card\s*\{[^}]*(visibility|display:\s*none)/s);
+  assert.match(tourScroll, /addEventListener\('focusin'/);
+  assert.match(tourScroll, /scrollIntoView\(\{ block: 'start' \}\)/);
+  // One headline, one sourced claim and one action per stop; the rail links every stop.
+  assert.match(tourSection, /<h3 className="ds-door-tour__name"/);
+  assert.match(tourSection, /buttonClassName\('primary', 'ds-door-tour__open'\)/);
+  assert.match(tourScroll, /<nav className="ds-door-tour__rail"[^>]*aria-label="Tour stops"/);
+  assert.match(tourScroll, /aria-current=\{current === at \? 'step' : undefined\}/);
+  // Without scripting the stops are a stacked list: the stage is behind `scripting: enabled`.
+  assert.ok(
+    tourCss.indexOf('@media (scripting: enabled)') <
+      tourCss.indexOf('.ds-door-tour__step {\n    min-height: 100dvh'),
+  );
 });

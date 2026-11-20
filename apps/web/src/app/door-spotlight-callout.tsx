@@ -247,6 +247,10 @@ export function DoorSpotlightCallout({
     const map = stage.getMap() as EventedMap | null;
     if (!map) return;
     let frame: number | null = null;
+    // Querying every rendered mark costs a frame, so the marks are read at rest and the last
+    // answer, carried along with the pin, stands in while the camera moves.
+    let marks: { readonly boxes: Box[]; readonly pin: { x: number; y: number } } | null = null;
+    let atRest = true;
     const place = () => {
       frame = null;
       const layer = layerRef.current;
@@ -261,6 +265,15 @@ export function DoorSpotlightCallout({
       const pin = { x: plate.left + projected.x, y: plate.top + projected.y };
       const win = windowEl.getBoundingClientRect();
       const stacked = window.matchMedia(STACKED_QUERY).matches;
+      if (atRest || !marks) marks = { boxes: markObstacles(map, plate), pin };
+      const shiftX = pin.x - marks.pin.x;
+      const shiftY = pin.y - marks.pin.y;
+      const obstacles = marks.boxes.map((box) => ({
+        left: box.left + shiftX,
+        top: box.top + shiftY,
+        right: box.right + shiftX,
+        bottom: box.bottom + shiftY,
+      }));
       const placement = placeCallout(
         pin,
         { width: card.offsetWidth, height: card.offsetHeight },
@@ -268,7 +281,7 @@ export function DoorSpotlightCallout({
         // the right corner (door-home.css); the card docks one row above it.
         stacked ? { ...rectBox(win), bottom: win.bottom - ATTRIBUTION_CLEARANCE } : win,
         stacked,
-        markObstacles(map, plate),
+        obstacles,
       );
       if (!placement) {
         show(null);
@@ -291,18 +304,26 @@ export function DoorSpotlightCallout({
     const schedule = () => {
       if (frame === null) frame = window.requestAnimationFrame(place);
     };
-    map.on('move', schedule);
-    map.on('resize', schedule);
+    const moving = () => {
+      atRest = false;
+      schedule();
+    };
+    const resting = () => {
+      atRest = true;
+      schedule();
+    };
+    map.on('move', moving);
+    map.on('resize', resting);
     // The groups the card avoids may still be loading when the camera stops: place it again once
     // the plate has drawn them.
-    map.on('idle', schedule);
-    window.addEventListener('resize', schedule);
+    map.on('idle', resting);
+    window.addEventListener('resize', resting);
     schedule();
     return () => {
-      map.off('move', schedule);
-      map.off('resize', schedule);
-      map.off('idle', schedule);
-      window.removeEventListener('resize', schedule);
+      map.off('move', moving);
+      map.off('resize', resting);
+      map.off('idle', resting);
+      window.removeEventListener('resize', resting);
       if (frame !== null) window.cancelAnimationFrame(frame);
     };
   }, [active, frameRef, lat, lng, stage]);

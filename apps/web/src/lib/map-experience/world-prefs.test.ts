@@ -34,7 +34,8 @@ const discFor = (width: number, height: number) =>
   (Math.PI * Math.cos((36 * Math.PI) / 180));
 
 test('Orbit: the globe disc fills the same share of a roomy map window', () => {
-  for (const side of [320, 600, 900]) {
+  // Up to the window where Orbit meets its ceiling (`DOOR_ORBIT_MAX_ZOOM`, door-field-frame.ts).
+  for (const side of [320, 600, 780]) {
     assert.ok(Math.abs(discFor(side * 1.1, side) - DOOR_ORBIT_FILL * side) < 0.001, String(side));
   }
 });

@@ -159,6 +159,14 @@ export const DOOR_ORBIT_CENTER: readonly [lng: number, lat: number] = [-96, 36];
 export const DOOR_ORBIT_HORIZON_RATIO = 0.85;
 /** How much of the map window's short side the globe's disc fills. */
 export const DOOR_ORBIT_FILL = 0.92;
+/**
+ * Orbit never comes closer than this. From `ORBIT_LINE_MIN_ZOOM` (explore-style.ts) the plate
+ * draws state lines, and on the globe at that distance MapLibre tears them into spikes across the
+ * disc. Orbit is lights and water only, so it stays just short of the lines.
+ * shortcut: the disc stops growing at about 830px on a very large screen; raise this if the
+ * tearing is fixed upstream or the lines get their own Orbit rule.
+ */
+export const DOOR_ORBIT_MAX_ZOOM = 1.88;
 
 /**
  * The zoom at which the globe's disc fills the map window (design-direction-v11.md, Orbit).
@@ -173,7 +181,10 @@ export function doorOrbitZoom(window: DoorFrameBox): number {
     Math.min(window.width, Math.max(window.height, DOOR_ORBIT_HORIZON_RATIO * window.width)),
   );
   const latitude = (DOOR_ORBIT_CENTER[1] * Math.PI) / 180;
-  return Math.log2((DOOR_ORBIT_FILL * side * Math.PI * Math.cos(latitude)) / 512);
+  return Math.min(
+    DOOR_ORBIT_MAX_ZOOM,
+    Math.log2((DOOR_ORBIT_FILL * side * Math.PI * Math.cos(latitude)) / 512),
+  );
 }
 
 /**

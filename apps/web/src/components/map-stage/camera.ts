@@ -1,6 +1,7 @@
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import {
   cameraPresetFor,
+  flightDurationFor,
   MAP_MIN_ZOOM,
   prefersReducedMotion,
   type CameraPresetName,
@@ -63,6 +64,17 @@ export type MapStageFlyOptions = {
  * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. Returns
  * `false` when `map` isn't constructed yet: callers latch the request and retry on `load`.
  */
+/** How many map widths of ground lie between the camera and `to`, at the camera's own zoom. */
+function screensAway(map: MapLibreMap, to: readonly [number, number]): number {
+  const from = map.getCenter();
+  const degrees = Math.hypot(
+    (to[0] - from.lng) * Math.cos((from.lat * Math.PI) / 180),
+    to[1] - from.lat,
+  );
+  const pixels = (degrees / 360) * 512 * 2 ** map.getZoom();
+  return pixels / (map.getContainer().clientWidth || 1000);
+}
+
 export function runFlyPreset(
   map: MapLibreMap | null,
   name: CameraPresetName,
@@ -143,7 +155,7 @@ export function runFlyPreset(
       zoom,
       padding: motionPadding,
       ...attitude,
-      duration: preset.duration,
+      duration: flightDurationFor(preset.duration, map.getZoom(), zoom, screensAway(map, center)),
       curve: preset.curve,
       speed: preset.speed,
       easing: preset.easing,

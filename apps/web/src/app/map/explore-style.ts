@@ -838,7 +838,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'raster',
         source: USGS_IMAGERY_SOURCE_ID,
         layout: { visibility: satellite ? 'visible' : 'none' },
-        paint: { ...SATELLITE_RASTER_PAINT[colorScheme] },
+        // Held at 0 while hidden, so switching imagery on eases it in over the plate instead of
+        // cutting to it. The transition is listed first: paint is pushed in this order.
+        paint: {
+          'raster-opacity-transition': { duration: 700, delay: 0 },
+          ...SATELLITE_RASTER_PAINT[colorScheme],
+          ...(satellite ? {} : { 'raster-opacity': 0 }),
+        },
       },
       /* —— Base cartography ————————————————————————————————————————————————————————
          The plate is a map before it is a chart. These layers come from the
@@ -1159,6 +1165,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
         minzoom: COUNTY_LABELS_MIN_ZOOM,
         layout: {
+          // Ungrouped is one record's own ground (a place page). The basemap prints a county's
+          // name once per tile it crosses and nothing there thins them (`hideNamedCounties` runs
+          // on tokens), so one view repeated a county five times around the record.
+          visibility: clusteringEnabled ? 'visible' : 'none',
           'text-field': ['upcase', ['get', 'name']] as unknown as ExpressionSpecification,
           'text-font': ['Noto Sans Regular'],
           'text-size': 9,

@@ -1,13 +1,17 @@
 /**
- * The tour: a few real records, one step each, between the opening and the grade band.
+ * The tour: a few real records, one stop each, between the opening and the grade band.
  *
- * Server-rendered and complete without JavaScript: a heading, one line of prompt, a way past it,
- * and one section per record (its name, where it is and how exactly, its photograph as a plate
- * with the credit, one sourced claim, a link to the record). With JavaScript the map follows the
- * reader's scroll (door-tour-scroll.tsx) and its chip says which step is in front ("4 of 5").
- * Each step is an ordinary heading and link.
+ * One scene, not a column of articles. The map is the ground for the whole tour; each stop is a
+ * screen of scroll, and its words (the record's photograph with its credit, its name, where it is
+ * and how exactly, one sourced claim, and one way into the record) hold still in one place and
+ * cross-fade as the camera travels to the next record (door-tour.css, door-tour-scroll.tsx).
+ * The scroll is the page's own: nothing is captured.
+ *
+ * Server-rendered and complete without JavaScript, where the stops are a stacked list of records.
+ * Each stop is an ordinary heading and link, in document order, whichever one is showing.
  */
 import React from 'react';
+import { buttonClassName } from '@repo/ui';
 import { RecordImage } from '../components/entity/RecordImage';
 import { EvidenceList } from '../components/evidence/EvidenceList';
 import { precisionInWords } from '../lib/map-experience/geo-precision';
@@ -18,6 +22,7 @@ import { tourHeading } from './door-tour';
 
 void React;
 
+/** The plate's slot beside the map; Commons serves the nearest thumbnail step at 2x. */
 const PLATE_SLOT_PX = 440;
 
 export type DoorTourProps = {
@@ -36,19 +41,26 @@ export function DoorTour({ records }: DoorTourProps) {
     person: record.person,
     ...(record.plate ? { plate: record.plate } : {}),
   }));
+  const heading = tourHeading(records);
   return (
-    <section className="ds-door-tour" aria-labelledby="door-tour-heading">
+    // The world is night in both themes, so the tour's words, rail and shade take the ink
+    // ground's tokens whatever the reader's theme is.
+    <section
+      className="ds-door-tour"
+      aria-labelledby="door-tour-heading"
+      data-ground="ink"
+      data-ground-fixed=""
+    >
+      {/* The way in, at the foot of the opening screen: it names what is below and goes there. */}
+      <a className="ds-door-tour__cue" href={`#${steps[0]!.id}`}>
+        Scroll for {heading.charAt(0).toLowerCase()}
+        {heading.slice(1)}
+      </a>
       <DoorTourScroll steps={steps} />
-      <div className="ds-door-tour__body" data-ground="ink" data-ground-fixed="">
-        <div className="ds-door-tour__intro ds-door-tour__card">
-          <h2 className="ds-door-tour__title" id="door-tour-heading">
-            {tourHeading(records)}
-          </h2>
-          <p className="ds-door-tour__prompt">Scroll, and the map follows.</p>
-          <a className="ds-door-tour__skip" href="#door-ch-evidence-band">
-            Skip the tour
-          </a>
-        </div>
+      <div className="ds-door-tour__body">
+        <h2 className="ds-visually-hidden" id="door-tour-heading">
+          {heading}
+        </h2>
         <ol className="ds-door-tour__steps">
           {records.map((record, i) => {
             const step = steps[i]!;
@@ -61,7 +73,7 @@ export function DoorTour({ records }: DoorTourProps) {
                   data-tour-step={i}
                 >
                   <div className="ds-door-tour__card ds-door-record">
-                    <h3 className="ds-door-record__name" id={`${step.id}-name`}>
+                    <h3 className="ds-door-tour__name" id={`${step.id}-name`}>
                       {record.name}
                     </h3>
                     <p className="ds-door-record__place">
@@ -75,11 +87,14 @@ export function DoorTour({ records }: DoorTourProps) {
                         image={record.plate}
                         plate
                         width={PLATE_SLOT_PX}
-                        className={`ds-door-record__plate${record.person ? ' ds-plate--upper' : ''}`}
+                        className={`ds-door-record__plate ds-door-tour__plate${record.person ? ' ds-plate--upper' : ''}`}
                       />
                     ) : null}
                     <EvidenceList items={[{ ...record.claim, id: `${step.id}-claim` }]} />
-                    <DoorRecordLink className="ds-door-tour__open" href={record.href}>
+                    <DoorRecordLink
+                      className={buttonClassName('primary', 'ds-door-tour__open')}
+                      href={record.href}
+                    >
                       Open the record
                       <span className="ds-visually-hidden">, {record.name}</span>
                     </DoorRecordLink>
