@@ -1,11 +1,13 @@
 /**
  * The tour (door-tour-section.tsx), between the opening and the grade band.
  *
- * One scene. The map is the fixed plate and stays the ground for the whole tour. Each stop is a
- * screen of ordinary page scroll with nothing drawn in it; the stop's words are pinned in one
- * place and only the current stop's show (`data-current`, set by door-tour-scroll.tsx), so one
- * stop cross-fades into the next while the camera travels between the two records. Nothing
- * scrolls across the map and nothing is captured: the page scrolls at the reader's own speed.
+ * One scene. The map is the fixed plate and stays the ground for the whole tour, and the page's
+ * own scroll is its camera (door-tour-scrub.ts): from the opening's globe down into the first
+ * record, out to the globe and down into the next, and back out at the end. Each stop is two
+ * screens of ordinary page scroll with nothing drawn in it. The stop's words are pinned in one
+ * place and show only while the camera is landed on its record (`data-current`, set by
+ * door-tour-scroll.tsx); while it travels the globe has the stage. Nothing scrolls across the
+ * map and nothing is captured: the page scrolls at the reader's own speed.
  *
  * Wide: the words stand on the left over a shade that fades out before the record, the map is
  * framed in what is left, and the chapter rail runs down the right edge where the opening's time
@@ -93,9 +95,12 @@
     display: none;
   }
 
+  .ds-door-tour {
+    background: var(--ds-canvas);
+  }
+
   .ds-door-tour__body {
     padding: var(--ds-section-sm) var(--ds-door-edge);
-    background: var(--ds-canvas);
     pointer-events: auto;
   }
 
@@ -115,9 +120,15 @@
       visibility 0s linear var(--ds-door-browse-ms);
   }
 
-  /* One screen of scroll per stop. The stop itself draws nothing. */
+  /* Two screens of scroll per stop: one to hold on the record, one to travel to the next
+     (`TOUR_STOP_SCREENS`, door-tour-scrub.ts). The stop itself draws nothing. */
   .ds-door-tour__step {
-    min-height: 100dvh;
+    min-height: 200dvh;
+  }
+
+  /* One more after the last stop, so the camera is back on the globe before the band arrives. */
+  .ds-door-tour__item:last-child .ds-door-tour__step {
+    min-height: 300dvh;
   }
 
   /* Pinned, and shown only for the stop in front of the reader. Still in the document and the
@@ -136,8 +147,8 @@
     transform: translateY(var(--ds-space-4));
     pointer-events: none;
     transition:
-      opacity 260ms var(--ds-ease-exit),
-      transform 0s linear 260ms;
+      opacity 200ms var(--ds-ease-exit),
+      transform 0s linear 200ms;
   }
 
   .ds-door-tour[data-active='true'] .ds-door-tour__step[data-current] .ds-door-tour__card,
@@ -145,10 +156,10 @@
     opacity: 1;
     transform: none;
     pointer-events: auto;
-    /* The outgoing stop clears first, then this one settles up into place. */
+    /* The camera has landed: the words settle up into place. */
     transition:
-      opacity 520ms var(--ds-ease-cinematic) 220ms,
-      transform 760ms var(--ds-ease-cinematic) 220ms;
+      opacity 420ms var(--ds-ease-cinematic),
+      transform 640ms var(--ds-ease-cinematic);
   }
 
   /* —— The shade under the words ————————————————————————————————————————————————————
@@ -175,9 +186,34 @@
     opacity: 1;
   }
 
-  /* The camera frames each record in what the words leave uncovered. */
-  .ds-door:has(.ds-door-tour[data-active='true']) .ds-door__window {
+  /* The shade is for the words: it stands only while a stop's words do, so the globe is clear
+     while the camera travels. */
+  .ds-door-tour[data-active='true']:not(:has([data-current]))::before {
+    opacity: 0;
+  }
+
+  /* Where a stop frames its record: what the words leave uncovered. Measured only (the camera
+     reads its box, door-immersive.tsx); it paints nothing and takes no hits. */
+  .ds-door__tour-window {
+    position: absolute;
     inset: 0 0 0 calc(var(--ds-door-edge) + var(--ds-tour-words-w) + var(--ds-space-8));
+    pointer-events: none;
+  }
+
+  /* Whose imagery it is, at the foot of the frame it fills. */
+  .ds-door__imagery {
+    position: absolute;
+    bottom: var(--ds-space-5);
+    left: calc(var(--ds-door-edge) + var(--ds-tour-words-w) + var(--ds-space-8));
+    max-width: 24rem;
+    margin: 0;
+    padding: var(--ds-space-2) var(--ds-space-3);
+    border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, #0c0b0a 86%, transparent);
+    color: #e9e2d6;
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-caption);
+    line-height: 1.45;
   }
 
   /* The selected pin is the stop's mark; its flag would only say the stop's name a second time. */
@@ -386,9 +422,18 @@
       font-size: var(--ds-text-display-3);
     }
 
-    .ds-door:has(.ds-door-tour[data-active='true']) .ds-door__window {
+    .ds-door__tour-window {
       inset: 0 0 auto 0;
       height: var(--ds-tour-map-h);
+    }
+
+    /* At the foot of the map band, where the shade begins: clear of the record's pin above it
+       and of the words below. */
+    .ds-door__imagery {
+      right: var(--ds-door-edge);
+      bottom: calc(100% - var(--ds-tour-map-h) - var(--ds-space-10));
+      left: var(--ds-door-edge);
+      max-width: none;
     }
 
     /* The shade rises from the foot, under the words. */

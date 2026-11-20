@@ -35,7 +35,7 @@ import { buttonClassName } from '@repo/ui';
 import { savePinContinuity } from '../lib/discovery/pin-continuity';
 import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';
 import type { StateDensityLevel } from '../lib/map-experience/density';
-import { recordMarkFor } from '../lib/map-experience/geo-precision';
+import { recordMarkFor, zoomForLocationPrecision } from '../lib/map-experience/geo-precision';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { nationalFieldPatch } from '../lib/map-experience/national-field';
 import { earliestDecadeFor } from '../lib/map-experience/decade-transition';
@@ -67,11 +67,18 @@ import {
 import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { DoorWalkCard } from './door-walk';
 import { DoorTimeRail, timeRailText } from './door-time-rail';
-import { DOOR_TOUR_EVENT, type DoorTourTarget } from './door-tour-scroll';
-import { tourZoom } from './door-tour';
+import {
+  measureTourLayout,
+  tourCameraAt,
+  tourNearestStop,
+  tourPhase,
+  type TourCameras,
+  type TourLayout,
+} from './door-tour-scrub';
+import { groundFrameFor } from '../components/map-stage/RecordGround';
 import { placeDrillZoom } from '../lib/map-experience/place-map';
 import { MAP_MAX_ZOOM } from '../lib/map-experience/camera-presets';
-import { readAsDocuments } from '../lib/map-experience/world-prefs';
+import { holdStill, readAsDocuments } from '../lib/map-experience/world-prefs';
 
 void React;
 
@@ -88,6 +95,11 @@ function prefetchAtlasCatalog(): void {
 
 /** Morph duration before instruments mount; matches `--ds-door-browse-ms` in door-home.css. */
 const DOOR_BROWSE_MORPH_MS = 320;
+/** How long the scroll rests before the tour brings back what it holds for a rest: the map's
+ * names, and a landing's aerial imagery. */
+const TOUR_REST_MS = 260;
+/** How close the decade walk comes to a decade's record: a region, so its neighbors still show. */
+const DOOR_WALK_ZOOM = 5.4;
 
 /** The opening's one sentence: what is here, not how to use the page. */
 const DOOR_OPEN_LINE =
@@ -177,6 +189,8 @@ export type DoorImmersiveProps = {
   readonly story: { readonly title: string; readonly slug: string } | null;
   /** The walk: one record per decade, oldest first. */
   readonly stops: readonly DoorJourneyRecord[];
+  /** The tour's records, in order (door-tour.ts): the camera's landings as the page scrolls. */
+  readonly tour?: readonly DoorJourneyRecord[];
   /** The register's decade histogram on a true time scale, and its prose caption. */
   readonly bars: readonly DecadeBar[];
   readonly barsCaption: string;
@@ -195,6 +209,7 @@ export function DoorImmersive({
   openingChoices,
   story,
   stops,
+  tour = [],
   bars,
   barsCaption,
   initialBrowse = false,
@@ -217,6 +232,8 @@ export function DoorImmersive({
   const browseFocusPendingRef = useRef(false);
   /** The map window: the part of the plate the dock leaves uncovered (door-home.css). */
   const windowRef = useRef<HTMLDivElement | null>(null);
+  /** Where a tour stop's record is framed: what the stop's words leave uncovered (door-tour.css). */
+  const tourWindowRef = useRef<HTMLDivElement | null>(null);
 
   const stage = useMapStage();
   const stageRef = useRef(stage);
@@ -488,10 +505,12 @@ export function DoorImmersive({
   /* —— The live plate ————————————————————————————————————————————————————————————————
      The same field Explore paints. `patchData` is also what wakes the shared plate on this
      surface (MapStage builds MapLibre on first contact). */
+  /** True while the camera rests on a tour stop whose stored precision allows aerial imagery. */
+  const [tourImagery, setTourImagery] = useState(false);
   useEffect(() => {
     if (browseModeRef.current) return;
-    stage.patchData(nationalFieldPatch(sweptPins, { densityLevels }));
-  }, [densityLevels, sweptPins, stage]);
+    stage.patchData(nationalFieldPatch(sweptPins, { densityLevels, satellite: tourImagery }));
+  }, [densityLevels, sweptPins, stage, tourImagery]);
 
   /** True once the plate has reported a viewport, which it only does once MapLibre has built. */
   const [plateLive, setPlateLive] = useState(false);
@@ -541,8 +560,164 @@ export function DoorImmersive({
    * `cut` lands the frame in one step: the first frame after mount, and every refit after a
    * resize, where the plate has to keep step with a layout that does not animate its own reflow.
    */
-  /** The tour step in front of the reader (door-tour-scroll.tsx), or null off the tour. */
-  const tourRef = useRef<DoorTourTarget | null>(null);
+  /* —— The tour's scrub ————————————————————————————————————————————————————————————
+     While the page is scrolled into the tour, the camera is a function of the scroll position
+     (door-tour-scrub.ts): scroll a little and it moves a little, scroll back and it reverses.
+     The words read the same path (door-tour-scroll.tsx). */
+  const scrubRef = useRef<{
+    layout: TourLayout | null;
+    cameras: TourCameras | null;
+    active: boolean;
+    nearest: number | null;
+    restTimer: number | null;
+    lastScrollAt: number;
+  }>({
+    layout: null,
+    cameras: null,
+    active: false,
+    nearest: null,
+    restTimer: null,
+    lastScrollAt: 0,
+  });
+  const tourRecordsRef = useRef(tour);
+  tourRecordsRef.current = tour;
+  /** The decade walk's record on screen, for the camera. */
+  const walkRecordRef = useRef<DoorJourneyRecord | null>(null);
+  walkRecordRef.current = step > 0 ? (stops[step - 1] ?? null) : null;
+  /** The path's cameras for the window as it is now: the opening, the globe between stops, and
+   * one landing per stop at the frame its stored precision allows (never tighter). */
+  const tourCameras = useCallback((map: { getContainer(): HTMLElement }): TourCameras | null => {
+    const plate = boxOf(map.getContainer());
+    const openingWindow = boxOf(windowRef.current);
+    const stopWindow = boxOf(tourWindowRef.current);
+    if (!plate || !openingWindow || !stopWindow) return null;
+    const none = { top: 0, right: 0, bottom: 0, left: 0 };
+    // Between stops the globe has the stage: everything under the bar.
+    const stageBox = {
+      top: openingWindow.top,
+      left: plate.left,
+      width: plate.width,
+      height: plate.top + plate.height - openingWindow.top,
+    };
+    const landing = doorFramePadding(stopWindow, plate) ?? none;
+    return {
+      opening: {
+        center: DOOR_ORBIT_CENTER,
+        zoom: doorOrbitZoom(openingWindow),
+        pitch: 0,
+        padding: doorFramePadding(openingWindow, plate) ?? none,
+      },
+      orbit: {
+        center: DOOR_ORBIT_CENTER,
+        zoom: doorOrbitZoom(stageBox),
+        pitch: 0,
+        padding: doorFramePadding(stageBox, plate) ?? none,
+      },
+      stops: tourRecordsRef.current.map((record) => {
+        const frame = groundFrameFor(record.precision, false);
+        return {
+          center: [record.lngLat[0], record.lngLat[1]] as const,
+          zoom: frame.zoom,
+          pitch: frame.pitch,
+          padding: landing,
+        };
+      }),
+    };
+  }, []);
+
+  /**
+   * Puts the camera where the scroll says. Returns true while the tour has the map. Called on
+   * every scrolled frame, and by `applyCamera` so a resize mid-tour re-aims at the same place.
+   */
+  const applyScrub = useCallback((): boolean => {
+    const scrub = scrubRef.current;
+    const records = tourRecordsRef.current;
+    if (records.length === 0 || browseModeRef.current || stepRef.current !== 0) return false;
+    scrub.layout ??= measureTourLayout();
+    if (!scrub.layout) return false;
+    const phase = tourPhase(window.scrollY, scrub.layout);
+    const nearest = tourNearestStop(phase, records.length);
+    // Not allowed to move (reduced motion, or the reader's "Hold still").
+    const still = prefersReducedMotion() || holdStill();
+
+    if (phase.active !== scrub.active) {
+      scrub.active = phase.active;
+      // The tour is about one record at a time: no place counts on the way there or around it,
+      // and the lights stay lit the whole way down (MapStage, `setPlaceTokens`).
+      stage.setPlaceTokens(!phase.active);
+      // The tour goes to its own records; a rail that had dimmed one would hide its pin.
+      if (phase.active) setRailDecade(null);
+    }
+    if (nearest !== scrub.nearest || !phase.active) {
+      const changed = nearest !== scrub.nearest;
+      scrub.nearest = nearest;
+      if (changed) {
+        stage.applyViewState({
+          selectedState: undefined,
+          selectedEdge: undefined,
+          selectedEntity:
+            (nearest === null ? selectedPinIdRef.current : records[nearest]?.pinId) ?? undefined,
+        });
+      }
+    }
+
+    // What waits for the scroll to rest. Aerial imagery belongs to a landing: on once the scroll
+    // has rested on an exact site, off the moment the camera leaves, so none is fetched for the
+    // zooms the scrub passes through. The map's own names stand down while the camera travels
+    // (`setMapLabels`) and return when it stops.
+    const landed = phase.active && phase.from === phase.to ? records[phase.from - 1] : undefined;
+    const wantsImagery = landed !== undefined && groundFrameFor(landed.precision, false).imagery;
+    if (scrub.restTimer !== null) {
+      window.clearTimeout(scrub.restTimer);
+      scrub.restTimer = null;
+    }
+    if (!wantsImagery) setTourImagery(false);
+    if (!phase.active) stage.setMapLabels(true);
+    else {
+      if (!still) stage.setMapLabels(false);
+      // Rest is measured from the last scroll event, and read inside a frame. After a long frame
+      // on a slow device the timer fires before the scroll events that queued up behind it; the
+      // browser delivers those ahead of a frame callback, so the check waits for one. Bringing
+      // the names back mid-dive, even for one frame, costs about a second of placing them again.
+      const rested = () => {
+        scrub.restTimer = null;
+        window.requestAnimationFrame(() => {
+          if (scrub.restTimer !== null) return;
+          const wait = TOUR_REST_MS - (performance.now() - scrub.lastScrollAt);
+          if (wait > 0) {
+            scrub.restTimer = window.setTimeout(rested, wait);
+            return;
+          }
+          stage.setMapLabels(true);
+          if (wantsImagery) setTourImagery(true);
+        });
+      };
+      scrub.restTimer = window.setTimeout(rested, TOUR_REST_MS);
+    }
+
+    if (!phase.active) return false;
+    const map = stage.getMap();
+    if (!map) return true;
+    scrub.cameras ??= tourCameras(map);
+    if (!scrub.cameras) return true;
+    // Not allowed to move (reduced motion, or the reader's "Hold still"): the camera cuts to
+    // the stop it is nearest, or back to the opening, and holds there.
+    const camera = still
+      ? nearest === null
+        ? scrub.cameras.opening
+        : scrub.cameras.stops[nearest]
+      : tourCameraAt(phase, scrub.cameras);
+    if (!camera) return true;
+    map.stop();
+    // A cut through the stage's own camera route (camera.ts): one frame, no flight of its own.
+    stage.flyPreset(
+      'point',
+      { center: [camera.center[0], camera.center[1]], zoom: camera.zoom },
+      { mode: 'cut', pitch: camera.pitch, bearing: 0, padding: camera.padding },
+    );
+    return true;
+  }, [stage, tourCameras]);
+
   const applyCamera = useCallback(
     (cut: boolean): boolean => {
       if (browseModeRef.current) return false;
@@ -551,15 +726,24 @@ export function DoorImmersive({
       const boxes = measureFrameBoxes(map);
       lastFrameBoxesRef.current = boxes;
       const { window: windowBox, plate: plateBox } = boxes;
+      // The window may have changed shape: the tour's cameras are for the old one.
+      scrubRef.current.cameras = null;
+      scrubRef.current.layout = null;
+      // Scrolled into the tour, the scroll position is the camera.
+      if (applyScrub()) return true;
       map.stop();
       const padding = windowBox && plateBox ? doorFramePadding(windowBox, plateBox) : null;
-      // A tour step in front of the reader: its record, no tighter than its precision allows,
-      // framed in the same window. One flight per step change (the tour listener below).
-      const tour = tourRef.current;
-      if (tour) {
+      // The decade walk goes to each decade's record: close enough to place it, far enough out
+      // that the records documented around it still show. `flyTo` pulls out as far as the trip
+      // needs: barely for a neighbor, to the country for the far coast.
+      const walking = stepRef.current > 0 ? walkRecordRef.current : null;
+      if (walking) {
         stage.flyPreset(
-          'point',
-          { center: [tour.lngLat[0], tour.lngLat[1]], zoom: tourZoom(tour.precision) },
+          'state',
+          {
+            center: [walking.lngLat[0], walking.lngLat[1]],
+            zoom: Math.min(DOOR_WALK_ZOOM, zoomForLocationPrecision(walking.precision)),
+          },
           { mode: cut ? 'cut' : 'fly', pitch: 0, bearing: 0, ...(padding ? { padding } : {}) },
         );
         return true;
@@ -593,7 +777,7 @@ export function DoorImmersive({
       );
       return true;
     },
-    [measureFrameBoxes, stage],
+    [applyScrub, measureFrameBoxes, stage],
   );
 
   /**
@@ -657,7 +841,8 @@ export function DoorImmersive({
   useEffect(() => {
     if (wasAtOpeningRef.current === atOpening) return;
     wasAtOpeningRef.current = atOpening;
-    if (plateLive) applyCamera(false);
+    // Back to the opening. Into the walk, the step's own effect below aims the camera.
+    if (plateLive && atOpening) applyCamera(false);
   }, [applyCamera, atOpening, plateLive]);
 
   /**
@@ -728,37 +913,46 @@ export function DoorImmersive({
     });
   }, [browseMode, selectedPinId, plateLive, stage]);
 
-  /**
-   * The tour hands over its step: fly to that record and mark it selected, or (null, the tour is
-   * out of view) go back to the national frame and the opening's own selection.
-   */
   const selectedPinIdRef = useRef(selectedPinId);
   selectedPinIdRef.current = selectedPinId;
+  /**
+   * The scroll is the tour's camera. One passive listener, coalesced to a frame: nothing is
+   * captured and nothing is timed, so the page scrolls at the reader's speed and the map keeps
+   * up with it. Leaving the tour hands the map back to the opening's own frame.
+   */
   useEffect(() => {
-    const onTour = (event: Event) => {
-      const target = (event as CustomEvent<DoorTourTarget | null>).detail;
-      tourRef.current = target;
-      // The tour is about one record at a time: no place counts on the way there or around it.
-      stage.setPlaceTokens(target === null);
-      // The tour flies to its own records; a rail that had dimmed one would hide its pin.
-      if (target) setRailDecade(null);
-      if (browseModeRef.current) return;
-      applyCamera(false);
-      stage.applyViewState({
-        selectedState: undefined,
-        selectedEdge: undefined,
-        selectedEntity: (target ? target.pinId : selectedPinIdRef.current) ?? undefined,
-      });
+    if (!plateLive) return undefined;
+    let frame: number | null = null;
+    const sync = () => {
+      frame = null;
+      const wasActive = scrubRef.current.active;
+      const active = applyScrub();
+      if (wasActive && !active) applyCamera(false);
     };
-    window.addEventListener(DOOR_TOUR_EVENT, onTour);
-    // The handle's identity changes when the map loads, which re-runs this mid-tour.
-    stage.setPlaceTokens(tourRef.current === null);
+    const scrub = scrubRef.current;
+    const schedule = () => {
+      scrub.lastScrollAt = performance.now();
+      if (frame === null) frame = window.requestAnimationFrame(sync);
+    };
+    window.addEventListener('scroll', schedule, { passive: true });
+    schedule();
     return () => {
-      window.removeEventListener(DOOR_TOUR_EVENT, onTour);
-      // The plate outlives this page: never leave the next surface without its tokens.
+      window.removeEventListener('scroll', schedule);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+      if (scrub.restTimer !== null) window.clearTimeout(scrub.restTimer);
+      scrub.restTimer = null;
+      scrub.active = false;
+      scrub.nearest = null;
+      // The plate outlives this page: never leave the next surface without its tokens or names.
       stage.setPlaceTokens(true);
+      stage.setMapLabels(true);
     };
-  }, [applyCamera, stage]);
+  }, [applyCamera, applyScrub, plateLive, stage]);
+
+  /** Each decade of the walk goes to its own record. */
+  useEffect(() => {
+    if (step > 0 && plateLive) applyCamera(false);
+  }, [applyCamera, plateLive, step]);
 
   /** A marker click on the live plate opens the record the pin's href names. */
   const hrefByPinId = useMemo(() => {
@@ -865,6 +1059,16 @@ export function DoorImmersive({
             (door-field-frame.ts) and the callout's bounds; nothing is drawn in it. */}
         {/* v11: the world is the ground. The record's photograph no longer sits behind the map. */}
         <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
+        {/* Where a tour stop frames its record. Measured only, like the window above. */}
+        <div className="ds-door__tour-window" ref={tourWindowRef} aria-hidden="true" />
+        {/* Imagery is context, never evidence, and not a picture of the record's own time: say
+            whose it is and that its date is not the record's (design-direction-v11.md §4.2). */}
+        {tourImagery ? (
+          <p className="ds-door__imagery">
+            Aerial imagery: USGS, The National Map. Its date varies by area and is not this
+            record&apos;s date.
+          </p>
+        ) : null}
         {plateUnavailable ? (
           /* No WebGL: say so where the map would be, and point at the index that needs none. */
           <p className="ds-door__field-note" role="status">

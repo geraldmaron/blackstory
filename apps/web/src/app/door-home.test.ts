@@ -86,7 +86,7 @@ test('the opening is the map, one headline column, one primary action and one se
   assert.match(immersive, /useMapStage\(\)/);
   assert.match(
     immersive,
-    /stage\.patchData\(\s*nationalFieldPatch\(sweptPins, \{ densityLevels \}\)/,
+    /stage\.patchData\(\s*nationalFieldPatch\(sweptPins, \{ densityLevels, satellite: tourImagery \}\)/,
   );
   assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
   assert.match(immersive, /AtlasLoader/);
@@ -443,17 +443,38 @@ test('a reader without a plate is told so, where the map would be, and sent to t
   assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);
 });
 
-test('the tour is one pinned scene: a screen of scroll per stop, one stop showing', () => {
-  // Native scroll only. Each stop is a screen tall and draws nothing; its words are pinned and
-  // shown by `data-current`, so stops cross-fade instead of scrolling across the map.
+test('the tour is one pinned scene scrubbed by the page scroll, one stop showing', () => {
+  // Native scroll only, never captured. A stop is two screens tall and draws nothing; its words
+  // are pinned and shown by `data-current` while the camera is landed on its record.
   assert.doesNotMatch(tourCss + tourScroll, /scroll-snap|preventDefault|addEventListener\('wheel'/);
-  assert.match(tourCss, /\.ds-door-tour__step\s*\{\s*min-height:\s*100dvh/);
+  assert.match(tourScroll, /addEventListener\('scroll', schedule, \{ passive: true \}\)/);
+  assert.match(immersive, /addEventListener\('scroll', schedule, \{ passive: true \}\)/);
+  assert.match(tourCss, /\.ds-door-tour__step\s*\{\s*min-height:\s*200dvh/);
+  // One more screen after the last stop, for the pull-out back to the globe.
+  assert.match(
+    tourCss,
+    /\.ds-door-tour__item:last-child \.ds-door-tour__step\s*\{\s*min-height:\s*300dvh/,
+  );
   assert.match(tourCss, /\.ds-door-tour__card\s*\{[^}]*position:\s*fixed;[^}]*opacity:\s*0/s);
   assert.match(
     tourCss,
     /\[data-active='true'\] \.ds-door-tour__step\[data-current\] \.ds-door-tour__card,\s*\.ds-door-tour__card:focus-within\s*\{[^}]*opacity:\s*1/s,
   );
-  assert.match(tourScroll, /toggleAttribute\('data-current', at === next\)/);
+  // The words and the camera read one path, so they cannot disagree about where the tour is.
+  assert.match(tourScroll, /tourPhase\(window\.scrollY, layout\)/);
+  assert.match(immersive, /tourPhase\(window\.scrollY, scrub\.layout\)/);
+  assert.match(immersive, /tourCameraAt\(phase, scrub\.cameras\)/);
+  assert.match(tourScroll, /toggleAttribute\('data-current', at === shown\)/);
+  // A reader who asked the map to hold still gets cuts between stops, never the scrub.
+  assert.match(immersive, /const still = prefersReducedMotion\(\) \|\| holdStill\(\)/);
+  // A landing uses the frame its stored precision allows, the record page's own rule.
+  assert.match(immersive, /groundFrameFor\(record\.precision, false\)/);
+  // Imagery is asked for only once the scroll rests on a stop, and it is credited on screen.
+  assert.match(immersive, /TOUR_REST_MS/);
+  assert.match(immersive, /className="ds-door__imagery"/);
+  // The stop's frame is measured from its own element, not from a window CSS moves mid-tour.
+  assert.match(immersive, /className="ds-door__tour-window" ref=\{tourWindowRef\}/);
+  assert.doesNotMatch(tourCss, /\[data-active='true'\]\) \.ds-door__window\s*\{/);
   // A stop that is not showing stays in the document and the tab order (never `visibility` or
   // `display`), and a link reached by keyboard brings its stop in.
   assert.doesNotMatch(tourCss, /\.ds-door-tour__card\s*\{[^}]*(visibility|display:\s*none)/s);
@@ -467,6 +488,6 @@ test('the tour is one pinned scene: a screen of scroll per stop, one stop showin
   // Without scripting the stops are a stacked list: the stage is behind `scripting: enabled`.
   assert.ok(
     tourCss.indexOf('@media (scripting: enabled)') <
-      tourCss.indexOf('.ds-door-tour__step {\n    min-height: 100dvh'),
+      tourCss.indexOf('.ds-door-tour__step {\n    min-height: 200dvh'),
   );
 });

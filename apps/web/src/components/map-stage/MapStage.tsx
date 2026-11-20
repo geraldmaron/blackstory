@@ -47,12 +47,14 @@ import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
+  EXPLORE_LIGHTS_LAYER_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
-import { buildExploreMapStyle, ORBIT_MAX_ZOOM } from '../../app/map/explore-style';
+import { buildExploreMapStyle, lightsOpacity, ORBIT_MAX_ZOOM } from '../../app/map/explore-style';
 import {
   applyDensityBlendProgress,
   applyDecadeHoldFeatureState,
@@ -360,6 +362,14 @@ export type MapStageHandle = {
    */
   readonly setPlaceTokens: (shown: boolean) => void;
   /**
+   * Whether the map's own text (street, city, state and county names) draws. A surface that
+   * moves the camera every frame (the Door's scroll scrub) turns it off while it travels: at
+   * that speed no name can be read, and placing them is the largest per-frame cost of a dive
+   * (about a third of main-thread time on a throttled phone). On again, each layer returns to
+   * the visibility it had.
+   */
+  readonly setMapLabels: (shown: boolean) => void;
+  /**
    * The live MapLibre map, or null before it starts and after it fails.
    *
    * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
@@ -553,8 +563,44 @@ export function MapStageProvider({
   }, []);
   const setPlaceTokens = useCallback((shown: boolean) => {
     plateRef.current?.toggleAttribute('data-tokens-off', !shown);
+    const map = mapRef.current;
+    // With the tokens down the lights carry the records all the way to the pins
+    // (`lightsOpacity`); `applyGeographyStyle` leaves this channel alone while they are down.
+    if (map?.getLayer(EXPLORE_LIGHTS_LAYER_ID)) {
+      map.setPaintProperty(EXPLORE_LIGHTS_LAYER_ID, 'circle-opacity', lightsOpacity(!shown));
+    }
+    // County names go with the tokens. The basemap prints one per tile a county crosses and only
+    // the token layer thins them (`hideNamedCounties`), so with it down a landing repeated its
+    // county four times around the record.
+    if (map?.getLayer(EXPLORE_COUNTY_LABEL_LAYER_ID)) {
+      map.setLayoutProperty(
+        EXPLORE_COUNTY_LABEL_LAYER_ID,
+        'visibility',
+        shown && configRef.current.clusteringEnabled ? 'visible' : 'none',
+      );
+    }
     // The token layer lays out on `render` (place-labels.ts): ask for one so it catches up.
-    if (shown) mapRef.current?.triggerRepaint();
+    if (shown) map?.triggerRepaint();
+  }, []);
+  /** The symbol layers `setMapLabels(false)` hid, with the visibility each had. */
+  const hiddenLabelsRef = useRef<Map<string, 'visible' | 'none'> | null>(null);
+  const setMapLabels = useCallback((shown: boolean) => {
+    const map = mapRef.current;
+    if (!map || shown === (hiddenLabelsRef.current === null)) return;
+    if (shown) {
+      for (const [id, visibility] of hiddenLabelsRef.current ?? []) {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility);
+      }
+      hiddenLabelsRef.current = null;
+      return;
+    }
+    const hidden = new Map<string, 'visible' | 'none'>();
+    for (const layer of map.getStyle().layers) {
+      if (layer.type !== 'symbol') continue;
+      hidden.set(layer.id, layer.layout?.visibility === 'none' ? 'none' : 'visible');
+      map.setLayoutProperty(layer.id, 'visibility', 'none');
+    }
+    hiddenLabelsRef.current = hidden;
   }, []);
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
@@ -2024,6 +2070,7 @@ export function MapStageProvider({
       },
       setDoorBrowseLive,
       setPlaceTokens,
+      setMapLabels,
       getMap: () => {
         ensureMap();
         return getMap();
@@ -2042,6 +2089,7 @@ export function MapStageProvider({
       resize,
       setDoorBrowseLive,
       setPlaceTokens,
+      setMapLabels,
       getMap,
     ],
   );

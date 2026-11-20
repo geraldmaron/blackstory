@@ -247,7 +247,15 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
     frame = 0;
     // Stood down by the surface (`setPlaceTokens`, shell.css): hidden, so not laid out either.
     // Three feature queries and a collision pass per frame is the cost a flight cannot spare.
-    if (layer.closest('[data-tokens-off]')) return;
+    if (layer.closest('[data-tokens-off]')) {
+      // The text list goes with the tokens: left alone it kept describing the last view they
+      // were laid out for, to a reader who cannot see that the map has moved on.
+      if (listLines.length > 0) {
+        listLines = [];
+        if (listTimer === undefined) listTimer = setTimeout(flushList, LIST_INTERVAL_MS);
+      }
+      return;
+    }
     const zoom = map.getZoom();
     const named = new Set<string>();
     for (const feature of query(EXPLORE_PLACE_NAME_LAYER_ID)) {

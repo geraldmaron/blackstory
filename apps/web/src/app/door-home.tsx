@@ -120,6 +120,7 @@ export async function DoorHome({ params = {}, initialBrowse = false }: DoorHomeP
         openingChoices={journey?.openingChoices ?? []}
         story={journey?.story ?? null}
         stops={journey?.stops ?? []}
+        tour={journey?.tour ?? []}
         bars={journey?.bars ?? []}
         barsCaption={journey?.barsCaption ?? ''}
         initialBrowse={initialBrowse}

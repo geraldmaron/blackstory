@@ -630,6 +630,20 @@ export const ORBIT_MAX_ZOOM = 2.7;
 // must keep its state lines, names and tints.
 export const ORBIT_LINE_MIN_ZOOM = 1.9;
 export const ORBIT_LIGHT_COLOR = '#f2a35c';
+/** Where the lights give way to record pins when they are kept lit on the way down. */
+export const LIGHTS_DEEP_MAX_ZOOM = 11;
+
+/**
+ * How bright the lights are by zoom. At rest they are gone by the national frame, where the place
+ * tokens take over. `deep` is for a surface that has stood the tokens down and is flying to one
+ * record (the Door's tour; MapStage, `setPlaceTokens`): the lights stay lit the whole way down
+ * and fade as the record pins arrive, so the descent is into the lights, not across an empty map.
+ */
+export function lightsOpacity(deep: boolean): ExpressionSpecification {
+  return deep
+    ? ['interpolate', ['linear'], ['zoom'], LIGHTS_DEEP_MAX_ZOOM - 2, 0.85, LIGHTS_DEEP_MAX_ZOOM, 0]
+    : ['interpolate', ['linear'], ['zoom'], ORBIT_MAX_ZOOM, 0.85, ORBIT_MAX_ZOOM + 0.6, 0];
+}
 
 /**
  * The lights are every drawn record, about four thousand points, and the style is rebuilt on
@@ -1366,20 +1380,14 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_LIGHTS_LAYER_ID,
         type: 'circle',
         source: EXPLORE_LIGHTS_SOURCE_ID,
-        maxzoom: ORBIT_MAX_ZOOM + 0.6,
+        // The layer reaches as deep as the lights ever go; at rest its opacity is 0 past the
+        // national frame, and a layer at 0 is not drawn.
+        maxzoom: LIGHTS_DEEP_MAX_ZOOM,
         paint: {
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, 1.4, ORBIT_MAX_ZOOM, 2.6],
           'circle-color': ORBIT_LIGHT_COLOR,
           'circle-blur': 0.7,
-          'circle-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            ORBIT_MAX_ZOOM,
-            0.85,
-            ORBIT_MAX_ZOOM + 0.6,
-            0,
-          ],
+          'circle-opacity': lightsOpacity(false),
         },
       },
       {
@@ -1572,10 +1580,14 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
     ],
   };
-  // Orbit shows lights and water, nothing else. Below `ORBIT_LINE_MIN_ZOOM` MapLibre's globe tears
-  // line and text layers into spikes across the disc, and the GeoJSON fills (state land, tints,
-  // hatches) cost about half a second of main-thread work at load to drape over the sphere, for
-  // a US land shape the background already paints. The water stays: it is what draws the coasts.
+  // Orbit shows lights and water, nothing else: lines and names stand down below
+  // `ORBIT_LINE_MIN_ZOOM`, and the GeoJSON fills (state land, tints, hatches) cost about half a
+  // second of main-thread work at load to drape over the sphere, for a US land shape the
+  // background already paints. The water stays: it is what draws the coasts.
+  // This comment used to say MapLibre's globe tears line and text layers into spikes down here.
+  // It does not: with every line and symbol layer forced on at zoom 1.5 they all draw cleanly
+  // (2026-11-20). The spikes were the place tokens' DOM tethers left visible after the tokens
+  // were hidden (shell.css, "v11 Orbit").
   return {
     ...style,
     layers: style.layers.map((layer) =>

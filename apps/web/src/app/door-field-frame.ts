@@ -161,10 +161,11 @@ export const DOOR_ORBIT_HORIZON_RATIO = 0.85;
 export const DOOR_ORBIT_FILL = 0.92;
 /**
  * Orbit never comes closer than this. From `ORBIT_LINE_MIN_ZOOM` (explore-style.ts) the plate
- * draws state lines, and on the globe at that distance MapLibre tears them into spikes across the
- * disc. Orbit is lights and water only, so it stays just short of the lines.
- * shortcut: the disc stops growing at about 830px on a very large screen; raise this if the
- * tearing is fixed upstream or the lines get their own Orbit rule.
+ * draws state lines, names and tints, and Orbit is lights and water only (design-direction-v11.md
+ * §4.1). Without a ceiling a large window opened on a globe with the states drawn and a small one
+ * on a globe without, so the opening stays just short of the lines at every size.
+ * shortcut: the disc stops growing on a very large screen; to lift this, start the line layers
+ * at `ORBIT_MAX_ZOOM` instead, which also changes a phone's national frame on Explore.
  */
 export const DOOR_ORBIT_MAX_ZOOM = 1.88;
 

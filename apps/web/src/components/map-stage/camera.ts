@@ -2,8 +2,10 @@ import type { Map as MapLibreMap } from 'maplibre-gl';
 import {
   cameraPresetFor,
   flightDurationFor,
+  flightPeakZoom,
   MAP_MIN_ZOOM,
   prefersReducedMotion,
+  screensBetween,
   type CameraPresetName,
 } from '../../lib/map-experience/camera-presets';
 import { lngLatTuple } from './viewport-geometry';
@@ -64,16 +66,7 @@ export type MapStageFlyOptions = {
  * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. Returns
  * `false` when `map` isn't constructed yet: callers latch the request and retry on `load`.
  */
-/** How many map widths of ground lie between the camera and `to`, at the camera's own zoom. */
-function screensAway(map: MapLibreMap, to: readonly [number, number]): number {
-  const from = map.getCenter();
-  const degrees = Math.hypot(
-    (to[0] - from.lng) * Math.cos((from.lat * Math.PI) / 180),
-    to[1] - from.lat,
-  );
-  const pixels = (degrees / 360) * 512 * 2 ** map.getZoom();
-  return pixels / (map.getContainer().clientWidth || 1000);
-}
+const ZERO_PADDING = { top: 0, bottom: 0, left: 0, right: 0 };
 
 export function runFlyPreset(
   map: MapLibreMap | null,
@@ -102,7 +95,18 @@ export function runFlyPreset(
   } else {
     const [west, south, east, north] = target.bounds;
     const camera = (() => {
+      // MapLibre fits bounds inside the padding it is given PLUS whatever padding the camera
+      // already holds (`cameraForBoxAndBearing`: `tr.padding + options.padding`). A center-and-zoom
+      // flight leaves its padding on the camera, so the next fit was padded twice: after the
+      // Door's Orbit the decade walk fitted the country into a 69px sliver and landed on Hudson
+      // Bay at zoom 1.8 with no record on screen. The fit below lands with no padding on the
+      // camera (`motionPadding`), so that is the state it is computed against. Nothing renders
+      // between the two writes: the held padding is back before this function returns.
+      const transform = map.transform as
+        { padding?: typeof ZERO_PADDING; setPadding?(p: typeof ZERO_PADDING): void } | undefined;
+      const held = transform?.padding ? { ...transform.padding } : null;
       try {
+        if (held) transform!.setPadding?.(ZERO_PADDING);
         return map.cameraForBounds([west, south, east, north] as [number, number, number, number], {
           // Honor caller padding (incl. asymmetric hero framing) when fitting bounds.
           padding,
@@ -110,6 +114,8 @@ export function runFlyPreset(
       } catch (error) {
         console.error('[MapStage] cameraForBounds failed', error);
         return undefined;
+      } finally {
+        if (held) transform!.setPadding?.(held);
       }
     })();
     // A map with no size yet (a background tab) fits to a non-finite zoom; fall through.
@@ -127,7 +133,7 @@ export function runFlyPreset(
 
   // Bounds fits already encode padding in center/zoom — re-applying padding on
   // ease/fly would double-shift (hero west coast pinned to the copy divider).
-  const motionPadding = boundsFitted ? { top: 0, bottom: 0, left: 0, right: 0 } : padding;
+  const motionPadding = boundsFitted ? ZERO_PADDING : padding;
 
   /** Only the attitude the caller actually authored — an absent one stays untouched. */
   const attitude = {
@@ -150,12 +156,16 @@ export function runFlyPreset(
       essential: true,
     });
   } else {
+    const from = map.getZoom();
+    const screens = screensBetween(map.getCenter(), center, from, map.getContainer().clientWidth);
     map.flyTo({
       center,
       zoom,
       padding: motionPadding,
       ...attitude,
-      duration: flightDurationFor(preset.duration, map.getZoom(), zoom, screensAway(map, center)),
+      duration: flightDurationFor(preset.duration, from, zoom, screens),
+      // The top of the arc, by distance (`flightPeakZoom`).
+      minZoom: flightPeakZoom(from, zoom, screens),
       curve: preset.curve,
       speed: preset.speed,
       easing: preset.easing,

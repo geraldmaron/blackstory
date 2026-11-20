@@ -351,3 +351,15 @@ describe('glass survives the CSS build', () => {
     }
   });
 });
+
+it('Orbit hides the tokens and their tethers together, never the tokens alone', () => {
+  // The tethers are a sibling SVG, not children of the tokens. Hidden tokens with visible tethers
+  // drew a burst of white spikes across the globe between the count zoom and the national frame.
+  const rule = shellCss.match(
+    /\.ds-map-stage:is\(\[data-orbit\], \[data-tokens-off\]\)\s*:is\(([^)]*)\)\s*\{\s*visibility:\s*hidden/,
+  );
+  assert.ok(rule, 'the stand-down rule exists');
+  for (const part of ['.ds-place-token', '.ds-site-name', '.ds-place-leaders']) {
+    assert.ok(rule[1]!.includes(part), part);
+  }
+});

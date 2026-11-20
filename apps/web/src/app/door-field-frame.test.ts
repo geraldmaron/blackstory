@@ -138,6 +138,6 @@ test('Orbit grows with its window but stops short of the zoom where state lines 
   const wall = doorOrbitZoom({ top: 52, left: 600, width: 1900, height: 1500 });
   assert.ok(small < laptop);
   assert.equal(wall, DOOR_ORBIT_MAX_ZOOM);
-  // explore-style.ts turns line layers on at ORBIT_LINE_MIN_ZOOM, and the globe tears them there.
+  // explore-style.ts turns state lines and tints on at ORBIT_LINE_MIN_ZOOM; Orbit has neither.
   assert.ok(DOOR_ORBIT_MAX_ZOOM < ORBIT_LINE_MIN_ZOOM);
 });

@@ -276,7 +276,7 @@ Not in the flagship though the spec describes them: the time rail, terrain, peri
 
 Found on the way:
 
-- MapLibre's globe tears line and text layers below zoom 2, so they stand down there.
+- ~~MapLibre's globe tears line and text layers below zoom 2, so they stand down there.~~ Corrected 2026-11-20: the globe does not tear them (every line and symbol layer forced on at zoom 1.5 draws cleanly). The white spikes were the place tokens' tether lines, which are DOM and stayed visible after Orbit hid the tokens. They are now hidden with the tokens. Lines still stand down at Orbit, because Orbit is lights and water only.
 - `renderWorldCopies: false` clamps a world-scale center, so it is removed on the stage.
 - A hidden browser pane throttles the map; earlier "20 to 30 second" load readings came from that and are withdrawn.
 - Place pages show no "Connected records" today for the reason in row 5.
@@ -476,3 +476,115 @@ itself that it cannot see painted contrast, layout, focus or motion, so this pas
   was not re-run in this pass.
 - Related neighbors on a place page still cannot be chosen by clicking the map. The map is
   locked there.
+
+## 17. Third pass: one scene on home, and what the sweep found (2026-11-20)
+
+Measured in headless Chromium on the real GPU (Metal) against the dev server and live data, and
+spot-checked in the owner's Chrome (1728 by 962 at 2x, "Hold still" on).
+
+### Built
+
+- **Home is one scene.** The opening is the headline (display role, 86px at 1440 wide), one
+  line, two actions and the coverage legend over the globe. The five-article column is gone.
+- **The tour is a pinned stage.** One screen of ordinary page scroll per stop; each stop's words
+  (photograph and credit, name, place, one sourced claim, one action) hold still and cross-fade
+  while the camera travels. A chapter rail on the right edge links every stop. Nothing captures
+  the wheel. Without JavaScript the stops are a stacked list.
+- **Flights last as long as the ground they cover**, capped at 3.2 seconds, so tiles load on the
+  way down instead of the map arriving blank.
+- **A surface can stand place tokens down** (`setPlaceTokens`). The tour does.
+
+### Defects found and fixed, with their causes
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Count numbers flashing across the map during the tour | Above Orbit every place token draws, and a flight to one record passes all of them | The tour stands tokens down |
+| White spikes radiating from New England on the globe | Orbit hid the count chips but not their tether lines, which are a sibling SVG | The tethers are hidden with the chips |
+| Decade walk showed an empty globe aimed at Hudson Bay | MapLibre fits bounds inside the padding it is given plus the padding already on the camera. The opening leaves its padding on the camera, so the walk's fit was padded twice and the country was fitted into a 69px sliver | The fit is computed with no padding held (`camera.ts`) |
+| Country cut off under the walk card | The opening's wider map frame (third pass) also applied to the walk | The wider frame is scoped to the opening |
+| Words invisible on tour stops in the light theme | The shade under the words took the light theme's paper | The tour sits on a fixed ink ground |
+| Uncaught "feature index out of bounds" | A second message for a tile race the query wrapper already handled | Both messages are caught |
+
+### Acceptance sweep
+
+Eight window shapes (1024 by 768, 1100 by 1300, 1280 by 800, 1440 by 900, 1728 by 962 with "Hold
+still", 1920 by 1080, 390 by 844, 768 by 1024), eight paths each: opening, a tour stop, back to
+the opening, decade walk, "Skip to the map", Explore cold, a place cold, place to home. All 64
+have records on screen, no tether without its chip, and no sideways overflow. The project's own
+nine-shape audit over home, Explore and a place reported no finding in the code this pass
+changed.
+
+### Still open
+
+- **Orbit has a ceiling** (`DOOR_ORBIT_MAX_ZOOM`), so the globe stops growing on large screens.
+  It exists only to keep state lines off the opening; lifting it means starting line layers at
+  `ORBIT_MAX_ZOOM`, which also changes Explore's national frame on phones. Owner's call.
+- State lines appear for part of any flight between Orbit and the country, for the same reason.
+- On windows narrower than about 1400px the decade walk rests inside Orbit, so it shows lights
+  and no counts.
+- The phone opening keeps its older boxed layout. The header is still the nav bar on every
+  surface (section 4.4 is not built).
+- Explore's list clips and truncates rows at several widths, and site names run under its left
+  column when arriving from a place. Both predate this pass and belong to the Explore rebuild.
+- Not run: a screen reader, touch on a real phone, and web vitals on a production build after
+  these changes.
+
+## 18. Fourth pass: the scroll is the camera (2026-11-20)
+
+Owner's requirement: scroll transitions zoom into and out of the map. Ten questions settled the
+behavior; the answers are the spec for this section.
+
+| Question | Decision |
+| --- | --- |
+| How scroll drives the camera | Scrubbed: a scroll position is a camera, forward and back |
+| Between two stops | Out to the globe, then down into the next record |
+| Entry and exit | Dive from the opening's globe into the first record; pull back out after the last |
+| Scroll per stop | Two screens: about one to hold, one to travel |
+| Words during travel | Clear the stage; the globe has it alone |
+| Landing | The record page's ground frame: tilted with credited aerial imagery for an exact site, flat and farther out for coarser precision |
+| Faster than tiles load | The camera follows the scroll; detail sharpens at rest |
+| Click flights (decade walk, opening a record, Explore selections) | Pull out by distance |
+| Phones | The same scrub |
+| Where it applies | Home tour, decade walk, opening a record, Explore selections |
+
+### Built
+
+- `door-tour-scrub.ts` is the path as pure arithmetic: a phase for a scroll position and a camera
+  for a phase. The words (`door-tour-scroll.tsx`) and the camera (`door-immersive.tsx`) both read
+  it, each from one passive, frame-coalesced scroll listener. Nothing is timed or captured.
+- A dive turns the globe to the place first, comes down at an even rate in zoom levels, and
+  tilts and reframes last. The lights stay lit down to the pins while the tokens are stood down.
+- "Hold still" and reduced motion get cuts between stops, never the scrub.
+- Aerial imagery is asked for only when the scroll has rested on an exact site, and is credited
+  on screen while it shows.
+- The map's own names stand down while the camera travels and return at rest.
+- Click flights share two rules in `camera-presets.ts`: a flight lasts as long as the zoom levels
+  and ground it covers (`flightDurationFor`), and its arc tops out where both ends fit, never past
+  the country (`flightPeakZoom`). The decade walk now flies to each decade's record at a
+  regional zoom. An Explore selection a screen or more away is flown to; a nearer one is still
+  one ease, now lasting as long as the zoom it covers.
+
+### Measured (headless Chromium, Metal, dev build, live data)
+
+| Check | Result |
+| --- | --- |
+| Scrub at 1728 by 962 and 1440 by 900, wheel through the whole tour | p50 17 ms, p95 33 ms, worst frame 33 to 50 ms, no page errors |
+| Reversibility | The camera at a scroll position is identical arriving from above or below |
+| Words, imagery, credit, tokens | Words only while landed; imagery and its credit only at rest on an exact site; no place counts at any point in the tour |
+| "Hold still" | Cuts to each stop; no scrub |
+| Phone 390 by 844 at 4x CPU throttle | Works, but not smooth: about 30 long tasks per two stops. Hiding names in travel cut long-task time by a third (3.75 s to 2.57 s) |
+| Decade walk | Far hops pull out 0.7 to 0.8 zoom levels over 1.7 s; near hops 0.4 over 1.6 s |
+| Explore selection from the country | 2.3 s down to the record (was 0.7 s) |
+| Eight shapes by eight paths | 64 of 64 with records on screen, no orphaned tether, no sideways overflow |
+
+### Open
+
+- **Phones are not yet smooth.** The remaining cost is tile and source work on every zoom level
+  of a dive. This was measured on the dev build, which overstates it (section 14.2); a
+  production-build measurement on a real phone decides whether phones keep the scrub.
+- A far Explore selection is covered by a unit test and by the decade walk, which uses the same
+  flight rule; it was not driven in a browser.
+- A straight-edged lighter patch shows in the Atlantic east of New England at about zoom 4. It is
+  in the state land shapes and predates this pass.
+- The tour is now about eleven screens of scroll for five stops.
+

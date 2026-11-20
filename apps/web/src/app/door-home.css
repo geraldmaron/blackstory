@@ -143,11 +143,18 @@
     --ds-door-card-w: calc(var(--ds-door-dock-w) + var(--ds-space-6) * 2);
   }
 
-  /* The globe is the scene, not a figure in a box beside the words: its window reaches under
-     the opening column, so the disc fills the screen's height and the headline stands on its
-     dark limb. */
+  /* The map window is everything right of the dock. The walk's card is a solid panel, so the
+     country has to be framed clear of it. */
   .ds-door__window {
-    inset: 0 0 var(--ds-door-peek) calc(var(--ds-door-edge) + var(--ds-door-card-w) * 0.6);
+    inset: 0 0 var(--ds-door-peek)
+      calc(var(--ds-door-edge) + var(--ds-door-card-w) + var(--ds-space-3));
+  }
+
+  /* The opening has no panel: the globe is the scene, not a figure in a box beside the words.
+     There the window reaches under the column, so the disc fills the screen's height and the
+     headline stands on its dark limb. */
+  .ds-door:has(.ds-door__dock[data-step='open']) .ds-door__window {
+    left: calc(var(--ds-door-edge) + var(--ds-door-card-w) * 0.6);
   }
 
   /* The first screen is the globe's alone; the tour's cue at its foot says the page goes on
@@ -1527,6 +1534,9 @@ body:has(.ds-door) .ds-door-journey {
 
 /* Inline padding grows the hit area to 44px on a phone without moving the line. */
 .ds-door-ch__story-title a {
+  /* A one-line title is 42px tall in the display role on a phone: hold it to the 44px target. */
+  display: inline-block;
+  min-height: 44px;
   padding-block: var(--ds-space-1);
   color: inherit;
   text-decoration: none;

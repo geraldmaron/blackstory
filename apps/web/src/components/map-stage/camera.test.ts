@@ -105,3 +105,33 @@ test('a fit may sink the zoom floor to what the frame needs, and only that far',
     false,
   );
 });
+
+test('a bounds fit is computed with no padding held on the camera, and the held padding is put back', () => {
+  // The defect: a center-and-zoom flight leaves its padding on the camera, MapLibre adds the
+  // fit's own padding to it, and the country is fitted into what is left of the screen twice over.
+  const held = { top: 84, bottom: 32, left: 585, right: 152 };
+  let onCamera = { ...held };
+  const seenAtFit: (typeof held)[] = [];
+  const { calls, map } = fakeMap();
+  const withPadding = {
+    ...map,
+    transform: {
+      get padding() {
+        return onCamera;
+      },
+      setPadding: (next: typeof held) => {
+        onCamera = { ...next };
+      },
+    },
+    cameraForBounds: () => {
+      seenAtFit.push({ ...onCamera });
+      return { center: { lng: -96.5, lat: 38.6 }, zoom: 3.35 };
+    },
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  runFlyPreset(withPadding as any, 'national', { bounds: CONUS }, { mode: 'ease', padding: held });
+  assert.deepEqual(seenAtFit, [{ top: 0, bottom: 0, left: 0, right: 0 }]);
+  assert.deepEqual(onCamera, held);
+  // The fit lands with no padding on the camera: its padding is already in the center and zoom.
+  assert.deepEqual(calls.at(-1)?.options.padding, { top: 0, bottom: 0, left: 0, right: 0 });
+});

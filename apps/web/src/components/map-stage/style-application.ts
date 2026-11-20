@@ -169,7 +169,13 @@ export function applyGeographyStyle(
   },
 ): void {
   const recreateEntities = options?.recreateEntitiesSource === true;
+  // While a surface has the place tokens stood down, the lights' opacity is the stage's
+  // (`setPlaceTokens` keeps them lit down to the pins): a style sync must not dim them again.
+  const tokensDown = map.getContainer().closest('[data-tokens-off]') !== null;
   const paintOmit = options?.preserveDecadeFadeOpacities ? DECADE_FADE_OMIT_CHANNELS : undefined;
+  const geographyOmit = tokensDown
+    ? new Set([...(paintOmit ?? []), `${EXPLORE_LIGHTS_LAYER_ID}:circle-opacity`])
+    : paintOmit;
 
   if (recreateEntities) {
     // A grouping flip (place tokens on or off) rebuilds the entities source and its layers
@@ -232,8 +238,15 @@ export function applyGeographyStyle(
         const beforeId = layer.id === 'background' ? undefined : entityAnchor;
         map.addLayer(layer as LayerSpecification, beforeId);
       } else {
-        syncSingleLayerPaint(map, layer, paintOmit ? { omitChannels: paintOmit } : undefined);
-        syncLayerLayoutVisibility(map, layer);
+        syncSingleLayerPaint(
+          map,
+          layer,
+          geographyOmit ? { omitChannels: geographyOmit } : undefined,
+        );
+        // County names stay down with the tokens (`setPlaceTokens`).
+        if (!(tokensDown && layer.id === EXPLORE_COUNTY_LABEL_LAYER_ID)) {
+          syncLayerLayoutVisibility(map, layer);
+        }
       }
       continue;
     }

@@ -157,6 +157,44 @@ export function flightDurationFor(
   );
 }
 
+/** A flight that starts and ends above this never pulls out past it: the country, not the globe. */
+const FLIGHT_PEAK_FLOOR_ZOOM = 3.3;
+
+/**
+ * How many map widths of ground lie between a camera and a point, at the camera's own zoom.
+ * Plain degrees on a 512px world: close enough to size a flight, never used to place anything.
+ */
+export function screensBetween(
+  from: { readonly lng: number; readonly lat: number },
+  to: readonly [lng: number, lat: number],
+  zoom: number,
+  mapWidthPx: number,
+): number {
+  const degrees = Math.hypot(
+    (to[0] - from.lng) * Math.cos((from.lat * Math.PI) / 180),
+    to[1] - from.lat,
+  );
+  const screens = ((degrees / 360) * 512 * 2 ** zoom) / (mapWidthPx || 1000);
+  return Number.isFinite(screens) ? screens : 0;
+}
+
+/**
+ * How far out a flight pulls before it comes down: the zoom at the top of its arc (`flyTo`'s
+ * `minZoom`). By distance: a record a few blocks away barely lifts the camera, one across the
+ * state lifts it until both ends fit, and one across the country lifts it to the country. It is
+ * never above either end (a flight from the globe just descends) and, between two closer
+ * views, never past the country.
+ */
+export function flightPeakZoom(zoomFrom: number, zoomTo: number, screensAway: number): number {
+  const low = Math.min(zoomFrom, zoomTo);
+  // The trip's width measured where the flight is widest, at the lower of its two ends.
+  const screensAtLow = Math.max(0, screensAway) * 2 ** (low - zoomFrom);
+  const peak = low - Math.log2(1 + screensAtLow);
+  // A camera that has not been sized yet has no arc to shape: go straight to the target.
+  if (!Number.isFinite(peak)) return zoomTo;
+  return Math.max(Math.min(low, FLIGHT_PEAK_FLOOR_ZOOM), peak);
+}
+
 /**
  * Explore / hero MapLibre zoom envelope (design-direction-v5 + street-orientation posture).
  * National floor at 3; ceiling stops short of address-invasive rooftop framing while still

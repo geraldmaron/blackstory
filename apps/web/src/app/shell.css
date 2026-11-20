@@ -2274,12 +2274,15 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
    `EXPLORE_LIGHTS_LAYER_ID`). Place tokens carry counts, and Orbit never weights a place by its
    count (design-direction-v11.md, "Darkness is not absence"), so they stand down until the camera
    reaches the country. `visibility`, not `display`: the token list for assistive tech is separate
-   and the tokens keep their boxes for the return. */
-.ds-map-stage:is([data-orbit], [data-tokens-off]) :is(.ds-place-token, .ds-site-name) {
-  visibility: hidden;
-}
-/* The tethers from displaced numerals go with them. */
-.ds-map-stage[data-tokens-off] .ds-place-leaders {
+   and the tokens keep their boxes for the return.
+
+   The tethers go with them. A numeral displaced by a collision is tied back to its anchor by a
+   line in `.ds-place-leaders` (place-labels.ts), a sibling of the tokens, not a child. Hiding the
+   tokens alone left every tether on the globe with nothing at its end: between the zoom where the
+   counts begin and the national frame, New England's crowded states drew a burst of white spikes
+   across the disc. They read as a rendering fault in the map; they were orphaned labels. */
+.ds-map-stage:is([data-orbit], [data-tokens-off])
+  :is(.ds-place-token, .ds-site-name, .ds-place-leaders) {
   visibility: hidden;
 }
 
