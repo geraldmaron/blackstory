@@ -39,7 +39,7 @@ export function DoorTour({ records }: DoorTourProps) {
   return (
     <section className="ds-door-tour" aria-labelledby="door-tour-heading">
       <DoorTourScroll steps={steps} />
-      <div className="ds-door-tour__body" data-ground="ink">
+      <div className="ds-door-tour__body" data-ground="ink" data-ground-fixed="">
         <div className="ds-door-tour__intro ds-door-tour__card">
           <h2 className="ds-door-tour__title" id="door-tour-heading">
             {tourHeading(records)}

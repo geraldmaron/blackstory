@@ -40,8 +40,6 @@ import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { nationalFieldPatch } from '../lib/map-experience/national-field';
 import { earliestDecadeFor } from '../lib/map-experience/decade-transition';
 import { HeroHeadlineMorph } from '../components/story/HeroHeadlineMorph';
-import { RecordImage } from '../components/entity/RecordImage';
-import { DoorRecordBlock } from './door-record-block';
 import type { DecadeBar, DoorJourneyRecord } from './door-decade-walk';
 import {
   PinPhotoLayer,
@@ -58,18 +56,22 @@ import { AtlasPending } from './explore/AtlasPending';
 import { fetchAtlasCatalog } from './explore/atlas-catalog-fetch';
 import type { AtlasShellModel } from './explore/explore-view-model-wire';
 import {
+  DOOR_ORBIT_CENTER,
   doorDrillPadding,
   doorFramePadding,
+  doorOrbitZoom,
+  lightThroughDecade,
   sameDoorFrameBox,
   type DoorFrameBox,
 } from './door-field-frame';
 import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { DoorWalkCard } from './door-walk';
+import { DoorTimeRail, timeRailText } from './door-time-rail';
 import { DOOR_TOUR_EVENT, type DoorTourTarget } from './door-tour-scroll';
 import { tourZoom } from './door-tour';
-import { BandRule } from '../components/atmosphere/BandArt';
 import { placeDrillZoom } from '../lib/map-experience/place-map';
 import { MAP_MAX_ZOOM } from '../lib/map-experience/camera-presets';
+import { readAsDocuments } from '../lib/map-experience/world-prefs';
 
 void React;
 
@@ -204,19 +206,8 @@ export function DoorImmersive({
     const kept = restoreOpening(pins, openingChoices);
     if (kept) setOpening(kept);
     else if (serverOpening) pinOpening(serverOpening);
-    // Mount only: later changes come from the reader's own "Another record".
+    // Mount only.
   }, []);
-  /** Set once the reader asks for another record, so the live region names it. */
-  const [openingChosen, setOpeningChosen] = useState(false);
-  const anotherOpening = useCallback(() => {
-    setOpeningChosen(true);
-    setOpening((now) => {
-      const at = openingChoices.findIndex((choice) => choice.href === now?.href);
-      const next = openingChoices[(at + 1) % openingChoices.length] ?? now;
-      if (next && next !== now) pinOpening(next);
-      return next;
-    });
-  }, [openingChoices]);
   const journeyRef = useRef<HTMLDivElement | null>(null);
   const dockRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<HTMLButtonElement | null>(null);
@@ -242,6 +233,9 @@ export function DoorImmersive({
 
   /** 0 is the opening; 1..n are the walk's decades, oldest first. */
   const [step, setStep] = useState(0);
+  /** Read by the camera, which must not re-bind (and re-frame) on every step. */
+  const stepRef = useRef(step);
+  stepRef.current = step;
   const stepFocusPendingRef = useRef(false);
 
   // The hidden walk is inert. Move focus only for an actual mode transition, never steal it on a
@@ -269,13 +263,34 @@ export function DoorImmersive({
     (step === 0 ? startRef.current : walkHeadingRef.current)?.focus({ preventScroll: true });
   }, [step]);
 
-  /** The record on screen: the opening's, or the current decade's. */
-  const current = step === 0 ? opening : (stops[step - 1] ?? null);
+  /** The time rail on the opening: the decade the world is lit through, or null for all time. */
+  const [railDecade, setRailDecade] = useState<number | null>(null);
+  /** What the plate is patched with: the rail's value, settled, so a drag is one patch. */
+  const [railSettled, setRailSettled] = useState<number | null>(null);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setRailSettled(railDecade), 140);
+    return () => window.clearTimeout(timer);
+  }, [railDecade]);
+  const railOn = step === 0 && railDecade !== null;
+
+  /** The record on screen: the opening's, or the current decade's; none while the rail is set. */
+  const current = railOn ? null : step === 0 ? opening : (stops[step - 1] ?? null);
   /** The decade the walk has filled the map to; null on the opening (the whole archive). */
   const shownDecade = step === 0 ? null : (stops[step - 1]?.decade ?? null);
 
   /** What the plate shows this frame: the whole field, or the archive as of the shown decade. */
   const sweptPins = useMemo<ExploreMapFeatureCollection>(() => {
+    // The rail keeps undated records lit (they are counted, never dropped); the walk's own
+    // sweep below shows only what it can place in a decade.
+    if (step === 0) {
+      if (railSettled === null) return pins;
+      return {
+        ...pins,
+        features: pins.features.filter((feature) =>
+          lightThroughDecade(earliestDecadeFor(feature), railSettled),
+        ),
+      };
+    }
     if (shownDecade === null) return pins;
     return {
       ...pins,
@@ -284,7 +299,20 @@ export function DoorImmersive({
         return decade !== null && decade <= shownDecade;
       }),
     };
-  }, [pins, shownDecade]);
+  }, [pins, railSettled, shownDecade, step]);
+
+  /** The rail's counts at its current position, before the plate has caught up. */
+  const railCounts = useMemo(() => {
+    let lit = 0;
+    let undated = 0;
+    for (const feature of pins.features) {
+      const decade = earliestDecadeFor(feature);
+      if (!lightThroughDecade(decade, railDecade)) continue;
+      lit += 1;
+      if (decade === null) undated += 1;
+    }
+    return { lit, undated };
+  }, [pins, railDecade]);
 
   /** Cold `/explore`: arm Live gestures and Door browse chrome before the first paint settles. */
   useEffect(() => {
@@ -515,8 +543,6 @@ export function DoorImmersive({
    */
   /** The tour step in front of the reader (door-tour-scroll.tsx), or null off the tour. */
   const tourRef = useRef<DoorTourTarget | null>(null);
-  /** The tour step on screen, for its photograph over the map's non-target area. */
-  const [tourStep, setTourStep] = useState<DoorTourTarget | null>(null);
   const applyCamera = useCallback(
     (cut: boolean): boolean => {
       if (browseModeRef.current) return false;
@@ -535,6 +561,22 @@ export function DoorImmersive({
           'point',
           { center: [tour.lngLat[0], tour.lngLat[1]], zoom: tourZoom(tour.precision) },
           { mode: cut ? 'cut' : 'fly', pitch: 0, bearing: 0, ...(padding ? { padding } : {}) },
+        );
+        return true;
+      }
+      // The opening is Orbit: the whole globe in the map window, every record one light. The
+      // decade walk comes down to the national frame, where the place tokens can be read.
+      if (stepRef.current === 0 && windowBox) {
+        stage.flyPreset(
+          'national',
+          { center: DOOR_ORBIT_CENTER, zoom: doorOrbitZoom(windowBox) },
+          {
+            mode: cut ? 'cut' : 'ease',
+            pitch: 0,
+            bearing: 0,
+            zoomFloor: 'fit',
+            ...(padding ? { padding } : {}),
+          },
         );
         return true;
       }
@@ -608,6 +650,15 @@ export function DoorImmersive({
     firstFrameRef.current = false;
     setFramed(true);
   }, [applyCamera, plateLive]);
+
+  /** Orbit to the national frame and back, when the reader enters or leaves the decade walk. */
+  const atOpening = step === 0;
+  const wasAtOpeningRef = useRef(atOpening);
+  useEffect(() => {
+    if (wasAtOpeningRef.current === atOpening) return;
+    wasAtOpeningRef.current = atOpening;
+    if (plateLive) applyCamera(false);
+  }, [applyCamera, atOpening, plateLive]);
 
   /**
    * The dock's height is the stacked window's bottom edge (door-home.css reads
@@ -687,7 +738,8 @@ export function DoorImmersive({
     const onTour = (event: Event) => {
       const target = (event as CustomEvent<DoorTourTarget | null>).detail;
       tourRef.current = target;
-      setTourStep(target);
+      // The tour flies to its own records; a rail that had dimmed one would hide its pin.
+      if (target) setRailDecade(null);
       if (browseModeRef.current) return;
       applyCamera(false);
       stage.applyViewState({
@@ -763,10 +815,6 @@ export function DoorImmersive({
     [stage],
   );
 
-  /** Whose photograph is the map's ground: the tour step's, else the opening's; none in browse or
-   * on the decade walk. */
-  const echo = browseMode ? null : (tourStep ?? (step === 0 ? opening : null));
-
   const plateState: DoorPlateState = plateUnavailable ? 'unavailable' : framed ? 'live' : 'pending';
 
   /** The plate never painted: say so with the plain list of places, from data the page holds. */
@@ -791,10 +839,10 @@ export function DoorImmersive({
 
   const liveLabel = browseMode
     ? 'Browsing the map'
-    : !current || (step === 0 && !openingChosen)
-      ? 'United States'
-      : step === 0
-        ? `${current.name}${current.locality ? `, ${current.locality}` : ''}`
+    : railOn
+      ? timeRailText(railDecade, railCounts.lit, railCounts.undated)
+      : !current || step === 0
+        ? 'The world, lit where records are published'
         : `${current.decade}s. ${current.name}${current.locality ? `, ${current.locality}` : ''}`;
 
   return (
@@ -807,30 +855,15 @@ export function DoorImmersive({
       >
         {/* The map window: the uncovered part of the plate. Measured for the camera frame
             (door-field-frame.ts) and the callout's bounds; nothing is drawn in it. */}
-        <div className="ds-door__window" ref={windowRef} aria-hidden="true">
-          {/* The record in front of the reader (a tour step's, or the opening's) is the map's
-              ground around it: clear over the record, deepening outward, with an ink wash under
-              the words on a wide screen (door-tour.css). */}
-          {echo ? (
-            <div className="ds-door__echo" key={echo.pinId ?? echo.name} data-ground="ink">
-              {echo.plate ? (
-                <RecordImage
-                  entityId={echo.pinId ?? echo.name}
-                  entityName={echo.name}
-                  image={echo.plate}
-                  plate
-                  width={440}
-                  className={echo.person ? 'ds-plate--upper' : ''}
-                />
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+        {/* v11: the world is the ground. The record's photograph no longer sits behind the map. */}
+        <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
         {plateUnavailable ? (
           /* No WebGL: say so where the map would be, and point at the index that needs none. */
           <p className="ds-door__field-note" role="status">
-            The map could not start in this browser. <Link href="/records">Browse the records</Link>{' '}
-            instead.
+            {readAsDocuments()
+              ? 'The map is off while you read as documents.'
+              : 'The map could not start in this browser.'}{' '}
+            <Link href="/records">Browse the records</Link> instead.
           </p>
         ) : null}
         {/* Said once, in plain meta type, and gone when the plate has painted. */}
@@ -877,9 +910,23 @@ export function DoorImmersive({
             frameRef={windowRef}
           />
         ) : null}
+        {step === 0 && plateState === 'live' ? (
+          <DoorTimeRail
+            bars={bars}
+            value={railDecade}
+            onChange={setRailDecade}
+            lit={railCounts.lit}
+            undated={railCounts.undated}
+          />
+        ) : null}
         <div className="ds-door__dock" ref={dockRef} data-step={step === 0 ? 'open' : 'walk'}>
           {step === 0 ? (
-            <section className="ds-door-open" aria-labelledby="door-open-heading" data-ground="ink">
+            <section
+              className="ds-door-open"
+              aria-labelledby="door-open-heading"
+              data-ground="ink"
+              data-ground-fixed=""
+            >
               {/* The headline and the one way into a story lead; the record the map points at
                   follows (desktop only: a phone's column is the headline and the story, and the
                   map is the second beat). */}
@@ -915,32 +962,16 @@ export function DoorImmersive({
                   </button>
                 ) : null}
               </div>
+              {/* v11 Orbit: the opening is the headline and the ways in. What the lights mean is
+                  said here, once, because unlit ground reads as "nothing happened there". */}
               {/* The page goes on below the map; say so in words, and make it a way there. */}
               <a className="ds-door-open__next" href="#door-ch-evidence-band">
                 Below the map, how every record is graded
               </a>
-              {/* The record the map is pointing at, the way its record page shows it: name, plate
-                  and one claim with its source and grade. Off the map window, so it never covers
-                  a live pin. */}
-              {opening ? (
-                <div className="ds-door-open__spotlight">
-                  {/* Only the record remounts on "Another record"; the button keeps focus. */}
-                  <DoorRecordBlock
-                    key={opening.href}
-                    record={opening}
-                    className="ds-door-open__record"
-                  />
-                  {openingChoices.length > 1 ? (
-                    <button
-                      type="button"
-                      className={buttonClassName('quiet', 'ds-door-open__another')}
-                      onClick={anotherOpening}
-                    >
-                      Another record
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
+              <p className="ds-door-open__coverage">
+                Each light is a record published so far. Unlit places are not yet researched.{' '}
+                <Link href="/methodology">How coverage works</Link>
+              </p>
               <div className="ds-door-open__actions">
                 <Link
                   className={buttonClassName('quiet', 'ds-door-open__browse-link')}
@@ -949,7 +980,6 @@ export function DoorImmersive({
                   Browse all records
                 </Link>
               </div>
-              <BandRule motif="grain" className="ds-door-open__edge" />
             </section>
           ) : current ? (
             <DoorWalkCard

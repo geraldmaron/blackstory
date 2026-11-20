@@ -33,6 +33,8 @@ import {
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_LIGHTS_LAYER_ID,
+  EXPLORE_LIGHTS_SOURCE_ID,
   EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
   EXPLORE_COUNTY_HATCH_LAYER_ID,
@@ -57,8 +59,12 @@ import { loadedCountyPolygons } from './geo-source-loaders';
 export const SELECTED_FILL_ID = 'explore-state-selected-fill';
 export const SELECTED_LINE_ID = 'explore-state-selected-line';
 
+const LIGHTS_LAST_SET = new WeakMap<object, unknown>();
+
 export const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
+  // Under the entity stack, like the geography: a light is ground, not a mark to click.
+  EXPLORE_LIGHTS_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
@@ -199,6 +205,12 @@ export function applyGeographyStyle(
         continue;
       }
       const data = (source as { data?: unknown }).data;
+      // The lights are the same object until the field itself changes (explore-style.ts,
+      // `lightsFor`): re-sending four thousand unchanged points on every patch is pure cost.
+      if (id === EXPLORE_LIGHTS_SOURCE_ID) {
+        if (LIGHTS_LAST_SET.get(existing) === data) continue;
+        LIGHTS_LAST_SET.set(existing, data);
+      }
       if (typeof existing.setData === 'function' && data && typeof data === 'object') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         existing.setData(data as any);

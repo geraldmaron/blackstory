@@ -427,3 +427,25 @@
     padding-bottom: var(--ds-section-sm);
   }
 }
+
+/* —— v11: the wash without the photograph ——————————————————————————————————————————————
+   The record's photograph no longer sits behind the map (door-immersive.tsx), so the wash under
+   the tour's words moves from `.ds-door__echo::after` to the map window itself. Wide screens
+   only; the phone card carries its own shade above. */
+@media (scripting: enabled) {
+  @media (min-width: 64rem), (min-width: 48rem) and (min-aspect-ratio: 1001/1000) {
+    .ds-door:has(.ds-door-tour[data-active='true']) .ds-door__window::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--ds-surface-sunken) 92%, transparent) 0,
+        color-mix(in srgb, var(--ds-surface-sunken) 90%, transparent)
+          calc(var(--ds-door-edge) + var(--ds-door-card-w) + 1rem),
+        transparent calc(var(--ds-door-edge) + var(--ds-door-card-w) + 12rem)
+      );
+    }
+  }
+}

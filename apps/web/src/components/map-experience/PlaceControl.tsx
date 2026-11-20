@@ -188,6 +188,7 @@ export function PlaceControl({
           id={fieldId}
           className="ds-place__input"
           type="search"
+          role="combobox"
           name="place"
           autoComplete="off"
           enterKeyHint="search"

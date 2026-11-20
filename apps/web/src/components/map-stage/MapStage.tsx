@@ -52,7 +52,7 @@ import {
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
-import { buildExploreMapStyle } from '../../app/map/explore-style';
+import { buildExploreMapStyle, ORBIT_MAX_ZOOM } from '../../app/map/explore-style';
 import {
   applyDensityBlendProgress,
   applyDecadeHoldFeatureState,
@@ -397,6 +397,19 @@ export function useMapStage(): MapStageHandle {
   return ctx;
 }
 
+/**
+ * The stage, or null where no provider is above. `RecordGround` renders inside a server-streamed
+ * record page, and its server render does not see the root shell's context (the throw above made
+ * React abandon server rendering for the record's whole boundary). It only acts in effects, so on
+ * the server it needs nothing.
+ */
+export function useOptionalMapStage(): MapStageHandle | null {
+  return useContext(MapStageContext);
+}
+
+/** From this zoom the globe and Mercator draw the same picture, so a switch cannot be seen. */
+const GLOBE_INVISIBLE_ZOOM = 8;
+
 /** Hover-intent delay before a pin's photo card opens (`PinPhotoCard`'s own doc comment). */
 const PIN_HOVER_INTENT_MS = 120;
 
@@ -650,6 +663,7 @@ export function MapStageProvider({
     mapAvailableRef.current = false;
     setMapAvailable(false);
     plateReadyRef.current = false;
+    globeAskedRef.current = false;
     plateRef.current?.removeAttribute('data-plate-ready');
     notify(listenersRef.current, 'error');
   }, []);
@@ -661,11 +675,52 @@ export function MapStageProvider({
    * their fade on it) and tell subscribers. Once per plate life — the three callers (first `idle`
    * after load, the 1800ms fallback, state polygons landing) race, and only the first counts.
    */
+  /** True once the flat plate has been asked to become the globe (below). */
+  const globeAskedRef = useRef(false);
   const markPlateReady = useCallback(() => {
     if (canceledRef.current || plateReadyRef.current) return;
-    plateReadyRef.current = true;
-    stampPlateReady(plateRef.current);
-    notify(listenersRef.current, 'ready');
+    const reveal = () => {
+      if (canceledRef.current || plateReadyRef.current) return;
+      plateReadyRef.current = true;
+      stampPlateReady(plateRef.current);
+      notify(listenersRef.current, 'ready');
+    };
+    const map = mapRef.current;
+    if (!map) {
+      reveal();
+      return;
+    }
+    // v11: a plate that opened flat (a record page; map-plate-paint.ts) becomes the globe here.
+    // Near the ground the two projections draw the same picture, so it is revealed at once and
+    // switched in idle time afterwards. Farther out the curve shows, so the switch comes first
+    // and the reveal waits for the globe's frame. A plate that opened as the globe just reveals.
+    if (globeAskedRef.current) return;
+    globeAskedRef.current = true;
+    if (map.getProjection()?.type === 'globe') {
+      reveal();
+      return;
+    }
+    const nearGround = map.getZoom() >= GLOBE_INVISIBLE_ZOOM;
+    const toGlobe = () => {
+      if (canceledRef.current) return;
+      try {
+        map.setProjection({ type: 'globe' });
+      } catch {
+        // The style is mid-load: ask again when it has settled.
+        map.once('idle', toGlobe);
+        return;
+      }
+      if (!nearGround) {
+        map.once('idle', reveal);
+        window.setTimeout(reveal, 1500);
+      }
+    };
+    if (nearGround) reveal();
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(toGlobe, { timeout: nearGround ? 4000 : 600 });
+    } else {
+      window.setTimeout(toGlobe, nearGround ? 2000 : 0);
+    }
   }, []);
 
   const entityPoint = useCallback((entityId: string): EntityPoint | undefined => {
@@ -1401,13 +1456,17 @@ export function MapStageProvider({
 
         map = new maplibregl.Map({
           container,
-          style: buildArchiveBaseStyle(mountScheme),
+          // The Door and Explore open on the globe; a record page opens near the ground, flat.
+          style: buildArchiveBaseStyle(
+            mountScheme,
+            postureRef.current === 'ambient' || postureRef.current === 'live',
+          ),
           attributionControl: false,
           clickTolerance: MAP_CLICK_TOLERANCE_PX,
-          // Keep the camera US-centered without a tight maxBounds box (see the former
-          // ExploreMapCanvas's identical comment): a portrait canvas cannot show full CONUS
-          // east-west if maxBounds also caps latitude.
-          renderWorldCopies: false,
+          // v11: the plate is a globe, which has no world copies to render. `false` here made
+          // MapLibre clamp a world-scale center to keep the Mercator map's edge off screen, both
+          // before the globe style loaded and on any flight that crossed the globe-to-Mercator
+          // handover, so the Door's Orbit landed over the Atlantic.
           // Street-level context is available (OpenFreeMap roads from z8); stop short of
           // address-level invasion — precision redaction still governs marker honesty.
           minZoom: MAP_MIN_ZOOM,
@@ -1419,6 +1478,13 @@ export function MapStageProvider({
         });
 
         mapRef.current = map;
+        // v11 Orbit: below the national frame the plate shows lights, not place tokens. The
+        // tokens are DOM, so the plate says which altitude it is at and shell.css hides them.
+        const orbitMap = map;
+        const syncOrbit = () =>
+          plateRef.current?.toggleAttribute('data-orbit', orbitMap.getZoom() < ORBIT_MAX_ZOOM);
+        orbitMap.on('zoom', syncOrbit);
+        orbitMap.on('load', syncOrbit);
         placeLabelsRef.current = bindPlaceLabels(map);
         placeLabelsRef.current.setSelectedPlace(
           configRef.current.selectedState

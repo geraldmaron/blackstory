@@ -90,6 +90,8 @@ import {
   EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_GHOSTS_SOURCE_ID,
   EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_LIGHTS_LAYER_ID,
+  EXPLORE_LIGHTS_SOURCE_ID,
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
   EXPLORE_COUNTY_HATCH_LAYER_ID,
@@ -620,6 +622,31 @@ function pinPaint(plate: MapPlate, opacity: number) {
  * jurisdiction-area polygon layer (area records render as geometry, never as a point;
  * empty today, see `build-explore-map-source.ts`). A token tap selects its place (MapStage).
  */
+/** Below this zoom the plate is at Orbit: lights, no place tokens (MapStage sets `data-orbit`). */
+export const ORBIT_MAX_ZOOM = 2.7;
+/** The one emission color of the world: the brand copper pushed toward an ember. */
+/** Line, text and non-water fill layers stand down below this zoom (see the end of the builder). */
+// 1.9, not 2: the national frame on a 320px phone fits the country at about zoom 1.95, and it
+// must keep its state lines, names and tints.
+export const ORBIT_LINE_MIN_ZOOM = 1.9;
+export const ORBIT_LIGHT_COLOR = '#f2a35c';
+
+/**
+ * The lights are every drawn record, about four thousand points, and the style is rebuilt on
+ * every patch. Building them once per feature collection keeps that off the main thread's
+ * repeat work, and hands `applyGeographyStyle` the same object so it can skip a redundant
+ * `setData` (which re-serializes the lot to the worker).
+ */
+const LIGHTS_BY_COLLECTION = new WeakMap<object, ReturnType<typeof drawnRecordCollection>>();
+function lightsFor(collection: BuildExploreMapStyleInput['featureCollection']) {
+  let lights = LIGHTS_BY_COLLECTION.get(collection);
+  if (!lights) {
+    lights = drawnRecordCollection(collection);
+    LIGHTS_BY_COLLECTION.set(collection, lights);
+  }
+  return lights;
+}
+
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   const colorScheme = input.colorScheme ?? 'dark';
   const satellite = input.satellite === true;
@@ -694,7 +721,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
     POPULATION_CHANGE_TIER_FILL.lossStrong,
     plate.densityUnknown,
   ] as unknown as ExpressionSpecification;
-  return {
+  const style: StyleSpecification = {
     version: 8,
     name: 'BlackStory — Explore',
     glyphs: OPENFREEMAP_GLYPHS_URL,
@@ -746,6 +773,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         promoteId: 'entityId',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: drawn as any,
+      },
+      [EXPLORE_LIGHTS_SOURCE_ID]: {
+        type: 'geojson',
+        // The same precision-honest marks the plate draws ungrouped: a county or state record
+        // has no point here either.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        data: lightsFor(input.featureCollection) as any,
       },
       [EXPLORE_PLACE_LEADERS_SOURCE_ID]: {
         type: 'geojson',
@@ -1316,6 +1350,29 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        // Orbit: one light per drawn record. Every light is the same size and strength; count,
+        // grade and kind are never encoded (design-direction-v11.md, "Darkness is not absence").
+        // Gone by the national frame, where the place tokens take over.
+        id: EXPLORE_LIGHTS_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_LIGHTS_SOURCE_ID,
+        maxzoom: ORBIT_MAX_ZOOM + 0.6,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, 1.4, ORBIT_MAX_ZOOM, 2.6],
+          'circle-color': ORBIT_LIGHT_COLOR,
+          'circle-blur': 0.7,
+          'circle-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            ORBIT_MAX_ZOOM,
+            0.85,
+            ORBIT_MAX_ZOOM + 0.6,
+            0,
+          ],
+        },
+      },
+      {
         // Brushed-out records: a sand ghost at the record's own drawn place, under every live mark.
         id: EXPLORE_GHOST_POINT_LAYER_ID,
         type: 'circle',
@@ -1504,5 +1561,20 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
     ],
+  };
+  // Orbit shows lights and water, nothing else. Below `ORBIT_LINE_MIN_ZOOM` MapLibre's globe tears
+  // line and text layers into spikes across the disc, and the GeoJSON fills (state land, tints,
+  // hatches) cost about half a second of main-thread work at load to drape over the sphere, for
+  // a US land shape the background already paints. The water stays: it is what draws the coasts.
+  return {
+    ...style,
+    layers: style.layers.map((layer) =>
+      (layer.type === 'symbol' ||
+        layer.type === 'line' ||
+        (layer.type === 'fill' && layer.id !== 'plate-water')) &&
+      (layer.minzoom ?? 0) < ORBIT_LINE_MIN_ZOOM
+        ? { ...layer, minzoom: ORBIT_LINE_MIN_ZOOM }
+        : layer,
+    ),
   };
 }

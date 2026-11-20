@@ -127,6 +127,8 @@ export type RecordPageProps = {
    * a family that passes one keeps the map out of `media`.
    */
   readonly plateMap?: ReactNode;
+  /** v11 Ground: the driver that hands this record to the persistent plate (`RecordGround`). */
+  readonly ground?: ReactNode;
 };
 
 export { formatRecordDate } from './format-record-date';
@@ -345,18 +347,27 @@ export function RecordPage({
   plate,
   quiet = false,
   plateMap,
+  ground,
 }: RecordPageProps) {
   const numeral = numeralOverride ?? recordNumeral(facts);
   const plated = Boolean(plate) && !quiet;
   const grounded = plated && Boolean(plateMap);
   return (
-    <main className="ds-room ds-recpage" id="main" data-quiet={quiet ? '' : undefined}>
+    <main
+      className="ds-room ds-recpage"
+      id="main"
+      data-quiet={quiet ? '' : undefined}
+      data-ground={ground ? '' : undefined}
+    >
+      {ground}
       <article className="ds-recpage__record" aria-labelledby="record-title">
         <header
           className="ds-recpage__mast ds-field"
           data-quiet={quiet ? '' : undefined}
           data-plate={plated ? '' : undefined}
           data-grounded={grounded ? '' : undefined}
+          // v11 Ground: the masthead sits on the night world in either theme.
+          {...(ground ? { 'data-ground': 'ink', 'data-ground-fixed': '' } : {})}
         >
           {/* No plate: the mast carries survey lines instead of an empty ground. */}
           {plated ? null : <BandArt motifs={['contours']} />}

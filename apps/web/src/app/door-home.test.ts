@@ -341,20 +341,20 @@ test('door CSS keeps one fixed full-bleed plate under a fixed dock; the chapters
   assert.doesNotMatch(immersive, /door-plate-labels|addLayer\(/);
 });
 
-test('the opening leads with one record the way its record page shows it', () => {
-  // Name, plate with its credit, one claim in the claims block's language.
+test('the opening is Orbit: the ways in and what the lights mean, no record block', () => {
+  // v11: the opening is the headline and its actions over the globe. The record the plate points
+  // at is named by the callout on the map, not shown as a block in the column.
+  assert.doesNotMatch(immersive, /<DoorRecordBlock/);
+  assert.doesNotMatch(immersive, />\s*Another record\s*</);
+  assert.ok(immersive.indexOf('<HeroHeadlineMorph') < immersive.indexOf('ds-door-open__coverage'));
+  // Unlit ground reads as "nothing happened there", so the legend says what a light is.
   assert.match(
     immersive,
-    /opening \? \(\s*<div[^>]*>[\s\S]*?<DoorRecordBlock\s+key=\{opening\.href\}\s+record=\{opening\}/,
+    /Each light is a record published so far\. Unlit places are not yet researched\./,
   );
-  // Only the record remounts on "Another record": a key on the wrapper would drop the button's focus.
-  assert.doesNotMatch(immersive, /ds-door-open__spotlight"\s+key=/);
-  // The headline and the story lead the column; the record follows them.
-  assert.ok(immersive.indexOf('<HeroHeadlineMorph') < immersive.indexOf('<DoorRecordBlock'));
-  assert.ok(immersive.indexOf('ds-door-open__story') < immersive.indexOf('<DoorRecordBlock'));
-  // The record is pinned for the browser session, guarded, and "Another record" cycles it.
+  // The record is still pinned for the browser session, guarded.
   assert.match(immersive, /sessionStorage\.getItem\(OPENING_STORAGE_KEY\)/);
-  assert.match(immersive, />\s*Another record\s*</);
+  // The record block itself is unchanged where the tour uses it.
   assert.match(block, /<RecordImage[\s\S]*image=\{record\.plate\}[\s\S]*plate/);
   assert.match(block, /<EvidenceList items=\{\[record\.claim\]\} \/>/);
   // Quiet records never come up on home, and a rendering is never shown as a plate.

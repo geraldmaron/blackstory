@@ -86,6 +86,7 @@ export function runFlyPreset(
   if ('center' in target) {
     center = [target.center[0], target.center[1]];
     zoom = target.zoom;
+    if (options?.zoomFloor === 'fit') map.setMinZoom(Math.min(MAP_MIN_ZOOM, zoom));
   } else {
     const [west, south, east, north] = target.bounds;
     const camera = (() => {

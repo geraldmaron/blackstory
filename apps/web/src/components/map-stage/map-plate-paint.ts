@@ -14,10 +14,23 @@ import { plateForScheme, type MapColorScheme } from '../../lib/map-experience/di
  * the plate at mount it could stay black until some later data patch happened to rebuild the
  * style — a light `/explore` reading as a solid black map with only state labels on it.
  */
-export function buildArchiveBaseStyle(colorScheme: MapColorScheme): StyleSpecification {
+export function buildArchiveBaseStyle(
+  colorScheme: MapColorScheme,
+  openAsGlobe = true,
+): StyleSpecification {
   return {
     version: 8,
     name: 'BlackStory — Archive (US)',
+    // v11: the plate is a globe. Where the first frame is the globe itself (the Door, Explore)
+    // it opens as one. Where the first frame is near the ground (a record page), building the
+    // globe at load cost about two thirds of the page's main-thread blocking for a curve nobody
+    // can see at that zoom, so the plate opens flat and MapStage switches it once it has
+    // painted (`markPlateReady`; design-direction-v11.md §14). MapLibre eases the globe into
+    // Mercator near the ground either way, so every street-scale rule is unchanged.
+    ...(openAsGlobe ? { projection: { type: 'globe' as const } } : {}),
+    // The atmosphere only draws with a light to scatter; it fades out by the national frame.
+    sky: { 'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 3, 1, 4.5, 0] },
+    light: { anchor: 'map', position: [1.5, 90, 80] },
     sources: {},
     layers: [
       {

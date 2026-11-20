@@ -231,7 +231,8 @@ test('population layer modes expose county choropleth fill keyed to shareTier / 
 
   assert.equal(shareLayer.layout?.visibility, 'visible');
   assert.equal(shareLayer.paint?.['fill-opacity'], 0.85);
-  assert.equal(shareLayer.minzoom, undefined, 'national frame must show share fills');
+  // v11: fills stand down at Orbit only, below every national frame (about 1.95 at 320px).
+  assert.ok((shareLayer.minzoom ?? 0) < 1.95, 'national frame must show share fills');
   assert.deepEqual((shareLayer.paint?.['fill-color'] as unknown[])?.slice(0, 3), [
     'match',
     ['get', 'shareTier'],

@@ -17,6 +17,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { surfaceClassFor } from '../../lib/nav/surface-classes';
 import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark, Tabs, toggleDocumentTheme, type TabItem } from '@repo/ui';
 import { BAR_SEARCH_INPUT_ID, CommandBarSearch } from './CommandBarSearch';
@@ -192,6 +193,8 @@ export function CommandBar({
       <header
         className={cx('ds-bar', className)}
         data-ground="ink"
+        // v11: on the Door the bar is corner chrome on the night world, in either theme.
+        {...(surfaceClassFor(pathname) === 'door' ? { 'data-ground-fixed': '' } : {})}
         data-browse-chrome="true"
         data-search-open={searchOpen ? 'true' : undefined}
       >

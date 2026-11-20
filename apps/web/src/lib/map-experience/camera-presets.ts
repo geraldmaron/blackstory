@@ -17,6 +17,8 @@
  * reduced motion, full functional parity.
  */
 
+import { holdStill } from './world-prefs';
+
 export type CameraPresetName = 'national' | 'state' | 'locality' | 'point';
 
 /** A time-based easing curve: elapsed-time fraction `t` in [0, 1] -> eased-progress fraction in
@@ -159,6 +161,8 @@ export const CAMERA_COUNTY_ZOOM = 9;
  * any non-DOM environment (SSR, plain-Node tests) never a client-only crash. */
 export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  // v11 "Hold still": the reader's own switch counts the same as the system preference.
+  if (holdStill()) return true;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 

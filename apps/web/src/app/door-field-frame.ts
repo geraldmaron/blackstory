@@ -152,3 +152,35 @@ export function sameDoorFrameBox(a: DoorFrameBox | null, b: DoorFrameBox | null)
     Math.round(a.height) === Math.round(b.height)
   );
 }
+
+/** Where Orbit looks: the middle of the documented field, far enough north to keep Alaska's arc. */
+export const DOOR_ORBIT_CENTER: readonly [lng: number, lat: number] = [-96, 36];
+/** A window shorter than this share of its width shows the globe as a horizon. */
+export const DOOR_ORBIT_HORIZON_RATIO = 0.85;
+/** How much of the map window's short side the globe's disc fills. */
+export const DOOR_ORBIT_FILL = 0.92;
+
+/**
+ * The zoom at which the globe's disc fills the map window (design-direction-v11.md, Orbit).
+ * MapLibre's globe keeps Mercator's scale at the center latitude, so the disc is
+ * `512 * 2^zoom / (pi * cos(lat))` pixels across.
+ */
+export function doorOrbitZoom(window: DoorFrameBox): number {
+  // A phone's map window is a short strip under the dock. A disc fitted to its height is a
+  // thumbnail, so there the disc is sized to the width and rises past the strip as a horizon.
+  const side = Math.max(
+    DOOR_FRAME_MIN_BOX_PX,
+    Math.min(window.width, Math.max(window.height, DOOR_ORBIT_HORIZON_RATIO * window.width)),
+  );
+  const latitude = (DOOR_ORBIT_CENTER[1] * Math.PI) / 180;
+  return Math.log2((DOOR_ORBIT_FILL * side * Math.PI * Math.cos(latitude)) / 512);
+}
+
+/**
+ * The time rail's rule (design-direction-v11.md §4.2): a record is lit when it is first documented
+ * by the rail's decade. A record with no decade is lit at every position; it is counted as
+ * undated, never dropped. `through === null` is all time.
+ */
+export function lightThroughDecade(decade: number | null, through: number | null): boolean {
+  return through === null || decade === null || decade <= through;
+}

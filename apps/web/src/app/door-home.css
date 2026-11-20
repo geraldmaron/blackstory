@@ -937,7 +937,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
      first screen, which is what tells the reader the page goes on. */
   body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open']) {
     --ds-door-map-top: calc(
-      var(--ds-island-clearance) + var(--ds-space-3) + var(--ds-door-dock-h, 12rem) +
+      var(--ds-island-clearance) + var(--ds-space-3) + var(--ds-door-dock-h, 21.5rem) +
         var(--ds-space-3)
     );
     --ds-door-map-h: min(
@@ -983,7 +983,7 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   /* Notes about the map sit under the headline column, not behind it. */
   body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open'])
     :is(.ds-door__field-note, .ds-door__loading, .ds-door__places) {
-    top: calc(var(--ds-door-dock-h, 12rem) + var(--ds-space-8));
+    top: calc(var(--ds-door-dock-h, 21.5rem) + var(--ds-space-8));
     right: var(--ds-gutter);
     left: var(--ds-gutter);
     max-width: none;
@@ -1379,6 +1379,8 @@ body:has(.ds-door) .ds-shell > .ds-bar {
 body:has(.ds-door) .ds-shell-footer {
   z-index: 3; /* local: above the fixed field and dock, with the chapters */
   pointer-events: auto;
+  /* The page itself does not clear the phone tab bar here (see above), so its last links do. */
+  padding-bottom: var(--ds-tabbar-h);
 }
 
 body:has(.ds-door-journey--browse) .ds-shell-footer {
@@ -1743,5 +1745,159 @@ body:has(.ds-door) .ds-door-journey {
           var(--ds-space-12)
       )
     );
+  }
+}
+
+/* v11 Orbit: what the lights mean, said once under the ways in (design-direction-v11.md,
+   "Darkness is not absence"). Meta type, so it reads as a legend, not a second lede. */
+.ds-door-open__coverage {
+  max-width: 30rem;
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+}
+
+.ds-door-open__coverage a {
+  color: var(--ds-ink);
+  text-underline-offset: 0.25em;
+}
+
+/* —— v11: the still before the globe —————————————————————————————————————————————
+   Until the plate has painted (and for good without JavaScript) the map window holds a drawn
+   night disc with the atmosphere's rim, where the globe will be: no loader, and the globe arrives
+   into its own outline instead of onto a blank field. It carries no continents and no lights, so
+   it claims nothing; the records are in the list the page links to. Gone once the plate is live. */
+.ds-door__field {
+  background: #04060c;
+}
+
+body:not(:has(.ds-map-stage[data-plate-ready]))
+  .ds-door__field:not([data-plate='unavailable'])
+  .ds-door__window::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: 86%;
+  max-width: 86%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 40%, #2a2622 0, #1b1815 55%, #0d0c0b 100%);
+  box-shadow:
+    inset 6px 6px 22px rgb(126 170 214 / 0.38),
+    0 0 26px rgb(126 170 214 / 0.16);
+}
+
+/* Phone and portrait: the disc is sized to the width and rises past the strip, as the globe does. */
+@media (max-width: 47.9375rem), (max-width: 63.9375rem) and (max-aspect-ratio: 1/1) {
+  body:not(:has(.ds-map-stage[data-plate-ready]))
+    .ds-door__field:not([data-plate='unavailable'])
+    .ds-door__window::before {
+    width: 72%;
+    height: auto;
+    max-width: none;
+  }
+}
+
+/* —— v11: the time rail ————————————————————————————————————————————————————————
+   The right edge of the globe is time (design-direction-v11.md §4.2): an upright slider in mono
+   (sentence case: the Door sets no type in capitals), the decade it is at above it, the count of lights under it. Wide screens
+   only: on a phone the globe is a strip under the opening and "Walk the decades" is the way
+   through time. Gone while the tour or the walk has the plate. */
+.ds-door-rail {
+  position: fixed;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-10));
+  right: var(--ds-space-6);
+  bottom: calc(var(--ds-door-peek, 0px) + var(--ds-space-8));
+  z-index: var(--ds-z-content);
+  display: none;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+  justify-items: center;
+  gap: var(--ds-space-2);
+  width: 5.5rem;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  pointer-events: auto;
+}
+
+@media (min-width: 64rem) {
+  .ds-door-rail {
+    display: grid;
+  }
+}
+
+.ds-door:has(.ds-door-tour[data-active='true']) .ds-door-rail,
+.ds-door-journey--browse .ds-door-rail {
+  display: none;
+}
+
+.ds-door-rail__now {
+  margin: 0;
+  color: var(--ds-ink);
+  font-size: var(--ds-text-body);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.ds-door-rail[data-active] .ds-door-rail__now {
+  color: var(--ds-accent-graphic);
+}
+
+.ds-door-rail__input {
+  /* Upright, later decades at the top. */
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 44px;
+  height: 100%;
+  min-height: 8rem;
+  margin: 0;
+  accent-color: var(--ds-accent-graphic);
+  cursor: grab;
+}
+
+.ds-door-rail__input:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 4px;
+}
+
+.ds-door-rail__count {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.ds-door-rail__reset {
+  min-height: 44px;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* The rail's ground attribute is for its inks; it paints no ground of its own over the globe. */
+.ds-door-rail {
+  background: none;
+}
+
+/* The map window ends where the rail begins, so the globe is framed clear of it. */
+@media (min-width: 64rem) {
+  .ds-door:not(:has(.ds-door-tour[data-active='true'])) .ds-door__window {
+    right: 7.5rem;
+  }
+}
+
+/* A short window puts the headline over the whole globe, so the featured record's label would sit
+   behind it, text on text. The record is still in the tour below. */
+@media (max-height: 30rem) {
+  body:has([data-surface='door']) .ds-map-callout--flag {
+    visibility: hidden;
   }
 }

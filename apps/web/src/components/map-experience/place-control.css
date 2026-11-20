@@ -25,6 +25,8 @@
 
 .ds-place__field:focus-within {
   border-color: var(--ds-ink);
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: var(--ds-focus-offset);
 }
 
 .ds-place__icon {

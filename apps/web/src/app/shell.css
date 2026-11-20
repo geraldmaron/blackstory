@@ -93,6 +93,15 @@ body {
   --ds-first-paint-ground-ink: #9a8a6d;
 }
 
+/* Keyboard focus must not come to rest under the phone tab bar (WCAG 2.4.11). */
+@media (max-width: 47.9375rem) {
+  html {
+    scroll-padding-bottom: calc(
+      var(--ds-tabbar-h, 4rem) + env(safe-area-inset-bottom, 0px) + var(--ds-space-4)
+    );
+  }
+}
+
 html:has([data-surface='instrument']) {
   overflow: hidden;
   overscroll-behavior: none;
@@ -1500,7 +1509,9 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
    /methodology, /data and /memorial rendered as an empty box in the page's own color, with the
    copper edge and the PLATE · LIVE tag around nothing. Gating this selector cannot be undone by
    ordering the way an override could. */
-body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
+body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
+    :has(.ds-recpage[data-ground])
+  )
   .ds-map-stage:not([data-plate-slot])::after {
   content: '';
   position: absolute;
@@ -1512,7 +1523,9 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
 
 /* Attribution and compass share the cover's z-index, so the cover hides the map but leaves a
    north rose and OSM chip sitting on the record. Hide the chrome; keep the MapLibre instance. */
-body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
+body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
+    :has(.ds-recpage[data-ground])
+  )
   .ds-map-stage:not([data-plate-slot])
   .maplibregl-ctrl {
   display: none;
@@ -1524,10 +1537,6 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
 .ds-shell-footer {
   position: relative;
   z-index: var(--ds-z-content);
-}
-
-[data-theme='light'] .ds-map-stage {
-  background: var(--ds-canvas);
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
@@ -2258,4 +2267,19 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   .ds-place-token__count {
     color: CanvasText;
   }
+}
+
+/* —— v11 Orbit ————————————————————————————————————————————————————————————————
+   Below the national frame the plate shows one light per record (explore-style.ts,
+   `EXPLORE_LIGHTS_LAYER_ID`). Place tokens carry counts, and Orbit never weights a place by its
+   count (design-direction-v11.md, "Darkness is not absence"), so they stand down until the camera
+   reaches the country. `visibility`, not `display`: the token list for assistive tech is separate
+   and the tokens keep their boxes for the return. */
+.ds-map-stage[data-orbit] :is(.ds-place-token, .ds-site-name) {
+  visibility: hidden;
+}
+
+/* Space, not page ground, behind the globe. */
+.ds-map-stage {
+  background: #04060c;
 }

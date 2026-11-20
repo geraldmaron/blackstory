@@ -106,6 +106,7 @@ export function DoorWalkCard({
     <section
       className="ds-door-walk"
       data-ground="ink"
+      data-ground-fixed=""
       aria-labelledby={headingId}
       aria-roledescription="walk step"
       onKeyDown={onKeyDown}

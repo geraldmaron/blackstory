@@ -1,0 +1,92 @@
+/* The world's two switches: bottom right, clear of the map credit at bottom left. Mono caps, the
+   v11 chrome voice. Hidden where no world is painted, unless documents mode is on. */
+.ds-world-controls {
+  position: fixed;
+  right: var(--ds-space-3);
+  bottom: var(--ds-space-3);
+  z-index: var(--ds-z-instrument-panel);
+  display: none;
+  gap: var(--ds-space-2);
+  /* The Door's shell lets clicks through to the plate; the switches take theirs back. */
+  pointer-events: auto;
+}
+
+body:has([data-surface='door'], .ds-recpage[data-ground]) .ds-world-controls,
+.ds-world-controls[data-documents] {
+  display: flex;
+}
+
+.ds-world-controls__button {
+  min-height: 44px;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-canvas);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ds-world-controls__button:hover {
+  color: var(--ds-ink);
+}
+
+.ds-world-controls__button[aria-pressed='true'] {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-ink);
+}
+
+.ds-world-controls__button:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+/* The opening keeps the map credit in the bottom right corner (door-home.css); the switches sit
+   beside it, not on it. */
+@media (min-width: 48rem) {
+  body:has(.ds-door-journey:not(.ds-door-journey--browse)) .ds-world-controls {
+    right: calc(var(--ds-space-4) + 44px + var(--ds-space-2));
+    bottom: var(--ds-space-4);
+  }
+}
+
+/* Browse is reader-driven and its dock and zoom stack own the bottom edge; the switches are on
+   the opening and on every record page. */
+body:has(.ds-door__browse) .ds-world-controls:not([data-documents]) {
+  display: none;
+}
+
+/* Phone: clear of the tab bar. */
+@media (max-width: 47.9375rem) {
+  .ds-world-controls {
+    bottom: calc(var(--ds-tabbar-h, 4rem) + env(safe-area-inset-bottom, 0px) + var(--ds-space-2));
+  }
+}
+
+/* Phone record pages carry their own action bar on the bottom edge; the switches are on the
+   opening there. With documents mode on, the one switch sits above that bar. The bar runs to
+   tablet width. */
+@media (max-width: 63.9375rem) {
+  body:has(.ds-recpage) .ds-world-controls:not([data-documents]) {
+    display: none;
+  }
+
+  body:has(.ds-recpage) .ds-world-controls[data-documents] {
+    bottom: calc(var(--ds-tabbar-h, 4rem) + 4.5rem);
+  }
+}
+
+/* A very short window (a desktop at 400% zoom) has no spare edge: fixed switches would sit on the
+   headline and its action. They stay first in the tab order and show when focused, as a skip
+   link does. */
+@media (max-height: 19.9375rem) {
+  .ds-world-controls:not(:focus-within) {
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}

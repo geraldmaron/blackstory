@@ -454,3 +454,29 @@ body:has(.ds-sheet) .ds-bar {
     transition-duration: 0.01ms;
   }
 }
+
+/* —— v11 corner chrome ————————————————————————————————————————————————————————
+   On the Door the bar is not a bar: the wordmark, the four destinations and search sit in the
+   world's top corners in the mono caps voice, on a shade that fades into the scene instead of a
+   glass strip with a hairline (design-direction-v11.md §4.4). Destinations stay in words. Every
+   other surface keeps the bar, because a sheet scrolls under it there. The bar holds
+   its ink ground there in either theme (`data-ground-fixed`, CommandBar.tsx). */
+body:has([data-surface='door']) .ds-bar {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ds-canvas) 82%, transparent) 0,
+    color-mix(in srgb, var(--ds-canvas) 55%, transparent) 60%,
+    transparent 100%
+  );
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  padding-bottom: var(--ds-space-4);
+}
+
+body:has([data-surface='door']) .ds-bar__tabs .ds-tabs__tab {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

@@ -46,6 +46,8 @@ import {
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
 import { RecordMap } from '../../../components/map-embed/RecordMap';
+import { RecordGround, type RecordGroundProps } from '../../../components/map-stage/RecordGround';
+import { loadDoorPinPlate } from '../../../lib/map-experience/door-catalog';
 import {
   loadRecordPlace,
   mapHrefInPlace,
@@ -212,6 +214,8 @@ export type EntityRecordViewProps = {
   readonly returns?: PlaceDiscoveryReturn;
   readonly citing?: readonly StoryCitation[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
+  /** v11 Ground: the record and its typed neighbors for the persistent plate. */
+  readonly ground?: Pick<RecordGroundProps, 'record' | 'neighbors'>;
 };
 
 export function EntityRecordView({
@@ -222,6 +226,7 @@ export function EntityRecordView({
   returns,
   citing = [],
   crossReferences = [],
+  ground,
 }: EntityRecordViewProps) {
   const tone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
   const anatomy = buildEntityAnatomyInputs(entity, tone);
@@ -234,8 +239,9 @@ export function EntityRecordView({
   const quiet = isQuietRecord(entity);
   /* The record's own photograph leads the masthead as a plate; a quiet record keeps it plain in
      the rail. Never a stand-in image. */
+  /* v11 Ground: the world is the masthead's ground, so the photograph is plain in the rail. */
   const plate =
-    !quiet && entity.primaryImage && !isRenderedImage(entity.primaryImage) ? (
+    !ground && !quiet && entity.primaryImage && !isRenderedImage(entity.primaryImage) ? (
       <RecordImage
         entityId={entity.id}
         entityName={entity.displayName}
@@ -368,7 +374,7 @@ export function EntityRecordView({
       ? buildExternalMapsSearchUrl({ ...point, query: anatomy.whereLabel })
       : undefined;
   const statePostalCode = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)?.postalCode;
-  const recordMap = point ? (
+  const recordMap = ground ? null : point ? (
     <RecordMap
       lat={point.lat}
       lng={point.lng}
@@ -532,6 +538,7 @@ export function EntityRecordView({
       quiet={quiet}
       {...(plate ? { plate } : {})}
       {...(plateMap ? { plateMap } : {})}
+      {...(ground ? { ground: <RecordGround {...ground} quiet={quiet} /> } : {})}
       meta={meta}
       {...(topicTags.length > 0 ? { tags: topicTags } : {})}
       ledeText={entity.summary}
@@ -640,6 +647,22 @@ export async function EntityRecordPage({
   const point = feature
     ? { lng: feature.geometry.coordinates[0], lat: feature.geometry.coordinates[1] }
     : undefined;
+  // v11 Ground: the typed neighbors that have a public point, from the same release-cached
+  // catalog the Door's plate is built from. A neighbor with no point is listed, never drawn.
+  const ground = feature
+    ? await loadDoorPinPlate()
+        .then(({ features }) => {
+          const byId = new Map(features.map((row) => [row.properties.entityId, row] as const));
+          return {
+            record: feature,
+            neighbors: (entity.relatedNeighbors ?? []).flatMap((neighbor) => {
+              const row = byId.get(neighbor.id);
+              return row ? [{ feature: row, relation: relationInWords(neighbor) }] : [];
+            }),
+          };
+        })
+        .catch(() => ({ record: feature, neighbors: [] }))
+    : undefined;
   const [returns, crossReferences, cites, place] = await Promise.all([
     recordDiscoveryReturn(entity.id, arrival, feature !== undefined),
     resolveEntityCrossReferences(entity.id),
@@ -655,6 +678,7 @@ export async function EntityRecordPage({
       returns={returns}
       citing={storiesCiting(cites, entity.id)}
       crossReferences={crossReferences}
+      {...(ground ? { ground } : {})}
     />
   );
 }

@@ -1513,3 +1513,220 @@
       );
   }
 }
+
+/* —— v11 Ground ————————————————————————————————————————————————————————————————
+   A record with a public point hands itself to the persistent plate (`RecordGround`), and the
+   plate paints full-bleed behind the masthead: the world is the masthead's ground, and the sheet
+   is laid over it (shell.css lifts the plate's cover for `[data-ground]`). The masthead is tall
+   enough that the record's place is seen before the sheet, and a wash under the name keeps the
+   type off the map. The photograph is plain in the rail. */
+.ds-recpage[data-ground] .ds-recpage__mast {
+  min-height: min(68svh, 44rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--ds-canvas) 88%, transparent) 0,
+    color-mix(in srgb, var(--ds-canvas) 55%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+/* Survey lines stood in for a missing ground; the ground is the world now. */
+.ds-recpage[data-ground] .ds-recpage__mast > .ds-band-art {
+  display: none;
+}
+
+.ds-recpage[data-ground] .ds-recpage__title {
+  text-shadow: 0 0 24px var(--ds-canvas);
+}
+
+/* Below the sheet the page ends on its own ground, not on a strip of map. */
+.ds-recpage[data-ground] .ds-recpage__desk {
+  background: linear-gradient(to bottom, transparent 0, var(--ds-canvas) var(--ds-space-18));
+}
+
+.ds-room.ds-recpage[data-ground] {
+  background: transparent;
+}
+
+/* The masthead already names the record; the plate's own name flag over it is a second copy
+   that lands on the crumb on a phone. The pin stays. */
+body:has(.ds-recpage[data-ground]) .ds-map-stage .ds-map-callout--flag {
+  display: none;
+}
+
+/* Whose imagery the Ground is, and that its date is not the record's. Top right of the world,
+   under the bar, in the chrome's mono voice; on a phone it sits above the name. */
+.ds-recpage[data-ground] {
+  position: relative;
+}
+
+.ds-recpage__imagery {
+  position: absolute;
+  top: var(--ds-space-4);
+  right: var(--ds-space-4);
+  z-index: var(--ds-z-content);
+  max-width: 22rem;
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, #04060c 78%, transparent);
+  color: #d9d2c5;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-recpage__imagery {
+    right: var(--ds-space-3);
+    left: var(--ds-space-3);
+    max-width: none;
+  }
+}
+
+/* —— v11 Ground, wide: the record is a right sheet ———————————————————————————————————
+   From 72rem the world keeps the left of the screen for the whole read: the masthead holds
+   there, pinned under the bar with the name at its foot, and the record scrolls beside it as one
+   column on the right (design-direction-v11.md §4.1). `RecordGround` frames the camera in the
+   part the sheet leaves uncovered. Narrower than this the sheet is laid over the world as before:
+   two columns of this page do not fit beside a map. */
+@media (min-width: 72rem) {
+  body:has(.ds-recpage[data-ground]) {
+    --ds-ground-sheet-w: min(44rem, 48vw);
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__record {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--ds-ground-sheet-w);
+    align-items: start;
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__record > :not(.ds-recpage__mast) {
+    grid-column: 2;
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__mast {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    position: sticky;
+    top: var(--ds-header-h);
+    height: calc(100svh - var(--ds-header-h));
+    min-height: 0;
+    padding-block: var(--ds-space-8);
+    /* The wash is under the name only, so the place above it reads clear. */
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ds-canvas) 86%, transparent) 0,
+      color-mix(in srgb, var(--ds-canvas) 40%, transparent) 30%,
+      transparent 52%
+    );
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__mast .ds-recpage__head {
+    width: auto;
+    margin-inline: 0;
+    padding-inline: var(--ds-gutter) var(--ds-space-8);
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__title {
+    font-size: clamp(2.25rem, 1rem + 3vw, 4rem);
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__record .ds-recpage__desk {
+    width: auto;
+    margin: 0;
+    padding: var(--ds-space-4) var(--ds-space-4) 0 0;
+    background: none;
+  }
+
+  /* One column inside the sheet: lede, the facts and actions, then the body. */
+  .ds-recpage[data-ground] .ds-recpage__main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas:
+      'lede'
+      'note'
+      'side'
+      'body';
+    row-gap: var(--ds-space-8);
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__rail {
+    position: static;
+  }
+
+  /* The caption and the switches keep to the world's side of the sheet. */
+  .ds-recpage[data-ground] .ds-recpage__imagery {
+    /* Under the switches, on the same left edge: side by side they collide near 72rem. */
+    top: calc(var(--ds-space-4) + 44px + var(--ds-space-3));
+    right: auto;
+    left: var(--ds-space-4);
+    max-width: min(22rem, 100vw - var(--ds-ground-sheet-w) - var(--ds-space-8));
+  }
+
+  /* The name holds the foot of the world's side, so the switches take its top left. */
+  body:has(.ds-recpage[data-ground]) .ds-world-controls {
+    top: calc(var(--ds-header-h) + var(--ds-space-4));
+    right: auto;
+    bottom: auto;
+    left: var(--ds-space-4);
+  }
+}
+
+/* The pager sits outside the article: it keeps to the sheet's column too. */
+@media (min-width: 72rem) {
+  .ds-recpage[data-ground] > .ds-recpage__desk {
+    width: calc(var(--ds-ground-sheet-w) - var(--ds-space-4));
+    margin: 0 var(--ds-space-4) 0 auto;
+    background: none;
+  }
+}
+
+/* A short window (high zoom) has no room for the caption above the name: it takes its own row. */
+@media (max-height: 30rem) and (max-width: 71.9375rem) {
+  .ds-recpage[data-ground] .ds-recpage__imagery {
+    position: static;
+    max-width: none;
+    /* Beside the map credit, which holds the top left corner here. */
+    margin: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3)
+      calc(var(--ds-space-3) + 44px + var(--ds-space-2));
+  }
+}
+
+/* Stacked Ground: the sheet scrolls over the foot of the world and a phone's tab bar holds the
+   bottom edge, so the map credit moves to the top of the part that stays in view, and the
+   imagery caption makes room beside it. */
+@media (max-width: 71.9375rem) {
+  body:has(.ds-recpage[data-ground]) .ds-map-stage .maplibregl-ctrl-bottom-left {
+    top: calc(var(--ds-header-h) + var(--ds-space-3));
+    bottom: auto;
+  }
+
+  .ds-recpage[data-ground] .ds-recpage__imagery {
+    left: calc(var(--ds-space-3) + 44px + var(--ds-space-2));
+  }
+
+  /* An opened credit unfolds across the caption's place, and names the imagery itself. */
+  body:has(.ds-map-stage .maplibregl-compact-show) .ds-recpage[data-ground] .ds-recpage__imagery {
+    visibility: hidden;
+  }
+}
+
+/* The world on a record page is locked, but its credit is a control: the masthead's empty parts
+   pass the pointer through so the credit can be opened by mouse and touch, as the Door's do. */
+body:has(.ds-recpage[data-ground])
+  :is(.ds-shell-page-transition, .ds-shell-page-transition__content) {
+  pointer-events: none;
+}
+
+.ds-recpage[data-ground] > :not(.ds-recpage__record),
+.ds-recpage[data-ground] .ds-recpage__record > :not(.ds-recpage__mast),
+.ds-recpage[data-ground]
+  .ds-recpage__mast
+  > :not(.ds-recpage__head, .ds-band-art, .ds-recpage__wash),
+.ds-recpage[data-ground] .ds-recpage__head > * {
+  pointer-events: auto;
+}
