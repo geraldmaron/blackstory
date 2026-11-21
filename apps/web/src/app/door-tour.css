@@ -3,7 +3,7 @@
  *
  * One scene. The map is the fixed plate and stays the ground for the whole tour, and the page's
  * own scroll is its camera (door-tour-scrub.ts): from the opening's globe down into the first
- * record, out to the globe and down into the next, and back out at the end. Each stop is two
+ * record, up until the next one fits and down into it, and back out at the end. Each stop is two
  * screens of ordinary page scroll with nothing drawn in it. The stop's words are pinned in one
  * place and show only while the camera is landed on its record (`data-current`, set by
  * door-tour-scroll.tsx); while it travels the globe has the stage. Nothing scrolls across the

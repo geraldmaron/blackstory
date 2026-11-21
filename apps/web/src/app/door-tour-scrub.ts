@@ -9,13 +9,15 @@
  *   - From the top of the page to the first stop: one dive from the opening's globe into the
  *     first record.
  *   - Each stop is two screens tall. For the first `TOUR_HOLD_SCREENS` of them the camera holds
- *     on the record and its words show; for the rest it travels: out to the globe, then down
- *     into the next record.
+ *     on the record and its words show; for the rest it travels: straight up from the record
+ *     until the next one fits on the stage with it, across, and straight down into that one.
+ *     It never goes back to the opening's globe on the way.
  *   - After the last stop it pulls back out to the opening's globe, and is there before the band
  *     that follows the tour reaches the screen (the last stop carries one extra screen for it).
  *
  * Pure arithmetic, so it is pinned under `node:test` without a DOM or a map.
  */
+import { flightPeakZoom } from '../lib/map-experience/camera-presets';
 
 /** How tall one stop's section is, in screens (door-tour.css sets the same number). */
 export const TOUR_STOP_SCREENS = 2;
@@ -63,7 +65,9 @@ export function tourPhase(scrollY: number, layout: TourLayout): TourPhase {
 
   // The dive from the opening into the first stop.
   if (scrollY < top) {
-    const t = clamp01(scrollY / top);
+    // Measured from where the tour takes the map, so its first frame is the opening's own.
+    const start = TOUR_ACTIVATE_SCREENS * screen;
+    const t = clamp01((scrollY - start) / (top - start));
     return { active: true, from: 0, to: 1, t, words: t >= 1 - TOUR_WORDS_WINDOW ? 0 : null };
   }
   const section = TOUR_STOP_SCREENS * screen;
@@ -96,8 +100,12 @@ export type TourCamera = {
 export type TourCameras = {
   /** The opening's globe: where the path starts and ends. */
   readonly opening: TourCamera;
-  /** The globe between two stops: centered, with the stage to itself. */
+  /** The stage with the words cleared: the frame the camera pulls out to between two stops, and
+   * the farthest out it may go. */
   readonly orbit: TourCamera;
+  /** The stage's shorter side, in pixels: two stops fit inside it at the top of the trip between
+   * them. */
+  readonly span: number;
   /** One landing per stop, in order. */
   readonly stops: readonly TourCamera[];
 };
@@ -110,27 +118,53 @@ const smoothstep = (edge0: number, edge1: number, x: number) => {
 };
 
 /**
- * One dive: from a globe camera (`t` 0) down to a landing (`t` 1). The globe turns to face the
- * place first, while there is still a globe to turn, then the camera comes down on it; the tilt
- * and the landing's own framing arrive last, near the ground, where they read as arriving.
+ * One dive: from a camera high up (`t` 0) down to a landing (`t` 1). The camera comes down ON the
+ * record: the record's distance from where it lands, measured on screen, only ever closes, and is
+ * closed by 45% of the way. From there the record does not move at all; the ground grows around
+ * it. The tilt arrives last, near the ground, where it reads as arriving.
+ *
+ * Two things make that true. The ground still to cover shrinks with the zoom gained as well as
+ * with the turn, because a degree is twice as many pixels one level down: easing the center in
+ * degrees alone sends the record away from its landing before bringing it back. And the landing's
+ * framing arrives with the turn, not after it, so the zoom's fixed point is already the record's
+ * final place on screen when the deep part of the dive begins.
  * Zoom is eased in zoom levels, so the ground grows at an even rate the whole way down.
  */
-export function tourDive(globe: TourCamera, landing: TourCamera, t: number): TourCamera {
+export function tourDive(high: TourCamera, landing: TourCamera, t: number): TourCamera {
   const turn = smoothstep(0, 0.45, t);
-  const frame = smoothstep(0.5, 1, t);
+  const zoom = lerp(high.zoom, landing.zoom, smoothstep(0, 1, t));
+  const reach = 1 - (1 - turn) * Math.min(1, 2 ** (high.zoom - zoom));
   return {
     center: [
-      lerp(globe.center[0], landing.center[0], turn),
-      lerp(globe.center[1], landing.center[1], turn),
+      lerp(high.center[0], landing.center[0], reach),
+      lerp(high.center[1], landing.center[1], reach),
     ],
-    zoom: lerp(globe.zoom, landing.zoom, smoothstep(0, 1, t)),
-    pitch: lerp(globe.pitch, landing.pitch, smoothstep(0.7, 1, t)),
+    zoom,
+    pitch: lerp(high.pitch, landing.pitch, smoothstep(0.7, 1, t)),
     padding: {
-      top: lerp(globe.padding.top, landing.padding.top, frame),
-      right: lerp(globe.padding.right, landing.padding.right, frame),
-      bottom: lerp(globe.padding.bottom, landing.padding.bottom, frame),
-      left: lerp(globe.padding.left, landing.padding.left, frame),
+      top: lerp(high.padding.top, landing.padding.top, turn),
+      right: lerp(high.padding.right, landing.padding.right, turn),
+      bottom: lerp(high.padding.bottom, landing.padding.bottom, turn),
+      left: lerp(high.padding.left, landing.padding.left, turn),
     },
+  };
+}
+
+/**
+ * The top of the trip between two stops: over the middle of the two, only as far out as it takes
+ * for both to fit on the stage (the click flights' rule, `flightPeakZoom`), and never as far as
+ * the opening's globe. Neighbors barely rise; the far coast rises to the country.
+ */
+export function tourBetween(from: TourCamera, to: TourCamera, cameras: TourCameras): TourCamera {
+  // Plain degrees on a 512px world, as `flightPeakZoom`'s callers measure it: sizes the trip,
+  // places nothing.
+  const degrees = Math.hypot(to.center[0] - from.center[0], to.center[1] - from.center[1]);
+  const screensAway = ((degrees / 360) * 512 * 2 ** from.zoom) / Math.max(1, cameras.span);
+  return {
+    center: [(from.center[0] + to.center[0]) / 2, (from.center[1] + to.center[1]) / 2],
+    zoom: Math.max(cameras.orbit.zoom, flightPeakZoom(from.zoom, to.zoom, screensAway)),
+    pitch: 0,
+    padding: cameras.orbit.padding,
   };
 }
 
@@ -146,20 +180,30 @@ export function tourCameraAt(phase: TourPhase, cameras: TourCameras): TourCamera
   // In from the opening, and back out to it: one dive each, no second globe in between.
   if (phase.from === 0) return tourDive(cameras.opening, to, phase.t);
   if (phase.to === count + 1) return tourDive(cameras.opening, from, 1 - phase.t);
-  // Between two stops: out to the globe, then down.
+  // Between two stops: up until both fit, then down.
+  const high = tourBetween(from, to, cameras);
   return phase.t < 0.5
-    ? tourDive(cameras.orbit, from, 1 - phase.t * 2)
-    : tourDive(cameras.orbit, to, (phase.t - 0.5) * 2);
+    ? tourDive(high, from, 1 - phase.t * 2)
+    : tourDive(high, to, (phase.t - 0.5) * 2);
 }
 
 /**
- * The stop the camera is at or nearest to (0-based), or null nearer the opening. This is the
- * record the map marks as selected, and where the camera cuts to when it is not allowed to move.
+ * The stop the camera is at or nearest to (0-based), or null nearer the opening. This is where
+ * the camera cuts to when it is not allowed to move.
  */
 export function tourNearestStop(phase: TourPhase, count: number): number | null {
   if (!phase.active) return null;
   const anchor = phase.t < 0.5 ? phase.from : phase.to;
   return anchor >= 1 && anchor <= count ? anchor - 1 : null;
+}
+
+/**
+ * The stop whose record the map marks (0-based). The nearest stop, except on the way in from the
+ * opening: there the first record is marked from the first frame, so the reader sees what the
+ * camera is coming down on while it is still one light among thousands.
+ */
+export function tourMarkedStop(phase: TourPhase, count: number): number | null {
+  return phase.active && phase.from === 0 && count > 0 ? 0 : tourNearestStop(phase, count);
 }
 
 /** Reads the tour's layout from its stop sections. `null` when there is no tour on the page. */
@@ -172,4 +216,40 @@ export function measureTourLayout(root: ParentNode = document): TourLayout | nul
   const screen = first.offsetHeight / (TOUR_STOP_SCREENS + (steps.length === 1 ? 1 : 0));
   if (screen <= 0) return null;
   return { top: first.getBoundingClientRect().top + window.scrollY, screen, count: steps.length };
+}
+
+const approach = (a: number, b: number, k: number) => a + (b - a) * k;
+
+/**
+ * One eased step of the camera toward where the scroll wants it. `k` is the share of the gap
+ * closed this step. `arrived` is set once every part is within what a reader can see, and then
+ * the camera is the target itself, so the last frame is the scroll's own camera.
+ */
+export function easeTourCamera(
+  current: TourCamera,
+  target: TourCamera,
+  k: number,
+): { readonly camera: TourCamera; readonly arrived: boolean } {
+  const camera: TourCamera = {
+    center: [
+      approach(current.center[0], target.center[0], k),
+      approach(current.center[1], target.center[1], k),
+    ],
+    zoom: approach(current.zoom, target.zoom, k),
+    pitch: approach(current.pitch, target.pitch, k),
+    padding: {
+      top: approach(current.padding.top, target.padding.top, k),
+      right: approach(current.padding.right, target.padding.right, k),
+      bottom: approach(current.padding.bottom, target.padding.bottom, k),
+      left: approach(current.padding.left, target.padding.left, k),
+    },
+  };
+  const arrived =
+    Math.abs(camera.center[0] - target.center[0]) < 1e-5 &&
+    Math.abs(camera.center[1] - target.center[1]) < 1e-5 &&
+    Math.abs(camera.zoom - target.zoom) < 0.001 &&
+    Math.abs(camera.pitch - target.pitch) < 0.05 &&
+    Math.abs(camera.padding.top - target.padding.top) < 0.5 &&
+    Math.abs(camera.padding.left - target.padding.left) < 0.5;
+  return arrived ? { camera: target, arrived } : { camera, arrived };
 }

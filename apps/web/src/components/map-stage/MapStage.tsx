@@ -1268,12 +1268,16 @@ export function MapStageProvider({
         setSelectedEntityFilter(map, selectedEntity);
         syncSelectionFlag(map, selectedEntity);
       };
+      // Apply now: each setter skips a layer the style does not have yet, and a layer that is
+      // there takes a filter whether or not tiles are still loading. Waiting for the map to
+      // settle held the mark back for a whole flight, and for a whole scrubbed dive on home,
+      // where the map never settles until the scroll rests: the ring arrived after the camera.
+      apply();
       // A selection made while sources are still loading (the home hand-off lands mid-flight,
       // as the catalog replaces the first-paint pins) used to be dropped, leaving the record
-      // framed with no copper mark. Apply it as soon as the map settles instead, reading the
-      // latest selection then.
-      if (map.isStyleLoaded()) apply();
-      else map.once('idle', apply);
+      // framed with no copper mark. Apply it again once the map settles, reading the latest
+      // selection then.
+      if (!map.isStyleLoaded()) map.once('idle', apply);
     },
     [syncSelectionFlag],
   );

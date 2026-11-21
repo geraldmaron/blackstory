@@ -68,10 +68,13 @@ import { DoorSpotlightCallout } from './door-spotlight-callout';
 import { DoorWalkCard } from './door-walk';
 import { DoorTimeRail, timeRailText } from './door-time-rail';
 import {
+  easeTourCamera,
   measureTourLayout,
   tourCameraAt,
+  tourMarkedStop,
   tourNearestStop,
   tourPhase,
+  type TourCamera,
   type TourCameras,
   type TourLayout,
 } from './door-tour-scrub';
@@ -98,6 +101,55 @@ const DOOR_BROWSE_MORPH_MS = 320;
 /** How long the scroll rests before the tour brings back what it holds for a rest: the map's
  * names, and a landing's aerial imagery. */
 const TOUR_REST_MS = 260;
+/** How quickly the tour's camera closes on where the scroll puts it, as a time constant in ms:
+ * long enough to smooth a wheel's coarse steps, short enough that the camera keeps up. */
+const TOUR_EASE_MS = 140;
+
+type TourStage = { readonly flyPreset: ReturnType<typeof useMapStage>['flyPreset'] };
+
+/** The tour camera's eased follow of the scroll: where it is, where the scroll wants it, and the
+ * animation frame that closes the gap. */
+type TourFollow = {
+  current: TourCamera | null;
+  target: TourCamera | null;
+  frame: number | null;
+  last: number;
+};
+
+/** One eased frame toward the target. True while the camera has not arrived. */
+function easeTourFollow(follow: TourFollow, stage: TourStage, now: number): boolean {
+  const { current, target } = follow;
+  if (!current || !target) return false;
+  const k = 1 - Math.exp(-(now - follow.last) / TOUR_EASE_MS);
+  follow.last = now;
+  const { camera: shown, arrived } = easeTourCamera(current, target, k);
+  follow.current = shown;
+  stage.flyPreset(
+    'point',
+    { center: [shown.center[0], shown.center[1]], zoom: shown.zoom },
+    { mode: 'cut', pitch: shown.pitch, bearing: 0, padding: shown.padding },
+  );
+  return !arrived;
+}
+
+/** Starts the frame loop if it is not running; a running loop picks up the new target itself. */
+function followTourCamera(follow: TourFollow, stage: TourStage): void {
+  if (follow.frame !== null) return;
+  const tick = (now: number) => {
+    follow.frame = null;
+    if (easeTourFollow(follow, stage, now)) follow.frame = window.requestAnimationFrame(tick);
+  };
+  follow.last = performance.now();
+  follow.frame = window.requestAnimationFrame(tick);
+}
+
+/** Ends the follow: the next tour frame starts from the scroll's own camera, not a stale one. */
+function stopTourFollow(follow: TourFollow): void {
+  if (follow.frame !== null) window.cancelAnimationFrame(follow.frame);
+  follow.frame = null;
+  follow.current = null;
+  follow.target = null;
+}
 /** How close the decade walk comes to a decade's record: a region, so its neighbors still show. */
 const DOOR_WALK_ZOOM = 5.4;
 
@@ -571,6 +623,7 @@ export function DoorImmersive({
     nearest: number | null;
     restTimer: number | null;
     lastScrollAt: number;
+    follow: TourFollow;
   }>({
     layout: null,
     cameras: null,
@@ -578,6 +631,7 @@ export function DoorImmersive({
     nearest: null,
     restTimer: null,
     lastScrollAt: 0,
+    follow: { current: null, target: null, frame: null, last: 0 },
   });
   const tourRecordsRef = useRef(tour);
   tourRecordsRef.current = tour;
@@ -592,7 +646,7 @@ export function DoorImmersive({
     const stopWindow = boxOf(tourWindowRef.current);
     if (!plate || !openingWindow || !stopWindow) return null;
     const none = { top: 0, right: 0, bottom: 0, left: 0 };
-    // Between stops the globe has the stage: everything under the bar.
+    // Between stops the map has the stage: everything under the bar.
     const stageBox = {
       top: openingWindow.top,
       left: plate.left,
@@ -613,6 +667,7 @@ export function DoorImmersive({
         pitch: 0,
         padding: doorFramePadding(stageBox, plate) ?? none,
       },
+      span: Math.min(stageBox.width, stageBox.height),
       stops: tourRecordsRef.current.map((record) => {
         const frame = groundFrameFor(record.precision, false);
         return {
@@ -632,7 +687,10 @@ export function DoorImmersive({
   const applyScrub = useCallback((): boolean => {
     const scrub = scrubRef.current;
     const records = tourRecordsRef.current;
-    if (records.length === 0 || browseModeRef.current || stepRef.current !== 0) return false;
+    if (records.length === 0 || browseModeRef.current || stepRef.current !== 0) {
+      stopTourFollow(scrub.follow);
+      return false;
+    }
     scrub.layout ??= measureTourLayout();
     if (!scrub.layout) return false;
     const phase = tourPhase(window.scrollY, scrub.layout);
@@ -648,17 +706,15 @@ export function DoorImmersive({
       // The tour goes to its own records; a rail that had dimmed one would hide its pin.
       if (phase.active) setRailDecade(null);
     }
-    if (nearest !== scrub.nearest || !phase.active) {
-      const changed = nearest !== scrub.nearest;
-      scrub.nearest = nearest;
-      if (changed) {
-        stage.applyViewState({
-          selectedState: undefined,
-          selectedEdge: undefined,
-          selectedEntity:
-            (nearest === null ? selectedPinIdRef.current : records[nearest]?.pinId) ?? undefined,
-        });
-      }
+    const marked = tourMarkedStop(phase, records.length);
+    if (marked !== scrub.nearest) {
+      scrub.nearest = marked;
+      stage.applyViewState({
+        selectedState: undefined,
+        selectedEdge: undefined,
+        selectedEntity:
+          (marked === null ? selectedPinIdRef.current : records[marked]?.pinId) ?? undefined,
+      });
     }
 
     // What waits for the scroll to rest. Aerial imagery belongs to a landing: on once the scroll
@@ -695,7 +751,10 @@ export function DoorImmersive({
       scrub.restTimer = window.setTimeout(rested, TOUR_REST_MS);
     }
 
-    if (!phase.active) return false;
+    if (!phase.active) {
+      stopTourFollow(scrub.follow);
+      return false;
+    }
     const map = stage.getMap();
     if (!map) return true;
     scrub.cameras ??= tourCameras(map);
@@ -709,12 +768,20 @@ export function DoorImmersive({
       : tourCameraAt(phase, scrub.cameras);
     if (!camera) return true;
     map.stop();
-    // A cut through the stage's own camera route (camera.ts): one frame, no flight of its own.
-    stage.flyPreset(
-      'point',
-      { center: [camera.center[0], camera.center[1]], zoom: camera.zoom },
-      { mode: 'cut', pitch: camera.pitch, bearing: 0, padding: camera.padding },
-    );
+    if (still) {
+      // A cut through the stage's own camera route (camera.ts): one frame, no flight of its own.
+      stopTourFollow(scrub.follow);
+      stage.flyPreset(
+        'point',
+        { center: [camera.center[0], camera.center[1]], zoom: camera.zoom },
+        { mode: 'cut', pitch: camera.pitch, bearing: 0, padding: camera.padding },
+      );
+    } else {
+      // Eased: the scroll sets where the camera is going, and the frames close on it.
+      scrub.follow.current ??= camera;
+      scrub.follow.target = camera;
+      followTourCamera(scrub.follow, stage);
+    }
     return true;
   }, [stage, tourCameras]);
 
@@ -939,6 +1006,7 @@ export function DoorImmersive({
     return () => {
       window.removeEventListener('scroll', schedule);
       if (frame !== null) window.cancelAnimationFrame(frame);
+      stopTourFollow(scrub.follow);
       if (scrub.restTimer !== null) window.clearTimeout(scrub.restTimer);
       scrub.restTimer = null;
       scrub.active = false;

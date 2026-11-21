@@ -6,8 +6,11 @@ import { test } from 'node:test';
 import {
   TOUR_HOLD_SCREENS,
   TOUR_STOP_SCREENS,
+  easeTourCamera,
+  tourBetween,
   tourCameraAt,
   tourDive,
+  tourMarkedStop,
   tourNearestStop,
   tourPhase,
   type TourCamera,
@@ -24,6 +27,7 @@ const pad = (left: number) => ({ top: 56, right: 0, bottom: 0, left });
 const CAMERAS: TourCameras = {
   opening: { center: [-96, 36], zoom: 1.8, pitch: 0, padding: pad(500) },
   orbit: { center: [-96, 36], zoom: 1.88, pitch: 0, padding: pad(0) },
+  span: 800,
   stops: [
     { center: [-72.5, 42.4], zoom: 14, pitch: 45, padding: pad(700) },
     { center: [-77, 38.9], zoom: 14, pitch: 45, padding: pad(700) },
@@ -58,13 +62,20 @@ test('a stop holds for its first screens, with its words, then the camera travel
   }
 });
 
-test('between two stops the camera goes out to the globe and comes down on the next', () => {
+test('between two stops the camera rises until both fit, never back to the opening globe', () => {
   const start = stopTop(0) + TOUR_HOLD_SCREENS * SCREEN;
   const leg = SECTION - TOUR_HOLD_SCREENS * SCREEN;
+  const [amherst, washington, sanFrancisco] = CAMERAS.stops as [TourCamera, TourCamera, TourCamera];
   const mid = tourCameraAt(tourPhase(start + leg / 2, LAYOUT), CAMERAS)!;
-  assert.ok(Math.abs(mid.zoom - CAMERAS.orbit.zoom) < 0.01, 'at the globe halfway');
+  assert.deepEqual(mid, tourBetween(amherst, washington, CAMERAS));
   assert.equal(mid.pitch, 0);
   assert.deepEqual(mid.padding, CAMERAS.orbit.padding);
+  // Over the two of them, not over the middle of the country.
+  assert.ok(mid.center[0] > washington.center[0] && mid.center[0] < amherst.center[0]);
+  // Neighbors rise to a region; the far coast rises to the country. Neither is the globe.
+  const far = tourBetween(washington, sanFrancisco, CAMERAS);
+  assert.ok(mid.zoom > 5 && mid.zoom < 8, `neighbors at ${mid.zoom}`);
+  assert.ok(far.zoom < mid.zoom && far.zoom > CAMERAS.orbit.zoom + 1, `far coast at ${far.zoom}`);
   // The zoom falls the whole first half and rises the whole second half.
   let last = Infinity;
   for (let k = 0; k <= 0.5; k += 0.05) {
@@ -76,6 +87,36 @@ test('between two stops the camera goes out to the globe and comes down on the n
     const zoom = tourCameraAt(tourPhase(start + leg * k, LAYOUT), CAMERAS)!.zoom;
     assert.ok(zoom >= last - 1e-9, `rising at ${k}`);
     last = zoom;
+  }
+});
+
+/** Where a record sits on screen, relative to where it lands, on a flat 512px world. */
+const offLanding = (camera: TourCamera, landing: TourCamera) => {
+  const scale = (512 * 2 ** camera.zoom) / 360;
+  const x =
+    (landing.center[0] - camera.center[0]) * scale +
+    (camera.padding.left - landing.padding.left) / 2;
+  const y = (camera.center[1] - landing.center[1]) * scale;
+  return Math.hypot(x, y);
+};
+
+test('a dive comes down on the record: its distance from its landing only ever closes', () => {
+  const landing = CAMERAS.stops[0]!;
+  for (const high of [
+    CAMERAS.opening,
+    CAMERAS.orbit,
+    tourBetween(landing, CAMERAS.stops[1]!, CAMERAS),
+  ]) {
+    let last = Infinity;
+    for (let t = 0; t <= 1.0001; t += 0.01) {
+      const off = offLanding(tourDive(high, landing, Math.min(1, t)), landing);
+      assert.ok(off <= last + 0.5, `off ${off} after ${last} at t=${t.toFixed(2)}`);
+      last = off;
+    }
+    // Through the deep half of the dive the record does not move: the ground grows around it.
+    for (let t = 0.45; t <= 1; t += 0.05) {
+      assert.ok(offLanding(tourDive(high, landing, t), landing) < 0.5, `still at ${t}`);
+    }
   }
 });
 
@@ -123,4 +164,36 @@ test('the nearest stop is the one the camera is on or closer to', () => {
   assert.equal(tourNearestStop(tourPhase(LAYOUT.top * 0.8, LAYOUT), 3), 0);
   assert.equal(tourNearestStop(tourPhase(stopTop(1) + 10, LAYOUT), 3), 1);
   assert.equal(tourNearestStop(tourPhase(END - 10, LAYOUT), 3), null);
+});
+
+test('the first record is marked from the first frame of the dive in', () => {
+  assert.equal(tourMarkedStop(tourPhase(0, LAYOUT), 3), null);
+  assert.equal(tourMarkedStop(tourPhase(LAYOUT.top * 0.2, LAYOUT), 3), 0);
+  assert.equal(tourMarkedStop(tourPhase(stopTop(1) + 10, LAYOUT), 3), 1);
+  assert.equal(tourMarkedStop(tourPhase(END - 10, LAYOUT), 3), null);
+});
+
+test('the eased camera closes on its target and lands on it exactly', () => {
+  const from = CAMERAS.opening;
+  const to = CAMERAS.stops[1] as TourCamera;
+  let current = from;
+  let steps = 0;
+  let arrived = false;
+  while (!arrived && steps < 600) {
+    ({ camera: current, arrived } = easeTourCamera(current, to, 0.3));
+    steps += 1;
+  }
+  assert.equal(arrived, true);
+  assert.ok(steps < 60, `arrives in a bounded number of frames, took ${steps}`);
+  assert.deepEqual(current, to);
+});
+
+test('an eased step never overshoots the target', () => {
+  const to = CAMERAS.stops[0] as TourCamera;
+  let current = CAMERAS.opening;
+  for (let i = 0; i < 40; i += 1) {
+    ({ camera: current } = easeTourCamera(current, to, 0.35));
+    assert.ok(current.zoom <= Math.max(CAMERAS.opening.zoom, to.zoom) + 1e-9);
+    assert.ok(current.zoom >= Math.min(CAMERAS.opening.zoom, to.zoom) - 1e-9);
+  }
 });

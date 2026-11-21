@@ -1,12 +1,9 @@
 'use client';
 
 /**
- * The reader's two switches over the world (design-direction-v11.md §4.1, §4.3): "Hold still"
- * stops camera motion, "Read as documents" removes the map from every page. Shown on the
- * surfaces that paint the world, and wherever documents mode is on, so it can be turned off.
- *
- * Documents mode reloads: the plate is built once per page load, and tearing down a WebGL
- * context in place is a path nothing else exercises.
+ * The reader's "Hold still" switch over the world (design-direction-v11.md §4.1): it stops camera
+ * motion. The "Read as documents" switch was removed; documents mode still applies where WebGL is
+ * missing (map-libre-lifecycle.ts).
  */
 import React, { useEffect, useState } from 'react';
 import {
@@ -26,6 +23,9 @@ export function WorldControls() {
   useEffect(() => {
     setStill(holdStill());
     setDocuments(readAsDocuments());
+    // The "Read as documents" switch is gone. Clear a choice saved before it was removed, so the
+    // next load has the map again instead of leaving the reader with no way out.
+    setWorldPref(READ_AS_DOCUMENTS_KEY, false);
   }, []);
 
   return (
@@ -47,17 +47,6 @@ export function WorldControls() {
           Hold still
         </button>
       )}
-      <button
-        type="button"
-        className="ds-world-controls__button"
-        aria-pressed={documents}
-        onClick={() => {
-          setWorldPref(READ_AS_DOCUMENTS_KEY, !documents);
-          window.location.reload();
-        }}
-      >
-        Read as documents
-      </button>
     </section>
   );
 }
