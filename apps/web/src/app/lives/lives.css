@@ -599,7 +599,8 @@ details[open] > summary > .lives-caret {
   font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
-  color: var(--ds-numeral-accent);
+  /* The text accent, not the numeral one: at this size the graphic copper fails on paper. */
+  color: var(--ds-accent);
 }
 
 .lives-scrub__era[aria-selected='true'] .lives-scrub__label {

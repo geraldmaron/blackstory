@@ -118,6 +118,12 @@
   color: var(--ds-ink);
 }
 
+/* The A cell is the sand material itself, the same in both themes, so its type is the ink
+   material too: the theme's ink turns to paper in dark and fails on sand. */
+.ds-grade-matrix__table td[data-grade='A'] :is(.ds-grade-matrix__letter, .ds-grade-matrix__moved) {
+  color: var(--ds-material-ink);
+}
+
 .ds-grade-matrix__letter {
   display: block;
   font-family: var(--ds-font-mono);

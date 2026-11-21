@@ -852,7 +852,7 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   - Checked: 18 pages, nine window shapes, no sideways overflow; text contrast in both themes
     showed nothing new. Flags that predate this and sit inside sheets: the methodology grade
     matrix letters in dark (1.97:1 on its copper cell) and the Lives scrub labels in light
-    (3.99:1).
+    (3.99:1). Both fixed 2026-11-21: the lowest is now 4.71:1 and 5.44:1.
   - Not done then: `/books` (built next, below) and `/stories` (see Open).
 
 - **`/books` is Parked, on the `/law` stage** (2026-11-21). Its instrument is the state tile
