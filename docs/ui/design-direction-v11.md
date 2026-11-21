@@ -868,6 +868,11 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
     other sorts, no match) at eleven window shapes with no sideways overflow, both themes,
     keyboard order with a focus ring on every stop in the page.
 
+- **The horizon is on the stage too** (2026-11-21), so `/law` and `/books` carry the same
+  signature as the trust frame. It is the sheet's first box, so it crests just above the sheet
+  wherever the sheet falls, and it passes behind the rail. Checked at eleven window shapes on
+  six states of the two pages: no sideways overflow and no added page height.
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at
@@ -877,8 +882,8 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
 - Criteria 14 and 15 and the reader test. Unrun at sign-off.
 - `/stories` is not Parked. It is a front of chapter covers and may belong to Reading rather
   than Parked; the owner decides.
-- `/law` and `/books` (the stage with a rail) do not carry the horizon the trust frame has.
-  One of the two should change so Parked has a single signature.
+- The horizon is drawn twice, once in `parked.css` (the stage) and once in `trust.css` (the
+  frame), with the same values. Fold them into one rule if a third user appears.
 - The register's "No titles match" and "No laws match" block still has the old sand ground and
   band art on a night page. On `/books` a search with no match prints "across 0 states" in the
   dek.

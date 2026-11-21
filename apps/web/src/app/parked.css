@@ -46,11 +46,50 @@ body:has(.ds-parked) .ds-reading-progress {
 /* The one sheet. Depth comes from value and a real shadow, not from an edge stripe. */
 .ds-parked__sheet {
   min-width: 0;
-  padding: var(--ds-space-8);
+  padding: var(--parked-sheet-pad);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface-raised);
   color: var(--ds-ink);
   box-shadow: var(--ds-shadow-sheet);
+}
+
+/* The horizon, Parked's signature (the trust frame draws the same one, trust.css): the world's lit
+   edge crests just above the sheet and runs out behind it, in the rim light and ember the globe
+   wears at Orbit. Drawn, never a map, so it claims no record.
+
+   It is the sheet's own first box, so it stands at the sheet's top wherever the sheet falls, but
+   the sheet is not positioned, so `left: 50%` reads the stage, which is centered in the window.
+   The stage clips it top and bottom; the room clips it at the window's sides. */
+.ds-parked {
+  position: relative;
+  overflow-y: clip;
+}
+
+.ds-room:has(.ds-parked) {
+  overflow-x: clip;
+}
+
+.ds-parked__sheet {
+  --parked-sheet-pad: var(--ds-space-8);
+}
+
+.ds-parked__sheet::before {
+  content: '';
+  position: absolute;
+  z-index: -1; /* local: under the sheet, inside the stage's own stack (its clip-path makes one) */
+  left: 50%;
+  width: 300vmax;
+  height: 300vmax;
+  margin-top: calc((var(--parked-sheet-pad) + var(--ds-space-4)) * -1);
+  border: 2px solid var(--ds-world-rim);
+  border-radius: 50%;
+  translate: -50% 0;
+  box-shadow:
+    0 0 var(--ds-space-16) color-mix(in srgb, var(--ds-world-rim) 45%, transparent),
+    0 0 var(--ds-space-4) color-mix(in srgb, var(--ds-world-rim) 70%, transparent),
+    inset 0 0 var(--ds-space-2) var(--ds-world-ember),
+    inset 0 0 var(--ds-space-12) color-mix(in srgb, var(--ds-world-ember) 30%, transparent);
+  pointer-events: none;
 }
 
 /* The register's toolbar is a sticky, window-wide strip on a document. On the night ground it is
@@ -88,8 +127,9 @@ body:has(.ds-parked) .ds-reading-progress {
 
   /* On a phone the sheet runs to the window's edges, as a page does. */
   .ds-parked__sheet {
+    --parked-sheet-pad: var(--ds-space-4);
+
     margin-inline: calc(var(--ds-gutter) * -1);
-    padding: var(--ds-space-4);
     border-radius: 0;
   }
 }
