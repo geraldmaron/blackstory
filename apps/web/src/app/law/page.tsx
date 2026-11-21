@@ -4,13 +4,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
-import { DisplayNumeral, PageHeader } from '@repo/ui';
+import { PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { parentCrumb, Room } from '../../components/room';
 import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from './law-view-model';
 import { LawBrowseSections } from './LawBrowseSections';
 import '../reading-room.css';
+import '../parked.css';
 import './law.css';
 
 void React;
@@ -53,26 +54,21 @@ export default async function LawPage({ searchParams }: LawPageProps) {
 
   return (
     <Room width="wide" className="ds-law">
-      {/* The count beside the title as a giant numeral; the dek states it in words, so the
-          numeral is not read twice. */}
-      <PageHeader
-        display
-        className="ds-law-head"
-        crumb={parentCrumb('/law')}
-        linkAs={Link}
-        title="Law"
-        dek={dek(view)}
-        {...(view.totalMatched > 0
-          ? {
-              actions: (
-                <DisplayNumeral decorative className="ds-law-head__count">
-                  {view.totalMatched.toLocaleString('en-US')}
-                </DisplayNumeral>
-              ),
-            }
-          : {})}
+      {/* The dek states the count in words; no numeral repeats it. */}
+      <LawBrowseSections
+        view={view}
+        catalog={source.snapshots}
+        head={
+          <PageHeader
+            display
+            className="ds-law-head"
+            crumb={parentCrumb('/law')}
+            linkAs={Link}
+            title="Law"
+            dek={dek(view)}
+          />
+        }
       />
-      <LawBrowseSections view={view} catalog={source.snapshots} />
     </Room>
   );
 }

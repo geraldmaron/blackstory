@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { LawBrowseSections, jurisdictionLabel } from './LawBrowseSections';
+import { catalogGaps, LawBrowseSections, jurisdictionLabel } from './LawBrowseSections';
 import { LAW_UNDATED, lawEraFor, type LawBrowseViewModel } from './law-view-model';
 import type { LegalSnapshotDocument } from '../../lib/legal/public-source';
 
@@ -206,4 +206,11 @@ test('an empty catalog is a load failure, not an empty list of laws', () => {
   const html = renderToStaticMarkup(<LawBrowseSections view={none} catalog={[]} />);
   assert.match(html, /The law catalog did not load/);
   assert.doesNotMatch(html, /No laws match/);
+});
+
+test('catalogGaps names only long stretches with no entry, from the whole catalog', () => {
+  // 1871 to 1954 is a gap; 1865 to 1871 and 1964 to 1968 are not long enough to say.
+  assert.deepEqual(catalogGaps([1954, 1865, 1871, 1964, 1968, 1871]), [[1872, 1953]]);
+  assert.deepEqual(catalogGaps([1965]), []);
+  assert.deepEqual(catalogGaps([]), []);
 });

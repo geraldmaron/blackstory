@@ -815,6 +815,28 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   (section 4.1) with the trust pages in phase 4, or define a different spatial mark for
   statutes and titles first.
 
+- **`/law` is the Parked flagship** (built 2026-11-20, awaiting the owner's approval,
+  uncommitted at the time of writing). Parked had only a one-line definition in 4.1; this is
+  what it means as built (`parked.css`, `law.css`):
+  - The page stands on the night ground (`--ds-world-space`) in either theme, to the window's
+    edges. Nothing on it is a map.
+  - Long text lives on one reading sheet, paper in light and graphite in dark, with a real
+    shadow and no edge stripe. The eras are sections inside it, not color blocks.
+  - A Parked page may carry its own instrument in the first column from 64rem. On `/law` it
+    is the time axis turned into a rail that holds the window's height, the way the home globe
+    carries its time rail: a stroke per law at its year, a bar per era, and the long stretches
+    the catalog holds nothing in yet, named ("No entries yet, 1872 to 1953"). An era's bar
+    turns copper while its section is in the window, by a CSS view timeline; without support
+    the bars rest muted. Below 64rem the rail runs across the page under the head.
+  - Gone from this page: the masthead numeral, the sand axis band, the alternating ink and
+    copper era blocks with their band art, the era span numerals and the sheet spine.
+  - Checked on the dev server: eleven shapes from 390 to 2560 wide with no sideways overflow,
+    both themes, a filter, a sort, no match, an open menu, keyboard order with a focus ring on
+    every stop in the page, and every text run at or above its contrast floor.
+  - Not settled: the header bar is paper over a night page in the light theme (the same open
+    question as a grounded record's bar); the shared "No laws match" block still carries the
+    old sand ground and band art; the rail is a picture and its marks are not links.
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at
