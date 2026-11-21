@@ -1,7 +1,7 @@
 # BlackStory design direction v11: One World
 
-**Status:** proposed (2026-11-19). Not binding until the owner signs off on the flagship in section 9. No sign-off is recorded as of 2026-11-20. The flagship is committed on the local branch `redesign/v11-one-world`; section 20 is the current account of what is built and where this document and the code disagree.
-**Supersedes on sign-off:** v10 visual models, `PROTECTED-EXPERIENCES.md` P-01, the visual half of `brand.md`.
+**Status:** binding (2026-11-20). The owner signed off on the flagship and started the rollout in section 10 on 2026-11-20. The sign-off was given with acceptance criteria 14 and 15 and the reader test of "darkness is not absence" still unrun; they stay open in section 21 and can still reverse the direction (section 12). Section 20 is the account of what was built at sign-off; section 21 tracks the rollout.
+**Supersedes:** v10 visual models, `PROTECTED-EXPERIENCES.md` P-01, the visual half of `brand.md`.
 **Still binding, unchanged:** P-02 evidence honesty, privacy rules, accessibility law, American English, the dignity rules for names and harm imagery.
 
 ## 1. Decisions already made (owner, 2026-11-19)
@@ -21,7 +21,7 @@
 
 ## 2. What the references do, and what we take
 
-Reviewed in a browser on 2026-11-19. Pioneer was scrolled through its first three chapters. Igloo's opening scene was observed; its later scenes did not advance under automated scrolling, so claims about them below are marked.
+Reviewed in a browser on 2026-11-19 and again on 2026-11-20. Pioneer "Corn. Revolutionized." (Resn and Bader-Rutter, 2020) is at `https://cornrevolution.resn.global/`, Resn's archive of the site; it was scrolled through its first three chapters. Igloo Inc. is at `https://www.igloo.inc/`; its opening scene was observed, and its later scenes did not advance under automated scrolling on either date, so claims about them below are marked. The owner refers to a third reference site whose address is not recorded here.
 
 | Pattern | Pioneer "Corn. Revolutionized." | Igloo Inc. | Verdict for BlackStory |
 |---|---|---|---|
@@ -751,3 +751,47 @@ need a row before rollout phase 1.
 Criteria 14 and 15 and the reader test of "darkness is not absence" (section 11) have not been
 run. Criterion 15 is the test of the alternative in section 12, so the direction itself is still
 unproven.
+
+## 21. Rollout (from 2026-11-20)
+
+The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 public routes at
+1440 by 900, dark, which matched the surface table in section 20.
+
+### Done
+
+- **The world palette is in the kit.** `worldPalette` in `packages/ui/src/tokens/colors.ts` and
+  `--ds-world-space`, `--ds-world-rim`, `--ds-world-ember`, `--ds-world-hud-ink` and
+  `--ds-world-hud-ground` in `tokens.css`, held together by `world.test.ts`. The stage ground, the
+  home disc's rim, the Orbit lights and both labels laid over the world (the imagery caption on a
+  record and on a tour stop) read them. The two captions had different grounds and inks; they are
+  now one treatment, which is the first step of 4.4's "one treatment everywhere".
+
+- **The bar goes to the corners.** From 64rem on home and Explore, and from 72rem on a grounded
+  record, the wordmark and the tools sit 24px from the window's edges instead of on the centered
+  column, and a grounded record's destinations take the mono caps voice home already had. Checked
+  at nine window shapes from 390 to 2560 wide on home, Explore, a place and `/records`: no
+  overlap in the bar, no sideways overflow, `/records` unchanged. The light theme was checked at
+  1440 and 390 with the saved toggle set (the app opens dark whatever the system prefers).
+- `apps/site` regenerated its token module, which now carries the world tokens.
+
+### Open before or during phase 1
+
+- The rest of 4.4: the current location in words beside the wordmark, one credit treatment at
+  the bottom left, and whether a grounded record's bar takes the night ground in the light theme
+  (it is paper there today, over a night world).
+
+- Criteria 14 and 15 and the reader test. Unrun at sign-off.
+- "Read as documents": restore it, or rewrite the controls in 4.1 and section 12 rows 1 and 9.
+- The third reference site's address.
+- `/presidents`, `/presidents/*`, `/lives/*` and `/lives/explorer` need rows in section 7.
+- `pnpm lint:tokens` fails on the flagship's own CSS: one raw-hex gradient in `door-home.css`
+  (the disc), one 6px margin in `door-tour.css`, and the 72rem side-sheet threshold in
+  `record-page.css`, which is off the 40/48/64/80rem grid. The threshold is a design decision:
+  move the sheet to 64 or 80rem, or add 72rem to the grid.
+- Found in the audit, not fixed: a statewide law (Mississippi Black Codes of 1865) grounds as an
+  exact site over aerial imagery instead of at its jurisdiction (section 7); a harm record gets
+  the standard grounded frame and ringed pin, and section 4.1's "no glow, no motion beyond a cut"
+  was not checked for it; `/place/{unknown}` renders light under a dark preference.
+- Pattern docs owed for the three built surfaces: `patterns-plate-posture.md`,
+  `patterns-record-page.md` and `patterns-surface-classes.md` carry a pointer here but are not
+  rewritten.

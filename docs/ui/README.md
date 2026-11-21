@@ -14,14 +14,14 @@ v10 is the authoritative product architecture. It amends the door-tip implementa
 |---|---|---|
 | [`experience-standard.md`](./experience-standard.md) | Pillars, critical user journeys, and the type, spacing, icon, pattern, theme and state rules every public surface follows; source library and policy-page gaps. Checked with `scripts/surface-audit.mjs`. | Binding (2026-11-16) |
 | [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md) | Memorial, evidence honesty, precision, dignity, public access, brand integrity. Overrides aesthetics. | Binding (2026-08-31) |
-| [`design-direction-v10.md`](./design-direction-v10.md) | Product thesis, visual models, surface law, KEEP AS IS, authority order. | Binding (2026-08-31) |
+| [`design-direction-v10.md`](./design-direction-v10.md) | Product thesis, visual models, surface law, KEEP AS IS, authority order. | Binding (2026-08-31), except its visual models, superseded by v11 on 2026-11-20 |
 | [`brand.md`](./brand.md) | Signature, palette, type, dignity law. Where this doc and the brand pack disagree, the pack wins. | Binding |
 | [`story.md`](./story.md) | Voice and microcopy, all user-facing copy. | Binding |
 | [`v10/`](./v10/) | Inventory, research, DiscoveryState, Place anatomy, schema/cost, reconciliation, plan. | Binding companions |
-| [`design-direction-v11.md`](./design-direction-v11.md) | One World: a persistent night globe behind the public surfaces. Would supersede v10's visual models on sign-off. | Proposed (2026-11-19), not binding. A flagship is built on the local branch `redesign/v11-one-world`; its section 20 says what is built and what disagrees with the docs above. |
+| [`design-direction-v11.md`](./design-direction-v11.md) | One World: a persistent night globe behind the public surfaces. Supersedes v10's visual models. | Binding (2026-11-20, owner sign-off). Supersedes v10's visual models and the visual half of `brand.md`. Built on home, Explore and place records so far; its section 21 tracks the rollout, and every other surface still renders the v10 identity until its phase lands. |
 
 **Do not** rebuild first paint as a live WebGL cockpit on `/` because a v9 doc says so.
-Live instrument chrome belongs on `/explore`. The v11 flagship branch does paint a live globe on `/`; that is the proposal under review, not a change to this rule. See [`v10/design-doc-reconciliation.md`](./v10/design-doc-reconciliation.md).
+Live instrument chrome belongs on `/explore`. v11 (binding 2026-11-20) does paint a live globe on `/`, over server-rendered text and with no loader; that is the one sanctioned exception. See [`v10/design-doc-reconciliation.md`](./v10/design-doc-reconciliation.md).
 
 ## Pattern index
 

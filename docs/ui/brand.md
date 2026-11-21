@@ -4,6 +4,8 @@ explanation, `success` for a receipt, and `warning` only for something the reade
 The tone shows in the edge, the tint and the cue; the title and body stay in ink.
 # Brand: usage contract
 
+> **v11 (2026-11-20):** the visual half of this contract (palette roles, grounds, bands, the bans on gradient, glow and glass) is superseded on world surfaces by [`design-direction-v11.md`](./design-direction-v11.md) section 5. Marks, type families, the dignity rules and the accessibility floor are unchanged.
+
 > **Binding source (2026-07-18):** root `brand/` — BlackStory full polished kit
 > (book-and-pin symbol + wordmark, light/dark transparent lockups and symbols,
 > app icons, 4-page guide, token files). Served copies use **role-based** paths

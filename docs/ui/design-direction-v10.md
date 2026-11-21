@@ -1,6 +1,6 @@
 # BlackStory design direction v10
 
-**Status:** binding (2026-08-31) for product architecture, surface law, and modernization work.  
+**Status:** binding (2026-08-31) for product architecture, surface law, and modernization work. Its visual models are superseded by [`design-direction-v11.md`](./design-direction-v11.md) (binding 2026-11-20).  
 **Protected overrides:** [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md).  
 **Brand (unchanged):** [`brand.md`](./brand.md).  
 **Audit/implementation branch:** `cursor/v10-modernization` @ merge of door tip `f101724f` + `staging` launch-gate.
