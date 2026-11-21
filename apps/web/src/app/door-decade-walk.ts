@@ -84,6 +84,14 @@ export function doorClaimFor(entity: PublicEntityView): EvidenceItem | null {
         statement.length <= MAX_STATEMENT_CHARS &&
         standsAlone(statement),
     )
+    // A sentence lifted from a source can be about anything in that source: Hawikuh's nomination
+    // opens on Narvaez landing in Florida. Shown alone under the record's name it reads as a fact
+    // about the record, so an excerpt has to name it. A record's own facts ("Founded year: 1865")
+    // have the record as their subject and pass.
+    .filter(
+      ({ card, statement }) =>
+        !isSourceExcerpt(card.predicate) || namesSubject(statement, entity.displayName),
+    )
     // A whole sentence says more than a label ("Significant for: Black heritage"); one that names
     // the record says more than one about its neighborhood; then the grade.
     .sort(
@@ -167,6 +175,11 @@ export function standsAlone(statement: string): boolean {
   return !/^(?:(?:ultimately|however|thus|therefore|also|then|and|but),?\s|(?:this|these|those|it|its|he|she|they|his|her|their|such)\b)/i.test(
     statement.trim(),
   );
+}
+
+/** A claim that is a sentence quoted from a source, not a fact stated about the record. */
+function isSourceExcerpt(predicate: string): boolean {
+  return predicate.trim().toLowerCase().replace(/[_-]/g, ' ') === 'source states';
 }
 
 /** Does the statement use a word of the record's own name (four letters or more)? */

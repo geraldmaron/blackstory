@@ -113,3 +113,35 @@ test('a claim names its record when it uses a word of the name', () => {
   assert.equal(namesSubject('The Lincoln was the largest theater.', 'Lincoln Theater'), true);
   assert.equal(namesSubject('Feminists were at the vanguard.', "The Women's Building"), false);
 });
+
+test('a source excerpt about something else is never the one claim shown for a record', async () => {
+  const { doorClaimFor } = await import('./door-decade-walk');
+  const claim = (id: string, predicate: string, object: string, confidenceLevel: string) => ({
+    id,
+    predicate,
+    object,
+    claimRole: predicate === 'source states' ? 'evidence' : 'record_index',
+    citationHref: `https://example.test/${id}`,
+    citationLabel: 'Nomination',
+    citationSource: 'example.test',
+    confidenceLevel,
+  });
+  const hawikuh = (claims: readonly ReturnType<typeof claim>[]) =>
+    ({ id: 'e1', displayName: 'Hawikuh', kind: 'place', summary: '', claims }) as never;
+  const narvaez = claim(
+    'c1',
+    'source states',
+    'Panfilo de Narvaez led the expedition of 300 men that landed near Tampa Bay, Florida, in 1528.',
+    'high',
+  );
+  const significance = claim('c2', 'significant for', 'Black heritage', 'high');
+  const named = claim('c3', 'source states', 'Estevanico reached Hawikuh in 1539.', 'low');
+
+  assert.equal(
+    doorClaimFor(hawikuh([narvaez, significance]))?.statement,
+    'Significant for: Black heritage',
+  );
+  assert.equal(doorClaimFor(hawikuh([narvaez, significance, named]))?.statement, named.object);
+  // With nothing else to show, the record stays off the home page.
+  assert.equal(doorClaimFor(hawikuh([narvaez])), null);
+});
