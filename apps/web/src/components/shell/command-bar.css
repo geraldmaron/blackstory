@@ -37,6 +37,13 @@ body:has(.ds-sheet) .ds-bar {
   background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
 }
 
+/* A Parked page stands on the night ground in either theme, and so does its bar (it holds its ink
+   roles there, CommandBar.tsx): the same night, solid, so the bar and the page are one sky and no
+   paper shows through it where the bar is in flow on a phone. */
+body:has(.ds-trust-room, .ds-parked) .ds-bar {
+  background: var(--ds-world-space);
+}
+
 /* Glass needs a backdrop the reader can read through; asked for less transparency, it is solid. */
 @media (prefers-reduced-transparency: reduce) {
   .ds-bar {

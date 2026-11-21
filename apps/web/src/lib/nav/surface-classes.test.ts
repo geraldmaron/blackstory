@@ -10,7 +10,12 @@ import { readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { CLASSIFIED_PATHS, ENDPOINT_ROUTES, surfaceClassFor } from './surface-classes';
+import {
+  CLASSIFIED_PATHS,
+  ENDPOINT_ROUTES,
+  isParkedPath,
+  surfaceClassFor,
+} from './surface-classes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appDir = join(here, '../../app');
@@ -51,6 +56,36 @@ describe('surface class resolution', () => {
     // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of
     // `/explore`.
     assert.ok(!CLASSIFIED_PATHS.includes('/story'));
+  });
+
+  it('knows which routes are Parked, so the header holds the night ground there', () => {
+    for (const path of [
+      '/law',
+      '/books',
+      '/about',
+      '/lives/explorer',
+      '/privacy',
+      '/collections',
+      '/corrections/status/abc',
+      '/stories/mosaic-credits',
+      '/no-such-page',
+    ]) {
+      assert.equal(isParkedPath(path), true, path);
+    }
+    for (const path of [
+      '/',
+      '/explore',
+      '/records',
+      '/stories',
+      '/stories/the-count',
+      '/memorial',
+      '/presidents/george-washington',
+      '/law/hb-1557',
+      '/place/somewhere',
+      '/design-system',
+    ]) {
+      assert.equal(isParkedPath(path), false, path);
+    }
   });
 
   it('separates a catalog index from its record pages', () => {

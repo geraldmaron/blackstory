@@ -882,6 +882,12 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   band art (`Outcome ground="paper"`). `/records` keeps the sand block. The `/books` dek no
   longer says "across 0 states" when nothing matches.
 
+- **The header and the phone tab bar are night on a Parked page** (2026-11-21), in either
+  theme. `isParkedPath` (`lib/nav/surface-classes.ts`) names the routes; the bars hold their
+  ink roles there (`data-ground-fixed`) and take the world's night as their ground. `/records`,
+  `/stories`, chapters, record pages and the memorial keep the theme's bar. Not covered: the
+  error page shown on a route that is not Parked keeps that route's bar.
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at

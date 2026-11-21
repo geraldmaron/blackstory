@@ -168,5 +168,25 @@ export function surfaceClassFor(pathname: string, _search?: string): SurfaceClas
   return 'utility';
 }
 
+/**
+ * Reading routes that are not Parked: the Country index, the Reading fronts and chapters, and the
+ * memorial wall (protected). Every other Reading or Utility route stands on the night ground.
+ */
+const NOT_PARKED: readonly string[] = ['/records', '/stories', '/memorial', '/design-system'];
+
+/**
+ * True when the route is Parked (design-direction-v11.md §4.1): no map, the night ground in either
+ * theme. The header reads this to hold its ink ground in the light theme, as it does on the Door,
+ * so a paper bar never sits over a night page. Unknown paths are the 404, which is Parked.
+ */
+export function isParkedPath(pathname: string): boolean {
+  const path = normalizePath(pathname);
+  const surface = surfaceClassFor(path);
+  if (surface !== 'reading' && surface !== 'utility') return false;
+  if (NOT_PARKED.includes(path)) return false;
+  if (path === '/lives/explorer' || path === '/stories/mosaic-credits') return true;
+  return !path.startsWith('/stories/') && !path.startsWith('/presidents/');
+}
+
 /** Every path with an explicit class, for the coverage test and the registry sweep. */
 export const CLASSIFIED_PATHS: readonly string[] = [...SURFACE_CLASS_BY_PATH.keys()];

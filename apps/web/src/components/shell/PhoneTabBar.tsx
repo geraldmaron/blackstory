@@ -8,6 +8,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { DestinationIcon } from '../patterns/DestinationIcon';
+import { isParkedPath } from '../../lib/nav/surface-classes';
 import { SHELL_TABS, currentTabFor, pathIsMapSurface } from './shell-tabs';
 import './tab-bar.css';
 
@@ -23,7 +24,14 @@ export function PhoneTabBar({ pathname, browsing }: PhoneTabBarProps) {
   const current = currentTabFor(pathname);
 
   return (
-    <nav className="ds-tabbar" aria-label="Main" data-ground="ink">
+    <nav
+      className="ds-tabbar"
+      aria-label="Main"
+      data-ground="ink"
+      // On a Parked page the tab bar stands on the page's night ground in either theme, as the
+      // header does (CommandBar.tsx).
+      {...(isParkedPath(pathname) ? { 'data-ground-fixed': '' } : {})}
+    >
       {SHELL_TABS.map((tab) => {
         const isCurrent = current === tab.id;
         const mark = (

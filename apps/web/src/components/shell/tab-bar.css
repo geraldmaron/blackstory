@@ -38,6 +38,11 @@
     pointer-events: auto;
   }
 
+  /* The same night as a Parked page and its header (command-bar.css). */
+  body:has(.ds-trust-room, .ds-parked) .ds-tabbar {
+    background: var(--ds-world-space);
+  }
+
   .ds-tabbar__tab {
     position: relative;
     display: flex;
