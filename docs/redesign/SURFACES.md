@@ -8,6 +8,10 @@
 acceptance criteria and ownership after the 2026-11-01 adversarial pass. The inventory below
 describes the audit baseline; it is not a claim that every listed defect still exists.
 
+**v11:** this spec and the inventory predate the proposed One World direction and carry no v11
+status. For which surfaces the v11 flagship branch has changed, see
+[`../ui/design-direction-v11.md`](../ui/design-direction-v11.md) section 20.
+
 **Inventory:** [`surface-inventory.json`](surface-inventory.json) maps all 66
 page modules and six shared surface groups to component sources, state applicability,
 redesign progress and evidence references. It is a planning baseline kept by hand; no gate checks it. Keep

@@ -1,6 +1,6 @@
 # BlackStory design direction v11: One World
 
-**Status:** proposed (2026-11-19). Not binding until the owner signs off on the flagship in section 9.
+**Status:** proposed (2026-11-19). Not binding until the owner signs off on the flagship in section 9. No sign-off is recorded as of 2026-11-20. The flagship is committed on the local branch `redesign/v11-one-world`; section 20 is the current account of what is built and where this document and the code disagree.
 **Supersedes on sign-off:** v10 visual models, `PROTECTED-EXPERIENCES.md` P-01, the visual half of `brand.md`.
 **Still binding, unchanged:** P-02 evidence honesty, privacy rules, accessibility law, American English, the dignity rules for names and harm imagery.
 
@@ -73,7 +73,7 @@ The camera has four named altitudes. Each is a URL class, a camera recipe and a 
 - Orbit and Country carry a standing line in the chrome, "Lights show records published so far. Unlit places are not yet researched.", linking to the coverage method.
 - The coverage-gap layer (catalog-relative gaps the research side already computes) is one toggle away at Country.
 - Harm-related records get no camera motion beyond a cut, and no glow treatment (P-04).
-- "Read as documents" is a persistent, remembered choice in the menu that parks the world on every route. The document fallback has to exist anyway; this exposes it.
+- "Read as documents" is a persistent, remembered choice in the menu that parks the world on every route. The document fallback has to exist anyway; this exposes it. **Withdrawn in code on 2026-11-20** (`aa6891791`): the switch is gone and a saved choice is cleared on load. Documents mode now applies only where WebGL is unavailable. Whether the control returns is an open owner decision (section 20).
 
 ### 4.2 Time
 
@@ -194,7 +194,7 @@ It is done when all of these are observed in the running app with live published
 7. Imagery credit and date are present and correct at every altitude.
 8. LCP, CLS and INP on `/` and one `/place/*` are no worse than the current branch, measured the same way before and after.
 9. Checked at the nine window shapes the project already audits, including 768 and tall mid-width.
-10. On a device without WebGL, and with "Read as documents" on, the same path completes as documents.
+10. On a device without WebGL, and with "Read as documents" on, the same path completes as documents. (The switch was removed on 2026-11-20, so only the no-WebGL half can be tested today. See section 20.)
 11. Cold deep link to `/place/{slug}` and browser back and forward restore the right camera and sheet.
 12. Failure paths: tile host blocked, WebGL context lost, a record with no coordinate, a city-precision record (drawn as an area, flat camera), and a dense overlap of records all behave as specified.
 13. A screen reader completes the path from the sheets alone; 200 percent zoom and 320 px reflow hold; reading sheets pass in both themes.
@@ -247,7 +247,11 @@ Codex (read-only, 2026-11-19) reviewed the first draft and returned **reject**. 
 
 **Standing disagreement.** Codex's verdict on the thesis is reject. This document's position is accepted with controls: the two blockers are answered in the spec, and the flagship is the validation. If criterion 15 or reader testing of "darkness is not absence" fails, the alternative in row 9 becomes the direction.
 
+**Rows 1 and 9 are weaker than written (2026-11-20).** Both dispositions count "Read as documents" among their controls, and that switch has since been removed from the code. Row 1 keeps its other controls. Row 9's alternative is no longer shipped as a reader choice. Neither criterion 15 nor the reader test has been run.
+
 ## 13. Flagship status (2026-11-20, second pass)
+
+This table is the second pass as it stood. Later passes changed some rows: the work is now committed, eight window shapes were swept (section 17), and "Read as documents" was removed, which undoes the observation in row 10. Section 20 has the current state.
 
 Branch `redesign/v11-one-world`, local, uncommitted. Checked in the dev server against live published data with the browser pane visible, at 1440 by 900, 768 by 1024 and 375 by 812.
 
@@ -537,7 +541,7 @@ behavior; the answers are the spec for this section.
 | Question | Decision |
 | --- | --- |
 | How scroll drives the camera | Scrubbed: a scroll position is a camera, forward and back |
-| Between two stops | Out to the globe, then down into the next record |
+| Between two stops | Out to the globe, then down into the next record. Superseded in section 19: up until both records fit, never back to the opening globe |
 | Entry and exit | Dive from the opening's globe into the first record; pull back out after the last |
 | Scroll per stop | Two screens: about one to hold, one to travel |
 | Words during travel | Clear the stage; the globe has it alone |
@@ -588,3 +592,162 @@ behavior; the answers are the spec for this section.
   in the state land shapes and predates this pass.
 - The tour is now about eleven screens of scroll for five stops.
 
+## 19. Fifth pass: the dive lands on the pin (2026-11-20)
+
+Owner's report: scrolling home does not zoom into the record's pin, it transitions to showing it.
+The globe should not reset, and the zoom into the pin should be smooth.
+
+### What the frames showed (1440 by 900, 40 samples per leg, live data)
+
+Captured with `.impeccable/redesign/v11-scroll-zoom/frames.mjs`, which records the camera and the
+target pin's screen position at each scroll step. Raw rows are in `before/` and `after/` beside it.
+
+| Gap                                       | Before                                                                                                                                                                                                | Cause                                                                                                                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The zoom was anchored beside the pin      | Between stops the pin sat 360px left of its landing from zoom 6.6 to 7.4, then slid across during the last quarter of the dive at up to 53px per sample. On the way in from the opening it slid 109px | The landing's padding arrived in the second half of the dive, after the turn had finished. The zoom's fixed point was the middle of the stage, not the record |
+| The pin wandered on the way down          | From the opening it went 72px off, out to 88, in to 40, out to 109                                                                                                                                    | The center eased in degrees while the zoom doubled the pixels in a degree each level                                                                          |
+| The globe reset between every stop        | Halfway through every hop the camera was at -96, 36 and zoom 1.88, the home globe, even for Amherst to Washington                                                                                     | The path was written as out to the opening's globe and back                                                                                                   |
+| The pin's ring arrived after the camera | The opening's featured record kept its ring through the dive in. The tour's own record was ringed only once the scroll rested on it | Two causes. The mark followed the nearest stop, which is none until halfway. And the shared stage held every selection change until the map was idle (`applyViewState` in `MapStage.tsx`), which a scrub never is: a trace of the filter showed one write for the whole dive, at the landing |
+| A small step where the tour takes the map | The dive's progress was measured from the top of the page but started 0.04 screens down                                                                                                               | Arithmetic in `tourPhase`                                                                                                                                     |
+
+### Built
+
+The path is in `door-tour-scrub.ts`, pinned by `door-tour-scrub.test.ts` (9 tests).
+
+- `tourDive` now comes down on the record. The ground still to cover shrinks with the zoom gained
+  as well as with the turn, and the landing's padding arrives with the turn. The pin's distance
+  from its landing only closes, and is closed by 45% of the dive. From there the pin does not
+  move and the ground grows around it.
+- `tourBetween` is the top of a hop: over the middle of the two records, only as far out as both
+  fit on the stage, using the click flights' `flightPeakZoom`. This replaces "out to the globe"
+  from section 18. Confirmed by the owner on 2026-11-20.
+- `tourMarkedStop` rings the first record from the first frame of the dive in.
+- `MapStage.tsx` `applyViewState` applies a selection at once and again when the map settles. It
+  used to wait for the map to settle. This is shared, so Explore selections and record pages also
+  get their ring at the start of a flight instead of the end.
+- The dive in is measured from where the tour takes the map.
+
+### Measured after
+
+| Check                                                                                     | Result                                                                                                     |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Pin against its landing, opening to stop 1, 1440 by 900                                   | 54px at the start, closing every sample, 0px from 45% to landing                                           |
+| Pin through the deep zoom, 390 by 844, 768 by 1024, 1024 by 768, 1440 by 900, 1728 by 962 | 0px of movement from 75% of every sampled leg to landing; no sample where it moved away in the second half |
+| Top of a hop, 1440 by 900                                                                 | Amherst to Washington zoom 6.70; Washington to Oklahoma City zoom 4.84. The home globe is 1.88             |
+| Pin drawn at rest, all five stops, 1728 by 962 and 768 by 1024                            | Drawn at every stop 1.5 s after arriving. After a hard jump some are not drawn at 150 ms (tiles)           |
+| Real wheel scroll through the dive in, 1440 by 900 and 390 by 844 (`wheel.mjs`) | The tour's record is ringed in every frame (88 of 88, 75 of 75) and sits on the zoom's fixed point, 0px off, for the last 45% of the dive |
+| Frame pacing on that wheel scroll, dev build | 1440 by 900: p50 17 ms, p95 33 ms, worst 40 ms. 390 by 844 unthrottled: p50 17 ms, p95 18 ms, one 168 ms frame |
+| Shared selection change on other surfaces (`siblings.mjs`) | Record page ringed on a cold load at 1440 and 390 wide; Explore loads with nothing ringed, as it should; no page errors |
+| Page errors                                                                               | None in any run                                                                                            |
+| Web tests (2,813 run), typecheck, lint on the changed files | 2,805 pass, 0 fail; clean |
+
+Not measured: a throttled phone profile, a production build, a real phone, reduced motion
+and "Hold still" (their code path is unchanged), the light theme.
+
+### Every map and globe surface
+
+Camera calls were found by searching `apps/web/src` for `flyPreset`, `flyTo`, `easeTo`, `jumpTo`
+and `fitBounds`, and `apps/mobile/src` for its map code. Timed flights were sampled every frame
+with `flights.mjs` in the same folder.
+
+| Surface                                                                 | How the camera moves                                                           | Same defect?                                                                             |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| Home tour (`door-immersive.tsx`, `door-tour-scrub.ts`)                  | Scroll scrub                                                                   | Yes. Fixed in this pass                                                                  |
+| Home decade walk                                                        | Timed `flyTo` through `camera.ts`, same padding at both ends                   | No. Target closes steadily (148, 69, 43, 21, 9, 0px across the descent). See open item 2 |
+| Home place drill (tapping a place count)                                | Timed ease to fitted bounds                                                    | Not sampled                                                                              |
+| Explore place selection (`use-atlas-camera.ts`, `camera-moves.ts`)      | Timed flight or ease                                                           | No wobble. A city token from zoom 8.2: 202, 61, 61, 38, 16, 0px                          |
+| Explore single-record selection                                         | Same route                                                                     | Not driven. Both test clicks landed on place tokens                                      |
+| Record and place pages (`RecordGround.tsx`)                             | Timed `flyPreset('point')` on arrival from another surface, a cut when cold    | From a landed tour stop it is a 706px pan at the same zoom over 1.9 s. See open item 5   |
+| Story map moments (`MapMoment.tsx`, `MapStage.tsx` `useMapMomentFrame`) | Timed flight when the live moment changes as the reader scrolls. Not a scrub   | Not sampled. Reading altitude (section 10, phase 2) is where a scrub would go            |
+| Embedded record maps (`RecordMap.tsx`, story `MapInsetMoment`)          | A fixed frame. `jumpTo` only, to widen until a place name shows                | Does not apply                                                                           |
+| Indexes, data, trust, error pages                                       | No map mounted today                                                           | Does not apply until section 10 builds them                                              |
+| Mobile app (`apps/mobile/src/features/map`)                             | Native MapLibre, timed moves from the duration tokens, no scroll-driven camera | Not run in this pass                                                                     |
+| Design system gallery                                                   | Static `MapMoment` demos                                                       | Does not apply                                                                           |
+
+### Open, in order
+
+1. ~~Confirm the hop.~~ Confirmed 2026-11-20: "up until both fit" stays.
+2. **The decade walk's first hop dips below the opening globe.** It starts at zoom 1.88, goes out
+   to 1.58, then comes in. `flightPeakZoom` returns 1.88 for it, so the extra pull-out is inside
+   MapLibre's `flyTo` or the fitted frame. Not diagnosed.
+3. **Phones, far hops.** On 390 by 844 the hop to San Francisco tops out at the country floor
+   (zoom 3.3) with the target still off screen at the top. It arrives on the way down. A wider
+   floor on narrow screens would fix it.
+4. **Scrolling back to the very top hands over to a timed ease.** Scrolling down again before it
+   finishes steps the camera (38px in the harness, which jumps there instantly). Not seen at wheel
+   speed, not measured there either.
+5. **A tour stop and its record page frame the pin in different places.** Opening the record from
+   a landed stop pans 706px. Sharing one frame would make that hand-off still.
+6. **Explore single-record selection and the home place drill** are not sampled.
+7. **Story Reading altitude** should reuse `tourDive` when it is built, so it inherits the pin
+   anchor instead of repeating this defect.
+8. **Mobile** was not run.
+9. Carried from section 18: phone smoothness on a production build and a real device; the
+   lighter patch in the Atlantic; the tour's length.
+
+## 20. Reconciliation: what is built, and where the documents disagree (2026-11-20)
+
+Written after an audit of the branch at `aa6891791`. Thirty-three public routes were loaded at
+1440 by 900 with a dark preference, in headless Chromium on the real GPU against live published
+data. Each was checked for a visible map, the projection, the header bar and the older identity's
+marks. Phones, the light theme, the other window shapes and the mobile app were not part of it.
+
+### Built since section 19
+
+- **The tour camera eases toward the scroll** (`aa6891791`). A scroll position sets a target
+  camera and a frame loop closes the gap with a 140 ms time constant until it arrives exactly
+  (`easeTourCamera` in `door-tour-scrub.ts`, pinned by `door-tour-scrub.test.ts`). "Hold still" and
+  reduced motion still cut straight to the stop. This replaces "the camera follows the scroll" in
+  section 18.
+- **"Read as documents" is removed** in the same commit. Its only exit was the same switch. A
+  saved choice is cleared on load.
+
+### Surfaces
+
+| Surface | State on the branch |
+| --- | --- |
+| Home `/` | v11: globe, scroll tour, time rail, coverage line |
+| Explore | Globe only. The left column and the decade histogram are unchanged, so section 7's "column becomes the left sheet; histogram becomes the time rail" is not built |
+| `/place/*`, `/entity/*`, `/invention/*` with a public point | v11 Ground with the right sheet |
+| `/law/*`, `/books/*` | Unchanged document. No world |
+| Indexes (`/records`, `/stories`, `/law`, `/books`, `/data`, `/lives`, `/collections`, `/presidents`) | Unchanged. No map, the 104px masthead and the count numeral |
+| Stories and chapters | Unchanged. The spine, the year numeral and the inset map (`MapInsetMoment`) are still in use |
+| Memorial | Unchanged, as section 7.1 intends |
+| Trust, legal and forms | Unchanged identity with the copper band. The parked restyle is not built |
+| 404 and record not found | Unchanged copper band. `/place/{unknown}` rendered in the light theme under a dark preference; the cause is not diagnosed |
+| Mobile, admin, docs, marketing site | No commits since v11 began |
+
+`/presidents`, `/presidents/*`, `/lives/*` and `/lives/explorer` are not named in section 7. They
+need a row before rollout phase 1.
+
+### Parts of this document that no surface uses yet
+
+- **Corner chrome (4.4).** The header bar is on every route, the flagship's included.
+- **The removed list (5).** Bands, masthead numerals and the sheet spine still render. The new
+  right sheet itself carries a copper spine.
+- **One map constructor (3).** `RecordMap` still exists and still serves story insets and record
+  pages without a ground.
+- **Ember and night ground as tokens (5).** `packages/ui/src/styles/tokens.css` has neither. The
+  new identity lives in the flagship's own CSS.
+- **The dive affordance (2).** A record opens by route change, not from a control inside the
+  scene.
+- **Edges (4.1, criterion 5).** Still none, for the reason in section 13 row 5.
+- **Coverage-gap toggle, period imagery, terrain, the night-globe still.** Not built.
+- **The time rail (4.2).** Home only, with the differences listed in section 15.
+
+### Where the documents disagree with the code or each other
+
+| Disagreement | State |
+| --- | --- |
+| This document is proposed; home, Explore and place pages on the branch are built from it | Open. Needs the owner's sign-off or a decision to hold |
+| `README.md` binds v10 and forbids a live WebGL first paint on `/`; the branch's home is one | Recorded in `README.md`. Resolved only by sign-off |
+| "Read as documents" is a control in 4.1, criterion 10 and section 12 rows 1 and 9; the code removed it | Noted inline at each place. Open: restore it, or rewrite those controls |
+| Section 10 says pattern docs are amended in the change that replaces a surface | Not done for home, Explore or place. Owed on sign-off: `patterns-plate-posture.md`, `patterns-record-page.md`, `patterns-surface-classes.md`, `PROTECTED-EXPERIENCES.md` P-01, `brand.md`. They are left alone until then so that no binding document describes an unsigned design |
+| `docs/redesign/surface-inventory.json` and `SURFACES.md` | Predate v11 (2026-11-16) and carry no v11 status. `SURFACES.md` now points here |
+| Section 2 names two references and records no address for either; Igloo was seen only at its opening | Open. The owner refers to three reference sites; the third is not recorded in the repository |
+
+### Not validated
+
+Criteria 14 and 15 and the reader test of "darkness is not absence" (section 11) have not been
+run. Criterion 15 is the test of the alternative in section 12, so the direction itself is still
+unproven.

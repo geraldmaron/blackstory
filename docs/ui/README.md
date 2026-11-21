@@ -18,9 +18,10 @@ v10 is the authoritative product architecture. It amends the door-tip implementa
 | [`brand.md`](./brand.md) | Signature, palette, type, dignity law. Where this doc and the brand pack disagree, the pack wins. | Binding |
 | [`story.md`](./story.md) | Voice and microcopy, all user-facing copy. | Binding |
 | [`v10/`](./v10/) | Inventory, research, DiscoveryState, Place anatomy, schema/cost, reconciliation, plan. | Binding companions |
+| [`design-direction-v11.md`](./design-direction-v11.md) | One World: a persistent night globe behind the public surfaces. Would supersede v10's visual models on sign-off. | Proposed (2026-11-19), not binding. A flagship is built on the local branch `redesign/v11-one-world`; its section 20 says what is built and what disagrees with the docs above. |
 
 **Do not** rebuild first paint as a live WebGL cockpit on `/` because a v9 doc says so.
-Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliation.md`](./v10/design-doc-reconciliation.md).
+Live instrument chrome belongs on `/explore`. The v11 flagship branch does paint a live globe on `/`; that is the proposal under review, not a change to this rule. See [`v10/design-doc-reconciliation.md`](./v10/design-doc-reconciliation.md).
 
 ## Pattern index
 
