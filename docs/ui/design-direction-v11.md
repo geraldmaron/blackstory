@@ -774,6 +774,28 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   1440 and 390 with the saved toggle set (the app opens dark whatever the system prefers).
 - `apps/site` regenerated its token module, which now carries the world tokens.
 
+- **`/records` is at Country** (phase 1 flagship, uncommitted at the time of writing). From 64rem,
+  with scripting, the list is a left sheet and the persistent plate shows the rows on the page
+  beside it, framed on the country (`IndexCountry.tsx`, `country.css`). Every light is a row on
+  the page; a legend on the world's side says how many rows are lit and how many have no mapped
+  place, with the coverage line. Pointing at a row or focusing it lifts its light and shows its
+  name; a light opens its record. The plate keeps its cover until the lights are handed over, so
+  the page does not move when the world arrives.
+  - Observed on the dev server, real GPU, live data: seven wide shapes from 1024 to 2560 (one
+    canvas, country in the uncovered part, no sideways overflow) and both themes at 1440; 768
+    and 390 stay documents and build no map; record and back, a filter, client navigation to
+    `/stories` (cover returns); reduced motion lands in one camera frame; with WebGL off the
+    page is the full-width document.
+  - How it differs from section 4.1 and 7: the lights are the page's rows, not the whole
+    narrowed set; the frame is always the country, so a narrowing to one state does not move
+    the camera and records outside the lower 48 can sit off frame; nothing dims to 20 percent
+    because nothing else is drawn; the coverage-gap toggle is not built; the timeline layout
+    stays a document; below 64rem there is no world.
+  - Found, not fixed: with scripting off `/records` never leaves its loading skeleton, because
+    the rows stream into a hidden container that a script reveals. This predates v11.
+  - The eight other indexes are unchanged. They take the same driver and stylesheet once this
+    one is approved.
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at

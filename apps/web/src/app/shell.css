@@ -1508,8 +1508,13 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
    painted `--ds-canvas` over every MapMoment on every reading surface. Every moment on /about,
    /methodology, /data and /memorial rendered as an empty box in the page's own color, with the
    copper edge and the PLATE · LIVE tag around nothing. Gating this selector cannot be undone by
-   ordering the way an override could. */
-body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
+   ordering the way an override could.
+
+   `html[data-world-on]` IS THE THIRD. An index at Country (`IndexCountry`) stamps it once it has
+   handed the plate its lights on a wide screen, and clears it when it leaves, so the cover stays
+   until there is a world to show and the page never opens on a half-drawn map. */
+html:not([data-world-on])
+  body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
     :has(.ds-recpage[data-ground])
   )
   .ds-map-stage:not([data-plate-slot])::after {
@@ -1523,7 +1528,8 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not
 
 /* Attribution and compass share the cover's z-index, so the cover hides the map but leaves a
    north rose and OSM chip sitting on the record. Hide the chrome; keep the MapLibre instance. */
-body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
+html:not([data-world-on])
+  body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
     :has(.ds-recpage[data-ground])
   )
   .ds-map-stage:not([data-plate-slot])

@@ -10,7 +10,7 @@
  * the pager is anchors with rel=prev/next and the decade jump is a GET form.
  */
 
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { Chip, DisplayNumeral, PageTitle, Sheet, buttonClassName } from '@repo/ui';
 import { Room } from '../../components/room';
 import { RecordsTimeline } from '../../components/discovery/records-chronology';
@@ -241,9 +241,11 @@ export type RecordsIndexProps = {
   readonly model: RecordsIndexModel;
   /** Record id to its thumbnail URL, for the rows on this page that have an image. */
   readonly photos?: Readonly<Record<string, string>>;
+  /** v11 Country: the driver that hands this page's rows to the persistent plate. */
+  readonly world?: ReactNode;
 };
 
-export function RecordsIndexRoom({ model, photos = {} }: RecordsIndexProps) {
+export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProps) {
   const {
     query,
     rows,
@@ -353,7 +355,7 @@ export function RecordsIndexRoom({ model, photos = {} }: RecordsIndexProps) {
   ] as const;
 
   return (
-    <Room width="wide" className="ds-records">
+    <Room width="wide" className={world ? 'ds-records ds-country' : 'ds-records'}>
       {/* The title at display scale with the count beside it as a giant copper numeral. The
           numeral is decorative, so the dek always carries the count for a screen reader; on
           screen it says what the numeral cannot: how the set is narrowed, or the span it covers.
@@ -444,6 +446,7 @@ export function RecordsIndexRoom({ model, photos = {} }: RecordsIndexProps) {
           ) : null}
         </nav>
       ) : null}
+      {world}
     </Room>
   );
 }

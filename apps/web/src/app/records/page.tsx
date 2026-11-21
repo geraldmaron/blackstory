@@ -9,8 +9,9 @@
  * all resolve here in one hop — so it must never 404 and must render something honest for any
  * param combination a stale bookmark carries.
  *
- * Plate posture: Parked. This room never shows the map; "Show these on the map" hands the
- * narrowing to it.
+ * v11 Country: from 64rem the list is a left sheet and the persistent plate shows this page's
+ * rows as lights beside it (`IndexCountry`). Narrower, or with no plate, it is the document it
+ * always was. "Show these on the map" still hands the whole narrowing to Explore.
  */
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -20,6 +21,9 @@ import { RecordsIndexRoom } from './RecordsIndex';
 import { loadRecordsIndex, recordsQueryCacheKey } from './load-records-index';
 import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
 import { buildEntityPhotoIndex } from '../../lib/map-experience/entity-photo-index';
+import { exploreMapSourceFor } from '../../lib/map-experience/build-explore-map-source';
+import { IndexCountry } from '../../components/map-stage/IndexCountry';
+import '../country.css';
 import '../reading-room.css';
 import './records-index.css';
 
@@ -107,6 +111,12 @@ export default async function RecordsPage({ searchParams }: RecordsPageProps) {
     if (photo) photos[row.id] = photo.url;
   }
 
+  // v11 Country: the rows on this page that have a public point are the lights beside the list.
+  const listed = new Set(pageRows.map((row) => row.id));
+  const lights = exploreMapSourceFor(entities).featureCollection.features.filter((feature) =>
+    listed.has(feature.properties.entityId),
+  );
+
   return (
     <>
       {/*
@@ -120,7 +130,14 @@ export default async function RecordsPage({ searchParams }: RecordsPageProps) {
       {model.nextHref === undefined ? null : (
         <link rel="next" href={new URL(model.nextHref, SITE_URL).toString()} />
       )}
-      <RecordsIndexRoom model={model} photos={photos} />
+      <RecordsIndexRoom
+        model={model}
+        photos={photos}
+        // The timeline lays its decades out across the full window; it stays a document for now.
+        {...(model.chronology === undefined
+          ? { world: <IndexCountry lights={lights} listed={listed.size} /> }
+          : {})}
+      />
     </>
   );
 }

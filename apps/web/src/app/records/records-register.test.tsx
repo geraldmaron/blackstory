@@ -127,7 +127,10 @@ describe('Records register', () => {
     assert.match(markup, /oldest <b>church<\/b> of its kind/);
     // The row is one link; the kind is a glyph and a word; the grade is a meter and a word, with
     // the count of sources beside it.
-    assert.match(markup, /<a class="ds-record__link" href="\/place\/first-church--r1\?from=list">/);
+    assert.match(
+      markup,
+      /<a class="ds-record__link" href="\/place\/first-church--r1\?from=list" data-record-id="[^"]+">/,
+    );
     assert.match(markup, /class="ds-record__kind-word">Place</);
     assert.match(markup, /ds-grade-meter ds-grade-tag--high">.*?Well evidenced<\/span>/);
     assert.match(markup, /ds-record__sources-count">3<\/span> sources/);

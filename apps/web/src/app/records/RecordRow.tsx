@@ -71,6 +71,7 @@ export function RecordRow({ row, query, compact = false, anchor, photoUrl }: Rec
       <a
         className={compact ? 'ds-record__link ds-record__link--compact' : 'ds-record__link'}
         href={row.href}
+        data-record-id={row.id}
         data-photo={photoUrl === undefined ? undefined : 'true'}
       >
         <span
