@@ -853,7 +853,20 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
     showed nothing new. Flags that predate this and sit inside sheets: the methodology grade
     matrix letters in dark (1.97:1 on its copper cell) and the Lives scrub labels in light
     (3.99:1).
-  - Not done: `/books` and `/stories` keep their own fronts (see Open).
+  - Not done then: `/books` (built next, below) and `/stories` (see Open).
+
+- **`/books` is Parked, on the `/law` stage** (2026-11-21). Its instrument is the state tile
+  map, as a rail in the first column from 64rem, with its key and, in the titles view, the
+  busiest states under it. The titles and the ranked list of states stand on the one sheet.
+  - The tiles climb the world's ember from a dim coal to paper; they stay square at rail size,
+    because a round ember dot would read as a light and a light means a record. State codes
+    show only where a tile is big enough to carry one (under 64rem); the ranked list names
+    every state.
+  - Gone: the count numeral in the head, the sand lead band, the alternating ink and sand
+    bands with their band art, and the per-band count numeral.
+  - Checked: seven states of the page (titles, states, a state filter in both views, two
+    other sorts, no match) at eleven window shapes with no sideways overflow, both themes,
+    keyboard order with a focus ring on every stop in the page.
 
 ### Open before or during phase 1
 
@@ -862,12 +875,13 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   (it is paper there today, over a night world).
 
 - Criteria 14 and 15 and the reader test. Unrun at sign-off.
-- `/books` and `/stories` are not Parked yet. `/books` has its own instrument (the state tile
-  map) and alternating sand and ink bands, so it needs the `/law` treatment built for it, not
-  the trust frame. `/stories` is a front of chapter covers and may belong to Reading rather
+- `/stories` is not Parked. It is a front of chapter covers and may belong to Reading rather
   than Parked; the owner decides.
-- `/law` does not carry the horizon the trust frame has. One of the two should change so
-  Parked has a single signature.
+- `/law` and `/books` (the stage with a rail) do not carry the horizon the trust frame has.
+  One of the two should change so Parked has a single signature.
+- The register's "No titles match" and "No laws match" block still has the old sand ground and
+  band art on a night page. On `/books` a search with no match prints "across 0 states" in the
+  dek.
 - "Read as documents": restore it, or rewrite the controls in 4.1 and section 12 rows 1 and 9.
 - The third reference site's address.
 - `/presidents`, `/presidents/*`, `/lives/*` and `/lives/explorer` need rows in section 7.

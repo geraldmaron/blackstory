@@ -96,7 +96,7 @@ test('the tile legend reads its ranges off the step formula, with no gaps or ove
   assert.deepEqual(tileLegend(1), [{ step: 4, from: 1, to: 1 }]);
 });
 
-test('the titles view leads with the busiest state on sand, every entry opening the states view', () => {
+test('the titles view leads with the busiest state on the rail, every entry opening the states view', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {});
   const html = render({});
   const [top] = view.stateCounts;

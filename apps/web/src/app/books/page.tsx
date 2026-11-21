@@ -5,7 +5,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
-import { DisplayNumeral, PageHeader } from '@repo/ui';
+import { PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { parentCrumb, Room } from '../../components/room';
@@ -19,6 +19,7 @@ import { BooksBrowseSections } from './BooksBrowseSections';
 import { isbnsKnownWithoutCovers } from './books-cover-availability';
 import { BOOKS_PAGE_DESCRIPTION } from './books-copy';
 import '../reading-room.css';
+import '../parked.css';
 import './books.css';
 
 void React;
@@ -60,10 +61,17 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   if (snapshot.books.length === 0) {
     return (
       <Room width="wide" className="ds-books">
-        <PageHeader {...header} />
-        <Outcome title="The catalog did not load" action={{ href: '/books', label: 'Try again' }}>
-          The titles and their reports are kept, only this page failed to read them.
-        </Outcome>
+        <div className="ds-parked ds-books-stage" data-ground="ink" data-ground-fixed="">
+          <div className="ds-parked__main">
+            <PageHeader {...header} />
+            <Outcome
+              title="The catalog did not load"
+              action={{ href: '/books', label: 'Try again' }}
+            >
+              The titles and their reports are kept, only this page failed to read them.
+            </Outcome>
+          </div>
+        </div>
       </Room>
     );
   }
@@ -84,21 +92,8 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
 
   return (
     <Room width="wide" className="ds-books">
-      {/* The title count as a giant numeral; the dek states it in words, so it is not read twice. */}
-      <PageHeader
-        {...header}
-        dek={dek(view)}
-        {...(view.totalMatched > 0
-          ? {
-              actions: (
-                <DisplayNumeral decorative className="ds-books-head__count">
-                  {view.totalMatched.toLocaleString('en-US')}
-                </DisplayNumeral>
-              ),
-            }
-          : {})}
-      />
-      <BooksBrowseSections view={view} />
+      {/* The dek states the count in words; no numeral repeats it. */}
+      <BooksBrowseSections view={view} head={<PageHeader {...header} dek={dek(view)} />} />
     </Room>
   );
 }
