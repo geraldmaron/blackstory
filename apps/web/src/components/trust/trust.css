@@ -15,9 +15,43 @@
   /* The sheet below rises this far into the block. */
   --trust-overlap: var(--ds-space-16);
 
-  padding-block: var(--ds-space-12) calc(var(--trust-overlap) + var(--ds-space-10));
+  padding-block: var(--ds-space-12) calc(var(--trust-overlap) + var(--ds-space-12));
   overflow: hidden;
   isolation: isolate;
+  background: var(--ds-world-space);
+}
+
+/* The room stands on the night ground in either theme, so the sheet is the only paper. The clip
+   holds the horizon below inside the room without making a scroll container. */
+.ds-trust-room {
+  overflow: clip;
+  background: var(--ds-world-space);
+}
+
+/* The world, parked just under the sheet: its lit edge crests above the sheet's top and runs out
+   behind it, in the rim light and ember the globe wears at Orbit. Drawn, never a map, so it
+   claims no record. */
+.ds-trust-room > .ds-room__mast + .ds-room__body {
+  isolation: isolate;
+}
+
+.ds-trust-room > .ds-room__mast + .ds-room__body::before {
+  content: '';
+  position: absolute;
+  z-index: -1; /* local: under the sheet, inside the room column's own isolated stack */
+  top: calc(var(--ds-space-10) * -1);
+  left: 50%;
+  width: 300vmax;
+  height: 300vmax;
+  border: 2px solid var(--ds-world-rim);
+  border-radius: 50%;
+  translate: -50% 0;
+  box-shadow:
+    0 0 var(--ds-space-16) color-mix(in srgb, var(--ds-world-rim) 45%, transparent),
+    0 0 var(--ds-space-4) color-mix(in srgb, var(--ds-world-rim) 70%, transparent),
+    inset 0 0 var(--ds-space-2) var(--ds-world-ember),
+    inset 0 0 var(--ds-space-12) color-mix(in srgb, var(--ds-world-ember) 30%, transparent);
+  pointer-events: none;
 }
 
 .ds-trust-mast__inner {
@@ -141,7 +175,7 @@
   }
 
   .ds-trust-mast {
-    padding-block: var(--ds-space-8) calc(var(--ds-space-8) + var(--ds-space-6));
+    padding-block: var(--ds-space-8) calc(var(--ds-space-8) + var(--ds-space-12));
   }
 
   .ds-trust-mast__inner {

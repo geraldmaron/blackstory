@@ -1,4 +1,4 @@
-/** The wait for /data: the page's own copper mast and paper sheet, with a blank ruled ledger on it. */
+/** The wait for /data: the page's own night mast and paper sheet, with a blank ruled ledger on it. */
 import React from 'react';
 import { PageHeader } from '@repo/ui';
 import { Room } from '../../components/room';
@@ -13,7 +13,7 @@ export default function Loading() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast tone="copper">
+        <TrustMast>
           <PageHeader
             display
             title={

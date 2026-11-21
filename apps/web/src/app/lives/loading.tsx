@@ -16,7 +16,7 @@ export default function Loading() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast tone="sand">
+        <TrustMast>
           <PageHeader
             display
             title={

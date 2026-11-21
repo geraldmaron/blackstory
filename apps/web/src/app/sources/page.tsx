@@ -35,7 +35,6 @@ export default async function SourcesPage() {
       masthead={
         <TrustMast
           art={['mapline']}
-          tone="sand"
           numeral={
             library === undefined
               ? undefined

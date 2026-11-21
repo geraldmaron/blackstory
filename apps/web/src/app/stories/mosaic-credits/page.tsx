@@ -45,7 +45,6 @@ export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
       className="ds-trust-room"
       masthead={
         <TrustMast
-          tone="sand"
           numeral={{ value: String(ATMOSPHERE_TILE_CREDITS.length), label: 'tiles in the mosaic' }}
         >
           <PageHeader

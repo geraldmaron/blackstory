@@ -28,7 +28,7 @@ export default function CorrectionStatusLandingPage() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast tone="sand">
+        <TrustMast>
           <PageHeader
             display
             crumb={parentCrumb('/corrections/status')}

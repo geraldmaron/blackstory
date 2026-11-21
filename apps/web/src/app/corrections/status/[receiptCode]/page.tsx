@@ -43,7 +43,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast tone="sand">
+        <TrustMast>
           <PageHeader
             display
             crumb={parentCrumb('/corrections/status')}

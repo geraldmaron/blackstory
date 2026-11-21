@@ -60,7 +60,6 @@ export default async function DataPage({
       masthead={
         <TrustMast
           art={['decades', 'grain']}
-          tone="copper"
           numeral={
             latest === undefined
               ? undefined

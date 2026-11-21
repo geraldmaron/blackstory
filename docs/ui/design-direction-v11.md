@@ -815,8 +815,7 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   (section 4.1) with the trust pages in phase 4, or define a different spatial mark for
   statutes and titles first.
 
-- **`/law` is the Parked flagship** (built 2026-11-20, awaiting the owner's approval,
-  uncommitted at the time of writing). Parked had only a one-line definition in 4.1; this is
+- **`/law` is the Parked flagship** (built 2026-11-20, approved by the owner 2026-11-21). Parked had only a one-line definition in 4.1; this is
   what it means as built (`parked.css`, `law.css`):
   - The page stands on the night ground (`--ds-world-space`) in either theme, to the window's
     edges. Nothing on it is a map.
@@ -837,6 +836,25 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
     question as a grounded record's bar); the shared "No laws match" block still carries the
     old sand ground and band art; the rail is a picture and its marks are not links.
 
+- **The shared trust frame is Parked** (2026-11-21). `components/trust` (`TrustMast`,
+  `TrustSheet`) is the frame of every trust, utility and data page, so the change is made once
+  there and reaches `/about`, `/methodology`, `/faq`, `/sources`, `/errata`, `/privacy`,
+  `/terms`, `/support`, `/submit`, `/corrections` and its status pages, the mosaic credits,
+  `/data`, `/lives`, `/lives/explorer`, the 404 and the error page. `/presidents` and
+  `/collections` moved onto the same frame.
+  - The mast is the night ground in both themes; the copper and sand mast tones are gone and
+    `TrustMast` no longer takes `tone`. The room is night around the sheet.
+  - The signature is the horizon: the world's lit edge (rim light and ember, the globe's own
+    colors) crests just above the sheet and runs out behind it. It is drawn in CSS and is not a
+    map, so it claims no record.
+  - The sheet lost its three-band spine (`bands="none"`), as on `/law`. The mast keeps its one
+    display numeral, now ember on night.
+  - Checked: 18 pages, nine window shapes, no sideways overflow; text contrast in both themes
+    showed nothing new. Flags that predate this and sit inside sheets: the methodology grade
+    matrix letters in dark (1.97:1 on its copper cell) and the Lives scrub labels in light
+    (3.99:1).
+  - Not done: `/books` and `/stories` keep their own fronts (see Open).
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at
@@ -844,6 +862,12 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   (it is paper there today, over a night world).
 
 - Criteria 14 and 15 and the reader test. Unrun at sign-off.
+- `/books` and `/stories` are not Parked yet. `/books` has its own instrument (the state tile
+  map) and alternating sand and ink bands, so it needs the `/law` treatment built for it, not
+  the trust frame. `/stories` is a front of chapter covers and may belong to Reading rather
+  than Parked; the owner decides.
+- `/law` does not carry the horizon the trust frame has. One of the two should change so
+  Parked has a single signature.
 - "Read as documents": restore it, or rewrite the controls in 4.1 and section 12 rows 1 and 9.
 - The third reference site's address.
 - `/presidents`, `/presidents/*`, `/lives/*` and `/lives/explorer` need rows in section 7.

@@ -25,7 +25,7 @@ export default function PrivacyPage() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast art={['grain']} tone="sand">
+        <TrustMast art={['grain']}>
           <PageHeader
             display
             crumb={parentCrumb('/privacy')}

@@ -52,7 +52,6 @@ export default async function AboutPage() {
       className="ds-trust-room ds-about-room"
       masthead={
         <TrustMast
-          tone="copper"
           numeral={
             states === undefined
               ? undefined

@@ -55,7 +55,6 @@ export default async function LivesIndexPage({
       className="ds-trust-room"
       masthead={
         <TrustMast
-          tone="sand"
           numeral={livesDecadeNumeral(bundle)}
           art={['tools', 'grain']}
           tools={

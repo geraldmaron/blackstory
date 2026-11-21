@@ -1,7 +1,8 @@
 /**
- * The frame every trust, utility and data page shares on the archive table: a full-bleed color
- * block at the top carrying the display title and one display numeral, and a paper sheet that
- * slides up over the block's foot with the page's sections on it.
+ * The frame every trust, utility and data page shares. These pages are Parked
+ * (design-direction-v11.md §4.1): no map, the night ground the world surfaces share in either
+ * theme, the display title and one display numeral over the world's lit edge, and one reading
+ * sheet that slides up over it with the page's sections on it.
  *
  * Render `TrustMast` as the room's `masthead` and wrap the body in `TrustSheet`; give the room
  * `className="ds-trust-room"` so the sheet overlaps the block. Styles: `./trust.css`.
@@ -23,7 +24,6 @@ export type TrustMastNumeral = {
 };
 
 export type TrustMastProps = {
-  readonly tone: Extract<BlockTone, 'copper' | 'sand'>;
   /** The page's `PageHeader display`. */
   readonly children: ReactNode;
   readonly numeral?: TrustMastNumeral | undefined;
@@ -34,9 +34,9 @@ export type TrustMastProps = {
   readonly art?: readonly BandArtMotif[];
 };
 
-export function TrustMast({ tone, children, numeral, tools, className, art }: TrustMastProps) {
+export function TrustMast({ children, numeral, tools, className, art }: TrustMastProps) {
   return (
-    <Block tone={tone} as="div" className={cx('ds-trust-mast', className)}>
+    <Block tone="ink" as="div" data-ground-fixed="" className={cx('ds-trust-mast', className)}>
       {art ? <BandArt motifs={art} /> : null}
       <div className="ds-wrap ds-trust-mast__inner">
         <div className="ds-trust-mast__head">{children}</div>
@@ -71,7 +71,7 @@ export function TrustSheet({
   // contents-list grid, which would otherwise dissolve the sheet with `display: contents`.
   return (
     <div className="ds-trust-folio">
-      <Sheet as="div" className={cx('ds-trust-sheet', className)}>
+      <Sheet as="div" bands="none" className={cx('ds-trust-sheet', className)}>
         {children}
       </Sheet>
     </div>

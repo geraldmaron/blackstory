@@ -28,7 +28,6 @@ export default function TermsPage() {
       masthead={
         <TrustMast
           art={['grain']}
-          tone="sand"
           numeral={{
             value: String(ACKNOWLEDGEMENT_HOURS),
             label: 'hours to acknowledge a copyright complaint',

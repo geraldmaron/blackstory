@@ -13,7 +13,7 @@ export default function ReceiptNotFound() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast tone="sand" art={['contours']}>
+        <TrustMast art={['contours']}>
           <PageHeader
             display
             crumb={parentCrumb('/corrections/status')}

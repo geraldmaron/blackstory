@@ -88,7 +88,6 @@ export default async function ErrataPage({ searchParams }: ErrataPageProps) {
       masthead={
         <TrustMast
           art={['ledger']}
-          tone="copper"
           numeral={
             all.length === 0
               ? undefined

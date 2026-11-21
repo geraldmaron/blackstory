@@ -34,7 +34,7 @@ export default function SupportPage() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast art={['weave']} tone="copper">
+        <TrustMast art={['weave']}>
           <PageHeader
             display
             crumb={parentCrumb('/support')}

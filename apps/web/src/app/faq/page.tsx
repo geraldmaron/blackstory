@@ -51,7 +51,6 @@ export default function FaqPage() {
       masthead={
         <TrustMast
           art={['weave']}
-          tone="copper"
           numeral={{
             value: String(FAQ_ENTRIES.length),
             label: 'questions, each with its own address',
