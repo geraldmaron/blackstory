@@ -873,6 +873,10 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   wherever the sheet falls, and it passes behind the rail. Checked at eleven window shapes on
   six states of the two pages: no sideways overflow and no added page height.
 
+- **`/stories` stays a Reading front** (owner's decision, 2026-11-21). It is a front of chapter
+  covers, not a Parked page, and takes no night stage or horizon. The Parked rollout of the
+  indexes is complete with it left as it is.
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at
@@ -880,8 +884,6 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   (it is paper there today, over a night world).
 
 - Criteria 14 and 15 and the reader test. Unrun at sign-off.
-- `/stories` is not Parked. It is a front of chapter covers and may belong to Reading rather
-  than Parked; the owner decides.
 - The horizon is drawn twice, once in `parked.css` (the stage) and once in `trust.css` (the
   frame), with the same values. Fold them into one rule if a third user appears.
 - The register's "No titles match" and "No laws match" block still has the old sand ground and
