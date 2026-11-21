@@ -420,7 +420,11 @@ export function BooksBrowseSections({ view, head }: BooksBrowseSectionsProps) {
   if (view.view === 'states') {
     body =
       view.stateCounts.length === 0 ? (
-        <Outcome title="No states to show" action={{ href: clearHref, label: 'Clear filters' }}>
+        <Outcome
+          ground="paper"
+          title="No states to show"
+          action={{ href: clearHref, label: 'Clear filters' }}
+        >
           No title matching {active.map((filter) => filter.label).join(', ')} carries a cited
           challenge with a state.
         </Outcome>
@@ -430,7 +434,11 @@ export function BooksBrowseSections({ view, head }: BooksBrowseSectionsProps) {
   } else {
     body =
       view.items.length === 0 ? (
-        <Outcome title="No titles match" action={{ href: clearHref, label: 'Clear filters' }}>
+        <Outcome
+          ground="paper"
+          title="No titles match"
+          action={{ href: clearHref, label: 'Clear filters' }}
+        >
           Nothing in the catalog matches {active.map((filter) => filter.label).join(', ')}.
         </Outcome>
       ) : (

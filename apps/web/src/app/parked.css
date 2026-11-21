@@ -92,6 +92,15 @@ body:has(.ds-parked) .ds-reading-progress {
   pointer-events: none;
 }
 
+/* An outcome (nothing matched, nothing loaded) stands in for the sheet, so it is one: the same
+   paper, shadow and corners, at the reading measure. Its copy is short, so no floor. */
+.ds-parked .ds-records-outcome {
+  min-height: 0;
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-shadow-sheet);
+}
+
 /* The register's toolbar is a sticky, window-wide strip on a document. On the night ground it is
    a row of controls in the page's own column. */
 .ds-parked .ds-records-toolbar {

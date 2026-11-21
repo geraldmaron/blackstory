@@ -877,6 +877,11 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   covers, not a Parked page, and takes no night stage or horizon. The Parked rollout of the
   indexes is complete with it left as it is.
 
+- **An outcome on a Parked page is the sheet** (2026-11-21). "No titles match", "No laws
+  match" and the two did-not-load states take the sheet's paper, shadow and corners, with no
+  band art (`Outcome ground="paper"`). `/records` keeps the sand block. The `/books` dek no
+  longer says "across 0 states" when nothing matches.
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at
@@ -886,9 +891,6 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
 - Criteria 14 and 15 and the reader test. Unrun at sign-off.
 - The horizon is drawn twice, once in `parked.css` (the stage) and once in `trust.css` (the
   frame), with the same values. Fold them into one rule if a third user appears.
-- The register's "No titles match" and "No laws match" block still has the old sand ground and
-  band art on a night page. On `/books` a search with no match prints "across 0 states" in the
-  dek.
 - "Read as documents": restore it, or rewrite the controls in 4.1 and section 12 rows 1 and 9.
 - The third reference site's address.
 - `/presidents`, `/presidents/*`, `/lives/*` and `/lives/explorer` need rows in section 7.

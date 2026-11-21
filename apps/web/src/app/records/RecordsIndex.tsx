@@ -146,7 +146,10 @@ export function Outcome({
   children,
   action,
   also,
+  ground = 'sand',
 }: {
+  /** `paper` on a Parked page (parked.css): the outcome is the page's sheet, with no band art. */
+  readonly ground?: 'sand' | 'paper';
   readonly title: string;
   readonly children: React.ReactNode;
   readonly action: { readonly href: string; readonly label: string };
@@ -154,8 +157,8 @@ export function Outcome({
   readonly also?: { readonly href: string; readonly label: string } | undefined;
 }) {
   return (
-    <div className="ds-records-outcome" role="status" data-ground="sand">
-      <BandArt motifs={['mapline']} />
+    <div className="ds-records-outcome" role="status" data-ground={ground}>
+      {ground === 'sand' ? <BandArt motifs={['mapline']} /> : null}
       <h2 className="ds-records-outcome__title">{title}</h2>
       <p className="ds-records-outcome__body">{children}</p>
       <div className="ds-records-outcome__actions">

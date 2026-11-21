@@ -40,11 +40,14 @@ function dek(view: ReturnType<typeof buildBooksBrowseViewModel>): string {
     view.totalMatched === view.totalAvailable
       ? `${view.totalAvailable.toLocaleString('en-US')} titles`
       : `${view.totalMatched.toLocaleString('en-US')} of ${view.totalAvailable.toLocaleString('en-US')} titles`;
+  // Nothing matched: there is no state to count, so the sentence does not name any.
   const where =
-    view.state === 'all'
-      ? `across ${states} ${states === 1 ? 'state' : 'states'}`
-      : `in ${bookStateName(view.state)}`;
-  return `${titles} challenged in schools and libraries ${where}, cited from public reports.`;
+    view.state !== 'all'
+      ? ` in ${bookStateName(view.state)}`
+      : states > 0
+        ? ` across ${states} ${states === 1 ? 'state' : 'states'}`
+        : '';
+  return `${titles} challenged in schools and libraries${where}, cited from public reports.`;
 }
 
 export default async function BooksPage({ searchParams }: BooksPageProps) {
@@ -65,6 +68,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
           <div className="ds-parked__main">
             <PageHeader {...header} />
             <Outcome
+              ground="paper"
               title="The catalog did not load"
               action={{ href: '/books', label: 'Try again' }}
             >
