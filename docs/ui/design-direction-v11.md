@@ -793,8 +793,27 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
     stays a document; below 64rem there is no world.
   - Found, not fixed: with scripting off `/records` never leaves its loading skeleton, because
     the rows stream into a hidden container that a script reveals. This predates v11.
-  - The eight other indexes are unchanged. They take the same driver and stylesheet once this
-    one is approved.
+  - Approved by the owner and committed on 2026-11-20 (`37e7d8ada`). A page with nothing to
+    light, such as a search with no match, is a document: an empty globe beside a list says
+    nothing.
+- **Section 7's index row does not hold for the other eight indexes.** It says every index goes
+  to Country with "the list and the lights the same set". Checked against the data on
+  2026-11-20:
+
+  | Index | What its rows are | What could be lit |
+  | --- | --- | --- |
+  | `/records` | Published records | The rows. Built. |
+  | `/stories` | Stories | Only the records a story cites: 7 across the list, and none on the default view, which is the lead-cover front laid out for the full window. Tried and backed out: the page flipped between a document and a split view on a sort, and the coverage line ("unlit places are not yet researched") is false when a light means "cited" |
+  | `/presidents` | Stories | Nothing. No entry cites a record with a public point |
+  | `/law` | Statutes from the legal snapshots, a dataset separate from records | Nothing. A statute row has no record and no point; lighting its jurisdiction would shade states by count, which 4.1 forbids |
+  | `/books` | Banned titles with challenge counts by state | Nothing, for the same reason |
+  | `/data`, `/lives`, `/lives/explorer` | Census figures | Nothing that is a record. Section 7's "a chart selection relights the globe by the same measure" is a separate design, not this pattern |
+  | `/collections` | Six links to other indexes | Nothing |
+
+  A light means a published record (section 5). On these eight a globe would be decoration or
+  a count map, so they stay documents. Open for the owner: give them the Parked identity
+  (section 4.1) with the trust pages in phase 4, or define a different spatial mark for
+  statutes and titles first.
 
 ### Open before or during phase 1
 

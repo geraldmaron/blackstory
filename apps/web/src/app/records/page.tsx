@@ -133,8 +133,9 @@ export default async function RecordsPage({ searchParams }: RecordsPageProps) {
       <RecordsIndexRoom
         model={model}
         photos={photos}
-        // The timeline lays its decades out across the full window; it stays a document for now.
-        {...(model.chronology === undefined
+        // The timeline lays its decades out across the full window, so it stays a document for
+        // now. So does a page with nothing to light: an empty globe beside a list says nothing.
+        {...(model.chronology === undefined && lights.length > 0
           ? { world: <IndexCountry lights={lights} listed={listed.size} /> }
           : {})}
       />
