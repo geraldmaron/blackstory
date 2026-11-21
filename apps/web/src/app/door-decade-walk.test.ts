@@ -145,3 +145,34 @@ test('a source excerpt about something else is never the one claim shown for a r
   // With nothing else to show, the record stays off the home page.
   assert.equal(doorClaimFor(hawikuh([narvaez])), null);
 });
+
+test('a claim keeps its predicate unless its object is a whole sentence', async () => {
+  const { statementFor, endsAsSentence } = await import('./entity/[id]/adapters');
+  // Ends on a period without being a sentence: the Dexter Avenue fragment.
+  assert.equal(
+    statementFor('was_pastored_by', 'Dr. Martin Luther King Jr.'),
+    'Was Pastored By: Dr. Martin Luther King Jr.',
+  );
+  // Long is not the same as whole.
+  assert.match(
+    statementFor(
+      'listing',
+      'on the National Register of Historic Places on October 15, 1966, reference #66000502',
+    ),
+    /^Listing: on the National Register/,
+  );
+  assert.equal(statementFor('founded', 'The school opened in 1867.'), 'The school opened in 1867.');
+  // A source's own words are never labeled, with or without their final period.
+  assert.equal(
+    statementFor('source states', 'The school opened in 1867'),
+    'The school opened in 1867',
+  );
+  assert.equal(endsAsSentence('Civil War battle in Washington D.C.'), false);
+});
+
+test('an excerpt cut off mid-sentence is told from one that only lacks its period', async () => {
+  const { isCutOff } = await import('./door-decade-walk');
+  assert.equal(isCutOff('Known as a civil rights leader, Dr.'), true);
+  assert.equal(isCutOff('Robert Carter III established six plantations on the north bank,'), true);
+  assert.equal(isCutOff('She earned a Bachelor of Science Degree in 1932'), false);
+});

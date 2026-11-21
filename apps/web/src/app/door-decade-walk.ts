@@ -20,7 +20,9 @@ import type { PublicEntityPrimaryImageView, PublicEntityView } from '../data/pub
 import type { EvidenceItem } from '../components/evidence/EvidenceList';
 import { isRenderedImage } from '../components/entity/rendered-image';
 import {
+  endsAsSentence,
   isQuietRecord,
+  isSourceExcerpt,
   publisherOf,
   statementFor,
   toEvidenceClaimInputs,
@@ -78,12 +80,18 @@ export function doorClaimFor(entity: PublicEntityView): EvidenceItem | null {
     }))
     // A sentence that stands alone: a fragment ("on the National Register ...", "1976,
     // designated ...") reads as a glitch when it is the only claim on the screen.
+    // A short labeled value ("Founded year: 1865") is whole. Anything longer has to open like a
+    // sentence in its own words: a label in front ("Listing: on the National Register ...") does
+    // not make a fragment whole.
     .filter(
-      ({ statement }) =>
-        /^[\p{Lu}"“]/u.test(statement) &&
+      ({ card, statement }) =>
+        (isLabeledValue(statement, card.object) || /^[\p{Lu}"“]/u.test(card.object.trim())) &&
         statement.length <= MAX_STATEMENT_CHARS &&
         standsAlone(statement),
     )
+    // An excerpt cut off mid-sentence ("Known as a civil rights leader, Dr.") stays on the record
+    // page, beside the rest of its source. Most excerpts only lack their final period; those pass.
+    .filter(({ card }) => !isSourceExcerpt(card.predicate) || !isCutOff(card.object))
     // A sentence lifted from a source can be about anything in that source: Hawikuh's nomination
     // opens on Narvaez landing in Florida. Shown alone under the record's name it reads as a fact
     // about the record, so an excerpt has to name it. A record's own facts ("Founded year: 1865")
@@ -96,7 +104,7 @@ export function doorClaimFor(entity: PublicEntityView): EvidenceItem | null {
     // the record says more than one about its neighborhood; then the grade.
     .sort(
       (a, b) =>
-        Number(isSentence(b.statement)) - Number(isSentence(a.statement)) ||
+        Number(endsAsSentence(b.statement)) - Number(endsAsSentence(a.statement)) ||
         Number(namesSubject(b.statement, entity.displayName)) -
           Number(namesSubject(a.statement, entity.displayName)) ||
         LEVEL_RANK[a.card.confidenceLevel] - LEVEL_RANK[b.card.confidenceLevel],
@@ -177,9 +185,14 @@ export function standsAlone(statement: string): boolean {
   );
 }
 
-/** A claim that is a sentence quoted from a source, not a fact stated about the record. */
-function isSourceExcerpt(predicate: string): boolean {
-  return predicate.trim().toLowerCase().replace(/[_-]/g, ' ') === 'source states';
+/** A labeled claim whose object is a name, a date or a few words. */
+function isLabeledValue(statement: string, object: string): boolean {
+  return statement !== object.trim() && object.trim().split(/\s+/).length <= 8;
+}
+
+/** Ends on a comma or on a title with no name after it: the sentence was cut, not finished. */
+export function isCutOff(text: string): boolean {
+  return /(?:[,;:]|\b(?:Dr|Mr|Mrs|Ms|Rev|St|Gen|Col|Capt|Lt|Sgt|Hon|Prof|No)\.)$/.test(text.trim());
 }
 
 /** Does the statement use a word of the record's own name (four letters or more)? */
@@ -188,16 +201,12 @@ export function namesSubject(statement: string, name: string): boolean {
   return (name.toLowerCase().match(/\p{L}{4,}/gu) ?? []).some((word) => text.includes(word));
 }
 
-function isSentence(statement: string): boolean {
-  return /[.!?]["')\]”]?$/u.test(statement.trim());
-}
-
 /**
  * A record drawn by `roll` (0..1) from the best pool that has any: photographed with a claim in a
  * whole sentence, then photographed, then a whole sentence, then any.
  */
 function bestPool(records: readonly DoorRecord[]): readonly DoorRecord[] {
-  const sentence = (record: DoorRecord) => isSentence(String(record.claim.statement ?? ''));
+  const sentence = (record: DoorRecord) => endsAsSentence(String(record.claim.statement ?? ''));
   const pools = [
     records.filter((record) => record.plate && sentence(record)),
     records.filter((record) => record.plate),
