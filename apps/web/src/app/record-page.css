@@ -1572,8 +1572,8 @@ body:has(.ds-recpage[data-ground]) .ds-map-stage .ds-map-callout--flag {
   margin: 0;
   padding: var(--ds-space-2) var(--ds-space-3);
   border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, #04060c 78%, transparent);
-  color: #d9d2c5;
+  background: var(--ds-world-hud-ground);
+  color: var(--ds-world-hud-ink);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   line-height: 1.45;
@@ -1596,6 +1596,12 @@ body:has(.ds-recpage[data-ground]) .ds-map-stage .ds-map-callout--flag {
 @media (min-width: 72rem) {
   body:has(.ds-recpage[data-ground]) {
     --ds-ground-sheet-w: min(44rem, 48vw);
+  }
+
+  /* The page under the bar is full bleed here, so the bar goes to the corners with it
+     (command-bar.css, "v11 corner chrome"). */
+  body:has(.ds-recpage[data-ground]) .ds-bar__inner {
+    width: calc(100% - var(--ds-space-6) * 2);
   }
 
   .ds-recpage[data-ground] .ds-recpage__record {

@@ -144,6 +144,21 @@ export const darkMap: MapPalette = {
   halo: '#38332d',
 };
 
+/**
+ * The world (design-direction-v11.md section 5). It is always night, so these do not change with
+ * the reader's theme. `--ds-world-*` in tokens.css mirrors them; `world.test.ts` holds the pairs.
+ */
+export const worldPalette = {
+  /** Space behind the globe, and the ground of every label laid over the world. */
+  space: '#04060c',
+  /** The atmosphere's rim. Graphic only. */
+  rim: '#7eaad6',
+  /** The one emission color: a published record. Never encodes grade, count or importance. */
+  ember: '#f2a35c',
+  /** Mono labels laid over the world (imagery credit, location, controls). */
+  hudInk: '#e9e2d6',
+} as const;
+
 export const mapPalettes = {
   light: lightMap,
   dark: darkMap,

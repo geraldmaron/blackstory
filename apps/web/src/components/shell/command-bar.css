@@ -474,7 +474,17 @@ body:has([data-surface='door']) .ds-bar {
   padding-bottom: var(--ds-space-4);
 }
 
-body:has([data-surface='door']) .ds-bar__tabs .ds-tabs__tab {
+/* Corners, not a centered column: from 64rem the wordmark and the tools sit at the same inset as
+   the world's other corner pieces (the reader switches, the time rail), however wide the window. */
+@media (min-width: 64rem) {
+  body:has([data-surface='door']) .ds-bar__inner {
+    width: calc(100% - var(--ds-space-6) * 2);
+  }
+}
+
+/* A grounded record keeps the bar (its sheet scrolls under it) but speaks in the same voice. */
+body:has([data-surface='door']) .ds-bar__tabs .ds-tabs__tab,
+body:has(.ds-recpage[data-ground]) .ds-bar__tabs .ds-tabs__tab {
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   letter-spacing: 0.08em;

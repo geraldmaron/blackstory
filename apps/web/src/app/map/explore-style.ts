@@ -12,7 +12,7 @@ import type {
   LineLayerSpecification,
   StyleSpecification,
 } from 'maplibre-gl';
-import { brandPalette } from '@repo/ui';
+import { brandPalette, worldPalette } from '@repo/ui';
 import {
   DENSITY_TIER_FILL,
   DIGNITY_PALETTE,
@@ -624,12 +624,12 @@ function pinPaint(plate: MapPlate, opacity: number) {
  */
 /** Below this zoom the plate is at Orbit: lights, no place tokens (MapStage sets `data-orbit`). */
 export const ORBIT_MAX_ZOOM = 2.7;
-/** The one emission color of the world: the brand copper pushed toward an ember. */
 /** Line, text and non-water fill layers stand down below this zoom (see the end of the builder). */
 // 1.9, not 2: the national frame on a 320px phone fits the country at about zoom 1.95, and it
 // must keep its state lines, names and tints.
 export const ORBIT_LINE_MIN_ZOOM = 1.9;
-export const ORBIT_LIGHT_COLOR = '#f2a35c';
+/** The one emission color of the world: the brand copper pushed toward an ember. */
+export const ORBIT_LIGHT_COLOR = worldPalette.ember;
 /** Where the lights give way to record pins when they are kept lit on the way down. */
 export const LIGHTS_DEEP_MAX_ZOOM = 11;
 

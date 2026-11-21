@@ -1729,7 +1729,7 @@ body:has(.ds-door) .ds-door-journey {
    into its own outline instead of onto a blank field. It carries no continents and no lights, so
    it claims nothing; the records are in the list the page links to. Gone once the plate is live. */
 .ds-door__field {
-  background: #04060c;
+  background: var(--ds-world-space);
 }
 
 body:not(:has(.ds-map-stage[data-plate-ready]))
@@ -1745,8 +1745,8 @@ body:not(:has(.ds-map-stage[data-plate-ready]))
   border-radius: 50%;
   background: radial-gradient(circle at 42% 40%, #2a2622 0, #1b1815 55%, #0d0c0b 100%);
   box-shadow:
-    inset 6px 6px 22px rgb(126 170 214 / 0.38),
-    0 0 26px rgb(126 170 214 / 0.16);
+    inset 6px 6px 22px color-mix(in srgb, var(--ds-world-rim) 38%, transparent),
+    0 0 26px color-mix(in srgb, var(--ds-world-rim) 16%, transparent);
 }
 
 /* Phone and portrait: the disc is sized to the width and rises past the strip, as the globe does. */

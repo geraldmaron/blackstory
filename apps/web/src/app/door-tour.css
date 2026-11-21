@@ -209,8 +209,8 @@
     margin: 0;
     padding: var(--ds-space-2) var(--ds-space-3);
     border-radius: var(--ds-radius-sm);
-    background: color-mix(in srgb, #0c0b0a 86%, transparent);
-    color: #e9e2d6;
+    background: var(--ds-world-hud-ground);
+    color: var(--ds-world-hud-ink);
     font-family: var(--ds-font-mono);
     font-size: var(--ds-text-caption);
     line-height: 1.45;

@@ -109,6 +109,20 @@
   --ds-map-halo: #fbf8f2;
 }
 
+/*
+ * The world (design-direction-v11.md section 5). Always night: these do not follow the theme.
+ * Mirrors `worldPalette` in colors.ts; world.test.ts asserts parity and the contrast pairs.
+ * Ember is the only saturated color in the world and means "a published record", nothing more.
+ */
+:root {
+  --ds-world-space: #04060c;
+  --ds-world-rim: #7eaad6;
+  --ds-world-ember: #f2a35c;
+  --ds-world-hud-ink: #e9e2d6;
+  /* The one ground for a label over the world: space, let through a little. */
+  --ds-world-hud-ground: color-mix(in srgb, var(--ds-world-space) 80%, transparent);
+}
+
 [data-theme='dark'] [data-ground='paper']:not([data-ground-fixed]),
 [data-theme='dark'] [data-ground='copper']:not([data-ground-fixed]),
 [data-theme='dark'] [data-ground='sand']:not([data-ground-fixed]),

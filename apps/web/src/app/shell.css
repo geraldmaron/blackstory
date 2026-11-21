@@ -2288,5 +2288,5 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
 
 /* Space, not page ground, behind the globe. */
 .ds-map-stage {
-  background: #04060c;
+  background: var(--ds-world-space);
 }
