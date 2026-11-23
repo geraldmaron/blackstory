@@ -166,7 +166,7 @@ test('Explore is `/`; `/explore` mounts the same Door browse shell', () => {
 
   const home = readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8');
   const explore = readFileSync(join(APP_ROOT, 'explore/page.tsx'), 'utf8');
-  assert.match(home, /DoorHome/);
+  assert.match(home, /home\/home-page/);
   assert.doesNotMatch(home, /AtlasHome|HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
   assert.match(explore, /DoorHome/);
   assert.match(explore, /initialBrowse/);

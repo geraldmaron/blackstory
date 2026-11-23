@@ -1,0 +1,32 @@
+[
+  {
+    "file": "grain.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. Square 1:1. Fine monochrome photographic film grain, neutral mid-gray field, even density edge to edge with no vignette, no objects, suitable to tile seamlessly as an overlay. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content."
+  },
+  {
+    "file": "paper.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. Square 1:1. Close-up of uncoated archival rag paper, warm off-white (#ece4d6 family), visible soft fibers and very slight mottling, flat even lighting, no folds, no edges, no stains larger than a speck, tileable. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content."
+  },
+  {
+    "file": "dust.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. 16:9 landscape. Pure black background with sparse white dust specks, a few hairline scratches and tiny fibers like a scanned film negative. Mostly black (over 95 percent), for use with screen blending. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content."
+  },
+  {
+    "file": "ember-haze.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. 16:9 landscape. Pure black background with a soft out-of-focus warm copper/amber light leak (#e08a3c family) drifting in from the lower left corner, gentle bokeh falloff, no hard shapes, upper right stays black. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content."
+  },
+  {
+    "file": "deckle.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. Very wide strip, aspect ratio 4:1. A torn, deckled paper edge silhouette: solid white paper filling the top two thirds, irregular fibrous torn edge running horizontally, pure black below. High contrast, for use as a mask. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content. Output canvas must be 2048 pixels wide by 512 pixels tall (4:1), a very shallow horizontal banner."
+  },
+  {
+    "file": "halftone.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. Square 1:1. A coarse newspaper halftone dot gradient, black dots on white, dots largest at bottom left and vanishing toward top right, crisp print look, no image content. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content."
+  }
+]

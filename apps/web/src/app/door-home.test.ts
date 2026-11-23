@@ -46,7 +46,7 @@ const chaptersTsx = readFileSync(
 );
 
 test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument', () => {
-  assert.match(page, /DoorHome/);
+  assert.match(page, /home\/home-page/);
   assert.doesNotMatch(page, /AtlasHome|AtlasLoader|AtlasExperience/);
   assert.match(door, /DoorImmersive/);
   assert.match(door, /loadDoorPinPlate/);

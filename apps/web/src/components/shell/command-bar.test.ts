@@ -25,7 +25,7 @@ test('the tabs are Map, Records, Stories and Collections, in that order, from th
 });
 
 test('a record page belongs to Records; a collection belongs to Collections', () => {
-  assert.equal(currentTabFor('/'), '/explore');
+  assert.equal(currentTabFor('/'), null);
   assert.equal(currentTabFor('/explore'), '/explore');
   assert.equal(currentTabFor('/records'), '/records');
   assert.equal(currentTabFor('/entity/abc'), '/records');

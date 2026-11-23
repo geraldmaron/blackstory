@@ -164,7 +164,7 @@ test('CSP allows blackstory-app and leftover GCS; no other supabase.co host', ()
 });
 
 test('first paint no longer boots the full catalog: `/` is the Door, Explore stays on /explore', () => {
-  // The homepage must use DoorHome and the live catalog cache without mounting the Explore
+  // The homepage must use the home page (home/home-page.tsx) and the live catalog cache without mounting the Explore
   // instrument.
   const page = readFileSync(join(SRC_ROOT, 'app/page.tsx'), 'utf8');
   const shell = readFileSync(join(SRC_ROOT, 'app/explore/explore-view-model.ts'), 'utf8');
@@ -175,7 +175,7 @@ test('first paint no longer boots the full catalog: `/` is the Door, Explore sta
   assert.doesNotMatch(page, /getSharedPublicEntities/);
   assert.doesNotMatch(page, /buildAtlasShell/);
   assert.doesNotMatch(page, /AtlasLoader/);
-  assert.match(page, /DoorHome/);
+  assert.match(page, /home\/home-page/);
   // Unlocated records remain collection matches; drawable points are only one projection.
   assert.match(shell, /totalMatched: matches\.length/);
   assert.match(catalogRoute, /ATLAS_CATALOG_CACHE_CONTROL/);

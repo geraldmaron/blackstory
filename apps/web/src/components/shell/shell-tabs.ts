@@ -51,7 +51,8 @@ export function pathIsMapSurface(pathname: string): boolean {
 
 /** Which tab is current. A record page belongs to Records, the catalog that lists it. */
 export function currentTabFor(pathname: string): ShellTabId | null {
-  if (pathIsMapSurface(pathname)) return '/explore';
+  // The home page is not the map (design-direction-v12.md): no tab is current on `/`.
+  if (under(pathname, '/explore')) return '/explore';
   if (under(pathname, '/stories')) return '/stories';
   if (RECORD_PREFIXES.some((path) => under(pathname, path))) return '/records';
   if (under(pathname, '/collections') || COLLECTION_PATHS.some((path) => under(pathname, path))) {

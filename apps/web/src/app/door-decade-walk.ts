@@ -47,6 +47,8 @@ export type DoorRecord = {
   readonly plate?: PublicEntityPrimaryImageView;
   /** A portrait: the plate holds the top of the frame, where the face is. */
   readonly person: boolean;
+  /** The record's kind (place, person, school...), so a pick can vary what it shows. */
+  readonly kind?: string;
   /** The one claim, already in the evidence list's shape (a string statement, a linked source). */
   readonly claim: EvidenceItem;
   /** The record's state (postal code), for the tour's spread across regions. */
@@ -149,6 +151,7 @@ export function doorRecords(
       precision: feature.properties.precision,
       decade,
       person: String(entity.kind) === 'person',
+      kind: String(entity.kind),
       ...(feature.properties.statePostalCode
         ? { statePostal: feature.properties.statePostalCode }
         : {}),

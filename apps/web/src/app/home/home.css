@@ -1,0 +1,1136 @@
+/*
+ * The home page (docs/ui/design-direction-v12.md, "On the Ground").
+ *
+ * Five planes, back to front: the ground (the persistent map, MapStage's fixed plate), the air
+ * (ember haze and grain, over the ground only, never over a photograph or text), the year (the
+ * decade in display type behind a stop), the plate (the record's own photograph, in its own
+ * color, credited) and the words (name, place, one claim on a paper card).
+ *
+ * The page is a document first: every section stacks and reads without JavaScript. `data-film`
+ * (home-film.tsx, once the plate is live and motion is allowed) pins each stop for two screens
+ * and lets the scroll move the camera.
+ */
+
+.ds-home {
+  --home-edge: clamp(var(--ds-space-5), 4.5vw, var(--ds-space-16));
+  --home-bar: var(--ds-island-clearance, 4rem);
+  --home-paper: var(--ds-material-paper);
+  --home-paper-ink: var(--ds-material-ink);
+  position: relative;
+  z-index: var(--ds-z-content);
+  color: var(--ds-world-hud-ink);
+  /* Night until this mount's own frame has landed on the plate; then the map is the ground. */
+  background: var(--ds-world-space);
+  transition: background-color var(--ds-duration-slow) var(--ds-easing);
+}
+
+.ds-home[data-plate='live'] {
+  background: transparent;
+}
+
+/* Measured only: where a landing frames its record. */
+.ds-home__landing {
+  position: fixed;
+  top: var(--home-bar);
+  right: 3vw;
+  bottom: 16vh;
+  left: 56vw;
+  pointer-events: none;
+}
+
+.ds-home__note {
+  position: relative;
+  margin: 0;
+  padding: var(--ds-space-3) var(--home-edge);
+  font: var(--ds-text-meta) / 1.4 var(--ds-font-mono);
+}
+
+/* —— Title ——————————————————————————————————————————————————————————————————— */
+
+.ds-home-title {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  padding: calc(var(--home-bar) + var(--ds-space-8)) var(--home-edge) var(--ds-space-16);
+  box-sizing: border-box;
+  align-items: center;
+  /* The ground stays readable as a country of lights but never competes with the words. */
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ds-world-space) 88%, transparent) 0%,
+    color-mix(in srgb, var(--ds-world-space) 62%, transparent) 46%,
+    color-mix(in srgb, var(--ds-world-space) 30%, transparent) 100%
+  );
+  isolation: isolate;
+}
+
+/* The air: warm light at the foot of the title, and grain. Over the ground only. */
+.ds-home-title::before,
+.ds-home-title::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* local: order inside the home page's own scenes */
+  pointer-events: none;
+}
+
+.ds-home-title::before {
+  background: url('/home/ember-haze.webp') left bottom / cover no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+
+.ds-home-title::after {
+  background: url('/home/grain.webp') 0 0 / 256px 256px;
+  mix-blend-mode: overlay;
+  opacity: 0.22;
+}
+
+.ds-home-title__words {
+  position: relative;
+  z-index: 2; /* local: order inside the home page's own scenes */
+  max-width: 44rem;
+}
+
+.ds-home-title__headline {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 800;
+  font-size: clamp(3.25rem, 1rem + 6.4vw, 7.75rem);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ds-home-title__headline em {
+  color: var(--ds-world-ember);
+  font-style: italic;
+}
+
+.ds-home-title__line {
+  max-width: 34rem;
+  margin: var(--ds-space-6) 0 0;
+  font: 500 var(--ds-text-editorial-lede) / 1.4 var(--ds-font-sans);
+  text-wrap: pretty;
+}
+
+.ds-home-title__search {
+  display: flex;
+  gap: var(--ds-space-2);
+  max-width: 30rem;
+  margin-top: var(--ds-space-8);
+}
+
+.ds-home-title__search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0 var(--ds-space-4);
+  border: 1px solid color-mix(in srgb, var(--ds-world-hud-ink) 45%, transparent);
+  border-radius: var(--ds-radius-sm);
+  background: color-mix(in srgb, var(--ds-world-space) 78%, transparent);
+  color: inherit;
+  font: var(--ds-text-body) / 1 var(--ds-font-sans);
+}
+
+.ds-home-title__search input::placeholder {
+  color: color-mix(in srgb, var(--ds-world-hud-ink) 72%, transparent);
+}
+
+.ds-home-title__search input:focus-visible {
+  outline: 2px solid var(--ds-world-ember);
+  outline-offset: 2px;
+}
+
+.ds-home-title__search button {
+  min-height: 3rem;
+}
+
+.ds-home-title__ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  margin: var(--ds-space-5) 0 0;
+}
+
+.ds-home-title__way {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: inherit;
+  font: 650 var(--ds-text-body) / 1.2 var(--ds-font-display);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-world-ember);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.3em;
+}
+
+.ds-home-title__way:hover {
+  color: var(--ds-world-ember);
+}
+
+.ds-home-title__coverage {
+  max-width: 30rem;
+  margin: var(--ds-space-6) 0 0;
+  font: var(--ds-text-meta) / 1.5 var(--ds-font-mono);
+  color: color-mix(in srgb, var(--ds-world-hud-ink) 82%, transparent);
+}
+
+.ds-home-title__coverage a {
+  color: inherit;
+}
+
+.ds-home-title__cue {
+  position: absolute;
+  bottom: var(--ds-space-6);
+  left: var(--home-edge);
+  z-index: 2; /* local: order inside the home page's own scenes */
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: inherit;
+  font: var(--ds-text-meta) / 1 var(--ds-font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.ds-home-title__cue::after {
+  content: '';
+  width: 1px;
+  height: 2rem;
+  margin-left: var(--ds-space-3);
+  background: var(--ds-world-ember);
+}
+
+/* The plates: real photographs as prints, at three depths. */
+.ds-home-title__plates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-10) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-home-plate {
+  position: relative;
+  margin: 0;
+  padding: var(--ds-space-2);
+  border-radius: 3px;
+  background: var(--home-paper);
+  color: var(--home-paper-ink);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.5),
+    0 18px 48px rgb(0 0 0 / 0.55);
+}
+
+.ds-home-plate--lead {
+  grid-column: 1 / -1;
+}
+
+.ds-home-plate:nth-child(n + 4) {
+  display: none;
+}
+
+.ds-home-plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 1px;
+}
+
+.ds-home-plate--lead img {
+  aspect-ratio: 16 / 10;
+  object-position: top;
+}
+
+.ds-home-plate figure {
+  margin: 0;
+}
+
+.ds-home-plate figcaption,
+.ds-home-plate__credit {
+  margin: var(--ds-space-1) 0 0;
+  font: var(--ds-text-micro) / 1.35 var(--ds-font-mono);
+  color: color-mix(in srgb, var(--home-paper-ink) 78%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.ds-home-plate figcaption a,
+.ds-home-plate__credit a {
+  color: inherit;
+}
+
+.ds-home-plate__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-home-plate__label,
+.ds-home-plate__name {
+  display: block;
+  margin-top: var(--ds-space-2);
+  color: var(--home-paper-ink);
+  font: 700 var(--ds-text-subtitle) / 1.15 var(--ds-font-display);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.ds-home-plate--lead .ds-home-plate__label {
+  font-size: var(--ds-text-title);
+}
+
+.ds-home-plate__kicker,
+.ds-home-plate__place {
+  display: block;
+  margin-bottom: var(--ds-space-1);
+  font: var(--ds-text-micro) / 1.3 var(--ds-font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--home-paper-ink) 78%, transparent);
+}
+
+.ds-home-plate__place {
+  margin: var(--ds-space-1) 0 0;
+}
+
+.ds-home-plate__name:hover,
+.ds-home-plate__link:hover .ds-home-plate__label {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ds-home-plate :is(a):focus-visible {
+  outline: 2px solid var(--home-paper-ink);
+  outline-offset: 2px;
+}
+
+@media (min-width: 64rem) {
+  .ds-home-title {
+    grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+    padding-bottom: var(--ds-space-18);
+  }
+
+  .ds-home-title__plates {
+    position: relative;
+    display: block;
+    align-self: stretch;
+    min-height: min(44rem, 74vh);
+    margin: 0 0 0 var(--ds-space-6);
+  }
+
+  .ds-home-plate,
+  .ds-home-plate:nth-child(n + 4) {
+    display: block;
+    position: absolute;
+  }
+
+  .ds-home-plate--lead {
+    top: 6%;
+    left: 0;
+    z-index: 3; /* local: order inside the home page's own scenes */
+    width: 56%;
+    rotate: -1.6deg;
+  }
+
+  .ds-home-plate:nth-child(2) {
+    top: 0;
+    right: 0;
+    z-index: 2; /* local: order inside the home page's own scenes */
+    width: 38%;
+    rotate: 1.4deg;
+  }
+
+  .ds-home-plate:nth-child(3) {
+    top: 46%;
+    right: 4%;
+    z-index: 4; /* local: order inside the home page's own scenes */
+    width: 44%;
+    rotate: -0.8deg;
+  }
+
+  .ds-home-plate:nth-child(4) {
+    bottom: 0;
+    left: 8%;
+    z-index: 4; /* local: order inside the home page's own scenes */
+    width: 34%;
+    rotate: 1.8deg;
+  }
+
+  .ds-home-plate:nth-child(n + 5) {
+    display: none;
+  }
+}
+
+/* Depth: each plane leaves the title at its own speed. The page's own scroll is the clock. */
+@supports (animation-timeline: scroll()) {
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .ds-home-plate {
+      animation: ds-home-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+
+    .ds-home-plate[data-depth='1'] {
+      --home-drift: -6vh;
+    }
+
+    .ds-home-plate[data-depth='2'] {
+      --home-drift: -16vh;
+    }
+
+    .ds-home-plate[data-depth='3'] {
+      --home-drift: -28vh;
+    }
+
+    .ds-home-title__words {
+      animation: ds-home-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+      --home-drift: 8vh;
+    }
+  }
+}
+
+@keyframes ds-home-drift {
+  to {
+    translate: 0 var(--home-drift, 0);
+  }
+}
+
+/* —— Journey: a stacked document by default ————————————————————————————————— */
+
+.ds-home-journey__stops {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-home-stop__scene {
+  position: relative;
+  display: grid;
+  gap: var(--ds-space-5);
+  padding: var(--ds-space-12) var(--home-edge);
+  background: color-mix(in srgb, var(--ds-world-space) 86%, transparent);
+  isolation: isolate;
+  overflow: clip;
+}
+
+.ds-home-stop__year {
+  position: absolute;
+  top: var(--ds-space-4);
+  left: calc(var(--home-edge) - 0.04em);
+  z-index: -1; /* local: order inside the home page's own scenes */
+  margin: 0;
+  font: 800 clamp(7rem, 34vw, 15rem) / 0.8 var(--ds-font-display);
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  color: var(--ds-world-ember);
+  opacity: 0.5;
+  /* Printed, not glowing: the numeral is filled with a coarse halftone. */
+  -webkit-mask: url('/home/halftone.webp') left bottom / 34rem 34rem;
+  mask: url('/home/halftone.webp') left bottom / 34rem 34rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ds-home-stop__plate {
+  margin-top: clamp(3.5rem, 16vw, 7rem);
+}
+
+.ds-home-stop__plate figure {
+  margin: 0;
+  padding: var(--ds-space-2);
+  border-radius: 3px;
+  background: var(--home-paper);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.5),
+    0 24px 60px rgb(0 0 0 / 0.6);
+}
+
+.ds-home-stop__plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 46svh;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 1px;
+}
+
+.ds-home-stop__figure--upper img {
+  object-position: top;
+}
+
+.ds-home-stop__plate figcaption {
+  margin-top: var(--ds-space-1);
+  font: var(--ds-text-micro) / 1.35 var(--ds-font-mono);
+  color: color-mix(in srgb, var(--home-paper-ink) 78%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.ds-home-stop__plate figcaption a {
+  color: inherit;
+}
+
+.ds-home-stop__photo-note {
+  margin: var(--ds-space-2) 0 0;
+  font: var(--ds-text-micro) / 1.35 var(--ds-font-mono);
+  color: color-mix(in srgb, var(--ds-world-hud-ink) 80%, transparent);
+}
+
+.ds-home-stop__kicker {
+  margin: 0;
+  font: var(--ds-text-meta) / 1.3 var(--ds-font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-world-ember);
+}
+
+.ds-home-stop__name {
+  margin: var(--ds-space-2) 0 0;
+  font: 800 var(--ds-text-headline) / 0.98 var(--ds-font-display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.ds-home-stop__place {
+  margin: var(--ds-space-2) 0 0;
+  font: var(--ds-text-body-sm) / 1.4 var(--ds-font-sans);
+  color: color-mix(in srgb, var(--ds-world-hud-ink) 86%, transparent);
+}
+
+/* The claim, on a plain paper card: interface, not a reproduced document, so it is flat paper
+   with no aging. */
+.ds-home-slip {
+  margin: var(--ds-space-5) 0;
+  padding: var(--ds-space-4) var(--ds-space-5);
+  border-radius: 3px;
+  background: var(--home-paper);
+  color: var(--home-paper-ink);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
+.ds-home-slip :where(ul, ol) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 64rem) {
+  .ds-home-stop__scene {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-4);
+    padding-top: calc(var(--home-bar) + var(--ds-space-5));
+    padding-bottom: var(--ds-space-18);
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ds-world-space) 94%, transparent) 0%,
+      color-mix(in srgb, var(--ds-world-space) 88%, transparent) 36%,
+      transparent 60%
+    );
+  }
+
+  .ds-home-stop__plate,
+  .ds-home-stop__words {
+    max-width: min(42vw, 40rem);
+  }
+
+  /* The decade stands at the foot of the map's side of the scene, under the pin. */
+  .ds-home-stop__year {
+    top: auto;
+    right: 3vw;
+    bottom: 6.5rem;
+    left: auto;
+    font-size: clamp(8rem, 24vh, 16rem);
+    opacity: 0.62;
+  }
+
+  .ds-home-stop__plate {
+    margin-top: 0;
+  }
+
+  .ds-home-stop__plate img {
+    max-height: 36vh;
+  }
+
+  .ds-home-stop__name {
+    font-size: clamp(1.75rem, 1rem + 1.5vw, 2.75rem);
+  }
+
+  .ds-home[data-film] .ds-home-stop__plate {
+    min-height: min(24vh, 14rem);
+  }
+
+  .ds-home-slip {
+    margin: var(--ds-space-4) 0;
+  }
+}
+
+/* —— The film: each stop pinned for two screens, its scene shown while the camera is landed —— */
+
+.ds-home[data-film] .ds-home-stop__section {
+  height: 200vh;
+}
+
+.ds-home[data-film] .ds-home-stop__scene {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  align-content: start;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-duration-base) var(--ds-easing),
+    visibility 0s linear var(--ds-duration-base);
+}
+
+.ds-home[data-film] [data-current] > .ds-home-stop__scene {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* A pinned scene always fits its window: the words take the room they need and the photograph
+   takes what is left, so a long name or a long claim never pushes the way in off the screen. */
+.ds-home[data-film] .ds-home-stop__scene {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+}
+
+.ds-home[data-film] .ds-home-stop__plate {
+  display: flex;
+  flex: 0 1 46vh;
+  flex-direction: column;
+  min-height: 6rem;
+}
+
+.ds-home[data-film] .ds-home-stop__plate figure {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ds-home[data-film] .ds-home-stop__plate img {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.ds-home[data-film] .ds-home-stop__words {
+  flex: none;
+}
+
+/* A phone: the photograph is the top of the screen and the words stand under it. */
+@media (max-width: 63.999rem) {
+  .ds-home__landing {
+    inset: var(--home-bar) 0 auto 0;
+    height: 30svh;
+  }
+
+  .ds-home[data-film] .ds-home-stop__scene {
+    justify-content: flex-start;
+    gap: var(--ds-space-3);
+    padding: 0 0 calc(var(--ds-space-16) + env(safe-area-inset-bottom));
+    background: linear-gradient(
+      180deg,
+      transparent 0,
+      color-mix(in srgb, var(--ds-world-space) 94%, transparent) 30svh
+    );
+  }
+
+  .ds-home[data-film] .ds-home-stop__plate {
+    margin-top: var(--home-bar);
+    padding: 0 var(--ds-space-4);
+  }
+
+  .ds-home[data-film] .ds-home-stop__words {
+    padding: 0 var(--ds-space-4);
+  }
+
+  .ds-home[data-film] .ds-home-stop__year {
+    top: auto;
+    right: var(--ds-space-3);
+    bottom: calc(var(--ds-space-16) + env(safe-area-inset-bottom));
+    left: auto;
+    font-size: var(--ds-text-numeral);
+    opacity: 0.32;
+  }
+
+  .ds-home[data-film] .ds-home-stop__name {
+    font-size: clamp(1.5rem, 6.4vw, 2rem);
+  }
+
+  .ds-home[data-film] .ds-home-slip {
+    margin: var(--ds-space-3) 0;
+    padding: var(--ds-space-3) var(--ds-space-4);
+  }
+
+  .ds-home[data-film] .ds-home-stop__photo-note {
+    display: none;
+  }
+}
+
+/* In transit: the decade rolling toward the next stop's, and where the camera is going. */
+.ds-home-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 2; /* local: order inside the home page's own scenes */
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--home-bar) var(--home-edge) 12vh;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+}
+
+.ds-home-hud[data-on] {
+  opacity: 1;
+}
+
+.ds-home-hud__roll {
+  font: 800 clamp(6rem, 26vw, 22rem) / 0.8 var(--ds-font-display);
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-world-ember);
+  opacity: 0.8;
+  -webkit-mask: url('/home/halftone.webp') left bottom / 40rem 40rem;
+  mask: url('/home/halftone.webp') left bottom / 40rem 40rem;
+}
+
+.ds-home-hud__leg {
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-world-hud-ground);
+  font: var(--ds-text-meta) / 1.3 var(--ds-font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The rail: the journey on a time axis. Each tick is a stop at its decade. */
+.ds-home-rail {
+  position: fixed;
+  right: 14rem;
+  bottom: var(--ds-space-5);
+  left: 54vw;
+  z-index: 3; /* local: order inside the home page's own scenes */
+  display: none;
+  align-items: flex-end;
+  gap: var(--ds-space-4);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-duration-base) var(--ds-easing),
+    visibility 0s linear var(--ds-duration-base);
+}
+
+/* From 80rem: narrower, five decade labels do not fit beside the scene. */
+@media (min-width: 80rem) {
+  .ds-home[data-film] .ds-home-rail {
+    display: flex;
+  }
+}
+
+.ds-home[data-active='true'] .ds-home-rail {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.ds-home-rail__stops {
+  position: relative;
+  flex: 1;
+  height: 2.75rem;
+  margin: 0 var(--ds-space-6);
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-world-hud-ink) 50%, transparent);
+}
+
+/* The playhead: where the scroll is in time. */
+.ds-home-rail__stops::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: calc(var(--home-time, 0) * 100%);
+  width: 7px;
+  height: 7px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--ds-world-ember);
+}
+
+.ds-home-rail__stops li {
+  position: absolute;
+  bottom: 0;
+  translate: -50% 0;
+}
+
+.ds-home-rail__stop {
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  color: var(--ds-world-hud-ink);
+  font: var(--ds-text-micro) / 1 var(--ds-font-mono);
+  text-decoration: none;
+}
+
+.ds-home-rail__tick {
+  order: 2;
+  width: 1px;
+  height: 0.5rem;
+  margin-top: var(--ds-space-1);
+  background: currentcolor;
+}
+
+.ds-home-rail__label {
+  padding: 2px var(--ds-space-1);
+  border-radius: 2px;
+  background: var(--ds-world-hud-ground);
+}
+
+.ds-home-rail__stop[aria-current] {
+  color: var(--ds-world-ember);
+  font-weight: 700;
+}
+
+.ds-home-rail__stop:focus-visible,
+.ds-home-rail__skip:focus-visible {
+  outline: 2px solid var(--ds-world-ember);
+  outline-offset: 2px;
+}
+
+.ds-home-rail__skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-world-hud-ground);
+  color: var(--ds-world-hud-ink);
+  font: var(--ds-text-micro) / 1 var(--ds-font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* —— Country ————————————————————————————————————————————————————————————————— */
+
+.ds-home-country {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  padding: var(--home-bar) var(--home-edge) var(--ds-space-24);
+  box-sizing: border-box;
+  align-items: end;
+  background: linear-gradient(
+    180deg,
+    transparent 40%,
+    color-mix(in srgb, var(--ds-world-space) 90%, transparent) 86%
+  );
+}
+
+.ds-home-country__headline {
+  margin: 0;
+  font: 800 var(--ds-text-display) / 0.9 var(--ds-font-display);
+  letter-spacing: -0.035em;
+}
+
+.ds-home-country__line {
+  max-width: 36rem;
+  margin: var(--ds-space-5) 0 0;
+  font: 500 var(--ds-text-editorial-lede) / 1.4 var(--ds-font-sans);
+  text-wrap: pretty;
+}
+
+.ds-home-country__ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-6) 0 0;
+}
+
+/* —— The sheet: stories and receipts on paper, rising over the map ————————————— */
+
+.ds-home-sheet {
+  position: relative;
+  padding: var(--ds-space-16) var(--home-edge) var(--ds-space-24);
+  background: var(--home-paper) url('/home/paper.webp') 0 0 / 384px 384px;
+  color: var(--home-paper-ink);
+}
+
+/* The sheet's top edge is torn: the one place the page shows paper as an object. */
+.ds-home-sheet::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: calc(100% - 1px);
+  left: 0;
+  height: clamp(2rem, 5vw, 4.5rem);
+  background: var(--home-paper) url('/home/paper.webp') 0 0 / 384px 384px;
+  -webkit-mask: url('/home/deckle.webp') center top / 100% 300%;
+  mask: url('/home/deckle.webp') center top / 100% 300%;
+  rotate: 180deg;
+  pointer-events: none;
+}
+
+.ds-home-sheet__kicker {
+  margin: 0 0 var(--ds-space-6);
+  padding-bottom: var(--ds-space-3);
+  border-bottom: 2px solid var(--home-paper-ink);
+  font: var(--ds-text-meta) / 1 var(--ds-font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-home-story a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-home-story a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-home-story--lead {
+  display: grid;
+  gap: var(--ds-space-8);
+  align-items: end;
+}
+
+.ds-home-story__cover {
+  margin: 0;
+}
+
+.ds-home-story__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 72svh;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  box-shadow: 0 24px 60px rgb(20 17 14 / 0.3);
+}
+
+.ds-home-story__cover figcaption {
+  margin-top: var(--ds-space-2);
+  font: var(--ds-text-micro) / 1.4 var(--ds-font-mono);
+  color: color-mix(in srgb, var(--home-paper-ink) 78%, transparent);
+}
+
+.ds-home-story__era {
+  margin: 0;
+  font: 800 var(--ds-text-numeral) / 0.9 var(--ds-font-display);
+  letter-spacing: -0.04em;
+  color: var(--ds-material-copper-deep);
+}
+
+.ds-home-story__title {
+  margin: var(--ds-space-3) 0 0;
+  font: 800 var(--ds-text-headline) / 0.98 var(--ds-font-display);
+  letter-spacing: -0.03em;
+}
+
+.ds-home-story__dek {
+  max-width: 34rem;
+  margin: var(--ds-space-4) 0 var(--ds-space-6);
+  font: var(--ds-text-editorial-lede) / 1.45 var(--ds-font-editorial);
+  text-wrap: pretty;
+}
+
+.ds-home-stories__more {
+  display: grid;
+  gap: var(--ds-space-8);
+  margin: var(--ds-space-16) 0 0;
+  padding: var(--ds-space-8) 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--home-paper-ink) 40%, transparent);
+  list-style: none;
+}
+
+.ds-home-story--row .ds-home-story__era {
+  font-size: var(--ds-text-title);
+  letter-spacing: -0.01em;
+}
+
+.ds-home-story--row .ds-home-story__title {
+  font-size: var(--ds-text-display-2);
+}
+
+.ds-home-story--row .ds-home-story__dek {
+  margin-bottom: 0;
+  font-size: var(--ds-text-editorial);
+}
+
+.ds-home-receipts {
+  margin-top: var(--ds-space-24);
+}
+
+.ds-home-receipts__headline {
+  margin: 0;
+  font: 800 var(--ds-text-headline) / 1 var(--ds-font-display);
+  letter-spacing: -0.03em;
+}
+
+.ds-home-receipts__line {
+  max-width: 36rem;
+  margin: var(--ds-space-4) 0 0;
+  font: var(--ds-text-editorial) / 1.5 var(--ds-font-editorial);
+}
+
+.ds-home-receipts__grades {
+  display: grid;
+  gap: var(--ds-space-5);
+  margin: var(--ds-space-8) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-home-receipts__grade {
+  display: grid;
+  gap: var(--ds-space-1);
+  padding-top: var(--ds-space-3);
+  border-top: 1px solid color-mix(in srgb, var(--home-paper-ink) 40%, transparent);
+  color: var(--home-paper-ink);
+}
+
+.ds-home-receipts__count {
+  font: 800 var(--ds-text-display-2) / 1 var(--ds-font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.ds-home-receipts__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font: 600 var(--ds-text-body) / 1.2 var(--ds-font-sans);
+}
+
+.ds-home-receipts__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: inherit;
+  font: 650 var(--ds-text-body) / 1.2 var(--ds-font-display);
+  text-underline-offset: 0.25em;
+}
+
+.ds-home-sheet :is(a, button):focus-visible {
+  outline: 2px solid var(--home-paper-ink);
+  outline-offset: 2px;
+}
+
+@media (min-width: 48rem) {
+  .ds-home-story--lead {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .ds-home-stories__more {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-space-12);
+  }
+
+  .ds-home-receipts__grades {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ds-space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-home,
+  .ds-home-hud,
+  .ds-home-rail,
+  .ds-home-stop__scene {
+    transition: none;
+  }
+}
+
+/* A short phone cannot hold the photograph and the whole claim in one pinned screen. The claim
+   wins: the photograph is on the record, one tap away. */
+@media (max-width: 63.999rem) and (max-height: 43.75rem) {
+  .ds-home[data-film] .ds-home-stop__plate {
+    display: none;
+  }
+
+  .ds-home[data-film] .ds-home-stop__words {
+    margin-top: calc(var(--home-bar) + var(--ds-space-4));
+  }
+}
+
+/* A short desktop window: the photograph gives up height before the scene overflows. */
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .ds-home[data-film] .ds-home-stop__plate {
+    min-height: 9rem;
+  }
+
+  .ds-home[data-film] .ds-home-stop__name {
+    font-size: var(--ds-text-title);
+  }
+
+  .ds-home[data-film] .ds-home-stop__photo-note {
+    display: none;
+  }
+
+  .ds-home[data-film] .ds-home-stop__scene {
+    padding-bottom: var(--ds-space-12);
+  }
+}
+
+/* Wide: the photograph has its own column at the height of the scene, and the words stand
+   beside it. The map keeps the rest of the window for the record's pin. A narrower or shorter
+   window keeps the stacked scene, where the photograph gives way to the words. */
+@media (min-width: 80rem) and (min-height: 48rem) {
+  .ds-home__landing {
+    left: 62vw;
+  }
+
+  .ds-home[data-film] .ds-home-stop__scene {
+    display: grid;
+    grid-template-columns: minmax(0, 25vw) minmax(0, 29vw);
+    justify-content: start;
+    align-content: safe center;
+    align-items: center;
+    gap: var(--ds-space-8);
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ds-world-space) 94%, transparent) 0%,
+      color-mix(in srgb, var(--ds-world-space) 90%, transparent) 46%,
+      transparent 66%
+    );
+  }
+
+  .ds-home[data-film] .ds-home-stop__plate,
+  .ds-home[data-film] .ds-home-stop__words {
+    max-width: none;
+  }
+
+  .ds-home[data-film] .ds-home-stop__plate {
+    display: block;
+    min-height: 0;
+  }
+
+  .ds-home[data-film] .ds-home-stop__plate figure {
+    display: block;
+  }
+
+  .ds-home[data-film] .ds-home-stop__plate img {
+    height: min(58vh, 34rem);
+    aspect-ratio: auto;
+  }
+}

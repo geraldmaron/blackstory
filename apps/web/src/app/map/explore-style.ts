@@ -1401,7 +1401,21 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         // national frame, and a layer at 0 is not drawn.
         maxzoom: LIGHTS_DEEP_MAX_ZOOM,
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, 1.4, ORBIT_MAX_ZOOM, 2.6],
+          // Past Orbit a light keeps growing a little with the ground, or the country frame on
+          // a wide window is 4,000 specks nobody can see.
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0,
+            1.4,
+            ORBIT_MAX_ZOOM,
+            2.6,
+            5,
+            4,
+            9,
+            5.5,
+          ],
           'circle-color': ORBIT_LIGHT_COLOR,
           'circle-blur': 0.7,
           'circle-opacity': lightsOpacity(false),

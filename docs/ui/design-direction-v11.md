@@ -1,6 +1,7 @@
 # BlackStory design direction v11: One World
 
 **Status:** binding (2026-11-20). The owner signed off on the flagship and started the rollout in section 10 on 2026-11-20. The sign-off was given with acceptance criteria 14 and 15 and the reader test of "darkness is not absence" still unrun; they stay open in section 21 and can still reverse the direction (section 12). Section 20 is the account of what was built at sign-off; section 21 tracks the rollout.
+**Home page:** `design-direction-v12.md` (proposed 2026-11-22) replaces the Orbit altitude and everything this document says about `/`. Built on the branch, awaiting sign-off.
 **Supersedes:** v10 visual models, `PROTECTED-EXPERIENCES.md` P-01, the visual half of `brand.md`.
 **Still binding, unchanged:** P-02 evidence honesty, privacy rules, accessibility law, American English, the dignity rules for names and harm imagery.
 

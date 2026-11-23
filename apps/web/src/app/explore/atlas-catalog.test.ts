@@ -86,8 +86,8 @@ test('the Explore page never puts the catalog back in the initial prop', async (
   assert.doesNotMatch(pageSource, /toSerializableExploreViewModel/);
   assert.doesNotMatch(pageSource, /buildExploreViewModelAsync/);
   assert.doesNotMatch(pageSource, /wantsAtlasInstrument|atlas=1/);
-  assert.match(pageImports, /DoorHome/);
-  assert.match(pageSource, /DoorHome/);
+  assert.match(pageImports, /home\/home-page/);
+  assert.match(pageSource, /home\/home-page/);
   assert.doesNotMatch(pageSource, /AtlasHome/);
   assert.match(explorePage, /DoorHome/);
   assert.match(explorePage, /initialBrowse/);
