@@ -73,11 +73,11 @@ export function AboutScreen() {
         <View style={styles.section}>
           <LedgerSectionLabel>What holds</LedgerSectionLabel>
           <Text variant="rowTitle" isHeading>
-            Presence. Evidence. Dignity.
+            Place, evidence and dignity
           </Text>
           <Text variant="caption" colorRole="inkMuted">
-            Three commitments travel with every record: place first, receipts attached, and
-            protections that are rules rather than tone.
+            Three commitments travel with every record. It’s pinned to a place, its receipts are
+            attached, and its protections are enforced.
           </Text>
           <View
             style={styles.pillarGrid}
@@ -117,10 +117,10 @@ export function AboutScreen() {
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>Why this exists</LedgerSectionLabel>
           <Text variant="rowTitle" isHeading>
-            Mission beats
+            Three reasons
           </Text>
           <Text variant="caption" colorRole="inkMuted">
-            Three reasons the archive stays public, place-first, and evidence-backed.
+            Why the archive stays public, starts from a place and shows its evidence.
           </Text>
           <View style={styles.beats}>
             {ABOUT_MISSION_BEATS.map((beat, index) => (
@@ -189,7 +189,7 @@ export function AboutScreen() {
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>Where to begin</LedgerSectionLabel>
           <Text variant="caption" colorRole="inkMuted">
-            Same destinations as the web archive, opened as native screens.
+            The same places as the website, opened here in the app.
           </Text>
           <View>
             {ABOUT_DESTINATIONS.map((item, index) => (

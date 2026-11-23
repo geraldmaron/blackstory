@@ -82,7 +82,7 @@ export function validateCorrectionSubmission(
   const issues: CorrectionFieldIssue[] = [];
 
   if (!isCorrectionTargetType(input.targetType)) {
-    issues.push({ field: 'targetType', message: 'Choose what you are correcting.' });
+    issues.push({ field: 'targetType', message: 'Choose what you’re correcting.' });
   }
   if (!isCorrectionCategory(input.category)) {
     issues.push({ field: 'category', message: 'Choose a correction category.' });
@@ -90,7 +90,7 @@ export function validateCorrectionSubmission(
   if (!input.targetRecordId?.trim()) {
     issues.push({
       field: 'targetRecordId',
-      message: 'Name the place or record you are correcting.',
+      message: 'Name the place or record you’re correcting.',
     });
   }
   if (!input.statement?.trim() || input.statement.trim().length < MIN_STATEMENT_LENGTH) {

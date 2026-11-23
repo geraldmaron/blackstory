@@ -15,7 +15,7 @@ test('confidenceHelp covers every tier', () => {
   assert.match(confidenceHelp('high'), /well supported/i);
   assert.match(confidenceHelp('medium'), /mixed|moderate/i);
   assert.match(confidenceHelp('low'), /thin|weaker/i);
-  assert.match(confidenceHelp('unrated'), /not been assigned/i);
+  assert.match(confidenceHelp('unrated'), /(not|n’t) been assigned/i);
 });
 
 test('statusHelp explains common lifecycle icons in words', () => {

@@ -134,7 +134,7 @@ export function CorrectionForm({
             ? { status: 'idle' }
             : {
                 status: 'failed',
-                title: 'The correction was not accepted.',
+                title: 'The correction wasn’t accepted.',
                 detail: elsewhere.map((issue) => issue.message).join(' '),
               },
         );
@@ -144,7 +144,7 @@ export function CorrectionForm({
     } catch {
       setState({
         status: 'failed',
-        title: 'The correction was not sent.',
+        title: 'The correction wasn’t sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }
@@ -216,7 +216,7 @@ export function CorrectionForm({
             </>
           }
           htmlFor={ids.target}
-          hint="Name the place or paste its page address. You do not need an internal id."
+          hint="Name the place or paste its page address. You don’t need an internal id."
           {...errorProps('targetRecordId')}
         >
           <input
@@ -329,7 +329,7 @@ export function CorrectionForm({
             required
           />
           <label htmlFor={ids.privacy}>
-            I have read how a correction is handled, and understand it enters a restricted review
+            I’ve read how a correction is handled, and understand it enters a restricted review
             queue.
             <RequiredMark />
             <small>{CORRECTION_PRIVACY_NOTICE.body}</small>

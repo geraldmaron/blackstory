@@ -27,7 +27,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/faq',
   title: 'Questions',
   description:
-    'Who makes BlackStory, how AI is and is not used, how a record gets in, what a grade means, why coverage is uneven, and how to report an error.',
+    'Who makes BlackStory, how AI is and isn’t used, how a record gets in, what a grade means, why coverage is uneven, and how to report an error.',
 });
 
 /** An internal room link, a mailto, or an off-site page. Only the first needs the client router. */
@@ -115,7 +115,7 @@ export default function FaqPage() {
         ))}
 
         <p className="ds-trust-foot">
-          A question that is not here? <Link href="/support">Ask it directly</Link>.
+          A question that isn’t here? <Link href="/support">Ask it directly</Link>.
         </p>
       </TrustSheet>
     </Room>

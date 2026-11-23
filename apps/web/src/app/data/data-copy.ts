@@ -35,7 +35,7 @@ export const DATA_SECTION_COPY = {
   },
   gaps: {
     title: 'Measured gaps',
-    lede: 'Wealth, housing and justice as agencies published them. These series do not share the census decade grid; each keeps its own place and period.',
+    lede: 'Wealth, housing and justice as agencies published them. These series don’t line up with the census decades. Each one keeps its own place and period.',
   },
   reading: {
     title: 'How to read these figures',
@@ -84,7 +84,7 @@ export const DATA_READING_RULES = [
   },
   {
     title: 'Comparison, never cause',
-    body: 'Two bars side by side name a gap. They do not explain it. The statutes, deeds and underwriting records that explain a gap are on the place and record pages.',
+    body: 'Two bars side by side name a gap. They don’t explain it. The statutes, deeds and underwriting records that explain a gap are on the place and record pages.',
   },
   {
     title: 'Definitions move',

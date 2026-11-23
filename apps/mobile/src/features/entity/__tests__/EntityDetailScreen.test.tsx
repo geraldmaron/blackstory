@@ -69,7 +69,7 @@ describe('EntityDetailScreen — non-ready states', () => {
       <EntityDetailScreen state={{ kind: 'not-found' }} onBackToExplore={onBackToExplore} />,
     );
     expect(getByTestId('entity-not-found-state')).toBeTruthy();
-    expect(getByText('This record is not currently public')).toBeTruthy();
+    expect(getByText('This record isn’t public right now')).toBeTruthy();
     fireEvent.press(getByRole('button'));
     expect(onBackToExplore).toHaveBeenCalledTimes(1);
   });

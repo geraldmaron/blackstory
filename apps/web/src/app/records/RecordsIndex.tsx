@@ -200,7 +200,7 @@ function NoMatch({ model }: { readonly model: RecordsIndexModel }) {
   if (constraints.length === 0) {
     return (
       <Outcome title="The release is empty" action={{ href: '/', label: 'Go to the map' }}>
-        The archive failed to load its records. That is a fault in the site, not an absence of
+        The archive failed to load its records. That’s a fault in the site, not an absence of
         history.
       </Outcome>
     );
@@ -300,14 +300,14 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
     body =
       notice.kind === 'collection' ? (
         <Outcome
-          title="This story's records cannot be shown"
+          title="This story's records can't be shown"
           action={{ href: clearAllHref, label: 'Browse every record' }}
         >
           {notice.message}
         </Outcome>
       ) : (
         <Outcome
-          title="This decade range cannot be read"
+          title="This decade range can’t be read"
           action={{ href: periodClearHref, label: 'Clear the range' }}
         >
           {notice.message}
@@ -361,7 +361,7 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
     <Room width="wide" className={world ? 'ds-records ds-country' : 'ds-records'}>
       {/* The title at display scale with the count beside it as a giant copper numeral. The
           numeral is decorative, so the dek always carries the count for a screen reader; on
-          screen it says what the numeral cannot: how the set is narrowed, or the span it covers.
+          screen it says what the numeral can’t: how the set is narrowed, or the span it covers.
           An empty result prints no numeral (a giant zero reads as a joke). */}
       <header className="ds-records-head">
         <PageTitle className="ds-records-head__title">Records</PageTitle>

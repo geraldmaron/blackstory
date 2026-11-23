@@ -184,8 +184,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
           <View style={styles.section}>
             <LedgerSectionLabel ruleAbove>Plain-language explainer</LedgerSectionLabel>
             <Text variant="caption" colorRole="inkMuted">
-              An explainer is not published for this entry yet. Official sources remain available
-              below.
+              There’s no explainer for this entry yet. The official sources are still listed below.
             </Text>
           </View>
         )}

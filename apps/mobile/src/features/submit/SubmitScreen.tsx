@@ -41,7 +41,7 @@ export function SubmitScreen() {
         <Notice
           tone="info"
           title="Two different lanes"
-          description="Corrections fix published records. Leads point us at sources that are not yet in the archive. Neither path publishes submissions as-is."
+          description="Corrections fix published records. Leads point the archive at sources it doesn’t have yet. Either way, nothing is published as you sent it."
         />
 
         <View style={styles.section}>
@@ -68,8 +68,8 @@ export function SubmitScreen() {
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>New leads</LedgerSectionLabel>
           <Text variant="body" colorRole="ink">
-            Lead intake (closed groups, family papers, oral accounts) goes through a private review
-            queue on the website. A native lead form is not available in this release.
+            Leads (a closed group post, a family paper, an account nobody wrote down) go through a
+            private review queue on the website. This app doesn’t have its own lead form yet.
           </Text>
           <View style={styles.actions}>
             <Button

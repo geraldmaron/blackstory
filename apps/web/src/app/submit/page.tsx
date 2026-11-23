@@ -46,7 +46,7 @@ export default function SubmitLeadPage() {
             <NextSteps
               steps={[
                 'I read it, after a screen that holds likely hate aside.',
-                'If it is worth pursuing, it becomes a private research candidate.',
+                'If it’s worth pursuing, it becomes a private research candidate.',
                 'It reaches the site only after the same source checks as every record.',
               ]}
             >

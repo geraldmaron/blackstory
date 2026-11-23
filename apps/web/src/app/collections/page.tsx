@@ -24,7 +24,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/collections',
   title: 'Collections',
   description:
-    'Sets of like things, each read in its own order: every president on the record, the laws and rulings, national data series, lives decade by decade, banned books, and the memorial wall.',
+    'Sets that belong together, each read in its own order: every president on the record, the laws and rulings, national data series, lives decade by decade, banned books, and the memorial wall.',
 });
 
 function ArrowGlyph() {
@@ -54,7 +54,7 @@ export default function CollectionsPage() {
           <PageHeader
             display
             title="Collections"
-            dek={`${collections.length} sets of like things, each read in its own order.`}
+            dek={`${collections.length} sets that belong together, each read in its own order.`}
           />
         </TrustMast>
       }

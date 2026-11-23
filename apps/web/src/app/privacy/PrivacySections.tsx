@@ -34,7 +34,7 @@ const WEB_INVENTORY = [
     id: 'reading',
     term: 'Public reading',
     definition:
-      'Browsing maps, records, stories, and trust pages does not require an account. The site never asks you to sign in to read a published page.',
+      'Browsing maps, records, stories, and trust pages doesn’t require an account. The site never asks you to sign in to read a published page.',
   },
   {
     id: 'integrity',
@@ -46,13 +46,13 @@ const WEB_INVENTORY = [
     id: 'location',
     term: 'Optional location lookup',
     definition:
-      'If you choose to share device location or enter an address or ZIP on the map, that input is sent to the U.S. Census Bureau public geocoder to resolve state, county, and (when applicable) city. Exact coordinates and typed addresses are discarded after resolution; they are not kept as a search history.',
+      'If you choose to share device location or enter an address or ZIP on the map, that input is sent to the U.S. Census Bureau public geocoder to resolve state, county, and (when applicable) city. Exact coordinates and typed addresses are discarded after resolution; they aren’t kept as a search history.',
   },
   {
     id: 'hosting',
     term: 'Standard hosting logs',
     definition:
-      'Hosting infrastructure may record IP address, user agent, request path, and timestamps in server logs, for security and reliability. Those logs are operational. I do not sell them, nothing in them is used for ad targeting, and there is no account for them to be linked to.',
+      'Hosting infrastructure may record IP address, user agent, request path, and timestamps in server logs, for security and reliability. Those logs are operational. I don’t sell them, nothing in them is used for ad targeting, and there’s no account for them to be linked to.',
   },
   {
     id: 'web-analytics',
@@ -65,7 +65,7 @@ const WEB_INVENTORY = [
 const NOT_COLLECTED_RULES = [
   'There are no user accounts. Nothing on this site asks you to make one.',
   'No advertising, no ad identifiers, and no tracking prompts.',
-  'I do not sell personal information, and the site does no cross-context behavioral advertising.',
+  'I don’t sell personal information, and the site does no cross-context behavioral advertising.',
 ] as const;
 
 function InventoryLedger({
@@ -100,7 +100,7 @@ export function PrivacySections() {
         <p className="ds-trust-copy">
           This policy describes how BlackStory handles information on{' '}
           <span className="ds-phrase-nowrap">blackstory.app</span>. It covers what the site does
-          now. It is not a promise about features that do not exist yet.
+          now. It isn’t a promise about features that don’t exist yet.
         </p>
         <p className="ds-trust-copy">
           Data controller: <strong>Gerald Dagher</strong> (individual).
@@ -110,8 +110,8 @@ export function PrivacySections() {
 
       <RoomSection id="web" title="What this site may process">
         <p className="ds-trust-copy">
-          The public website is read-first. Interactive flows are optional and labeled before you
-          use them.
+          You can read everything here without handing anything over. The interactive parts are
+          optional, and each one is labeled before you use it.
         </p>
         <InventoryLedger items={WEB_INVENTORY} label="Website data inventory" />
         <p className="ds-trust-copy">
@@ -121,7 +121,7 @@ export function PrivacySections() {
         </p>
       </RoomSection>
 
-      <RoomSection id="not-collected" title="What I do not collect">
+      <RoomSection id="not-collected" title="What I don’t collect">
         <p className="ds-trust-copy">
           These are rules the software follows. If a release ever adds one of the things listed
           here, this page changes before that release ships.
@@ -154,13 +154,13 @@ export function PrivacySections() {
           When you file a correction, appeal, abuse report, or research lead, you choose what to
           write. Submissions go into a private queue, are kept so they can be opened later, and are
           never published as submitted. A screen runs over incoming mail before I read it, so
-          likely-hate is held aside and handled separately. Submissions are not used to train
-          models. The optional contact fields are used only to follow up with you about that
-          submission, and they are never shown publicly.
+          likely-hate is held aside and handled separately. Submissions aren’t used to train models.
+          The optional contact fields are used only to follow up with you about that submission, and
+          they are never shown publicly.
         </p>
         <p className="ds-trust-copy">
           Read the corrections privacy notice on the{' '}
-          <Link href="/corrections">corrections page</Link> before submitting. Do not include
+          <Link href="/corrections">corrections page</Link> before submitting. Don’t include
           anyone&apos;s home address or other sensitive personal details about a living person
           unless strictly necessary for the correction.
         </p>

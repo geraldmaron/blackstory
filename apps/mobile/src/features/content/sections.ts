@@ -50,7 +50,7 @@ export const SUPPORTING_SECTIONS: readonly SectionRow[] = [
   {
     routeId: 'about',
     title: 'About',
-    subtitle: 'What this is for, and what it refuses to do',
+    subtitle: 'What this is for, and what it won’t do',
     catalogSection: 'about',
     directSlug: 'about',
   },
@@ -78,7 +78,7 @@ export const SUPPORTING_SECTIONS: readonly SectionRow[] = [
   {
     routeId: 'privacy',
     title: 'Privacy',
-    subtitle: 'What this app collects, and what it does not',
+    subtitle: 'What this app collects, and what it doesn’t',
     catalogSection: 'privacy',
     directSlug: 'privacy',
   },

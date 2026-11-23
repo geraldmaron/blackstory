@@ -17,14 +17,14 @@ const FIELD_HELP: Readonly<Record<MetaFieldKey, string>> = {
   evidence: 'How many accepted, cited claims sit on the full record.',
   where: 'The U.S. state where this record is pinned on the map.',
   status:
-    'Lifecycle of the subject: whether it is still active, historic, living, deceased, or a legal status.',
+    'Lifecycle of the subject: whether it’s still active, historic, living, deceased, or a legal status.',
 };
 
 const CONFIDENCE_HELP: Readonly<Record<string, string>> = {
   high: 'High confidence: the strongest accepted claim is well supported by sources.',
   medium: 'Medium confidence: supporting evidence is mixed or only moderately strong.',
   low: 'Low confidence: supporting evidence is thin or weaker so far.',
-  unrated: 'Unrated: an evidence-strength score has not been assigned yet.',
+  unrated: 'Unrated: an evidence-strength score hasn’t been assigned yet.',
 };
 
 const STATUS_HELP: Readonly<Record<string, string>> = {
@@ -37,7 +37,7 @@ const STATUS_HELP: Readonly<Record<string, string>> = {
   presumed_deceased:
     'Presumed deceased: no death date on record, but birth year exceeds a plausibility bound (WP:BDP). Distinct from evidenced deceased.',
   unknown: 'Unknown: living status not yet established from evidence.',
-  in_force: 'In force: a legal rule or order that is still in effect.',
+  in_force: 'In force: a legal rule or order that’s still in effect.',
   amended: 'Amended: legal text that has been changed.',
   repealed: 'Repealed: a legal rule that has been withdrawn.',
   struck_down: 'Struck down: a legal rule invalidated by a court.',

@@ -39,7 +39,7 @@ export function LocationPrivacyNotice({
           {deviceStaysLocal ? (
             <li>
               Your device&rsquo;s location is used only in this browser, to mark where you are and
-              sort records by distance. It is not sent to BlackStory, saved, or added to the link.
+              sort records by distance. It isn’t sent to BlackStory, saved, or added to the link.
             </li>
           ) : null}
           <li>

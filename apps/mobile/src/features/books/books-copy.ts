@@ -19,7 +19,7 @@ export const BOOKS_CATALOG = {
   emptyBody: 'Try a broader keyword.',
   emptyAction: 'Clear search',
   seedNote:
-    'Curated on-device seed (exported from the web listing). Not a live warehouse refresh. A mobile bannedBooksListing API is tracked separately.',
+    'This list is a snapshot stored on your device, exported from the website, so it can be behind.',
   sourceCurated: 'Curated seed',
   sourceLive: 'Live snapshot',
 } as const;
@@ -35,7 +35,7 @@ export const BOOKS_DETAIL = {
   contextTitle: 'About this title',
   challengesTitle: 'States on challenge lists',
   challengesLede:
-    'Validated USPS codes for reported or unknown challenges. Rescinded entries are omitted. Codes follow cited public reports, not a claim of statewide removal.',
+    'States with a challenge that’s reported or of unknown outcome. Rescinded challenges are left out. A state follows a cited public report and doesn’t mean the book was removed statewide.',
   evidenceTitle: 'Citations',
   lookupTitle: 'Purchase and identifiers',
   lookupFootnote:
@@ -43,8 +43,7 @@ export const BOOKS_DETAIL = {
   relatedTitle: 'More in this catalog',
   entityCta: 'Open linked place record',
   missingTitle: 'Book not found',
-  missingBody:
-    'That catalog entry is not in this release. Return to Banned books and pick another title.',
+  missingBody: 'That title isn’t in this release. Go back to Banned books and pick another one.',
 } as const;
 
 /**

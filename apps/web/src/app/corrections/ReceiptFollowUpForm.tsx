@@ -123,7 +123,7 @@ export function ReceiptFollowUpForm({
       if (kind === 'appeal' && (response.status === 403 || response.status === 404)) {
         setState({
           status: 'failed',
-          title: 'This receipt cannot take an appeal right now.',
+          title: 'This receipt can’t take an appeal right now.',
           detail: 'An appeal is open only once a correction is closed, and only once per receipt.',
         });
         return;
@@ -140,7 +140,7 @@ export function ReceiptFollowUpForm({
     } catch {
       setState({
         status: 'failed',
-        title: 'It was not sent.',
+        title: 'It wasn’t sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }
@@ -239,7 +239,7 @@ export function ReceiptFollowUpForm({
           required
         />
         <label htmlFor={ids.privacy}>
-          I have read how this is handled.
+          I’ve read how this is handled.
           <RequiredMark />
           <small>{CORRECTION_PRIVACY_NOTICE.body}</small>
         </label>

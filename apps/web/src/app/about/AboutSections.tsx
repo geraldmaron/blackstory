@@ -30,7 +30,7 @@ const ABOUT_JUMP = [
   { id: 'stance', label: 'How I mean this' },
   { id: 'pillars', label: 'What records stand on' },
   { id: 'neo', label: 'How writing is made' },
-  { id: 'refusals', label: 'What it will not do' },
+  { id: 'refusals', label: 'What it won’t do' },
   { id: 'contribute', label: 'Add to it' },
   { id: 'begin', label: 'Where to begin' },
 ] as const;
@@ -134,8 +134,8 @@ export function AboutSections({ states }: AboutSectionsProps) {
       </TrustBand>
 
       <TrustBand tone="sand">
-        <RoomSection rule="weave" id="refusals" title="What it will not do">
-          <ul className="ds-trust-list" aria-label="What it will not do">
+        <RoomSection rule="weave" id="refusals" title="What it won’t do">
+          <ul className="ds-trust-list" aria-label="What it won’t do">
             {ABOUT_REFUSALS.map((refusal) => {
               const stop = refusal.indexOf('. ');
               return (

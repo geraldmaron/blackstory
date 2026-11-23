@@ -32,7 +32,7 @@ export type LocationConsentButtonProps = {
 
 const DENIAL_MESSAGES: Readonly<Record<GeolocationDenialReason, string>> = {
   unsupported:
-    'Your browser does not support location lookup here. Use the search form below instead.',
+    'Your browser doesn’t support location lookup here. Use the search form below instead.',
   permission_denied: 'Location access was denied. Use the search form below instead.',
   position_unavailable: 'Your location could not be determined. Use the search form below instead.',
   timeout: 'Location lookup timed out. Use the search form below instead.',

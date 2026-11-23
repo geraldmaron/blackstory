@@ -9,17 +9,16 @@ export const MEMORIAL_PAGE_DESCRIPTION =
 /**
  * "Held in the Wall" message: assembles from the wall's own handwriting
  * mechanic, one line at a time, then holds fixed at center permanently.
- * Approved copy. Do not rewrite without checking with product first.
+ * Owner-approved copy, rewritten at the owner's request on 2026-11-22. Check with the owner
+ * before changing it again.
  *
- * The "we" in the first line is the reader and the writer saying the names together, which is
- * what that line is for. It is not the project's first person, and the site-wide rule against
- * the publisher's "we" does not reach it.
+ * No "we": the lines speak about the names, to the reader, and nobody speaks for a group.
  */
 export const MEMORIAL_HELD_MESSAGE_LINES = [
-  'We say their names because silence is how forgetting starts.',
-  "Some of these names you know. Most of them, until now, you didn't.",
-  'Every one is a reminder: the fight for equality is not over.',
-  'This list will never be finished. That is not a flaw. It is the truth.',
+  'These names are here so nobody gets to forget them.',
+  "Some of them you know. Most of them, until now, you didn't.",
+  "The fight for equality isn't over, and every name here says so.",
+  "This list isn't finished, and it never will be.",
 ] as const;
 
 export const MEMORIAL_LIST_LEDE =

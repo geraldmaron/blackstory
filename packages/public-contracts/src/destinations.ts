@@ -182,8 +182,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'stories',
     isPublic: true,
     browsable: true,
-    description:
-      'The archive argued rather than listed. Sourced narrative that names the records it rests on.',
+    description: 'Long reads that make an argument and name the records they rest on.',
   },
   {
     id: 'records',
@@ -207,7 +206,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'collection',
     isPublic: true,
     browsable: true,
-    description: 'Sets of like things, read in their own order.',
+    description: 'Sets that belong together, read in their own order.',
   },
 
   /* ---------- collections ---------- */
@@ -245,7 +244,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     isPublic: true,
     browsable: true,
     description:
-      'National series with their sources attached, and a plain account of what each one cannot tell you.',
+      'National series with their sources attached, and a plain account of what each one can’t tell you.',
   },
   {
     id: 'lives',
@@ -257,7 +256,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     isPublic: true,
     browsable: true,
     description:
-      'Class and conditions by race, decade by decade, bound to published census tables.',
+      'Class and living conditions by race, decade by decade, straight from published census tables.',
   },
   {
     id: 'books',
@@ -268,7 +267,8 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'books',
     isPublic: true,
     browsable: true,
-    description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
+    description:
+      'Documented challenges to books. Each one is recorded as a challenge, and nobody here rules on the book.',
   },
   {
     id: 'memorial',
@@ -279,7 +279,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'memorial',
     isPublic: true,
     browsable: true,
-    description: 'Names, held quietly. No imagery of harm, no counts presented as a score.',
+    description: 'Names, held quietly. No images of harm, and no count kept like a score.',
   },
 
   /* ---------- understand / trust ---------- */
@@ -292,7 +292,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'about',
     isPublic: true,
     browsable: true,
-    description: 'What this is for, who it is for, and what it refuses to do.',
+    description: 'What this is for, who it’s for, and what it won’t do.',
   },
   {
     id: 'faq',
@@ -304,7 +304,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     isPublic: true,
     browsable: true,
     description:
-      'Who runs this, how AI is and is not used, what a grade means, and what to do when a record is wrong.',
+      'Who runs this, how AI is and isn’t used, what a grade means, and what to do when a record is wrong.',
   },
   {
     id: 'methodology',
@@ -339,8 +339,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'errata',
     isPublic: true,
     browsable: true,
-    description:
-      'The mistakes the archive found and fixed, published rather than quietly overwritten.',
+    description: 'The mistakes the archive found and fixed, published where you can see them.',
   },
 
   /* ---------- take part ---------- */
@@ -354,7 +353,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     isPublic: true,
     browsable: true,
     description:
-      'Point the archive at something it has missed. Leads are reviewed, not published on arrival.',
+      'Point the archive at something it missed. Every lead gets reviewed before anything is published.',
   },
   {
     id: 'corrections',
@@ -365,7 +364,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'correction',
     isPublic: true,
     browsable: true,
-    description: 'Tell the archive it is wrong. You get a receipt code and a tracked outcome.',
+    description: 'Tell the archive it’s wrong. You get a receipt code and a tracked outcome.',
   },
   {
     id: 'support',
@@ -393,7 +392,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'privacy',
     isPublic: true,
     browsable: false,
-    description: 'What this archive collects, what it does not, and how to ask.',
+    description: 'What this archive collects, what it doesn’t, and how to ask.',
   },
   {
     id: 'terms',
@@ -404,7 +403,7 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     icon: 'terms',
     isPublic: true,
     browsable: false,
-    description: 'What using this app means, and what it does not promise.',
+    description: 'What using this app means, and what it doesn’t promise.',
   },
 
   /* ---------- real destinations, not somewhere a reader is sent browsing ---------- */

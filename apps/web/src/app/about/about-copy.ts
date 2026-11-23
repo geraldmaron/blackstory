@@ -33,7 +33,7 @@ export const ABOUT_LINE =
 /** Brand support line. Keep on the door under the product name. */
 export const ABOUT_SUPPORT_LINE = 'People. Places. Evidence. Context.';
 
-export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records available to me, and it is unfinished on purpose.`;
+export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records available to me, and it’s unfinished on purpose.`;
 
 /** Origin paragraph the door steals. You walk past the place. Do not retype. */
 export const ABOUT_WALK_PAST =
@@ -43,8 +43,8 @@ export const ABOUT_WALK_PAST =
 export const ABOUT_ORIGIN = [
   "I'm not an institution. I'm one person with a laptop, a stack of evenings, and access to more public records than any generation before mine could have searched in a lifetime.",
   ABOUT_WALK_PAST,
-  "I'm not a historian, and I'm not an expert in the software I use to do this. What I have is the means, and enough command of the tools to put history that other people are working to hide in front of more of the people it belongs to. That is the size of the claim, and I would rather state it that small than dress it up.",
-  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I parse and review this in good faith, and I still get things wrong, because there is more of it than one person can hold at once. Those mistakes are in the errata with the earlier wording still readable, because a correction you cannot check is just a second assertion.',
+  "I'm not a historian, and I'm not an expert in the software I use to do this. What I have is the means, and enough command of the tools to put history that other people are working to hide in front of more of the people it belongs to. That's the size of the claim, and I'd rather state it that small than dress it up.",
+  'So I started pulling the records into one place, pinned to where they happened, with the source attached to every claim. I parse and review this in good faith, and I still get things wrong, because there’s more of it than one person can hold at once. Those mistakes are in the errata with the earlier wording still readable, because a correction you can’t check is just a second assertion.',
   "This was never going to be finished by one person, and I was never going to be the authority on any of it. I'll do my part for as long as I can. The rest of the work is making this solid enough that somebody else can add to it and trust what they find.",
 ] as const;
 
@@ -57,7 +57,7 @@ export const ABOUT_STANCE = {
   paragraphs: [
     "This is not anti-white, and it is not a case against anybody else. Black history is here because it happened in these places, and because the paper that survived it is still sitting in public files. Presence here is not a subtraction from anyone else's history.",
     'I try to keep the framing even. Assembling the site is still an opinion. I chose what to look for, which records to open first, and what to leave for later. The citations are how you form your own reading, including one that disagrees with mine.',
-    'You can challenge how I assembled this. You should not have to go looking for who I am in order to do it. I work as a product manager. The job is storytelling that has to survive the facts. I have done that at IBM, AT&T, HashiCorp and Sentry Data Systems, and I have led employee groups for people who were not the default in those rooms.',
+    'You can challenge how I assembled this. You shouldn’t have to go looking for who I am in order to do it. I work as a product manager. The job is storytelling that has to survive the facts. I’ve done that at IBM, AT&T, HashiCorp and Sentry Data Systems, and I’ve led employee groups for people who were not the default in those rooms.',
   ],
   maker: {
     lead: 'The rest of who I am, if you want it, is at',
@@ -85,11 +85,11 @@ export const ABOUT_PILLARS: readonly {
   },
   {
     title: 'A point is drawn no sharper than its source',
-    body: 'A record known to a county is drawn as a county, and a coarsened point is never labeled as an address.',
+    body: 'A record known to a county is drawn as a county, and a point that’s been widened is never labeled as an address.',
   },
   {
     title: 'The protections are in the code, not in the tone',
-    body: 'Public precision stops at a city, a campus or an institution. Current residential addresses for living private people do not appear on public pages, and a record whose living status is unknown is treated as living.',
+    body: 'Public precision stops at a city, a campus or an institution. Current home addresses for living private people don’t appear on public pages, and a record whose living status is unknown is treated as living.',
   },
 ] as const;
 
@@ -104,7 +104,7 @@ export const ABOUT_COLLECTIONS_HANDOFF = {
   href: '/collections',
   label: 'Browse the collections',
   lede: 'Past the map and the records, the archive keeps sets you read in their own order, from every president on the record to the laws, the data, lives decade by decade, banned books and the memorial wall.',
-  line: 'If a collection is not on that list, it is not finished.',
+  line: 'If a collection isn’t on that list, it isn’t finished.',
 } as const;
 
 /**
@@ -121,9 +121,9 @@ export const ABOUT_COLLECTIONS_HANDOFF = {
 export const ABOUT_NEO = {
   heading: 'How the writing is made',
   rules: [
-    'The long-form writing here, the chapters and the articles, is narrated in a single voice. The voice is called Neo. Neo is not a person, not a byline, and signs nothing. It is a written standard, and whoever, or whatever, is doing the writing has to work under it, which covers how a document gets quoted, which sentences have to carry a citation, and which endings are off limits.',
+    'The long-form writing here, the chapters and the articles, is narrated in a single voice. The voice is called Neo. Neo is not a person, not a byline, and signs nothing. It’s a written standard, and whoever, or whatever, is doing the writing has to work under it, which covers how a document gets quoted, which sentences have to carry a citation, and which endings are off limits.',
     'AI drafts that prose. Saying so here is cheaper than letting you find it out. Every piece then goes through the same steps before anything publishes.',
-    "None of that can move the evidence bar. Voice never relaxes an evidence gate. Facts are gathered from fetched sources and checked before any prose is written, never from a model's memory, and load-bearing figures need two independent sources. When a detail cannot be sourced, the scene is written without it.",
+    "None of that can move the evidence bar. Voice never relaxes an evidence gate. Facts are gathered from fetched sources and checked before any prose is written, never from a model's memory, and load-bearing figures need two independent sources. When a detail can't be sourced, the scene is written without it.",
   ],
   human: [
     "I decide what gets researched, I read every lead and correction, and a release reaches the public site because a person activated it. None of that gets handed to a machine. When the archive is wrong, it's wrong in my name and I fix it where you can see it.",
@@ -137,12 +137,12 @@ export const ABOUT_NEO = {
     },
     {
       title: 'Attacked',
-      body: 'A separate review hunts the sentence a specialist would write a letter about. A finding is a blocker the writer cannot overrule.',
+      body: 'A separate review hunts the sentence a specialist would write a letter about. A finding is a blocker the writer can’t overrule.',
     },
     { title: 'Gated', body: 'Code gates check source tiers, citations and length.' },
     { title: 'Released', body: 'A person activates the release.' },
   ],
-  hand: 'One part of this is made with a pen and stays that way. The cover plate on an article is a scan of a real drawing: dry felt-tip on cream paper, one weight of line, hatch fills, a sliver of burnt ochre. It is not a generated image and not a stock photo, and that is enforced rather than promised. A plate whose file, link or caption points at a stock library or an image generator cannot publish.',
+  hand: 'One part of this is made with a pen and stays that way. The cover plate on an article is a scan of a real drawing: dry felt-tip on cream paper, one weight of line, hatch fills, a sliver of burnt ochre. It is not a generated image and not a stock photo, and that’s enforced rather than promised. A plate whose file, link or caption points at a stock library or an image generator can’t publish.',
   photographs:
     "A photograph shown large, at the top of a record or beside the map on the front page, is that record's own sourced image, toned to match the page. Its credit and license sit right beside it.",
 } as const;
@@ -160,16 +160,16 @@ export const ABOUT_REFUSALS = [
   'Publish a fact because a model produced it. Facts come from fetched sources and are checked before any of the writing starts.',
   'Publish a living private person at a street address, or frame anyone as a case study in harm.',
   'Fix a mistake quietly. Corrections are published, with the earlier wording still readable.',
-  "Treat Black history as a rebuttal of anyone else's. Presence here is not a subtraction from another archive, and it is not a claim that somebody else's experience did not happen.",
+  "Treat Black history as a rebuttal of anyone else's. Presence here isn't a subtraction from another archive, and it isn't a claim that somebody else's experience didn't happen.",
   'Ask you to make an account, or to identify yourself, in order to read anything here.',
 ] as const;
 
 /** The invitation. Rendered above the take-part cards. */
 export const ABOUT_CONTRIBUTE = {
   heading: 'Add to it',
-  lede: 'Most of what is missing here is already known by somebody, and often that somebody is not in an archive at all. You do not need an account or a credential to hand it over.',
+  lede: 'Most of what’s missing here is already known by somebody, and often that somebody isn’t in an archive at all. You don’t need an account or a credential to hand it over.',
   terms:
-    'I read every lead before anything is published. Nothing you send goes public on arrival, and nothing is published without a source someone else can check. If you tell the archive it is wrong, you get a receipt code and a tracked outcome, not a thank-you note.',
+    'I read every lead before anything is published. Nothing you send goes public on arrival, and nothing is published without a source someone else can check. If you tell the archive it’s wrong, you get a receipt code and a tracked outcome, not a thank-you note.',
   direct:
     'This is a side project. If you want to partner, or a form is the wrong shape for what you have, write to me:',
 } as const;

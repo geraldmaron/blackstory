@@ -48,8 +48,8 @@ export default async function NotFound() {
         <TrustMast art={['contours']}>
           <PageHeader
             display
-            title="That page is not here"
-            dek="Either the address has a typo in it, or it names a record the archive has not published."
+            title="That page isn’t here"
+            dek="Either the address has a typo in it, or it names a record the archive hasn’t published."
           />
         </TrustMast>
       }
@@ -81,7 +81,7 @@ export default async function NotFound() {
             Press <kbd className="ds-kbd">⌘K</kbd> to search.
           </span>
           <span className="ds-utility-exits__touch">Tap search at the top to look it up.</span> It
-          opens holding what this address was trying to say.
+          opens with what this address was looking for already typed in.
         </p>
       </TrustSheet>
     </Room>

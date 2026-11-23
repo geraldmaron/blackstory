@@ -29,7 +29,7 @@ describe('DataScreen', () => {
   it('renders Data title and lede matching web intent', async () => {
     const { getByText } = await render(<DataScreen />);
     expect(getByText('Data behind the archive')).toBeTruthy();
-    expect(getByText(/National Census context plus curated indicators/)).toBeTruthy();
+    expect(getByText(/The national census picture, plus published figures/)).toBeTruthy();
   });
 
   it('shows honest Census degraded empty state with model frame', async () => {

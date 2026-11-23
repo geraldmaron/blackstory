@@ -205,9 +205,10 @@ export function MethodologySections() {
               lists those archived copies beside the bibliography.
             </p>
             <p>
-              Outbound contribution is operator-gated: cited public URLs are captured through the
-              Wayback workflow, and curated research exports may be staged for human review before
-              any Internet Archive upload. There is no automatic public upload from the reader site.
+              Nothing goes to the Internet Archive automatically. Cited public pages are saved
+              through the Wayback Machine, and a curated research export can be set aside for a
+              person to review before anything is uploaded. The public site never uploads anything
+              by itself.
             </p>
           </Prose>
         </RoomSection>

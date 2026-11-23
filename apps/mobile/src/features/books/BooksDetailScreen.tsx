@@ -117,7 +117,7 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
           </Text>
           {activeChallenges.length === 0 ? (
             <Text variant="caption" colorRole="inkMuted">
-              No active challenge rows on this entry.
+              No active challenges are listed for this book.
             </Text>
           ) : (
             activeChallenges.map((challenge, index) => (

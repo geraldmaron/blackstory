@@ -60,14 +60,14 @@ export function SourcesSections({ library }: { readonly library: SourceLibrary |
 
       <RoomSection id="citation-chain" title="How a URL becomes a citation">
         <p className="ds-trust-lead">
-          A source is captured when it is found, so the reading survives even if the page does not.
+          A source is captured when it’s found, so the reading survives even if the page doesn’t.
         </p>
         <TrustFlow caption="From a research run to a record" steps={SOURCE_LINEAGE_STAGES} />
       </RoomSection>
 
       <RoomSection id="publisher-kinds" title="Kinds of publisher">
         <p className="ds-trust-lead">
-          A government archive is not the same kind of source as a newsroom or a crowd-edited wiki,
+          A government archive isn’t the same kind of source as a newsroom or a crowd-edited wiki,
           and a news or reference source never corroborates a claim alone.
         </p>
         <dl className="ds-trust-dl ds-trust-dl--split" aria-label="Kinds of publisher">

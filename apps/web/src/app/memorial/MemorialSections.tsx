@@ -61,7 +61,7 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
           {anyLinked ? (
             <p className="ds-memorial-index__lede">
               Where this archive also holds a record of someone, their name is a link to it. Where
-              it does not, the name is written plainly. Both are held here the same.
+              it doesn’t, the name is written plainly. Both are held here the same.
             </p>
           ) : null}
         </header>
@@ -130,7 +130,7 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
             href="/methodology"
             icon="methodology"
             title="How names are held"
-            line="Living-person protection, and why a memorial name is not a map pin."
+            line="Living-person protection, and why a memorial name isn’t a map pin."
           />
           <RoomHandoff
             href="/about"
