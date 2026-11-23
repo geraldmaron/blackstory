@@ -3,7 +3,7 @@
  * (`/presidents/{slug}`). A story requested under the wrong base is sent to its own address, the
  * same rule the site follows, so a shared link opens the same piece on both.
  */
-import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -22,22 +22,14 @@ import {
   space,
   useScreenScrollInsets,
 } from '@/ui';
+import { CiteButton } from '@/features/cite/CiteButton';
 import { plainRangeText } from '../record-facts/record-facts';
 import { StoryBlocks, StoryImageExhibit, StoryReferences, storyWebUrl } from './StoryBody';
 import { StoryProgress, type StoryProgressHandle } from './StoryProgress';
 import { storyPosition, type ChapterMark } from './story-progress';
 import { useStory } from './use-stories';
 
-export function StoryScreen({
-  slug,
-  base,
-  actions,
-}: {
-  readonly slug: string;
-  readonly base: string;
-  /** Page actions under the summary (Cite, when it is on). */
-  readonly actions?: (story: { readonly title: string; readonly webPath: string }) => ReactNode;
-}) {
+export function StoryScreen({ slug, base }: { readonly slug: string; readonly base: string }) {
   const insets = useScreenScrollInsets();
   const progress = useRef<StoryProgressHandle>(null);
   // Chapter offsets are measured inside the blocks; `blocksTop` places the blocks in the scroll.
@@ -137,7 +129,14 @@ export function StoryScreen({
                   : []),
               ]}
             />
-            {actions ? actions(story) : null}
+            {/* The page's date is its last revision; the subject's years never enter a citation. */}
+            <CiteButton
+              source={{
+                title: story.title,
+                url: storyWebUrl(story.webPath),
+                published: story.updatedAt ?? story.publishedAt,
+              }}
+            />
             {story.heroImage ? (
               <StoryImageExhibit image={story.heroImage} bleed={insets.paddingHorizontal} />
             ) : null}

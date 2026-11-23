@@ -139,11 +139,7 @@ export function AnatomySection({ entity }: Pick<AnatomySectionProps, 'entity'>) 
   const facts = factsFor(entity);
 
   return (
-    <EntityEditionPanel
-      kicker="At a glance"
-      title="Record at a glance"
-      testID="entity-anatomy-section"
-    >
+    <EntityEditionPanel kicker="Facts" title="Record at a glance" testID="entity-anatomy-section">
       <View style={styles.factsList} accessibilityLabel="Record at a glance">
         {facts.map((fact) => (
           <RecordBeatRow

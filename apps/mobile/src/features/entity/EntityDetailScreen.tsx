@@ -14,7 +14,9 @@ import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
 import { markPerf } from '@/lib/perf-marks';
 import type { EntityDetailState } from './useEntityDetail';
+import { CiteButton } from '@/features/cite/CiteButton';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
+import { buildCanonicalEntityUrl, CANONICAL_WEB_ORIGIN } from './share';
 import { CitedInSection } from './sections/CitedInSection';
 import { ClaimsSection } from './sections/ClaimsSection';
 import { AnatomySection, RecordMapSection } from './sections/AnatomySection';
@@ -41,8 +43,6 @@ export type EntityDetailScreenProps = {
   readonly onMethodologyPress?: () => void;
   /** Optional session Previous / Next / Random footer (web EntitySessionNav parity). */
   readonly sessionNav?: ReactNode;
-  /** Page actions under the summary (Cite, when it is on). */
-  readonly actions?: ReactNode;
 };
 
 export function EntityDetailScreen({
@@ -55,7 +55,6 @@ export function EntityDetailScreen({
   onOpenStory,
   onMethodologyPress,
   sessionNav,
-  actions,
 }: EntityDetailScreenProps) {
   const theme = useThemeColors();
   const canvasStyle = { flex: 1, backgroundColor: theme.canvas };
@@ -153,7 +152,14 @@ export function EntityDetailScreen({
       ) : null}
 
       <IntroSection entity={entity} {...(entity.primaryImage ? {} : { lead: mapSection })} />
-      {actions ?? null}
+      {/* The page's date is its last revision; the subject's years never enter a citation. */}
+      <CiteButton
+        source={{
+          title: entity.displayName,
+          url: buildCanonicalEntityUrl(entity.id) ?? CANONICAL_WEB_ORIGIN,
+          published: entity.revision.recordUpdatedAt,
+        }}
+      />
       <AnatomySection entity={entity} />
       <ClaimsSection claims={entity.claims} isOnline={isOnline} />
       {entity.primaryImage ? mapSection : null}
