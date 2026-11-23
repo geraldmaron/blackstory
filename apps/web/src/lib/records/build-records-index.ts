@@ -94,6 +94,10 @@ function recordsArrivalQuery(query: RecordsQuery): string {
   params.set('from', 'list');
   if (query.q.length > 0) params.set('q', query.q);
   if (query.sort !== 'discovery') params.set('sort', query.sort);
+  // The shuffle rides along so Return and previous/next follow the order the reader saw.
+  if (query.seed.length > 0 && query.sort === 'discovery' && query.q.length === 0) {
+    params.set('seed', query.seed);
+  }
   if (query.kind.length > 0) params.set('kind', query.kind);
   if (query.era.length > 0) params.set('era', query.era);
   if (query.state.length > 0) params.set('state', query.state);
@@ -430,7 +434,8 @@ function toFacts(
       )
     : `/entity/${entry.id}`;
   const href =
-    drawnHrefs === undefined ? guessed : (drawnHrefs.get(entry.id) ?? `/entity/${entry.id}`);
+    // `||`: a plate cached before `instrumentRecordHref` stopped returning '' still holds blanks.
+    drawnHrefs === undefined ? guessed : drawnHrefs.get(entry.id) || `/entity/${entry.id}`;
 
   return {
     row: {

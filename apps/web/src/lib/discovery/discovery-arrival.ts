@@ -14,6 +14,8 @@ export function withQuery(href: string, query: string): string {
 export type PlaceArrivalFields = {
   readonly query?: string;
   readonly sort?: string;
+  /** The Records shuffle the reader left, so Return lands on the same order. */
+  readonly seed?: string;
   readonly kind?: string;
   readonly era?: string;
   readonly state?: string;
@@ -40,6 +42,7 @@ export function placeArrivalQuery(fields: PlaceArrivalFields, from: 'map' | 'lis
   params.set('from', from);
   if (fields.query) params.set('q', fields.query);
   if (fields.sort && fields.sort !== 'discovery') params.set('sort', fields.sort);
+  if (fields.seed) params.set('seed', fields.seed);
   if (fields.kind) params.set('kind', fields.kind);
   if (fields.era) params.set('era', fields.era);
   if (fields.state) params.set('state', fields.state);

@@ -18,6 +18,7 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { parseRecordsQuery, recordsHref } from '../../lib/records/build-records-index';
 import { RecordsIndexRoom } from './RecordsIndex';
+import { SeedInAddress } from './SeedInAddress';
 import { loadRecordsIndex, recordsQueryCacheKey } from './load-records-index';
 import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
 import { buildEntityPhotoIndex } from '../../lib/map-experience/entity-photo-index';
@@ -130,6 +131,7 @@ export default async function RecordsPage({ searchParams }: RecordsPageProps) {
       {model.nextHref === undefined ? null : (
         <link rel="next" href={new URL(model.nextHref, SITE_URL).toString()} />
       )}
+      {query.seed.length > 0 ? <SeedInAddress seed={query.seed} /> : null}
       <RecordsIndexRoom
         model={model}
         photos={photos}

@@ -589,6 +589,30 @@ describe('/records · order and decade jumps', () => {
     assert.equal(seeded.nextHref, '/records?seed=abc&page=2');
     assert.deepEqual(seeded.decadeJumps, [], 'a shuffle has no decade to jump to');
     assert.equal(earliest.canonicalPath, '/records?sort=era');
+
+    // A card on page 2 of the shuffle carries the seed, and the record page that reads it back
+    // finds the record at the position the reader saw, so Return lands on page 2 again.
+    const second = buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, seed: 'abc', page: 2 });
+    const card = second.rows[0]!;
+    assert.match(card.href, /\?from=list&seed=abc$/);
+    const found = findRecordsNeighbors(many, { ...EMPTY_RECORDS_QUERY, seed: 'abc' }, card.id);
+    assert.equal(found?.index, 100);
+    assert.doesNotMatch(earliest.rows[0]!.href, /seed=/, 'an explicit sort has no shuffle');
+  });
+
+  it('never renders a row with an empty address', () => {
+    const tokens = ['42Cb1758', '42Cb242', '42Dc682', '42Dc696'].map((displayName, index) =>
+      entity({ id: `ent_site_${index}`, kind: 'place', displayName, summary: 'A site.' }),
+    );
+    // What a plate built before the shared fix handed over for token-named records.
+    const stale = new Map(tokens.map((record) => [record.id, '']));
+    for (const drawn of [undefined, stale]) {
+      const rows = buildRecordsIndex(tokens, EMPTY_RECORDS_QUERY, drawn).rows;
+      assert.deepEqual(
+        rows.map((row) => row.href).sort(),
+        tokens.map((record) => `/entity/${record.id}?from=list`),
+      );
+    }
   });
 });
 

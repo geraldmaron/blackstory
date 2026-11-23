@@ -57,6 +57,8 @@ export type DiscoveryState = {
   /** Records representation to restore on return. `index` has no spelling. */
   readonly layout?: 'chronology';
   readonly sort?: string;
+  /** The Records shuffle seed the reader arrived under (default order only). */
+  readonly seed?: string;
   readonly selected?: string;
   readonly view?: DiscoveryView;
 };
@@ -161,6 +163,7 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
     ...EMPTY_RECORDS_QUERY,
     q: parseRecordsQuery({ q: state.query }).q,
     sort: parseRecordsQuery({ sort: state.sort }).sort,
+    seed: parseRecordsQuery({ seed: state.seed }).seed,
     kind: (firstOf(state.kind) ?? '').toLowerCase(),
     era: (firstOf(state.era) ?? '').toLowerCase(),
     state: (firstOf(state.state) ?? '').toUpperCase(),
@@ -256,6 +259,7 @@ export function discoveryFromSearchParams(
   const normalized = parseRecordsQuery({
     q: params.q,
     sort: params.sort,
+    seed: params.seed,
     collection: params.collection,
     periodStart: params.periodStart,
     periodEnd: params.periodEnd,
@@ -275,6 +279,7 @@ export function discoveryFromSearchParams(
   return {
     ...(query ? { query } : {}),
     sort: normalized.sort,
+    ...(normalized.seed ? { seed: normalized.seed } : {}),
     ...(kind ? { kind } : {}),
     ...(era ? { era } : {}),
     ...(state ? { state } : {}),
@@ -348,6 +353,7 @@ export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): 
     {
       ...(state.query ? { query: state.query } : {}),
       ...(state.sort ? { sort: state.sort } : {}),
+      ...(state.seed ? { seed: state.seed } : {}),
       ...(kind !== undefined ? { kind } : {}),
       ...(era !== undefined ? { era } : {}),
       ...(stateCode !== undefined ? { state: stateCode } : {}),

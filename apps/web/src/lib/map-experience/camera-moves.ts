@@ -466,7 +466,13 @@ export function createCamera(deps: CameraDeps): CameraApi {
     if (frame.kind === 'bounds' && frame.minZoom !== undefined && map.cameraForBounds) {
       // A place: fly to its frame in the unobscured map, never short of the next level.
       const inset = padding();
-      const fitted = map.cameraForBounds(frame.bounds, { padding: inset })?.zoom;
+      let fitted: number | undefined;
+      try {
+        const zoom = map.cameraForBounds(frame.bounds, { padding: inset })?.zoom;
+        if (Number.isFinite(zoom)) fitted = zoom;
+      } catch {
+        // MapLibre's globe throws when the paddings leave no canvas: fly to the floor instead.
+      }
       const [[west, south], [east, north]] = frame.bounds;
       map.flyTo({
         center: [(west + east) / 2, (south + north) / 2],

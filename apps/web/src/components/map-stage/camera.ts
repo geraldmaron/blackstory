@@ -68,6 +68,48 @@ export type MapStageFlyOptions = {
  */
 const ZERO_PADDING = { top: 0, bottom: 0, left: 0, right: 0 };
 
+/**
+ * `map.cameraForBounds`, safe to call from any camera state. Returns undefined when there is no
+ * usable fit, so every caller needs its own fallback frame.
+ *
+ * MapLibre fits bounds inside the padding it is given PLUS whatever padding the camera already
+ * holds (`cameraForBoxAndBearing`: `tr.padding + options.padding`). A center-and-zoom flight
+ * leaves its padding on the camera, so the next fit was padded twice: after the Door's Orbit the
+ * decade walk fitted the country into a 69px sliver and landed on Hudson Bay at zoom 1.8 with no
+ * record on screen. When the two paddings together exceed the canvas the globe helper throws
+ * outright (it reads `.center` off a fit that came back undefined), which is what a place click
+ * on the Door did. So the fit is computed with no padding on the camera, and a throw or a
+ * non-finite zoom (a map with no size yet, a background tab) is no fit. Nothing renders between
+ * the two writes: the held padding is back before this returns.
+ */
+export function fitBoundsCamera<Center>(
+  // Structural, so the stage's `AtlasCameraTarget` fits as well as the MapLibre map.
+  map: {
+    cameraForBounds(bounds: never, options: never): { center?: Center; zoom?: number } | undefined;
+  },
+  [west, south, east, north]: readonly [number, number, number, number],
+  padding: number | typeof ZERO_PADDING | undefined,
+): { center: Center | undefined; zoom: number } | undefined {
+  const transform = (map as { transform?: unknown }).transform as
+    { padding?: typeof ZERO_PADDING; setPadding?(p: typeof ZERO_PADDING): void } | undefined;
+  const held = transform?.padding ? { ...transform.padding } : null;
+  try {
+    if (held) transform!.setPadding?.(ZERO_PADDING);
+    const fit = map.cameraForBounds(
+      [west, south, east, north] as never,
+      (padding === undefined ? {} : { padding }) as never,
+    );
+    return typeof fit?.zoom === 'number' && Number.isFinite(fit.zoom)
+      ? { center: fit.center, zoom: fit.zoom }
+      : undefined;
+  } catch (error) {
+    console.error('[MapStage] cameraForBounds failed', error);
+    return undefined;
+  } finally {
+    if (held) transform!.setPadding?.(held);
+  }
+}
+
 export function runFlyPreset(
   map: MapLibreMap | null,
   name: CameraPresetName,
@@ -94,32 +136,9 @@ export function runFlyPreset(
     if (options?.zoomFloor === 'fit') map.setMinZoom(Math.min(MAP_MIN_ZOOM, zoom));
   } else {
     const [west, south, east, north] = target.bounds;
-    const camera = (() => {
-      // MapLibre fits bounds inside the padding it is given PLUS whatever padding the camera
-      // already holds (`cameraForBoxAndBearing`: `tr.padding + options.padding`). A center-and-zoom
-      // flight leaves its padding on the camera, so the next fit was padded twice: after the
-      // Door's Orbit the decade walk fitted the country into a 69px sliver and landed on Hudson
-      // Bay at zoom 1.8 with no record on screen. The fit below lands with no padding on the
-      // camera (`motionPadding`), so that is the state it is computed against. Nothing renders
-      // between the two writes: the held padding is back before this function returns.
-      const transform = map.transform as
-        { padding?: typeof ZERO_PADDING; setPadding?(p: typeof ZERO_PADDING): void } | undefined;
-      const held = transform?.padding ? { ...transform.padding } : null;
-      try {
-        if (held) transform!.setPadding?.(ZERO_PADDING);
-        return map.cameraForBounds([west, south, east, north] as [number, number, number, number], {
-          // Honor caller padding (incl. asymmetric hero framing) when fitting bounds.
-          padding,
-        });
-      } catch (error) {
-        console.error('[MapStage] cameraForBounds failed', error);
-        return undefined;
-      } finally {
-        if (held) transform!.setPadding?.(held);
-      }
-    })();
-    // A map with no size yet (a background tab) fits to a non-finite zoom; fall through.
-    if (camera?.center && typeof camera.zoom === 'number' && Number.isFinite(camera.zoom)) {
+    // Honor caller padding (incl. asymmetric hero framing) when fitting bounds.
+    const camera = fitBoundsCamera(map, target.bounds, padding);
+    if (camera?.center) {
       center = lngLatTuple(camera.center);
       zoom = camera.zoom;
       boundsFitted = true;

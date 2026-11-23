@@ -6,14 +6,43 @@
  * needs work. The rules are the form's own pure `validate(FormData)`; server issues land in the
  * same map, so a server rejection draws exactly like a local one.
  */
-import { useCallback, useState, type FocusEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FocusEvent, type FormEvent } from 'react';
 
 export type FieldErrors = Readonly<Record<string, string>>;
 export type Validate = (data: FormData) => FieldErrors;
 
+/** The form whose submit control a press landed on, or null for a press anywhere else. */
+export function formOfPressedSubmit(target: EventTarget | null): HTMLFormElement | null {
+  const control = (target as Element | null)?.closest?.<HTMLButtonElement>(
+    'button[type="submit"], input[type="submit"]',
+  );
+  return control?.form ?? null;
+}
+
 export function useFieldErrors(validate: Validate) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<ReadonlySet<string>>(new Set());
+  const pressedSubmit = useRef<HTMLFormElement | null>(null);
+
+  /*
+   * A press on the submit button blurs the field being left. Drawing that field's error then
+   * moves the button out from under the pointer before release, so no click and no submit fire.
+   * Tracked from pointerdown, not the blur's relatedTarget: Safari does not focus a clicked button.
+   */
+  useEffect(() => {
+    const press = (event: PointerEvent) => {
+      pressedSubmit.current = formOfPressedSubmit(event.target);
+    };
+    const release = () => {
+      pressedSubmit.current = null;
+    };
+    document.addEventListener('pointerdown', press, true);
+    document.addEventListener('keydown', release, true);
+    return () => {
+      document.removeEventListener('pointerdown', press, true);
+      document.removeEventListener('keydown', release, true);
+    };
+  }, []);
 
   const recheck = useCallback(
     (form: HTMLFormElement, name: string) => {
@@ -34,6 +63,8 @@ export function useFieldErrors(validate: Validate) {
     (event: FocusEvent<HTMLFormElement>) => {
       const name = (event.target as unknown as HTMLInputElement).name;
       if (!name) return;
+      // Submit checks every field anyway, this one included.
+      if (pressedSubmit.current === event.currentTarget) return;
       // A field left empty on the way past is not an error yet; one with an answer is checked.
       const value = (event.target as unknown as HTMLInputElement).value;
       if (!touched.has(name) && value.trim().length === 0) return;

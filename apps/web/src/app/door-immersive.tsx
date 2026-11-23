@@ -45,6 +45,7 @@ import {
   PinPhotoLayer,
   type PinPhotoHoverTarget,
 } from '../components/map-experience/PinPhotoLayer';
+import { fitBoundsCamera } from '../components/map-stage/camera';
 import { useMapStage } from '../components/map-stage/MapStage';
 import {
   announceMapBrowseEntered,
@@ -711,7 +712,20 @@ export function DoorImmersive({
       scrub.active = phase.active;
       // The tour is about one record at a time: no place counts on the way there or around it,
       // and the lights stay lit the whole way down (MapStage, `setPlaceTokens`).
-      stage.setPlaceTokens(!phase.active);
+      if (phase.active) stage.setPlaceTokens(false);
+      else {
+        // The counts come back once the camera has landed, not when the scroll leaves. Leaving
+        // starts a flight out to the opening (`applyCamera`, after this returns), and every zoom
+        // it crosses above Orbit drew the counts and their tethers over the globe on the way.
+        const restore = () => {
+          if (!scrub.active) stage.setPlaceTokens(true);
+        };
+        window.requestAnimationFrame(() => {
+          const map = stage.getMap();
+          if (map?.isMoving()) map.once('moveend', restore);
+          else restore();
+        });
+      }
       // The tour goes to its own records; a rail that had dimmed one would hide its pin.
       if (phase.active) setRailDecade(null);
     }
@@ -893,13 +907,7 @@ export function DoorImmersive({
         const { window: windowBox, plate: plateBox } = measureFrameBoxes(map);
         const padding = windowBox && plateBox ? doorDrillPadding(windowBox, plateBox) : null;
         const [west, south, east, north] = frame.bounds;
-        const fit = map.cameraForBounds(
-          [
-            [west, south],
-            [east, north],
-          ] as never,
-          { padding: padding ?? 48 } as never,
-        );
+        const fit = fitBoundsCamera(map, frame.bounds, padding ?? 48);
         stage.flyPreset(
           'point',
           {

@@ -53,6 +53,7 @@ const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'];
 const PLACE_PAGE_PARAM_ALLOWLIST = [
   'from',
   'sort',
+  'seed',
   'q',
   'kind',
   'era',

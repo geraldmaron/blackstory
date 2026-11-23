@@ -177,6 +177,27 @@ describe('DiscoveryState map/list continuity', () => {
   });
 });
 
+test('a shuffled list arrival returns to the same seed and the page that holds the record', () => {
+  const raw = { from: 'list', seed: '4ywe5m', kind: 'places', state: 'AL' };
+  const search = 'from=list&kind=places&seed=4ywe5m&state=AL';
+  assert.equal(normalizeQueryString('/place/some-place', new URLSearchParams(raw)), search);
+  assert.equal(
+    [...new URLSearchParams(recordArrivalQuery(raw))].sort().join(),
+    [...new URLSearchParams(search)].sort().join(),
+    'the seed survives the /entity to /place redirect',
+  );
+  const ret = placeDiscoveryReturn('ent_a', discoveryFromSearchParams(raw), {
+    index: 150,
+    total: 400,
+  });
+  assert.equal(ret.listHref, '/records?kind=places&state=AL&seed=4ywe5m&page=2');
+  // A search has no shuffle, so a stray seed never reaches the list address.
+  assert.equal(
+    listHrefFromDiscovery(discoveryFromSearchParams({ from: 'list', q: 'church', seed: '4ywe5m' })),
+    '/records?q=church',
+  );
+});
+
 describe('record arrival carried through redirects', () => {
   it('is empty for a bare direct URL so canonical addresses gain no from=', () => {
     assert.equal(recordArrivalQuery({}), '');

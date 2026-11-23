@@ -401,6 +401,8 @@ export type AtlasCameraTarget = {
   project(lngLat: never): { x: number; y: number };
   /** Whether a flight, ease or gesture is in progress — a refit must not cut one short. */
   isMoving(): boolean;
+  /** One callback when the current move ends: for work that must wait for the camera to land. */
+  once(type: 'moveend', listener: () => void): unknown;
   stop(): unknown;
 };
 
@@ -1655,13 +1657,20 @@ export function MapStageProvider({
           return;
         }
         const [west, south, east, north] = hit.bounds;
-        const framed = activeMap.cameraForBounds(
-          [
-            [west, south],
-            [east, north],
-          ],
-          { padding: 48 },
-        );
+        // Not `fitBoundsCamera`: this move lands on the fitted center with the camera's held
+        // padding still on it, so the fit has to be computed against that padding too.
+        let framed: ReturnType<typeof activeMap.cameraForBounds>;
+        try {
+          framed = activeMap.cameraForBounds(
+            [
+              [west, south],
+              [east, north],
+            ],
+            { padding: 48 },
+          );
+        } catch {
+          // MapLibre's globe throws when the paddings leave no canvas; the fallback frame below.
+        }
         activeMap.easeTo({
           center: framed?.center ?? [(west + east) / 2, (south + north) / 2],
           zoom: placeDrillZoom(hit.level, framed?.zoom, MAP_MAX_ZOOM, hit.openZoom),
