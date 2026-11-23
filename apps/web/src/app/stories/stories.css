@@ -1,6 +1,7 @@
 /*
- * /stories: the lead chapter edge to edge with its title on an ink panel, the other chapters as
- * ruled lead rows, then one paper sheet of stories under a display head.
+ * /stories and /presidents, on paper (docs/ui/DESIGN.md section 9.3): the chapters as ruled
+ * entries, each with its cover as a compact exhibit when the cover is safe on a front page, then
+ * one ruled list. A cover is whole and in its own color. No toned plate, panel, shadow or band.
  * Type sizes come from the --ds-text-* scale (room-kit.test guards this file).
  */
 
@@ -8,224 +9,11 @@
   padding-block: var(--ds-space-12) var(--ds-space-18);
 }
 
-/* —— Lead: the cover edge to edge, the title on an ink panel over its foot ————————————— */
-.ds-stories-lead {
-  position: relative;
+.ds-stories-title.ds-stories-title {
+  margin: 0 0 var(--ds-space-8);
 }
 
-.ds-stories-lead__media {
-  height: clamp(20rem, 52vh, 36rem);
-  overflow: hidden;
-  background: var(--ds-material-ink);
-}
-
-/* Covers and row thumbnails are plates: the same duotone as `.ds-plate` (shadows in
-   --ds-plate-lo, lights in --ds-plate-hi), so one photo language runs from home to the stories.
-   Each cover prints its credit in its caption. Forced colors show the image as it is. */
-.ds-stories-lead__media,
-.ds-stories-cover__media,
-.ds-stories-row__thumb[data-media='photo'] {
-  position: relative;
-  isolation: isolate;
-  background: var(--ds-plate-hi);
-}
-
-.ds-stories-lead__media .ds-story-img,
-.ds-stories-cover__media .ds-story-img,
-.ds-stories-row__thumb .ds-story-img {
-  background: transparent;
-}
-
-.ds-stories-lead__media img,
-.ds-stories-cover__media img,
-.ds-stories-row__thumb img {
-  filter: grayscale(1) contrast(1.12);
-  mix-blend-mode: multiply;
-}
-
-.ds-stories-lead__media::after,
-.ds-stories-cover__media::after,
-.ds-stories-row__thumb[data-media='photo']::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--ds-plate-lo);
-  mix-blend-mode: lighten;
-  pointer-events: none;
-}
-
-@media (forced-colors: active) {
-  .ds-stories-lead__media img,
-  .ds-stories-cover__media img,
-  .ds-stories-row__thumb img {
-    filter: none;
-    mix-blend-mode: normal;
-  }
-
-  .ds-stories-lead__media::after,
-  .ds-stories-cover__media::after,
-  .ds-stories-row__thumb[data-media='photo']::after {
-    content: none;
-  }
-}
-
-.ds-stories-lead__credit {
-  grid-area: credit;
-}
-
-.ds-stories-cover__credit,
-.ds-stories-lead__credit {
-  margin: var(--ds-space-3) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-meta);
-  letter-spacing: var(--ds-tracking-meta);
-  text-transform: uppercase;
-}
-
-/* The chapter images are archive scans with paper borders; a cover crops inside the document, at
-   its head, never on its edge. --crop is the inset zoom, and hover adds to it. */
-.ds-stories-lead__media,
-.ds-stories-cover__media {
-  --crop: 1.06;
-}
-
-.ds-stories-lead__media .ds-story-img,
-.ds-stories-cover__media .ds-story-img {
-  height: 100%;
-}
-
-.ds-stories-lead__media img,
-.ds-stories-cover__media img {
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 8%;
-  transform: scale(var(--crop));
-  transition: transform var(--ds-duration-slow) var(--ds-ease-entrance);
-}
-
-.ds-stories-lead:hover .ds-stories-lead__media img,
-.ds-stories-cover:hover .ds-stories-cover__media img {
-  transform: scale(calc(var(--crop) + 0.02));
-}
-
-.ds-stories-lead__wrap {
-  position: relative;
-  margin-top: calc(var(--ds-space-24) * -1);
-}
-
-/* The table's ground: ink in the dark theme, paper in the light one. The years line carries the
-   date, so the panel prints no numeral. */
-.ds-stories-lead__panel {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'years'
-    'title'
-    'dek'
-    'cta'
-    'credit';
-  justify-items: start;
-  column-gap: var(--ds-space-12);
-  row-gap: var(--ds-space-4);
-  overflow: hidden;
-  padding: var(--ds-space-10) var(--ds-space-12);
-  /* A sheet's lift: in the light theme the table's ground is paper, and the shadow is what keeps
-     the panel from dissolving into the page. */
-  box-shadow: var(--ds-shadow-sheet);
-  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
-}
-
-.ds-stories-lead__page {
-  margin-right: var(--ds-space-3);
-  padding-right: var(--ds-space-3);
-  border-right: var(--ds-border-width) solid currentColor;
-  color: var(--ds-ink);
-}
-
-.ds-stories-lead__years {
-  grid-area: years;
-  margin: 0;
-  /* Meta, not a tag: the years in copper mono capitals over the title, the way home's cover
-     and the record masthead print an era. */
-  color: var(--ds-numeral-soft-text);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-body-sm);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--ds-tracking-meta);
-  text-transform: uppercase;
-}
-
-.ds-stories-lead__title {
-  grid-area: title;
-  margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display);
-  /* Headline weight: the page's h1 holds the display role, once per surface. */
-  font-weight: 700;
-  line-height: 0.9;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
-}
-
-.ds-stories-lead__link {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* The whole cover is the link; the button stays the visible affordance on top of it. */
-.ds-stories-lead__link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0; /* local: the stretched link over the panel, under the button */
-}
-
-.ds-stories-lead__link:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 4px;
-  text-underline-offset: 0.08em;
-}
-
-.ds-stories-lead__panel:has(.ds-stories-lead__link:focus-visible) {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-stories-lead__link:focus-visible {
-  outline: none;
-}
-
-.ds-stories-lead__dek {
-  grid-area: dek;
-  max-width: 38rem;
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  font-style: italic;
-  line-height: 1.4;
-  text-wrap: pretty;
-}
-
-.ds-stories-lead__cta {
-  grid-area: cta;
-  position: relative;
-  z-index: 1; /* local: the button above the stretched link, inside this panel only */
-  margin-top: var(--ds-space-2);
-}
-
-/* No picture: the panel opens the page on its own. */
-.ds-stories-lead[data-media='none'] .ds-stories-lead__media {
-  display: none;
-}
-
-.ds-stories-lead[data-media='none'] .ds-stories-lead__wrap {
-  margin-top: var(--ds-space-8);
-}
-
-/* —— Chapter lead rows: ruled, a plate beside the title block ——————————————————————— */
+/* —— Chapters: ruled entries, the cover beside the title block ————————————————————————— */
 .ds-stories-covers {
   display: grid;
   border-bottom: var(--ds-border-width-strong) solid var(--ds-ink);
@@ -234,22 +22,25 @@
 .ds-stories-cover {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  column-gap: var(--ds-space-8);
+  gap: var(--ds-space-4) var(--ds-space-8);
   padding-block: var(--ds-space-8);
   border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
-.ds-stories-cover__media {
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
+.ds-stories-cover[data-media='photo'] {
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
 }
 
-.ds-stories-cover__blank {
-  display: block;
-  height: 100%;
-  background: var(--ds-plate-hi);
+.ds-stories-cover[data-media='photo'][data-lead] {
+  grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+}
+
+/* A tall scan is letterboxed inside the cap, never cropped. */
+.ds-stories-cover__media img {
+  max-height: 30rem;
+  object-fit: contain;
 }
 
 .ds-stories-cover__caption {
@@ -278,15 +69,26 @@
   text-wrap: balance;
 }
 
+.ds-stories-cover[data-lead] .ds-stories-cover__title {
+  font-size: var(--ds-text-headline);
+}
+
 .ds-stories-cover__link {
   color: inherit;
   text-decoration: none;
 }
 
+/* The whole entry is the link; the receipt and the button sit above it. */
 .ds-stories-cover__link::after {
   content: '';
   position: absolute;
   inset: 0;
+}
+
+.ds-stories-cover__cta,
+.ds-stories-cover .ds-exhibit__receipt {
+  position: relative;
+  z-index: 1; /* local: above the stretched link, inside this entry only */
 }
 
 .ds-stories-cover:hover .ds-stories-cover__link {
@@ -305,6 +107,7 @@
 }
 
 .ds-stories-cover__dek {
+  max-width: var(--ds-content-max);
   margin: 0;
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial);
@@ -312,7 +115,7 @@
   text-wrap: pretty;
 }
 
-/* —— The list head: a display title and the count as a copper numeral ——————————————— */
+/* —— The list head: a title and the count as a sentence ————————————————————————————— */
 .ds-stories-browse {
   margin-top: var(--ds-space-18);
 }
@@ -322,44 +125,23 @@
 }
 
 .ds-stories-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'title count'
-    'dek count';
-  align-items: end;
-  column-gap: var(--ds-space-8);
-  padding-bottom: var(--ds-space-8);
+  padding-bottom: var(--ds-space-6);
 }
 
 .ds-stories-head__title {
-  grid-area: title;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-headline);
+  font-size: var(--ds-text-display-2);
   font-weight: 600;
-  line-height: 0.92;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
-}
-
-.ds-stories-browse[data-first] .ds-stories-head__title {
-  font-size: var(--ds-text-display);
-}
-
-.ds-stories-head__count {
-  grid-area: count;
-  margin-bottom: -0.06em;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .ds-stories-head__dek {
-  grid-area: dek;
-  margin: var(--ds-space-3) 0 0;
+  margin: var(--ds-space-2) 0 0;
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  font-style: italic;
-  line-height: 1.3;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
 }
 
 /* —— Toolbar ——————————————————————————————————————————————————————————————— */
@@ -390,12 +172,14 @@
   height: 1rem;
 }
 
-/* The sort menu is a small paper sheet. */
+/* The sort menu floats over the list: the one shadow on the page. */
 .ds-stories-sort {
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-shadow-lift);
   width: min(100% - var(--ds-space-8), 18rem);
   margin: auto;
   padding: var(--ds-space-2);
-  border: 0;
   color: var(--ds-ink);
 }
 
@@ -498,9 +282,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* —— The list: one paper sheet ———————————————————————————————————————————————— */
+/* —— The list: ruled rows ———————————————————————————————————————————————————— */
 .ds-stories-paper {
-  padding-block: var(--ds-space-2);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-stories-list {
@@ -513,28 +297,26 @@
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-stories-row:last-child {
-  border-bottom: 0;
-}
-
 .ds-stories-row__link {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title years'
+    'kind years'
+    'summary summary';
+  align-items: start;
+  gap: var(--ds-space-2) var(--ds-space-6);
+  padding-block: var(--ds-space-4);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-stories-row__link[data-media='photo'] {
   grid-template-columns: 4.5rem minmax(0, 1fr) auto;
   grid-template-areas:
     'thumb title years'
     'thumb kind years'
     'thumb summary summary';
-  align-items: start;
-  gap: var(--ds-space-2) var(--ds-space-6);
-  margin-inline: calc(var(--ds-space-2) * -1);
-  padding: var(--ds-space-4) var(--ds-space-2);
-  color: var(--ds-ink);
-  text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-ease-standard);
-}
-
-.ds-stories-row__link:hover {
-  background: var(--ds-surface-sunken);
 }
 
 .ds-stories-row__link:focus-visible {
@@ -542,20 +324,16 @@
   outline-offset: calc(var(--ds-focus-width) * -1);
 }
 
-/* A 72px plate, or the plate's ground with the initial in ink; both sit on the one title edge. */
+/* A small portrait, cropped to its head as a thumbnail and in its own color; the whole picture
+   and its credit are on the entry's own page. */
 .ds-stories-row__thumb {
   grid-area: thumb;
-  display: grid;
-  place-items: center;
   width: 4.5rem;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: var(--ds-plate-hi);
-  color: var(--ds-material-ink);
 }
 
 .ds-stories-row__thumb .ds-story-img {
-  width: 100%;
   height: 100%;
   min-height: 0;
 }
@@ -564,12 +342,6 @@
   height: 100%;
   object-fit: cover;
   object-position: center top;
-}
-
-.ds-stories-row__initial {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 600;
 }
 
 .ds-stories-row__title {
@@ -593,7 +365,7 @@
   justify-self: end;
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-title);
+  font-size: var(--ds-text-body);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -624,32 +396,8 @@
     padding-top: var(--ds-space-8);
   }
 
-  .ds-stories-lead__media {
-    height: auto;
-    aspect-ratio: 4 / 3;
-  }
-
-  /* The panel runs edge to edge and rises over the picture's foot by a band. */
-  .ds-stories-lead__wrap {
-    width: 100%;
-    margin-top: calc(var(--ds-space-12) * -1);
-  }
-
-  .ds-stories-lead__panel {
+  .ds-stories-cover.ds-stories-cover {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'years'
-      'title'
-      'dek'
-      'cta'
-      'credit';
-    padding: var(--ds-space-6) var(--ds-gutter) var(--ds-space-8);
-    border-radius: 0;
-  }
-
-  .ds-stories-cover {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: var(--ds-space-4);
     padding-block: var(--ds-space-6);
   }
 
@@ -657,31 +405,22 @@
     margin-top: var(--ds-space-12);
   }
 
-  .ds-stories-head {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'count'
-      'title'
-      'dek';
-  }
-
-  .ds-stories-head__count {
-    margin: 0 0 var(--ds-space-2);
-  }
-
-  /* The sheet runs full-bleed on a phone (the kit drops its side edges). */
-  .ds-stories-paper {
-    margin-inline: calc(var(--ds-gutter) * -1);
-  }
-
   .ds-stories-row__link {
+    grid-template-areas:
+      'title title'
+      'years years'
+      'kind kind'
+      'summary summary';
+    column-gap: var(--ds-space-4);
+  }
+
+  .ds-stories-row__link[data-media='photo'] {
     grid-template-columns: 4rem minmax(0, 1fr);
     grid-template-areas:
       'thumb title'
       'thumb years'
       'thumb kind'
       'summary summary';
-    column-gap: var(--ds-space-4);
   }
 
   .ds-stories-row__thumb {
@@ -690,7 +429,6 @@
 
   .ds-stories-row__years {
     justify-self: start;
-    font-size: var(--ds-text-body);
   }
 
   /* Sort opens as a bottom sheet within thumb reach. */
@@ -707,49 +445,14 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ds-stories-lead__media img,
-  .ds-stories-cover__media img {
-    transition: none;
-  }
-
-  .ds-stories-lead:hover .ds-stories-lead__media img,
-  .ds-stories-cover:hover .ds-stories-cover__media img {
-    transform: scale(var(--crop));
-  }
-}
-
 /* A thumbnail or a cover has no room for the failure sentence (and sits inside a link, so the
    sentence could not link out); a failed one shows its ground. */
 .ds-stories-row__thumb .ds-story-img__failed,
-.ds-stories-lead .ds-story-img__failed,
 .ds-stories-cover .ds-story-img__failed {
   display: none;
 }
 
-/* —— Loading: the front's shape, held still ———————————————————————————————————— */
-.ds-stories-wait {
-  display: grid;
-  gap: var(--ds-space-8);
-}
-
-.ds-stories-wait__lead {
-  display: block;
-  height: clamp(20rem, 52vh, 36rem);
-  background: var(--ds-material-ink);
-}
-
-.ds-stories-wait__covers {
-  display: grid;
-  gap: var(--ds-space-8);
-}
-
-.ds-stories-wait__covers > span {
-  display: block;
-  height: 10rem;
-  background: var(--ds-surface-sunken);
-}
-
+/* —— Loading: rows held still ———————————————————————————————————————————————— */
 .ds-stories-wait__rows {
   display: grid;
   gap: var(--ds-space-4);

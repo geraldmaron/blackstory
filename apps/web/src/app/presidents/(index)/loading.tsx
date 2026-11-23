@@ -1,9 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../components/room';
-import { TrustMast, TrustSheet } from '../../components/trust';
-import '../stories/stories.css';
+import { parentCrumb, Room } from '../../../components/room';
+import { TrustMast, TrustSheet } from '../../../components/trust';
+import '../../stories/stories.css';
 
 void React;
 

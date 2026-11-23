@@ -1,16 +1,17 @@
 /**
- * The pieces of the `/stories` front: the lead cover, the chapter covers, a list row and the one
- * toolbar. Server components; the only client code is StoryImage's load and error state.
+ * The pieces of the `/stories` front: a chapter entry (its cover as a compact exhibit when the
+ * cover is safe on a front page, a text entry when it is not), a list row and the one toolbar.
+ * Server components; the only client code is StoryImage's load and error state.
  *
- * Material: the lead runs edge to edge with an ink panel, the other chapters are ruled rows with
- * a toned plate, and the list is one paper sheet on the ink table.
+ * Everything is on paper. A cover is shown whole and in its own color, with its credit under it.
  */
 import React from 'react';
 import type { PublicStoryListItemDoc } from '@repo/schemas';
-import { FilterButton, buttonClassName } from '@repo/ui';
+import { ExhibitFrame, FilterButton, Receipt, buttonClassName } from '@repo/ui';
 import { StoryImage } from '../../components/story/StoryImage';
 import { storyImageSrc } from '../../components/story/story-image';
 import { coverDek } from '../../components/story/story-text';
+import { frontSafeCover } from '../../lib/stories/cover-safety';
 
 void React;
 
@@ -32,7 +33,8 @@ export function CoverImage({
   /** `ds-plate__img` when the cover stands as a toned plate (home's lead story). */
   readonly className?: string;
 }) {
-  const image = item.heroImage;
+  // Hidden unless the story is listed as safe; home and the old Explore front read this too.
+  const image = frontSafeCover(item);
   if (!image) return <span className="ds-stories-cover__blank" aria-hidden="true" />;
   return (
     <StoryImage
@@ -47,52 +49,35 @@ export function CoverImage({
 }
 
 /**
- * The newest chapter, edge to edge under the header: the cover unfiltered, and the title at display
- * scale on a solid panel that overlaps the picture's foot. The panel is the table's ground (ink in
- * the dark theme, paper in the light one), so the type never sits on the picture and needs no scrim.
+ * One chapter on the front: years, the title in display type, one line, the way in. Its cover
+ * stands beside it as a compact exhibit (crop marks, credit, no kind label) only when
+ * `frontSafeCover` allows it; otherwise the entry is text. `lead` sets the newest chapter larger.
  */
-export function LeadCover({ item }: { readonly item: PublicStoryListItemDoc }) {
+export function ChapterCover({
+  item,
+  lead = false,
+}: {
+  readonly item: PublicStoryListItemDoc;
+  readonly lead?: boolean;
+}) {
+  const cover = frontSafeCover(item);
   return (
-    <article className="ds-stories-lead" data-media={item.heroImage ? 'photo' : 'none'}>
-      <div className="ds-stories-lead__media">
-        <CoverImage item={item} width={1440} eager />
-      </div>
-      <div className="ds-wrap ds-stories-lead__wrap">
-        <div className="ds-stories-lead__panel" data-ground="ink">
-          <p className="ds-stories-lead__years">
-            {/* The page's name, visible; the outline's h1 says it for assistive tech. */}
-            <span className="ds-stories-lead__page" aria-hidden="true">
-              Stories
-            </span>
-            {item.eraLabel}
-          </p>
-          <h2 className="ds-stories-lead__title">
-            <a className="ds-stories-lead__link" href={href(item)}>
-              {item.title}
-            </a>
-          </h2>
-          <p className="ds-stories-lead__dek">{coverDek(item.summary)}</p>
-          <a className={buttonClassName('primary', 'ds-stories-lead__cta')} href={href(item)}>
-            {readLabel(item)}
-          </a>
-          {item.heroImage ? (
-            <p className="ds-plate__credit ds-stories-lead__credit">
-              Cover: {item.heroImage.credit}
-            </p>
-          ) : null}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/** One of the other chapters: a ruled row, the plate beside the title large in ink. */
-export function ChapterCover({ item }: { readonly item: PublicStoryListItemDoc }) {
-  return (
-    <article className="ds-stories-cover">
-      <div className="ds-stories-cover__media">
-        <CoverImage item={item} width={720} />
-      </div>
+    <article
+      className="ds-stories-cover"
+      data-lead={lead ? '' : undefined}
+      data-media={cover ? 'photo' : 'none'}
+    >
+      {cover ? (
+        <ExhibitFrame
+          className="ds-stories-cover__media"
+          id={`cover-${item.slug}`}
+          kind="photograph"
+          variant="compact"
+          receipt={<Receipt source={cover.credit} />}
+        >
+          <CoverImage item={item} width={lead ? 720 : 460} eager={lead} />
+        </ExhibitFrame>
+      ) : null}
       <div className="ds-stories-cover__caption">
         <p className="ds-stories-cover__years">{item.eraLabel}</p>
         <h2 className="ds-stories-cover__title">
@@ -101,37 +86,35 @@ export function ChapterCover({ item }: { readonly item: PublicStoryListItemDoc }
           </a>
         </h2>
         <p className="ds-stories-cover__dek">{coverDek(item.summary)}</p>
-        {item.heroImage ? (
-          <p className="ds-plate__credit ds-stories-cover__credit">{item.heroImage.credit}</p>
+        {lead ? (
+          <a className={buttonClassName('primary', 'ds-stories-cover__cta')} href={href(item)}>
+            {readLabel(item)}
+          </a>
         ) : null}
       </div>
     </article>
   );
 }
 
-/** A list row on the paper sheet: a 72px portrait where the data has one, the name large, the
- *  years bold in mono, one line of summary. */
+/** A list row: a small portrait where the cover is safe to show, the name, the years in mono,
+ *  one line of summary. A row with no portrait is a text row. */
 export function StoryRow({ item }: { readonly item: PublicStoryListItemDoc }) {
-  const image = item.heroImage;
+  const image = frontSafeCover(item);
   // An entry names its place in its collection ("2nd president"); a chapter says it is one.
   const kind = item.collection?.positionLabel ?? (item.format === 'entry' ? 'Entry' : 'Chapter');
   return (
     <li className="ds-stories-row">
-      <a className="ds-stories-row__link" href={href(item)}>
-        <span className="ds-stories-row__thumb" data-media={image ? 'photo' : 'none'}>
-          {image ? (
+      <a className="ds-stories-row__link" href={href(item)} data-media={image ? 'photo' : 'none'}>
+        {image ? (
+          <span className="ds-stories-row__thumb">
             <StoryImage
               src={storyImageSrc(image.url, 72, image.width)}
               fallbackSrc={image.url}
               alt=""
               inLink
             />
-          ) : (
-            <span className="ds-stories-row__initial" aria-hidden="true">
-              {item.title.slice(0, 1)}
-            </span>
-          )}
-        </span>
+          </span>
+        ) : null}
         <span className="ds-stories-row__title">{item.title}</span>
         <span className="ds-stories-row__years">{item.eraLabel}</span>
         <span className="ds-stories-row__kind">{kind}</span>
@@ -196,7 +179,7 @@ export function StoriesToolbar({ sort }: { readonly sort: readonly SortOption[] 
           {current?.label}
         </FilterButton>
         <div
-          className="ds-stories-sort ds-float"
+          className="ds-stories-sort"
           id={SORT_MENU_ID}
           popover="auto"
           role="dialog"
