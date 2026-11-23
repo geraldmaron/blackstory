@@ -16,6 +16,8 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
 import { DisplayNumeral, Notice, PageTitle } from '@repo/ui';
+import { FigureEmbed } from '../data/figures/FigureEmbed';
+import { isFigureId } from '../data/figures/figure-ids';
 import { RecordCite } from '../patterns/RecordCite';
 import { Room } from '../room';
 import { StoryBody } from './StoryBody';
@@ -286,7 +288,19 @@ export async function StoryDetail({
         <StorySpine headings={headings} {...(hasSources ? { sourcesHref: '#sources' } : {})} />
 
         <div className="ds-story__main">
-          <StoryBody story={story} numerals />
+          <StoryBody
+            story={story}
+            numerals
+            renderFigure={({ figureId, writtenAsOf, fallback }) =>
+              isFigureId(figureId) ? (
+                <FigureEmbed
+                  id={figureId}
+                  fallback={fallback}
+                  {...(writtenAsOf ? { writtenAsOf } : {})}
+                />
+              ) : undefined
+            }
+          />
 
           <div className="ds-story-body">
             {hasSources ? (

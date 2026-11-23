@@ -128,13 +128,28 @@ const storyPullQuoteBlockSchema = z.object({
 /**
  * A metric figure rendered as a chart from a packet's cited observations. When
  * `metricIds` is omitted the renderer charts every time-series metric on the
- * packet; provide it to pin the figure to specific series.
+ * packet; provide it to pin the figure to specific series. With `figureId` the
+ * block is an embed of that registry figure instead.
  */
 const storyFigureBlockSchema = z.object({
   type: z.literal('figure'),
   packetId: z.string().min(1),
   metricIds: z.array(z.string().min(1)).min(1).optional(),
   caption: z.string().min(1).max(400),
+  /**
+   * A Data registry figure (`D-08`) to draw in place of the packet chart. The packet still
+   * supplies the block's cited sources, and is the chart shown if the figure cannot load.
+   */
+  figureId: z
+    .string()
+    .regex(/^D-\d{2}$/)
+    .optional(),
+  /**
+   * The build of the figure's data the story was written against: the figure's own revision
+   * time (ISO) on the day of writing. The figure's receipt prints it and says when the drawing
+   * is a later build.
+   */
+  figureAsOf: z.string().datetime().optional(),
   anchors: z.array(storyAnchorSchema).optional(),
   replicationVerified: z.boolean().optional(),
 });
