@@ -1,20 +1,20 @@
 /**
- * The figure (`.ds-datafig`) and the chart kit inside it (`components/data/chart-kit.tsx`).
+ * The chart kit (`components/data/chart-kit.tsx`) and the plain drawings built from it, plus the
+ * parts of a figure that are not a drawing: its finding, its limits and its numbers table. The
+ * figure's own frame is `figures/figure.css`.
  *
- * Imported by DataChartFrame itself, so every page that renders a figure gets this sheet on a
- * direct load. (/lives once rendered its class chart as solid black bars because only /data
- * imported it.)
+ * Imported by `FigureBody`, so every page that renders a figure gets this sheet on a direct load.
  *
- * Series wear the brand's materials, read from the ground the figure sits on (a paper sheet on
- * /data and /lives): `hi`, the Black series a figure is about, is copper; `lo`, the comparison, is
- * ink; `mid`, a part of a whole, is stone. Copper-to-ink and stone-to-ink separate well for every
+ * Series wear the brand's materials, read from the ground the figure sits on (paper on /data and
+ * /lives): `hi`, the Black series a figure is about, is copper; `lo`, the comparison, is ink;
+ * `mid`, a part of a whole, is stone. Copper-to-ink and stone-to-ink separate well for every
  * color vision type (checked with the dataviz validator against #f4efe5); copper beside stone is
  * the close pair (normal-vision delta 14), so the two only meet with a 2px gap between them and a
  * direct label on each. Identity is never color alone: every series is named by a direct label,
  * in the tooltip and in the table.
  */
 
-.ds-datafig,
+.ds-figure,
 .ds-plot,
 .ds-hbars {
   --fig-hi: var(--ds-accent-graphic);
@@ -31,28 +31,13 @@
 
 /* —— the figure ————————————————————————————————————————————————————————————— */
 
-/* The explicit minmax(0, 1fr) track keeps an open table from widening the figure past the
-   viewport: the table scrolls inside its own panel. */
-.ds-datafig {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ds-space-4);
-  min-width: 0;
-  max-width: 100%;
-  margin: 0;
-  padding-top: var(--ds-space-6);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  container-type: inline-size;
-  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
-}
-
-.ds-datafig__head {
+.ds-figure__head {
   display: grid;
   gap: var(--ds-space-1);
   max-width: 44rem;
 }
 
-.ds-datafig__title {
+.ds-figure__title {
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-title);
@@ -63,7 +48,7 @@
   text-wrap: balance;
 }
 
-.ds-datafig__subtitle {
+.ds-figure__subtitle {
   margin: 0;
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
@@ -71,106 +56,12 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-datafig__viz {
-  min-width: 0;
-  max-width: 100%;
-}
-
-/* —— the footer row: source, Limits, Numbers ———————————————————————————————— */
-.ds-datafig__foot {
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-datafig__foot-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-1) var(--ds-space-4);
-  min-height: 2.75rem;
-}
-
-.ds-datafig__source {
-  flex: 1 1 18rem;
-  min-width: 0;
-  margin: 0;
-  padding: var(--ds-space-2) 0;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
-}
-
-.ds-datafig__source-label {
-  color: var(--ds-ink-muted);
-}
-
-.ds-datafig__source a {
-  color: var(--ds-ink);
-  text-decoration: underline;
-  text-decoration-color: var(--ds-border-control);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-}
-
-.ds-datafig__source a:hover {
-  text-decoration-color: currentColor;
-}
-
-.ds-datafig__toggles {
-  display: flex;
-  gap: var(--ds-space-1);
-  margin-left: auto;
-}
-
-.ds-datafig__toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-2);
-  border: 0;
-  border-radius: var(--ds-radius-sm);
-  background: none;
-  color: var(--ds-ink-muted);
-  font: inherit;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.ds-datafig__toggle svg {
-  width: 0.75rem;
-  height: 0.75rem;
-  transition: transform var(--ds-duration-fast, 120ms) ease-out;
-}
-
-.ds-datafig__toggle:hover {
-  color: var(--ds-ink);
-  background: var(--ds-surface-sunken);
-}
-
-.ds-datafig__toggle[aria-expanded='true'] {
-  color: var(--ds-ink);
-  font-weight: 600;
-}
-
-.ds-datafig__toggle[aria-expanded='true'] svg {
-  transform: rotate(180deg);
-}
-
-.ds-datafig__toggle:focus-visible,
-.ds-datafig__numbers:focus-visible {
+.ds-figure__numbers:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: 2px;
 }
 
-.ds-datafig__panel {
-  padding: var(--ds-space-3) 0 var(--ds-space-4);
-}
-
-.ds-datafig__limits {
+.ds-figure__limits {
   max-width: 62ch;
   margin: 0;
   font-family: var(--ds-font-sans);
@@ -179,7 +70,7 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-datafig__numbers {
+.ds-figure__numbers {
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
@@ -868,12 +759,12 @@ button.ds-mark {
   margin: 0;
 }
 
+/* A ratio is a measurement: body type, never display (docs/ui/DESIGN.md rule 4). */
 .ds-ratio__value {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
   font-weight: 600;
-  line-height: 1;
-  letter-spacing: var(--ds-tracking-display);
+  font-variant-numeric: tabular-nums;
   color: var(--ds-ink);
 }
 
@@ -959,8 +850,8 @@ button.ds-mark {
   grid-row: 1 / span 2;
   grid-column: 2;
   align-self: center;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--ds-ink);
@@ -1147,48 +1038,6 @@ button.ds-mark {
 .ds-plot__swatch[data-hatched='true'] {
   background: var(--fig-hatch), color-mix(in srgb, var(--fig-mid) 30%, transparent);
   box-shadow: inset 0 0 0 1px var(--fig-mid);
-}
-
-.ds-datafig__more {
-  position: relative;
-  min-height: 1.5rem;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ds-ink);
-  font: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--ds-border-control);
-  text-underline-offset: 0.2em;
-  cursor: pointer;
-}
-
-/* A 44px hit area around the inline text, without moving the source line. */
-.ds-datafig__more::before {
-  content: '';
-  position: absolute;
-  inset: -0.625rem 0;
-}
-
-.ds-datafig__more:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: 2px;
-}
-
-.ds-datafig__source-list {
-  display: grid;
-  gap: var(--ds-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-}
-
-.ds-datafig__source-list a {
-  color: var(--ds-ink);
-  text-underline-offset: 0.2em;
 }
 
 @container (max-width: 34rem) {

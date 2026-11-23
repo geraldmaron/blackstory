@@ -1,20 +1,32 @@
 /**
- * Encoding tests for the two Portrait forms (docs/ui/DESIGN.md section 9.5: a form whose encoding
+ * Encoding tests for the Portrait forms (docs/ui/DESIGN.md section 9.5: a form whose encoding
  * cannot be tested is not built). Each is checked twice: on the geometry, and on the SVG the
  * component actually renders, so a drawing that drifts from its data fails here.
  *
  *   coiled bar      length along the bar is proportional to the value, within 0.5 percent
  *   stacked fields  area is proportional to the value, within 0.5 percent
- *   both            a missing value is a labeled gap, never a zero; every value is printed
+ *   folded bars     length along each bar, turns included, is proportional to the value
+ *   all             a missing value is a labeled gap, never a zero; every value is printed
  */
 import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import type { NationalPopulationTimelineRow } from '@repo/domain/statistics/public-data-summaries';
-import { coiledBar, polylineLength, stackedFields, type Point } from './geometry';
-import { COIL_LAYOUTS, FIELD_LAYOUTS } from './portraits';
-import { D01, D02, figureCsv, parseFigureView } from './registry';
+import { coiledBar, foldedBars, polylineLength, stackedFields, type Point } from './geometry';
+import { COIL_LAYOUTS, FIELD_LAYOUTS, FOLD_LAYOUTS } from './portraits';
+import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
+import { D01, D02 } from './census';
+import { seriesData } from './indicators';
+import {
+  FIGURES,
+  FIGURE_IDS,
+  figureCsv,
+  figureViewOf,
+  figureViewsParam,
+  parseFigureView,
+  parseFigureViews,
+} from './registry';
 
 void React;
 
@@ -293,4 +305,132 @@ test('Plain is the default view; only the three names are accepted', () => {
   assert.equal(parseFigureView('Portrait'), 'portrait');
   assert.equal(parseFigureView(['numbers', 'plain']), 'numbers');
   assert.equal(parseFigureView('spiral'), 'plain');
+});
+
+/* —— folded bars: length ——————————————————————————————————————————————————— */
+
+const RATIO = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthRatioLongArc!;
+const RATIO_ID = RATIO.series[0]!.id;
+const ratioOf = (index: number) => RATIO.points[index]!.values[RATIO_ID]!;
+
+test('folded bar geometry: every bar is as long as its value times the one scale, turns included', () => {
+  for (const layout of Object.values(FOLD_LAYOUTS)) {
+    const geometry = foldedBars(
+      RATIO.points.map((point) => ({ key: point.period, value: point.values[RATIO_ID] ?? null })),
+      layout,
+    );
+    assert.equal(geometry.bars.length, RATIO.points.length);
+    geometry.bars.forEach((bar, index) => {
+      const expected = ratioOf(index) * layout.unit;
+      assert.ok(
+        within(polylineLength(bar.points), expected),
+        `${bar.key}: ${polylineLength(bar.points)} is not ${expected}`,
+      );
+      // No run leaves the plot, so a value printed past a bar's end stays on the drawing.
+      for (const point of bar.points) {
+        assert.ok(
+          point.x >= layout.gutter - 1e-9 && point.x <= layout.gutter + geometry.run + 1e-9,
+        );
+      }
+      // Every bar starts at the one left edge, so bars compare by length from a common base.
+      assert.equal(bar.points[0]!.x, layout.gutter);
+    });
+    // Only a bar longer than the run turns back; a bar that fits is one straight segment.
+    geometry.bars.forEach((bar, index) => {
+      assert.equal(bar.points.length > 2, ratioOf(index) * layout.unit > geometry.run, bar.key);
+    });
+    // Bars never share a row: each starts below the last run of the one before it.
+    geometry.bars.slice(1).forEach((bar, index) => {
+      const before = geometry.bars[index]!;
+      const lowest = Math.max(...before.points.map((point) => point.y));
+      assert.ok(bar.y - lowest >= layout.thickness + 3, `${bar.key} overlaps ${before.key}`);
+    });
+  }
+});
+
+test('D-09 Portrait as rendered: drawn length over value is one constant, in both drawings', () => {
+  const figure = FIGURES['D-09'].fromRows(seriesData(RATIO)!);
+  const markup = renderToStaticMarkup(<>{figure.portrait}</>);
+  for (const [size, svg] of Object.entries(svgs(markup))) {
+    const bars = svg.match(/<path class="ds-portrait__stretch"[^>]*>/g) ?? [];
+    assert.equal(bars.length, RATIO.points.length, `${size}: one bar for each year measured`);
+    const unit = FOLD_LAYOUTS[size as 'narrow' | 'wide'].unit;
+    const lengths = bars.map((tag, index) => {
+      const point = RATIO.points[index]!;
+      assert.equal(attr(tag, 'data-bar'), point.period);
+      assert.equal(Number(attr(tag, 'data-value')), ratioOf(index));
+      const length = polylineLength(pointsOf(attr(tag, 'd')));
+      assert.ok(within(length / ratioOf(index), unit), `${size} ${point.period}: ${length}`);
+      // Printed at the bar's end as the table prints it, with its year at the start.
+      assert.ok(svg.includes(`>${figure.table.rows[index]![1]!.text}<`), `${point.period} value`);
+      assert.ok(svg.includes(`>${point.period}<`), `${point.period} year`);
+      return length;
+    });
+    // The longest bar is the largest ratio and the shortest the smallest.
+    const values = RATIO.points.map((_, index) => ratioOf(index));
+    assert.equal(lengths.indexOf(Math.max(...lengths)), values.indexOf(Math.max(...values)));
+    assert.equal(lengths.indexOf(Math.min(...lengths)), values.indexOf(Math.min(...values)));
+    // The fill is the measured quantity: sand, with an ink outline under it.
+    assert.equal((svg.match(/data-tone="sand"/g) ?? []).length, RATIO.points.length);
+    assert.equal((svg.match(/class="ds-portrait__edge"/g) ?? []).length, RATIO.points.length);
+  }
+});
+
+test('folded bars: a year with no value is a gap that says "no data", not a short bar', () => {
+  const missing = {
+    ...RATIO,
+    points: RATIO.points.map((point, index) => (index === 3 ? { ...point, values: {} } : point)),
+  };
+  const figure = FIGURES['D-09'].fromRows(seriesData(missing)!);
+  const year = missing.points[3]!.period;
+  for (const [size, svg] of Object.entries(svgs(renderToStaticMarkup(<>{figure.portrait}</>)))) {
+    const gap = (svg.match(/<path class="ds-portrait__stretch"[^>]*>/g) ?? []).find(
+      (tag) => attr(tag, 'data-bar') === year,
+    )!;
+    assert.equal(attr(gap, 'data-tone'), 'gap');
+    assert.equal(attr(gap, 'data-value'), 'none');
+    assert.ok(
+      within(polylineLength(pointsOf(attr(gap, 'd'))), FOLD_LAYOUTS[size as 'narrow' | 'wide'].gap),
+    );
+    assert.ok(svg.includes('>no data<'));
+  }
+  assert.equal(figure.table.rows[3]![1]!.text, 'no data');
+  assert.equal(figureCsv(figure.table).split('\r\n')[4], `${year},no data`);
+});
+
+test('a folded bar is drawn only for one series; two series have no Portrait', () => {
+  const two = seriesData(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.nationalHomeownershipLongArc)!;
+  assert.equal(FIGURES['D-09'].fromRows(two).portrait, undefined);
+});
+
+/* —— the registry and the view parameter ——————————————————————————————————— */
+
+test('only the figures whose form was built and tested have a Portrait', () => {
+  // Plain and Numbers are every figure's; a Portrait is the exception and is listed here.
+  assert.deepEqual(
+    FIGURE_IDS.filter((id) => FIGURES[id].hasPortrait),
+    ['D-01', 'D-02', 'D-09'],
+  );
+});
+
+test('each figure keeps its own view in one URL parameter', () => {
+  const views = parseFigureViews('D-01:portrait,D-09:numbers');
+  assert.equal(figureViewOf(views, 'D-01'), 'portrait');
+  assert.equal(figureViewOf(views, 'D-09'), 'numbers');
+  assert.equal(figureViewOf(views, 'D-05'), 'plain');
+  // Changing one figure leaves the others where they are; Plain everywhere carries no parameter.
+  assert.equal(
+    figureViewsParam(views, 'D-05', 'numbers'),
+    'D-01:portrait,D-09:numbers,D-05:numbers',
+  );
+  assert.equal(figureViewsParam(views, 'D-01', 'plain'), 'D-09:numbers');
+  assert.equal(figureViewsParam(parseFigureViews(undefined), 'D-01', 'plain'), undefined);
+  // The page-wide form phase 6a shipped still opens every figure in that view.
+  const all = parseFigureViews('numbers');
+  assert.equal(figureViewOf(all, 'D-12'), 'numbers');
+  assert.equal(figureViewsParam(all, 'D-12', 'plain'), 'numbers,D-12:plain');
+  assert.equal(figureViewOf(parseFigureViews('numbers,D-12:plain'), 'D-12'), 'plain');
+  // Anything unknown is dropped, never guessed.
+  assert.deepEqual(parseFigureViews('D-01:spiral,weird').byId, {});
+  assert.equal(parseFigureViews(['D-02:numbers', 'portrait']).all, 'portrait');
 });

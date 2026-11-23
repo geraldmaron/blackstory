@@ -30,6 +30,8 @@ export type BuildSitemapOptions = {
   readonly releaseGeneratedAt?: string;
   readonly entities?: readonly SitemapEntityEntry[];
   readonly stories?: readonly SitemapStoryEntry[];
+  /** Paths of the figure pages that have something to draw in this release (`/data/D-01`). */
+  readonly figures?: readonly string[];
 };
 
 /**
@@ -133,7 +135,15 @@ export function buildPublicSitemapEntries(
     });
   }
 
-  return [...staticEntries, ...storyEntries, ...entityEntries];
+  // A figure's page is revised when its series is rebuilt, which a release does.
+  const figureEntries: MetadataRoute.Sitemap = (options.figures ?? []).map((path) => ({
+    url: toAbsolute(siteUrl, path),
+    lastModified: releaseStamp,
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
+  return [...staticEntries, ...figureEntries, ...storyEntries, ...entityEntries];
 }
 
 /**

@@ -16,7 +16,6 @@ import LawLoading from './law/(index)/loading';
 import StoriesLoading from './stories/(index)/loading';
 import MosaicCreditsLoading from './stories/mosaic-credits/loading';
 import RecordsLoading from './records/loading';
-import LivesLoading from './lives/loading';
 import ReceiptLoading from './corrections/status/[receiptCode]/loading';
 
 void React;
@@ -54,8 +53,6 @@ const LOADING_BOUNDARIES = [
     Loading: RecordsLoading,
     label: 'Pulling the records together…',
   },
-  // Also the wait for /lives/explorer, which awaits the same snapshot read.
-  { route: '/lives', dir: 'lives', Loading: LivesLoading, label: 'Finding the lives…' },
   {
     route: '/corrections/status/[receiptCode]',
     dir: 'corrections/status/[receiptCode]',
@@ -102,6 +99,12 @@ test('no record, story or figure route sits behind a loading boundary', () => {
     'presidents/[slug]',
     'presidents',
     'data',
+    'data/[figure]',
+    // Lives since phase 6b: its figures are cited by address, and a region that does not exist
+    // answers a real 404 instead of a 200 that streams one.
+    'lives',
+    'lives/explorer',
+    'lives/[region]',
     '',
   ]) {
     assert.ok(!existsSync(join(here, dir, 'loading.tsx')), `${dir || 'app'} has a loading.tsx`);

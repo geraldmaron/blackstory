@@ -1,5 +1,6 @@
 /**
- * `GET /sitemap.xml` — registry routes, published story URLs and active-release record URLs, CDN-cached.
+ * `GET /sitemap.xml` — registry routes, figure pages, published story URLs and active-release
+ * record URLs, CDN-cached.
  *
  * Must not statically generate at build: App Hosting mounts DATABASE_URL at runtime only, and a
  * baked sitemap would ship the 4-entity seed plus localhost. Being dynamic does not stop the
@@ -10,6 +11,7 @@ import { getPublicActiveReleaseMeta, getPublicSearchIndex } from '../../lib/publ
 import { shouldUseLivePublicProjections } from '../../lib/public-data/live-policy';
 import { listPublicStoryListItems } from '../../lib/stories/source';
 import { storyHref } from '../../lib/stories/story-routes';
+import { FIGURES, FIGURE_IDS, figurePagePath } from '../../components/data/figures/registry';
 import {
   SITEMAP_CACHE_CONTROL,
   buildPublicSitemapEntries,
@@ -35,10 +37,12 @@ export async function GET(): Promise<Response> {
 
   // A failed story read degrades to no story URLs (the reader returns an empty list), never to a
   // failed sitemap: record URLs are the larger set and must not depend on the story table.
-  const [{ data: index }, release, { items: stories }] = await Promise.all([
+  // A figure with nothing to draw answers 404 on its own page, so it is not listed.
+  const [{ data: index }, release, { items: stories }, figures] = await Promise.all([
     getPublicSearchIndex(),
     getPublicActiveReleaseMeta(),
     listPublicStoryListItems(),
+    Promise.all(FIGURE_IDS.map((id) => FIGURES[id].load().catch(() => undefined))),
   ]);
 
   const xml = serializeSitemapXml(
@@ -55,6 +59,7 @@ export async function GET(): Promise<Response> {
         ...(story.publishedAt !== undefined ? { publishedAt: story.publishedAt } : {}),
         ...(story.updatedAt !== undefined ? { updatedAt: story.updatedAt } : {}),
       })),
+      figures: FIGURE_IDS.filter((_, at) => figures[at] !== undefined).map(figurePagePath),
       ...(release ? { releaseGeneratedAt: release.activatedAt } : {}),
     }),
   );

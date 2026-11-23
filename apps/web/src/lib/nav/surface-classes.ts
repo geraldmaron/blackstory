@@ -86,6 +86,7 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // URLs that return 404.
   ['/stories/', 'reading'],
   ['/presidents/', 'reading'],
+  ['/data/', 'reading'],
   ['/lives/', 'reading'],
   ['/place/', 'record'],
   ['/invention/', 'record'],

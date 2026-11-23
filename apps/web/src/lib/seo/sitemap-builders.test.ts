@@ -264,3 +264,12 @@ test('a collection story is listed at its canonical collection address, not unde
   assert.ok(urls.includes('https://example.test/presidents/abraham-lincoln'));
   assert.ok(!urls.includes('https://example.test/stories/abraham-lincoln'));
 });
+
+test('figure pages are listed at their own address', () => {
+  const urls = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    figures: ['/data/D-01', '/data/D-09'],
+  }).map((entry) => entry.url);
+  assert.ok(urls.includes('https://blackbook.example/data/D-01'));
+  assert.equal(urls.filter((url) => url.endsWith('/data/D-09')).length, 1);
+});

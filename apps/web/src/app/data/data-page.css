@@ -1,6 +1,6 @@
 /**
- * `/data` page layout: a sticky contents list beside the figures on desktop, plain sections, a
- * two-up figure grid where two figures form one comparison. The figures themselves are drawn by
+ * `/data` page layout: a sticky contents list beside the figures on desktop and plain sections on
+ * one paper sheet. The figures themselves are drawn by `components/data/figures/figure.css` and
  * `components/data/data-charts.css`, which each figure imports.
  *
  * Named data-page.css, not data-edition.css: room-kit.test.tsx forbids new `*-edition.css`
@@ -118,8 +118,12 @@
   scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
 }
 
-/* Inside a sheet a section opens on type: a heavy ink rule, then the headline. Depth comes from
-   type and rules there, never a colored card on the paper. */
+/* A section opens on type: a heavy ink rule, then the headline. Depth comes from type and rules,
+   never a colored field on the paper. */
+.ds-data-section + .ds-data-section {
+  margin-top: var(--ds-space-18);
+}
+
 .ds-data-section__head {
   display: grid;
   gap: var(--ds-space-3);
@@ -146,44 +150,6 @@
   font-style: italic;
   line-height: 1.4;
   color: var(--ds-ink);
-}
-
-/* Between the sheets: the door into Lives on copper and the reading rules on sand, full bleed. */
-.ds-data-band {
-  margin-block: var(--ds-space-16);
-  margin-inline: calc(50% - 50vw);
-  padding-block: var(--ds-space-16);
-  background: var(--ds-canvas);
-  color: var(--ds-ink);
-  position: relative;
-  isolation: isolate;
-}
-
-/* Narrow screens: the decade rule gets its own floor under the text instead of sitting behind it. */
-@media (max-width: 79.99rem) {
-  .ds-data-band:has(.ds-band-art__layer--decades) {
-    --ds-band-art-floor: clamp(7rem, 30vw, 15rem);
-    padding-bottom: calc(var(--ds-space-16) + var(--ds-band-art-floor));
-  }
-}
-
-.ds-data-band:last-child {
-  margin-bottom: 0;
-}
-
-.ds-data-band .ds-data-section__head {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.ds-data-band .ds-data-section__head > .ds-section-heading {
-  font-size: var(--ds-text-headline);
-  font-weight: 800;
-  line-height: 0.95;
-}
-
-.ds-data-band .ds-data-door {
-  margin: 0;
 }
 
 .ds-data-section__meta {
@@ -224,27 +190,16 @@
   color: var(--ds-ink);
 }
 
-/* The figure grid: one column, two where a pair shares a row and the column is wide. */
+/* The figures of a section, one under the next. */
 .ds-data-figures {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--ds-space-12) var(--ds-space-8);
+  gap: var(--ds-space-12);
 }
 
-@media (min-width: 56rem) {
-  .ds-data-figures {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .ds-data-figures > .ds-datafig:not(.ds-datafig--half),
-  .ds-data-figures > .ds-figure {
-    grid-column: 1 / -1;
-  }
-}
-
-/* A two-bar comparison alone on a row keeps a readable length. */
-.ds-data-figures > .ds-datafig:not(.ds-datafig--half) .ds-hbars {
-  max-width: 44rem;
+/* An address a figure had before it had an id: nothing to see, only somewhere to land. */
+.ds-data-figures__was {
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-32));
 }
 
 /* —— Lives door, rules, empty ———————————————————————————————————————————————— */
@@ -335,16 +290,4 @@
   font-size: var(--ds-text-body-sm);
   line-height: var(--ds-leading-body);
   color: var(--ds-ink-muted);
-}
-
-/* —— a figure's key number ————————————————————————————————————————————————————
-   One number per figure, set at the title step in copper above the finding that states it. */
-.ds-datafig__key {
-  display: block;
-  margin-bottom: var(--ds-space-3);
-  font-size: var(--ds-text-headline);
-}
-
-.ds-datafig--half .ds-datafig__key {
-  font-size: var(--ds-text-display-2);
 }

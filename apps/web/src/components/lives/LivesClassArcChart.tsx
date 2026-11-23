@@ -15,7 +15,6 @@ import {
   type LivesLens,
 } from '@repo/domain/statistics/lives';
 import { formatLivesPercent } from '../../lib/lives/lives-format';
-import { DataChartFrame } from '../data/DataChartFrame';
 import {
   Band,
   Dot,
@@ -30,7 +29,7 @@ import {
   valueScale,
   type LinePoint,
 } from '../data/chart-kit';
-import { drawnValue, sourcesOfCells } from './lives-chart-utils';
+import { drawnValue } from './lives-chart-utils';
 
 void React;
 
@@ -38,31 +37,22 @@ export type LivesClassArcChartProps = {
   readonly bundle: LivesAreaBundle;
   readonly emphasis: LivesLens;
   readonly selectedDecade: number;
-  readonly id?: string;
 };
 
-export function LivesClassArcChart({
-  bundle,
-  emphasis,
-  selectedDecade,
-  id,
-}: LivesClassArcChartProps) {
+export function LivesClassArcChart({ bundle, emphasis, selectedDecade }: LivesClassArcChartProps) {
   const decades = bundle.decades;
-  if (decades.length < 2) return null;
 
   const share = (lens: LivesLens, index: number) =>
     drawnValue(decades[index]!.classShares[lens].middle);
   const values = LIVES_LENSES.flatMap((lens) =>
     decades.map((_, index) => share(lens, index)).filter((v): v is number => v !== null),
   );
-  if (values.length === 0) return null;
 
   const { top, ticks } = valueScale(Math.max(...values), (value) => `${value}%`);
   const y = (value: number) => (value / top) * 100;
   const { center, width } = bandLayout(decades.length);
   const selected = decades.find((entry) => entry.decade === selectedDecade) ?? decades.at(-1)!;
   const selectedIndex = decades.indexOf(selected);
-  const emphasisValue = share(emphasis, selectedIndex);
 
   // Spans of decades the emphasized group was not published in, each labeled once.
   const gaps: { from: number; to: number }[] = [];
@@ -107,138 +97,79 @@ export function LivesClassArcChart({
     return [];
   });
 
-  const allCells = decades.flatMap((decade) =>
-    LIVES_LENSES.map((lens) => decade.classShares[lens].middle),
-  );
-
   return (
-    <DataChartFrame
-      title={`Middle-band class share by group · ${bundle.areaName}, ${decades[0]!.label} to ${decades.at(-1)!.label}`}
-      {...(id !== undefined ? { id } : {})}
-      // The explorer's first finding sits straight under the page title.
-      headingLevel={2}
-      reading={
-        emphasisValue === null ? (
-          <>
-            {LIVES_LENS_LABELS[emphasis]} middle-band share was not published for the{' '}
-            {selected.label}
-          </>
-        ) : (
-          <>
-            In the {selected.label}, {formatLivesPercent(emphasisValue)} of{' '}
-            {LIVES_LENS_LABELS[emphasis]} {selected.classLabel.toLowerCase()} sat in the middle band
-          </>
-        )
-      }
-      caption="Each line is one group’s middle class (or middle work) band as the census published it that decade. Class is measured differently across regimes, so a line breaks at each change of measure and wherever a group was not published. A gap is missing publication, not zero."
-      sources={sourcesOfCells(allCells)}
-      textAlternative={
-        <table className="ds-data-chart__table">
-          <caption>Middle-band share by decade and group</caption>
-          <thead>
-            <tr>
-              <th scope="col">Decade</th>
-              {LIVES_LENSES.map((lens) => (
-                <th key={lens} scope="col">
-                  {LIVES_LENS_LABELS[lens]}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {decades.map((decade, index) => (
-              <tr key={decade.decade}>
-                <th scope="row">{decade.label}</th>
-                {LIVES_LENSES.map((lens) => {
-                  const value = share(lens, index);
-                  return (
-                    <td key={lens}>
-                      {value === null ? 'Not published' : formatLivesPercent(value)}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      }
+    <Plot
+      label="Middle-band class share by decade"
+      unit="Share in the middle class band, percent"
+      size="md"
+      endWidth="min(7rem, 22cqi)"
+      yTicks={ticks}
+      xTicks={categoryTicks(
+        decades.map((decade) => decade.label),
+        center,
+        2,
+      )}
     >
-      <Plot
-        label="Middle-band class share by decade"
-        unit="Share in the middle class band, percent"
-        size="md"
-        endWidth="min(7rem, 22cqi)"
-        yTicks={ticks}
-        xTicks={categoryTicks(
-          decades.map((decade) => decade.label),
-          center,
-          2,
-        )}
-      >
-        {gaps.map((gap) => (
-          <Band
-            key={gap.from}
-            from={center(gap.from) - width / 2}
-            to={center(gap.to) + width / 2}
-            kind="gap"
-            label={gap === gaps[0] || gap.to - gap.from >= 1 ? 'Not published' : ''}
-          />
-        ))}
-        {measureBreaks.map((index, order) => (
-          <Rule
-            key={`m-${index}`}
-            at={center(index) - width / 2}
-            // Two breaks a decade or two apart would print over each other; the first speaks for both.
-            {...(order === 0 || index - measureBreaks[order - 1]! > 2
-              ? { label: 'Measured differently', minor: order > 0 }
-              : {})}
-          />
-        ))}
-        <Rule at={center(selectedIndex)} kind="current" />
-        <Lines series={lines} />
-        {decades.map((decade, index) => {
-          const rows = LIVES_LENSES.map((lens) => {
-            const value = share(lens, index);
-            return {
-              value: value === null ? 'Not published' : formatLivesPercent(value),
-              label: LIVES_LENS_LABELS[lens],
-              tone: lens === emphasis ? ('hi' as const) : ('lo' as const),
-            };
-          });
-          const highest = Math.max(
-            0,
-            ...LIVES_LENSES.map((lens) => share(lens, index) ?? 0).map(y),
-          );
-          const isSelected = index === selectedIndex;
-          return (
-            <Mark
-              key={decade.decade}
-              x={center(index)}
-              width={width}
-              first={index === 0}
-              crosshair
-              selected={isSelected}
-              tipY={highest}
-              ariaLabel={`${decade.label}: ${rows.map((row) => `${row.label} ${row.value}`).join(', ')}`}
-              tip={<Tip title={decade.label} rows={rows} />}
-            >
-              {LIVES_LENSES.map((lens) => {
-                const value = share(lens, index);
-                return value === null ? null : (
-                  <Dot
-                    key={lens}
-                    x={50}
-                    y={y(value)}
-                    tone={lens === emphasis ? 'hi' : 'lo'}
-                    size={isSelected && lens === emphasis ? 'lg' : 'sm'}
-                  />
-                );
-              })}
-            </Mark>
-          );
-        })}
-        <EndLabels items={lastValues} />
-      </Plot>
-    </DataChartFrame>
+      {gaps.map((gap) => (
+        <Band
+          key={gap.from}
+          from={center(gap.from) - width / 2}
+          to={center(gap.to) + width / 2}
+          kind="gap"
+          label={gap === gaps[0] || gap.to - gap.from >= 1 ? 'Not published' : ''}
+        />
+      ))}
+      {measureBreaks.map((index, order) => (
+        <Rule
+          key={`m-${index}`}
+          at={center(index) - width / 2}
+          // Two breaks a decade or two apart would print over each other; the first speaks for both.
+          {...(order === 0 || index - measureBreaks[order - 1]! > 2
+            ? { label: 'Measured differently', minor: order > 0 }
+            : {})}
+        />
+      ))}
+      <Rule at={center(selectedIndex)} kind="current" />
+      <Lines series={lines} />
+      {decades.map((decade, index) => {
+        const rows = LIVES_LENSES.map((lens) => {
+          const value = share(lens, index);
+          return {
+            value: value === null ? 'Not published' : formatLivesPercent(value),
+            label: LIVES_LENS_LABELS[lens],
+            tone: lens === emphasis ? ('hi' as const) : ('lo' as const),
+          };
+        });
+        const highest = Math.max(0, ...LIVES_LENSES.map((lens) => share(lens, index) ?? 0).map(y));
+        const isSelected = index === selectedIndex;
+        return (
+          <Mark
+            key={decade.decade}
+            x={center(index)}
+            width={width}
+            first={index === 0}
+            crosshair
+            selected={isSelected}
+            tipY={highest}
+            ariaLabel={`${decade.label}: ${rows.map((row) => `${row.label} ${row.value}`).join(', ')}`}
+            tip={<Tip title={decade.label} rows={rows} />}
+          >
+            {LIVES_LENSES.map((lens) => {
+              const value = share(lens, index);
+              return value === null ? null : (
+                <Dot
+                  key={lens}
+                  x={50}
+                  y={y(value)}
+                  tone={lens === emphasis ? 'hi' : 'lo'}
+                  size={isSelected && lens === emphasis ? 'lg' : 'sm'}
+                />
+              );
+            })}
+          </Mark>
+        );
+      })}
+      <EndLabels items={lastValues} />
+    </Plot>
   );
 }

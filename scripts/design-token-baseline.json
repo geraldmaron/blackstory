@@ -61,7 +61,6 @@
     "breakpoint": {
       "apps/web/src/admin/design-system/management.css": 5,
       "apps/web/src/app/admin/admin.css": 1,
-      "apps/web/src/app/data/data-page.css": 1,
       "apps/web/src/app/explore/explore.css": 1,
       "apps/web/src/app/shell.css": 1,
       "apps/web/src/components/patterns/command-palette/command-palette.css": 1,

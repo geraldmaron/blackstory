@@ -19,6 +19,7 @@ import {
   ADMISSION_STEPS,
   CATALOG_VIEWS,
   DIGNITY_RULES,
+  FIGURE_LINEAGE_CREDIT,
   EDITORIAL_STANDARDS,
   GRADE_RULE_NOTES,
   GRADES_LEAD,
@@ -164,6 +165,9 @@ export function MethodologySections() {
               },
             ]}
           />
+          <Prose>
+            <p>{FIGURE_LINEAGE_CREDIT}</p>
+          </Prose>
         </RoomSection>
 
         <RoomSection id="where-the-evidence-comes-from" title="Where the evidence comes from">

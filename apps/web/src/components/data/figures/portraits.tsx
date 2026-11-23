@@ -1,7 +1,7 @@
 /**
- * The two Portrait forms, in the lineage of W.E.B. Du Bois's data portraits for the 1900 Paris
- * Exposition: the bar that runs and then coils, and stacked proportional fields. Both are drawn
- * from the data by `geometry.ts`; every value is printed on its mark; a missing value is a gap
+ * The Portrait forms, in the lineage of W.E.B. Du Bois's data portraits for the 1900 Paris
+ * Exposition: the bar that runs and then coils, stacked proportional fields, and bars that fold
+ * when one value dwarfs the rest. All are drawn from the data by `geometry.ts`; every value is printed on its mark; a missing value is a gap
  * that says "no data". Flat ink, copper and sand with an ink outline. No aging and no period
  * lettering (docs/ui/DESIGN.md section 9.5).
  *
@@ -11,9 +11,11 @@
 import React, { type ReactNode } from 'react';
 import {
   coiledBar,
+  foldedBars,
   stackedFields,
   type CoilLayout,
   type FieldLayout,
+  type FoldLayout,
   type Point,
 } from './geometry';
 
@@ -272,6 +274,139 @@ export function StackedFieldsPortrait({
                     fontSize={LABEL_SIZE[size]}
                   >
                     {column.key}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        );
+      })}
+    </div>
+  );
+}
+
+/* —— folded bars ——————————————————————————————————————————————————————————— */
+
+export const FOLD_LAYOUTS: Readonly<Record<'narrow' | 'wide', FoldLayout>> = {
+  narrow: {
+    width: 320,
+    gutter: 38,
+    labelRoom: 44,
+    thickness: 13,
+    rowHeight: 22,
+    foldPitch: 22,
+    unit: 11,
+    gap: 60,
+  },
+  wide: {
+    width: 720,
+    gutter: 46,
+    labelRoom: 52,
+    thickness: 14,
+    rowHeight: 24,
+    foldPitch: 24,
+    unit: 29,
+    gap: 120,
+  },
+};
+
+/** Straight labels have room to be larger than the coil's, which must fit inside a 24px bar. */
+const FOLD_LABEL_SIZE = { narrow: 12.5, wide: 13 } as const;
+
+export type FoldPortraitItem = {
+  /** The bar's name, printed at its start: the year. */
+  readonly key: string;
+  readonly value: number | null;
+  /** The value as printed at the bar's end: "56.3×". */
+  readonly text: string;
+};
+
+export function FoldedBarPortrait({
+  label,
+  items,
+  children,
+}: {
+  readonly label: string;
+  readonly items: readonly FoldPortraitItem[];
+  /** How to read the form, set above the bars. */
+  readonly children: ReactNode;
+}) {
+  return (
+    <div className="ds-portrait ds-portrait--fold">
+      <div className="ds-portrait__key">{children}</div>
+      {(['narrow', 'wide'] as const).map((size) => {
+        const layout = FOLD_LAYOUTS[size];
+        const geometry = foldedBars(items, layout);
+        const half = layout.thickness / 2;
+        return (
+          <svg
+            key={size}
+            className={`ds-portrait__svg ds-portrait__svg--${size}`}
+            viewBox={`0 -2 ${geometry.width} ${round(geometry.height + 4)}`}
+            role="img"
+            aria-label={label}
+            data-layout={size}
+          >
+            {geometry.bars.map((bar, index) => {
+              const item = items[index]!;
+              const d = pathOf(bar.points);
+              const end = bar.points.at(-1)!;
+              const before = bar.points.at(-2)!;
+              // A bar that ends on a turn prints its value beside the turn, not under it.
+              const sideways = end.y === before.y;
+              return (
+                <g key={bar.key}>
+                  <path
+                    className="ds-portrait__edge"
+                    d={d}
+                    strokeWidth={layout.thickness + 3}
+                    strokeLinejoin="miter"
+                    {...(bar.value === null ? { strokeDasharray: '3 3' } : {})}
+                  />
+                  <path
+                    className="ds-portrait__stretch"
+                    d={d}
+                    strokeWidth={layout.thickness}
+                    strokeLinejoin="miter"
+                    data-bar={bar.key}
+                    data-value={bar.value ?? 'none'}
+                    data-tone={bar.value === null ? 'gap' : 'sand'}
+                  />
+                  {(
+                    [
+                      [bar.points[0]!, true],
+                      [end, sideways],
+                    ] as const
+                  ).map(([at, upright], tick) => (
+                    <line
+                      key={tick}
+                      className="ds-portrait__tick"
+                      x1={round(at.x - (upright ? 0 : half))}
+                      y1={round(at.y - (upright ? half : 0))}
+                      x2={round(at.x + (upright ? 0 : half))}
+                      y2={round(at.y + (upright ? half : 0))}
+                    />
+                  ))}
+                  <text
+                    className="ds-portrait__year"
+                    x={layout.gutter - 6}
+                    y={round(bar.y)}
+                    textAnchor="end"
+                    dominantBaseline="central"
+                    fontSize={FOLD_LABEL_SIZE[size]}
+                  >
+                    {bar.key}
+                  </text>
+                  <text
+                    className="ds-portrait__label"
+                    data-tone="gap"
+                    x={round(end.x + (sideways ? bar.direction * 6 : -bar.direction * 12))}
+                    y={round(end.y)}
+                    textAnchor={(sideways ? bar.direction : -bar.direction) === 1 ? 'start' : 'end'}
+                    dominantBaseline="central"
+                    fontSize={FOLD_LABEL_SIZE[size]}
+                  >
+                    {item.text}
                   </text>
                 </g>
               );

@@ -1,7 +1,8 @@
 /**
- * Geometry for the two Portrait forms (docs/ui/DESIGN.md section 9.5). Pure functions from data to
- * coordinates, so each form's encoding can be tested: length along the bar for the coiled bar,
- * area for the stacked fields. A missing value is a gap of fixed size, never a zero.
+ * Geometry for the Portrait forms (docs/ui/DESIGN.md section 9.5). Pure functions from data to
+ * coordinates, so each form's encoding can be tested: length along the bar for the coiled bar and
+ * the folded bars, area for the stacked fields. A missing value is a gap of fixed size, never a
+ * zero.
  */
 
 export type Point = { readonly x: number; readonly y: number };
@@ -242,4 +243,82 @@ export function stackedFields(columns: readonly FieldColumn[], layout: FieldLayo
       return { key: column.key, x, rects };
     }),
   };
+}
+
+/* —— folded bars: one bar a row, length encodes the value, an outlier turns back —————— */
+
+export type FoldItem = {
+  readonly key: string;
+  /** `null` is missing data: drawn as a labeled gap. */
+  readonly value: number | null;
+};
+
+export type FoldLayout = {
+  readonly width: number;
+  /** Room at the left for each bar's name. */
+  readonly gutter: number;
+  /** Room at the right for a value printed past a full-length run. */
+  readonly labelRoom: number;
+  readonly thickness: number;
+  /** Distance from one bar to the next, center line to center line. */
+  readonly rowHeight: number;
+  /** Distance between the runs of one folded bar, center line to center line. */
+  readonly foldPitch: number;
+  /** Length drawn per unit of value. The one scale of the figure. */
+  readonly unit: number;
+  /** Length of a "no data" gap. */
+  readonly gap: number;
+};
+
+export type FoldBar = {
+  readonly key: string;
+  readonly value: number | null;
+  /** The bar's center line. Its length is `value * unit` (or `gap` when the value is null). */
+  readonly points: readonly Point[];
+  /** The center line of the bar's first run: where its name is set. */
+  readonly y: number;
+  /** 1 when the bar ends running right, -1 when it ends running left. */
+  readonly direction: 1 | -1;
+};
+
+export type FoldGeometry = {
+  readonly width: number;
+  readonly height: number;
+  /** The longest straight run: a bar longer than this turns back. */
+  readonly run: number;
+  readonly bars: readonly FoldBar[];
+};
+
+/**
+ * One bar a row from a common left edge. A bar longer than the run turns down and runs back, as
+ * many times as it needs; the turns are part of its length, so the length along its center line is
+ * always `value * unit`.
+ */
+export function foldedBars(items: readonly FoldItem[], layout: FoldLayout): FoldGeometry {
+  const left = layout.gutter;
+  const run = layout.width - layout.gutter - layout.labelRoom;
+  let y = layout.rowHeight / 2;
+  const bars = items.map((item): FoldBar => {
+    const top = y;
+    let remaining = item.value === null ? layout.gap : Math.max(0, item.value) * layout.unit;
+    let x = left;
+    let direction: 1 | -1 = 1;
+    const points: Point[] = [{ x, y }];
+    for (;;) {
+      const along = Math.min(remaining, run);
+      x += direction * along;
+      points.push({ x, y });
+      remaining -= along;
+      if (remaining <= 0) break;
+      const down = Math.min(remaining, layout.foldPitch);
+      y += down;
+      points.push({ x, y });
+      remaining -= down;
+      if (remaining <= 0) break;
+      direction = direction === 1 ? -1 : 1;
+    }
+    y += layout.rowHeight;
+    return { key: item.key, value: item.value, points, y: top, direction };
+  });
+  return { width: layout.width, height: y - layout.rowHeight / 2, run, bars };
 }

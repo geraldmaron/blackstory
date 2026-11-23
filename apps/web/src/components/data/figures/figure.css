@@ -43,6 +43,11 @@
   color: var(--ds-ink);
 }
 
+/* A two-bar comparison keeps a readable length on a wide column. */
+.ds-figure .ds-hbars {
+  max-width: 44rem;
+}
+
 .ds-figure__download {
   margin: 0;
 }
@@ -52,7 +57,7 @@
   gap: var(--ds-space-2);
 }
 
-.ds-figure__receipt .ds-datafig__limits strong {
+.ds-figure__receipt .ds-figure__limits strong {
   color: var(--ds-ink);
   font-weight: 600;
 }
@@ -227,7 +232,7 @@
     display: block;
   }
 
-  .ds-figure > .ds-datafig__head {
+  .ds-figure > .ds-figure__head {
     margin-bottom: var(--ds-space-4);
     break-after: avoid;
   }

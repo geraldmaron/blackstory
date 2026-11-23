@@ -261,6 +261,7 @@ export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/entity/', '/records'],
   ['/books/', '/books'],
   ['/law/', '/law'],
+  ['/data/', '/data'],
   ['/lives/', '/lives'],
 ];
 

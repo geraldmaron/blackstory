@@ -5,8 +5,11 @@
  */
 import React from 'react';
 import type { LivesDecadeBundle, LivesLens } from '@repo/domain/statistics/lives';
-import { LivesClassSharesChart } from './LivesClassSharesChart';
-import { LivesConditionsChart } from './LivesConditionsChart';
+import {
+  LivesClassSharesFigure,
+  LivesConditionsFigure,
+  type LivesFigureFrame,
+} from './LivesFigures';
 import { LivesCountSight } from './LivesCountSight';
 import { LivesRegimeNotice } from './LivesRegimeNotice';
 import { LivesRulesInForce } from './LivesRulesInForce';
@@ -18,10 +21,17 @@ export type LivesDecadePanelProps = {
   readonly decade: LivesDecadeBundle;
   readonly emphasis: LivesLens;
   readonly disclaimer: string;
+  readonly frame: LivesFigureFrame;
   readonly id?: string;
 };
 
-export function LivesDecadePanel({ decade, emphasis, disclaimer, id }: LivesDecadePanelProps) {
+export function LivesDecadePanel({
+  decade,
+  emphasis,
+  disclaimer,
+  frame,
+  id,
+}: LivesDecadePanelProps) {
   return (
     <section
       {...(id ? { id } : {})}
@@ -52,8 +62,8 @@ export function LivesDecadePanel({ decade, emphasis, disclaimer, id }: LivesDeca
           displayed groups do partition.
         </p>
       ) : null}
-      <LivesClassSharesChart decade={decade} emphasis={emphasis} />
-      <LivesConditionsChart decade={decade} emphasis={emphasis} />
+      <LivesClassSharesFigure decade={decade} emphasis={emphasis} frame={frame} />
+      <LivesConditionsFigure decade={decade} emphasis={emphasis} frame={frame} />
       <LivesRulesInForce decade={decade} emphasis={emphasis} disclaimer={disclaimer} />
       <LivesWorldBeats decade={decade.decade} beats={decade.worldBeats} emphasis={emphasis} />
     </section>

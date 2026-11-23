@@ -1,9 +1,10 @@
 /**
- * `/data`: the reference ledger. Census counts, a door into Lives, and published indicator
- * series, with a sticky contents list on desktop. Every figure names the series behind it.
+ * `/data`: census counts, a link into Lives, and published indicator series, with a sticky
+ * contents list on desktop. Every figure names the series behind it and has its own page at
+ * `/data/[figure]`.
  *
- * Primary arrivals (Rooms, footer, bare `/data`) must paint at the top. Deep links into the
- * Lived act use `/data#lives`. Legacy `?s=lives` hops once to the immersive `/lives` room.
+ * A bare `/data` paints at the top. `/data#lives` is the Lives section. Legacy `?s=lives` hops once
+ * to `/lives`.
  */
 import type { Metadata } from 'next';
 import React from 'react';
@@ -20,9 +21,9 @@ import {
   type RawLivesSearchParams,
 } from '../../lib/lives/lives-url-state';
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
-import { DataSections, millionsFigure } from './DataSections';
+import { DataSections } from './DataSections';
 import { loadDataPageModel } from './load-data-page-model';
-import { parseFigureView } from '../../components/data/figures/registry';
+import { parseFigureViews } from '../../components/data/figures/registry';
 import '../reading-room.css';
 import './data-page.css';
 
@@ -50,9 +51,8 @@ export default async function DataPage({
     permanentRedirect(buildLivesHref(parseLivesAreaSlug(raw), parseLivesSearchParams(raw)));
   }
 
-  const dataModel = await loadDataPageModel();
-
-  const latest = dataModel.sections.timelineRows.at(-1);
+  const model = await loadDataPageModel();
+  const latest = model.latestCensus;
 
   return (
     <Room
@@ -64,9 +64,9 @@ export default async function DataPage({
             latest === undefined
               ? undefined
               : {
-                  // The figure the population chart's finding states ("41.3 million in 2020"), with
-                  // the census category the chart's table scopes it to.
-                  value: `${millionsFigure(latest.blackPopulation)}M`,
+                  // The count figure D-03's finding states ("41.3 million in 2020"), with the
+                  // census category its table scopes it to. `TrustMast` sets it as a sentence.
+                  value: `${(latest.blackPopulation / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })}M`,
                   label: `${latest.raceCategoryLabel}, counted in ${latest.decade}`,
                 }
           }
@@ -81,7 +81,12 @@ export default async function DataPage({
         </TrustMast>
       }
     >
-      <DataSections {...dataModel.sections} figureView={parseFigureView(raw.view)} />
+      <DataSections
+        figures={model.figures}
+        populationAsOf={model.populationAsOf}
+        indicatorsAsOf={model.indicatorsAsOf}
+        views={parseFigureViews(raw.view)}
+      />
     </Room>
   );
 }

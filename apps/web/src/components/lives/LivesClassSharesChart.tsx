@@ -14,14 +14,12 @@ import {
 } from '@repo/domain/statistics/lives';
 import { describeLivesCell, formatLivesPercent } from '../../lib/lives/lives-format';
 import { ChartMarks } from '../data/ChartMarks';
-import { DataChartFrame } from '../data/DataChartFrame';
 import { Tip } from '../data/chart-kit';
-import { LivesClassSharesTable } from './LivesClassSharesTable';
-import { drawnValue, sourcesOfCells } from './lives-chart-utils';
+import { drawnValue } from './lives-chart-utils';
 
 void React;
 
-const BUCKET_LABELS: Readonly<Record<LivesClassBucket, string>> = {
+export const LIVES_BUCKET_LABELS: Readonly<Record<LivesClassBucket, string>> = {
   lower: 'Lower',
   middle: 'Middle',
   upper: 'Upper',
@@ -40,7 +38,7 @@ export type LivesClassSharesChartProps = {
   readonly emphasis: LivesLens;
 };
 
-function bucketsFor(decade: LivesDecadeBundle): readonly LivesClassBucket[] {
+export function livesBucketsFor(decade: LivesDecadeBundle): readonly LivesClassBucket[] {
   return decade.regime === 'work_based'
     ? ['lower', 'middle', 'upper', 'unclassified']
     : ['lower', 'middle', 'upper'];
@@ -50,7 +48,7 @@ function bucketsFor(decade: LivesDecadeBundle): readonly LivesClassBucket[] {
  * The lower band, because the class arc above this chart already titles the middle band for the
  * same decade; one figure per number.
  */
-function readingFor(decade: LivesDecadeBundle, emphasis: LivesLens): string {
+export function livesClassSharesReading(decade: LivesDecadeBundle, emphasis: LivesLens): string {
   const lower = decade.classShares[emphasis].lower;
   const label = LIVES_LENS_LABELS[emphasis];
   const value = drawnValue(lower);
@@ -61,20 +59,10 @@ function readingFor(decade: LivesDecadeBundle, emphasis: LivesLens): string {
 }
 
 export function LivesClassSharesChart({ decade, emphasis }: LivesClassSharesChartProps) {
-  const buckets = bucketsFor(decade);
-  const cells = LIVES_LENSES.flatMap((lens) =>
-    buckets.map((bucket) => decade.classShares[lens][bucket]),
-  );
-  if (!cells.some((cell) => drawnValue(cell) !== null)) return null;
+  const buckets = livesBucketsFor(decade);
 
   return (
-    <DataChartFrame
-      title={`${decade.classLabel} by group, ${decade.label}`}
-      reading={readingFor(decade, emphasis)}
-      caption="Each bar is one group. Its parts are the class bands from the table the census published that decade, not a comparison of incomes across measurement regimes."
-      sources={sourcesOfCells(cells)}
-      textAlternative={<LivesClassSharesTable decade={decade} emphasis={emphasis} />}
-    >
+    <>
       <p className="ds-plot__unit" aria-hidden="true">
         Share of each group, percent
         {buckets.map((bucket) => (
@@ -84,7 +72,7 @@ export function LivesClassSharesChart({ decade, emphasis }: LivesClassSharesChar
               data-tone={BUCKET_TONE[bucket] === 'none' ? 'lo' : BUCKET_TONE[bucket]}
               data-hatched={BUCKET_TONE[bucket] === 'none' ? 'true' : undefined}
             />
-            {BUCKET_LABELS[bucket]}
+            {LIVES_BUCKET_LABELS[bucket]}
           </span>
         ))}
       </p>
@@ -99,7 +87,10 @@ export function LivesClassSharesChart({ decade, emphasis }: LivesClassSharesChar
             const summary = hasAny
               ? shares
                   .filter((part) => part.value !== null)
-                  .map((part) => `${BUCKET_LABELS[part.bucket]} ${formatLivesPercent(part.value!)}`)
+                  .map(
+                    (part) =>
+                      `${LIVES_BUCKET_LABELS[part.bucket]} ${formatLivesPercent(part.value!)}`,
+                  )
                   .join(', ')
               : describeLivesCell(decade.classShares[lens].middle).text;
             return (
@@ -146,7 +137,7 @@ export function LivesClassSharesChart({ decade, emphasis }: LivesClassSharesChar
                       .filter((part) => part.value !== null)
                       .map((part) => ({
                         value: formatLivesPercent(part.value!),
-                        label: BUCKET_LABELS[part.bucket],
+                        label: LIVES_BUCKET_LABELS[part.bucket],
                       }))}
                   />
                 ) : null}
@@ -155,6 +146,6 @@ export function LivesClassSharesChart({ decade, emphasis }: LivesClassSharesChar
           })}
         </ul>
       </ChartMarks>
-    </DataChartFrame>
+    </>
   );
 }

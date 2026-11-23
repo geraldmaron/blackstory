@@ -4,8 +4,10 @@
 students, whom the owner recruits (`DESIGN.md` section 15 item 3).
 **Decides:** whether the Portrait view of a figure may be the default view. Until this test
 passes for a figure, Plain is that figure's default everywhere (`DESIGN.md` section 9.5).
-**Covers:** `D-01` (Black share of the U.S. population by census, 1790 to 2020) and `D-02` (free
-and enslaved shares of the Black population, 1790 to 1860) on `/data`.
+**Covers:** the three figures that have a Portrait: `D-01` (Black share of the U.S. population by
+census, 1790 to 2020), `D-02` (free and enslaved shares of the Black population, 1790 to 1860) and,
+added in phase 6b, `D-09` (White-to-Black per-capita wealth ratio, 1860 to 2019). Each is on
+`/data` and on its own page, `/data/D-09`.
 
 Five readers is a gate, not a statistic. It can show that a form is misread. It cannot show that a
 form is read well by everyone. A tie goes to Plain.
@@ -18,7 +20,8 @@ form is read well by everyone. A tie goes to Plain.
 - The student reads the screen. The tester does not point, explain the form, or say whether an
   answer is right until the session ends.
 - The tester opens each view by its link, so the student never has to find the switch:
-  `/data?view=portrait#D-01`, `/data?view=plain#D-01`, and the same for `D-02`.
+  `/data/D-01?view=portrait` and `/data/D-01` (Plain), and the same for `D-02` and `D-09`. A
+  figure's own page shows that figure alone, so nothing else on `/data` gives an answer away.
 - The Numbers view is not shown during the questions. A student who opens it on their own is
   noted, and that answer is scored as "used the table", not as a Portrait or Plain reading.
 - Time each answer from the end of the question to the end of the answer.
@@ -35,6 +38,8 @@ answer does not help. The view order alternates so neither view always goes firs
 | 3 | Portrait (B) | Plain (A) | Plain (B) | Portrait (A) |
 | 4 | Plain (B) | Portrait (A) | Portrait (B) | Plain (A) |
 | 5 | Portrait (A) | Plain (B) | Plain (A) | Portrait (B) |
+
+`D-09` follows `D-01`'s columns: the same first view and the same form for each student.
 
 ## 2. Questions and what counts as correct
 
@@ -63,6 +68,20 @@ a value, the key is re-read from the Numbers table before the test, never from t
 | 5 | Scope | Why does the figure stop at 1860? | Same | The census counted enslaved and free people separately only through 1860; slavery ended before the 1870 census. "The data is missing" is wrong |
 | 6 | The form's trap | Does this figure tell you how many people were enslaved in 1860? | ...in 1790? | No. It shows shares; the count is in the Numbers table. A student who reads a count off the height or area has misread the form |
 
+### D-09, White-to-Black per-capita wealth ratio
+
+Keys read from the live Numbers table on 2026-11-23. The series is 32 benchmark years, not every
+year.
+
+| # | Tests | Form A | Form B | Correct |
+| - | ----- | ------ | ------ | ------- |
+| 1 | Reading one value | What was the ratio in 1900? | ...in 1950? | A: 11.4. B: 7.1. Within half a point either way |
+| 2 | Finding the low point | In which year was the ratio lowest, and what was it? | Same | 5.5, in 1989 or 2007. Either year with the value is correct; naming both is noted. 1992, 1995 or 2004 (5.6) is wrong |
+| 3 | Comparing two values | Was the ratio higher in 1962 or in 2013, and by about how much? | ...in 1989 or in 2019? | A: 1962, by about 0.7 (7.6 against 6.9; 0.5 to 1 is correct). B: 2019, by about 1 (6.6 against 5.5; 0.8 to 1.3 is correct) |
+| 4 | Reading the shape | In one sentence, what did the ratio do between 1860 and 2019? | Same | It fell very fast after 1860, kept falling more slowly until about the 1980s, and has not closed since (it is higher in 2019 than in 1989). "It went down" alone is wrong |
+| 5 | Scope | Was the ratio measured every year? | Same | No. Only the years named, and they are not evenly spaced. A student who says a value for an unnamed year (1865, 1940) was measured is wrong |
+| 6 | The form's trap | Portrait only: how does the 1860 bar compare with the 1870 bar? Then: is the time between the 1936 and 1950 bars the same as between 1950 and 1953? Plain only: where does the vertical axis start, and can you tell 2007 from 2013 apart without pointing at them? | Same | Portrait: 1860 is more than twice as long (56.3 against 21.4), because it turns back and keeps going; and no, the bars are evenly stacked but the years are not. A student who reads only the first run of the 1860 bar, or who reads equal steps as equal years, has misread the form. Plain: zero; "no" or "barely" is a correct reading of the chart, not an error |
+
 Portrait prints every value on its mark. Plain prints only a few and shows the rest when a mark is
 pointed at or focused; a student may do that, and a student who reads the axis instead is scored
 the same way. That is why a single value counts as correct within one point in both views: the
@@ -77,7 +96,8 @@ score, the time, the student's words when wrong, and anything they said about th
 
 A **misreading** is a wrong answer of a kind the form invites and the other view does not: a total
 read from the coiled bar's whole length, a census read from the wrong stretch of the coil, a count
-read from a proportional field. It is recorded separately from an ordinary slip.
+read from a proportional field, a folded bar read by its first run alone, or evenly stacked bars
+read as evenly spaced years. It is recorded separately from an ordinary slip.
 
 ## 4. Pass criteria, per figure
 
@@ -100,7 +120,7 @@ Whatever the result, Plain and Numbers remain the print default and the default 
 
 ## 5. Record
 
-One row per answer, kept with the phase notes and summarized in the 6a row of `DESIGN.md`
-section 13:
+One row per answer, kept with the phase notes and summarized in the 6a and 6b rows of
+`DESIGN.md` section 13:
 
 `student, level, device, window width, figure, view, form, question, answer as said, score, seconds, misreading (yes or no), note`

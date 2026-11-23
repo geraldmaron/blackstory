@@ -25,7 +25,8 @@ import {
   parseLivesSearchParams,
   type LivesViewState,
 } from '../../lib/lives/lives-url-state';
-import { LivesClassArcChart } from './LivesClassArcChart';
+import { parseFigureViews } from '../data/figures/figure-spec';
+import { LivesClassArcFigure, type LivesFigureFrame } from './LivesFigures';
 import { LivesDecadePanel } from './LivesDecadePanel';
 import { LivesPlaceAnchors } from './LivesPlaceAnchors';
 import { DisclosureCaret } from './DisclosureCaret';
@@ -39,9 +40,11 @@ function sameView(a: LivesViewState, b: LivesViewState): boolean {
 export type LivesTimelineProps = {
   readonly bundle: LivesAreaBundle;
   readonly areaSlug: string;
+  /** The site origin and the render date, for the figures' citations. */
+  readonly frame: Pick<LivesFigureFrame, 'origin' | 'accessed'>;
 };
 
-export function LivesTimeline({ bundle, areaSlug }: LivesTimelineProps) {
+export function LivesTimeline({ bundle, areaSlug, frame }: LivesTimelineProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [view, setView] = useState<LivesViewState>(() =>
@@ -82,6 +85,12 @@ export function LivesTimeline({ bundle, areaSlug }: LivesTimelineProps) {
     bundle.decades.find((entry) => entry.decade === view.decade) ?? bundle.decades.at(-1);
   const area = livesAreaBySlug(areaSlug) ?? LIVES_NATIONAL;
   const panelId = 'lives-decade-panel';
+  const figureFrame: LivesFigureFrame = {
+    ...frame,
+    areaSlug,
+    state: view,
+    views: parseFigureViews(searchParams.get('view') ?? undefined),
+  };
 
   return (
     <div className="lives-instrument">
@@ -136,11 +145,11 @@ export function LivesTimeline({ bundle, areaSlug }: LivesTimelineProps) {
       <section className="lives-result" aria-label={bundle.areaName}>
         {decade ? (
           <>
-            <LivesClassArcChart
-              id="lives-class-arc"
+            <LivesClassArcFigure
               bundle={bundle}
               emphasis={view.race}
               selectedDecade={decade.decade}
+              frame={figureFrame}
             />
 
             <p className="lives-result__summary">
@@ -158,6 +167,7 @@ export function LivesTimeline({ bundle, areaSlug }: LivesTimelineProps) {
               decade={decade}
               emphasis={view.race}
               disclaimer={bundle.disclaimer}
+              frame={figureFrame}
             />
           </>
         ) : (

@@ -4,6 +4,7 @@
  *
  * Speaker: the archive describing what its figures do and do not carry. No first person here.
  */
+import type { FigureId } from '../../components/data/figures/registry';
 import { METHODOLOGY_SOURCE_LIBRARY_HREF } from '../methodology/methodology-copy';
 
 export const DATA_PAGE_DESCRIPTION =
@@ -50,24 +51,30 @@ export const DATA_GAP_GROUPS = [
   { id: 'justice', label: 'Justice' },
 ] as const;
 
-/** Short names for the contents list, keyed by figure anchor. */
-export const DATA_FIGURE_NAMES: Readonly<Record<string, string>> = {
-  'D-01': 'Share of the nation',
-  'D-02': 'Free and enslaved, to 1860',
-  'population-count': 'Population by census',
-  'population-change': 'Recent change',
-  'population-states': 'State gains and losses',
-  'wealth-ratio-sight': 'Wealth ratio',
-  'wealth-gap': 'Median net worth',
-  'wealth-trend': 'Net worth since 1989',
-  'wealth-ratio-long-arc': 'Wealth ratio since 1860',
-  'housing-ownership': 'Cook County homeownership',
-  'housing-denials': 'Mortgage denials',
-  'housing-ownership-long-arc': 'Homeownership since 1900',
-  'housing-cost-burden': 'Housing cost burden',
-  'justice-ratio-sight': 'Imprisonment ratio',
-  'justice-imprisonment': 'Imprisonment rates',
-  'justice-sentences': 'Federal drug sentences',
+/** Which registry figures stand under which heading, in reading order. */
+export const DATA_FIGURE_GROUPS = {
+  counted: ['D-01', 'D-02', 'D-03', 'D-04', 'D-05'],
+  wealth: ['D-06', 'D-07', 'D-08', 'D-09'],
+  housing: ['D-10', 'D-11', 'D-12', 'D-13'],
+  justice: ['D-14', 'D-15', 'D-16'],
+} as const satisfies Record<string, readonly FigureId[]>;
+
+/** The anchor each figure had before it had an id. Kept so links made then still land. */
+export const DATA_LEGACY_ANCHORS: Readonly<Partial<Record<FigureId, string>>> = {
+  'D-03': 'population-count',
+  'D-04': 'population-change',
+  'D-05': 'population-states',
+  'D-06': 'wealth-ratio-sight',
+  'D-07': 'wealth-gap',
+  'D-08': 'wealth-trend',
+  'D-09': 'wealth-ratio-long-arc',
+  'D-10': 'housing-ownership',
+  'D-11': 'housing-denials',
+  'D-12': 'housing-ownership-long-arc',
+  'D-13': 'housing-cost-burden',
+  'D-14': 'justice-ratio-sight',
+  'D-15': 'justice-imprisonment',
+  'D-16': 'justice-sentences',
 };
 
 /** Handoff from Data to the Methodology source-library section. */

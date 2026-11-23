@@ -252,6 +252,13 @@ export const LIVES_METHOD_RULES = [
   },
 ] as const;
 
+/**
+ * The lineage of the Portrait view some Data figures have (docs/ui/DESIGN.md section 9.5). The
+ * same credit stands under each Portrait.
+ */
+export const FIGURE_LINEAGE_CREDIT =
+  'A Portrait view on Data follows the forms of the data portraits W.E.B. Du Bois made for the 1900 Paris Exposition, and it’s drawn from the same numbers as the plain chart and the table.';
+
 /* —— Where the evidence comes from ——————————————————————————————————————————— */
 
 /** Canonical public source-library room. Methodology keeps a hash handoff for old links. */
