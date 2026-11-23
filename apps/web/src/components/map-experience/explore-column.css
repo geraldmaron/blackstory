@@ -86,25 +86,21 @@
   min-width: 0;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: var(--ds-weight-numeral);
+  font-size: var(--ds-text-title);
+  font-weight: var(--ds-weight-title);
   line-height: 1.2;
   white-space: nowrap;
 }
 
+/* v12: a count, said plainly. The copper numeral made the page's hero a number. */
 .ds-xcol__count-num {
-  color: var(--ds-numeral-soft-text);
+  color: var(--ds-ink);
   font-variant-numeric: tabular-nums;
   letter-spacing: var(--ds-tracking-numeral);
 }
 
 .ds-xcol__count-unit {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-meta);
-  font-weight: 500;
-  letter-spacing: var(--ds-tracking-meta);
-  text-transform: uppercase;
+  color: var(--ds-ink);
 }
 
 .ds-xcol__back {
@@ -498,8 +494,16 @@ body:has(.ds-atlas .ds-xcol) {
     padding-block: 0;
   }
 
-  /* At peek the sheet shows its count and the top row; nothing scrolls under a finger. */
-  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__search,
+  /* At peek the sheet shows its count and the place field: finding by place is the first thing a
+     phone reader does, and it used to be hidden until the sheet was dragged up. The list starts
+     at half height. Nothing scrolls under a finger. */
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__search {
+    border-bottom: 0;
+  }
+
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__search > :not(.ds-place),
+  .ds-xcol--sheet[data-detent='peek'] .ds-place > :not(.ds-place__field),
+  .ds-xcol--sheet[data-detent='peek'] .ds-xcol__body,
   .ds-xcol--sheet[data-detent='peek'] .ds-xcol__scope,
   .ds-xcol--sheet[data-detent='peek'] .ds-xcol__echoes,
   .ds-xcol--sheet[data-detent='peek'] .ds-xcol__note,

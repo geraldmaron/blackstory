@@ -633,8 +633,9 @@ export const ORBIT_LIGHT_COLOR = worldPalette.ember;
 /** Where the lights give way to record pins when they are kept lit on the way down. */
 export const LIGHTS_DEEP_MAX_ZOOM = 11;
 
-/** The lights' level under the state counts: present, and quieter than the counts they stand under. */
-const LIGHTS_UNDER_COUNTS_OPACITY = 0.45;
+/** The lights' level under the state counts. v12: the lights lead. Ember is only ever a record,
+ * and the counts over them are plain labels in the map's type color (shell.css). */
+const LIGHTS_UNDER_COUNTS_OPACITY = 0.85;
 
 /**
  * How bright the lights are by zoom. At rest they step down as the state counts arrive and stay

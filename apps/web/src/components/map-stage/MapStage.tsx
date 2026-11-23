@@ -426,9 +426,6 @@ export function useOptionalMapStage(): MapStageHandle | null {
   return useContext(MapStageContext);
 }
 
-/** From this zoom the globe and Mercator draw the same picture, so a switch cannot be seen. */
-const GLOBE_INVISIBLE_ZOOM = 8;
-
 /** Hover-intent delay before a pin's photo card opens (`PinPhotoCard`'s own doc comment). */
 const PIN_HOVER_INTENT_MS = 120;
 
@@ -732,7 +729,6 @@ export function MapStageProvider({
     mapAvailableRef.current = false;
     setMapAvailable(false);
     plateReadyRef.current = false;
-    globeAskedRef.current = false;
     plateRef.current?.removeAttribute('data-plate-ready');
     notify(listenersRef.current, 'error');
   }, []);
@@ -744,8 +740,6 @@ export function MapStageProvider({
    * their fade on it) and tell subscribers. Once per plate life — the three callers (first `idle`
    * after load, the 1800ms fallback, state polygons landing) race, and only the first counts.
    */
-  /** True once the flat plate has been asked to become the globe (below). */
-  const globeAskedRef = useRef(false);
   const markPlateReady = useCallback(() => {
     if (canceledRef.current || plateReadyRef.current) return;
     const reveal = () => {
@@ -759,37 +753,10 @@ export function MapStageProvider({
       reveal();
       return;
     }
-    // v11: a plate that opened flat (a record page; map-plate-paint.ts) becomes the globe here.
-    // Near the ground the two projections draw the same picture, so it is revealed at once and
-    // switched in idle time afterwards. Farther out the curve shows, so the switch comes first
-    // and the reveal waits for the globe's frame. A plate that opened as the globe just reveals.
-    if (globeAskedRef.current) return;
-    globeAskedRef.current = true;
-    if (map.getProjection()?.type === 'globe') {
-      reveal();
-      return;
-    }
-    const nearGround = map.getZoom() >= GLOBE_INVISIBLE_ZOOM;
-    const toGlobe = () => {
-      if (canceledRef.current) return;
-      try {
-        map.setProjection({ type: 'globe' });
-      } catch {
-        // The style is mid-load: ask again when it has settled.
-        map.once('idle', toGlobe);
-        return;
-      }
-      if (!nearGround) {
-        map.once('idle', reveal);
-        window.setTimeout(reveal, 1500);
-      }
-    };
-    if (nearGround) reveal();
-    if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(toGlobe, { timeout: nearGround ? 4000 : 600 });
-    } else {
-      window.setTimeout(toGlobe, nearGround ? 2000 : 0);
-    }
+    // v12: the plate is flat everywhere (design-direction-v12.md, "Don't show the planet"). It
+    // used to open as, or switch to, MapLibre's globe here; nothing shows the ball any more, so
+    // the plate reveals as it painted.
+    reveal();
   }, []);
 
   const entityPoint = useCallback((entityId: string): EntityPoint | undefined => {
@@ -1529,11 +1496,7 @@ export function MapStageProvider({
 
         map = new maplibregl.Map({
           container,
-          // The Door and Explore open on the globe; a record page opens near the ground, flat.
-          style: buildArchiveBaseStyle(
-            mountScheme,
-            postureRef.current === 'ambient' || postureRef.current === 'live',
-          ),
+          style: buildArchiveBaseStyle(mountScheme),
           attributionControl: false,
           clickTolerance: MAP_CLICK_TOLERANCE_PX,
           // v11: the plate is a globe, which has no world copies to render. `false` here made

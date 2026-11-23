@@ -255,3 +255,61 @@ under aerial imagery and is partly covered by the scene on some shapes.
    the standard grounded frame and ring.
 7. The checks listed as not run in section 13.
 8. `PRODUCT.md`'s visual-world paragraph still describes toned plates and the texture rule.
+
+## 15. Explore, and the globe removed from the map (2026-11-23)
+
+The owner asked for `/explore` to be rebuilt the same way. Looked at in full resolution, in
+four states at 1440 by 900 and 390 by 844, section 10's row for it was partly wrong: the list
+is 13px, not 11px, and reads; the column, filters, brush and non-modal inspector work. Codex
+reviewed the plan and said so too (verdict: needs validation, "presentation only" too narrow).
+So this is a targeted rebuild of what was actually broken, not a new page.
+
+### What was wrong
+
+1. **The ball.** A planet's edge in the corners on desktop and half the screen on a phone.
+2. **The selected record.** Its photograph, a 480px thumbnail, was toned sepia and stretched
+   over the whole map with a hole cut around the pin. Streets were drawn over a blurred
+   picture, the panel lost its surface, and neighbors could not be read.
+3. **Counts shouted over the records.** State counts were bold ember numerals; the lights
+   under them were dimmed to 45 percent. Ember is supposed to mean a record.
+4. **The panel cut the summary at three lines** and showed the decade as a bare numeral.
+5. **On a phone, finding by place was hidden** until the sheet was dragged up.
+6. **Keyboard:** the list's only tab stop could be a row that was not in the DOM.
+
+### What changed
+
+| Change                                                                                                                                                                                                   | Where                                                                    |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| The map is flat (Mercator) on every surface. MapLibre's globe is no longer requested anywhere; v11 measured it as the main-thread cost of the home page                                                  | `MapStage.tsx`, `map-plate-paint.ts`                                     |
+| A selected record leaves the map alone. Its photograph is in the panel, in color, at column width, with its credit and a line that its date is not on record. The panel keeps its surface in both themes | `RecordInspector.tsx`, `record-inspector.css`; `SelectionGround` deleted |
+| The panel shows the whole summary and says "First documented in the 1970s"                                                                                                                               | same                                                                     |
+| Counts are labels in the night's ink; lights stay at 85 percent under them. A hovered count underlines                                                                                                   | `shell.css`, `explore-style.ts`                                          |
+| List photographs are in color                                                                                                                                                                            | `ExploreRecordList.tsx`, `explore-record-list.css`                       |
+| The count in the column head is a plain title, not a copper numeral                                                                                                                                      | `explore-column.css`                                                     |
+| On a phone the sheet's peek is the count and the place field; focusing the field raises the sheet                                                                                                        | `ExploreColumn.tsx`, `explore-column.css`                                |
+| The list's tab stop is the selected row while it is rendered, otherwise the first rendered row                                                                                                           | `ExploreRecordList.tsx`                                                  |
+
+### Codex's findings and what was done
+
+| Finding                                                                                 | Disposition                                                                                       |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Exact-site precision alone does not authorize aerial imagery in Explore (blocker)       | Accepted. Automatic imagery was dropped from the plan. The existing satellite toggle is unchanged |
+| Untruncated rows break the fixed-height windowed list                                   | Accepted. Row height is unchanged at 84px; place lines still truncate                             |
+| The list's tab stop depends on mounted rows; the place field is a combobox in name only | First half fixed. The combobox arrows are still open (also v11 section 16)                        |
+| A two-row peek misses the phone's real problem, place search                            | Accepted and built                                                                                |
+| The inspector photograph was suppressed by the selection overlay                        | Accepted and built                                                                                |
+| Taller bars do not improve time selection; keep the key                                 | Accepted. The dock is untouched                                                                   |
+| Photo batching must stay                                                                | Untouched                                                                                         |
+
+### Checked
+
+Dev server, real GPU, live data: `/explore` cold, a selected record with a photograph, and a
+two-filter view at 1440 by 900 and 390 by 844; cold and selected at 1024 by 768, 768 by 1024,
+1920 by 1080 and 375 by 667, with no sideways overflow; light theme at 1440. A place page,
+`/records` and the home page on the flat map. Web tests 2,832 run, 0 fail; typecheck, lint and
+token lint clean.
+
+Not checked: the list's tab stop by hand, a screen reader, the phone sheet by touch, a far
+zoom-out on a very wide window (the flat world may repeat sideways), a production build. Still
+open in Explore: place lines truncate, the place field's arrow keys, records with no
+photograph are 74 percent of the list, and `/explore` still mounts through `door-home.tsx`.

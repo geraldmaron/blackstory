@@ -174,7 +174,18 @@ export function ExploreColumn({
         ) : null}
         <div className="ds-xcol__head">{header}</div>
       </div>
-      {search ? <div className="ds-xcol__search">{search}</div> : null}
+      {search ? (
+        <div
+          className="ds-xcol__search"
+          // On a phone the place field shows at peek. Using it needs room for its suggestions
+          // and the keyboard, so focus raises the sheet.
+          onFocusCapture={() => {
+            if (sheet && detent === 'peek') onDetentChange('full');
+          }}
+        >
+          {search}
+        </div>
+      ) : null}
       {echoes}
       <div className="ds-xcol__body">{children}</div>
     </aside>

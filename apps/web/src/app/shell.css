@@ -2087,13 +2087,17 @@ main[tabindex='-1']:focus-visible {
   top: 0;
   left: 0;
   translate: -50% -50%;
-  color: var(--ds-numeral-soft-text);
+  /* v12: a count is a label, not a record, so it is never ember. The world is night in both
+     themes, so it takes the night's ink and a night halo whatever the reader's theme is. */
+  color: var(--ds-world-hud-ink);
   font-family: var(--ds-font-display);
   font-size: var(--ds-place-count);
   font-variant-numeric: tabular-nums;
-  font-weight: var(--ds-weight-numeral);
+  font-weight: 650;
   line-height: 1;
-  text-shadow: var(--ds-place-halo);
+  text-shadow:
+    0 0 2px var(--ds-world-space),
+    0 0 5px var(--ds-world-space);
   white-space: nowrap;
   transition:
     color var(--ds-duration-fast) var(--ds-easing),
@@ -2107,13 +2111,15 @@ main[tabindex='-1']:focus-visible {
   top: 0;
   left: calc(var(--ds-place-digits, 2) * var(--ds-place-count) * 0.31 + 8px);
   translate: 0 -50%;
-  color: var(--ds-map-label-hi);
+  color: var(--ds-world-hud-ink);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-place-name);
   font-weight: 500;
   letter-spacing: var(--ds-tracking-meta);
   line-height: 1;
-  text-shadow: var(--ds-place-halo);
+  text-shadow:
+    0 0 2px var(--ds-world-space),
+    0 0 5px var(--ds-world-space);
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 0;
@@ -2124,10 +2130,11 @@ main[tabindex='-1']:focus-visible {
   opacity: 1;
 }
 
-/* Hover answers the pointer the map already hit-tests: the numeral takes the plate's type color
-   and the name underlines in copper. Press settles the numeral. */
+/* Hover answers the pointer the map already hit-tests: the numeral and the name underline in
+   copper. Press settles the numeral. */
 .ds-place-token.is-hovered .ds-place-token__count {
-  color: var(--ds-map-label-hi);
+  text-decoration: underline 2px var(--ds-accent-graphic);
+  text-underline-offset: 3px;
 }
 
 .ds-place-token.is-hovered .ds-place-token__name {
