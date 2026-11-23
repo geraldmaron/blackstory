@@ -1,6 +1,6 @@
 /**
- * Ledger Line entity section stack: mono index · kicker section label, optional
- * title, hairline rule — flat on canvas, not a nested Surface card shell.
+ * One section of a record: a 2px ink rule opens it (docs/ui/DESIGN.md section 7.4), a mono label
+ * says what it is, then its title and body. Sections are not numbered; only claims are.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -8,38 +8,29 @@ import { Text, space, useThemeColors } from '@/ui';
 import { SectionHeading, type SectionHeadingLevel } from './sections/SectionHeading';
 
 export type EntityEditionPanelProps = {
-  readonly index: string;
   readonly kicker: string;
   readonly title: string;
   readonly titleLevel?: SectionHeadingLevel;
-  readonly headerExtra?: ReactNode;
   readonly children: ReactNode;
   readonly testID?: string;
-  /** When false, omit the section title (label-only beat). Default true. */
-  readonly showTitle?: boolean;
 };
 
 export function EntityEditionPanel({
-  index,
   kicker,
   title,
   titleLevel = 2,
-  headerExtra,
   children,
   testID,
-  showTitle = true,
 }: EntityEditionPanelProps) {
   const theme = useThemeColors();
-  const sectionLabel = `${index} · ${kicker}`;
 
   return (
     <View testID={testID} style={styles.panel}>
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
+      <View style={[styles.header, { borderTopColor: theme.ink }]}>
         <Text variant="meta" colorRole="inkMuted" style={styles.label}>
-          {sectionLabel}
+          {kicker}
         </Text>
-        {headerExtra}
-        {showTitle ? <SectionHeading level={titleLevel}>{title}</SectionHeading> : null}
+        <SectionHeading level={titleLevel}>{title}</SectionHeading>
       </View>
       <View style={styles.body}>{children}</View>
     </View>
@@ -51,9 +42,9 @@ const styles = StyleSheet.create({
     gap: space['3'],
   },
   header: {
-    gap: space['2'],
-    paddingBottom: space['2'],
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: space['1'],
+    paddingTop: space['3'],
+    borderTopWidth: 2,
   },
   label: {
     letterSpacing: 1,

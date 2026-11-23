@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import { evidenceMeterLabel } from '@/lib/evidence-words';
+import { evidenceLabel, evidenceMeterLabel } from '@/lib/evidence-words';
 
 import {
   NavIcon,
@@ -128,6 +128,10 @@ const RecordRow = memo(function RecordRow({
             {story.caption}
           </Text>
         ) : null}
+        {/* The grade in words; the bars beside the row are its glyph. */}
+        <Text variant="caption" colorRole="inkMuted">
+          {evidenceLabel(story.confidenceTier, story.sourceCount)}
+        </Text>
       </View>
       <View style={styles.rowTrailing}>
         {selected ? (

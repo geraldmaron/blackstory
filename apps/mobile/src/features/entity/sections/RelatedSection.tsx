@@ -102,18 +102,15 @@ export type RelatedSectionProps = {
   readonly relatedNeighbors: readonly RelatedNeighbor[];
   readonly continueLearning: readonly RelatedNeighbor[];
   readonly onOpenEntity?: (entityId: string) => void;
-  readonly index: string;
 };
 
 export function RelatedSection({
   relatedNeighbors,
   continueLearning,
   onOpenEntity,
-  index,
 }: RelatedSectionProps) {
   return (
     <EntityEditionPanel
-      index={index}
       kicker="Connected"
       title={SECTION_HEADINGS.related}
       testID="entity-connected-section"

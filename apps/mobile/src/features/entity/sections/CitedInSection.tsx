@@ -26,19 +26,17 @@ import type { StoryCitation } from '../types';
 export type CitedInSectionProps = {
   readonly citingStories: readonly StoryCitation[];
   readonly onOpenStory?: (slug: string) => void;
-  readonly index: string;
 };
 
 function storyCountLabel(count: number): string {
   return count === 1 ? '1 story' : `${count} stories`;
 }
 
-export function CitedInSection({ citingStories, onOpenStory, index }: CitedInSectionProps) {
+export function CitedInSection({ citingStories, onOpenStory }: CitedInSectionProps) {
   if (citingStories.length === 0) return null;
 
   return (
     <EntityEditionPanel
-      index={index}
       kicker="Cited in"
       title={SECTION_HEADINGS.citedIn}
       testID="entity-cited-in-section"

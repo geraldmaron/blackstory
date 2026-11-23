@@ -14,7 +14,9 @@ import { space } from './tokens';
 
 export type ReceiptProps = {
   /** The credit for an image, or the source for a claim. */
-  readonly source: string;
+  readonly source?: string;
+  /** A source link the caller already built, in place of `source` and `href`. */
+  readonly link?: ReactNode;
   readonly href?: string;
   readonly detail?: string;
   readonly grade?: ReactNode;
@@ -22,19 +24,20 @@ export type ReceiptProps = {
   readonly testID?: string;
 };
 
-export function Receipt({ source, href, detail, grade, action, testID }: ReceiptProps) {
+export function Receipt({ source, link, href, detail, grade, action, testID }: ReceiptProps) {
   return (
     <View style={styles.receipt} testID={testID}>
       <View style={styles.text}>
-        {href ? (
-          <Link href={href} textRole="bodySmall" accessibilityLabel={`Source: ${source}`}>
-            {source}
-          </Link>
-        ) : (
-          <Text variant="bodySmall" colorRole="inkMuted">
-            {source}
-          </Text>
-        )}
+        {link ??
+          (source && href ? (
+            <Link href={href} textRole="bodySmall" accessibilityLabel={`Source: ${source}`}>
+              {source}
+            </Link>
+          ) : source ? (
+            <Text variant="bodySmall" colorRole="inkMuted">
+              {source}
+            </Text>
+          ) : null)}
         {detail ? (
           <Text variant="caption" colorRole="inkMuted">
             {detail}

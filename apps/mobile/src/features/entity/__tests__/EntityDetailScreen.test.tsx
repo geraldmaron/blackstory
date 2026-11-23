@@ -292,16 +292,29 @@ describe('EntityDetailScreen — dense claims expand', () => {
   });
 });
 
-describe('EntityDetailScreen — v6 edition beats', () => {
-  it('renders numbered edition panels for intro, anatomy, and provenance', async () => {
-    const { getByTestId, getByText } = await render(
+describe('EntityDetailScreen: phone order and receipts', () => {
+  it('leads with the exhibit, then the name, and numbers claims, not sections', async () => {
+    const { getByTestId, getByText, queryByText, getAllByTestId, getByLabelText } = await render(
       <EntityDetailScreen state={readyState(fullEntityFixture('place'))} />,
     );
-    expect(getByTestId('entity-intro-brand')).toBeTruthy();
+    expect(getByTestId('entity-photograph')).toBeTruthy();
     expect(getByTestId('entity-intro-section')).toBeTruthy();
     expect(getByTestId('entity-anatomy-section')).toBeTruthy();
+    expect(getByTestId('entity-map-section')).toBeTruthy();
     expect(getByTestId('entity-provenance-section')).toBeTruthy();
-    expect(getByText('00 · Record')).toBeTruthy();
     expect(getByText('How complete this record is')).toBeTruthy();
+    // Sections carry no counters; a claim carries its number and its own receipt.
+    expect(queryByText(/^\d\d · /)).toBeNull();
+    expect(getByLabelText('Claim 1')).toBeTruthy();
+    expect(getAllByTestId('entity-claim-receipt').length).toBeGreaterThan(0);
+    expect(getAllByTestId('evidence-grade').length).toBeGreaterThan(0);
+  });
+
+  it('leads with the map when the record has no photograph', async () => {
+    const { queryByTestId, getAllByTestId } = await render(
+      <EntityDetailScreen state={readyState(entityWithUnclearedImageRights())} />,
+    );
+    expect(queryByTestId('entity-photograph')).toBeNull();
+    expect(getAllByTestId('entity-map-section')).toHaveLength(1);
   });
 });

@@ -29,15 +29,13 @@ function tracked(value: string): string {
 
 export type ProvenanceSectionProps = {
   readonly entity: Entity;
-  readonly index: string;
 };
 
-export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
+export function ProvenanceSection({ entity }: ProvenanceSectionProps) {
   const coverage = coverageLevel(entity.researchCoverage);
 
   return (
     <EntityEditionPanel
-      index={index}
       kicker="Provenance"
       title="How complete this record is"
       testID="entity-provenance-section"

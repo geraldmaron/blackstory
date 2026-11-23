@@ -144,13 +144,13 @@ describe('SearchResultCard — evidence meter (a tier is an assessment, not a ra
     const props = toSearchResultCardProps(baseResult({ confidenceTier: 'high' }), {
       onPress: jest.fn(),
     });
-    const { getByTestId, getByLabelText } = await render(<SearchResultCard {...props} />);
+    const { getByTestId, getAllByLabelText } = await render(<SearchResultCard {...props} />);
     expect(
       getByTestId('search-result-evidence-meter', { includeHiddenElements: true }),
     ).toBeTruthy();
     // Color is never the only cue: the grade in words rides in the row's meta line and the sentence
     // rides in the row's own accessibility label.
-    expect(getByLabelText(/Well evidenced/i)).toBeTruthy();
+    expect(getAllByLabelText(/Well evidenced/i).length).toBeGreaterThan(0);
   });
 
   it('renders the grade in words as visible text, not color alone', async () => {
