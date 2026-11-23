@@ -334,7 +334,7 @@
     box-sizing: border-box;
     width: 9px;
     height: 9px;
-    margin-inline: 6px;
+    margin-inline: calc(var(--ds-space-1) + 2px);
     border: 1.5px solid var(--ds-ink-muted);
     border-radius: 50%;
     transition:

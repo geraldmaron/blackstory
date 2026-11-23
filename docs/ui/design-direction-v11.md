@@ -923,10 +923,9 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
 - "Read as documents": restore it, or rewrite the controls in 4.1 and section 12 rows 1 and 9.
 - The third reference site's address.
 - `/presidents`, `/presidents/*`, `/lives/*` and `/lives/explorer` need rows in section 7.
-- `pnpm lint:tokens` fails on the flagship's own CSS: one raw-hex gradient in `door-home.css`
-  (the disc), one 6px margin in `door-tour.css`, and the 72rem side-sheet threshold in
-  `record-page.css`, which is off the 40/48/64/80rem grid. The threshold is a design decision:
-  move the sheet to 64 or 80rem, or add 72rem to the grid.
+- `pnpm lint:tokens` passes (2026-11-22). 72rem, the page grid's own cap, joined the
+  breakpoint grid by the owner's decision, so the record page's side sheet stays where it was
+  tuned; the Door's placeholder disc and the tour rail's dot margin are written with tokens.
 - Found in the audit, not fixed: a statewide law (Mississippi Black Codes of 1865) grounds as an
   exact site over aerial imagery instead of at its jurisdiction (section 7); a harm record gets
   the standard grounded frame and ringed pin, and section 4.1's "no glow, no motion beyond a cut"

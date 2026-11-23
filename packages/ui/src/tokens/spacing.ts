@@ -28,6 +28,8 @@ export const grid = {
     sm: '40rem',
     md: '48rem',
     lg: '64rem',
+    /** The page grid's own cap (`maxWidth`): where the record page's side sheet has room. */
+    max: '72rem',
     xl: '80rem',
   },
 } as const;

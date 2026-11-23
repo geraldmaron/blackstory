@@ -219,7 +219,8 @@ characters); the page grid caps at `--ds-grid-max` (72rem).
 
 - **Space** is a 4px rhythm, `--ds-space-1` to `--ds-space-16` inside
   components, and the fluid `--ds-section-sm` / `-md` / `-lg` between sections.
-- **Breakpoints** are 40 / 48 / 64 / 80rem. CSS cannot read a custom property
+- **Breakpoints** are 40 / 48 / 64 / 72 / 80rem. 72rem is the page grid's cap, used where a
+  side sheet needs the full grid beside it (the record page). CSS cannot read a custom property
   in a media query, so they live in `grid.breakpoints` in
   `packages/ui/src/tokens/spacing.ts`.
 - **Motion** explains a change of state and nothing else. Durations are

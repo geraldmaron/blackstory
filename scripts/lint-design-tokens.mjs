@@ -5,7 +5,7 @@
  *   hex          raw #rgb/#rrggbb outside the token definition file; use a color token.
  *   spacing      padding/margin/gap length other than 0, 1px or 2px; use var(--ds-space-*).
  *   font-size    literal font-size; use var(--ds-text-*).
- *   breakpoint   @media min/max-width off the grid (grid.breakpoints: 40/48/64/80rem).
+ *   breakpoint   @media min/max-width off the grid (grid.breakpoints: 40/48/64/72/80rem).
  *
  * Existing violations are recorded per file in scripts/design-token-baseline.json. The check
  * fails when a file's count for a rule rises above its baseline (or a new file has any), so
@@ -27,7 +27,7 @@ const SCAN_ROOTS = ['apps/web/src', 'packages/ui/src/styles'];
 const TOKEN_FILES = new Set(['packages/ui/src/styles/tokens.css']);
 
 /** grid.breakpoints in packages/ui/src/tokens/spacing.ts, in px. */
-const BREAKPOINTS_PX = [640, 768, 1024, 1280];
+const BREAKPOINTS_PX = [640, 768, 1024, 1152, 1280];
 const SPACING_ALLOWED_PX = new Set([0, 1, 2]);
 const SPACING_PROPERTY =
   /^(padding|margin|gap|row-gap|column-gap)(-(top|right|bottom|left|inline|block)(-(start|end))?)?$/;

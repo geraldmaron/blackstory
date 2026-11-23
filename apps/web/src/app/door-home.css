@@ -1743,7 +1743,12 @@ body:not(:has(.ds-map-stage[data-plate-ready]))
   max-width: 86%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 42% 40%, #2a2622 0, #1b1815 55%, #0d0c0b 100%);
+  background: radial-gradient(
+    circle at 42% 40%,
+    color-mix(in srgb, var(--ds-world-hud-ink) 15%, var(--ds-material-ink)) 0,
+    color-mix(in srgb, var(--ds-world-hud-ink) 8%, var(--ds-material-ink)) 55%,
+    color-mix(in srgb, var(--ds-world-hud-ink) 1%, var(--ds-material-ink)) 100%
+  );
   box-shadow:
     inset 6px 6px 22px color-mix(in srgb, var(--ds-world-rim) 38%, transparent),
     0 0 26px color-mix(in srgb, var(--ds-world-rim) 16%, transparent);
