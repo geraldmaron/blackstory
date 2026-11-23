@@ -481,6 +481,12 @@ body:has([data-surface='door']) .ds-bar {
   padding-bottom: var(--ds-space-4);
 }
 
+/* The front page ends on paper (its contents), and a shade that fades to nothing lets the paper
+   and its search field show through the nav. There the bar is solid ink from edge to edge. */
+body:has(.ds-front) .ds-bar {
+  background: var(--ds-canvas);
+}
+
 /* Corners, not a centered column: from 64rem the wordmark and the tools sit at the same inset as
    the world's other corner pieces (the reader switches, the time rail), however wide the window. */
 @media (min-width: 64rem) {
