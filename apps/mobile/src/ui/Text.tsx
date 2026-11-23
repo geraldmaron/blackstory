@@ -40,6 +40,18 @@ export type TextProps = Omit<RNTextProps, 'role'> & {
   isHeading?: boolean;
 };
 
+/**
+ * Headings follow the system text size less far than reading text, as iOS's own large titles do
+ * (34pt to 60pt at the largest size): a 36pt name at 2.8x is 100pt and breaks mid-word on a
+ * phone. Body, editorial and meta are never capped here.
+ */
+const HEADING_MAX_FONT_SCALE: Partial<Record<TextRole, number>> = {
+  display: 1.7,
+  numeral: 1.4,
+  headline: 2,
+  title: 2.4,
+};
+
 export function Text({
   variant = 'body',
   colorRole = 'ink',
@@ -59,7 +71,7 @@ export function Text({
     <RNText
       accessibilityRole={accessibilityRole ?? (resolvedHeading ? 'header' : undefined)}
       allowFontScaling
-      maxFontSizeMultiplier={maxFontSizeMultiplier}
+      maxFontSizeMultiplier={maxFontSizeMultiplier ?? HEADING_MAX_FONT_SCALE[variant]}
       style={[
         {
           fontFamily: family,
