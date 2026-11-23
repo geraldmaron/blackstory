@@ -87,3 +87,25 @@ export const loadRecordPlace = cache(async (entityId: string): Promise<RecordPla
     return undefined;
   }
 });
+
+/**
+ * The county a record's point falls in, by name with its suffix ("Cook County"), for matching a
+ * county series to a record (`figure-coverage.ts`). Nothing when the record has no point, sits at
+ * state precision, or the county outlines cannot be read. Never throws.
+ */
+export const loadRecordCounty = cache(async (entityId: string): Promise<string | undefined> => {
+  try {
+    const plate = await loadDoorPinPlate();
+    let collection = collections.get(plate);
+    if (!collection) {
+      collection = { type: 'FeatureCollection', features: plate.features };
+      collections.set(plate, collection);
+    }
+    const groups = placeGroupsFor(collection, await loadCounties());
+    const county = groups.pathById.get(entityId)?.county;
+    // A county place is named with its state's postal code ("Cook County, IL").
+    return county ? groups.places.get(county)?.name.replace(/, [A-Z]{2}$/, '') : undefined;
+  } catch {
+    return undefined;
+  }
+});
