@@ -22,7 +22,7 @@ describe('RelatedSection evidence meter', () => {
     expect(neighbors.length).toBeGreaterThan(0);
 
     const { getByTestId } = await render(
-      <RelatedSection relatedNeighbors={neighbors} continueLearning={[]} index="08" />,
+      <RelatedSection relatedNeighbors={neighbors} continueLearning={[]} />,
     );
     for (const neighbor of neighbors) {
       expect(
@@ -34,7 +34,7 @@ describe('RelatedSection evidence meter', () => {
   it('speaks the grade in the row label, so color is never the only cue', async () => {
     const neighbors = neighborsFrom(fullEntityFixture('place'));
     const { getAllByLabelText } = await render(
-      <RelatedSection relatedNeighbors={neighbors} continueLearning={[]} index="08" />,
+      <RelatedSection relatedNeighbors={neighbors} continueLearning={[]} />,
     );
     // Grade A: strongest claim high, two lineages that can corroborate. Every row says so.
     expect(getAllByLabelText(/Evidence: Well evidenced/i)).toHaveLength(neighbors.length);
@@ -54,7 +54,6 @@ describe('RelatedSection evidence meter', () => {
       <RelatedSection
         relatedNeighbors={neighborsFrom({ ...raw, relatedNeighbors: neighbors })}
         continueLearning={[]}
-        index="08"
       />,
     );
     expect(getAllByLabelText(/Evidence: Partly evidenced/i).length).toBeGreaterThan(0);
@@ -70,7 +69,7 @@ describe('RelatedSection evidence meter', () => {
     });
     const resolved = neighborsFrom({ ...raw, relatedNeighbors: neighbors });
     const { queryByTestId } = await render(
-      <RelatedSection relatedNeighbors={resolved} continueLearning={[]} index="08" />,
+      <RelatedSection relatedNeighbors={resolved} continueLearning={[]} />,
     );
     for (const neighbor of resolved) {
       expect(
@@ -87,7 +86,6 @@ describe('RelatedSection evidence meter', () => {
       <RelatedSection
         relatedNeighbors={entity.relatedNeighbors ?? []}
         continueLearning={continueLearning}
-        index="08"
       />,
     );
     for (const neighbor of continueLearning) {
