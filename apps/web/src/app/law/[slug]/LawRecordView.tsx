@@ -2,9 +2,9 @@
  * A law entry on the shared record anatomy: masthead, citation line, rail, record file. Its own
  * body (what the law means, why it matters, the rights it gives today) arrives as body beats.
  *
- * A law has a jurisdiction, not a location, so the rail carries no map. The design law asks for
- * a jurisdiction outline, but the catalog has no state-code-to-polygon join yet, and the rule for
- * exactly that case is to ship without the plate rather than fake one. The map action opens the
+ * A law has a jurisdiction, not a location, so the page carries no map exhibit. The design law
+ * asks for a jurisdiction outline, but the catalog has no state-code-to-polygon join yet, and the
+ * rule for exactly that case is to ship without one rather than fake it. The map action opens the
  * records sharing the law's state and era, and its label says exactly that ("Georgia records from
  * the 2020s on the map"), never that the law itself is on the map; `buildLensHandoff` refuses a
  * reason that implies cause.
@@ -31,6 +31,7 @@ import {
   legalStatusDisplay,
 } from '../../../components/legal/format';
 import { buildLensHandoff } from '../../../lib/map-experience/lens-handoff';
+import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
 import type { LegalSnapshotDocument } from '../../../lib/legal/public-source';
 import { jurisdictionLabel, statePostalForJurisdiction } from '../LawBrowseSections';
 import type { LawDetailViewModel } from '../law-view-model';
@@ -173,6 +174,11 @@ export function LawRecordView({ snapshot, explainer, previous, next }: LawView) 
       actions={{
         ...(handoff ? { map: handoff } : {}),
         correctionHref: `/corrections?target=${encodeURIComponent(snapshot.id)}`,
+        cite: {
+          title: snapshot.title,
+          url: absolutePublicUrl(`/law/${snapshot.slug}`),
+          ...(explainer?.reviewedAt ? { published: explainer.reviewedAt } : {}),
+        },
       }}
       sourcesAnchor="sources"
       file={file}

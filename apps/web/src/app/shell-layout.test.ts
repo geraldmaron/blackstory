@@ -242,12 +242,13 @@ describe('the plate is styled globally, not from the route group', () => {
     // once the Instrument built MapLibre the live map stayed lit under every subsequent route
     // and state labels read through the prose column. Only reproduces after visiting Explore
     // first, which is why a cold load of /rooms looked fine.
-    // The Door is another surface whose plate is content (posture `ambient`), and since v11 so
-    // is a record page that hands the plate its record (`[data-ground]`). Both are excluded from
-    // the cover in the same rule rather than uncovered by a second one.
+    // The Door is another surface whose plate is content (posture `ambient`). It is excluded from
+    // the cover in the same rule rather than uncovered by a second one. A record page is covered:
+    // its map is an exhibit in the page (DESIGN.md section 9.1).
+    assert.doesNotMatch(shellCss, /ds-recpage\[data-ground\]/);
     assert.match(
       shellCss,
-      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\):not\(\s*:has\(\.ds-recpage\[data-ground\]\)\s*\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
     );
     // Covered, not hidden: the cover is what keeps the MapLibre instance alive across
     // navigation (`docs/decisions-carryover.md`, "Persistent map canvas").
@@ -260,7 +261,7 @@ describe('the plate is styled globally, not from the route group', () => {
   it('hides MapLibre controls on covered plates so a compass cannot sit on a record', () => {
     assert.match(
       shellCss,
-      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\):not\(\s*:has\(\.ds-recpage\[data-ground\]\)\s*\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)\s+\.maplibregl-ctrl\s*\{[^}]*display:\s*none/s,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)\s+\.maplibregl-ctrl\s*\{[^}]*display:\s*none/s,
     );
   });
 

@@ -10,7 +10,7 @@ import {
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import type { PublicClaimView, PublicEntityView } from '../../../data/public-seed';
 import { humanizeToken } from '../../../components/entity/format';
-import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
+import { resolveMapTone } from '../../../lib/map-experience/kind-encoding';
 
 /**
  * The sensitive-content disclaimer when the record's own accepted prose documents harm, else
@@ -95,13 +95,18 @@ export function toEvidenceClaimInputs(
 
 /**
  * A sensitive or violence-adjacent record: a sensitivity flag, a trauma content note, or a
- * massacre or plantation tone. It stands on a quiet ground (no plate, no lamplight, no motion) on
+ * massacre or plantation tone (by topic or by name). Its exhibits are quiet and its map still on
  * its own page and is never lifted onto the home page.
  */
 export function isQuietRecord(entity: PublicEntityView): boolean {
   if (entity.sensitivity) return true;
   if (traumaContentDisclaimerFor(entity) !== undefined) return true;
-  const tone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
+  // Topics first, then the name: a record titled a massacre whose topics do not say so (the
+  // Wilmington massacre of 1898) is still one.
+  const tone = resolveMapTone({
+    topicTags: entity.topicIds ?? entity.topicTags,
+    displayName: entity.displayName,
+  });
   return tone === 'massacre' || tone === 'plantation';
 }
 

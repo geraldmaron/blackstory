@@ -23,7 +23,7 @@ import type { StateDensityLevel } from '../../lib/map-experience/density';
 import { nationalFieldPatch } from '../../lib/map-experience/national-field';
 import { holdStill } from '../../lib/map-experience/world-prefs';
 import { useMapStage } from '../../components/map-stage/MapStage';
-import { groundFrameFor } from '../../components/map-stage/RecordGround';
+import { groundFrameFor } from '../../components/map-stage/ground-frame';
 import { ORBIT_MAX_ZOOM } from '../map/explore-style';
 import { doorFramePadding } from '../door-field-frame';
 import {

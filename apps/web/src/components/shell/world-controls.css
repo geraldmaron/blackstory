@@ -11,7 +11,7 @@
   pointer-events: auto;
 }
 
-body:has([data-surface='door'], .ds-recpage[data-ground]) .ds-world-controls,
+body:has([data-surface='door']) .ds-world-controls,
 html[data-world-on] .ds-world-controls,
 .ds-world-controls[data-documents] {
   display: flex;

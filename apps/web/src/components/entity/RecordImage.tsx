@@ -1,7 +1,11 @@
 /**
  * A record's own rights-cleared photograph, or nothing.
  *
- * `plate` shows the same photograph as a plate (docs/ui/archive/patterns-living-archive.md): toned in ink
+ * On a record page it is an exhibit (docs/ui/DESIGN.md section 7.3), addressed
+ * `#{entityId}-photograph`; `quiet` is the variant for a harm-adjacent record: no crop marks,
+ * nothing that draws the eye.
+ *
+ * `plate` (the Door and its tour only, until they go in phases 4b and 7) shows the same photograph as a plate (docs/ui/archive/patterns-living-archive.md): toned in ink
  * and copper by CSS (`.ds-plate`, packages/ui components.css), cover-fit to the box it leads, with
  * the same credit line beside it, unaltered. Only ever a real, sourced photograph; never on the
  * memorial or a sensitive or violence-adjacent record (callers decide; those show it plain).
@@ -34,6 +38,7 @@ export function RecordImage({
   entityName,
   image,
   plate: asPlate = false,
+  quiet = false,
   width,
   className,
 }: {
@@ -41,6 +46,7 @@ export function RecordImage({
   readonly entityName: string;
   readonly image: PublicEntityPrimaryImageView;
   readonly plate?: boolean;
+  readonly quiet?: boolean;
   /** The slot's CSS width, for a Commons thumbnail near it. */
   readonly width?: number;
   readonly className?: string;
@@ -81,6 +87,7 @@ export function RecordImage({
         id={`${entityId}-photograph`}
         kind="photograph"
         basis="date not on record"
+        variant={quiet ? 'quiet' : 'full'}
         receipt={<RecordPhotoCredit entityId={entityId} image={image} />}
         {...(className ? { className } : {})}
       >

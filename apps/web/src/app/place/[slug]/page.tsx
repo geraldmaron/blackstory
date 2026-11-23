@@ -74,7 +74,11 @@ export default async function PlacePage({ params, searchParams }: PlacePageProps
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
-      {await EntityRecordPage({ entity: place, arrival: discoveryFromSearchParams(rawArrival) })}
+      {await EntityRecordPage({
+        entity: place,
+        arrival: discoveryFromSearchParams(rawArrival),
+        canonicalPath: recordCanonicalPath('place', slug),
+      })}
     </>
   );
 }

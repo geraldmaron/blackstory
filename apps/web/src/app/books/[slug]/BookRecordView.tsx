@@ -30,6 +30,7 @@ import {
 import { BooksCoverArt } from '../BooksCoverArt';
 import { coverIsbnForBook } from '../books-cover';
 import { BOOKS_DETAIL } from '../books-copy';
+import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
 
 void React;
 
@@ -247,7 +248,7 @@ export function BookRecordView({
       {...(numeral ? { numeral } : {})}
       {...(coverIsbn
         ? {
-            media: (
+            lead: (
               <BooksCoverArt
                 title={book.title}
                 {...(hasCover ? { isbn: coverIsbn } : {})}
@@ -273,6 +274,7 @@ export function BookRecordView({
             }
           : {}),
         correctionHref: `/corrections?target=${encodeURIComponent(book.id)}`,
+        cite: { title: book.title, url: absolutePublicUrl(`/books/${book.slug}`) },
       }}
       sourcesAnchor="sources"
       file={file}

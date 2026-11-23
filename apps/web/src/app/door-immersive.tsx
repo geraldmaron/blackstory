@@ -80,7 +80,7 @@ import {
   type TourLayout,
 } from './door-tour-scrub';
 import { LIGHTS_DEEP_MAX_ZOOM } from './map/explore-style';
-import { groundFrameFor } from '../components/map-stage/RecordGround';
+import { groundFrameFor } from '../components/map-stage/ground-frame';
 import { placeDrillZoom } from '../lib/map-experience/place-map';
 import { MAP_MAX_ZOOM } from '../lib/map-experience/camera-presets';
 import { holdStill, readAsDocuments } from '../lib/map-experience/world-prefs';

@@ -417,8 +417,8 @@ export function useMapStage(): MapStageHandle {
 }
 
 /**
- * The stage, or null where no provider is above. `RecordGround` renders inside a server-streamed
- * record page, and its server render does not see the root shell's context (the throw above made
+ * The stage, or null where no provider is above. A driver can render inside a server-streamed
+ * page, and its server render does not see the root shell's context (the throw above made
  * React abandon server rendering for the record's whole boundary). It only acts in effects, so on
  * the server it needs nothing.
  */

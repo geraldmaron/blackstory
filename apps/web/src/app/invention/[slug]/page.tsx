@@ -79,7 +79,11 @@ export default async function InventionPage({ params, searchParams }: InventionP
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
-      {await EntityRecordPage({ entity, arrival: discoveryFromSearchParams(rawArrival) })}
+      {await EntityRecordPage({
+        entity,
+        arrival: discoveryFromSearchParams(rawArrival),
+        canonicalPath: recordCanonicalPath('invention', slug),
+      })}
     </>
   );
 }

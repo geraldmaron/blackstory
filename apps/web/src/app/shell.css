@@ -1514,9 +1514,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
    handed the plate its lights on a wide screen, and clears it when it leaves, so the cover stays
    until there is a world to show and the page never opens on a half-drawn map. */
 html:not([data-world-on])
-  body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
-    :has(.ds-recpage[data-ground])
-  )
+  body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
   .ds-map-stage:not([data-plate-slot])::after {
   content: '';
   position: absolute;
@@ -1529,9 +1527,7 @@ html:not([data-world-on])
 /* Attribution and compass share the cover's z-index, so the cover hides the map but leaves a
    north rose and OSM chip sitting on the record. Hide the chrome; keep the MapLibre instance. */
 html:not([data-world-on])
-  body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])):not(
-    :has(.ds-recpage[data-ground])
-  )
+  body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
   .ds-map-stage:not([data-plate-slot])
   .maplibregl-ctrl {
   display: none;

@@ -4,7 +4,7 @@ import {
   groundFrameFor,
   GROUND_MAX_ZOOM,
   GROUND_SITE_PITCH,
-} from '../../components/map-stage/RecordGround';
+} from '../../components/map-stage/ground-frame';
 import { DOOR_ORBIT_FILL, doorOrbitZoom } from '../../app/door-field-frame';
 
 test('Ground: only a site-precision record is pitched and shown over imagery', () => {

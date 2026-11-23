@@ -109,6 +109,8 @@ export type RecordMapProps = {
   readonly exploreHref?: string;
   /** The place the record belongs to, with its record count (`loadRecordPlace`). */
   readonly place?: Pick<RecordPlace, 'key' | 'name' | 'count' | 'href'>;
+  /** A harm-adjacent record: the frame is a still picture. No fade in, no zoom, no pan (P-04). */
+  readonly still?: boolean;
   readonly className?: string;
 };
 
@@ -292,6 +294,7 @@ export function RecordMap({
   caption = true,
   exploreHref,
   place,
+  still = false,
   className,
 }: RecordMapProps) {
   // A statewide record's place is its state (`state-ga`): the outline comes from the place.
@@ -354,15 +357,28 @@ export function RecordMap({
         const record = recordCollection(lng, lat, precision, statePostal);
         const marks = marked ? record : NO_MARKS;
         const center = renderedAnchorFor(record.features[0]!, area.counties);
+        const zoom = Math.min(zoomForLocationPrecision(precision), maxZoom, EMBED_CONTEXT_MAX_ZOOM);
+        // A county or state record is its outline: frame all of it, never closer than its zoom.
+        const points = area.rings.flat();
+        const lngs = points.map((point) => point[0]);
+        const lats = points.map((point) => point[1]);
         map = new maplibregl.Map({
           container,
           style: styleFor(readDocumentColorScheme(), marks),
-          center: [center[0], center[1]],
-          zoom: Math.min(zoomForLocationPrecision(precision), maxZoom, EMBED_CONTEXT_MAX_ZOOM),
+          ...(points.length > 0
+            ? {
+                bounds: [
+                  [Math.min(...lngs), Math.min(...lats)],
+                  [Math.max(...lngs), Math.max(...lats)],
+                ] as [[number, number], [number, number]],
+                fitBoundsOptions: { padding: 16, maxZoom: zoom },
+              }
+            : { center: [center[0], center[1]] as [number, number], zoom }),
           minZoom: MAP_MIN_ZOOM,
           maxZoom: MAP_MAX_ZOOM,
           attributionControl: false,
           renderWorldCopies: false,
+          interactive: !still,
           cooperativeGestures: true,
           dragRotate: false,
           pitchWithRotate: false,
@@ -370,7 +386,7 @@ export function RecordMap({
           trackResize: false,
         });
         const active = map;
-        active.touchZoomRotate.disableRotation();
+        if (!still) active.touchZoomRotate.disableRotation();
         active.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
         // Start the credit as the "i" button; the text opens on tap.
         const collapseAttribution = () => {
@@ -428,19 +444,31 @@ export function RecordMap({
       guard?.detach();
       map?.remove();
     };
-  }, [wanted, lat, lng, precision, statePostal, maxZoom, label]);
+  }, [wanted, lat, lng, precision, statePostal, maxZoom, label, still]);
 
   const named = label.trim();
   const precisionWords = precisionInWords(precision);
 
   return (
     <figure className={className ? `ds-record-map ${className}` : 'ds-record-map'}>
-      <div ref={slotRef} className="ds-record-map__frame" data-ground="ink" data-status={status}>
+      {/* Fixed: the plate is night in both themes (color-scheme.ts), so its ground is too. */}
+      <div
+        ref={slotRef}
+        className="ds-record-map__frame"
+        data-ground="ink"
+        data-ground-fixed=""
+        data-status={status}
+        data-still={still ? '' : undefined}
+      >
         <div
           ref={canvasRef}
           className="ds-record-map__canvas"
           role="region"
-          aria-label={`Map of ${named}. Use two fingers, or Control and scroll, to move it.`}
+          aria-label={
+            still
+              ? `Map of ${named}.`
+              : `Map of ${named}. Use two fingers, or Control and scroll, to move it.`
+          }
         />
         {/* The plate before the canvas paints, and the whole map where it never does. */}
         <p className="ds-record-map__ground">

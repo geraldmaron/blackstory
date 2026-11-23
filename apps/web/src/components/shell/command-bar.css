@@ -489,9 +489,7 @@ body:has([data-surface='door']) .ds-bar {
   }
 }
 
-/* A grounded record keeps the bar (its sheet scrolls under it) but speaks in the same voice. */
-body:has([data-surface='door']) .ds-bar__tabs .ds-tabs__tab,
-body:has(.ds-recpage[data-ground]) .ds-bar__tabs .ds-tabs__tab {
+body:has([data-surface='door']) .ds-bar__tabs .ds-tabs__tab {
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   letter-spacing: 0.08em;

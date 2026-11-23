@@ -1,7 +1,8 @@
 /*
- * One claims language wherever a claim is shown (EvidenceList.tsx): the record page's sources
- * beat and the home page's opening and decade walk. A copper numeral, the statement in the
- * editorial serif, its source as a link, then the grade as a glyph and a word.
+ * One claims language wherever a claim is shown (EvidenceList.tsx): a numbered statement in the
+ * editorial serif, then its own receipt (the kit's `Receipt`): the source as a link, its publisher,
+ * and the grade as a glyph and a word. The number is a reading aid in the meta voice, not display
+ * type (docs/ui/DESIGN.md section 4 rule 4).
  */
 .ds-evidence {
   margin: 0;
@@ -15,31 +16,27 @@
   position: relative;
   display: grid;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-6) 0 var(--ds-space-6) var(--ds-space-18);
+  padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-10);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
   counter-increment: evidence;
   scroll-margin-top: calc(56px + var(--ds-space-6));
 }
 
-/* Each statement's number in a large copper numeral (3.5:1 at this size on paper). */
 .ds-evidence__item::before {
-  content: counter(evidence);
+  content: counter(evidence, decimal-leading-zero);
   position: absolute;
-  top: var(--ds-space-4);
+  top: calc(var(--ds-space-4) + 0.3em);
   left: 0;
-  width: var(--ds-space-12);
-  color: var(--ds-numeral-accent);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-2);
-  font-weight: var(--ds-weight-numeral);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  text-align: right;
-  font-variant-numeric: lining-nums;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-meta);
 }
 
+/* A linked claim says which one it is with an ink rule, not a fill. */
 .ds-evidence__item:target {
-  background: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
+  box-shadow: inset 2px 0 0 var(--ds-ink);
 }
 
 .ds-evidence__statement {
@@ -51,48 +48,36 @@
   text-wrap: pretty;
 }
 
-.ds-evidence__source {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--ds-space-1) var(--ds-space-3);
-  margin: 0;
-  font-family: var(--ds-font-sans);
+/* The receipt sits directly under its claim at reading size (DESIGN.md section 7.6). */
+.ds-evidence__receipt,
+.ds-evidence__receipt .ds-grade-tag {
   font-size: var(--ds-text-body-sm);
-  line-height: 1.45;
 }
 
-.ds-evidence__publisher {
-  color: var(--ds-ink-muted);
-}
-
-.ds-evidence__title {
-  color: var(--ds-ink);
-  font-weight: 500;
+.ds-evidence__receipt .ds-receipt__source {
+  overflow-wrap: anywhere;
 }
 
 /* A source link is one line of type; padding paid back in margin makes it a 44px target without
    moving the row. */
-a.ds-evidence__title,
-.ds-evidence__archive {
+.ds-evidence__receipt a {
   display: inline-block;
   margin-block: calc(var(--ds-space-3) * -1);
   padding-block: var(--ds-space-3);
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
-.ds-evidence__archive {
+.ds-evidence__receipt a:hover {
+  color: var(--ds-accent);
+  text-decoration-color: currentColor;
+}
+
+.ds-evidence__receipt .ds-evidence__archive {
   color: var(--ds-ink-muted);
-}
-
-.ds-evidence__date,
-.ds-evidence__note {
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-caption);
-}
-
-.ds-evidence__date {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
 }
 
 .ds-grade-tag {
@@ -108,7 +93,6 @@ a.ds-evidence__title,
 .ds-evidence__flag {
   max-width: 62ch;
   padding: var(--ds-space-3) var(--ds-space-4);
-  border-radius: var(--ds-radius-sm);
   background: var(--ds-dispute-bg);
   color: var(--ds-dispute-fg);
   font-family: var(--ds-font-sans);
@@ -121,25 +105,24 @@ a.ds-evidence__title,
   color: var(--ds-error-fg);
 }
 
+/* Each value on file, then the source it came from. */
 .ds-evidence__alternates {
+  display: grid;
+  gap: var(--ds-space-2);
   margin: var(--ds-space-2) 0 0;
-  padding-left: var(--ds-space-4);
+  padding: 0;
+  list-style: none;
 }
 
-/* A source link is not running prose: ink with a 1px control underline, copper only on hover. */
-a.ds-evidence__title,
-.ds-evidence__archive {
-  color: var(--ds-ink);
-  text-decoration: underline;
-  text-decoration-color: var(--ds-border-control);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
+.ds-evidence__value {
+  display: block;
+  font-weight: 600;
 }
 
-a.ds-evidence__title:hover,
-.ds-evidence__archive:hover {
-  color: var(--ds-accent);
-  text-decoration-color: currentColor;
+/* On the dispute ground a receipt takes that ground's own ink. */
+.ds-evidence__flag .ds-receipt,
+.ds-evidence__flag .ds-receipt a {
+  color: inherit;
 }
 
 /* The glyph carries the tier's hue; the word carries the meaning. */
