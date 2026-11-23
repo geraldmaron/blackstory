@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ORBIT_LINE_MIN_ZOOM } from './map/explore-style';
+import { ORBIT_MAX_ZOOM } from './map/explore-style';
 import {
   DOOR_FRAME_MARGIN_MAX_PX,
   DOOR_FRAME_MARGIN_MIN_PX,
@@ -132,12 +132,16 @@ test('a drill falls back to the plain padding when the extra air leaves no room'
   assert.deepEqual(doorDrillPadding(tiny, tiny), doorFramePadding(tiny, tiny));
 });
 
-test('Orbit grows with its window but stops short of the zoom where state lines draw', () => {
+test('Orbit grows with its window but stops short of the zoom where Orbit ends', () => {
   const small = doorOrbitZoom({ top: 0, left: 0, width: 300, height: 300 });
   const laptop = doorOrbitZoom({ top: 52, left: 440, width: 880, height: 848 });
-  const wall = doorOrbitZoom({ top: 52, left: 600, width: 1900, height: 1500 });
+  const desk = doorOrbitZoom({ top: 52, left: 600, width: 1300, height: 1020 });
+  const wall = doorOrbitZoom({ top: 52, left: 600, width: 2800, height: 2000 });
   assert.ok(small < laptop);
+  // A 1920 window's globe is bigger than a laptop's: it used to stop at the laptop's size.
+  assert.ok(laptop < desk);
   assert.equal(wall, DOOR_ORBIT_MAX_ZOOM);
-  // explore-style.ts turns state lines and tints on at ORBIT_LINE_MIN_ZOOM; Orbit has neither.
-  assert.ok(DOOR_ORBIT_MAX_ZOOM < ORBIT_LINE_MIN_ZOOM);
+  // At ORBIT_MAX_ZOOM the lights dim and the tokens and names arrive; the Door holds its line
+  // layers back to the same zoom (map-stage, `applyOrbitLineFloor`). Orbit has none of them.
+  assert.ok(DOOR_ORBIT_MAX_ZOOM < ORBIT_MAX_ZOOM);
 });

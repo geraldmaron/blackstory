@@ -130,6 +130,7 @@ import { recordMarkFor } from '../../lib/map-experience/geo-precision';
 import { EMPTY_EDGE_COLLECTION, EMPTY_FEATURE_COLLECTION, type StageConfig } from './stage-config';
 import {
   applyGeographyStyle,
+  applyOrbitLineFloor,
   buildStyleForScheme,
   setSelectedStateFilter,
 } from './style-application';
@@ -605,6 +606,15 @@ export function MapStageProvider({
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
   postureRef.current = posture;
+  /** True while the plate is the Door's own Orbit, not its browse posture: lines wait for
+   * `ORBIT_MAX_ZOOM` there (`applyOrbitLineFloor`). */
+  const bareOrbit = posture === 'ambient' && !doorBrowseLive;
+  const bareOrbitRef = useRef(bareOrbit);
+  bareOrbitRef.current = bareOrbit;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map?.isStyleLoaded()) applyOrbitLineFloor(map, configRef.current.style, bareOrbit);
+  }, [bareOrbit]);
   /** The custom rotate gestures currently attached (`custom-rotate-gestures.ts`), or all null
    * when the posture has them detached. One ref, not three independent booleans, so the set
    * attaches and detaches together — see that module's doc comment for why they are one
@@ -1576,6 +1586,10 @@ export function MapStageProvider({
         };
         map.on('styledata', collapseAttribution);
         map.on('sourcedata', collapseAttribution);
+        // A theme switch or a patch can put layers back at the style's own floor.
+        map.on('styledata', () => {
+          if (map) applyOrbitLineFloor(map, configRef.current.style, bareOrbitRef.current);
+        });
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
         });

@@ -903,8 +903,13 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   windows opened on counts with no light. They now step down to 0.45 as the counts arrive, hold
   there, and fade with the counts between zoom 5.6 and 6.2. Measured at six widths from 390 to
   3840: lights on every one. The handoff to the place tokens past zoom 6 was not looked at.
-- Seen in the same pass, not changed: the Orbit globe stops growing at 1440 wide, so it is
-  small on a 4K window.
+- **The Orbit globe grows past a 1440 window** (2026-11-22). It stopped at zoom 1.88 because
+  the style draws state lines from 1.9 and Orbit has none. On the Door the line, name and land
+  layers now wait for zoom 2.7 (`applyOrbitLineFloor`), and the ceiling is 2.65: the disc is
+  about 750px at 1920 wide (was 610) and about 1270px from 2560 wide. Explore and the Door's
+  browse posture keep the style's own floor, so a 320 phone's national frame still has its
+  lines. A 4K window is still not filled; going further means moving where the lights hand
+  over to the place tokens.
 
 ### Open before or during phase 1
 

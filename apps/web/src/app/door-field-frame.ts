@@ -160,14 +160,15 @@ export const DOOR_ORBIT_HORIZON_RATIO = 0.85;
 /** How much of the map window's short side the globe's disc fills. */
 export const DOOR_ORBIT_FILL = 0.92;
 /**
- * Orbit never comes closer than this. From `ORBIT_LINE_MIN_ZOOM` (explore-style.ts) the plate
- * draws state lines, names and tints, and Orbit is lights and water only (design-direction-v11.md
- * §4.1). Without a ceiling a large window opened on a globe with the states drawn and a small one
- * on a globe without, so the opening stays just short of the lines at every size.
- * shortcut: the disc stops growing on a very large screen; to lift this, start the line layers
- * at `ORBIT_MAX_ZOOM` instead, which also changes a phone's national frame on Explore.
+ * Orbit never comes closer than this. Orbit is lights and water only (design-direction-v11.md
+ * §4.1), and at `ORBIT_MAX_ZOOM` (explore-style.ts) the lights start to dim and the place tokens
+ * and state names arrive, so the opening stays just short of it at every size. On the Door the
+ * line layers wait for the same zoom (`applyOrbitLineFloor`, map-stage), which is what lets the
+ * disc keep growing past a 1440 window: it stopped at 1.88 while the lines began at 1.9.
+ * shortcut: the disc stops growing at about 1270px, so a 4K window is not filled; lifting it
+ * further means moving where the lights hand over to the tokens.
  */
-export const DOOR_ORBIT_MAX_ZOOM = 1.88;
+export const DOOR_ORBIT_MAX_ZOOM = 2.65;
 
 /**
  * The zoom at which the globe's disc fills the map window (design-direction-v11.md, Orbit).

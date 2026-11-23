@@ -44,7 +44,11 @@ import {
   EXPLORE_SITE_NAME_LAYER_ID,
   PLATE_WATERLINE_LAYER_IDS,
 } from '../../app/map/explore-layer-ids';
-import { buildExploreMapStyle, stateLabelFilters } from '../../app/map/explore-style';
+import {
+  buildExploreMapStyle,
+  ORBIT_MAX_ZOOM,
+  stateLabelFilters,
+} from '../../app/map/explore-style';
 import {
   DECADE_CROSSFADE_IN_TARGETS,
   DECADE_CROSSFADE_OUT_TARGETS,
@@ -315,4 +319,30 @@ export function buildStyleForScheme(
     hatchedCountyKeys: hatchedCountyKeys(cfg.featureCollection, loadedCountyPolygons()),
     ...(loadedCountyPolygons() ? { counties: loadedCountyPolygons()! } : {}),
   });
+}
+
+/**
+ * The Door's Orbit is lights and water at every window size. The style starts lines, names and
+ * land fills at `ORBIT_LINE_MIN_ZOOM` so a small phone's national frame on Explore keeps them;
+ * on the Door they wait for `ORBIT_MAX_ZOOM`, which lets the opening globe grow with a large
+ * window without drawing the states on it. `bare` false puts every layer back where the style
+ * has it. Safe to call on every style event: it writes only what differs.
+ */
+export function applyOrbitLineFloor(
+  map: MapLibreMap,
+  style: StyleSpecification,
+  bare: boolean,
+): void {
+  for (const layer of style.layers) {
+    const gated =
+      layer.type === 'symbol' ||
+      layer.type === 'line' ||
+      (layer.type === 'fill' && layer.id !== 'plate-water');
+    const styled = layer.minzoom ?? 0;
+    if (!gated || styled >= ORBIT_MAX_ZOOM) continue;
+    const live = map.getLayer(layer.id);
+    if (!live) continue;
+    const want = bare ? ORBIT_MAX_ZOOM : styled;
+    if (live.minzoom !== want) map.setLayerZoomRange(layer.id, want, layer.maxzoom ?? 24);
+  }
 }
