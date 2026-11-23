@@ -1157,14 +1157,6 @@ export function DoorImmersive({
         <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
         {/* Where a tour stop frames its record. Measured only, like the window above. */}
         <div className="ds-door__tour-window" ref={tourWindowRef} aria-hidden="true" />
-        {/* Imagery is context, never evidence, and not a picture of the record's own time: say
-            whose it is and that its date is not the record's (design-direction-v11.md §4.2). */}
-        {tourImagery ? (
-          <p className="ds-door__imagery">
-            Aerial imagery: USGS, The National Map. Its date varies by area and isn’t this
-            record&apos;s date.
-          </p>
-        ) : null}
         {plateUnavailable ? (
           /* No WebGL: say so where the map would be, and point at the index that needs none. */
           <p className="ds-door__field-note" role="status">

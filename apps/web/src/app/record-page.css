@@ -1557,34 +1557,10 @@ body:has(.ds-recpage[data-ground]) .ds-map-stage .ds-map-callout--flag {
   display: none;
 }
 
-/* Whose imagery the Ground is, and that its date is not the record's. Top right of the world,
-   under the bar, in the chrome's mono voice; on a phone it sits above the name. */
+/* Whose imagery the Ground is, and that its date is not the record's, is said in the map's own
+   credit (`USGS_IMAGERY_ATTRIBUTION`); nothing is laid over the world to say it. */
 .ds-recpage[data-ground] {
   position: relative;
-}
-
-.ds-recpage__imagery {
-  position: absolute;
-  top: var(--ds-space-4);
-  right: var(--ds-space-4);
-  z-index: var(--ds-z-content);
-  max-width: 22rem;
-  margin: 0;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-world-hud-ground);
-  color: var(--ds-world-hud-ink);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-}
-
-@media (max-width: 47.9375rem) {
-  .ds-recpage__imagery {
-    right: var(--ds-space-3);
-    left: var(--ds-space-3);
-    max-width: none;
-  }
 }
 
 /* —— v11 Ground, wide: the record is a right sheet ———————————————————————————————————
@@ -1664,15 +1640,6 @@ body:has(.ds-recpage[data-ground]) .ds-map-stage .ds-map-callout--flag {
     position: static;
   }
 
-  /* The caption and the switches keep to the world's side of the sheet. */
-  .ds-recpage[data-ground] .ds-recpage__imagery {
-    /* Under the switches, on the same left edge: side by side they collide near 72rem. */
-    top: calc(var(--ds-space-4) + 44px + var(--ds-space-3));
-    right: auto;
-    left: var(--ds-space-4);
-    max-width: min(22rem, 100vw - var(--ds-ground-sheet-w) - var(--ds-space-8));
-  }
-
   /* The name holds the foot of the world's side, so the switches take its top left. */
   body:has(.ds-recpage[data-ground]) .ds-world-controls {
     top: calc(var(--ds-header-h) + var(--ds-space-4));
@@ -1691,33 +1658,12 @@ body:has(.ds-recpage[data-ground]) .ds-map-stage .ds-map-callout--flag {
   }
 }
 
-/* A short window (high zoom) has no room for the caption above the name: it takes its own row. */
-@media (max-height: 30rem) and (max-width: 71.9375rem) {
-  .ds-recpage[data-ground] .ds-recpage__imagery {
-    position: static;
-    max-width: none;
-    /* Beside the map credit, which holds the top left corner here. */
-    margin: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3)
-      calc(var(--ds-space-3) + 44px + var(--ds-space-2));
-  }
-}
-
 /* Stacked Ground: the sheet scrolls over the foot of the world and a phone's tab bar holds the
-   bottom edge, so the map credit moves to the top of the part that stays in view, and the
-   imagery caption makes room beside it. */
+   bottom edge, so the map credit moves to the top of the part that stays in view. */
 @media (max-width: 71.9375rem) {
   body:has(.ds-recpage[data-ground]) .ds-map-stage .maplibregl-ctrl-bottom-left {
     top: calc(var(--ds-header-h) + var(--ds-space-3));
     bottom: auto;
-  }
-
-  .ds-recpage[data-ground] .ds-recpage__imagery {
-    left: calc(var(--ds-space-3) + 44px + var(--ds-space-2));
-  }
-
-  /* An opened credit unfolds across the caption's place, and names the imagery itself. */
-  body:has(.ds-map-stage .maplibregl-compact-show) .ds-recpage[data-ground] .ds-recpage__imagery {
-    visibility: hidden;
   }
 }
 

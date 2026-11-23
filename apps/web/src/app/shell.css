@@ -1634,6 +1634,24 @@ html:not([data-world-on])
   padding-right: 44px;
 }
 
+/* A left-anchored control keeps its button on the left (MapLibre's own rule), so the room goes
+   there. With it on the right, the opened credit's first words ran under the "i". */
+:is(.ds-map-stage, .ds-record-map)
+  :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-top-left)
+  > .maplibregl-ctrl-attrib.maplibregl-compact-show {
+  padding-right: 0;
+  /* The button's 44px, from the scale. */
+  padding-left: calc(var(--ds-space-10) + var(--ds-space-1));
+}
+
+:is(.ds-map-stage, .ds-record-map)
+  :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-top-left)
+  .maplibregl-ctrl-attrib.maplibregl-compact
+  .maplibregl-ctrl-attrib-button {
+  right: auto;
+  left: 0;
+}
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib.maplibregl-compact {
     background-color: var(--ds-canvas);

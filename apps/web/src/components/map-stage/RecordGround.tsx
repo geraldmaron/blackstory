@@ -174,12 +174,7 @@ export function RecordGround({ record, neighbors, quiet = false }: RecordGroundP
     [neighbors, router, stage],
   );
 
-  // Imagery is context, never evidence, and it is not a picture of the record's own time: say
-  // whose it is and that its date is not the record's (design-direction-v11.md §4.2).
-  return groundFrameFor(record.properties.precision, quiet).imagery ? (
-    <p className="ds-recpage__imagery">
-      Aerial imagery: USGS, The National Map. Its date varies by area and is not this record&apos;s
-      date.
-    </p>
-  ) : null;
+  // Whose imagery it is, and that its date is not the record's, is said in the map's own credit
+  // (`USGS_IMAGERY_ATTRIBUTION`), not in a caption laid over the world.
+  return null;
 }

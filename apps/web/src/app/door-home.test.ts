@@ -472,9 +472,10 @@ test('the tour is one pinned scene scrubbed by the page scroll, one stop showing
   assert.match(immersive, /const still = prefersReducedMotion\(\) \|\| holdStill\(\)/);
   // A landing uses the frame its stored precision allows, the record page's own rule.
   assert.match(immersive, /groundFrameFor\(record\.precision, false\)/);
-  // Imagery is asked for only once the scroll rests on a stop, and it is credited on screen.
+  // Imagery is asked for only once the scroll rests on a stop. Its credit and date caveat ride
+  // in the map's own attribution, not in a caption over the map.
   assert.match(immersive, /TOUR_REST_MS/);
-  assert.match(immersive, /className="ds-door__imagery"/);
+  assert.doesNotMatch(immersive, /ds-door__imagery/);
   // The stop's frame is measured from its own element, not from a window CSS moves mid-tour.
   assert.match(immersive, /className="ds-door__tour-window" ref=\{tourWindowRef\}/);
   assert.doesNotMatch(tourCss, /\[data-active='true'\]\) \.ds-door__window\s*\{/);

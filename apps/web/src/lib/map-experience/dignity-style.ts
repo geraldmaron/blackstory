@@ -33,8 +33,13 @@ export const USGS_IMAGERY_HOST = 'https://basemap.nationalmap.gov';
 export const USGS_IMAGERY_TILE_URL = `${USGS_IMAGERY_HOST}/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}`;
 /** The service stops serving imagery above this zoom; past it MapLibre overzooms the last tile. */
 export const USGS_IMAGERY_MAX_ZOOM = 16;
+/**
+ * Imagery is context, never evidence, and not a picture of the record's own time
+ * (design-direction-v11.md §4.2). The credit says so itself, so the caveat is there whenever
+ * imagery is on and costs no room on the map: it used to be a second, always-open caption.
+ */
 export const USGS_IMAGERY_ATTRIBUTION =
-  'Imagery: <a href="https://www.usgs.gov/programs/national-geospatial-program/national-map" target="_blank" rel="noreferrer">USGS The National Map</a>';
+  'Imagery: <a href="https://www.usgs.gov/programs/national-geospatial-program/national-map" target="_blank" rel="noreferrer">USGS The National Map</a>, date varies by area and isn’t the record’s';
 
 export type MapColorScheme = 'light' | 'dark';
 

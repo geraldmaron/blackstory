@@ -200,22 +200,6 @@
     pointer-events: none;
   }
 
-  /* Whose imagery it is, at the foot of the frame it fills. */
-  .ds-door__imagery {
-    position: absolute;
-    bottom: var(--ds-space-5);
-    left: calc(var(--ds-door-edge) + var(--ds-tour-words-w) + var(--ds-space-8));
-    max-width: 24rem;
-    margin: 0;
-    padding: var(--ds-space-2) var(--ds-space-3);
-    border-radius: var(--ds-radius-sm);
-    background: var(--ds-world-hud-ground);
-    color: var(--ds-world-hud-ink);
-    font-family: var(--ds-font-mono);
-    font-size: var(--ds-text-caption);
-    line-height: 1.45;
-  }
-
   /* The selected pin is the stop's mark; its flag would only say the stop's name a second time. */
   body:has(.ds-door-tour[data-active='true']) .ds-map-stage .ds-map-callout--flag {
     display: none;
@@ -425,15 +409,6 @@
     .ds-door__tour-window {
       inset: 0 0 auto 0;
       height: var(--ds-tour-map-h);
-    }
-
-    /* At the foot of the map band, where the shade begins: clear of the record's pin above it
-       and of the words below. */
-    .ds-door__imagery {
-      right: var(--ds-door-edge);
-      bottom: calc(100% - var(--ds-tour-map-h) - var(--ds-space-10));
-      left: var(--ds-door-edge);
-      max-width: none;
     }
 
     /* The shade rises from the foot, under the words. */
