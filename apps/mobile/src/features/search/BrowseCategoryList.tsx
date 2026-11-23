@@ -31,7 +31,7 @@ export function BrowseCategoryList({ categories, onSelectCategory }: BrowseCateg
           leading={<NavIcon name={navIconForEntityKind(category.kind)} size={18} />}
           showChevron
           onPress={() => onSelectCategory(category.kind)}
-          accessibilityLabel={`List ${category.label} in Records`}
+          accessibilityLabel={`List ${category.label} in the Archive`}
           showDivider={index < categories.length - 1}
         />
       ))}
@@ -41,5 +41,5 @@ export function BrowseCategoryList({ categories, onSelectCategory }: BrowseCateg
 
 /** The explicit map path for a kind the reader is already looking at in Records. */
 export function showCategoryOnMap(kind: string): void {
-  router.push({ pathname: '/explore', params: { kind } });
+  router.push({ pathname: '/archive', params: { view: 'map', kind } });
 }

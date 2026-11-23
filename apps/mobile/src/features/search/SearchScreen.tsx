@@ -19,7 +19,6 @@ import { router } from 'expo-router';
 
 import { ApiStatusBanner } from '@/ui/ApiStatusBanner';
 import { Button } from '@/ui/Button';
-import { DevMenuHeaderButton } from '@/ui/DevMenuHeaderButton';
 import { Divider } from '@/ui/Divider';
 import { EmptyState } from '@/ui/EmptyState';
 import { ErrorState } from '@/ui/ErrorState';
@@ -28,7 +27,6 @@ import { ListRow } from '@/ui/ListRow';
 import { NavIcon, navIconForEntityKind, type NavIconName } from '@/ui/NavIcon';
 import { Notice } from '@/ui/Notice';
 import { ScreenCanvas } from '@/ui/ScreenCanvas';
-import { ScreenHeader } from '@/ui/ScreenHeader';
 import { Text } from '@/ui/Text';
 import {
   MIN_TOUCH_TARGET,
@@ -48,6 +46,7 @@ import { BROWSE_CATEGORIES } from './browse-categories';
 import type { SearchResultV1 } from './search-contracts';
 import type { SearchRuntime } from './search-runtime';
 
+/** The Archive tab's List view. The tab draws the title and the top safe area. */
 export interface SearchScreenProps {
   readonly initialQuery?: string;
   readonly initialKind?: string;
@@ -164,8 +163,9 @@ export function SearchScreen({
     const safeId = parseEntityId(id);
     if (!safeId) return;
     router.push({
-      pathname: '/explore',
+      pathname: '/archive',
       params: {
+        view: 'map',
         selected: safeId,
         ...(kind.trim().length > 0 ? { kind } : {}),
       },
@@ -197,7 +197,7 @@ export function SearchScreen({
   const draftLength = draft.trim().length;
 
   return (
-    <ScreenCanvas>
+    <ScreenCanvas edges={['left', 'right']}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: insets.paddingHorizontal,
@@ -210,14 +210,9 @@ export function SearchScreen({
         automaticallyAdjustKeyboardInsets
       >
         <ApiStatusBanner compact />
-        <ScreenHeader
-          kicker="The archive"
-          title="Records"
-          dek="Every documented person, place, event and institution. Browse by kind, or search by name."
-          compact
-          dense
-          trailing={typeof __DEV__ !== 'undefined' && __DEV__ ? <DevMenuHeaderButton /> : undefined}
-        />
+        <Text variant="bodySmall" colorRole="inkMuted">
+          Every documented person, place, event and institution. Browse by kind, or search by name.
+        </Text>
 
         <View
           style={[

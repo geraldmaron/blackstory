@@ -16,6 +16,7 @@ import {
   Text,
   screenScrollInsets,
   space,
+  useScreenScrollInsets,
 } from '@/ui';
 import { CensusModelFrame } from './CensusModelFrame';
 import { CoveragePulse } from './CoveragePulse';
@@ -35,6 +36,7 @@ const COVERAGE_ITEMS = [
 ];
 
 export function DataScreen() {
+  const insets = useScreenScrollInsets();
   const model = getDataPageModel();
   const { indicators, phase1 } = model;
   const servedFromNote =
@@ -45,8 +47,8 @@ export function DataScreen() {
   return (
     // `/data` is a stack screen with a visible native header, so the canvas insets
     // only the sides and bottom — the header already owns the top inset.
-    <ScreenCanvas edges={['left', 'right', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.content}>
+    <ScreenCanvas>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.paddingBottom }]}>
         <ScreenHeader
           kicker={DATA_INTRO.kicker}
           title="Data behind the archive"
@@ -101,11 +103,11 @@ export function DataScreen() {
           <CensusModelFrame />
           <View style={{ alignItems: 'flex-start' }}>
             <Button
-              label="Open Explore"
+              label="Open the Archive map"
               variant="secondary"
               density="compact"
-              onPress={() => router.push('/explore')}
-              accessibilityHint="Opens the Explore map tab"
+              onPress={() => router.push('/archive')}
+              accessibilityHint="Opens the Archive map"
             />
           </View>
         </View>
@@ -195,7 +197,7 @@ export function DataScreen() {
               summary="Open pins and place records nearby"
               leading={<NavIcon name="explore" size={20} />}
               showChevron
-              onPress={() => router.push('/explore')}
+              onPress={() => router.push('/archive')}
               accessibilityLabel="Explore the map"
               showDivider
             />

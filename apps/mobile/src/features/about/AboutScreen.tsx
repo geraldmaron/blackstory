@@ -58,8 +58,8 @@ export function AboutScreen() {
             label="Open the map"
             variant="accent"
             density="compact"
-            onPress={() => router.push('/explore')}
-            accessibilityHint="Opens the Explore map tab"
+            onPress={() => router.push('/archive')}
+            accessibilityHint="Opens the Archive map"
           />
           <Button
             label="Methodology"
@@ -220,8 +220,8 @@ export function AboutScreen() {
               label="Explore the map"
               variant="accent"
               density="compact"
-              onPress={() => router.push('/explore')}
-              accessibilityHint="Opens the Explore map tab"
+              onPress={() => router.push('/archive')}
+              accessibilityHint="Opens the Archive map"
             />
             <Button
               label="Read stories"

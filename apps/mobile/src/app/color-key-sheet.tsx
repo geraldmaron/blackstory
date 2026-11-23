@@ -9,7 +9,7 @@ import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 
 export default function ColorKeySheet() {
   useEditionStackBack({
-    fallbackHref: '/explore',
+    fallbackHref: '/archive',
     accessibilityHint: 'Closes the color key when there is no previous screen',
   });
 

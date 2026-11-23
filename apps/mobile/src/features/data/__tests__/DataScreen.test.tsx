@@ -18,6 +18,7 @@ jest.mock('react-native-safe-area-context', () => {
     SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
       React.createElement(View, { style }, children as never),
     SafeAreaProvider: ({ children }: { children?: unknown }) => children,
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
   };
 });
 
@@ -60,14 +61,14 @@ describe('DataScreen', () => {
 
   it('navigates Explore from the Census empty action', async () => {
     const { getByText } = await render(<DataScreen />);
-    fireEvent.press(getByText('Open Explore'));
-    expect(mockPush).toHaveBeenCalledWith('/explore');
+    fireEvent.press(getByText('Open the Archive map'));
+    expect(mockPush).toHaveBeenCalledWith('/archive');
   });
 
   it('navigates Explore and Methodology from next-step actions', async () => {
     const { getByText } = await render(<DataScreen />);
     fireEvent.press(getByText('Explore the map'));
-    expect(mockPush).toHaveBeenCalledWith('/explore');
+    expect(mockPush).toHaveBeenCalledWith('/archive');
     fireEvent.press(getByText('Read methodology'));
     expect(mockPush).toHaveBeenCalledWith('/methodology');
   });

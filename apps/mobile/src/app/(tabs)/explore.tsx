@@ -1,57 +1,27 @@
 /**
- * Explore tab — the native map-led experience (MOB-012), the mobile counterpart of
- * web's `/explore`.
- *
- * This route file owns only the ROUTER surface (MOB-008 contract): it reads and
- * VALIDATES the query params (`kind`/`era` filters and a `selected` entity id)
- * through the shared parser, and it supplies the navigation callbacks. The whole
- * map/list/filter/preview experience is `ExploreView` (feature-owned, router-free,
- * unit-testable), which never touches raw params or the router directly.
- *
- * Live map pins come from `GET /v1/map` via `useExploreMapSource`
- * (`docs/decisions-carryover.md`, "Explore basemap and live map source"). Bundled
- * `DEMO_MAP_SOURCE` is only a `__DEV__` fallback when the API is unreachable.
- *
- * Selection restoration rides the `selected` query param (shareable + deep-link +
- * cold-start-restorable): `ExploreView` validates it via `parseEntityId` and only
- * restores it if the entity still exists in the active release — a withdrawn or
- * released-out entity falls back to no selection, never a crash (MOB-005;
- * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots").
- *
- * Filters apply in-map via the instruments panel (live chip apply + URL sync
- * through `onFiltersChange`). Modal route `/filters-sheet` is a deep-link
- * fallback that also live-applies; `/color-key-sheet` remains for the key.
+ * `/explore` was the map tab. The Archive tab is the map now, so this route only forwards an old
+ * deep link, a saved link or restored navigation state, keeping its filters and its selected
+ * record.
  */
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 
-import { parseFilterState, filterStateToRouteParams } from '@/lib/route-params';
-import { ExploreView, useExploreMapSource } from '@/features/explore';
+import { filterStateToRouteParams, parseEntityId, parseFilterState } from '@/lib/route-params';
+import { ARCHIVE_ROUTE } from '@/shell/mobile-nav';
 
-export default function ExploreScreen() {
-  const rawParams = useLocalSearchParams();
-  const filters = parseFilterState(rawParams as Record<string, unknown>);
-  const mapSource = useExploreMapSource();
+export default function ExploreRedirectScreen() {
+  const params = useLocalSearchParams();
+  const selected = parseEntityId(params.selected);
+  const filters = Object.fromEntries(
+    Object.entries(
+      filterStateToRouteParams(parseFilterState(params as Record<string, unknown>)),
+    ).filter(([, value]) => value !== ''),
+  );
 
   return (
-    <ExploreView
-      source={mapSource.source}
-      loadState={mapSource.loadState}
-      usingDemo={mapSource.usingDemo}
-      onRetryMap={mapSource.retry}
-      filters={filters}
-      selectedParam={rawParams.selected}
-      onOpenEntity={(id) => router.push({ pathname: '/entity/[id]', params: { id } })}
-      onOpenStory={(slug) => router.push({ pathname: '/stories/[slug]', params: { slug } })}
-      onOpenSearch={() => router.push('/records')}
-      onSelectionChange={(entityId) => {
-        if (entityId) {
-          router.setParams({ selected: entityId });
-        } else {
-          router.setParams({ selected: '' });
-        }
-      }}
-      onFiltersChange={(next) => {
-        router.setParams(filterStateToRouteParams(next));
+    <Redirect
+      href={{
+        pathname: ARCHIVE_ROUTE,
+        params: { ...filters, ...(selected ? { selected } : {}) },
       }}
     />
   );

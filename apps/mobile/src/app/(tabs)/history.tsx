@@ -7,6 +7,7 @@
  */
 import { Redirect, useLocalSearchParams } from 'expo-router';
 
+import { ARCHIVE_LIST_HREF } from '@/shell/mobile-nav';
 import { decadeParamToEra, parseFilterState, parseSearchQuery } from '@/lib/route-params';
 
 export default function HistoryRedirectScreen() {
@@ -23,8 +24,9 @@ export default function HistoryRedirectScreen() {
   return (
     <Redirect
       href={{
-        pathname: '/records',
+        pathname: ARCHIVE_LIST_HREF.pathname,
         params: {
+          ...ARCHIVE_LIST_HREF.params,
           ...(q ? { q } : {}),
           ...(kind ? { kind } : {}),
           ...(era ? { era } : {}),

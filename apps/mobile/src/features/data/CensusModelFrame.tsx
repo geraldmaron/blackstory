@@ -53,7 +53,7 @@ export function CensusModelFrame() {
         <EmptyState
           compact
           title="Census timeline not on this release yet"
-          description="Open Explore for place layers, or read Methodology for juxtaposition rules."
+          description="Open the Archive map for place layers, or read Methodology for juxtaposition rules."
         />
       </View>
     </View>

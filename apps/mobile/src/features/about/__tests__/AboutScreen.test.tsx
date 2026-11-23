@@ -49,7 +49,7 @@ describe('AboutScreen', () => {
   it('navigates Explore from the accent CTA', async () => {
     const { getAllByText } = await render(<AboutScreen />);
     fireEvent.press(getAllByText('Open the map')[0]!);
-    expect(mockPush).toHaveBeenCalledWith('/explore');
+    expect(mockPush).toHaveBeenCalledWith('/archive');
   });
 
   it('navigates Methodology and Data destinations', async () => {

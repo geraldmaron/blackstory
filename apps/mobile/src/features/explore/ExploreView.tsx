@@ -27,6 +27,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import type { Edge } from 'react-native-safe-area-context';
 import {
   ApiStatusBanner,
   ScreenCanvas,
@@ -105,6 +106,8 @@ export type ExploreViewProps = {
   readonly onRetryMap?: () => void;
   /** Reduced-motion override (defaults to the OS setting). */
   readonly reduceMotion?: boolean;
+  /** Safe-area edges this view pads. The Archive tab pads the top itself. */
+  readonly edges?: readonly Edge[];
   /** Navigate to the full entity route (MOB-014 owns its content). */
   readonly onOpenEntity: (entityId: string) => void;
   /** Navigate to a published story by slug — the preview's "Cited in" list is the only caller. */
@@ -129,6 +132,7 @@ export function ExploreView({
   usingDemo = false,
   onRetryMap,
   reduceMotion: reduceMotionProp,
+  edges = ['top', 'left', 'right'],
   onOpenEntity,
   onOpenStory,
   onOpenFilters: _onOpenFilters,
@@ -455,7 +459,7 @@ export function ExploreView({
   ) : null;
 
   return (
-    <ScreenCanvas edges={['top', 'left', 'right']}>
+    <ScreenCanvas edges={edges}>
       <ApiStatusBanner compact />
 
       <View style={styles.panes} testID="explore-panes">

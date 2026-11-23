@@ -17,7 +17,6 @@ import {
   MOBILE_LEGACY_SEARCH_ROUTE,
   MOBILE_MORE_SECTIONS,
   MOBILE_PRIMARY_TABS,
-  MOBILE_RECORDS_ROUTE,
   MOBILE_TAB_ROOTS,
   nativeLegacyRoutes,
   nativeRouteForWebPath,
@@ -27,17 +26,17 @@ import {
 const allRows = MOBILE_MORE_SECTIONS.flatMap((section) => section.rows);
 
 describe('MOBILE_PRIMARY_TABS', () => {
-  it('is the three product axes a phone navigates between, plus More', () => {
+  it('is Archive, Stories, Data, More, in that order', () => {
     expect(MOBILE_PRIMARY_TABS.map((tab) => tab.label)).toEqual([
-      'Map',
+      'Archive',
       'Stories',
-      'Records',
+      'Data',
       'More',
     ]);
     expect(MOBILE_PRIMARY_TABS.map((tab) => tab.route)).toEqual([
-      '/explore',
+      '/archive',
       '/stories',
-      '/records',
+      '/data',
       '/more',
     ]);
   });
@@ -49,9 +48,9 @@ describe('MOBILE_PRIMARY_TABS', () => {
     expect(MOBILE_PRIMARY_TABS.some((tab) => tab.label === 'History')).toBe(false);
   });
 
-  it('does not expose a standalone Search tab: search is a capability of Records', () => {
+  it('does not expose a standalone Search tab: search is the Archive list', () => {
     expect(MOBILE_PRIMARY_TABS.some((tab) => tab.label === 'Search')).toBe(false);
-    expect(MOBILE_PRIMARY_TABS.some((tab) => tab.route === '/records')).toBe(true);
+    expect(MOBILE_PRIMARY_TABS.some((tab) => tab.route === '/archive')).toBe(true);
   });
 
   it('does not push a route that is a legacy alias', () => {
@@ -62,9 +61,10 @@ describe('MOBILE_PRIMARY_TABS', () => {
     expect(routes).not.toContain('/learn');
   });
 
-  it('takes each axis label and route from the shared catalog', () => {
+  it('takes Stories and Data from the shared catalog', () => {
     for (const tab of MOBILE_PRIMARY_TABS) {
-      if (tab.id === 'more') continue;
+      // Archive is the phone's merge of the web's map and list; the catalog has no entry yet.
+      if (tab.id === 'more' || tab.id === 'archive') continue;
       const destination = semanticDestinationByPath(tab.route);
       expect(destination).toBeDefined();
       expect(tab.label).toBe(destination?.label);
@@ -72,7 +72,7 @@ describe('MOBILE_PRIMARY_TABS', () => {
   });
 
   it('registers four tab roots for restore/returnTo allowlists', () => {
-    expect(MOBILE_TAB_ROOTS).toEqual(['/explore', '/stories', '/records', '/more']);
+    expect(MOBILE_TAB_ROOTS).toEqual(['/archive', '/stories', '/data', '/more']);
   });
 });
 
@@ -87,7 +87,6 @@ describe('MOBILE_MORE_SECTIONS', () => {
     expect(MOBILE_MORE_SECTIONS[0]?.rows.map((row) => row.title)).toEqual([
       'Presidents',
       'Law',
-      'Data',
       'Lives',
       'Banned books',
       'Memorial',
@@ -126,19 +125,16 @@ describe('MOBILE_MORE_SECTIONS', () => {
     const privacy = allRows.find((row) => row.id === 'privacy');
     expect(privacy?.destination).toEqual({ kind: 'native', route: '/privacy' });
     expect(allRows.some((row) => row.id === 'law')).toBe(true);
-    expect(allRows.some((row) => row.id === 'data')).toBe(true);
+    // Data is a tab; a tab is not listed again inside More.
+    expect(allRows.some((row) => row.id === 'data')).toBe(false);
     expect(allRows.some((row) => row.id === 'about')).toBe(true);
   });
 
-  it('opens Law, Data, and About as native rooms again', () => {
+  it('opens Law and About as native rooms', () => {
     expect(allRows.find((row) => row.id === 'how-it-works')).toBeUndefined();
     expect(allRows.find((row) => row.id === 'law')?.destination).toEqual({
       kind: 'native',
       route: '/law',
-    });
-    expect(allRows.find((row) => row.id === 'data')?.destination).toEqual({
-      kind: 'native',
-      route: '/data',
     });
     expect(allRows.find((row) => row.id === 'about')?.destination).toEqual({
       kind: 'native',
@@ -197,9 +193,11 @@ describe('MOBILE_MORE_SECTIONS', () => {
 });
 
 describe('normalizeMobileTabRoot', () => {
-  it('sends the legacy find-in-time roots to Records', () => {
-    expect(normalizeMobileTabRoot(MOBILE_LEGACY_SEARCH_ROUTE)).toBe(MOBILE_RECORDS_ROUTE);
-    expect(normalizeMobileTabRoot('/history')).toBe(MOBILE_RECORDS_ROUTE);
+  it('sends the old tabs and the legacy find-in-time roots to the Archive', () => {
+    expect(normalizeMobileTabRoot('/explore')).toBe('/archive');
+    expect(normalizeMobileTabRoot('/records')).toBe('/archive');
+    expect(normalizeMobileTabRoot(MOBILE_LEGACY_SEARCH_ROUTE)).toBe('/archive');
+    expect(normalizeMobileTabRoot('/history')).toBe('/archive');
   });
 
   it('sends the legacy narrative roots to Stories', () => {
@@ -209,8 +207,8 @@ describe('normalizeMobileTabRoot', () => {
   });
 
   it('leaves a canonical route alone', () => {
-    expect(normalizeMobileTabRoot('/explore')).toBe('/explore');
-    expect(normalizeMobileTabRoot('/records')).toBe('/records');
+    expect(normalizeMobileTabRoot('/archive')).toBe('/archive');
+    expect(normalizeMobileTabRoot('/data')).toBe('/data');
     expect(normalizeMobileTabRoot('/stories')).toBe('/stories');
   });
 
@@ -231,11 +229,12 @@ describe('normalizeMobileTabRoot', () => {
     }
   });
 
-  it('declares exactly one web-to-native route difference, and says why', () => {
-    // Every other destination uses the same path on both platforms. A second entry here would
-    // mean the two products had started to diverge in addressing, not just in presentation.
+  it('declares the web-to-native route differences, and says why', () => {
+    // The hub is More; and until the web merges its map and list (DESIGN.md phase 4b) both are
+    // the phone's one Archive. Every other destination uses the same path on both platforms.
     expect(nativeRouteForWebPath('/collections')).toBe('/more');
-    expect(nativeRouteForWebPath('/records')).toBe('/records');
+    expect(nativeRouteForWebPath('/explore')).toBe('/archive');
+    expect(nativeRouteForWebPath('/records')).toBe('/archive');
     expect(nativeRouteForWebPath('/stories')).toBe('/stories');
   });
 });

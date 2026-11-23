@@ -6,5 +6,5 @@
 import { Redirect } from 'expo-router';
 
 export default function TabIndexRedirect() {
-  return <Redirect href="/explore" />;
+  return <Redirect href="/archive" />;
 }
