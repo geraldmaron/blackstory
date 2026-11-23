@@ -87,7 +87,6 @@ export default async function ErrataPage({ searchParams }: ErrataPageProps) {
       className="ds-trust-room"
       masthead={
         <TrustMast
-          art={['ledger']}
           numeral={
             all.length === 0
               ? undefined

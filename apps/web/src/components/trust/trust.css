@@ -1,64 +1,22 @@
 /**
- * Trust, utility and data pages: the blocks they share.
+ * Method, utility and data pages: the blocks they share (docs/ui/DESIGN.md section 9.6).
  *
- * The frame (TrustFrame.tsx): a full-bleed copper or sand block with the display title and one
- * display numeral, then a paper sheet with page bands that slides up over the block's foot. Each
- * section on the sheet opens on a copper section numeral. Inside the sheet: the one-sentence
- * answer that opens a section, flat related links, a step flow drawn as an ink panel, ruled
- * lists and definition lists, and the quiet note.
+ * One document on the page's own ground: a title and its line, then sections that each open on a
+ * 2px rule. Inside: the one-sentence answer that opens a section, flat related links, a step
+ * flow, ruled lists and definition lists, and the quiet note.
  *
  * Spacing uses the shared scale only.
  */
 
-/* —— the mast: a color block with the display title and its numeral ——————————————— */
+/* —— the mast: the title, its line, and at most one fact in a sentence ————————————— */
 .ds-trust-mast {
-  /* The sheet below rises this far into the block. */
-  --trust-overlap: var(--ds-space-16);
-
-  padding-block: var(--ds-space-12) calc(var(--trust-overlap) + var(--ds-space-12));
-  overflow: hidden;
-  isolation: isolate;
-  background: var(--ds-world-space);
-}
-
-/* The room stands on the night ground in either theme, so the sheet is the only paper. The clip
-   holds the horizon below inside the room without making a scroll container. */
-.ds-trust-room {
-  overflow: clip;
-  background: var(--ds-world-space);
-}
-
-/* The world, parked just under the sheet: its lit edge crests above the sheet's top and runs out
-   behind it, in the rim light and ember the globe wears at Orbit. Drawn, never a map, so it
-   claims no record. */
-.ds-trust-room > .ds-room__mast + .ds-room__body {
-  isolation: isolate;
-}
-
-.ds-trust-room > .ds-room__mast + .ds-room__body::before {
-  content: '';
-  position: absolute;
-  z-index: -1; /* local: under the sheet, inside the room column's own isolated stack */
-  top: calc(var(--ds-space-10) * -1);
-  left: 50%;
-  width: 300vmax;
-  height: 300vmax;
-  border: 2px solid var(--ds-world-rim);
-  border-radius: 50%;
-  translate: -50% 0;
-  box-shadow:
-    0 0 var(--ds-space-16) color-mix(in srgb, var(--ds-world-rim) 45%, transparent),
-    0 0 var(--ds-space-4) color-mix(in srgb, var(--ds-world-rim) 70%, transparent),
-    inset 0 0 var(--ds-space-2) var(--ds-world-ember),
-    inset 0 0 var(--ds-space-12) color-mix(in srgb, var(--ds-world-ember) 30%, transparent);
-  pointer-events: none;
+  padding-block: var(--ds-space-10) var(--ds-space-8);
 }
 
 .ds-trust-mast__inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  row-gap: var(--ds-space-8);
-  align-items: end;
+  row-gap: var(--ds-space-5);
 }
 
 .ds-trust-mast .ds-page-header {
@@ -78,7 +36,7 @@
 /* The dek is the page's pull line: Newsreader italic, a step under the title. */
 .ds-trust-mast .ds-page-header__dek {
   max-width: 40ch;
-  margin-top: var(--ds-space-5);
+  margin-top: var(--ds-space-4);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial-lede);
   font-style: italic;
@@ -87,55 +45,26 @@
 }
 
 .ds-trust-mast__figure {
-  display: grid;
-  justify-items: start;
-  gap: var(--ds-space-2);
+  max-width: 60ch;
   margin: 0;
-}
-
-/* A long figure steps down to the title size, but never under the 72px display floor. */
-.ds-trust-mast__numeral.ds-numeral--title {
-  font-size: max(4.5rem, var(--ds-text-display));
-}
-
-.ds-trust-mast__label {
-  max-width: 22ch;
-  text-wrap: balance;
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
-  font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-trust-mast__figure > strong {
   color: var(--ds-ink);
+  font-weight: 600;
 }
 
 .ds-trust-mast__tools {
   min-width: 0;
 }
 
-@media (min-width: 64rem) {
-  .ds-trust-mast {
-    padding-top: var(--ds-space-16);
-  }
-
-  .ds-trust-mast__inner {
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: var(--ds-space-12);
-  }
-
-  .ds-trust-mast__figure {
-    justify-items: end;
-    text-align: right;
-  }
-
-  .ds-trust-mast__tools {
-    grid-column: 1 / -1;
-  }
-}
-
-/* —— the sheet, risen over the mast ——————————————————————————————————————————— */
-.ds-trust-room > .ds-room__mast + .ds-room__body {
-  position: relative;
-  margin-top: calc(-1 * var(--ds-space-16));
+/* The room kit's patterned section rule is ornament; a section here opens on its 2px rule only. */
+.ds-trust-room .ds-room-section__rule {
+  display: none;
 }
 
 /* Outranks the room kit's top space for a column with no PageHeader (the header is in the mast). */
@@ -143,57 +72,14 @@
   padding-top: 0;
 }
 
-/* The numbering runs across a page's sheets and the bands between them. */
-.ds-trust-room {
-  counter-reset: trust-section;
-}
-
-/* —— a band between sheets: full bleed, the section on the wide container —————————— */
-.ds-trust-band {
-  margin-inline: calc(50% - 50vw);
-  margin-block: var(--ds-space-16);
-  padding-block: var(--ds-space-4) var(--ds-space-16);
-  background: var(--ds-canvas);
-  color: var(--ds-ink);
-}
-
-.ds-trust-band__inner {
-  width: min(100% - var(--ds-gutter) * 2, var(--ds-width-wide));
-  margin-inline: auto;
-}
-
-.ds-trust-band .ds-room-section > .ds-section-heading {
-  border-top-color: var(--ds-ink);
-}
-
-/* On a phone the sheet runs edge to edge, so it steps out of the page gutter, and the mast
-   tightens so the sheet starts inside the first screen. The numeral keeps display scale on its
-   own line, its label stacked under it. */
 @media (max-width: 47.9375rem) {
-  .ds-trust-folio {
-    margin-inline: calc(-1 * var(--ds-gutter));
-  }
-
   .ds-trust-mast {
-    padding-block: var(--ds-space-8) calc(var(--ds-space-8) + var(--ds-space-12));
-  }
-
-  .ds-trust-mast__inner {
-    row-gap: var(--ds-space-5);
+    padding-block: var(--ds-space-6) var(--ds-space-5);
   }
 
   .ds-trust-mast .ds-page-header__dek {
     margin-top: var(--ds-space-3);
     font-size: var(--ds-text-body);
-  }
-
-  .ds-trust-mast__figure .ds-trust-mast__numeral {
-    font-size: clamp(4.5rem, 24vw, 7.5rem);
-    letter-spacing: -0.035em;
-  }
-
-  .ds-trust-room > .ds-room__mast + .ds-room__body {
-    margin-top: calc(-1 * var(--ds-space-8));
   }
 }
 
@@ -228,36 +114,15 @@
   }
 }
 
-/* —— section numerals ——————————————————————————————————————————————————————————
-   Each section on a sheet opens on a hard rule and its number set large in copper. The number
-   is drawn, not read: the alt text after the slash is empty. */
-.ds-trust-sheet .ds-room-section,
-.ds-trust-band .ds-room-section {
-  counter-increment: trust-section;
-}
-
+/* —— section headings: each section opens on a hard rule ————————————————————————— */
 .ds-trust-sheet .ds-room-section > .ds-section-heading,
 .ds-trust-band .ds-room-section > .ds-section-heading {
-  display: grid;
-  gap: var(--ds-space-3);
-  margin-top: var(--ds-space-16);
-  padding-top: var(--ds-space-5);
+  margin-top: var(--ds-space-12);
+  padding-top: var(--ds-space-4);
   border-top: 2px solid var(--ds-ink);
   font-size: var(--ds-text-display-3);
   line-height: 1.05;
   letter-spacing: -0.02em;
-}
-
-.ds-trust-sheet .ds-room-section > .ds-section-heading::before,
-.ds-trust-band .ds-room-section > .ds-section-heading::before {
-  content: counter(trust-section, decimal-leading-zero) / '';
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-headline);
-  font-weight: 600;
-  font-variant-numeric: lining-nums;
-  line-height: var(--ds-leading-numeral);
-  letter-spacing: var(--ds-tracking-numeral);
-  color: var(--ds-numeral-accent);
 }
 
 .ds-trust-sheet .ds-room-section:first-of-type > .ds-section-heading,

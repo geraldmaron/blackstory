@@ -48,7 +48,7 @@ export default async function CorrectionsPage({ searchParams }: CorrectionsPageP
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast art={['tools']}>
+        <TrustMast>
           <PageHeader
             display
             crumb={parentCrumb('/corrections')}

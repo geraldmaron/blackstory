@@ -40,7 +40,7 @@ body:has(.ds-sheet) .ds-bar {
 /* A Parked page stands on the night ground in either theme, and so does its bar (it holds its ink
    roles there, CommandBar.tsx): the same night, solid, so the bar and the page are one sky and no
    paper shows through it where the bar is in flow on a phone. */
-body:has(.ds-trust-room, .ds-parked) .ds-bar {
+body:has(.ds-parked) .ds-bar {
   background: var(--ds-world-space);
 }
 

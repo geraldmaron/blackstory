@@ -85,6 +85,14 @@ describe('THEME_BOOTSTRAP_SCRIPT', () => {
   });
 });
 
+describe('print', () => {
+  it('turns the page to paper for a print and back after, without writing the stored choice', () => {
+    assert.match(THEME_BOOTSTRAP_SCRIPT, /beforeprint/);
+    assert.match(THEME_BOOTSTRAP_SCRIPT, /afterprint/);
+    assert.equal(THEME_BOOTSTRAP_SCRIPT.match(/setItem/g), null);
+  });
+});
+
 describe('bootstrap script', () => {
   it('embeds the real storage key', () => {
     // The key is inlined rather than interpolated (see document-theme.ts). This is the guard that

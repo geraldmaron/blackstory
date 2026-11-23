@@ -59,7 +59,6 @@ export default async function DataPage({
       className="ds-trust-room"
       masthead={
         <TrustMast
-          art={['decades', 'grain']}
           numeral={
             latest === undefined
               ? undefined

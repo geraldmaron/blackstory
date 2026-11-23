@@ -56,7 +56,6 @@ export default async function LivesIndexPage({
       masthead={
         <TrustMast
           numeral={livesDecadeNumeral(bundle)}
-          art={['tools', 'grain']}
           tools={
             // The page reads the nation; each region's own tables live in the appendix. Without
             // this row the only way there was a link at the foot of a very long page.

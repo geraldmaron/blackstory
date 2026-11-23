@@ -58,7 +58,7 @@ export type StyledCitationInput = {
   /** Injected so citations are deterministic. */
   readonly accessed: Date;
   /** The page's publication or last-revision date. Omit when it is not on record. */
-  readonly published?: Date;
+  readonly published?: Date | undefined;
   readonly siteName?: string;
 };
 

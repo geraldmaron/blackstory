@@ -50,7 +50,6 @@ export default function FaqPage() {
       className="ds-trust-room"
       masthead={
         <TrustMast
-          art={['weave']}
           numeral={{
             value: String(FAQ_ENTRIES.length),
             label: 'questions, each with its own address',

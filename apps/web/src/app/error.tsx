@@ -33,7 +33,7 @@ export default function Error({
       width="read"
       className="ds-trust-room"
       masthead={
-        <TrustMast art={['contours']}>
+        <TrustMast>
           <PageHeader
             display
             title="This page failed to load"

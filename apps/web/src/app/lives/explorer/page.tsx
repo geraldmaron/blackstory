@@ -43,7 +43,7 @@ export default async function LivesExplorerPage({
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast art={['ledger', 'grain']} numeral={livesDecadeNumeral(bundle)}>
+        <TrustMast numeral={livesDecadeNumeral(bundle)}>
           <PageHeader
             display
             crumb={parentCrumb('/lives/explorer')}

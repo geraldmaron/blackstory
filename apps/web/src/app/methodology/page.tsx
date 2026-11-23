@@ -37,7 +37,6 @@ export default function MethodologyPage() {
       className="ds-trust-room"
       masthead={
         <TrustMast
-          art={['ledger']}
           numeral={{
             value: String(ADMISSION_STEPS.length),
             label: 'steps from a lead to a public page',

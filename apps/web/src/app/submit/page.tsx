@@ -29,7 +29,7 @@ export default function SubmitLeadPage() {
       width="wide"
       className="ds-trust-room"
       masthead={
-        <TrustMast art={['tools']}>
+        <TrustMast>
           <PageHeader
             display
             crumb={parentCrumb('/submit')}

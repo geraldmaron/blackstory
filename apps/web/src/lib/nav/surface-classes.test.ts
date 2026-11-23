@@ -58,18 +58,8 @@ describe('surface class resolution', () => {
     assert.ok(!CLASSIFIED_PATHS.includes('/story'));
   });
 
-  it('knows which routes are Parked, so the header holds the night ground there', () => {
-    for (const path of [
-      '/law',
-      '/books',
-      '/about',
-      '/lives/explorer',
-      '/privacy',
-      '/collections',
-      '/corrections/status/abc',
-      '/stories/mosaic-credits',
-      '/no-such-page',
-    ]) {
+  it('knows which routes still stand on the night ground, so the header holds it there', () => {
+    for (const path of ['/law', '/books']) {
       assert.equal(isParkedPath(path), true, path);
     }
     for (const path of [
@@ -83,6 +73,11 @@ describe('surface class resolution', () => {
       '/law/hb-1557',
       '/place/somewhere',
       '/design-system',
+      '/about',
+      '/data',
+      '/privacy',
+      '/collections',
+      '/no-such-page',
     ]) {
       assert.equal(isParkedPath(path), false, path);
     }

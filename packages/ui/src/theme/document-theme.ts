@@ -22,13 +22,16 @@ export function resolvePreferredTheme(stored: string | null | undefined): ThemeN
  * Inline-safe bootstrap: runs before paint when placed in `<head>`.
  * Must stay free of imports — string is injected via dangerouslySetInnerHTML.
  *
+ * It also makes print always paper (docs/ui/DESIGN.md section 7.1): a dark-theme page turns light
+ * for the print and back after, without touching the stored choice.
+ *
  * The storage key is written as a literal rather than interpolated. Building executable code by
  * substituting a value into a template is the shape CodeQL flags (js/bad-code-sanitization), and
  * `JSON.stringify` is not an escape for a code context: a value containing `</script` would end
  * the tag regardless of quoting. `document-theme.test.ts` asserts this literal still equals
  * THEME_STORAGE_KEY, so the two cannot drift apart silently.
  */
-export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k='ds-theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`;
+export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k='ds-theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}var b;addEventListener('beforeprint',function(){if(!b)b=document.documentElement.getAttribute('data-theme');document.documentElement.setAttribute('data-theme','light');});addEventListener('afterprint',function(){if(b)document.documentElement.setAttribute('data-theme',b);b=null;});})();`;
 
 /**
  * Compile-time guarantee that the key inlined in THEME_BOOTSTRAP_SCRIPT is THEME_STORAGE_KEY.

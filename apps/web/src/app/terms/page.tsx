@@ -27,7 +27,6 @@ export default function TermsPage() {
       className="ds-trust-room"
       masthead={
         <TrustMast
-          art={['grain']}
           numeral={{
             value: String(ACKNOWLEDGEMENT_HOURS),
             label: 'hours to acknowledge a copyright complaint',
