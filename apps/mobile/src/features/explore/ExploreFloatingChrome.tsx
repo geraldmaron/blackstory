@@ -142,7 +142,8 @@ export function ExploreFloatingChrome({
           style={[
             styles.countChip,
             {
-              backgroundColor: 'transparent',
+              // Solid, like every map control: a map label must not show through the count.
+              backgroundColor: chrome.mapGhostBg,
               borderColor: chrome.mapAccent,
             },
           ]}
