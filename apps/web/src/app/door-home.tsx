@@ -175,7 +175,7 @@ async function loadDoorJourney(
     opening: opening ? withPin(opening) : null,
     openingChoices: openingChoices.map(withPin),
     tour: tour.map(withPin),
-    story: lead ? { title: lead.title, slug: lead.slug } : null,
+    story: lead ? { title: lead.title, slug: lead.slug, era: lead.eraLabel } : null,
     stops: pickDecadeStops(records, roll).map(withPin),
     bars,
     barsCaption: decadeCaption(bars),

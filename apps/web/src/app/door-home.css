@@ -350,14 +350,17 @@
   font-style: italic;
 }
 
+/* 27rem, not the column's 30: on a wide window the line's right end is where the globe's limb
+   begins, and three more characters put the words on the atmosphere. */
 .ds-door-open__line {
-  max-width: 30rem;
+  max-width: 27rem;
   margin: 0;
   font-family: var(--ds-font-sans);
   font-size: clamp(var(--ds-text-subtitle), 1.4vw, 1.375rem);
   line-height: 1.45;
   color: var(--ds-ink);
-  text-wrap: pretty;
+  /* Balanced, so the short line breaks at its own full stop instead of leaving two words over. */
+  text-wrap: balance;
 }
 
 /* —— The walk: the decade histogram, its record, and its controls ————————————————————— */
@@ -830,13 +833,30 @@ body:has(.ds-door-journey:not(.ds-door-journey--browse))
   }
 }
 
-/* The lead story, named in the meta role above its action. */
+/* The lead story, named above its action: a copper kicker, the title in the column's own type so
+   it reads as a thing to open, and the years it covers. */
 .ds-door-open__lead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-3);
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
   line-height: 1.4;
+}
+
+.ds-door-open__lead-kicker {
+  color: var(--ds-accent);
+}
+
+.ds-door-open__lead-title {
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-title);
 }
 
 /* One primary and one quiet secondary, each at its content width and the button's own size. */
@@ -1697,6 +1717,30 @@ body:has(.ds-door) .ds-door-journey {
 
   .ds-door__dock[data-step='open'] > .ds-door-open {
     padding-top: 0;
+  }
+
+  /* The sky's stars (shell.css, `.ds-map-stage::before`) stop short of the words: a soft hole in
+     the star mask around the column, which sits at the middle of the first screen. A star inside
+     a line of type reads as a stray accent or full stop. Stars stay above, below and left of it. */
+  body:has(.ds-door__dock[data-step='open']) .ds-map-stage::before {
+    mask-image:
+      radial-gradient(
+        ellipse 30rem 19rem at
+          calc(max(var(--ds-gutter), (100vw - var(--ds-width-wide)) / 2) + 15rem) 52%,
+        transparent 70%,
+        black 100%
+      ),
+      var(--ds-star-tile), var(--ds-star-tile);
+    mask-size:
+      auto,
+      640px 640px,
+      910px 910px;
+    mask-position:
+      0 0,
+      0 0,
+      317px 131px;
+    mask-repeat: no-repeat, repeat, repeat;
+    mask-composite: intersect, add, add;
   }
 
   body:has(.ds-door-journey:not([inert]) > .ds-door__dock[data-step='open']) .ds-door-chapters {

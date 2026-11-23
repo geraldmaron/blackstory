@@ -154,9 +154,10 @@ function stopTourFollow(follow: TourFollow): void {
 /** How close the decade walk comes to a decade's record: a region, so its neighbors still show. */
 const DOOR_WALK_ZOOM = 5.4;
 
-/** The opening's one sentence: what is here, not how to use the page. */
+/** The opening's line: what is here and where, not how to use the page. It names the country,
+    because a globe on its own reads as "the world's records". */
 const DOOR_OPEN_LINE =
-  'People, places and events in Black American history, each pinned where its sources put it.';
+  'Black history has an address. Thousands of them across the United States, every one sourced.';
 
 function boxOf(element: HTMLElement | null): DoorFrameBox | null {
   if (!element) return null;
@@ -239,7 +240,12 @@ export type DoorImmersiveProps = {
   /** What "Another record" cycles through: the opening first, all of one eligibility. */
   readonly openingChoices: readonly DoorJourneyRecord[];
   /** The lead story the opening's one primary action reads, or nothing without a story. */
-  readonly story: { readonly title: string; readonly slug: string } | null;
+  readonly story: {
+    readonly title: string;
+    readonly slug: string;
+    /** The years the story covers, as its own cover prints them ("1787–present"). */
+    readonly era?: string;
+  } | null;
   /** The walk: one record per decade, oldest first. */
   readonly stops: readonly DoorJourneyRecord[];
   /** The tour's records, in order (door-tour.ts): the camera's landings as the page scrolls. */
@@ -1134,7 +1140,7 @@ export function DoorImmersive({
     : railOn
       ? timeRailText(railDecade, railCounts.lit, railCounts.undated)
       : !current || step === 0
-        ? 'The world, lit where records are published'
+        ? 'The globe, lit where United States records are published'
         : `${current.decade}s. ${current.name}${current.locality ? `, ${current.locality}` : ''}`;
 
   return (
@@ -1155,7 +1161,7 @@ export function DoorImmersive({
             whose it is and that its date is not the record's (design-direction-v11.md §4.2). */}
         {tourImagery ? (
           <p className="ds-door__imagery">
-            Aerial imagery: USGS, The National Map. Its date varies by area and is not this
+            Aerial imagery: USGS, The National Map. Its date varies by area and isn’t this
             record&apos;s date.
           </p>
         ) : null}
@@ -1235,12 +1241,20 @@ export function DoorImmersive({
               <HeroHeadlineMorph className="ds-door-open__headline" id="door-open-heading" />
               <p className="ds-door-open__line">{DOOR_OPEN_LINE}</p>
               {/* One primary into the lead story and one quiet secondary into the walk, at their
-                  content width; the story is named in the meta line above them. */}
+                  content width. The story is named above them as a thing to read, title first:
+                  a kicker that says where to begin, the title in the column's own type, and the
+                  years it covers. */}
               {story ? (
                 <p className="ds-door-open__lead">
-                  <span className="ds-visually-hidden">Lead story, </span>
-                  <span aria-hidden="true">Lead story · </span>
-                  {story.title}
+                  <span className="ds-door-open__lead-kicker">Start here</span>
+                  <span className="ds-visually-hidden">, </span>
+                  <span className="ds-door-open__lead-title">{story.title}</span>
+                  {story.era ? (
+                    <span className="ds-door-open__lead-era">
+                      <span className="ds-visually-hidden">, </span>
+                      {story.era}
+                    </span>
+                  ) : null}
                 </p>
               ) : null}
               <div className="ds-door-open__cta">
@@ -1265,10 +1279,15 @@ export function DoorImmersive({
                 ) : null}
               </div>
               {/* v11 Orbit: the opening is the headline and the ways in. What the lights mean is
-                  said here, once, because unlit ground reads as "nothing happened there". The
-                  tour's own cue (door-tour-section.tsx) says the page goes on. */}
+                  said here, once, because unlit ground reads as "nothing happened there". It
+                  also says the map stops at the country: on a globe, the dark over every other
+                  continent would otherwise read as ground nobody has reached yet. "Almost",
+                  because a few records are pinned abroad (three Cuban-born players, 2026-11-22).
+                  The tour's own
+                  cue (door-tour-section.tsx) says the page goes on. */}
               <p className="ds-door-open__coverage">
-                Each light is a record published so far. Unlit places are not yet researched.{' '}
+                Every light is a record that’s made it in so far. Where the country’s dark, nobody’s
+                gotten there yet. Outside the United States, almost nothing is on this map.{' '}
                 <Link href="/methodology">How coverage works</Link>
               </p>
             </section>

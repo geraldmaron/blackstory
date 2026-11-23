@@ -362,8 +362,11 @@ test('the opening is Orbit: the ways in and what the lights mean, no record bloc
   // Unlit ground reads as "nothing happened there", so the legend says what a light is.
   assert.match(
     immersive,
-    /Each light is a record published so far\. Unlit places are not yet researched\./,
+    /Every light is a record that’s made it in so far\. Where the country’s dark,\s+nobody’s\s+gotten there yet\./,
   );
+  // A globe shows every continent dark; the legend and the opening line say the map is the country.
+  assert.match(immersive, /Outside the United States, almost nothing is on this\s+map\./);
+  assert.match(immersive, /DOOR_OPEN_LINE =\s+'[^']*across the United States/);
   // The record is still pinned for the browser session, guarded.
   assert.match(immersive, /sessionStorage\.getItem\(OPENING_STORAGE_KEY\)/);
   // The record block itself is unchanged where the tour uses it.
