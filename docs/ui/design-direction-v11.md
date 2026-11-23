@@ -888,6 +888,20 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   `/stories`, chapters, record pages and the memorial keep the theme's bar. Not covered: the
   error page shown on a route that is not Parked keeps that route's bar.
 
+- **A rest short of a tour landing gets imagery** (2026-11-22). On `/`, stopping the scroll
+  between two stops with the camera near the ground left an empty plate with one pin: the
+  lights have faded by zoom 11 and imagery waited for an exact landing. Which scroll positions
+  those are depends on the window's height. Resting from zoom 10 up now shows the nearest
+  stop's imagery, under the same precision rule and credit, and it still goes the moment the
+  scroll moves, so the scrub fetches none. Checked at 1440 by 900 and 390 by 844: held for 12
+  seconds with no flicker. A stop whose precision does not allow imagery still rests on the
+  plate.
+- **The public database pool is bounded** (2026-11-22). It had no timeouts; after a dropped
+  connection `/` took 60 seconds and `/explore` 15 minutes, and the map had nothing to draw.
+- Seen in the same pass, not changed: `/explore` shows state counts and no lights from about
+  1366 wide, because the national frame there sits above the zoom where the lights fade; and
+  the Orbit globe stops growing at 1440 wide, so it is small on a 4K window.
+
 ### Open before or during phase 1
 
 - The rest of 4.4: the current location in words beside the wordmark, one credit treatment at

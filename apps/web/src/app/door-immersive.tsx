@@ -78,6 +78,7 @@ import {
   type TourCameras,
   type TourLayout,
 } from './door-tour-scrub';
+import { LIGHTS_DEEP_MAX_ZOOM } from './map/explore-style';
 import { groundFrameFor } from '../components/map-stage/RecordGround';
 import { placeDrillZoom } from '../lib/map-experience/place-map';
 import { MAP_MAX_ZOOM } from '../lib/map-experience/camera-presets';
@@ -623,6 +624,7 @@ export function DoorImmersive({
     nearest: number | null;
     restTimer: number | null;
     lastScrollAt: number;
+    lastY: number;
     follow: TourFollow;
   }>({
     layout: null,
@@ -631,6 +633,7 @@ export function DoorImmersive({
     nearest: null,
     restTimer: null,
     lastScrollAt: 0,
+    lastY: -1,
     follow: { current: null, target: null, frame: null, last: 0 },
   });
   const tourRecordsRef = useRef(tour);
@@ -722,12 +725,31 @@ export function DoorImmersive({
     // zooms the scrub passes through. The map's own names stand down while the camera travels
     // (`setMapLabels`) and return when it stops.
     const landed = phase.active && phase.from === phase.to ? records[phase.from - 1] : undefined;
-    const wantsImagery = landed !== undefined && groundFrameFor(landed.precision, false).imagery;
+    // A reader can also stop short of a landing, with the camera already near the ground. The
+    // lights have faded by then (`LIGHTS_DEEP_MAX_ZOOM`), so without imagery the rest is an empty
+    // plate with one pin. Resting there gets the nearest stop's imagery too; it still goes the
+    // moment the scroll moves, so the scrub itself fetches none.
+    const plate = phase.active ? stage.getMap() : null;
+    if (plate) scrub.cameras ??= tourCameras(plate);
+    const scrubbed = phase.active && scrub.cameras ? tourCameraAt(phase, scrub.cameras) : null;
+    const short =
+      landed === undefined &&
+      nearest !== null &&
+      scrubbed !== null &&
+      scrubbed !== undefined &&
+      scrubbed.zoom >= LIGHTS_DEEP_MAX_ZOOM - 1
+        ? records[nearest]
+        : undefined;
+    const rest = landed ?? short;
+    const wantsImagery = rest !== undefined && groundFrameFor(rest.precision, false).imagery;
     if (scrub.restTimer !== null) {
       window.clearTimeout(scrub.restTimer);
       scrub.restTimer = null;
     }
-    if (!wantsImagery) setTourImagery(false);
+    // Only a scroll that moved takes it away: this also runs on a refit, with the reader at rest.
+    const moved = window.scrollY !== scrub.lastY;
+    scrub.lastY = window.scrollY;
+    if (!wantsImagery || (short !== undefined && moved)) setTourImagery(false);
     if (!phase.active) stage.setMapLabels(true);
     else {
       if (!still) stage.setMapLabels(false);
