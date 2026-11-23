@@ -29,9 +29,17 @@ export default function MoreScreen() {
       title="More"
       dek="What this archive is, how it decides what to publish, and how to add to it."
     >
-      {MOBILE_MORE_SECTIONS.map((section, sectionIndex) => (
+      <LedgerRow
+        title="Watch the opening"
+        summary="Six words, from History to BlackStory"
+        leading={<NavIcon name="story" size={20} />}
+        showChevron
+        showDivider={false}
+        onPress={() => router.push('/opening' as never)}
+      />
+      {MOBILE_MORE_SECTIONS.map((section) => (
         <View key={section.id} style={styles.section}>
-          <LedgerSectionLabel ruleAbove={sectionIndex > 0}>{section.title}</LedgerSectionLabel>
+          <LedgerSectionLabel ruleAbove>{section.title}</LedgerSectionLabel>
           <View accessibilityRole="list">
             {section.rows.map((row, index) => (
               <LedgerRow

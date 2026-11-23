@@ -23,6 +23,7 @@ function EditionStack() {
   return (
     <Stack screenOptions={screenOptions}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="opening" options={{ headerShown: false, title: 'The opening' }} />
       <Stack.Screen name="books" options={{ headerShown: false, title: 'Banned books' }} />
       <Stack.Screen name="law" options={{ headerShown: false, title: 'Law' }} />
       <Stack.Screen name="presidents" options={{ headerShown: false, title: 'Presidents' }} />
