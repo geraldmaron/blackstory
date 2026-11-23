@@ -1,0 +1,35 @@
+Application    application  BlackStory (Dev)
+Button         button       Map, Archive view
+Button         button       List, Archive view
+Heading        heading      Archive
+Button         button       Sheet handle | Collapsed
+Slider         slider       Bottom Sheet
+Button         button       Expand the map
+Button         button       100 Block North Greenwood Avenue. Oklahoma · 1920s to 2000s. Partly evidenced, 3 sources. 1 of 4090
+Button         button       10th U.S. Cavalry. Kansas · 1860s to 1910s. Partly evidenced, 5 sources. 2 of 4090
+Button         button       1199SEIU United Healthcare Workers East. New York · 1930s to 2010s. Thinly evidenced, 2 sources. 3 of 4090
+Button         button       16th Street Viaduct. Wisconsin · 1960s. Partly evidenced, 4 sources. 4 of 4090
+Button         button       1811 German Coast Uprising. Louisiana · 1810s. Partly evidenced, 2 sources. 5 of 4090
+Button         button       18th and Vine Historic District. Missouri · 1920s to 1940s. Partly evidenced, 2 sources. 6 of 4090
+Button         button       18th and Vine Jazz District. Missouri · 1930s to 1990s. Thinly evidenced, 5 sources. 7 of 4090
+Button         button       1907 House. Mississippi · 1820s to 1980s. Partly evidenced, 4 sources. 8 of 4090
+Button         button       1963 Klan bombing. Alabama · 1960s. Thinly evidenced, 5 sources. 9 of 4090
+Button         button       1967 Detroit riot. Michigan · 1960s. Thinly evidenced, 3 sources. 10 of 4090
+Button         button       1967 Newark riots. New Jersey · 1960s. Thinly evidenced, 6 sources. 11 of 4090
+Button         button       1967 Tampa riots. Florida · 1960s. Thinly evidenced, 3 sources. 12 of 4090
+Button         button       1st Mississippi Infantry (African Descent). Mississippi · 1860s. Partly evidenced, 3 sources. 13 of 4090
+Button         button       2002 Salt Lake City Winter Olympics. Utah · 2000s. Thinly evidenced, 3 sources. 14 of 4090
+Button         button       27th Street Historic District. California · 1920s to 1950s. Partly evidenced, 3 sources. 15 of 4090
+Button         button       Map of pinned places
+Button         button       Nearby, 4,090 nearby, 4,096 in release
+Button         button       Open search
+Button         button       Open map filters
+Button         button       Expand records rail
+Button         button       Reset to national view
+Button         button       Zoom in
+Button         button       Zoom out
+GenericElement              Map data © OpenStreetMap contributors, OpenFreeMap, OpenMapTiles
+Button         button       Archive, tab, 1 of 4
+Button         button       Stories, tab, 2 of 4
+Button         button       Data, tab, 3 of 4
+Button         button       More, tab, 4 of 4

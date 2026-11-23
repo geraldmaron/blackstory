@@ -31,7 +31,7 @@ what exists before changing it; do not build a new look from them.
 | Admin | [`patterns-admin-intake.md`](./patterns-admin-intake.md), [`patterns-admin-editorial.md`](./patterns-admin-editorial.md), [`patterns-source-library.md`](./patterns-source-library.md), [`patterns-work-review.md`](./patterns-work-review.md), [`patterns-ground-investigation.md`](./patterns-ground-investigation.md) |
 | Component import paths | [`patterns-registry.md`](./patterns-registry.md) |
 | Product model | [`v10/`](./v10/): discovery state, place anatomy, schema and cost. Reference until `DESIGN.md` phase 4a writes the Archive contract |
-| App | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md): the app's current shell, until `DESIGN.md` phase 9 replaces it |
+| App | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md): the app's earlier shell, superseded in part by `DESIGN.md` phase 9 (its header says which parts) |
 
 ## Retiring with their code
 

@@ -1,0 +1,60 @@
+Application    application  BlackStory (Dev)
+StaticText     text         Photograph, date not on record.
+GenericElement              Tallahassee, Florida :  John Gilmore Riley House
+StaticText     text         Ebyabe · CC BY-SA 3.0 · Wikimedia Commons
+StaticText     text         PLACE · TALLAHASSEE, FLORIDA · PRESENT-DAY RECORD
+Heading        heading      John Gilmore Riley House
+StaticText     text         John Gilmore Riley, born enslaved in 1857, rose to become a leading Black educator and civic figure in Tallahassee, serving decades as principal of the city's first secondary school open to Bl
+StaticText     text         FACTS
+Heading        heading      Record at a glance
+StaticText     text         KIND
+StaticText     text         Place
+StaticText     text         WHERE
+Button         button       Where: Tallahassee, Florida. Open in Maps at public precision.
+StaticText     text         ERA
+StaticText     text         1850s to 1990s
+StaticText     text         EVIDENCE
+StaticText     text         Partly evidenced · 4 sources
+StaticText     text         CLAIMS
+Heading        heading      Accepted claims
+StaticText     text         Claim 1
+Heading        heading      LISTING
+StaticText     text         on the National Register of Historic Places on August 1, 1978, reference #78000950
+Link           link         catalog.archives.gov
+GenericElement              Evidence: Well evidenced
+StaticText     text         Claim 2
+Heading        heading      SIGNIFICANT FOR
+StaticText     text         education and Black heritage
+Link           link         catalog.archives.gov
+GenericElement              Evidence: Well evidenced
+Button         button       Show 2 more claims
+StaticText     text         Map, city precision.
+Button         button       Open John Gilmore Riley House in Maps at public precision
+StaticText     text         John Gilmore Riley House
+StaticText     text         Location precision: City. Showing John Gilmore Riley House. Exact residential addresses are never shown.
+Button         button       Open John Gilmore Riley House in Maps at public precision
+Button         button       View John Gilmore Riley House on the national map
+StaticText     text         RELEVANCE
+Heading        heading      Why this appears
+StaticText     text         Included as a documented site in the active public release; each accepted claim below cites its source.
+StaticText     text         CONTEXT
+Heading        heading      Historical context
+StaticText     text         Riley never formally attended school himself, having been taught by a former teacher known as Aunt Henrietta, but he began teaching in Wakulla County in 1877 and by 1892 had become principal o
+StaticText     text         STATUS
+Heading        heading      Status and history
+GenericElement              No status history recorded, No status with dates has been entered for this record yet.
+StaticText     text         CHRONOLOGY
+Heading        heading      Timeline
+StaticText     text         1978 · Date precision: year
+StaticText     text         Status: Active
+StaticText     text         In effect from 1978.
+StaticText     text         Dated status changes and relationship timespans published for this record.
+StaticText     text         CONNECTED
+Heading        heading      Connected records
+GenericElement              No linked records yet, This record isn’t linked to other people, places, institutions or events yet.
+StaticText     text         PROVENANCE
+Heading        heading      How complete this record is
+StaticText     text         RESEARCH
+StaticText     text         Partly researched
+StaticText     text         COVERAGE
+StaticText     text         Partial

@@ -1,0 +1,60 @@
+Application    application  BlackStory (Dev)
+Button         button       Go back
+Heading        heading      Story
+GenericElement              Reading position: The Count | 0%
+Heading        heading      The Count
+StaticText     text         The United States has been writing Black people down since before it had a president: a fraction in the Constitution, a numbered line on a property schedule, a grade on a survey form, a name s
+StaticText     text         YEARS
+StaticText     text         PLACE
+StaticText     text         1787 to present
+StaticText     text         United States
+StaticText     text         SOURCES
+StaticText     text         34
+StaticText     text         Document, date in the credit.
+GenericElement              The engrossed first page of the United States Constitution, September 17, 1787, carrying Article I, Section 2 and its "three fifths of all other Persons" apportionment clause.
+StaticText     text         Constitution of the United States, page 1, September 17, 1787. Work of the Constitutional Convention; U.S. government record, public domain (National Archives, via Digital Public Library of Am
+Heading        heading      1790 · A ledger open on his knee
+StaticText     text         The man on the horse doesn’t get down. It’s 1790, the first census is being taken, and the marshal’s assistant riding out through the district has a ledger open on his knee and a handful
+StaticText     text         The rule he’s working under got written three years earlier, and it never says who it’s about. Article I, Section 2 of the Constitution hands out representation and direct taxes by populat
+StaticText     text         That year the country counts 3,929,214 people  4. By the Census Bureau’s own historical tables, 697,681 of them are held in slavery; a peer-reviewed demographic history of the same census pu
+StaticText     text         The results come out in 1793 under a title worth reading slowly: "Return of the Whole Number of Persons within the Several Districts of the United States"  3. The whole number of persons. The 
+StaticText     text         A government has now made a record about you, for its own purposes, with real consequences riding on it, and it never needed your name or wanted your answer to get what it wanted. That census 
+Heading        heading      1857 · The record rules on who you are
+StaticText     text         Photograph, date in the credit.
+GenericElement              A photographic portrait of Dred Scott, taken around 1857, the year the Supreme Court ruled that he couldn’t be a citizen entitled to sue in federal court.
+StaticText     text         Dred Scott, photograph, circa 1857. Public domain (Library of Congress Prints and Photographs Division, via Wikimedia Commons).
+StaticText     text         DRED SCOTT, PLAINTIFF, ST. LOUIS, MISSOURI, CIRCA 1857. The photograph dates to about the year the Court ruled on the case that carried his name.
+StaticText     text         Dred Scott is in St. Louis and the case with his name on it is in Washington. Held in slavery in Missouri, he sued for his freedom on the ground that his enslaver took him to live for years on
+Link           link         Dred Scott v. Sandford
+StaticText     text         Start with the part of that record that’s his. The case sits in the United States Reports because he put it there. A man held as property carried a claim into a federal court, and the refusa
+StaticText     text         To get to the refusal, Taney does what a record-keeper does. He reads the old records back. The opinion surveys the founding era and reports what it finds there, that Black people "had for mor
+StaticText     text         The National Archives’ summary of the case states the rest of the holding in two clean strokes: the Court ruled that enslaved people weren’t citizens and couldn’t sue in federal court, a
+StaticText     text         The ruling also settles what the count you appear in can never do for you. Living on free soil doesn’t free you. The census of a free state may write you down, and no amount of paper makes y
+Heading        heading      1860 · A line without a name
+StaticText     text         It’s the summer of 1860 and you’re standing in the yard while a man writes a number where your name would go. Since 1850 the census has taken down every free person in a household by name,
+StaticText     text         Read the rest of the columns and you can reconstruct the mind that drew the form. Past color, sex, and age, the National Archives’ guide lists what else each owner’s block of lines records
+StaticText     text         That summer the marshals count 3,953,760 people this way  5,7. Nearly four million lines, each one a person, almost none of them carrying a name. Alongside them the same count finds 488,070 fr
+GenericElement              A chart is on the web page, White-to-Black per-capita wealth ratio, United States, benchmark years 1860–2019 (Derenoncourt, Kim, Kuhn & Schularick). The 1860 reading is taken while nearly fo
+Link           link         Open the story on the web
+Heading        heading      1865 · Your name enters the file
+StaticText     text         On the twelfth of January, 1865, in a house in Savannah, twenty Black ministers and church officers sit down with the Secretary of War and General Sherman, and a clerk takes minutes. The men c
+StaticText     text         Four days later Sherman answers the meeting with Special Field Orders No. 15, setting aside the coastal land for settlement by the freed people, and inside the year President Johnson’s pardo
+StaticText     text         That fall, with the promised land going back to pardoned Confederates, the freedpeople of Edisto Island answer the government in writing. Their own committee drafts the petition: "General we w
+GenericElement              A document excerpt is on the web page
+Link           link         Open the story on the web
+StaticText     text         The same season builds the machinery. On March 3, 1865, the Freedmen’s Bureau Act sets up the Bureau of Refugees, Freedmen, and Abandoned Lands inside the War Department  15. The bureau issu
+Link           link         Freedmen’s Bureau Act
+StaticText     text         Some of what gets written down had been unwritable. A marriage between enslaved people had no legal standing anywhere in the South, and the bureau’s commissioner directs that "in places wher
+StaticText     text         The same season produces a bank. The Freedman’s Savings and Trust Company, chartered the same day as the bureau, grows to dozens of branches, and across nine years it serves some seventy tho
+GenericElement              A document excerpt is on the web page
+Link           link         Open the story on the web
+StaticText     text         The bank fails, and it fails from above. In 1870 Congress amends the charter to let the trustees put half the deposits into riskier investments, a change the Comptroller of the Currency’s hi
+StaticText     text         One more record from the decade, and it’s the largest. The 1870 census, the first taken after the war, is the first to enumerate the formerly enslaved like everyone else, and the National Ar
+StaticText     text         It took a war, three amendments, and eighty years of counting before a name went on the page.
+StaticText     text         The money was lost and the names were kept.
+Heading        heading      1898 · Your name comes off the rolls
+GenericElement              A document excerpt is on the web page
+Link           link         Open the story on the web
+StaticText     text         A name a record put on can be taken off by a record. It’s the 1890s in Louisiana, and your name on the registration rolls makes you one of a hundred and thirty thousand Black men entitled to
+StaticText     text         Sit with the shape of that instrument for a moment. Disfranchisement here isn’t a man at the courthouse door with a gun, though the era had those too. It’s a registrar with a form, applyin
+Heading        heading      1921 · The record burns, and then accuses

@@ -1,6 +1,6 @@
 # BlackStory design direction v6 — mobile foundation (full rebuild)
 
-**Status:** binding rebuild contract (2026-07-23).  
+**Status:** superseded in part (2026-11-23) by [`DESIGN.md`](./DESIGN.md) phase 9, which is binding where the two disagree. Replaced: the tab set (now Archive, Stories, Data, More, with `/explore` and `/records` as redirects), the type ramp (now the seven roles of DESIGN.md 7.2; `masthead`, `entityTitle`, `rowTitle`, `sectionLabel` and `code` no longer exist), radius (0, 8 and full only), the `LiftedSurface` and `EditionSurfacePanel` card surfaces (deleted), the `00` to `09` section counters on a record, letter grades (a grade is words and a glyph), and translucent map controls (now solid). Still current: the ledger rows and section labels, the browse and utility shells, the map plate's fixed dark register, the 44pt target rule and the route-safety rules. Was: binding rebuild contract (2026-07-23).  
 **Polish direction:** **Ledger Line** (adopted 2026-07-23) — dense index first; hierarchy from type and hairlines, not stacked cards. Mockup: [`mobile-polish-mockups.html`](./mobile-polish-mockups.html) approach `ledger`.  
 **Scope:** native shell, chrome, design-system primitives, and browse-surface patterns. Sibling agents own Explore map instruments and entity detail stacks.  
 **Parent docs:** [`brand.md`](./brand.md), web v6 surface directions, [`patterns-browse-mode.md`](./patterns-browse-mode.md), [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md), [`patterns-utility-edition.md`](./patterns-utility-edition.md).

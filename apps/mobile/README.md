@@ -243,10 +243,10 @@ Dev). That service reads `published.*` when
 
 | Surface | Data source today |
 |---|---|
-| **Explore** map + metrics | Live `GET /v1/map` (`MapSourceV1`) via `API_BASE_URL` when api-public is reachable. Sheet defaults to kind/place/era/precision metrics from the FeatureCollection; pin selection opens entity preview; record list is secondary. Bundled `DEMO_MAP_SOURCE` is a `__DEV__` fallback only (subtitle shows `demo fixtures`). Basemap defaults to **OpenFreeMap** (same as web); optional `MAP_PMTILES_URL` for self-hosted Protomaps; `MAP_BASEMAP_ENABLED=false` for points-only. |
+| **Archive** tab, Map view (was the Explore tab) | Live `GET /v1/map` (`MapSourceV1`) via `API_BASE_URL` when api-public is reachable. Sheet defaults to kind/place/era/precision metrics from the FeatureCollection; pin selection opens entity preview; record list is secondary. Bundled `DEMO_MAP_SOURCE` is a `__DEV__` fallback only (subtitle shows `demo fixtures`). Basemap defaults to **OpenFreeMap** (same as web); optional `MAP_PMTILES_URL` for self-hosted Protomaps; `MAP_BASEMAP_ENABLED=false` for points-only. |
 | **Stories** (Learn tab) | Bundled `content-catalog.ts` longform (web `/stories`, `/history`, `/myths`) — not `/v1/content`. |
-| **Data** (`/data`, from More) | Bundled Phase 1 indicator fixture snapshot matching web `/data` fixtures; Census national timeline is an honest empty state until a public API ships. |
-| **Search** / **entity** / cold-start **bootstrap** | HTTP to `API_BASE_URL` (`/v1/search`, `/v1/entity/:id`, `/v1/bootstrap`) with `X-BlackStory-Client`. SQLite is a release-coupled cache, not a fixture pack. |
+| **Data** tab (`/data`) | Bundled Phase 1 indicator fixture snapshot matching web `/data` fixtures; Census national timeline is an honest empty state until a public API ships. |
+| **Archive** tab, List view (search) / **entity** / cold-start **bootstrap** / the opening's record pages and town field | HTTP to `API_BASE_URL` (`/v1/search`, `/v1/entity/:id`, `/v1/bootstrap`) with `X-BlackStory-Client`. SQLite is a release-coupled cache, not a fixture pack. |
 | **Web Explore** | Server-side Postgres in Next.js — unrelated to mobile’s API host. |
 
 **Defaults:** `app.config.ts` and preview/production `eas.json` bake
