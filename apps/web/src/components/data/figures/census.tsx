@@ -60,6 +60,7 @@ async function timelineRows(
       .filter((source) => used.has(source.sourceId))
       .map((source) => ({ label: source.label, url: source.sourceUrl })),
     revised: timeline.generatedAt,
+    built: timeline.generatedAt,
   };
 }
 
@@ -71,6 +72,9 @@ function Swatch({ tone }: { readonly tone: PortraitTone }) {
 }
 
 /* —— D-01: Black share of the U.S. population ————————————————————————————————— */
+
+/** Every row of the census timeline is the whole country. */
+const NATION = () => ({ level: 'nation' }) as const;
 
 /** `null` when the census total is missing: a gap, never a zero. */
 function shareOfTotal(row: TimelineRow): number | null {
@@ -87,6 +91,7 @@ function shareTone(rows: readonly TimelineRow[], index: number): PortraitTone {
 
 export const D01 = defineFigure<TimelineRow>({
   id: 'D-01',
+  coverage: NATION,
   name: 'Share of the nation',
   title: 'Black share of the U.S. population at each census, 1790 to 2020',
   basis: '1790 to 2020, each census',
@@ -201,6 +206,7 @@ function splitSpan(rows: readonly TimelineRow[]): readonly TimelineRow[] {
 
 export const D02 = defineFigure<TimelineRow>({
   id: 'D-02',
+  coverage: NATION,
   name: 'Free and enslaved, to 1860',
   title: 'Free and enslaved shares of the Black population at each census, 1790 to 1860',
   basis: '1790 to 1860, each census',
@@ -326,6 +332,7 @@ const partCell = (value: number | null) => (value === null ? 'no data' : formatC
 
 export const D03 = defineFigure<TimelineRow>({
   id: 'D-03',
+  coverage: NATION,
   name: 'Population by census',
   title: 'Black population at each census, 1790 to 2020',
   basis: '1790 to 2020, each census',
@@ -404,6 +411,7 @@ export function deltaTrendReading(
 
 export const D04 = defineFigure<DeltaRow>({
   id: 'D-04',
+  coverage: NATION,
   name: 'Recent change',
   title: 'Change in the Black population between recent censuses',
   basis: ({ rows }) =>
@@ -432,6 +440,7 @@ export const D04 = defineFigure<DeltaRow>({
       ),
       sources,
       revised: timeline.generatedAt,
+      built: timeline.generatedAt,
     };
   },
   headline: ({ rows }) => {
@@ -463,6 +472,13 @@ const STATE_NAME_BY_FIPS = buildStateFipsNameMap(US_STATES);
 
 export const D05 = defineFigure<StateShiftBarRow>({
   id: 'D-05',
+  // One row a state, and only the states in the figure: a state it leaves out is not covered.
+  coverage: ({ rows }) => ({ level: 'state', states: rows.map((row) => row.stateName) }),
+  focus: {
+    is: (row, state) => row.stateName === state,
+    reading: (row) =>
+      `${row.stateName}: ${signedCount(row.blackAbsoluteChange)} Black residents, ${SHIFT.from} to ${SHIFT.to}.`,
+  },
   name: 'State gains and losses',
   title: `Where the Black population rose or fell, ${SHIFT.from} to ${SHIFT.to}`,
   basis: `${SHIFT.from} to ${SHIFT.to}`,
@@ -480,6 +496,7 @@ export const D05 = defineFigure<StateShiftBarRow>({
       rows: stateShiftRows(changes, STATE_NAME_BY_FIPS),
       sources: timeline.sources.map((source) => ({ label: source.label, url: source.sourceUrl })),
       revised: timeline.generatedAt,
+      built: timeline.generatedAt,
     };
   },
   headline: ({ rows }) => {
@@ -510,7 +527,12 @@ export const D05 = defineFigure<StateShiftBarRow>({
       csv: (row) => Math.round(row.shareChangePp * 100) / 100,
     },
   ],
-  plain: ({ rows }) => (
-    <StatePopulationShiftChart fromDecade={SHIFT.from} toDecade={SHIFT.to} rows={rows} />
+  plain: ({ rows, focus }) => (
+    <StatePopulationShiftChart
+      fromDecade={SHIFT.from}
+      toDecade={SHIFT.to}
+      rows={rows}
+      {...(focus ? { marked: focus } : {})}
+    />
   ),
 });

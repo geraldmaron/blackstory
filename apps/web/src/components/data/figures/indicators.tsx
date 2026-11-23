@@ -9,21 +9,22 @@ import type {
   DataPageIndicatorBundle,
   DataPageRacePairSeries,
 } from '@repo/domain/statistics/data-page-series';
-import { getDataPageIndicatorBundle } from '../../../lib/demographics/data-page-indicators';
+import { getDataPageIndicatorBuild } from '../../../lib/demographics/data-page-indicators';
 import { chapterHrefForTheme, formatDataPageValue } from '../chart-utils';
 import { GapMagnitudeSight, hasRatio } from '../GapMagnitudeSight';
 import { GroupedBarIndicatorChart } from '../GroupedBarIndicatorChart';
 import { RacePairComparisonChart } from '../RacePairComparisonChart';
 import { seriesSubtitle } from '../series-format';
 import { TrendLineChart } from '../TrendLineChart';
+import { coverageFromGeography } from './figure-coverage';
 import { defineFigure, type FigureRows } from './figure-spec';
 import { FoldedBarPortrait } from './portraits';
 
 void React;
 
-const loadIndicators = cache(async (): Promise<DataPageIndicatorBundle | undefined> => {
+const loadIndicators = cache(async () => {
   try {
-    return await getDataPageIndicatorBundle();
+    return await getDataPageIndicatorBuild();
   } catch {
     return undefined;
   }
@@ -45,6 +46,7 @@ export function pairData(
   series: DataPageRacePairSeries,
   kind: 'pair' | 'ratio',
   revised?: string,
+  built?: string,
 ): PairData | undefined {
   if (
     kind === 'ratio'
@@ -68,6 +70,7 @@ export function pairData(
     ],
     sources: series.sources,
     ...(revised === undefined ? {} : { revised }),
+    ...(built === undefined ? {} : { built }),
     extra: series,
   };
 }
@@ -76,8 +79,10 @@ async function pairRows(
   pick: (bundle: DataPageIndicatorBundle) => DataPageRacePairSeries,
   kind: 'pair' | 'ratio',
 ): Promise<PairData | undefined> {
-  const bundle = await loadIndicators();
-  return bundle ? pairData(pick(bundle), kind, bundle.generatedAt) : undefined;
+  const loaded = await loadIndicators();
+  return loaded
+    ? pairData(pick(loaded.bundle), kind, loaded.bundle.generatedAt, loaded.builtAt)
+    : undefined;
 }
 
 const PAIR_COLUMNS = [
@@ -87,6 +92,13 @@ const PAIR_COLUMNS = [
 
 const chapterOf = (data: { readonly extra: { readonly themeId?: string } }) =>
   chapterHrefForTheme(data.extra.themeId);
+
+/** A series says where it was measured; the figure's coverage is read from that, never assumed. */
+const placed = {
+  coverage: (data: { readonly extra: { readonly geographyLabel: string } }) =>
+    coverageFromGeography(data.extra.geographyLabel),
+  themeId: (data: { readonly extra: { readonly themeId?: string } }) => data.extra.themeId,
+};
 
 /** The pair bars: both values, in the series' own words. */
 function pairFigure(spec: {
@@ -102,6 +114,7 @@ function pairFigure(spec: {
     title: ({ extra }) => `${extra.title} · ${extra.geographyLabel}, ${extra.referencePeriod}`,
     basis: ({ extra }) => extra.referencePeriod,
     limits: ({ extra }) => extra.caption,
+    ...placed,
     loadRows: () => pairRows(spec.pick, 'pair'),
     headline: ({ extra }) =>
       `${extra.primary.label} ${spec.verb} ${formatDataPageValue(extra.primary.value, extra.primary.unit)}; ${extra.comparison.label}, ${formatDataPageValue(extra.comparison.value, extra.comparison.unit)}`,
@@ -127,6 +140,9 @@ function ratioFigure(spec: {
       `${extra.ratioLabel ?? extra.title} · ${extra.geographyLabel}, ${extra.referencePeriod}`,
     basis: ({ extra }) => extra.referencePeriod,
     limits: ({ extra }) => extra.caption,
+    // No coverage: the ratio restates its pair figure, and a record embeds the pair, which prints
+    // both values.
+    themeId: placed.themeId,
     loadRows: () => pairRows(spec.pick, 'ratio'),
     headline: ({ extra }) => {
       const primaryLarger = extra.primary.value >= extra.comparison.value;
@@ -148,12 +164,14 @@ type SeriesData = FigureRows<DataPageGroupedBarPoint, DataPageGroupedBarSeries>;
 export function seriesData(
   series: DataPageGroupedBarSeries | undefined,
   revised?: string,
+  built?: string,
 ): SeriesData | undefined {
   if (!series || series.series.length === 0) return undefined;
   return {
     rows: series.points,
     sources: series.sources,
     ...(revised === undefined ? {} : { revised }),
+    ...(built === undefined ? {} : { built }),
     extra: series,
   };
 }
@@ -161,8 +179,10 @@ export function seriesData(
 async function seriesRows(
   pick: (bundle: DataPageIndicatorBundle) => DataPageGroupedBarSeries | undefined,
 ): Promise<SeriesData | undefined> {
-  const bundle = await loadIndicators();
-  return bundle ? seriesData(pick(bundle), bundle.generatedAt) : undefined;
+  const loaded = await loadIndicators();
+  return loaded
+    ? seriesData(pick(loaded.bundle), loaded.bundle.generatedAt, loaded.builtAt)
+    : undefined;
 }
 
 /** The latest period, every group: "In 2022: Black families, $44,900; White families, $285,000". */
@@ -208,6 +228,7 @@ function seriesFigure(spec: {
     title: ({ extra }) => seriesSubtitle(extra),
     basis: ({ rows }) => `${rows[0]!.period} to ${rows.at(-1)!.period}`,
     limits: ({ extra }) => extra.caption,
+    ...placed,
     loadRows: () => seriesRows(spec.pick),
     headline: (data) => spec.headline?.(data) ?? latestReading(data),
     chapterHref: chapterOf,

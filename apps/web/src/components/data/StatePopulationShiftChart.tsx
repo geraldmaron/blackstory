@@ -22,6 +22,8 @@ export type StatePopulationShiftChartProps = {
   readonly toDecade: string;
   /** The ranked rows: `stateShiftRows`. */
   readonly rows: readonly StateShiftBarRow[];
+  /** A state name to mark: the state of the record the figure is embedded on. */
+  readonly marked?: string;
 };
 
 /** The largest gains and losses, sorted from largest gain to largest loss. */
@@ -55,6 +57,7 @@ export function StatePopulationShiftChart({
   fromDecade,
   toDecade,
   rows,
+  marked,
 }: StatePopulationShiftChartProps) {
   const { maxAbs } = divergingBarDomain(rows);
 
@@ -82,6 +85,7 @@ export function StatePopulationShiftChart({
               key={row.stateFips}
               className="ds-diverge__row"
               data-mark=""
+              {...(row.stateName === marked ? { 'data-focus': '' } : {})}
               tabIndex={index === 0 ? 0 : -1}
               aria-label={formatStateChangeLine(row, row.stateName)}
               style={{ '--tip-y': '100%' } as CSSProperties}
