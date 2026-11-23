@@ -1,0 +1,234 @@
+/**
+ * A registry figure (`Figure.tsx`) and the two Portrait forms (`portraits.tsx`).
+ * docs/ui/DESIGN.md section 9.5: flat ink, copper and sand with an ink outline. Sand and copper
+ * carry ink type in both themes; the ink field turns with the theme, so it is always the page's
+ * strongest tone with the page's ground as its type.
+ */
+
+.ds-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-4);
+  min-width: 0;
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  container-type: inline-size;
+}
+
+.ds-figure__switch {
+  justify-self: start;
+}
+
+/* A link to the figure lands with its finding and the switch still on screen. */
+.ds-figure > .ds-exhibit {
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-32));
+}
+
+.ds-figure__object {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-4);
+  padding: var(--ds-space-1);
+  color: var(--ds-ink);
+}
+
+.ds-figure__change {
+  max-width: 62ch;
+  margin: 0;
+  padding-left: var(--ds-space-3);
+  border-left: 2px solid var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink);
+}
+
+.ds-figure__download {
+  margin: 0;
+}
+
+.ds-figure__receipt {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-figure__receipt .ds-datafig__limits strong {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-figure__print {
+  display: none;
+}
+
+/* —— Portrait ————————————————————————————————————————————————————————————— */
+.ds-portrait {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-4);
+}
+
+.ds-portrait__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--ds-font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-portrait__svg--narrow {
+  max-width: 26rem;
+}
+
+.ds-portrait__svg--wide {
+  display: none;
+}
+
+/* One tone per mark: the bar's stretch, the field and the key's swatch read the same three. */
+.ds-portrait [data-tone='ink'] {
+  --portrait-tone: var(--ds-ink);
+}
+
+.ds-portrait [data-tone='copper'] {
+  --portrait-tone: var(--ds-material-copper);
+}
+
+.ds-portrait [data-tone='sand'] {
+  --portrait-tone: var(--ds-material-sand);
+}
+
+.ds-portrait__edge,
+.ds-portrait__stretch {
+  fill: none;
+  stroke: var(--portrait-tone, var(--ds-ink));
+  stroke-linecap: butt;
+}
+
+/* A gap: the dashed edge shows, the inside is the page. */
+.ds-portrait__stretch[data-tone='gap'] {
+  stroke: var(--ds-canvas);
+}
+
+.ds-portrait__tick,
+.ds-portrait__break,
+.ds-portrait__field {
+  fill: var(--portrait-tone, none);
+  stroke: var(--ds-ink);
+  stroke-width: 1.5;
+}
+
+.ds-portrait__break {
+  stroke-width: 2.5;
+}
+
+.ds-portrait__label {
+  font-weight: 600;
+  fill: var(--ds-fixed-ink);
+}
+
+.ds-portrait__label[data-tone='ink'] {
+  fill: var(--ds-canvas);
+}
+
+.ds-portrait__label[data-tone='gap'],
+.ds-portrait__year {
+  fill: var(--ds-ink);
+}
+
+.ds-portrait__year {
+  font-weight: 500;
+}
+
+.ds-portrait__key {
+  display: grid;
+  gap: var(--ds-space-2);
+  max-width: 34rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink);
+}
+
+.ds-portrait__key p,
+.ds-portrait__key ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-portrait__key ul {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-portrait__key li {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-portrait__swatch,
+.ds-portrait__break-mark {
+  flex: none;
+  width: var(--ds-space-6);
+  height: var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.ds-portrait__swatch {
+  background: var(--portrait-tone);
+}
+
+/* The break's two lines, as they cross the bar. */
+.ds-portrait__break-mark {
+  width: var(--ds-space-2);
+  margin-inline: var(--ds-space-2);
+  border-block: 0;
+  border-inline-width: 2px;
+}
+
+@container (min-width: 40rem) {
+  .ds-figure__object {
+    padding: var(--ds-space-3);
+  }
+
+  .ds-portrait__svg--narrow {
+    display: none;
+  }
+
+  .ds-portrait__svg--wide {
+    display: block;
+  }
+
+  /* The coil stands at the right; the key takes the open ground under the bar's straight run. */
+  .ds-portrait--coil .ds-portrait__key {
+    position: absolute;
+    top: 22%;
+    left: 0;
+    width: 46%;
+  }
+}
+
+@media print {
+  .ds-figure__switch,
+  .ds-figure__screen,
+  .ds-figure__download {
+    display: none;
+  }
+
+  .ds-figure__print {
+    display: block;
+  }
+
+  /* The finding stays on the page its figure is on. */
+  .ds-figure {
+    display: block;
+  }
+
+  .ds-figure > .ds-datafig__head {
+    margin-bottom: var(--ds-space-4);
+    break-after: avoid;
+  }
+}

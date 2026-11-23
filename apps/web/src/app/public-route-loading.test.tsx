@@ -16,7 +16,6 @@ import LawLoading from './law/(index)/loading';
 import StoriesLoading from './stories/(index)/loading';
 import MosaicCreditsLoading from './stories/mosaic-credits/loading';
 import RecordsLoading from './records/loading';
-import DataLoading from './data/loading';
 import LivesLoading from './lives/loading';
 import ReceiptLoading from './corrections/status/[receiptCode]/loading';
 
@@ -55,7 +54,6 @@ const LOADING_BOUNDARIES = [
     Loading: RecordsLoading,
     label: 'Pulling the records together…',
   },
-  { route: '/data', dir: 'data', Loading: DataLoading, label: 'Gathering the figures…' },
   // Also the wait for /lives/explorer, which awaits the same snapshot read.
   { route: '/lives', dir: 'lives', Loading: LivesLoading, label: 'Finding the lives…' },
   {
@@ -84,9 +82,10 @@ for (const { route, dir, Loading, label } of LOADING_BOUNDARIES) {
  * loading boundary streams the page into a hidden block that only script reveals, so no record
  * route has one, and no ancestor segment may either (a `law/loading.tsx` would wrap
  * `law/[slug]`; the index pages keep theirs inside an `(index)` route group). It also lets a
- * missing record answer a real 404.
+ * missing record answer a real 404. `/data` is the same since phase 6a: a figure is cited by its
+ * address, and its Plain drawing, its table and its view links are in the first HTML.
  */
-test('no record or story route sits behind a loading boundary', () => {
+test('no record, story or figure route sits behind a loading boundary', () => {
   for (const dir of [
     'entity/[id]',
     'entity',
@@ -102,6 +101,7 @@ test('no record or story route sits behind a loading boundary', () => {
     'stories',
     'presidents/[slug]',
     'presidents',
+    'data',
     '',
   ]) {
     assert.ok(!existsSync(join(here, dir, 'loading.tsx')), `${dir || 'app'} has a loading.tsx`);

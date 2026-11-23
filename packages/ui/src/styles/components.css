@@ -1542,6 +1542,11 @@ span.ds-tabs__tab {
   margin-left: auto;
 }
 
+/* The Cite toggle's outlined face reaches a step past its box; keep it inside the receipt. */
+.ds-receipt__action > .ds-cite {
+  margin-inline: var(--ds-space-2);
+}
+
 /* Cite: a native disclosure. The toggle is a 44px target with a small outlined face. */
 .ds-cite {
   position: relative;

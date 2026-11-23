@@ -236,7 +236,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .ds-data-figures > .ds-datafig:not(.ds-datafig--half) {
+  .ds-data-figures > .ds-datafig:not(.ds-datafig--half),
+  .ds-data-figures > .ds-figure {
     grid-column: 1 / -1;
   }
 }

@@ -22,6 +22,7 @@ import {
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections, millionsFigure } from './DataSections';
 import { loadDataPageModel } from './load-data-page-model';
+import { parseFigureView } from '../../components/data/figures/registry';
 import '../reading-room.css';
 import './data-page.css';
 
@@ -80,7 +81,7 @@ export default async function DataPage({
         </TrustMast>
       }
     >
-      <DataSections {...dataModel.sections} />
+      <DataSections {...dataModel.sections} figureView={parseFigureView(raw.view)} />
     </Room>
   );
 }

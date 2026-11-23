@@ -5,7 +5,8 @@
  *
  * Every figure renders through `DataChartFrame`. This file decides order, pairing and findings; it
  * draws no chart of its own. Two figures that show one series two ways (the ratio and the pair
- * bars, the share spine and the share line) sit side by side so they read as one comparison.
+ * bars) sit side by side so they read as one comparison. `D-01` and `D-02` are registry figures
+ * (`components/data/figures`): three views behind one switch, Plain by default.
  */
 import React, { type ReactNode } from 'react';
 import Link from 'next/link';
@@ -21,20 +22,20 @@ import type {
 import { DisplayNumeral, SectionHeading, buttonClassName, cx } from '@repo/ui';
 import { TrustSheet } from '../../components/trust';
 import { BandArt, type BandArtMotif } from '../../components/atmosphere/BandArt';
-import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataChartFrame } from '../../components/data/DataChartFrame';
 import { DataContents, type ContentsGroup } from '../../components/data/DataContents';
+import { Figure } from '../../components/data/figures/Figure';
+import type { FigureView } from '../../components/data/figures/registry';
 import { GapMagnitudeSight } from '../../components/data/GapMagnitudeSight';
 import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
-import { PopulationDecadeSpine } from '../../components/data/PopulationDecadeSpine';
 import {
   isRatioLabel,
   RacePairComparisonChart,
 } from '../../components/data/RacePairComparisonChart';
 import { StatePopulationShiftChart } from '../../components/data/StatePopulationShiftChart';
 import { TrendLineChart } from '../../components/data/TrendLineChart';
-import { formatDataPageValue, formatSharePct } from '../../components/data/chart-utils';
+import { formatDataPageValue } from '../../components/data/chart-utils';
 import { rankStateMovers } from '../../components/data/population-change';
 import type { DataSourceRef } from '../../components/data/SourceFootnote';
 import {
@@ -66,6 +67,8 @@ export type DataSectionsProps = {
   readonly indicators: DataPageIndicatorBundle;
   readonly populationAsOf: string;
   readonly indicatorsAsOf: string;
+  /** The view every registry figure on the page opens in: the `view` URL parameter. */
+  readonly figureView: FigureView;
 };
 
 /* —— findings: the sentence each figure leads with ———————————————————————————— */
@@ -87,50 +90,6 @@ function populationReading(rows: readonly NationalPopulationTimelineRow[]): Reac
     <>
       From {first.blackPopulation.toLocaleString('en-US')} Black people in {first.decade} to{' '}
       {formatMillions(last.blackPopulation)} in {last.decade}
-    </>
-  );
-}
-
-function shareExtremes(rows: readonly NationalPopulationTimelineRow[]) {
-  const peak = rows.reduce((best, row) =>
-    (row.blackShareOfTotalPct ?? 0) > (best.blackShareOfTotalPct ?? 0) ? row : best,
-  );
-  const trough = rows.reduce((best, row) =>
-    (row.blackShareOfTotalPct ?? 100) < (best.blackShareOfTotalPct ?? 100) ? row : best,
-  );
-  return { peak, trough, last: rows.at(-1)! };
-}
-
-function shareReading(rows: readonly NationalPopulationTimelineRow[]): ReactNode {
-  if (rows.length === 0) return null;
-  const { peak, trough, last } = shareExtremes(rows);
-  return (
-    <>
-      The Black share of the country peaked at{' '}
-      {formatSharePct(peak.blackPopulation, peak.totalPopulation)} in {peak.decade}, fell to{' '}
-      {formatSharePct(trough.blackPopulation, trough.totalPopulation)} by {trough.decade}, and stood
-      at {formatSharePct(last.blackPopulation, last.totalPopulation)} in {last.decade}
-    </>
-  );
-}
-
-/**
- * The census-by-census line's own finding: how many censuses since the low point raised the
- * share. The spine beside it already states the peak, the low and the latest value.
- */
-export function shareRiseReading(rows: readonly NationalPopulationTimelineRow[]): ReactNode {
-  if (rows.length < 2) return null;
-  const { trough } = shareExtremes(rows);
-  const since = rows.slice(rows.indexOf(trough));
-  const steps = since.length - 1;
-  if (steps < 1) return null;
-  const share = (row: NationalPopulationTimelineRow) => row.blackPopulation / row.totalPopulation;
-  const rises = since.slice(1).filter((row, index) => share(row) > share(since[index]!)).length;
-  return rises === steps ? (
-    <>The share has risen at every census since {trough.decade}</>
-  ) : (
-    <>
-      The share rose at {rises} of the {steps} censuses since {trough.decade}
     </>
   );
 }
@@ -269,12 +228,6 @@ function populationKey(rows: readonly NationalPopulationTimelineRow[]): string |
     : undefined;
 }
 
-function shareKey(rows: readonly NationalPopulationTimelineRow[]): string | undefined {
-  if (rows.length === 0) return undefined;
-  const { peak } = shareExtremes(rows);
-  return formatSharePct(peak.blackPopulation, peak.totalPopulation);
-}
-
 function stateGainKey(changes: readonly StatePopulationChange[]): string | undefined {
   const gain = rankStateMovers(changes, 1).gains[0];
   return gain ? `+${gain.blackAbsoluteChange.toLocaleString('en-US')}` : undefined;
@@ -365,7 +318,6 @@ function DeltaFigure({
     <DataChartFrame
       id="population-change"
       title="Change in the Black population between recent censuses"
-      span="half"
       reading={
         deltaTrendReading(items) ?? (
           <>
@@ -419,6 +371,7 @@ export function DataSections({
   indicators,
   populationAsOf,
   indicatorsAsOf,
+  figureView,
 }: DataSectionsProps) {
   const hasPopulation = timelineRows.length > 0;
   const hasRatio = (series: DataPageRacePairSeries) =>
@@ -431,38 +384,13 @@ export function DataSections({
   const population: FigureEntry[] = hasPopulation
     ? [
         {
-          id: 'population-spine',
-          node: (
-            <PopulationDecadeSpine
-              key="spine"
-              id="population-spine"
-              rows={timelineRows}
-              sources={chartSources}
-              reading={keyed(shareKey(timelineRows), shareReading(timelineRows))}
-            />
-          ),
+          id: 'D-01',
+          node: <Figure key="D-01" id="D-01" view={figureView} />,
         },
         {
-          id: 'population-share',
-          node: (
-            <BlackPopulationShareChart
-              key="share"
-              id="population-share"
-              span="half"
-              rows={timelineRows}
-              sources={chartSources}
-              reading={shareRiseReading(timelineRows)}
-            />
-          ),
+          id: 'D-02',
+          node: <Figure key="D-02" id="D-02" view={figureView} />,
         },
-        ...(deltaItems.length > 0
-          ? [
-              {
-                id: 'population-change',
-                node: <DeltaFigure key="change" items={deltaItems} sources={chartSources} />,
-              },
-            ]
-          : []),
         {
           id: 'population-count',
           node: (
@@ -475,6 +403,14 @@ export function DataSections({
             />
           ),
         },
+        ...(deltaItems.length > 0
+          ? [
+              {
+                id: 'population-change',
+                node: <DeltaFigure key="change" items={deltaItems} sources={chartSources} />,
+              },
+            ]
+          : []),
         ...(stateChanges.length > 0
           ? [
               {

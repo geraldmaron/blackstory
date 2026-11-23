@@ -60,9 +60,11 @@ test('legacy \\?s=lives on /data rewrites to the hash deep link', () => {
 });
 
 test('data sections keep census and indicator chart wiring', () => {
-  assert.match(sectionsSource, /PopulationDecadeSpine/);
   assert.match(sectionsSource, /PopulationByDecadeChart/);
-  assert.match(sectionsSource, /BlackPopulationShareChart/);
+  // The share and the free and enslaved shares are registry figures, three views each.
+  assert.match(sectionsSource, /<Figure key="D-01" id="D-01" view=\{figureView\} \/>/);
+  assert.match(sectionsSource, /<Figure key="D-02" id="D-02" view=\{figureView\} \/>/);
+  assert.match(pageSource, /figureView=\{parseFigureView\(raw\.view\)\}/);
   assert.match(sectionsSource, /GapMagnitudeSight/);
   assert.match(sectionsSource, /RacePairComparisonChart/);
   assert.match(sectionsSource, /GroupedBarIndicatorChart/);
@@ -150,7 +152,7 @@ test('the indicator fixture captions the figures print verbatim keep the same vo
 test('figure findings compare the values instead of restating them', async () => {
   const { createElement, Fragment } = await import('react');
   const { renderToStaticMarkup } = await import('react-dom/server');
-  const { deltaTrendReading, gapTrendReading, shareRiseReading } = await import('./DataSections');
+  const { deltaTrendReading, gapTrendReading } = await import('./DataSections');
   const text = (node: unknown) =>
     renderToStaticMarkup(createElement(Fragment, null, node as never)).replace(/<!-- -->/g, '');
 
@@ -169,35 +171,6 @@ test('figure findings compare the values instead of restating them', async () =>
   assert.equal(
     deltaTrendReading([delta('A, 1990 to 2000', '+5'), delta('B', '+9'), delta('C', '+2')]),
     null,
-  );
-
-  const row = (decade: string, black: number) => ({
-    decade,
-    blackPopulation: black,
-    totalPopulation: 100,
-    blackShareOfTotalPct: black,
-  });
-  assert.equal(
-    text(
-      shareRiseReading([
-        row('1910', 11),
-        row('1930', 9),
-        row('1950', 10),
-        row('1970', 11),
-      ] as never),
-    ),
-    'The share has risen at every census since 1930',
-  );
-  assert.equal(
-    text(
-      shareRiseReading([
-        row('1930', 9),
-        row('1950', 10),
-        row('1970', 9.5),
-        row('1990', 12),
-      ] as never),
-    ),
-    'The share rose at 2 of the 3 censuses since 1930',
   );
 
   const trend = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthTrend;

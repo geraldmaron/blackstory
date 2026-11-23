@@ -1,5 +1,6 @@
 /**
- * The figure contract on `/data`: every chart renders through `DataChartFrame`, and the frame
+ * The figure contract on `/data`: every chart renders through `DataChartFrame` or, for the
+ * registry figures (`D-01`, `D-02`), through `Figure`. The frame
  * carries, in order, the finding as its heading, the plotted line, the graphic, and one footer row
  * holding the source, Limits and Numbers. Asserted against the source so a figure silently
  * dropping one of them fails here rather than in review.
@@ -22,9 +23,7 @@ function countOccurrences(source: string, pattern: RegExp): number {
 }
 
 const CHART_TAGS = [
-  'PopulationDecadeSpine',
   'PopulationByDecadeChart',
-  'BlackPopulationShareChart',
   'StatePopulationShiftChart',
   'DeltaFigure',
   'GapMagnitudeSight',
@@ -33,21 +32,28 @@ const CHART_TAGS = [
   'TrendLineChart',
 ];
 
+/** Registry figures: `Figure` supplies the finding, the three views and the receipt itself. */
+const REGISTRY_FIGURES = countOccurrences(sectionsSource, /<Figure\b/g);
+
 test('all sixteen figures stay on the page, each with an anchor and a finding', () => {
-  const figureCount = CHART_TAGS.reduce(
+  const framed = CHART_TAGS.reduce(
     (sum, tag) => sum + countOccurrences(sectionsSource, new RegExp(`<${tag}\\b`, 'g')),
     0,
   );
-  // Figures are an owner decision: none is deleted or merged by a redesign.
-  assert.equal(figureCount, 16);
-  // Every chart is handed a finding; DeltaFigure's own frame call carries the sixteenth.
-  assert.equal(countOccurrences(sectionsSource, /reading=\{/g), figureCount);
-  assert.equal(countOccurrences(sectionsSource, /\bid="[a-z-]+"/g) >= figureCount - 1, true);
+  // Figures are an owner decision. Phase 6a (owner brief, 2026-11-23) made the share spine and
+  // the share line one figure, D-01, and added D-02; the count stays sixteen.
+  assert.equal(REGISTRY_FIGURES, 2);
+  assert.equal(framed + REGISTRY_FIGURES, 16);
+  // Every framed chart is handed a finding; DeltaFigure's own frame call carries the last.
+  assert.equal(countOccurrences(sectionsSource, /reading=\{/g), framed);
+  assert.equal(countOccurrences(sectionsSource, /\bid="[A-Za-z0-9-]+"/g) >= framed - 1, true);
 });
 
 test('every figure anchor has a short name for the contents list', () => {
   const copy = readFileSync(join(here, 'data-copy.ts'), 'utf8');
-  const anchors = [...sectionsSource.matchAll(/\bid: '([a-z-]+)'/g)].map((match) => match[1]!);
+  const anchors = [...sectionsSource.matchAll(/\bid: '([A-Za-z0-9-]+)'/g)].map(
+    (match) => match[1]!,
+  );
   assert.ok(anchors.length >= 16, 'no figure anchors found — the markup changed');
   for (const anchor of anchors) assert.match(copy, new RegExp(`'${anchor}':`));
 });

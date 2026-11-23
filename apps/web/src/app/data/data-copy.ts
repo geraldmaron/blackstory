@@ -52,10 +52,10 @@ export const DATA_GAP_GROUPS = [
 
 /** Short names for the contents list, keyed by figure anchor. */
 export const DATA_FIGURE_NAMES: Readonly<Record<string, string>> = {
-  'population-spine': 'Share of the nation',
-  'population-share': 'Share, census by census',
-  'population-change': 'Recent change',
+  'D-01': 'Share of the nation',
+  'D-02': 'Free and enslaved, to 1860',
   'population-count': 'Population by census',
+  'population-change': 'Recent change',
   'population-states': 'State gains and losses',
   'wealth-ratio-sight': 'Wealth ratio',
   'wealth-gap': 'Median net worth',

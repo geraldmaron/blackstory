@@ -449,11 +449,6 @@ button.ds-mark {
   stroke-dasharray: 5 4;
 }
 
-.ds-lines__area {
-  fill: color-mix(in srgb, var(--fig-hi) 9%, transparent);
-  stroke: none;
-}
-
 .ds-dot {
   --dot: 8px;
   position: absolute;

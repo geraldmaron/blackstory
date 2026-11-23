@@ -39,7 +39,7 @@ function formatAsOf(value: string | undefined): string {
  * supplies an area bundle it never reads.
  */
 export type DataPageModel = {
-  readonly sections: Omit<DataSectionsProps, 'livesBundle' | 'livesAreaSlug'>;
+  readonly sections: Omit<DataSectionsProps, 'figureView'>;
 };
 
 export async function loadDataPageModel(): Promise<DataPageModel> {
