@@ -13,8 +13,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import BooksLoading from './books/(index)/loading';
 import LawLoading from './law/(index)/loading';
-import StoriesLoading from './stories/loading';
-import StoryLoading from './stories/[slug]/loading';
+import StoriesLoading from './stories/(index)/loading';
 import MosaicCreditsLoading from './stories/mosaic-credits/loading';
 import RecordsLoading from './records/loading';
 import DataLoading from './data/loading';
@@ -38,12 +37,11 @@ const LOADING_BOUNDARIES = [
     Loading: LawLoading,
     label: 'Pulling the laws together…',
   },
-  { route: '/stories', dir: 'stories', Loading: StoriesLoading, label: 'Loading stories' },
   {
-    route: '/stories/[slug]',
-    dir: 'stories/[slug]',
-    Loading: StoryLoading,
-    label: 'Loading the story',
+    route: '/stories',
+    dir: 'stories/(index)',
+    Loading: StoriesLoading,
+    label: 'Loading stories',
   },
   {
     route: '/stories/mosaic-credits',
@@ -82,13 +80,13 @@ for (const { route, dir, Loading, label } of LOADING_BOUNDARIES) {
 }
 
 /*
- * A record page is the archive's citable document: it must read without script. A segment
+ * A record page or a story is the archive's citable document: it must read without script. A segment
  * loading boundary streams the page into a hidden block that only script reveals, so no record
  * route has one, and no ancestor segment may either (a `law/loading.tsx` would wrap
  * `law/[slug]`; the index pages keep theirs inside an `(index)` route group). It also lets a
  * missing record answer a real 404.
  */
-test('no record route sits behind a loading boundary', () => {
+test('no record or story route sits behind a loading boundary', () => {
   for (const dir of [
     'entity/[id]',
     'entity',
@@ -100,6 +98,10 @@ test('no record route sits behind a loading boundary', () => {
     'law',
     'books/[slug]',
     'books',
+    'stories/[slug]',
+    'stories',
+    'presidents/[slug]',
+    'presidents',
     '',
   ]) {
     assert.ok(!existsSync(join(here, dir, 'loading.tsx')), `${dir || 'app'} has a loading.tsx`);

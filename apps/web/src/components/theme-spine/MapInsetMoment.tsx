@@ -19,6 +19,10 @@ export type MapInsetMomentProps = {
   readonly lng: number;
   readonly precision:
     'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
+  /** A harm-adjacent place: a still picture, no fade, zoom or pan. */
+  readonly still?: boolean;
+  /** False when the caller prints the place and the way on itself (an exhibit's receipt). */
+  readonly caption?: boolean;
   readonly className?: string;
 };
 
@@ -28,6 +32,8 @@ export async function MapInsetMoment({
   lat,
   lng,
   precision,
+  still = false,
+  caption = true,
   className,
 }: MapInsetMomentProps) {
   const place = await loadRecordPlace(entityId);
@@ -39,6 +45,8 @@ export async function MapInsetMoment({
       precision={precision}
       exploreHref={place ? place.href : exploreRecordHref(entityId)}
       {...(place ? { place } : {})}
+      still={still}
+      caption={caption}
       {...(className ? { className } : {})}
     />
   );

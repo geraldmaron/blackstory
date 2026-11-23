@@ -3,18 +3,18 @@
  * single-subject features. Collections of uniform entries (the presidents) are not listed here;
  * they live at their own path.
  *
- * Bare `/stories` is an editorial front: the newest chapter edge to edge with its title on an ink
- * panel, the other chapters as tiles with sand and copper captions, then everything else as one
- * paper sheet under a display head and one toolbar. Any choice
+ * Bare `/stories` is a front on paper: the chapters, newest first and set large, each with its
+ * cover as an exhibit when that cover is safe on a front page (`lib/stories/cover-safety.ts`) and
+ * as text when it is not, then everything else as one ruled list under one toolbar. Any choice
  * in the toolbar (format, sort) or a narrowing that arrives by link (collection, era, tag, place,
  * an old `q`) turns the page into the flat list of what matches. Every control is a link, so a
  * view is bookmarkable and works with JavaScript off.
  */
 import type { Metadata } from 'next';
-import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { listPublicStoryListItems } from '../../lib/stories/source';
-import { listedOnStories } from '../../lib/stories/story-routes';
-import { Chip, DisplayNumeral, Notice, Sheet, buttonClassName } from '@repo/ui';
+import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
+import { listPublicStoryListItems } from '../../../lib/stories/source';
+import { listedOnStories } from '../../../lib/stories/story-routes';
+import { Chip, Notice, PageTitle, buttonClassName } from '@repo/ui';
 import {
   buildStoriesFront,
   filterItems,
@@ -27,10 +27,10 @@ import {
   storiesNotice,
   STORY_SORT_KEYS,
   STORY_SORT_LABELS,
-} from './stories-index';
-import { Room } from '../../components/room';
-import { ChapterCover, LeadCover, StoriesToolbar, StoryRow } from './StoriesIndexParts';
-import './stories.css';
+} from '../stories-index';
+import { Room } from '../../../components/room';
+import { ChapterCover, StoriesToolbar, StoryRow } from '../StoriesIndexParts';
+import '../stories.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/stories',
@@ -79,33 +79,18 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
 
   const toolbar = source === 'live' && items.length > 0 ? <StoriesToolbar sort={sort} /> : null;
 
-  // The list's own head: what the sheet below holds, with its count as a copper numeral.
+  // The list's own head: what the list below holds, with its count as a sentence.
   const listed = front ? front.rest.length : filtered.length;
   const listTitle = front ? 'More stories' : 'Stories';
   const countLine = `${listed.toLocaleString('en-US')} ${listed === 1 ? 'story' : 'stories'}`;
 
   return (
-    <Room
-      width="wide"
-      className="ds-stories"
-      {...(front?.lead
-        ? {
-            masthead: (
-              <>
-                {/* First in the outline, ahead of the lead cover's h2. */}
-                <h1 className="ds-visually-hidden">Stories</h1>
-                <LeadCover item={front.lead} />
-              </>
-            ),
-          }
-        : {})}
-    >
-      {/* The covers (or the list head) lead in every state; the h1 is for the outline only, so
-          the toolbar never moves when the reader narrows the list. */}
-      {front?.lead ? null : <h1 className="ds-visually-hidden">Stories</h1>}
+    <Room width="wide" className="ds-stories">
+      <PageTitle className="ds-stories-title">Stories</PageTitle>
 
-      {front && front.covers.length > 0 ? (
-        <section className="ds-stories-covers" aria-label="More chapters">
+      {front?.lead ? (
+        <section className="ds-stories-covers" aria-label="Chapters">
+          <ChapterCover item={front.lead} lead />
           {front.covers.map((item) => (
             <ChapterCover key={item.slug} item={item} />
           ))}
@@ -122,14 +107,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
             <h2 className="ds-stories-head__title" id="stories-list-title">
               {listTitle}
             </h2>
-            {source === 'unavailable' ? null : (
-              <>
-                <DisplayNumeral className="ds-stories-head__count" decorative>
-                  {listed.toLocaleString('en-US')}
-                </DisplayNumeral>
-                <p className="ds-stories-head__dek">{countLine}</p>
-              </>
-            )}
+            {source === 'unavailable' ? null : <p className="ds-stories-head__dek">{countLine}</p>}
           </header>
           {toolbar}
           {echoes.length > 0 ? (
@@ -147,7 +125,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
             </div>
           ) : null}
 
-          <Sheet className="ds-stories-paper">
+          <div className="ds-stories-paper">
             {notice.body.length > 0 ? (
               <div className="ds-stories-notice">
                 <Notice tone={source === 'unavailable' ? 'warning' : 'note'} title={notice.title}>
@@ -166,7 +144,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                 ))}
               </ul>
             )}
-          </Sheet>
+          </div>
 
           {pager.pageCount > 1 ? (
             <nav className="ds-stories-pager" aria-label="Stories pages">

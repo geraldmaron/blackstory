@@ -24,7 +24,10 @@ import { StoryCitationMarks, StoryInline, StoryProse } from './StoryProse';
 import { StoryVideo } from './StoryVideo';
 import { StoryFigure } from './StoryFigure';
 import { splitSectionHeading } from './story-text';
-import { DisplayNumeral } from '@repo/ui';
+import { RIGHTS_LABEL } from './story-exhibit';
+import { precisionInWords } from '../../lib/map-experience/geo-precision';
+import { resolveMapTone } from '../../lib/map-experience/kind-encoding';
+import { DisplayNumeral, ExhibitFrame, Receipt } from '@repo/ui';
 // The artifacts' own sheets travel with the body, so every surface that renders one (the story
 // page, /lives, the admin preview) gets them without remembering to import them.
 import '../theme-spine/theme-spine.css';
@@ -61,12 +64,6 @@ const VIDEO_PROVIDER_LABEL = {
   loc: 'Library of Congress',
 } as const;
 
-const VIDEO_RIGHTS_LABEL = {
-  public_domain: 'In the public domain',
-  licensed: 'Used under license',
-  fair_use: 'Used under fair use',
-} as const;
-
 /** The year span of a timeline, for its caption: "1790 to 2013". */
 function timelineSpan(events: readonly { readonly date: string }[]): string | undefined {
   const years = events
@@ -78,10 +75,13 @@ function timelineSpan(events: readonly { readonly date: string }[]): string | un
   return first === last ? String(first) : `${first} to ${last}`;
 }
 
-/** A run of consecutive stat blocks: figure callouts in one row on the wide track. */
+/**
+ * A run of consecutive stat blocks: the chapter's own numbers as a ruled list on paper. A count
+ * is set at body size (DESIGN.md rule 4), never as display type and never on a color field.
+ */
 function FigureCallouts({ stats }: { readonly stats: readonly HydratedStoryStat[] }) {
   return (
-    <div className="ds-story-wide ds-story-figures" data-count={stats.length} data-ground="copper">
+    <div className="ds-story-figures">
       {stats.map((stat, index) => (
         <figure className="ds-story-figures__item" key={index}>
           <span className="ds-story-figures__number">{stat.figure.replace(/_/g, ' ')}</span>
@@ -161,6 +161,9 @@ function Block({
         </blockquote>
       );
     case 'figure':
+      // Seam for phase 6c (DESIGN.md 9.3): this chart becomes a `Figure` embed from the Data
+      // registry, pinned to the data version the story was written against, with that version and
+      // a link to the current figure in its receipt. Until then it is the story's own packet chart.
       return (
         <figure className="ds-story-wide ds-story-chart">
           <ThemeImpactMetricChart observations={block.observations} />
@@ -174,22 +177,25 @@ function Block({
       // Stats never render standalone; StoryBody coalesces runs into FigureCallouts.
       return null;
     case 'primaryDocument':
+      // A transcribed excerpt, not a scan: the words are the object, the date is the document's.
       return (
-        <figure className="ds-story-wide ds-story-doc" data-ground="sand">
-          <div className="ds-story-doc__head">
-            {block.dateLabel ? <p className="ds-story-doc__date">{block.dateLabel}</p> : null}
-            <p className="ds-story-doc__title">{block.title}</p>
-          </div>
-          <div className="ds-story-doc__text">
-            {block.quote ? (
-              <blockquote className="ds-story-doc__quote">{block.quote}</blockquote>
-            ) : null}
-            <figcaption className="ds-story-doc__summary">
+        <ExhibitFrame
+          className="ds-story-wide ds-story-doc"
+          id={`document-${block.refId}`}
+          kind="document"
+          basis={block.dateLabel ? `dated ${block.dateLabel}` : 'date not on record'}
+          receipt={
+            <p className="ds-story-caption">
               {block.summary}
               <StoryCitationMarks numbers={block.sourceNumbers} />
-            </figcaption>
-          </div>
-        </figure>
+            </p>
+          }
+        >
+          <p className="ds-story-doc__title">{block.title}</p>
+          {block.quote ? (
+            <blockquote className="ds-story-doc__quote">{block.quote}</blockquote>
+          ) : null}
+        </ExhibitFrame>
       );
     case 'timeline': {
       const events = timelinePoints(block.events);
@@ -202,18 +208,38 @@ function Block({
         </div>
       );
     }
-    case 'mapInset':
+    case 'mapInset': {
+      // The record pages' rule: a massacre or plantation site is a still, quiet frame.
+      const tone = resolveMapTone(block);
+      const quiet = tone === 'massacre' || tone === 'plantation';
       return (
-        <div className="ds-story-wide ds-story-map">
+        <ExhibitFrame
+          className="ds-story-wide ds-story-map"
+          id={`map-${block.entityId}`}
+          kind="map"
+          ground="ink"
+          basis={precisionInWords(block.precision)}
+          variant={quiet ? 'quiet' : 'full'}
+          receipt={
+            <Receipt
+              source={block.label}
+              href={`/entity/${block.entityId}`}
+              detail="Place as the record states it"
+            />
+          }
+        >
           <MapInsetMoment
             entityId={block.entityId}
             label={block.label}
             lat={block.lat}
             lng={block.lng}
             precision={block.precision}
+            still={quiet}
+            caption={false}
           />
-        </div>
+        </ExhibitFrame>
       );
+    }
     case 'dispute':
       return (
         <DisputeBlock
@@ -284,7 +310,7 @@ function Block({
             title={block.title}
             providerLabel={VIDEO_PROVIDER_LABEL[block.provider]}
             credit={block.credit}
-            rights={VIDEO_RIGHTS_LABEL[block.rightsStatus]}
+            rights={RIGHTS_LABEL[block.rightsStatus]}
             watchUrl={storyVideoWatchUrl(block)}
             source={storyVideoSource(block)}
             {...(block.caption

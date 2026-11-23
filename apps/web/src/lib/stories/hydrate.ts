@@ -77,6 +77,8 @@ export type HydratedStoryStat = {
 
 export type HydratedStoryPrimaryDocument = {
   readonly type: 'primaryDocument';
+  /** The packet artifact's stored id: the exhibit's address on the page. */
+  readonly refId: string;
   readonly title: string;
   readonly summary: string;
   readonly quote?: string;
@@ -405,6 +407,7 @@ function hydrateBlock(
       }
       return {
         type: 'primaryDocument',
+        refId: block.refId,
         title: artifact.title,
         summary: artifact.summary,
         ...(block.quote ? { quote: block.quote } : {}),
