@@ -642,12 +642,7 @@ for (const path of ['/entity/ent_test', '/place/test-place', '/invention/test-in
   });
 }
 
-test('the front page keeps only its opening switch, and only when it is on', () => {
-  assert.equal(normalizeQueryString('/', { opening: '1' }), 'opening=1');
-  assert.equal(normalizeQueryString('/', { opening: '0' }), '');
-  assert.equal(normalizeQueryString('/', { opening: 'yes', state: 'dc' }), '');
-  assert.equal(
-    normalizeQueryString('/', { opening: '1', utm_source: 'x', state: 'dc' }),
-    'opening=1',
-  );
+test('the front page keeps no query: the trial switch is gone', () => {
+  assert.equal(normalizeQueryString('/', { opening: '1' }), '');
+  assert.equal(normalizeQueryString('/', { opening: '1', utm_source: 'x', state: 'dc' }), '');
 });

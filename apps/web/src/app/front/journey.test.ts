@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { DoorRecord } from '../door-decade-walk';
-import { legBetween, legText, pickJourney, pickTitlePlates, shortPlace } from './home-journey';
+import { legBetween, legText, pickJourney, pickTitlePlates, shortPlace } from './journey';
 
 const make = (id: string, state: string, decade: number, over: Partial<DoorRecord> = {}) =>
   ({

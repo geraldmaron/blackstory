@@ -52,9 +52,6 @@ function isTrackingKey(key: string): boolean {
   return TRACKING_QUERY_PREFIXES.some((prefix) => lower.startsWith(prefix));
 }
 
-/** `/?opening=1`: the retelling opens the front page. Read by `app/page.tsx`. */
-export const FRONT_OPENING_PARAM = 'opening';
-
 function firstString(value: string | string[] | undefined): string | undefined {
   if (value === undefined) return undefined;
   return Array.isArray(value) ? value[0] : value;
@@ -74,9 +71,6 @@ export function isPublicRecordPath(pathname: string): boolean {
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
   const path = normalizePathname(pathname);
   if (path === '/atlas/catalog') return ['v'];
-  // The front page's one switch: `opening=1` shows the retelling as the entrance while it is on
-  // trial (DESIGN.md section 9.7). Any other value drops, below.
-  if (path === '/') return [FRONT_OPENING_PARAM];
   if (path === '/stories/mosaic-credits') return ['page'];
   if (path === '/search') {
     return SEARCH_PAGE_PARAM_ALLOWLIST;
@@ -137,7 +131,7 @@ function allowlistedBag(pathname: string, bag: QueryParamBag): QueryParamBag {
 /**
  * Returns a stable query string containing only allowed, non-tracking params.
  * Explore (`/explore`) goes through parse→build so revisit URLs match what the
- * client writes (`layerMode=presence`, uppercase state). `/` keeps only `opening=1`.
+ * client writes (`layerMode=presence`, uppercase state). `/` keeps no query.
  * Empty string means no query component should appear in cache keys or redirects.
  */
 export function normalizeQueryString(
@@ -165,10 +159,6 @@ export function normalizeQueryString(
   for (const key of Object.keys(bag).sort()) {
     const value = firstString(bag[key]);
     if (value === undefined) continue;
-    if (path === '/' && key === FRONT_OPENING_PARAM) {
-      if (value === '1') normalized.set(key, value);
-      continue;
-    }
     // Only a real kind of change survives, so a stray `type` cannot fragment the cache.
     if (path === '/errata' && key === 'type') {
       if (isErrataChangeType(value)) normalized.set(key, value);

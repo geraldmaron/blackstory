@@ -24,7 +24,7 @@ import { RecordImage } from '../../components/entity/RecordImage';
 import { EvidenceList } from '../../components/evidence/EvidenceList';
 import { doorRecords, type DoorRecord } from '../door-decade-walk';
 import { DoorRecordLink } from '../door-record-link';
-import { legText, shortPlace } from '../home/home-journey';
+import { legText, shortPlace } from './journey';
 import { loadRecordsIndex, recordsQueryCacheKey } from '../records/load-records-index';
 import { FRONT_ROUTES } from './front-routes';
 import { RETELLING_SENTENCES, RETELLING_TAGLINE, archiveSentence } from './retelling-copy';

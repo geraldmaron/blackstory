@@ -25,7 +25,7 @@ import {
 import { nearbyDistances, type NearbyArea } from '../../lib/map-experience/nearby';
 import { useLocateMe } from '../explore/hooks/use-locate-me';
 import { DoorRecordLink } from '../door-record-link';
-import { legText } from '../home/home-journey';
+import { legText } from './journey';
 import { useSetRetellingTown, type RetellingStop } from './retelling-film';
 
 void React;

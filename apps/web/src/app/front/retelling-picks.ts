@@ -8,7 +8,7 @@
  *
  * `provisional: true` means the owner has not chosen this record. All three are provisional.
  */
-import { isJourneyEligible } from '../home/home-journey';
+import { isJourneyEligible } from './journey';
 import type { DoorRecord } from '../door-decade-walk';
 import type { RecordSceneId } from './retelling-scenes';
 
