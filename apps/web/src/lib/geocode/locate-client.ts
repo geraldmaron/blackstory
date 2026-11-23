@@ -47,16 +47,25 @@ export type LocateClientResult =
   | { readonly kind: 'network_error' };
 
 async function callLocateApi(
-  searchParams: URLSearchParams,
+  request: URLSearchParams | { readonly address: string; readonly camera: boolean },
   integrityHeaders: Readonly<Record<string, string>>,
 ): Promise<LocateClientResult> {
   let response: Response;
   try {
-    response = await fetch(`/locate/api?${searchParams.toString()}`, {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: integrityHeaders,
-    });
+    response =
+      request instanceof URLSearchParams
+        ? await fetch(`/locate/api?${request.toString()}`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: integrityHeaders,
+          })
+        : // What a reader typed goes in the body, never in the address of a request.
+          await fetch('/locate/api', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { ...integrityHeaders, 'content-type': 'application/json' },
+            body: JSON.stringify(request),
+          });
   } catch {
     return { kind: 'network_error' };
   }
@@ -111,9 +120,7 @@ export function fetchLocateByAddress(
   integrityHeaders: Readonly<Record<string, string>> = {},
   options: FetchLocateByAddressOptions = {},
 ): Promise<LocateClientResult> {
-  const params = new URLSearchParams({ address });
-  if (options.forCamera) params.set('camera', '1');
-  return callLocateApi(params, integrityHeaders);
+  return callLocateApi({ address, camera: options.forCamera === true }, integrityHeaders);
 }
 
 export type FetchLocateByCoordinatesOptions = {
