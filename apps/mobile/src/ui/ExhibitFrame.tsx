@@ -35,6 +35,11 @@ export type ExhibitFrameProps = {
   readonly variant?: ExhibitVariant;
   readonly ground?: 'ink';
   readonly receipt?: ReactNode;
+  /**
+   * Side padding for the label and the receipt only. A story sets its exhibits edge to edge and
+   * passes its column padding here, so the words stay on the reading column.
+   */
+  readonly gutter?: number;
   readonly children: ReactNode;
   readonly testID?: string;
 };
@@ -81,6 +86,7 @@ export function ExhibitFrame({
   variant = 'full',
   ground,
   receipt,
+  gutter = 0,
   children,
   testID,
 }: ExhibitFrameProps) {
@@ -94,7 +100,7 @@ export function ExhibitFrame({
         <Text
           variant="meta"
           colorRole="inkMuted"
-          style={styles.label}
+          style={[styles.label, { paddingHorizontal: gutter }]}
           accessibilityLabel={`${label.replace(' · ', ', ')}.`}
           testID="exhibit-label"
         >
@@ -107,7 +113,11 @@ export function ExhibitFrame({
         </View>
         {marked ? <CropMarks color={theme.ink} /> : null}
       </View>
-      {receipt ? <View testID="exhibit-receipt">{receipt}</View> : null}
+      {receipt ? (
+        <View style={{ paddingHorizontal: gutter }} testID="exhibit-receipt">
+          {receipt}
+        </View>
+      ) : null}
     </View>
   );
 }

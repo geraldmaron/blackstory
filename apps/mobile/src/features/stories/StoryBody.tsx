@@ -115,9 +115,12 @@ export function Runs({ runs }: { readonly runs: readonly StoryRunV1[] }) {
 export function StoryImageExhibit({
   image,
   caption,
+  bleed = 0,
 }: {
   readonly image: StoryImageV1;
   readonly caption?: string | undefined;
+  /** The reading column's side padding: the exhibit runs that far past it, to the screen edge. */
+  readonly bleed?: number;
 }) {
   const kind = storyImageKind(image);
   const quiet = isQuietImage(image);
@@ -140,19 +143,30 @@ export function StoryImageExhibit({
     );
   }
   return (
-    <ExhibitFrame
-      kind={kind ?? 'photograph'}
-      basis={storyImageBasis(image)}
-      variant={quiet ? 'quiet' : kind ? 'full' : 'compact'}
-      receipt={receipt}
-      testID="story-image-exhibit"
-    >
-      {picture}
-    </ExhibitFrame>
+    <View style={{ marginHorizontal: -bleed }}>
+      <ExhibitFrame
+        kind={kind ?? 'photograph'}
+        basis={storyImageBasis(image)}
+        variant={quiet ? 'quiet' : kind ? 'full' : 'compact'}
+        receipt={receipt}
+        gutter={bleed}
+        testID="story-image-exhibit"
+      >
+        {picture}
+      </ExhibitFrame>
+    </View>
   );
 }
 
-function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUrl: string }) {
+type BlockProps = {
+  readonly block: StoryBlockV1;
+  readonly webUrl: string;
+  readonly bleed: number;
+  /** Reports a chapter heading's offset inside the blocks, for the progress line. */
+  readonly onChapterLayout?: ((text: string, y: number) => void) | undefined;
+};
+
+function Block({ block, webUrl, bleed, onChapterLayout }: BlockProps) {
   const theme = useThemeColors();
   switch (block.type) {
     case 'heading':
@@ -161,6 +175,9 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
           variant={block.level === 2 ? 'headline' : 'title'}
           isHeading
           style={{ marginTop: space['5'] }}
+          {...(block.level === 2 && onChapterLayout
+            ? { onLayout: (event) => onChapterLayout(block.text, event.nativeEvent.layout.y) }
+            : {})}
         >
           {block.text}
         </Text>
@@ -188,9 +205,7 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
       );
     case 'quote':
       return (
-        <View
-          style={{ borderLeftWidth: 3, borderLeftColor: theme.accent, paddingLeft: space['3'] }}
-        >
+        <View style={{ borderLeftWidth: 2, borderLeftColor: theme.ink, paddingLeft: space['3'] }}>
           <Text variant="editorial" style={{ fontStyle: 'italic' }}>
             <Runs runs={block.runs} />
           </Text>
@@ -223,7 +238,7 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
         </View>
       );
     case 'image':
-      return <StoryImageExhibit image={block.image} caption={block.caption} />;
+      return <StoryImageExhibit image={block.image} caption={block.caption} bleed={bleed} />;
     case 'table':
       return (
         <View style={{ gap: space['2'] }}>
@@ -277,14 +292,24 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
 export function StoryBlocks({
   blocks,
   webUrl,
+  bleed = 0,
+  onChapterLayout,
 }: {
   readonly blocks: readonly StoryBlockV1[];
   readonly webUrl: string;
+  readonly bleed?: number;
+  readonly onChapterLayout?: BlockProps['onChapterLayout'];
 }) {
   return (
     <View style={{ gap: space['4'] }}>
       {blocks.map((block, index) => (
-        <Block key={index} block={block} webUrl={webUrl} />
+        <Block
+          key={index}
+          block={block}
+          webUrl={webUrl}
+          bleed={bleed}
+          onChapterLayout={onChapterLayout}
+        />
       ))}
     </View>
   );
