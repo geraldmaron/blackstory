@@ -35,7 +35,6 @@ import {
   faQuoteLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { buttonClassName, DisplayNumeral, SectionHeading, Sheet } from '@repo/ui';
-import { BandArt } from '../atmosphere/BandArt';
 import '../../app/record-page.css';
 
 void React;
@@ -369,8 +368,6 @@ export function RecordPage({
           // v11 Ground: the masthead sits on the night world in either theme.
           {...(ground ? { 'data-ground': 'ink', 'data-ground-fixed': '' } : {})}
         >
-          {/* No plate: the mast carries survey lines instead of an empty ground. */}
-          {plated ? null : <BandArt motifs={['contours']} />}
           <div className="ds-recpage__head ds-wrap">
             {numeral?.caption ? (
               <div
@@ -409,7 +406,7 @@ export function RecordPage({
         </header>
 
         <div className="ds-recpage__desk ds-wrap">
-          <Sheet className="ds-recpage__grid">
+          <Sheet bands="none" className="ds-recpage__grid">
             {/* The rail's sticky run ends where the body ends: on a desktop this is the rail's
                 containing block, so it never slides into the record file below. Elsewhere it is
                 `display: contents` and its children take the sheet's own grid areas. */}
@@ -422,7 +419,7 @@ export function RecordPage({
               {/* The card and the rail: one column beside the reading on a desktop, so the card's
                   height never pushes the body down; `display: contents` elsewhere. */}
               <div className="ds-recpage__side">
-                <dl className="ds-recpage__facts" aria-label="Record at a glance" data-ground="ink">
+                <dl className="ds-recpage__facts" aria-label="Record at a glance">
                   {facts.map((fact) => (
                     <div key={fact.label} className="ds-recpage__fact">
                       <dt className="ds-recpage__fact-label">{fact.label}</dt>
@@ -507,11 +504,7 @@ export function RecordPage({
               <div className="ds-recpage__body">{children}</div>
             </div>
 
-            <footer
-              className="ds-recpage__file"
-              aria-labelledby="record-file-title"
-              data-ground="sand"
-            >
+            <footer className="ds-recpage__file" aria-labelledby="record-file-title">
               <h2 id="record-file-title" className="ds-recpage__file-title">
                 Record file
               </h2>

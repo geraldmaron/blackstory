@@ -92,10 +92,10 @@
   margin-top: calc(var(--ds-recpage-overlap) * -1);
 }
 
-/* The record sheet keeps its page bands and edge but casts no drop shadow: on this page depth
-   comes from the plate, the change of ground and the type. */
+/* The record sheet is the page's paper: square, no bands, no shadow (DESIGN.md section 7.4). */
 .ds-recpage__grid.ds-sheet {
-  box-shadow: var(--ds-sheet-bands);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .ds-recpage__grid {
@@ -433,29 +433,17 @@
   margin: 0 0 var(--ds-space-2);
 }
 
-/* —— 3. the record at a glance: an ink card carrying the masthead's ground into the sheet (the
-   table paper with an edge on the light table, tokens.css), a copper tab at its head like the
-   chapters below. On a desktop it stands beside the lede, at the top of the rail's column. —— */
+/* —— 3. the record at a glance: a ruled list on the page's own paper, opened by a 2px rule
+   (docs/ui/DESIGN.md section 7.4). On a desktop it stands beside the lede, at the top of the
+   rail's column. —— */
 .ds-recpage__facts {
-  --ds-facts-pad: var(--ds-space-5);
   grid-area: facts;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: var(--ds-space-8) 0 0;
-  padding: var(--ds-facts-pad);
-  border-radius: var(--ds-radius-md);
-  background:
-    linear-gradient(var(--ds-accent-graphic), var(--ds-accent-graphic)) var(--ds-facts-pad) 0 /
-      3.5rem 4px no-repeat,
-    radial-gradient(
-      120% 80% at 100% 0,
-      color-mix(in srgb, var(--ds-accent-graphic) 16%, transparent),
-      transparent 62%
-    ),
-    var(--ds-canvas);
-  box-shadow:
-    inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge),
-    var(--ds-shadow-sheet);
+  padding-block: var(--ds-space-4);
+  border-top: 2px solid var(--ds-ink);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink);
 }
 
@@ -549,14 +537,13 @@
   height: auto;
   max-height: 30rem;
   object-fit: contain;
-  border-radius: var(--ds-radius-sm);
   background: var(--ds-surface-sunken);
 }
 
-/* The map sits in the sheet with an ink edge at the sheet's radius; no shadow. */
+/* The map sits in the sheet with an ink edge, square. */
 .ds-recpage__media .ds-record-map__frame {
   border-color: var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
 }
 
 .ds-recpage__photo .ds-entity-photo__credit {
@@ -931,12 +918,12 @@
   gap: var(--ds-space-1);
 }
 
-/* —— 6. the record file: a sand block across the sheet's foot ———————————————————— */
+/* —— 6. the record file: ruled off at the sheet's foot ——————————————————————————— */
 .ds-recpage__file {
   grid-area: file;
-  margin: var(--ds-space-12) calc(var(--ds-sheet-pad) * -1) calc(var(--ds-sheet-pad) * -1);
-  padding: var(--ds-space-8) var(--ds-sheet-pad);
-  border-radius: 0 0 calc(var(--ds-radius-md) - 1px) 0;
+  margin-top: var(--ds-space-12);
+  padding-top: var(--ds-space-6);
+  border-top: 2px solid var(--ds-ink);
 }
 
 .ds-recpage__file-title {

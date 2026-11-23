@@ -19,6 +19,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ExhibitFrame } from '@repo/ui';
 import type { PublicEntityPrimaryImageView } from '../../data/public-seed';
 import { buildEntityMastImageCandidates } from './entity-mast-image-candidates';
 import { RecordPhotoCredit } from './EntityMastMedia';
@@ -71,6 +72,22 @@ export function RecordImage({
       onError={() => setIndex((current) => current + 1)}
     />
   );
+  // A real photograph outside the plate is an exhibit (docs/ui/DESIGN.md section 7.3): crop marks,
+  // a label that says its date is not on record (the archive does not store one), and its credit
+  // as the receipt. An artist's rendering keeps its own caption below.
+  if (!plate && !rendered) {
+    return (
+      <ExhibitFrame
+        id={`${entityId}-photograph`}
+        kind="photograph"
+        basis="date not on record"
+        receipt={<RecordPhotoCredit entityId={entityId} image={image} />}
+        {...(className ? { className } : {})}
+      >
+        {img}
+      </ExhibitFrame>
+    );
+  }
   return (
     <figure
       className={[plate ? 'ds-plate' : 'ds-recpage__photo', className].filter(Boolean).join(' ')}

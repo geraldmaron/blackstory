@@ -64,7 +64,9 @@ test('the sticky rail stops where the body ends, above the record file', () => {
   assert.match(desktop, /'lede side'\s*'note side'/);
   assert.match(
     pattern,
-    /<dl className="ds-recpage__facts"[^>]*data-ground="ink"[\s\S]*<aside className="ds-recpage__rail"/,
+    /<dl className="ds-recpage__facts"[^>]*>[\s\S]*<aside className="ds-recpage__rail"/,
   );
   assert.doesNotMatch(desktop, /'file\s+file'/);
+  // The facts are a ruled list on the page's paper, not a card on its own ground (DESIGN.md 7.4).
+  assert.doesNotMatch(pattern, /ds-recpage__facts"[^>]*data-ground/);
 });
