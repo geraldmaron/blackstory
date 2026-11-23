@@ -6,12 +6,8 @@
  * module is the shared vocabulary and the adapters that keep a reader's narrowing intact when
  * they switch views. Surfaces may expose a subset; they must not invent conflicting meanings.
  */
-import {
-  buildExploreHref,
-  defaultExploreOverlayState,
-  type ExploreViewState,
-} from '../map-experience/url-state';
-import { DEFAULT_EXPLORE_FILTERS } from '../map-experience/filters';
+import { buildExploreHref, type ExploreViewState } from '../map-experience/url-state';
+import { exploreViewFromRecordsQuery } from './explore-collection';
 import type { EvidenceGrade } from '../map-experience/evidence-grade';
 import {
   EMPTY_RECORDS_QUERY,
@@ -27,7 +23,6 @@ import {
 import { normalizePeriod } from './collection-period';
 import { parseCollectionToken } from './story-collection';
 
-export { mapListContinuityLabel } from './continuity-label';
 export { withQuery } from './discovery-arrival';
 
 export type DiscoveryView = 'map' | 'list';
@@ -171,6 +166,7 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
     status: (firstOf(state.status) ?? '').toLowerCase(),
     evidence: evidence ?? '',
     ...scopeToRecordsQuery(state),
+    selected: parseRecordsQuery({ selected: state.selected }).selected,
     page: 1,
   };
 }
@@ -179,49 +175,12 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
  * Builds an Explore view state carrying the same collection narrowing and bibliography order.
  */
 export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewState {
-  const kind = firstOf(state.kind) ?? DEFAULT_EXPLORE_FILTERS.kind;
-  const era = firstOf(state.era) ?? DEFAULT_EXPLORE_FILTERS.era;
-  const topic = firstOf(state.topic) ?? DEFAULT_EXPLORE_FILTERS.theme;
-  const status = firstOf(state.status) ?? DEFAULT_EXPLORE_FILTERS.status;
-  const postal = firstOf(state.state)?.toUpperCase();
-
-  return {
-    ...(state.query ? { query: parseRecordsQuery({ q: state.query }).q } : {}),
-    sort: parseRecordsQuery({ sort: state.sort }).sort,
-    filters: {
-      ...DEFAULT_EXPLORE_FILTERS,
-      kind,
-      era,
-      theme: topic,
-      status,
-    },
-    ...defaultExploreOverlayState(),
-    ...(postal ? { state: postal } : {}),
-    ...(state.evidence ? { floor: state.evidence } : {}),
-    ...(state.selected ? { selected: state.selected } : {}),
-    ...exploreScope(state),
-  };
-}
-
-function exploreScope(
-  state: DiscoveryState,
-): Pick<
-  ExploreViewState,
-  'collection' | 'periodStart' | 'periodEnd' | 'includeUndated' | 'layout'
-> {
-  const scope = scopeToRecordsQuery(state);
-  return {
-    ...(scope.collection ? { collection: scope.collection } : {}),
-    ...(scope.periodStart ? { periodStart: scope.periodStart } : {}),
-    ...(scope.periodEnd ? { periodEnd: scope.periodEnd } : {}),
-    ...(scope.includeUndated ? { includeUndated: true } : {}),
-    ...(scope.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
-  };
+  return exploreViewFromRecordsQuery(recordsQueryFromDiscovery(state));
 }
 
 /** `/records` href carrying DiscoveryState narrowing (drops map-only fields). */
 export function listHrefFromDiscovery(state: DiscoveryState): string {
-  return recordsHref(recordsQueryFromDiscovery(state));
+  return recordsHref({ ...recordsQueryFromDiscovery(state), selected: '' });
 }
 
 /** `/explore` href carrying DiscoveryState narrowing that Explore understands. */
@@ -428,6 +387,7 @@ export function placeDiscoveryReturn(
     listHref: neighbors
       ? recordsHref({
           ...recordsQueryFromDiscovery(arrival),
+          selected: '',
           page: Math.floor(neighbors.index / RECORDS_PAGE_SIZE) + 1,
         })
       : listHrefFromDiscovery(arrival),

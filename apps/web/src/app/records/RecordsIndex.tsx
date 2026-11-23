@@ -2,7 +2,8 @@
  * `/records` — the register. Presentation only; every number and href comes from
  * `lib/records/build-records-index.ts`.
  *
- * Header with the one count, one toolbar row, the active narrowing as removable chips (only when
+ * Header with the count as one sentence (how many match, how many of those the map can show),
+ * one toolbar row with the Map, List and Timeline switch, the active narrowing as removable chips (only when
  * set), then the rows as a list or along a time axis, then the pager. The header search is the
  * only search on the page; it carries `q` in and the chip row echoes it.
  *
@@ -11,7 +12,7 @@
  */
 
 import React, { type ReactNode } from 'react';
-import { Chip, DisplayNumeral, PageTitle, Sheet, buttonClassName } from '@repo/ui';
+import { Chip, PageTitle, Segmented, Sheet, buttonClassName } from '@repo/ui';
 import { Room } from '../../components/room';
 import { RecordsTimeline } from '../../components/discovery/records-chronology';
 import {
@@ -27,6 +28,7 @@ import {
 } from '../../lib/records/build-records-index';
 import { recordsQueryString } from '../../lib/records/records-query';
 import { earliestDecade } from '../../lib/records/records-matching';
+import { membershipSentence } from '../../lib/discovery/continuity-label';
 import { DecadeJump } from './DecadeJump';
 import { RecordRow } from './RecordRow';
 import { BandArt } from '../../components/atmosphere/BandArt';
@@ -276,14 +278,6 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
     <RecordsToolbar
       filters={filters}
       sort={sortMenu(query)}
-      view={{
-        label: 'Show records as',
-        value: timeline ? 'timeline' : 'list',
-        options: [
-          { value: 'list', label: 'List', href: indexHref },
-          { value: 'timeline', label: 'Timeline', href: chronologyHref },
-        ],
-      }}
       activeCount={filterCount}
       showLabel={`Show ${countPhrase(model.totalMatched)}`}
       {...(filterCount > 0
@@ -337,7 +331,7 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
   } else {
     const anchors = decadeJumps.length > 0 ? decadeAnchors(rows) : new Map<string, string>();
     body = (
-      <Sheet className="ds-records-paper">
+      <Sheet bands="none" className="ds-records-paper">
         <ol className="ds-records-list">
           {rows.map((row) => (
             <RecordRow
@@ -359,27 +353,39 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
 
   return (
     <Room width="wide" className={world ? 'ds-records ds-country' : 'ds-records'}>
-      {/* The title at display scale with the count beside it as a giant copper numeral. The
-          numeral is decorative, so the dek always carries the count for a screen reader; on
-          screen it says what the numeral can’t: how the set is narrowed, or the span it covers.
-          An empty result prints no numeral (a giant zero reads as a joke). */}
+      {/* The count is a sentence, never a numeral on its own (DESIGN.md rule 4): how many match,
+          the span they cover, and how many of them the map can show, so a record missing from
+          the map reads as unmapped, not deleted. */}
       <header className="ds-records-head">
         <PageTitle className="ds-records-head__title">Records</PageTitle>
-        {model.totalMatched > 0 ? (
-          <DisplayNumeral className="ds-records-head__count" decorative>
-            {model.totalMatched.toLocaleString('en-US')}
-          </DisplayNumeral>
-        ) : null}
         <p className="ds-records-head__dek">
-          {constraints.length > 0 || !span ? (
-            countLabel
-          ) : (
-            <>
-              <span className="ds-visually-hidden">{countLabel}, </span>
-              {span}
-            </>
-          )}
+          {countLabel}.{constraints.length === 0 && span ? ` ${span}` : ''}
         </p>
+        {/* The same filter set on the map, in a list or along time: plain links, so the switch
+            works without JavaScript. */}
+        <div className="ds-records-head__views" data-archive-views>
+          <Segmented
+            label="Show records as"
+            value={timeline ? 'timeline' : 'list'}
+            options={[
+              { value: 'map', label: 'Map', href: atlasHref },
+              { value: 'list', label: 'List', href: indexHref },
+              { value: 'timeline', label: 'Timeline', href: chronologyHref },
+            ]}
+          />
+        </div>
+        {notice === undefined ? (
+          <p className="ds-records-head__membership" data-membership>
+            {membershipSentence({
+              view: timeline ? 'timeline' : 'list',
+              matched: model.totalMatched,
+              mapped: model.mappableMatched,
+              undated: model.undatedMatched,
+              undatedExcluded: model.undatedExcluded,
+              placeCarried: query.place.length > 0,
+            })}
+          </p>
+        ) : null}
       </header>
       {toolbar}
 
@@ -397,11 +403,6 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
           {constraints.length > 1 ? (
             <a className={buttonClassName('quiet')} href={clearAllHref}>
               Clear all
-            </a>
-          ) : null}
-          {notice === undefined && rows.length > 0 ? (
-            <a className={buttonClassName('quiet', 'ds-records-active__map')} href={atlasHref}>
-              Show these on the map
             </a>
           ) : null}
         </div>

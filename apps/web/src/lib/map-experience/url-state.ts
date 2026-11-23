@@ -24,7 +24,6 @@
 import { parseRecordsQuery, type RecordsSort } from '../records/records-query';
 import { isPopulationDecade } from '@repo/domain/demographics/population-decades';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import { PLACE_KEY_PATTERN } from '@repo/domain/map/place-groups';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
 import {
   coercePopulationGeoForDecade,
@@ -39,7 +38,7 @@ import {
 import { EXPLORE_RADIUS_PRESETS, type ExploreRadiusPresetId } from './explore-place-radius';
 import type { EvidenceGrade } from './evidence-grade';
 import { normalizePeriod, type PeriodBound } from '../discovery/collection-period';
-import { parseCollectionToken, type CollectionToken } from '../discovery/story-collection';
+import type { CollectionToken } from '../discovery/story-collection';
 
 export type ExploreViewport = {
   readonly lat: number;
@@ -229,9 +228,7 @@ function parseFiniteNumber(raw: string | undefined): number | undefined {
  * else falls back to the default and the edge 308s it away.
  */
 const FILTER_TOKEN = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,63}$/;
-const RECORD_ID = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,159}$/;
 const EDGE_ID = /^[^\s\p{Cc}]{1,256}$/u;
-const STATE_POSTAL = /^[A-Z]{2}$/;
 const DECADE = /^\d{3}0s$/;
 
 function cleanSelectParam(raw: string | undefined): string {
@@ -352,20 +349,33 @@ function parseNear(raw: string | undefined): string | undefined {
   return cleanLabelParam(raw, 80);
 }
 
-function parseEvidenceFloor(raw: string | undefined): EvidenceGrade | undefined {
-  const trimmed = raw?.trim().toUpperCase();
-  if (trimmed === 'A' || trimmed === 'B' || trimmed === 'C') return trimmed;
-  return undefined;
-}
-
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
-  const collection = parseRecordsQuery({ q: raw.q, sort: raw.sort });
+  // The shared filter model is parsed once, by the list's parser, so a value the list accepts
+  // the map accepts and the reverse. The map's two spellings (`theme`, `floor`) map onto it here.
+  const collection = parseRecordsQuery({
+    q: raw.q,
+    sort: raw.sort,
+    kind: raw.kind,
+    era: raw.era,
+    state: raw.state,
+    topic: raw.theme,
+    status: raw.status,
+    evidence: raw.floor,
+    selected: raw.selected,
+    place: raw.place,
+    collection: raw.collection,
+    periodStart: raw.periodStart,
+    periodEnd: raw.periodEnd,
+    includeUndated: raw.includeUndated,
+    layout: raw.layout,
+  });
+  const orAll = (value: string) => (value === '' ? 'all' : value);
   const filters: ExploreFilterState = {
-    era: cleanSelectParam(firstValue(raw.era)),
-    kind: cleanSelectParam(firstValue(raw.kind)),
+    era: orAll(collection.era),
+    kind: orAll(collection.kind),
     tone: cleanSelectParam(firstValue(raw.tone)),
-    theme: cleanSelectParam(firstValue(raw.theme)),
-    status: cleanSelectParam(firstValue(raw.status)),
+    theme: orAll(collection.topic),
+    status: orAll(collection.status),
     confidence: cleanSelectParam(firstValue(raw.confidence)),
   };
 
@@ -373,15 +383,14 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const lng = parseFiniteNumber(firstValue(raw.lng));
   const zoom = parseFiniteNumber(firstValue(raw.zoom));
 
-  const selectedRaw = matchOrUndefined(firstValue(raw.selected)?.trim(), RECORD_ID);
-  const stateCandidate = firstValue(raw.state)?.trim().toUpperCase();
-  const stateRaw = matchOrUndefined(stateCandidate, STATE_POSTAL);
-  const placeRaw = matchOrUndefined(firstValue(raw.place)?.trim(), PLACE_KEY_PATTERN);
+  const selectedRaw = collection.selected;
+  const stateRaw = collection.state;
+  const placeRaw = collection.place;
   const satRaw = firstValue(raw.sat);
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = matchOrUndefined(firstValue(raw.decade)?.trim(), DECADE);
   const edgeRaw = matchOrUndefined(firstValue(raw.edge)?.trim(), EDGE_ID);
-  const floor = parseEvidenceFloor(firstValue(raw.floor));
+  const floor = collection.evidence === '' ? undefined : (collection.evidence as EvidenceGrade);
   const layerMode = parseLayerMode(raw);
   const popGeoRaw = firstValue(raw.popGeo)?.trim();
   const popDecadeRaw = firstValue(raw.popDecade)?.trim();
@@ -390,13 +399,13 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const radiusRaw = firstValue(raw.radius)?.trim();
   const nearRaw = firstValue(raw.near)?.trim();
   const findRaw = cleanLabelParam(firstValue(raw.find), 120);
-  const collectionToken = parseCollectionToken(raw.collection);
-  const period = normalizePeriod({
-    start: raw.periodStart,
-    end: raw.periodEnd,
-    includeUndated: raw.includeUndated,
-  });
-  const chronologyLayout = firstValue(raw.layout)?.trim().toLowerCase() === 'chronology';
+  const collectionToken = collection.collection;
+  const period = {
+    start: collection.periodStart,
+    end: collection.periodEnd,
+    includeUndated: collection.includeUndated,
+  };
+  const chronologyLayout = collection.layout === 'chronology';
 
   const satOn = satRaw === '1' || satRaw === 'true';
 
@@ -444,7 +453,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
       ? { viewport: { lat, lng, zoom } }
       : {}),
     ...(selectedRaw ? { selected: selectedRaw } : {}),
-    ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
+    ...(stateRaw ? { state: stateRaw } : {}),
     ...(placeRaw ? { place: placeRaw } : {}),
     layerMode,
     ...(popGeo ? { popGeo } : {}),

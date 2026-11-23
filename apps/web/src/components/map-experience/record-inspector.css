@@ -173,8 +173,8 @@
   margin: var(--ds-space-3) calc(var(--ds-space-6) * -1) 0;
   padding: var(--ds-space-3) var(--ds-space-6);
   border-top: var(--ds-border-width) solid var(--ds-rule);
-  /* The column's own glass again, so rows scrolling under the pinned actions never read through. */
-  background: color-mix(in srgb, var(--ds-canvas) var(--ds-xcol-float-alpha, 94%), transparent);
+  /* The column's own ground, so rows scrolling under the pinned actions never read through. */
+  background: var(--ds-canvas);
 }
 
 .ds-inspector__pager {

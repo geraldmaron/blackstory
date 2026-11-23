@@ -1,11 +1,25 @@
 /** Collection predicates use Records facts; the camera only projects the result. */
 import { EMPTY_RECORDS_QUERY, type RecordsQuery } from '../records/records-query';
 import { matchesExcept, comparatorFor, type CollectionFacts } from '../records/records-matching';
-import type { ExploreViewState } from '../map-experience/url-state';
+import {
+  buildExploreHref,
+  defaultExploreOverlayState,
+  type ExploreViewState,
+} from '../map-experience/url-state';
+import { DEFAULT_EXPLORE_FILTERS } from '../map-experience/filters';
 import type { ExploreMapFeature } from '../map-experience/build-explore-map-source';
 import { documentedDecades, normalizePeriod } from './collection-period';
 import { parseCollectionToken } from './story-collection';
 
+/**
+ * The shared filter model is `RecordsQuery` (`records-query.ts`): kind, era, decade range, state,
+ * topic, evidence, status, query, sort, page, and the record or place selected on the map. These
+ * two functions are the only translation between it and the map's view state. The map spells two
+ * of its keys differently (`theme` for topic, `floor` for evidence); nothing else differs.
+ *
+ * Map-only state (layers, satellite, lines, radius, exact `tone` and `confidence`) is not part of
+ * the model and does not survive a visit to the list. The camera is never in either.
+ */
 export function recordsQueryFromExplore(state: ExploreViewState): RecordsQuery {
   const value = (input: string) => (input === 'all' ? '' : input);
   const period = normalizePeriod({
@@ -29,7 +43,43 @@ export function recordsQueryFromExplore(state: ExploreViewState): RecordsQuery {
     includeUndated: period.includeUndated,
     // Return context only: it never changes which records match, but Records restores it.
     layout: state.layout === 'chronology' ? 'chronology' : 'index',
+    selected: state.selected ?? '',
+    place: state.place ?? '',
   };
+}
+
+/** The inverse. `page` and `seed` belong to the list and have no meaning on the map. */
+export function exploreViewFromRecordsQuery(query: RecordsQuery): ExploreViewState {
+  const value = (input: string) => (input === '' ? 'all' : input);
+  return {
+    ...(query.q ? { query: query.q } : {}),
+    ...(query.sort !== 'discovery' ? { sort: query.sort } : {}),
+    filters: {
+      ...DEFAULT_EXPLORE_FILTERS,
+      kind: value(query.kind),
+      era: value(query.era),
+      theme: value(query.topic),
+      status: value(query.status),
+    },
+    ...defaultExploreOverlayState(),
+    ...(query.state ? { state: query.state } : {}),
+    ...(query.evidence === 'A' || query.evidence === 'B' || query.evidence === 'C'
+      ? { floor: query.evidence }
+      : {}),
+    ...(query.selected ? { selected: query.selected } : {}),
+    ...(query.place ? { place: query.place } : {}),
+    ...(query.collection ? { collection: query.collection } : {}),
+    ...(query.periodStart ? { periodStart: query.periodStart } : {}),
+    ...(query.periodEnd ? { periodEnd: query.periodEnd } : {}),
+    ...(query.includeUndated ? { includeUndated: true } : {}),
+    // Return context only: the map ignores it for matching and hands it back with the reader.
+    ...(query.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
+  };
+}
+
+/** `/explore` showing the same filter set. No camera: the view state built above has none. */
+export function exploreHrefFromRecordsQuery(query: RecordsQuery): string {
+  return buildExploreHref(exploreViewFromRecordsQuery(query));
 }
 
 /**

@@ -10,6 +10,8 @@ import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../components/map-experience/SynchronizedResultList';
 import type { ExploreMapFeature } from '../lib/map-experience/build-explore-map-source';
 import type { AtlasShellModel } from './explore/explore-view-model-wire';
+import { recordsHref } from '../lib/records/records-query';
+import { recordsQueryFromExplore } from '../lib/discovery/explore-collection';
 
 void React;
 
@@ -98,9 +100,19 @@ export function DoorNoscript({ view: noscriptView }: DoorNoscriptProps) {
             <p className="ds-sans ds-explore__results-count">
               Showing the first {noscriptView.filteredFeatures.length} of{' '}
               {noscriptView.totalMatched}. Enable JavaScript for the full map and records list, or
-              browse every record at <a href="/records">/records</a>.
+              open{' '}
+              <a href={recordsHref(recordsQueryFromExplore(noscriptView.viewState))}>
+                the same records as a list
+              </a>
+              .
             </p>
-          ) : null}
+          ) : (
+            <p className="ds-sans ds-explore__results-count">
+              <a href={recordsHref(recordsQueryFromExplore(noscriptView.viewState))}>
+                Open the same records as a list
+              </a>
+            </p>
+          )}
         </div>
       ) : (
         <p className="ds-door__noscript">

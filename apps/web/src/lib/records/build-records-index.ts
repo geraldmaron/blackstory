@@ -66,8 +66,10 @@ import {
   chronologyOrder,
   type ChronologyPage,
 } from '../discovery/collection-chronology';
+import { exploreHrefFromRecordsQuery } from '../discovery/explore-collection';
 import {
   decadeLabel,
+  documentedDecades,
   periodIsActive,
   periodIsInvalid,
   periodLabel,
@@ -222,6 +224,10 @@ export type RecordsIndex = {
   readonly atlasHref: string;
   /** Matched records the current map plate draws; Explore's count must equal it. */
   readonly mappableMatched: number;
+  /** Matched records with no documented decade: the timeline's Undated band. */
+  readonly undatedMatched: number;
+  /** Records every other filter keeps that a decade range leaves out for having no decade. */
+  readonly undatedExcluded: number;
   /** The resolved named collection (`none` when the whole archive is the collection). */
   readonly collection: CollectionDescriptor;
   /** Set when the collection or period cannot be shown; never a silently widened list. */
@@ -797,8 +803,9 @@ export function buildRecordsIndex(
       singular: 'record',
       plural: 'records',
     }),
-    // The shuffle seed is per visit, never part of what the page is.
-    canonicalPath: recordsHref({ ...query, page, seed: '' }),
+    // The shuffle seed is per visit and a map selection is one reader's way back; neither is
+    // part of what the page is.
+    canonicalPath: recordsHref({ ...query, page, seed: '', selected: '', place: '' }),
     indexable: recordsQueryIndexable(query),
     previousHref: page > 1 ? recordsHref({ ...query, page: page - 1 }) : undefined,
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
@@ -807,6 +814,16 @@ export function buildRecordsIndex(
     clearAllHref: '/records',
     atlasHref: buildAtlasHref(query),
     mappableMatched,
+    undatedMatched: matched.filter((record) => documentedDecades(record.eraBuckets).length === 0)
+      .length,
+    undatedExcluded:
+      periodIsActive(period) && !period.includeUndated && !periodIsInvalid(period)
+        ? facts.filter(
+            (record) =>
+              documentedDecades(record.eraBuckets).length === 0 &&
+              matchesExcept(record, query, 'period', members),
+          ).length
+        : 0,
     collection,
     notice,
     indexHref: recordsHref({
@@ -903,23 +920,7 @@ export function findRecordsNeighbors(
  * `evidence` becomes `floor` (and-up grade predicate; not exact-match `confidence`).
  */
 export function buildAtlasHref(query: RecordsQuery): string {
-  const params = new URLSearchParams();
-  if (query.q) params.set('q', query.q);
-  if (query.sort !== 'discovery') params.set('sort', query.sort);
-  if (query.kind.length > 0) params.set('kind', query.kind);
-  if (query.era.length > 0) params.set('era', query.era);
-  if (query.state.length > 0) params.set('state', query.state);
-  if (query.topic.length > 0) params.set('theme', query.topic);
-  if (query.status.length > 0) params.set('status', query.status);
-  if (query.evidence.length > 0) params.set('floor', query.evidence);
-  if (query.collection.length > 0) params.set('collection', query.collection);
-  if (query.periodStart.length > 0) params.set('periodStart', query.periodStart);
-  if (query.periodEnd.length > 0) params.set('periodEnd', query.periodEnd);
-  if (query.includeUndated) params.set('includeUndated', '1');
-  // Return context only: Explore ignores it for matching and hands it back with the reader.
-  if (query.layout === 'chronology') params.set('layout', 'chronology');
-  const search = params.toString();
-  return search.length > 0 ? `/explore?${search}` : '/explore';
+  return exploreHrefFromRecordsQuery(query);
 }
 
 /** Exported for the drift test: the postal codes this index can actually filter on. */

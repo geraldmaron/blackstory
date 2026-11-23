@@ -149,9 +149,13 @@
 }
 
 .ds-place__option:hover,
-.ds-place__option:focus-visible {
+.ds-place__option[data-active] {
   background: var(--ds-surface);
-  outline: none;
+}
+
+/* The arrow-key highlight is a rule as well as a tint, so it is never color alone. */
+.ds-place__option[data-active] {
+  box-shadow: inset var(--ds-space-1) 0 0 var(--ds-ink);
 }
 
 .ds-place__option-name {

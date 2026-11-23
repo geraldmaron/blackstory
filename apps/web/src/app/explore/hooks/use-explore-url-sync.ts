@@ -84,7 +84,8 @@ export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSync
   return buildExploreHref(next);
 }
 
-export function useExploreUrlSync(base: ExploreViewState, lens: ExploreUrlSyncLens): void {
+/** Returns the href it keeps in the address bar, for the view switch's link to this view. */
+export function useExploreUrlSync(base: ExploreViewState, lens: ExploreUrlSyncLens): string {
   const lastPushed = useRef<string | null>(null);
   const lastPlace = useRef(lens.placeKey);
   const href = exploreHrefFromLens(base, lens);
@@ -103,4 +104,5 @@ export function useExploreUrlSync(base: ExploreViewState, lens: ExploreUrlSyncLe
     else window.history.replaceState(window.history.state, '', href);
     lastPushed.current = href;
   }, [href, placeKey]);
+  return href;
 }

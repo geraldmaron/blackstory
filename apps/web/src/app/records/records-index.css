@@ -19,36 +19,22 @@ body:has(.ds-records) .ds-reading-progress {
   --records-bar-h: 68px;
 }
 
-/* The register's own action in the active-filter row. */
-.ds-records-active__map {
-  margin-left: auto;
-}
-
-/* —— header: the title at display scale, the count as a giant copper numeral ———————— */
+/* —— header: the title, then the count and the map membership as sentences ———————— */
 .ds-records-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'title count'
-    'dek count';
-  align-items: end;
-  column-gap: var(--ds-space-8);
   padding-block: var(--ds-space-12) var(--ds-space-8);
 }
 
-.ds-records-head__title {
-  grid-area: title;
+.ds-records-head__views {
+  margin-top: var(--ds-space-4);
 }
 
-.ds-records-head__count {
-  grid-area: count;
-  align-self: end;
-  /* Crop the numeral's descender space so it sits on the same floor as the dek. */
-  margin-bottom: -0.06em;
+.ds-records-head__membership {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
 }
 
 .ds-records-head__dek {
-  grid-area: dek;
   margin: var(--ds-space-4) 0 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
@@ -57,10 +43,12 @@ body:has(.ds-records) .ds-reading-progress {
   line-height: 1.3;
 }
 
-/* —— the list: one paper sheet on the table ——————————————————————————————————— */
-.ds-records-paper {
+/* —— the list: one paper sheet, square, no bands, no shadow (DESIGN.md 7.4) ———————— */
+.ds-records-paper.ds-sheet {
   margin-top: var(--ds-space-6);
   padding-block: var(--ds-space-2);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .ds-records-list {
@@ -413,17 +401,7 @@ body:has(.ds-records) .ds-reading-progress {
 /* —— phone ————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
   .ds-records-head {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'title'
-      'count'
-      'dek';
     padding-block: var(--ds-space-8) var(--ds-space-4);
-  }
-
-  .ds-records-head__count {
-    justify-self: start;
-    margin: var(--ds-space-2) 0 0;
   }
 
   .ds-records-paper {
@@ -458,11 +436,6 @@ body:has(.ds-records) .ds-reading-progress {
 
   .ds-record__link--compact {
     grid-template-columns: 3rem minmax(0, 1fr);
-  }
-
-  /* Under the chips, flush to the gutter. */
-  .ds-records-active__map {
-    margin-left: 0;
   }
 
   .ds-records-pager__at {

@@ -3,9 +3,9 @@
  * whole viewport, and the chrome floats on it as plates of the table's own ground
  * (`data-ground="ink"`: the night atlas's ink in the dark theme, the paper table in the light one).
  * A 380px column inset from the left edge, the decade histogram inset along the bottom, and the
- * zoom and locate stack bottom-right, each on the float plane: glass of the ground with a keyline
- * and the float shadow (the `.ds-float` recipe in @repo/ui, copied below), solid under reduced
- * transparency. Below 768px the column is a bottom sheet of the same glass.
+ * zoom and locate stack bottom-right. Each is a square, solid sheet of the ground with a keyline
+ * and the float shadow, the one place a shadow is allowed: it floats over the map (DESIGN.md 7.4).
+ * No glass, no blur. Below 1024px the column is a bottom sheet of the same paper.
  *
  * `--ds-xcol-detent-h` (set on `.ds-atlas` by AtlasExperience) is the sheet's resting height, so
  * the controls and the attribution can sit on top of it. `--ds-xcol-sheet-h` is the live height
@@ -13,9 +13,6 @@
  */
 .ds-atlas {
   --ds-xcol-w: 380px;
-  /* The column and strip carry reading text over a busy plate: glass at the edge, near solid
-     under the words, so legibility never depends on the blur rendering. */
-  --ds-xcol-float-alpha: 94%;
   /* The gutter every floating plate keeps from the viewport edge and from its neighbors. */
   --ds-xfloat: var(--ds-space-3);
 }
@@ -31,36 +28,16 @@
   flex-direction: column;
   width: var(--ds-xcol-w);
   overflow: hidden;
-  border-radius: var(--ds-radius-md);
   color: var(--ds-ink);
   pointer-events: auto;
 }
 
-/* The float plane (the `.ds-float` recipe): glass of the ground, a keyline, the float shadow. */
 .ds-xcol,
 .ds-xdock {
-  background: color-mix(in srgb, var(--ds-canvas) var(--ds-xcol-float-alpha), transparent);
+  background: var(--ds-canvas);
   box-shadow:
     inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
     var(--ds-shadow-float);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .ds-xcol,
-  .ds-xdock {
-    background: var(--ds-canvas);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .ds-xcol,
-  .ds-xdock {
-    background: var(--ds-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .ds-xcol__top {
@@ -76,33 +53,21 @@
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-/* The only count on the page: a copper numeral (the register's numeral role, stepped down to the
-   column's scale) and "records" in mono capitals. */
+/* How many records the list holds now, in body type: a count is never display type
+   (DESIGN.md rule 4). */
 .ds-xcol__count {
-  display: flex;
   flex: 1 1 auto;
-  align-items: baseline;
-  gap: var(--ds-space-2);
   min-width: 0;
   margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-title);
-  font-weight: var(--ds-weight-title);
-  line-height: 1.2;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  font-weight: 600;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
 /* v12: a count, said plainly. The copper numeral made the page's hero a number. */
-.ds-xcol__count-num {
-  color: var(--ds-ink);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--ds-tracking-numeral);
-}
-
-.ds-xcol__count-unit {
-  color: var(--ds-ink);
-}
-
 .ds-xcol__back {
   display: inline-flex;
   flex: 1 1 auto;
@@ -252,29 +217,26 @@
   display: none;
 }
 
-.ds-xcol__note {
-  display: none;
+/* The same filter set as a list or a timeline (plain links), then the membership sentence: how
+   many of the matching records the map can show and why the rest are absent. */
+.ds-xcol__views {
+  flex: none;
+  padding: var(--ds-space-3) var(--ds-space-4) 0;
 }
 
 .ds-xcol__note {
   flex: none;
   margin: 0;
   padding: var(--ds-space-3) var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   line-height: 1.45;
 }
 
-.ds-xcol__note a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin-block: calc(var(--ds-space-3) * -1);
-  color: var(--ds-ink);
-  text-underline-offset: 0.2em;
-  white-space: nowrap;
+.ds-xcol[data-view='filters'] .ds-xcol__views {
+  display: none;
 }
 
 /* The place the map scoped the list to, named the way the plate names it: the trail of places
@@ -424,8 +386,8 @@
 }
 
 /* —— The histogram on the map's bottom edge ————————————————————————————————— */
-/* A strip of glass on the table's ground (`data-ground="ink"` on the dock): ink in the dark theme,
-   paper in the light one (float recipe above). Its bars and brushed range take their colors from that ground. */
+/* A strip of the table's ground (`data-ground="ink"` on the dock): ink in the dark theme, paper
+   in the light one. Its bars and brushed range take their colors from that ground. */
 .ds-xdock {
   position: fixed;
   right: var(--ds-xfloat);
@@ -433,7 +395,6 @@
   left: calc(var(--ds-xcol-w) + var(--ds-xfloat) * 2);
   z-index: var(--ds-z-atlas-instruments);
   overflow: hidden;
-  border-radius: var(--ds-radius-md);
   pointer-events: auto;
 }
 
@@ -452,7 +413,6 @@ body:has(.ds-atlas .ds-xcol) {
     width: auto;
     left: 0;
     height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 176px));
-    border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
     transition: height var(--ds-duration-base) var(--ds-ease-entrance);
   }
 
@@ -558,6 +518,5 @@ body:has(.ds-atlas .ds-xcol) {
     height: 176px;
     overflow: hidden;
     left: 0;
-    border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
   }
 }

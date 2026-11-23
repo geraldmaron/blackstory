@@ -159,24 +159,19 @@ describe('horizontal overflow guards', () => {
     assert.doesNotMatch(commandBarCss, /box-shadow:\s*0\s+\d+px/, 'command-bar must not elevate');
   });
 
-  it('Explore chrome blurs only on the float plane: the column and dock, nothing inside them', () => {
+  it('Explore chrome never blurs: the column, dock and controls are solid sheets (DESIGN.md 7.4)', () => {
     const mapCss = (file: string) =>
       readFileSync(join(here, '../components/map-experience', file), 'utf8');
     const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
     for (const [name, source] of [
       ['column', mapCss('explore-column.css')],
+      ['controls', mapCss('map-controls.css')],
       ['list', mapCss('explore-record-list.css')],
       ['inspector', mapCss('record-inspector.css')],
       ['histogram', mapCss('decade-brush.css')],
       ['atlas', atlasCss],
     ] as const) {
-      // Glass lives on the float surfaces (column, dock, controls); parts inside stay unblurred.
-      if (name === 'column') {
-        assert.match(source, /backdrop-filter:\s*blur\(18px\)/, 'column is glass');
-        assert.match(source, /prefers-reduced-transparency/, 'column has a solid fallback');
-      } else {
-        assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
-      }
+      assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
       assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);
       assert.doesNotMatch(
         source,
