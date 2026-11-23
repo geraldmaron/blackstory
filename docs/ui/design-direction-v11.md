@@ -898,9 +898,13 @@ The owner signed off on 2026-11-20 ("Yes, start rollout") after an audit of 43 p
   plate.
 - **The public database pool is bounded** (2026-11-22). It had no timeouts; after a dropped
   connection `/` took 60 seconds and `/explore` 15 minutes, and the map had nothing to draw.
-- Seen in the same pass, not changed: `/explore` shows state counts and no lights from about
-  1366 wide, because the national frame there sits above the zoom where the lights fade; and
-  the Orbit globe stops growing at 1440 wide, so it is small on a 4K window.
+- **The lights stay lit under the state counts** (2026-11-22). They used to be gone by zoom
+  3.3, and the national frame on `/explore` sits above that from about 1366 wide, so wide
+  windows opened on counts with no light. They now step down to 0.45 as the counts arrive, hold
+  there, and fade with the counts between zoom 5.6 and 6.2. Measured at six widths from 390 to
+  3840: lights on every one. The handoff to the place tokens past zoom 6 was not looked at.
+- Seen in the same pass, not changed: the Orbit globe stops growing at 1440 wide, so it is
+  small on a 4K window.
 
 ### Open before or during phase 1
 

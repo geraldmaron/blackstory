@@ -633,16 +633,33 @@ export const ORBIT_LIGHT_COLOR = worldPalette.ember;
 /** Where the lights give way to record pins when they are kept lit on the way down. */
 export const LIGHTS_DEEP_MAX_ZOOM = 11;
 
+/** The lights' level under the state counts: present, and quieter than the counts they stand under. */
+const LIGHTS_UNDER_COUNTS_OPACITY = 0.45;
+
 /**
- * How bright the lights are by zoom. At rest they are gone by the national frame, where the place
- * tokens take over. `deep` is for a surface that has stood the tokens down and is flying to one
+ * How bright the lights are by zoom. At rest they step down as the state counts arrive and stay
+ * under them until the counts fade for the place tokens. They used to be gone by zoom 3.3, but
+ * the national frame's zoom follows the window: on a window from about 1366 wide it sits above
+ * that, so the widest screens opened on a map with no light on it at all. `deep` is for a surface that has stood the tokens down and is flying to one
  * record (the Door's tour; MapStage, `setPlaceTokens`): the lights stay lit the whole way down
  * and fade as the record pins arrive, so the descent is into the lights, not across an empty map.
  */
 export function lightsOpacity(deep: boolean): ExpressionSpecification {
   return deep
     ? ['interpolate', ['linear'], ['zoom'], LIGHTS_DEEP_MAX_ZOOM - 2, 0.85, LIGHTS_DEEP_MAX_ZOOM, 0]
-    : ['interpolate', ['linear'], ['zoom'], ORBIT_MAX_ZOOM, 0.85, ORBIT_MAX_ZOOM + 0.6, 0];
+    : [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        ORBIT_MAX_ZOOM,
+        0.85,
+        ORBIT_MAX_ZOOM + 0.6,
+        LIGHTS_UNDER_COUNTS_OPACITY,
+        STATE_LABEL_FADE_START_ZOOM,
+        LIGHTS_UNDER_COUNTS_OPACITY,
+        STATE_LABEL_FADE_END_ZOOM,
+        0,
+      ];
 }
 
 /**
