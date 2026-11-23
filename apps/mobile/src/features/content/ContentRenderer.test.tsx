@@ -80,19 +80,15 @@ describe('ContentRenderer', () => {
     expect(getByText('Showing cached copy (offline)')).toBeTruthy();
   });
 
-  it('shows an "up to date" notice when served fresh from the network', async () => {
-    const { getByText } = await renderPage(BASE_PAGE, {
-      cached: { fetchedAt: Date.now(), degraded: false },
-    });
-    expect(getByText('Up to date')).toBeTruthy();
-  });
-
-  it('hides the fresh "up to date" notice in longform presentation', async () => {
-    const { queryByText } = await renderPage(BASE_PAGE, {
-      presentation: 'longform',
-      cached: { fetchedAt: Date.now(), degraded: false },
-    });
-    expect(queryByText('Up to date')).toBeNull();
+  it('says nothing about the cache when the copy on screen is fresh', async () => {
+    for (const presentation of ['document', 'longform'] as const) {
+      const { queryByText } = await renderPage(BASE_PAGE, {
+        presentation,
+        cached: { fetchedAt: Date.now(), degraded: false },
+      });
+      expect(queryByText('Up to date')).toBeNull();
+      expect(queryByText(/Last updated/)).toBeNull();
+    }
   });
 
   it('still shows offline cache notice in longform presentation', async () => {

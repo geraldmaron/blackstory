@@ -74,7 +74,7 @@ function Block({
   if (block.kind === 'heading') {
     return (
       <Text
-        variant="bodyEmphasis"
+        variant="title"
         isHeading
         style={{
           marginTop: presentation === 'longform' ? space['5'] : space['4'],
@@ -148,7 +148,8 @@ export function ContentRenderer({
   const theme = useThemeColors();
   const hasSources = Boolean(sources && sources.length > 0);
   const isLongform = presentation === 'longform';
-  const showCacheNotice = cached && (!isLongform || cached.degraded);
+  // A plain document says nothing about its cache unless the copy on screen may be old.
+  const showCacheNotice = cached?.degraded;
   const facts = headerFacts ?? [
     ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }] : []),
     ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
@@ -186,7 +187,7 @@ export function ContentRenderer({
       {showCacheNotice ? (
         <Notice
           tone="info"
-          title={cached.degraded ? 'Showing cached copy (offline)' : 'Up to date'}
+          title="Showing cached copy (offline)"
           description={`Last updated ${formatRelativeTime(cached.fetchedAt)}`}
         />
       ) : null}

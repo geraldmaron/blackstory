@@ -46,7 +46,7 @@ export const UtilityScreenShell = forwardRef<ScrollView, UtilityScreenShellProps
           contentContainerStyle={styles.content}
           {...scrollProps}
         >
-          <ScreenHeader kicker={kicker} title={title} dek={dek} compact dense />
+          <ScreenHeader kicker={kicker} title={title} dek={dek} dense={false} />
           <View style={styles.body}>{children}</View>
         </ScrollView>
       </ScreenCanvas>
