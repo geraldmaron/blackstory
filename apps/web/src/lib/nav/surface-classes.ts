@@ -84,6 +84,10 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // `/corrections/appeal` and `/corrections/abuse` are API-only directories. Their forms render
   // inside the receipt status page, so classifying the directory paths would advertise chrome for
   // URLs that return 404.
+  // The retelling as its own page: the front page's ground and plate, on trial (DESIGN.md
+  // section 9.7). A prefix entry, not an exact one, keeps it out of `CLASSIFIED_PATHS` and so out
+  // of the footer, the palette and the sitemap until the read test decides where it lives.
+  ['/story', 'door'],
   ['/stories/', 'reading'],
   ['/presidents/', 'reading'],
   ['/lives/', 'reading'],
