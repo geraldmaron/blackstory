@@ -1143,12 +1143,12 @@ describe('room kit · one public control system', () => {
 describe('room kit · every page picks one of the three containers', () => {
   const PAGES = [
     'about/page.tsx',
-    'books/page.tsx',
+    'books/(index)/page.tsx',
     'corrections/page.tsx',
     'data/page.tsx',
     'errata/page.tsx',
     'faq/page.tsx',
-    'law/page.tsx',
+    'law/(index)/page.tsx',
     'lives/page.tsx',
     'lives/explorer/page.tsx',
     'methodology/page.tsx',

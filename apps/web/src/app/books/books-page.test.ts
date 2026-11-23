@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { BOOKS_INDEX_NOTE } from './books-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const indexSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const indexSource = readFileSync(join(here, '(index)', 'page.tsx'), 'utf8');
 const detailSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
 const detailViewSource = readFileSync(join(here, '[slug]', 'BookRecordView.tsx'), 'utf8');

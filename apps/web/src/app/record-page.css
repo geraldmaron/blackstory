@@ -55,12 +55,6 @@
   margin-bottom: var(--ds-space-8);
 }
 
-.ds-recpage__head--loading {
-  display: grid;
-  grid-template-areas: none;
-  gap: var(--ds-space-3);
-}
-
 .ds-recpage__head > .ds-recpage__crumb {
   grid-area: crumb;
 }
@@ -636,9 +630,16 @@
 }
 
 /* A book cover: the real art, at its own proportion, never stretched to the rail. */
-.ds-recpage .ds-recpage__lead .ds-recpage__cover {
+.ds-recpage .ds-recpage__lead .ds-book-cover.ds-recpage__cover {
   width: min(100%, 180px);
   margin: 0;
+}
+
+/* Without script nothing marks the cover loaded, so it is simply shown. */
+@media (scripting: none) {
+  .ds-recpage .ds-book-cover[data-art='pending'] .ds-book-cover__img {
+    opacity: 1;
+  }
 }
 
 /* A cover that fails to load leaves no typeset stand-in behind on the record page. */
@@ -876,21 +877,6 @@
   white-space: nowrap;
 }
 
-/* —— loading geometry ———————————————————————————————————————————————————— */
-.ds-recpage__sk-title {
-  height: 2.75rem;
-  width: 70%;
-}
-
-.ds-recpage__sk-line {
-  height: 1.125rem;
-  margin-block: var(--ds-space-2);
-}
-
-.ds-recpage__sk-media {
-  aspect-ratio: 16 / 10;
-}
-
 /* —— phone and tablet: one column, actions pinned at the bottom ————————
    Reading order (DESIGN.md section 9.1): exhibit, name, summary, facts, the first beat (an
    entity's claims), map, the other beats, the record file. The main block, the side column and
@@ -920,7 +906,7 @@
   }
 
   /* A cover is 2:3, so its width caps its height. */
-  .ds-recpage .ds-recpage__lead .ds-recpage__cover {
+  .ds-recpage .ds-recpage__lead .ds-book-cover.ds-recpage__cover {
     width: min(100%, 180px, 24svh);
   }
 

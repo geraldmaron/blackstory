@@ -11,16 +11,12 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import BooksLoading from './books/loading';
-import BookLoading from './books/[slug]/loading';
-import LawLoading from './law/loading';
-import LawEntryLoading from './law/[slug]/loading';
+import BooksLoading from './books/(index)/loading';
+import LawLoading from './law/(index)/loading';
 import StoriesLoading from './stories/loading';
 import StoryLoading from './stories/[slug]/loading';
 import MosaicCreditsLoading from './stories/mosaic-credits/loading';
 import RecordsLoading from './records/loading';
-import PlaceLoading from './place/[slug]/loading';
-import InventionLoading from './invention/[slug]/loading';
 import DataLoading from './data/loading';
 import LivesLoading from './lives/loading';
 import ReceiptLoading from './corrections/status/[receiptCode]/loading';
@@ -32,22 +28,15 @@ const here = dirname(fileURLToPath(import.meta.url));
 const LOADING_BOUNDARIES = [
   {
     route: '/books',
-    dir: 'books',
+    dir: 'books/(index)',
     Loading: BooksLoading,
     label: 'Taking the books off the shelf…',
   },
   {
-    route: '/books/[slug]',
-    dir: 'books/[slug]',
-    Loading: BookLoading,
-    label: 'Opening record',
-  },
-  { route: '/law', dir: 'law', Loading: LawLoading, label: 'Pulling the laws together…' },
-  {
-    route: '/law/[slug]',
-    dir: 'law/[slug]',
-    Loading: LawEntryLoading,
-    label: 'Opening record',
+    route: '/law',
+    dir: 'law/(index)',
+    Loading: LawLoading,
+    label: 'Pulling the laws together…',
   },
   { route: '/stories', dir: 'stories', Loading: StoriesLoading, label: 'Loading stories' },
   {
@@ -67,14 +56,6 @@ const LOADING_BOUNDARIES = [
     dir: 'records',
     Loading: RecordsLoading,
     label: 'Pulling the records together…',
-  },
-  // Every record family (entity, place, invention, law, book) shares one record skeleton.
-  { route: '/place/[slug]', dir: 'place/[slug]', Loading: PlaceLoading, label: 'Opening record' },
-  {
-    route: '/invention/[slug]',
-    dir: 'invention/[slug]',
-    Loading: InventionLoading,
-    label: 'Opening record',
   },
   { route: '/data', dir: 'data', Loading: DataLoading, label: 'Gathering the figures…' },
   // Also the wait for /lives/explorer, which awaits the same snapshot read.
@@ -99,6 +80,31 @@ for (const { route, dir, Loading, label } of LOADING_BOUNDARIES) {
     assert.doesNotMatch(html, /role="progressbar"/);
   });
 }
+
+/*
+ * A record page is the archive's citable document: it must read without script. A segment
+ * loading boundary streams the page into a hidden block that only script reveals, so no record
+ * route has one, and no ancestor segment may either (a `law/loading.tsx` would wrap
+ * `law/[slug]`; the index pages keep theirs inside an `(index)` route group). It also lets a
+ * missing record answer a real 404.
+ */
+test('no record route sits behind a loading boundary', () => {
+  for (const dir of [
+    'entity/[id]',
+    'entity',
+    'place/[slug]',
+    'place',
+    'invention/[slug]',
+    'invention',
+    'law/[slug]',
+    'law',
+    'books/[slug]',
+    'books',
+    '',
+  ]) {
+    assert.ok(!existsSync(join(here, dir, 'loading.tsx')), `${dir || 'app'} has a loading.tsx`);
+  }
+});
 
 test('only the routes that await no read are left without a segment loading boundary', () => {
   // Static or in-memory reading rooms: no awaited data, so there is no wait to represent.

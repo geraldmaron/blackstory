@@ -18,7 +18,7 @@ const WALK_ROOMS = [
   'errata/page.tsx',
   'memorial/page.tsx',
   'stories/page.tsx',
-  'law/page.tsx',
+  'law/(index)/page.tsx',
   'submit/page.tsx',
   'corrections/CorrectionsSections.tsx',
   'support/page.tsx',

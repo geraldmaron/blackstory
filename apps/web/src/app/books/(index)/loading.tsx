@@ -4,10 +4,10 @@
  */
 import React from 'react';
 import { PageHeader } from '@repo/ui';
-import { Room } from '../../components/room';
-import '../reading-room.css';
-import '../parked.css';
-import './books.css';
+import { Room } from '../../../components/room';
+import '../../reading-room.css';
+import '../../parked.css';
+import '../books.css';
 
 void React;
 

@@ -6,21 +6,21 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
 import { PageHeader } from '@repo/ui';
-import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
-import { parentCrumb, Room } from '../../components/room';
-import { Outcome } from '../records/RecordsIndex';
+import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
+import { loadBannedBooksListing } from '../../../lib/banned-books/public-source.js';
+import { parentCrumb, Room } from '../../../components/room';
+import { Outcome } from '../../records/RecordsIndex';
 import {
   bookStateName,
   buildBooksBrowseViewModel,
   type RawBooksBrowseParams,
-} from './books-view-model';
-import { BooksBrowseSections } from './BooksBrowseSections';
-import { isbnsKnownWithoutCovers } from './books-cover-availability';
-import { BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import '../reading-room.css';
-import '../parked.css';
-import './books.css';
+} from '../books-view-model';
+import { BooksBrowseSections } from '../BooksBrowseSections';
+import { isbnsKnownWithoutCovers } from '../books-cover-availability';
+import { BOOKS_PAGE_DESCRIPTION } from '../books-copy';
+import '../../reading-room.css';
+import '../../parked.css';
+import '../books.css';
 
 void React;
 

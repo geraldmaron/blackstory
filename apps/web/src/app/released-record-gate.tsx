@@ -1,11 +1,10 @@
 /**
  * The 404 gate for record rooms (`/place/{slug}`, `/invention/{slug}`).
  *
- * Both rooms stream behind a segment `loading.tsx`. Once that skeleton flushes, the response has
- * already committed to 200, so the page body's own `notFound()` can only add `noindex`: a missing
- * record answered "200 Place not found", a soft 404 to every crawler and link checker. A layout
- * renders outside its own segment's loading boundary, so deciding existence here, before the
- * skeleton, is what lets a missing record answer a real 404 while a real one still streams.
+ * A layout decides existence before the page renders, so a missing record answers a real 404 and
+ * never a "200 Place not found". Record routes have no segment `loading.tsx` (a record must read
+ * without script; see `public-route-loading.test.tsx`), so the page's own `notFound()` would now
+ * give the same status; the gate keeps the lookup in one place for both families.
  *
  * Each family passes the lookup its own page uses (`loadPlaceRecord`, `loadInventionRecord`), so
  * the gate and the page ask the same question. A store that cannot be reached already resolves

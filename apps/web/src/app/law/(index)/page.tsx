@@ -5,14 +5,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
 import { PageHeader } from '@repo/ui';
-import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { loadLegalCatalog } from '../../lib/legal/public-source';
-import { parentCrumb, Room } from '../../components/room';
-import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from './law-view-model';
-import { LawBrowseSections } from './LawBrowseSections';
-import '../reading-room.css';
-import '../parked.css';
-import './law.css';
+import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
+import { loadLegalCatalog } from '../../../lib/legal/public-source';
+import { parentCrumb, Room } from '../../../components/room';
+import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from '../law-view-model';
+import { LawBrowseSections } from '../LawBrowseSections';
+import '../../reading-room.css';
+import '../../parked.css';
+import '../law.css';
 
 void React;
 

@@ -8,7 +8,7 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const indexPageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const indexPageSource = readFileSync(join(here, '(index)', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'LawBrowseSections.tsx'), 'utf8');
 const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailViewSource = readFileSync(join(here, '[slug]', 'LawRecordView.tsx'), 'utf8');
