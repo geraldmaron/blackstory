@@ -1,0 +1,916 @@
+/*
+ * The front page and the retelling (docs/ui/DESIGN.md section 9.7).
+ *
+ * Two layouts of the same HTML.
+ *
+ * Stacked is the default and needs nothing: six sections in order, each a heading over the map
+ * (a window onto the ink ground), then its exhibit and slip on ink. It is what a phone, a narrow
+ * or short window, a reader with JavaScript off, reduced motion or "Hold still" gets.
+ *
+ * Pinned is the wide-screen scene: each section holds for a part of a screen, one persistent
+ * word sits over the map, and its italic prefix changes as the next section crosses the window
+ * while "tory" stays where it is. The change is tied to the scroll by CSS view timelines where
+ * the browser has them, and to the `data-scene` attribute retelling-film.tsx sets where it does
+ * not. Nothing here is timed against a clock except that fallback's one short transition.
+ */
+
+.ds-retelling {
+  --front-edge: clamp(var(--ds-space-5), 4.5vw, var(--ds-space-16));
+  --front-bar: var(--ds-island-clearance, 4rem);
+  --front-rail: 2.75rem;
+  --front-word: var(--ds-text-display);
+  --front-accent: var(--ds-world-ember);
+  position: relative;
+  z-index: var(--ds-z-content);
+  color: var(--ds-world-hud-ink);
+  /* Ink until the map's own frame has landed; then the map is the ground. Without WebGL it
+     stays ink and nothing else changes. */
+  background: var(--ds-world-space);
+}
+
+/* The ground is stated on the page (`data-ground="ink"`); the retelling paints it, so the map can
+   show through once it is live. */
+.ds-front {
+  background: transparent;
+}
+
+.ds-retelling[data-plate='live'] {
+  background: transparent;
+}
+
+/* Measured only: the part of the window a scene leaves to the map. */
+.ds-retelling__landing {
+  position: fixed;
+  top: calc(var(--front-bar) + var(--front-rail));
+  right: 0;
+  left: 0;
+  height: 30svh;
+  pointer-events: none;
+}
+
+.ds-retelling__note {
+  margin: 0;
+  padding: var(--ds-space-3) var(--front-edge);
+  font: var(--ds-text-meta) / 1.4 var(--ds-font-mono);
+}
+
+.ds-retelling__stage {
+  display: none;
+}
+
+/* —— The rail: all six words, the current one marked, and the way out ———————————— */
+
+.ds-retelling__rail {
+  position: sticky;
+  top: var(--front-bar);
+  z-index: 3; /* local: order inside the retelling's own scenes */
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  height: var(--front-rail);
+  margin-bottom: calc(-1 * var(--front-rail));
+  padding: 0 var(--front-edge);
+  background: color-mix(in srgb, var(--ds-world-space) 90%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-world-hud-ink) 18%, transparent);
+  font: var(--ds-text-meta) / 1 var(--ds-font-mono);
+}
+
+.ds-retelling__rail ol {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.ds-retelling__rail a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--front-rail);
+  padding: 0 var(--ds-space-3);
+  color: color-mix(in srgb, var(--ds-world-hud-ink) 72%, transparent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ds-retelling__rail a:hover,
+.ds-retelling__rail a[aria-current] {
+  color: var(--ds-world-hud-ink);
+}
+
+.ds-retelling__rail a[aria-current] {
+  box-shadow: inset 0 -2px 0 var(--front-accent);
+}
+
+.ds-retelling__rail .ds-retelling__skip {
+  flex: none;
+  padding: 0;
+  color: var(--ds-world-hud-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.ds-retelling a:focus-visible,
+.ds-retelling button:focus-visible {
+  outline: var(--ds-focus-width) solid var(--front-accent);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* —— The page's own heading —————————————————————————————————————————————————— */
+
+/* Read by a screen reader always. Shown where the page is a plain document. */
+.ds-retelling__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ds-retelling[data-still] .ds-retelling__title {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: calc(var(--front-bar) + var(--front-rail) + var(--ds-space-8)) var(--front-edge) 0;
+  overflow: visible;
+  clip-path: none;
+  font: 600 var(--ds-text-headline) / 1.05 var(--ds-font-display);
+  letter-spacing: -0.02em;
+}
+
+@media (scripting: none), (prefers-reduced-motion: reduce) {
+  .ds-retelling__title {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: calc(var(--front-bar) + var(--front-rail) + var(--ds-space-8)) var(--front-edge) 0;
+    overflow: visible;
+    clip-path: none;
+    font: 600 var(--ds-text-headline) / 1.05 var(--ds-font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* —— A scene, stacked ————————————————————————————————————————————————————————— */
+
+.ds-scene {
+  position: relative;
+  /* A rail link lands a scene with its travel line clear of the bar and the rail. */
+  scroll-margin-top: calc(var(--front-bar) + var(--front-rail));
+}
+
+.ds-scene__pin {
+  display: grid;
+  gap: var(--ds-space-4);
+  padding: 0 var(--front-edge) var(--ds-space-6);
+  /* Ink under everything but the heading's window. */
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    var(--ds-world-space) 30svh,
+    var(--ds-world-space) 100%
+  );
+}
+
+/* The heading's window onto the map. */
+.ds-scene__words {
+  display: grid;
+  align-content: end;
+  gap: var(--ds-space-3);
+  box-sizing: border-box;
+  min-height: 32svh;
+  padding-top: calc(var(--front-bar) + var(--front-rail) + var(--ds-space-6));
+}
+
+.ds-scene__heading {
+  margin: 0;
+  font: 600 var(--front-word) / 1 var(--ds-font-display);
+  letter-spacing: -0.02em;
+}
+
+/* The accent rule (section 7.2): the word the line turns on, in Newsreader italic, in copper. */
+.ds-scene__heading em,
+.ds-retelling__word em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--front-accent);
+}
+
+.ds-scene__sentence {
+  max-width: 34rem;
+  margin: 0;
+  font: var(--ds-text-editorial-lede) / 1.4 var(--ds-font-editorial);
+}
+
+.ds-scene__leg {
+  margin: 0;
+  padding: var(--ds-space-3) var(--front-edge);
+  border-top: 1px solid color-mix(in srgb, var(--ds-world-hud-ink) 18%, transparent);
+  background: var(--ds-world-space);
+  color: color-mix(in srgb, var(--ds-world-hud-ink) 78%, transparent);
+  font: var(--ds-text-meta) / 1.3 var(--ds-font-mono);
+}
+
+.ds-scene__record {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+}
+
+.ds-scene__name {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  justify-self: start;
+  color: var(--ds-world-hud-ink);
+  font: 600 var(--ds-text-title) / 1.2 var(--ds-font-display);
+  text-decoration: underline;
+  text-decoration-color: var(--front-accent);
+  text-underline-offset: 0.2em;
+}
+
+.ds-scene__place {
+  color: color-mix(in srgb, var(--ds-world-hud-ink) 78%, transparent);
+  font: var(--ds-text-body-sm) / 1.4 var(--ds-font-sans);
+}
+
+.ds-scene__exhibit {
+  max-width: 34rem;
+  margin: 0;
+}
+
+.ds-scene__exhibit img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 30svh;
+  object-fit: cover;
+}
+
+.ds-scene__slip,
+.ds-town {
+  box-sizing: border-box;
+  max-width: 34rem;
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+}
+
+/* —— Scene 1 and scene 6: the word alone on the map ———————————————————————————— */
+
+/* A little short of a full screen, so the next scene shows at the foot and invites the scroll. */
+.ds-scene[data-kind='word'] .ds-scene__pin,
+.ds-scene[data-kind='country'] .ds-scene__pin {
+  min-height: 76svh;
+  box-sizing: border-box;
+  align-content: center;
+  background: none;
+}
+
+.ds-scene[data-kind='country'] .ds-scene__pin {
+  min-height: 70svh;
+}
+
+/* Scene 1 stands on the dark map: the ink ground, nearly whole, thinning toward scene 2. */
+.ds-scene[data-kind='word'] {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ds-world-space) 88%, transparent) 0,
+    color-mix(in srgb, var(--ds-world-space) 88%, transparent) 60%,
+    transparent 100%
+  );
+}
+
+.ds-scene[data-kind='word'] .ds-scene__words,
+.ds-scene[data-kind='country'] .ds-scene__words {
+  min-height: 0;
+  padding-top: 0;
+}
+
+.ds-scene[data-kind='country'] .ds-scene__words {
+  justify-items: start;
+  max-width: 40rem;
+  padding: var(--ds-space-6);
+  background: color-mix(in srgb, var(--ds-world-space) 82%, transparent);
+}
+
+/* The official lockup, cropped to its artwork: the file carries wide transparent margins. */
+.ds-scene__heading--mark {
+  position: relative;
+  width: min(100%, 26rem);
+  aspect-ratio: 3.42;
+  overflow: hidden;
+}
+
+.ds-scene__heading--mark img {
+  position: absolute;
+  top: -74.4%;
+  left: -18.33%;
+  width: 133.33%;
+  max-width: none;
+  height: auto;
+}
+
+.ds-scene__tagline {
+  margin: 0;
+  font: 600 var(--ds-text-display-3) / 1.1 var(--ds-font-display);
+  letter-spacing: -0.01em;
+}
+
+.ds-scene__ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-5);
+  margin: 0;
+  font: var(--ds-text-body-sm) / 1.4 var(--ds-font-sans);
+}
+
+.ds-scene__ways a[hidden] {
+  display: none;
+}
+
+.ds-scene__ways a:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-world-hud-ink);
+  text-underline-offset: 0.2em;
+}
+
+/* —— Scene 4: the town field ——————————————————————————————————————————————————— */
+
+.ds-town {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-town__prompt {
+  margin: 0;
+  font: 600 var(--ds-text-title) / 1.2 var(--ds-font-display);
+}
+
+.ds-town__fields {
+  display: grid;
+  gap: var(--ds-space-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ds-town__noscript {
+  margin: 0;
+  font: var(--ds-text-body-sm) / 1.45 var(--ds-font-sans);
+}
+
+.ds-town__locate {
+  justify-self: start;
+  min-height: 2.75rem;
+}
+
+.ds-town__answer p {
+  margin: 0;
+  font: var(--ds-text-body-sm) / 1.45 var(--ds-font-sans);
+}
+
+.ds-town__answer ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-town__answer li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  min-height: 2.75rem;
+  border-top: 1px solid var(--ds-rule);
+  font: var(--ds-text-body-sm) / 1.3 var(--ds-font-sans);
+}
+
+.ds-town__answer li span {
+  flex: none;
+  color: var(--ds-ink-muted);
+  font: var(--ds-text-meta) / 1 var(--ds-font-mono);
+}
+
+.ds-town__answer a {
+  color: var(--ds-ink);
+  text-underline-offset: 0.2em;
+}
+
+/* —— Pinned: a wide, tall enough window, script on, motion allowed ——————————————— */
+
+@media (min-width: 64rem) and (min-height: 40rem) and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .ds-retelling:not([data-still]) {
+    /* Named in scene order so the persistent word can follow each section's crossing. */
+    timeline-scope:
+      --scene-his-story, --scene-her-story, --scene-your-story, --scene-their-story,
+      --scene-black-story;
+    --front-top: calc(var(--front-bar) + var(--front-rail) + var(--ds-space-8));
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__landing {
+    top: var(--front-top);
+    right: min(38vw, 34rem);
+    bottom: 12svh;
+    left: min(40vw, 32rem);
+    height: auto;
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__stage {
+    position: sticky;
+    top: 0;
+    z-index: 2; /* local: order inside the retelling's own scenes */
+    display: block;
+    height: 100svh;
+    margin-bottom: -100svh;
+    pointer-events: none;
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__word {
+    position: absolute;
+    top: var(--front-top);
+    left: var(--front-edge);
+    display: inline-grid;
+    justify-items: end;
+    margin: 0;
+    font: 600 var(--front-word) / 1 var(--ds-font-display);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__sizer,
+  .ds-retelling:not([data-still]) .ds-retelling__row {
+    grid-area: 1 / 1;
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__sizer {
+    visibility: hidden;
+  }
+
+  /* A real word space, kept when it stands alone in its box. */
+  .ds-retelling:not([data-still]) .ds-retelling__gap > span {
+    white-space: pre;
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__prefixes {
+    display: inline-grid;
+    justify-items: end;
+    align-items: baseline;
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__prefixes > span {
+    grid-area: 1 / 1;
+  }
+
+  /* The space, the "s" and the capital "S" each open from nothing: a track that grows to its
+     letter's own width, so no letter's width is written down here. */
+  .ds-retelling:not([data-still]) .ds-retelling__gap,
+  .ds-retelling:not([data-still]) .ds-retelling__s,
+  .ds-retelling:not([data-still]) .ds-retelling__cap {
+    display: inline-grid;
+    grid-template-columns: 0fr;
+  }
+
+  .ds-retelling:not([data-still]) .ds-retelling__gap > span,
+  .ds-retelling:not([data-still]) .ds-retelling__s > span,
+  .ds-retelling:not([data-still]) .ds-retelling__cap > span {
+    min-width: 0;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene {
+    height: calc(var(--scene-screens) * 100svh);
+    scroll-margin-top: 0;
+    view-timeline-axis: block;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='his-story'] {
+    view-timeline-name: --scene, --scene-his-story;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='her-story'] {
+    view-timeline-name: --scene, --scene-her-story;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='your-story'] {
+    view-timeline-name: --scene, --scene-your-story;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='their-story'] {
+    view-timeline-name: --scene, --scene-their-story;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='black-story'] {
+    view-timeline-name: --scene, --scene-black-story;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene__pin {
+    position: sticky;
+    top: 0;
+    box-sizing: border-box;
+    grid-template-columns: minmax(0, 26rem) minmax(0, 1fr) minmax(0, min(32vw, 30rem));
+    grid-template-rows: auto auto 1fr;
+    align-content: start;
+    column-gap: var(--ds-space-8);
+    row-gap: var(--ds-space-4);
+    height: 100svh;
+    padding: calc(var(--front-top) + var(--front-word) * 1.08 + var(--ds-space-4)) var(--front-edge)
+      var(--ds-space-8);
+    background: none;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene__pin > * {
+    grid-column: 1;
+    align-self: start;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene__words {
+    min-height: 0;
+    padding-top: 0;
+  }
+
+  /* The persistent word is this heading's visible form. It stays in the accessibility tree. */
+  .ds-retelling:not([data-still]) .ds-scene__heading:not(.ds-scene__heading--mark) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene__exhibit {
+    grid-column: 3;
+    grid-row: 1 / -1;
+    align-self: start;
+    width: 100%;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene__exhibit img {
+    max-height: 48svh;
+  }
+
+  /* Scene 1 keeps its dark ground; scene 6 lands its artwork where the word was. */
+  .ds-retelling:not([data-still]) .ds-scene[data-kind='word'] .ds-scene__pin,
+  .ds-retelling:not([data-still]) .ds-scene[data-kind='country'] .ds-scene__pin {
+    align-content: start;
+    min-height: 0;
+  }
+
+  /* The artwork lands where the typed word stood: the panel's own padding is taken back out. */
+  .ds-retelling:not([data-still]) .ds-scene[data-kind='country'] .ds-scene__pin {
+    padding-top: calc(var(--front-top) - var(--ds-space-6));
+    padding-left: calc(var(--front-edge) - var(--ds-space-6));
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-kind='country'] .ds-scene__words {
+    grid-column: 1 / span 2;
+    padding: var(--ds-space-6);
+  }
+
+  /* Words on the left read against the ink ground, thinning toward the map. */
+  .ds-retelling:not([data-still]) .ds-scene[data-kind='record'] .ds-scene__pin,
+  .ds-retelling:not([data-still]) .ds-scene[data-kind='town'] .ds-scene__pin {
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--ds-world-space) 84%, transparent) 0,
+      color-mix(in srgb, var(--ds-world-space) 70%, transparent) 26rem,
+      transparent 44rem
+    );
+  }
+
+  /* Where the camera is going, while it travels: one line at the foot of the window. */
+  .ds-retelling:not([data-still]) .ds-scene__leg {
+    position: fixed;
+    bottom: var(--ds-space-8);
+    left: 50%;
+    z-index: 3; /* local: order inside the retelling's own scenes */
+    padding: var(--ds-space-2) var(--ds-space-4);
+    border: 0;
+    background: var(--ds-world-hud-ground);
+    opacity: 0;
+    translate: -50% 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* —— The turn, tied to the scroll ————————————————————————————————————————— */
+
+  @supports (animation-timeline: view()) {
+    .ds-retelling:not([data-still]) .ds-scene__leg {
+      animation: front-leg linear both;
+      animation-timeline: --scene;
+      animation-range: entry 0% entry 100%;
+    }
+
+    /* A prefix comes in as its own scene crosses the window and goes as the next one does:
+       the outer span carries the first, the inner the second. */
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span:not([data-for='history']) {
+      animation: front-in linear both;
+      animation-range: entry 38% entry 56%;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span > * {
+      display: inline-block;
+      animation: front-out linear both;
+      animation-range: entry 38% entry 56%;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='his-story'],
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='history'] > * {
+      animation-timeline: --scene-his-story;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='her-story'],
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='his-story'] > * {
+      animation-timeline: --scene-her-story;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='your-story'],
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='her-story'] > * {
+      animation-timeline: --scene-your-story;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='their-story'],
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='your-story'] > * {
+      animation-timeline: --scene-their-story;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='black-story'],
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='their-story'] > * {
+      animation-timeline: --scene-black-story;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span[data-for='black-story'] > * {
+      animation: none;
+    }
+
+    /* History splits into "His story": the space and the "s" open. */
+    .ds-retelling:not([data-still]) .ds-retelling__gap,
+    .ds-retelling:not([data-still]) .ds-retelling__s {
+      animation: front-open linear both;
+      animation-timeline: --scene-his-story;
+      animation-range: entry 30% entry 56%;
+    }
+
+    /* BlackStory closes it again and takes its capital. */
+    .ds-retelling:not([data-still]) .ds-retelling__gap > span,
+    .ds-retelling:not([data-still]) .ds-retelling__s > span {
+      animation: front-close linear both;
+      animation-timeline: --scene-black-story;
+      animation-range: entry 38% entry 56%;
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__cap {
+      animation: front-open linear both;
+      animation-timeline: --scene-black-story;
+      animation-range: entry 38% entry 56%;
+    }
+
+    /* The typed word gives way to the official artwork as scene 6 lands in its place. */
+    .ds-retelling:not([data-still]) .ds-retelling__word {
+      animation: front-out linear both;
+      animation-timeline: --scene-black-story;
+      animation-range: entry 78% entry 96%;
+    }
+  }
+
+  /* No view timelines: the same states from the attribute the camera's listener sets. */
+  @supports not (animation-timeline: view()) {
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span,
+    .ds-retelling:not([data-still]) .ds-retelling__word,
+    .ds-retelling:not([data-still]) .ds-scene__leg {
+      transition: opacity var(--ds-duration-base) var(--ds-easing);
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__gap,
+    .ds-retelling:not([data-still]) .ds-retelling__s,
+    .ds-retelling:not([data-still]) .ds-retelling__cap {
+      transition:
+        grid-template-columns var(--ds-duration-base) var(--ds-easing),
+        opacity var(--ds-duration-base) var(--ds-easing);
+    }
+
+    .ds-retelling:not([data-still]) .ds-retelling__prefixes > span,
+    .ds-retelling:not([data-still])[data-scene='history'] .ds-retelling__s,
+    .ds-retelling:not([data-still]) .ds-retelling__cap {
+      opacity: 0;
+    }
+
+    .ds-retelling:not([data-still])[data-scene='history'] [data-for='history'],
+    .ds-retelling:not([data-still])[data-scene='his-story'] [data-for='his-story'],
+    .ds-retelling:not([data-still])[data-scene='her-story'] [data-for='her-story'],
+    .ds-retelling:not([data-still])[data-scene='your-story'] [data-for='your-story'],
+    .ds-retelling:not([data-still])[data-scene='their-story'] [data-for='their-story'],
+    .ds-retelling:not([data-still])[data-scene='black-story'] [data-for='black-story'],
+    .ds-retelling:not([data-still])[data-to='his-story'] [data-leg='his-story'],
+    .ds-retelling:not([data-still])[data-to='her-story'] [data-leg='her-story'],
+    .ds-retelling:not([data-still])[data-to='your-story'] [data-leg='your-story'],
+    .ds-retelling:not([data-still])[data-to='their-story'] [data-leg='their-story'],
+    .ds-retelling:not([data-still])[data-to='black-story'] [data-leg='black-story'] {
+      opacity: 1;
+    }
+
+    .ds-retelling:not([data-still]):not([data-scene='history']):not([data-scene='black-story'])
+      .ds-retelling__gap,
+    .ds-retelling:not([data-still]):not([data-scene='history']):not([data-scene='black-story'])
+      .ds-retelling__s,
+    .ds-retelling:not([data-still])[data-scene='black-story'] .ds-retelling__cap {
+      grid-template-columns: 1fr;
+      opacity: 1;
+    }
+
+    .ds-retelling:not([data-still])[data-scene='black-story'] .ds-retelling__s {
+      opacity: 0;
+    }
+  }
+}
+
+@keyframes front-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes front-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes front-open {
+  from {
+    grid-template-columns: 0fr;
+    opacity: 0;
+  }
+
+  to {
+    grid-template-columns: 1fr;
+    opacity: 1;
+  }
+}
+
+/* The inner letter narrows to nothing: its track above then has nothing to hold open. */
+@keyframes front-close {
+  from {
+    max-width: 1em;
+    opacity: 1;
+  }
+
+  to {
+    max-width: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes front-leg {
+  0%,
+  8% {
+    opacity: 0;
+  }
+
+  22%,
+  70% {
+    opacity: 1;
+  }
+
+  86%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* —— The contents, on paper ——————————————————————————————————————————————————— */
+
+.ds-front-contents {
+  position: relative;
+  z-index: var(--ds-z-content);
+  padding: var(--ds-space-16) clamp(var(--ds-space-5), 4.5vw, var(--ds-space-16)) var(--ds-space-24);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+}
+
+.ds-front-contents > section {
+  display: grid;
+  gap: var(--ds-space-8);
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.ds-front-contents__title {
+  margin: 0;
+  padding-top: var(--ds-space-4);
+  border-top: 2px solid var(--ds-ink);
+  font: 600 var(--ds-text-headline) / 1.05 var(--ds-font-display);
+  letter-spacing: -0.02em;
+}
+
+.ds-front-contents__search {
+  display: grid;
+  gap: var(--ds-space-2);
+  max-width: 38rem;
+}
+
+.ds-front-contents__search label {
+  font: var(--ds-text-meta) / 1.2 var(--ds-font-mono);
+}
+
+.ds-front-contents__search div {
+  display: flex;
+  gap: var(--ds-space-2);
+}
+
+.ds-front-contents__search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  padding: 0 var(--ds-space-3);
+  border: 1px solid var(--ds-ink);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font: var(--ds-text-body) / 1.2 var(--ds-font-sans);
+}
+
+.ds-front-contents__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--ds-space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-front-contents__list li {
+  display: grid;
+  align-content: start;
+  gap: var(--ds-space-2);
+  padding-top: var(--ds-space-3);
+  border-top: 1px solid var(--ds-rule);
+}
+
+.ds-front-contents__list h3 {
+  margin: 0;
+  font: 600 var(--ds-text-display-3) / 1.1 var(--ds-font-display);
+  letter-spacing: -0.01em;
+}
+
+.ds-front-contents__list p {
+  margin: 0;
+  font: var(--ds-text-body) / 1.5 var(--ds-font-sans);
+}
+
+.ds-front-contents__links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--ds-space-5);
+}
+
+.ds-front-contents__links a,
+.ds-front-contents__lead a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
+
+.ds-front-contents__lead {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-front-contents__cover {
+  display: grid;
+  gap: var(--ds-space-1);
+  color: var(--ds-ink-muted);
+  font: var(--ds-text-micro) / 1.3 var(--ds-font-mono);
+}
+
+.ds-front-contents__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 12rem;
+  object-fit: cover;
+}

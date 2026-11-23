@@ -51,10 +51,12 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/explore?state=DC'), 'door');
   });
 
-  it('does not classify /story, which was deprecated in favor of the Explore story mode', () => {
-    // A classified path with no registry entry fails the coverage test, and a registry entry for
-    // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of
-    // `/explore`.
+  it("renders /story on the front page's ground without listing it as a destination", () => {
+    // The retelling is on trial at `/story` (DESIGN.md section 9.7). It needs the door's plate,
+    // but a registry entry would put it in the footer, the palette and the sitemap before the
+    // read test has decided where it lives.
+    assert.equal(surfaceClassFor('/story'), 'door');
+    assert.equal(surfaceClassFor('/stories'), 'reading');
     assert.ok(!CLASSIFIED_PATHS.includes('/story'));
   });
 
