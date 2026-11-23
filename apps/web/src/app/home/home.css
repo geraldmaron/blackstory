@@ -1134,3 +1134,22 @@
     aspect-ratio: auto;
   }
 }
+
+/*
+ * A record photograph on this page is an exhibit (RecordImage), and these cards are paper standing
+ * on the page's fixed ink ground: the exhibit's label, crop marks and credit take the card's ink,
+ * not the ground's. This page is replaced in DESIGN.md phase 7.
+ */
+.ds-home-plate .ds-exhibit__label,
+.ds-home-plate .ds-exhibit__object,
+.ds-home-plate .ds-exhibit__receipt :is(p, span, a),
+.ds-home-stop__plate .ds-exhibit__label,
+.ds-home-stop__plate .ds-exhibit__object,
+.ds-home-stop__plate .ds-exhibit__receipt :is(p, span, a) {
+  color: color-mix(in srgb, var(--home-paper-ink) 78%, transparent);
+}
+
+.ds-home-plate .ds-exhibit__label,
+.ds-home-stop__plate .ds-exhibit__label {
+  padding: var(--ds-space-2) var(--ds-space-2) 0;
+}
