@@ -8,7 +8,6 @@ import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   ErrorState,
-  Image,
   Link,
   Notice,
   RecordFactStrip,
@@ -18,7 +17,7 @@ import {
   useScreenScrollInsets,
 } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
-import { StoryBlocks, StoryReferences, storyWebUrl } from './StoryBody';
+import { StoryBlocks, StoryImageExhibit, StoryReferences, storyWebUrl } from './StoryBody';
 import { useStory } from './use-stories';
 
 export function StoryScreen({ slug, base }: { readonly slug: string; readonly base: string }) {
@@ -100,23 +99,7 @@ export function StoryScreen({ slug, base }: { readonly slug: string; readonly ba
                   : []),
               ]}
             />
-            {story.heroImage ? (
-              <View style={{ gap: space['1'] }}>
-                <Image
-                  source={story.heroImage.url}
-                  alt={story.heroImage.alt}
-                  aspectRatio={
-                    story.heroImage.width && story.heroImage.height
-                      ? story.heroImage.width / story.heroImage.height
-                      : 4 / 3
-                  }
-                  fallback={{ entityName: story.title, reason: 'absent' }}
-                />
-                <Text variant="caption" colorRole="inkMuted">
-                  {story.heroImage.credit}
-                </Text>
-              </View>
-            ) : null}
+            {story.heroImage ? <StoryImageExhibit image={story.heroImage} /> : null}
 
             <StoryBlocks blocks={story.body} webUrl={storyWebUrl(story.webPath)} />
             <StoryReferences references={story.references} />

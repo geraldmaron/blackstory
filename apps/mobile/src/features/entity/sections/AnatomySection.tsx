@@ -20,6 +20,7 @@ import type { Entity } from '../types';
 import { EditionFactIcon, type EditionFactIconProps } from '../edition-fact-icon';
 import { RecordBeatRow, recordBeatLabelColumnWidth, recordBeatRowStyle } from '../RecordBeatRow';
 import { RecordPlacePreview } from '../record-place-preview';
+import { isQuietRecord } from '../entity-view-model';
 
 export type AnatomySectionProps = {
   readonly entity: Entity;
@@ -98,6 +99,7 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
     >
       <RecordPlacePreview
         place={place}
+        quiet={isQuietRecord(entity)}
         {...(hasPublicAnchor
           ? {
               onOpenInMaps: () => {

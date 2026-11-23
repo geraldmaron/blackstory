@@ -23,8 +23,15 @@ export { Divider, type DividerProps } from './Divider';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { ErrorState, type ErrorStateProps } from './ErrorState';
 export { Image, type ImageProps } from './Image';
+export {
+  ExhibitFrame,
+  exhibitLabel,
+  type ExhibitFrameProps,
+  type ExhibitKind,
+  type ExhibitVariant,
+} from './ExhibitFrame';
+export { EvidenceGrade, Receipt, type ReceiptProps } from './Receipt';
 export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
-export { Plate, type PlateProps } from './Plate';
 export {
   EntityMark,
   type EntityMarkProps,

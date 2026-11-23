@@ -4,7 +4,7 @@
  * — Ledger Line, not a Surface card.
  */
 import { StyleSheet, View } from 'react-native';
-import { Image, Logo, Plate, Text, space, useThemeColors } from '@/ui';
+import { ExhibitFrame, Image, Logo, Receipt, Text, space, useThemeColors } from '@/ui';
 import type { EntityMarkShape } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import { humanizeToken } from '../format';
@@ -91,19 +91,18 @@ export function IntroSection({ entity }: IntroSectionProps) {
           </Text>
         }
       >
-        {image?.credit && !isQuietRecord(entity) ? (
-          <Plate {...media} credit={image.credit} />
-        ) : (
-          // A quiet record keeps its photograph plain: no plate (patterns-living-archive.md).
-          <View style={styles.mediaBlock}>
-            <Image {...media} aspectRatio={16 / 9} />
-            {image?.credit ? (
-              <Text variant="caption" colorRole="inkSubtle">
-                {image.credit}
-              </Text>
-            ) : null}
-          </View>
-        )}
+        {/* The record stores no date for its image, so the label never implies the period. */}
+        {image ? (
+          <ExhibitFrame
+            kind="photograph"
+            basis="date not on record"
+            variant={isQuietRecord(entity) ? 'quiet' : 'full'}
+            receipt={image.credit ? <Receipt source={image.credit} /> : undefined}
+            testID="entity-photograph"
+          >
+            <Image {...media} aspectRatio={3 / 2} />
+          </ExhibitFrame>
+        ) : null}
 
         {entity.summary.trim().length > 0 ? (
           <Text variant="editorial" colorRole="ink">
@@ -129,9 +128,6 @@ const styles = StyleSheet.create({
   },
   brand: {
     alignSelf: 'flex-start',
-  },
-  mediaBlock: {
-    gap: space['2'],
   },
   tags: {
     paddingTop: space['2'],

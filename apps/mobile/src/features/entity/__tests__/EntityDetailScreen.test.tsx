@@ -140,11 +140,11 @@ describe('EntityDetailScreen — adversarial content cases', () => {
     expect(getByText('No source citation is available for this claim.')).toBeTruthy();
   });
 
-  it('shows the placeholder (never the image) for uncleared/unrecognized image rights', async () => {
-    const { getByLabelText, queryByLabelText } = await render(
+  it('never shows an image with uncleared or unrecognized rights, and no stand-in for it', async () => {
+    const { queryByTestId, queryByLabelText } = await render(
       <EntityDetailScreen state={readyState(entityWithUnclearedImageRights())} />,
     );
-    expect(getByLabelText(/No image available/)).toBeTruthy();
+    expect(queryByTestId('entity-photograph')).toBeNull();
     expect(queryByLabelText(/A photograph\./)).toBeNull();
   });
 

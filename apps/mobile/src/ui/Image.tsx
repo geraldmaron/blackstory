@@ -14,11 +14,19 @@ export type ImageProps = {
   source: ImageSource | string | number | null | undefined;
   alt: string;
   aspectRatio?: number;
+  /** `contain` shows the picture whole (a document, a story image); `cover` fills the box. */
+  contentFit?: 'cover' | 'contain';
   /** Required so the fallback mark can be labeled meaningfully; also used while loading. */
   fallback: Omit<EntityMarkProps, 'entityName'> & { entityName?: string };
 };
 
-export function Image({ source, alt, aspectRatio = 4 / 3, fallback }: ImageProps) {
+export function Image({
+  source,
+  alt,
+  aspectRatio = 4 / 3,
+  contentFit = 'cover',
+  fallback,
+}: ImageProps) {
   const theme = useThemeColors();
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -62,7 +70,7 @@ export function Image({ source, alt, aspectRatio = 4 / 3, fallback }: ImageProps
         alt={alt}
         accessible
         accessibilityLabel={alt}
-        contentFit="cover"
+        contentFit={contentFit}
         transition={150}
         style={StyleSheet.absoluteFill}
         onLoad={() => setLoaded(true)}

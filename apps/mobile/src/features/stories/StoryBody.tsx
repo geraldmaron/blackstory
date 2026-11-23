@@ -9,19 +9,27 @@
  */
 import { Linking, Text as NativeText, View, type TextStyle } from 'react-native';
 import { router } from 'expo-router';
-import type { StoryBlockV1, StoryReferenceV1, StoryRunV1 } from '@repo/public-contracts/v1/story';
+import type {
+  StoryBlockV1,
+  StoryImageV1,
+  StoryReferenceV1,
+  StoryRunV1,
+} from '@repo/public-contracts/v1/story';
 import {
   Divider,
   EXTERNAL_LINK_HINT,
+  ExhibitFrame,
   Image,
   LedgerRow,
   Link,
   Notice,
+  Receipt,
   Text,
   space,
   useThemeColors,
 } from '@/ui';
 import { sanitizeExternalHref } from '@/features/content/link-safety';
+import { isQuietImage, storyImageBasis, storyImageKind } from './story-exhibit';
 
 const WEB_ORIGIN = 'https://blackstory.app';
 
@@ -99,6 +107,51 @@ export function Runs({ runs }: { readonly runs: readonly StoryRunV1[] }) {
   );
 }
 
+/**
+ * A story image as an exhibit: shown whole and in its own color, with its credit as the receipt.
+ * An image whose words do not say what it is (a painting) gets crop marks and no kind; a
+ * harm-adjacent one gets no crop marks.
+ */
+export function StoryImageExhibit({
+  image,
+  caption,
+}: {
+  readonly image: StoryImageV1;
+  readonly caption?: string | undefined;
+}) {
+  const kind = storyImageKind(image);
+  const quiet = isQuietImage(image);
+  const picture = (
+    <Image
+      source={image.url}
+      alt={image.alt}
+      aspectRatio={image.width && image.height ? image.width / image.height : 4 / 3}
+      contentFit="contain"
+      fallback={{ entityName: image.alt, reason: 'absent' }}
+    />
+  );
+  const receipt = <Receipt source={image.credit} {...(caption ? { detail: caption } : {})} />;
+  if (quiet && !kind) {
+    return (
+      <View style={{ gap: space['2'] }}>
+        {picture}
+        {receipt}
+      </View>
+    );
+  }
+  return (
+    <ExhibitFrame
+      kind={kind ?? 'photograph'}
+      basis={storyImageBasis(image)}
+      variant={quiet ? 'quiet' : kind ? 'full' : 'compact'}
+      receipt={receipt}
+      testID="story-image-exhibit"
+    >
+      {picture}
+    </ExhibitFrame>
+  );
+}
+
 function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUrl: string }) {
   const theme = useThemeColors();
   switch (block.type) {
@@ -170,22 +223,7 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
         </View>
       );
     case 'image':
-      return (
-        <View style={{ gap: space['1'] }}>
-          <Image
-            source={block.image.url}
-            alt={block.image.alt}
-            {...(block.image.width && block.image.height
-              ? { aspectRatio: block.image.width / block.image.height }
-              : { aspectRatio: 4 / 3 })}
-            fallback={{ entityName: block.image.alt, reason: 'absent' }}
-          />
-          {block.caption ? <Text variant="caption">{block.caption}</Text> : null}
-          <Text variant="caption" colorRole="inkMuted">
-            {block.image.credit}
-          </Text>
-        </View>
-      );
+      return <StoryImageExhibit image={block.image} caption={block.caption} />;
     case 'table':
       return (
         <View style={{ gap: space['2'] }}>
