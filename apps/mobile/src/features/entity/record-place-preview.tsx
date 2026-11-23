@@ -80,8 +80,26 @@ export function RecordPlacePreview({
   }
 
   const label = `Map showing ${place.label} at public precision`;
+  const map = (
+    <View
+      style={styles.frame}
+      accessibilityRole="image"
+      accessibilityLabel={label}
+      testID="record-place-preview"
+    >
+      <MapScreen
+        source={source}
+        cameraCommand={camera}
+        gesturesEnabled={false}
+        clustering={false}
+        selectedEntityId="record-place"
+      />
+    </View>
+  );
+
   // The map is drawn no sharper than the stored precision, and the label says which that is.
-  const plate = (
+  // Only the map is the button: wrapping the whole exhibit would hide its label from VoiceOver.
+  return (
     <ExhibitFrame
       kind="map"
       ground="ink"
@@ -90,37 +108,20 @@ export function RecordPlacePreview({
       receipt={<Receipt source={place.label} />}
       testID="record-place-exhibit"
     >
-      <View
-        style={styles.frame}
-        accessibilityRole="image"
-        accessibilityLabel={label}
-        testID="record-place-preview"
-      >
-        <MapScreen
-          source={source}
-          cameraCommand={camera}
-          gesturesEnabled={false}
-          clustering={false}
-          selectedEntityId="record-place"
-        />
-      </View>
+      {onOpenInMaps ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Open ${place.label} in Maps at public precision`}
+          onPress={onOpenInMaps}
+          testID="record-place-preview-pressable"
+        >
+          {map}
+        </Pressable>
+      ) : (
+        map
+      )}
     </ExhibitFrame>
   );
-
-  if (onOpenInMaps) {
-    return (
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`Open ${place.label} in Maps at public precision`}
-        onPress={onOpenInMaps}
-        testID="record-place-preview-pressable"
-      >
-        {plate}
-      </Pressable>
-    );
-  }
-
-  return plate;
 }
 
 const styles = StyleSheet.create({

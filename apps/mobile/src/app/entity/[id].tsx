@@ -32,7 +32,7 @@ import {
   type EntityDataDeps,
 } from '@/features/entity';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
-import { Button, ScreenCanvas } from '@/ui';
+import { Button, CHROME_MAX_FONT_SCALE, ScreenCanvas } from '@/ui';
 
 function compactHeaderTitle(title: string): string {
   const trimmed = title.trim();
@@ -83,6 +83,7 @@ export default function EntityDetailRoute() {
             label="Share"
             variant="ghost"
             density="compact"
+            maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
             loading={shareBusy}
             accessibilityLabel={`Share ${readyEntity.displayName}`}
             onPress={() => {

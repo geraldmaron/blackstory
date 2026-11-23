@@ -55,12 +55,15 @@ describe('Archive tab', () => {
     expect(mockSearchScreenSpy).not.toHaveBeenCalled();
   });
 
-  it('labels the switch and marks the current view as selected', async () => {
+  it('names the switch on each segment and marks the current view as selected', async () => {
     mockParams = { view: 'list' };
-    const { getByLabelText, getByRole } = await render(<ArchiveTabScreen />);
-    expect(getByLabelText('Archive view')).toBeTruthy();
-    expect(getByRole('tab', { name: 'List' }).props.accessibilityState).toEqual({ selected: true });
-    expect(getByRole('tab', { name: 'Map' }).props.accessibilityState).toEqual({ selected: false });
+    const { getByLabelText } = await render(<ArchiveTabScreen />);
+    expect(getByLabelText('List, Archive view').props.accessibilityState).toEqual({
+      selected: true,
+    });
+    expect(getByLabelText('Map, Archive view').props.accessibilityState).toEqual({
+      selected: false,
+    });
   });
 
   it('gives the list the query, kind and era the address carries', async () => {

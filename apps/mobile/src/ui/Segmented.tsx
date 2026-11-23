@@ -5,7 +5,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Text } from './Text';
-import { MIN_TOUCH_TARGET, radius, space, useThemeColors } from './tokens';
+import { CHROME_MAX_FONT_SCALE, MIN_TOUCH_TARGET, radius, space, useThemeColors } from './tokens';
 
 export type SegmentedOption<T extends string> = {
   readonly id: T;
@@ -16,7 +16,7 @@ export type SegmentedProps<T extends string> = {
   readonly options: readonly SegmentedOption<T>[];
   readonly value: T;
   readonly onChange: (next: T) => void;
-  /** What the switch changes: "View", "Figure view". */
+  /** What the switch changes, said after each segment's own name: "Archive view". */
   readonly accessibilityLabel: string;
   readonly testID?: string;
 };
@@ -31,8 +31,6 @@ export function Segmented<T extends string>({
   const theme = useThemeColors();
   return (
     <View
-      accessibilityRole="tablist"
-      accessibilityLabel={accessibilityLabel}
       style={[styles.track, { borderColor: theme.borderControl, backgroundColor: theme.surface }]}
       testID={testID}
     >
@@ -41,14 +39,20 @@ export function Segmented<T extends string>({
         return (
           <Pressable
             key={option.id}
-            accessibilityRole="tab"
-            accessibilityLabel={option.label}
+            // A button with a selected state: iOS has no tab trait outside a tab bar, and a
+            // container label is not read, so each segment names the switch it belongs to.
+            accessibilityRole="button"
+            accessibilityLabel={`${option.label}, ${accessibilityLabel}`}
             accessibilityState={{ selected }}
             onPress={() => onChange(option.id)}
             style={[styles.segment, selected ? { backgroundColor: theme.ink } : undefined]}
             testID={testID ? `${testID}-${option.id}` : undefined}
           >
-            <Text variant="bodyEmphasis" colorRole={selected ? 'inverseInk' : 'ink'}>
+            <Text
+              variant="bodyEmphasis"
+              colorRole={selected ? 'inverseInk' : 'ink'}
+              maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
+            >
               {option.label}
             </Text>
           </Pressable>

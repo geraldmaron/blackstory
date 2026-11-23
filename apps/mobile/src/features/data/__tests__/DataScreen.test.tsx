@@ -40,16 +40,16 @@ describe('DataScreen', () => {
   });
 
   it('opens every figure in Plain, with Numbers one tap away and its sources as the receipt', async () => {
-    const { getAllByTestId, getAllByRole, queryAllByTestId, getAllByLabelText } = await render(
-      <DataScreen />,
-    );
-    const plain = getAllByRole('tab', { name: 'Plain' });
+    const { getAllByTestId, queryAllByTestId, getAllByLabelText } = await render(<DataScreen />);
+    const plain = getAllByLabelText(/^Plain, View of /);
     expect(plain.length).toBeGreaterThan(0);
-    for (const tab of plain) expect(tab.props.accessibilityState).toEqual({ selected: true });
+    for (const segment of plain) {
+      expect(segment.props.accessibilityState).toEqual({ selected: true });
+    }
     expect(queryAllByTestId('data-figure-numbers')).toHaveLength(0);
     expect(getAllByTestId('exhibit-receipt').length).toBe(plain.length);
 
-    await fireEvent.press(getAllByRole('tab', { name: 'Numbers' })[0]!);
+    await fireEvent.press(getAllByLabelText(/^Numbers, View of /)[0]!);
     expect(getAllByTestId('data-figure-numbers')).toHaveLength(1);
     // The table speaks each value with its label.
     expect(getAllByLabelText(/Black families: \$44,900/).length).toBeGreaterThan(0);

@@ -7,7 +7,7 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Text, space, useThemeColors } from '@/ui';
+import { CHROME_MAX_FONT_SCALE, Text, space, useThemeColors } from '@/ui';
 import type { StoryPosition } from './story-progress';
 
 export type StoryProgressHandle = { readonly set: (position: StoryPosition) => void };
@@ -47,7 +47,7 @@ export const StoryProgress = forwardRef<StoryProgressHandle, { readonly title: s
           variant="meta"
           colorRole="inkMuted"
           numberOfLines={1}
-          maxFontSizeMultiplier={1.6}
+          maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
           style={styles.name}
         >
           {name}

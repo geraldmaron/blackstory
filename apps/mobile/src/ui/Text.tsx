@@ -9,23 +9,16 @@
  * callers laying out a fixed-height header row can opt into a cap via the
  * `maxFontSizeMultiplier` prop, but nothing here disables scaling by default.
  *
- * LINE HEIGHT SCALES WITH THE FONT, AND HAS TO BE DONE BY HAND. React Native
- * multiplies `fontSize` by the OS font scale when `allowFontScaling` is on, but it
- * leaves a numeric `lineHeight` exactly as written — a line box measured in points
- * does not know the text inside it grew. At the largest accessibility size (~3.1x on
- * iOS) a 16pt body in a 24pt line box renders at ~50pt and is cropped to the tops of
- * its own letters: on an iPad at accessibility-XXXL every record row in Explore read
- * as a row of disconnected dashes. So the same multiplier is applied here, capped the
- * same way `maxFontSizeMultiplier` caps the size, which keeps the ratio between the
- * two constant at every text size.
+ * LINE HEIGHT IS WRITTEN UNSCALED. React Native multiplies a numeric `lineHeight` by the same
+ * font-size multiplier it applies to `fontSize` (iOS: `RCTAttributedTextUtils.mm`,
+ * `lineHeight * RCTEffectiveFontSizeMultiplierFromTextAttributes`; Android:
+ * `TextAttributeProps.effectiveLineHeight`), cap included. This component used to multiply it
+ * again by hand, so at the largest accessibility size (about 2.8x) every line box was about
+ * 7.9x: a three-word label ran down a whole screen. Seen on the iOS 27 Simulator at
+ * accessibility-XXXL on 2026-11-23; do not reintroduce the manual scale without looking at a
+ * device.
  */
-import {
-  PixelRatio,
-  Text as RNText,
-  useWindowDimensions,
-  type TextProps as RNTextProps,
-  type TextStyle,
-} from 'react-native';
+import { Text as RNText, type TextProps as RNTextProps, type TextStyle } from 'react-native';
 import { brandCore, useThemeColors } from './tokens';
 import { typeScale, type TypeScaleRole } from './tokens';
 import { resolveFontFamily } from './fonts';
@@ -59,7 +52,6 @@ export function Text({
   const theme = useThemeColors();
   const scale = typeScale[variant];
   const family = resolveFontFamily(scale.family, scale.weight);
-  const lineHeight = scale.lineHeight * useFontScale(maxFontSizeMultiplier);
   const headingRoles: TextRole[] = ['display', 'headline', 'title'];
   const resolvedHeading = isHeading ?? headingRoles.includes(variant);
 
@@ -72,7 +64,7 @@ export function Text({
         {
           fontFamily: family,
           fontSize: scale.size,
-          lineHeight,
+          lineHeight: scale.lineHeight,
           fontWeight: scale.weight as TextStyle['fontWeight'],
           color: theme[colorRole],
         },
@@ -105,27 +97,4 @@ export function Accent({
       {children}
     </RNText>
   );
-}
-
-/**
- * The multiplier React Native is about to apply to `fontSize`, so `lineHeight` can be
- * given the same one.
- *
- * Read from `useWindowDimensions()` rather than `PixelRatio.getFontScale()` because the
- * hook re-renders when the OS text size changes while the app is open — a one-shot read
- * would leave every already-mounted screen with the old line boxes until it remounted.
- * `PixelRatio` stays as the fallback for the case where the window reports no font scale.
- *
- * `maxFontSizeMultiplier` is honored the same way RN honors it, including its convention
- * that `0` means "no cap"; a caller who capped the size would otherwise get a line box
- * that kept growing past text that had stopped.
- */
-function useFontScale(maxFontSizeMultiplier: number | null | undefined): number {
-  const { fontScale } = useWindowDimensions();
-  const systemScale =
-    Number.isFinite(fontScale) && fontScale > 0 ? fontScale : PixelRatio.getFontScale();
-  if (typeof maxFontSizeMultiplier === 'number' && maxFontSizeMultiplier > 0) {
-    return Math.min(systemScale, maxFontSizeMultiplier);
-  }
-  return systemScale;
 }

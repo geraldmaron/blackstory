@@ -19,7 +19,15 @@ import { ExploreView, useExploreMapSource } from '@/features/explore';
 import { SearchScreen } from '@/features/search';
 import { filterStateToRouteParams, parseFilterState, parseSearchQuery } from '@/lib/route-params';
 import type { ArchiveView } from '@/shell/mobile-nav';
-import { DevMenuHeaderButton, Segmented, Text, brandCore, space, useThemeColors } from '@/ui';
+import {
+  CHROME_MAX_FONT_SCALE,
+  DevMenuHeaderButton,
+  Segmented,
+  Text,
+  brandCore,
+  space,
+  useThemeColors,
+} from '@/ui';
 
 const VIEWS = [
   { id: 'map', label: 'Map' },
@@ -49,6 +57,7 @@ export default function ArchiveTabScreen() {
         <Text
           variant="title"
           isHeading
+          maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
           style={onInk ? { color: brandCore.archivePaper } : undefined}
         >
           Archive

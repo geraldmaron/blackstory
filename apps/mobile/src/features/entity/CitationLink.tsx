@@ -42,7 +42,7 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
       {hasSafeHref ? (
         <Pressable
           accessibilityRole="link"
-          accessibilityLabel={`${citation.label}, ${sourceName}`}
+          accessibilityLabel={showSource ? `${citation.label}, ${sourceName}` : citation.label}
           accessibilityHint={EXTERNAL_LINK_HINT}
           hitSlop={8}
           onPress={handlePress}

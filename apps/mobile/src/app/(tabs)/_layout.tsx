@@ -18,13 +18,15 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={tabBarOptions}>
       <Tabs.Screen name="index" options={{ href: null }} />
-      {MOBILE_PRIMARY_TABS.map((tab) => (
+      {MOBILE_PRIMARY_TABS.map((tab, index) => (
         <Tabs.Screen
           key={tab.id}
           name={tab.id}
           options={{
             title: tab.label,
             tabBarIcon: editionTabIcon(tab.icon),
+            // The default label counts the hidden redirect routes too ("2 of 9").
+            tabBarAccessibilityLabel: `${tab.label}, tab, ${index + 1} of ${MOBILE_PRIMARY_TABS.length}`,
           }}
         />
       ))}

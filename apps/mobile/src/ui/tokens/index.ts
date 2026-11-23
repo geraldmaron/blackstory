@@ -67,6 +67,12 @@ export type {
 export const MIN_TOUCH_TARGET: number = Platform.select({ android: 48, default: 44 });
 
 /**
+ * How far chrome (a bar title, a view switch, a header button) follows the system text size.
+ * Reading text is never capped; a control that tripled would push the content off the screen.
+ */
+export const CHROME_MAX_FONT_SCALE = 1.6;
+
+/**
  * Shared stacking order for map-adjacent overlays. Keeps sheet/chrome/attribution
  * layering decided in one place instead of scattered magic `zIndex` numbers.
  */

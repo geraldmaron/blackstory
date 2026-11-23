@@ -38,6 +38,8 @@ export type ButtonProps = Omit<PressableProps, 'children' | 'style' | 'accessibi
   >;
   /** Tighter padding for filter chips and inline actions. */
   density?: ButtonDensity;
+  /** Caps how far the label follows the system text size. For chrome; never for content. */
+  maxFontSizeMultiplier?: number;
 };
 
 export function Button({
@@ -49,6 +51,7 @@ export function Button({
   accessibilityState,
   onPress,
   density = 'default',
+  maxFontSizeMultiplier,
   ...rest
 }: ButtonProps) {
   const theme = useThemeColors();
@@ -101,6 +104,7 @@ export function Button({
         ) : null}
         <Text
           variant={density === 'compact' ? 'bodySmall' : 'bodyEmphasis'}
+          maxFontSizeMultiplier={maxFontSizeMultiplier}
           style={{ color: palette.fg }}
         >
           {label}

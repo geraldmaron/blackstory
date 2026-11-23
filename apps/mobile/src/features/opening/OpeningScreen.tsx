@@ -29,12 +29,14 @@ import {
   buildEntityAnatomyPlace,
 } from '@/features/entity/entity-anatomy-facts';
 import { isQuietRecord } from '@/features/entity/entity-view-model';
+import { humanizeToken } from '@/features/entity/format';
 import type { Entity } from '@/features/entity/types';
 import { useEntityDetail } from '@/features/entity/useEntityDetail';
 import { MAP_ACCENT, MAP_INK, MAP_INK_MUTED } from '@/features/map/map-plate-ink';
 import {
   Accent,
   Button,
+  CHROME_MAX_FONT_SCALE,
   EvidenceGrade,
   ExhibitFrame,
   Image,
@@ -152,11 +154,19 @@ function RecordSlip({
       </Link>
       {place ? (
         <Text variant="bodySmall" colorRole="inkMuted">
-          {place.label}, shown at {place.precision ?? 'city'} precision.
+          {entity.jurisdictionLabel.trim() || place.label}, shown at {place.precision ?? 'city'}{' '}
+          precision.
         </Text>
       ) : null}
       {claim ? (
         <View style={styles.claim}>
+          <Text
+            variant="caption"
+            colorRole="inkMuted"
+            style={{ letterSpacing: 0.6, textTransform: 'uppercase' }}
+          >
+            {humanizeToken(claim.predicate)}
+          </Text>
           <Text variant="editorial">{claim.object}</Text>
           <Receipt
             {...(claim.citation
@@ -379,7 +389,11 @@ export function OpeningScreen({
           style={styles.skip}
           testID="opening-skip"
         >
-          <Text variant="bodySmall" style={{ color: onInk ? MAP_INK : theme.accent }}>
+          <Text
+            variant="bodySmall"
+            maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
+            style={{ color: onInk ? MAP_INK : theme.accent }}
+          >
             {OPENING_SKIP_LABEL}
           </Text>
         </Pressable>
@@ -460,6 +474,7 @@ export function OpeningScreen({
             label="Back"
             variant="ghost"
             density="compact"
+            maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
             accessibilityLabel={`Back to ${OPENING_SCENES[page - 1]!.heading}`}
             onPress={() => goTo(page - 1)}
           />
@@ -471,12 +486,19 @@ export function OpeningScreen({
             label="Next"
             variant="primary"
             density="compact"
+            maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
             accessibilityLabel={`Next: ${OPENING_SCENES[page + 1]!.heading}`}
             onPress={() => goTo(page + 1)}
             testID="opening-next"
           />
         ) : (
-          <Button label="Enter the archive" variant="primary" density="compact" onPress={onDone} />
+          <Button
+            label="Enter the archive"
+            variant="primary"
+            density="compact"
+            maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
+            onPress={onDone}
+          />
         )}
       </View>
     </View>
