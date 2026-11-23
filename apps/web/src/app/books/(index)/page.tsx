@@ -1,14 +1,15 @@
 /**
- * `/books`: the challenged titles as a cover wall, with the states by challenge count one
- * switch away. The list is national; a state is where a cited report places a challenge.
+ * `/books`: the Archive's books lens. The challenged titles under the Archive's head, with the
+ * state tile map as the lens's exhibit and the states by challenge count one switch away. The
+ * list is national; a state is where a cited report places a challenge. Its own canonical
+ * address (docs/ui/archive-url-contract.md, 10.3).
  */
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import React from 'react';
-import { PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { loadBannedBooksListing } from '../../../lib/banned-books/public-source.js';
-import { parentCrumb, Room } from '../../../components/room';
+import { Room } from '../../../components/room';
+import { ArchiveHead } from '../../archive/ArchiveHead';
 import { Outcome } from '../../records/RecordsIndex';
 import {
   bookStateName,
@@ -19,7 +20,7 @@ import { BooksBrowseSections } from '../BooksBrowseSections';
 import { isbnsKnownWithoutCovers } from '../books-cover-availability';
 import { BOOKS_PAGE_DESCRIPTION } from '../books-copy';
 import '../../reading-room.css';
-import '../../parked.css';
+import '../../archive/lens.css';
 import '../books.css';
 
 void React;
@@ -53,20 +54,12 @@ function dek(view: ReturnType<typeof buildBooksBrowseViewModel>): string {
 export default async function BooksPage({ searchParams }: BooksPageProps) {
   const params = await searchParams;
   const snapshot = await loadBannedBooksListing();
-  const header = {
-    crumb: parentCrumb('/books'),
-    linkAs: Link,
-    title: 'Banned books',
-    display: true,
-    className: 'ds-books-head',
-  } as const;
-
   if (snapshot.books.length === 0) {
     return (
       <Room width="wide" className="ds-books">
-        <div className="ds-parked ds-books-stage" data-ground="ink" data-ground-fixed="">
-          <div className="ds-parked__main">
-            <PageHeader {...header} />
+        <div className="ds-lens ds-books-stage">
+          <div className="ds-lens__main">
+            <ArchiveHead title="Banned books" view={null} lens="books" />
             <Outcome
               ground="paper"
               title="The catalog did not load"
@@ -97,7 +90,10 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   return (
     <Room width="wide" className="ds-books">
       {/* The dek states the count in words; no numeral repeats it. */}
-      <BooksBrowseSections view={view} head={<PageHeader {...header} dek={dek(view)} />} />
+      <BooksBrowseSections
+        view={view}
+        head={<ArchiveHead title="Banned books" dek={dek(view)} view={null} lens="books" />}
+      />
     </Room>
   );
 }

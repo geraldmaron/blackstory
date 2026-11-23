@@ -81,25 +81,32 @@ describe('shared archive filters', () => {
 
   it('the list hand-off is the same converter', () => {
     const query = { ...EMPTY_RECORDS_QUERY, topic: 'education', evidence: 'B' };
-    assert.equal(buildAtlasHref(query), '/explore?theme=education&floor=B');
+    assert.equal(buildAtlasHref(query), '/archive?view=map&topic=education&evidence=B');
   });
 
-  it('page and seed stay with the list; the map never receives them', () => {
+  it('the map carries the list page and seed as return context and hands them back', () => {
     const href = exploreHrefFromRecordsQuery({
       ...EMPTY_RECORDS_QUERY,
       kind: 'people',
       page: 3,
       seed: 'abc',
     });
-    assert.equal(href, '/explore?kind=people');
+    assert.equal(href, '/archive?view=map&kind=people&seed=abc&page=3');
+    const back = recordsQueryFromExplore(
+      parseExploreSearchParams(Object.fromEntries(new URLSearchParams(href.split('?')[1]))),
+    );
+    assert.equal(recordsHref(back), '/archive?kind=people&seed=abc&page=3');
   });
 
   it('never serializes a camera or a device location', () => {
     const onMap = parseExploreSearchParams({ state: 'GA', lat: '33.7', lng: '-84.4', zoom: '9' });
     const listHref = recordsHref(recordsQueryFromExplore(onMap));
-    assert.equal(listHref, '/records?state=GA');
-    assert.equal(atEdge('/explore?state=GA&lat=33.7&lng=-84.4&zoom=9'), 'state=GA');
-    assert.equal(atEdge('/records?state=GA&lat=33.7&lng=-84.4&zoom=9&near=Atlanta'), 'state=GA');
+    assert.equal(listHref, '/archive?state=GA');
+    assert.equal(
+      atEdge('/archive?view=map&state=GA&lat=33.7&lng=-84.4&zoom=9'),
+      'view=map&state=GA',
+    );
+    assert.equal(atEdge('/archive?state=GA&lat=33.7&lng=-84.4&zoom=9&near=Atlanta'), 'state=GA');
     for (const [, set] of SETS) {
       const href = exploreHrefFromRecordsQuery({ ...EMPTY_RECORDS_QUERY, ...set });
       assert.doesNotMatch(href, /[?&](lat|lng|zoom|near|radius)=/);

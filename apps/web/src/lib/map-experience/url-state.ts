@@ -136,6 +136,12 @@ export type ExploreViewState = {
    * leaving the map for Records restores the chronology they left. Never narrows anything.
    */
   readonly layout?: 'chronology';
+  /**
+   * Return context from the list, never read by the map: the page and the shuffle seed the reader
+   * left, so the List link can hand them back while the filters are unchanged.
+   */
+  readonly page?: number;
+  readonly seed?: string;
 };
 
 export type RawExploreSearchParams = Readonly<
@@ -153,14 +159,17 @@ export type RawExploreSearchParams = Readonly<
  * reads a key this list lacks, and when the serializer writes one.
  */
 export const EXPLORE_URL_PARAM_KEYS = [
+  'view',
   'q',
   'sort',
   'era',
   'kind',
   'tone',
+  'topic',
   'theme',
   'status',
   'confidence',
+  'evidence',
   'floor',
   'lat',
   'lng',
@@ -188,6 +197,8 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'periodEnd',
   'includeUndated',
   'layout',
+  'seed',
+  'page',
 ] as const;
 
 export type ExploreUrlParamKey = (typeof EXPLORE_URL_PARAM_KEYS)[number];
@@ -351,16 +362,17 @@ function parseNear(raw: string | undefined): string | undefined {
 
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
   // The shared filter model is parsed once, by the list's parser, so a value the list accepts
-  // the map accepts and the reverse. The map's two spellings (`theme`, `floor`) map onto it here.
+  // the map accepts and the reverse. `theme` and `floor` are the map's 4a spellings of `topic` and
+  // `evidence`: still read, never written.
   const collection = parseRecordsQuery({
     q: raw.q,
     sort: raw.sort,
     kind: raw.kind,
     era: raw.era,
     state: raw.state,
-    topic: raw.theme,
+    topic: raw.topic ?? raw.theme,
     status: raw.status,
-    evidence: raw.floor,
+    evidence: raw.evidence ?? raw.floor,
     selected: raw.selected,
     place: raw.place,
     collection: raw.collection,
@@ -368,6 +380,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     periodEnd: raw.periodEnd,
     includeUndated: raw.includeUndated,
     layout: raw.layout,
+    seed: raw.seed,
+    page: raw.page,
   });
   const orAll = (value: string) => (value === '' ? 'all' : value);
   const filters: ExploreFilterState = {
@@ -476,20 +490,23 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(period.end !== '' ? { periodEnd: period.end } : {}),
     ...(period.includeUndated ? { includeUndated: true } : {}),
     ...(chronologyLayout ? { layout: 'chronology' as const } : {}),
+    ...(collection.seed ? { seed: collection.seed } : {}),
+    ...(collection.page > 1 ? { page: collection.page } : {}),
   };
 }
 
-/** Builds a plain `?...` query string (no leading `/explore`) so callers can compose full hrefs
- * or push it via `history.replaceState` without a full navigation. */
+/** Builds the map view's query string (no leading `/archive?`), `view=map` first, so callers can
+ * compose full hrefs or push it via `history.replaceState` without a full navigation. */
 export function buildExploreSearchParams(state: ExploreViewState): string {
   const params = new URLSearchParams();
+  params.set('view', 'map');
   if (state.query) params.set('q', state.query);
   if (state.sort && state.sort !== 'discovery') params.set('sort', state.sort);
   if (state.filters.era !== DEFAULT_EXPLORE_FILTERS.era) params.set('era', state.filters.era);
   if (state.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind) params.set('kind', state.filters.kind);
   if (state.filters.tone !== DEFAULT_EXPLORE_FILTERS.tone) params.set('tone', state.filters.tone);
   if (state.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme)
-    params.set('theme', state.filters.theme);
+    params.set('topic', state.filters.theme);
   if (state.filters.status !== DEFAULT_EXPLORE_FILTERS.status)
     params.set('status', state.filters.status);
   if (state.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence) {
@@ -539,7 +556,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   // for the same reason. Inbound `panels=` and `hidePanels=` still parse; they never round-trip.
   if (state.radius && state.radius !== 'all') params.set('radius', state.radius);
   if (state.near) params.set('near', state.near);
-  if (state.floor) params.set('floor', state.floor);
+  if (state.floor) params.set('evidence', state.floor);
   if (state.find) params.set('find', state.find);
   if (state.collection) params.set('collection', state.collection);
   // Re-normalized so reversed bounds and a redundant `includeUndated` have one spelling.
@@ -552,13 +569,14 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (period.end !== '') params.set('periodEnd', period.end);
   if (period.includeUndated) params.set('includeUndated', '1');
   if (state.layout === 'chronology') params.set('layout', 'chronology');
+  if (state.seed) params.set('seed', state.seed);
+  if (state.page && state.page > 1) params.set('page', String(state.page));
   return params.toString();
 }
 
-/** Filter handoffs answer on `/explore`. `/` is the Door (reading); the live instrument is `/explore`. */
+/** The map view's address: `/archive?view=map` and the filter set. Never a camera. */
 export function buildExploreHref(state: ExploreViewState): string {
-  const qs = buildExploreSearchParams(state);
-  return qs ? `/explore?${qs}` : '/explore';
+  return `/archive?${buildExploreSearchParams(state)}`;
 }
 
 /**

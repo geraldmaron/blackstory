@@ -16,6 +16,8 @@ import {
   type ExploreLayerMode,
   type ExploreViewState,
 } from '../../../lib/map-experience/url-state';
+import { recordsQueryFromExplore } from '../../../lib/discovery/explore-collection';
+import { recordsQueryString } from '../../../lib/records/records-query';
 import type { EvidenceFloor } from '../../../lib/map-experience/evidence-grade';
 import type { MapKindFamily } from '../../../lib/map-experience/kind-encoding';
 
@@ -80,8 +82,22 @@ export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSync
     ...(base.periodEnd ? { periodEnd: base.periodEnd } : {}),
     ...(base.includeUndated ? { includeUndated: true } : {}),
     ...(base.layout ? { layout: base.layout } : {}),
+    ...(base.seed ? { seed: base.seed } : {}),
   };
-  return buildExploreHref(next);
+  // The list's page means something only for the filter set it was counted under.
+  const page = base.page && filterKey(next) === filterKey(base) ? { page: base.page } : {};
+  return buildExploreHref({ ...next, ...page });
+}
+
+/** The filter set alone: what a list page number was counted under. */
+function filterKey(state: ExploreViewState): string {
+  return recordsQueryString({
+    ...recordsQueryFromExplore(state),
+    page: 1,
+    seed: '',
+    selected: '',
+    place: '',
+  });
 }
 
 /** Returns the href it keeps in the address bar, for the view switch's link to this view. */

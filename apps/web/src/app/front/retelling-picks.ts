@@ -9,7 +9,7 @@
  * `provisional: true` means the owner has not chosen this record. All three are provisional.
  */
 import { isJourneyEligible } from './journey';
-import type { DoorRecord } from '../door-decade-walk';
+import type { ShownRecord } from './shown-records';
 import type { RecordSceneId } from './retelling-scenes';
 
 export type RetellingPick = {
@@ -34,9 +34,9 @@ export const RETELLING_PICKS: Readonly<Record<RecordSceneId, RetellingPick>> = {
  * a record the rules no longer allow.
  */
 export function pickedRecord(
-  records: readonly DoorRecord[],
+  records: readonly ShownRecord[],
   pick: RetellingPick,
-): DoorRecord | null {
+): ShownRecord | null {
   const record = records.find((candidate) => candidate.entityId === pick.recordId);
   return record && isJourneyEligible(record) ? record : null;
 }

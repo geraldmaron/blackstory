@@ -99,9 +99,9 @@ export const ABOUT_SOURCE_LIBRARY_HANDOFF = {
   label: 'Where the evidence comes from',
 } as const;
 
-/** Handoff from About to the collections. The list lives on `/collections`, not here. */
+/** Handoff from About to the collections, which are the Archive's lenses. */
 export const ABOUT_COLLECTIONS_HANDOFF = {
-  href: '/collections',
+  href: '/archive',
   label: 'Browse the collections',
   lede: 'Past the map and the records, the archive keeps sets you read in their own order, from every president on the record to the laws, the data, lives decade by decade, banned books and the memorial wall.',
   line: 'If a collection isn’t on that list, it isn’t finished.',

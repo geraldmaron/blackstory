@@ -41,7 +41,7 @@ export function SourcesSections({ library }: { readonly library: SourceLibrary |
           <p className="ds-trust-note" role="status">
             <strong>The publisher list could not be loaded just now.</strong> Every record page
             still lists its own sources. Reload this page in a minute, or{' '}
-            <Link href="/records">browse the records</Link>.
+            <Link href="/archive">browse the records</Link>.
           </p>
         ) : library.rows.length === 0 ? (
           <p className="ds-trust-note" role="status">

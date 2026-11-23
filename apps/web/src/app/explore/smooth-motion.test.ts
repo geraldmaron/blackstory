@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 const read = (path: string) => readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf8');
 const mapStage = read('../../components/map-stage/MapStage.tsx');
 const mapControlsCss = read('../../components/map-experience/map-controls.css');
-const atlasCss = read('./atlas.css');
+const atlasCss = read('./explore.css');
 const columnCss = read('../../components/map-experience/explore-column.css');
 const heroMorph = read('../../components/story/HeroHeadlineMorph.tsx');
 const shellCss = read('../shell.css');

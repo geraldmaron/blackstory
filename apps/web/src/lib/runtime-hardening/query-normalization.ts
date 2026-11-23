@@ -13,7 +13,9 @@
 import { isErrataChangeType } from '@repo/domain/trust';
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
 import {
+  ARCHIVE_PATH,
   RECORDS_PAGE_PARAM_ALLOWLIST,
+  archiveQueryString,
   parseRecordsQuery,
   recordsQueryString,
 } from '../records/records-query';
@@ -46,6 +48,30 @@ const EXPLORE_SURFACE_PATHS = new Set(['/explore']);
  */
 const RECORDS_PATH = '/records';
 
+/**
+ * `/archive` reads the list's keys, the map's keys, and `lens`. Which set is printed back depends
+ * on `view` (archive-url-contract.md, 10.1).
+ */
+const ARCHIVE_PAGE_PARAM_ALLOWLIST: readonly string[] = [
+  ...new Set(['lens', ...RECORDS_PAGE_PARAM_ALLOWLIST, ...EXPLORE_PAGE_PARAM_ALLOWLIST]),
+];
+
+/** One spelling per state: the map's set under `view=map`, the list's set otherwise. */
+function normalizeArchiveQuery(bag: QueryParamBag): string {
+  if (firstString(bag.view)?.toLowerCase() === 'map') {
+    return buildExploreSearchParams(parseExploreSearchParams(bag));
+  }
+  return archiveQueryString(
+    parseRecordsQuery({
+      ...bag,
+      topic: bag.topic ?? bag.theme,
+      evidence: bag.evidence ?? bag.floor,
+      // The inventions lens is one filter on the shared model.
+      kind: firstString(bag.lens)?.toLowerCase() === 'inventions' ? 'inventions' : bag.kind,
+    }),
+  );
+}
+
 function isTrackingKey(key: string): boolean {
   const lower = key.toLowerCase();
   if (TRACKING_QUERY_KEYS.has(lower)) return true;
@@ -77,6 +103,9 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   }
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return EXPLORE_PAGE_PARAM_ALLOWLIST;
+  }
+  if (path === ARCHIVE_PATH) {
+    return ARCHIVE_PAGE_PARAM_ALLOWLIST;
   }
   if (path === RECORDS_PATH) {
     return RECORDS_PAGE_PARAM_ALLOWLIST;
@@ -145,8 +174,12 @@ export function normalizeQueryString(
     return version === '3' || version === '4' ? `v=${version}` : '';
   }
 
+  if (path === ARCHIVE_PATH) return normalizeArchiveQuery(bag);
   if (EXPLORE_SURFACE_PATHS.has(path)) {
-    return buildExploreSearchParams(parseExploreSearchParams(bag));
+    // Reached only with the redirects switched off: the old path keeps no `view` of its own.
+    const params = new URLSearchParams(buildExploreSearchParams(parseExploreSearchParams(bag)));
+    params.delete('view');
+    return params.toString();
   }
   if (path === RECORDS_PATH) {
     return recordsQueryString(parseRecordsQuery(bag));

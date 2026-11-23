@@ -11,11 +11,8 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import BooksLoading from './books/(index)/loading';
-import LawLoading from './law/(index)/loading';
 import StoriesLoading from './stories/(index)/loading';
 import MosaicCreditsLoading from './stories/mosaic-credits/loading';
-import RecordsLoading from './records/loading';
 import ReceiptLoading from './corrections/status/[receiptCode]/loading';
 
 void React;
@@ -23,18 +20,6 @@ void React;
 const here = dirname(fileURLToPath(import.meta.url));
 
 const LOADING_BOUNDARIES = [
-  {
-    route: '/books',
-    dir: 'books/(index)',
-    Loading: BooksLoading,
-    label: 'Taking the books off the shelf…',
-  },
-  {
-    route: '/law',
-    dir: 'law/(index)',
-    Loading: LawLoading,
-    label: 'Pulling the laws together…',
-  },
   {
     route: '/stories',
     dir: 'stories/(index)',
@@ -46,12 +31,6 @@ const LOADING_BOUNDARIES = [
     dir: 'stories/mosaic-credits',
     Loading: MosaicCreditsLoading,
     label: 'Gathering the image credits…',
-  },
-  {
-    route: '/records',
-    dir: 'records',
-    Loading: RecordsLoading,
-    label: 'Pulling the records together…',
   },
   {
     route: '/corrections/status/[receiptCode]',
@@ -105,6 +84,13 @@ test('no record, story or figure route sits behind a loading boundary', () => {
     'lives',
     'lives/explorer',
     'lives/[region]',
+    // The Archive since phase 4b: the list is the page a reader without script needs, and its
+    // lens pages and 4a addresses render through the same page.
+    'archive',
+    'records',
+    'explore',
+    'law/(index)',
+    'books/(index)',
     '',
   ]) {
     assert.ok(!existsSync(join(here, dir, 'loading.tsx')), `${dir || 'app'} has a loading.tsx`);

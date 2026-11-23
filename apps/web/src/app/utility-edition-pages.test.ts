@@ -79,7 +79,7 @@ test('not-found keeps archive recovery CTA', () => {
   assert.match(source, /Find in the archive/);
   // `/history` became a permanent redirect to `/records`; the recovery CTA on the 404 must land
   // on the real index rather than teaching a lost reader to take an extra hop (SP-15).
-  assert.match(source, /href="\/records"/);
+  assert.match(source, /href="\/archive"/);
 });
 
 test('not-found offers the four exits the design law names, and no gallery', () => {

@@ -59,7 +59,7 @@ test('the page states what the archive refuses to do', () => {
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
 });
 
-test('trust and contribution links come from the registry; collections hand off to /collections', () => {
+test('trust and contribution links come from the registry; collections hand off to the Archive', () => {
   assert.match(sectionsSource, /destinationsInGroup\('take-part'\)/);
   assert.match(sectionsSource, /destinationsInGroup\('check'\)/);
   assert.match(sectionsSource, /cardTitleFor/);
@@ -67,7 +67,7 @@ test('trust and contribution links come from the registry; collections hand off 
   assert.doesNotMatch(sectionsSource, /DestinationIcon|CardGrid|RoomCard|RoomHandoff/);
   assert.match(sectionsSource, /TrustLinks/);
   assert.match(sectionsSource, /ABOUT_COLLECTIONS_HANDOFF/);
-  assert.equal(ABOUT_COLLECTIONS_HANDOFF.href, '/collections');
+  assert.equal(ABOUT_COLLECTIONS_HANDOFF.href, '/archive');
   assert.doesNotMatch(sectionsSource, /readRooms|checkRooms|\[\.\.\.readRooms/);
   // The old page hardcoded six links, two of them into `/history`, which is a redirect endpoint.
   assert.doesNotMatch(sectionsSource, /href="\/history"/);

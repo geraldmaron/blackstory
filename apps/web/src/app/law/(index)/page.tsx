@@ -1,17 +1,18 @@
 /**
- * `/law`: the statutes, amendments and court decisions as a chronology.
+ * `/law`: the Archive's law lens. The statutes, amendments and court decisions as a chronology,
+ * under the Archive's head, with the time rail as the lens's exhibit. Its own canonical address
+ * (docs/ui/archive-url-contract.md, 10.3).
  */
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import React from 'react';
-import { PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { loadLegalCatalog } from '../../../lib/legal/public-source';
-import { parentCrumb, Room } from '../../../components/room';
+import { Room } from '../../../components/room';
+import { ArchiveHead } from '../../archive/ArchiveHead';
 import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from '../law-view-model';
 import { LawBrowseSections } from '../LawBrowseSections';
 import '../../reading-room.css';
-import '../../parked.css';
+import '../../archive/lens.css';
 import '../law.css';
 
 void React;
@@ -58,16 +59,7 @@ export default async function LawPage({ searchParams }: LawPageProps) {
       <LawBrowseSections
         view={view}
         catalog={source.snapshots}
-        head={
-          <PageHeader
-            display
-            className="ds-law-head"
-            crumb={parentCrumb('/law')}
-            linkAs={Link}
-            title="Law"
-            dek={dek(view)}
-          />
-        }
+        head={<ArchiveHead title="Law" dek={dek(view)} view={null} lens="law" />}
       />
     </Room>
   );

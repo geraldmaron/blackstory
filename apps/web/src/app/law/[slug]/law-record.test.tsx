@@ -23,7 +23,7 @@ function okViewFor(slug: string): Extract<LawDetailViewModel, { kind: 'ok' }> {
 /** The map action's href and label: the label must name exactly the filter the href applies. */
 function mapAction(html: string): { readonly href: string; readonly label: string } | undefined {
   const match =
-    /<a class="[^"]*" href="(\/explore[^"]*)"[^>]*>(?:<svg[^]*?<\/svg>)?([^<]*on the map)<\/a>/.exec(
+    /<a class="[^"]*" href="(\/archive\?view=map[^"]*)"[^>]*>(?:<svg[^]*?<\/svg>)?([^<]*on the map)<\/a>/.exec(
       html,
     );
   return match ? { href: match[1]!.replaceAll('&amp;', '&'), label: match[2]! } : undefined;

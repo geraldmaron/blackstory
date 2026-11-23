@@ -45,18 +45,9 @@ html[data-world-on] .ds-world-controls,
   outline-offset: 2px;
 }
 
-/* The opening keeps the map credit in the bottom right corner (door-home.css); the switches sit
-   beside it, not on it. */
-@media (min-width: 48rem) {
-  body:has(.ds-door-journey:not(.ds-door-journey--browse)) .ds-world-controls {
-    right: calc(var(--ds-space-4) + 44px + var(--ds-space-2));
-    bottom: var(--ds-space-4);
-  }
-}
-
-/* Browse is reader-driven and its dock and zoom stack own the bottom edge; the switches are on
-   the opening and on every record page. */
-body:has(.ds-door__browse) .ds-world-controls:not([data-documents]) {
+/* The map view is reader-driven and its dock and zoom stack own the bottom edge; the switches
+   are on the front page and on every record page. */
+body:has(.ds-archive-map) .ds-world-controls:not([data-documents]) {
   display: none;
 }
 

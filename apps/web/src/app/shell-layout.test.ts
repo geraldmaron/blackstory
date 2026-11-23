@@ -162,7 +162,7 @@ describe('horizontal overflow guards', () => {
   it('Explore chrome never blurs: the column, dock and controls are solid sheets (DESIGN.md 7.4)', () => {
     const mapCss = (file: string) =>
       readFileSync(join(here, '../components/map-experience', file), 'utf8');
-    const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
+    const atlasCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
     for (const [name, source] of [
       ['column', mapCss('explore-column.css')],
       ['controls', mapCss('map-controls.css')],

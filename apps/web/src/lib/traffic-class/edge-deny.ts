@@ -15,7 +15,13 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { SEO_TOOL_USER_AGENTS } from './agent-lists';
 import { classifyTraffic } from './classify';
 
-const EXPENSIVE_EXACT = new Set(['/explore', '/records', '/atlas/catalog', '/sitemap.xml']);
+const EXPENSIVE_EXACT = new Set([
+  '/archive',
+  '/explore',
+  '/records',
+  '/atlas/catalog',
+  '/sitemap.xml',
+]);
 const EXPENSIVE_PREFIXES = ['/explore/api', '/search/api', '/locate/api'] as const;
 
 function normalizePath(pathname: string): string {

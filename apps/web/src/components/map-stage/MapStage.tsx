@@ -355,7 +355,7 @@ export type MapStageHandle = {
    * Door browse morph: force Live posture (reader-steered gestures) while the journey surface
    * stays mounted on `/`. Clears back to the surface-class default when browse ends.
    */
-  readonly setDoorBrowseLive: (live: boolean) => void;
+  readonly setBrowseLive: (live: boolean) => void;
   /**
    * Whether place tokens (counts and names) and site names draw. A surface that flies the camera
    * to one record (the Door's tour) turns them off, so the flight does not pass through every
@@ -554,12 +554,12 @@ export function MapStageProvider({
     defaultPostureFor(surfaceClassFor(pathname ?? '/')),
   );
   /** Door in-place browse: Live gestures without leaving the Door route tree. */
-  const [doorBrowseLive, setDoorBrowseLiveState] = useState(false);
-  const doorBrowseLiveRef = useRef(false);
-  doorBrowseLiveRef.current = doorBrowseLive;
-  const setDoorBrowseLive = useCallback((live: boolean) => {
-    doorBrowseLiveRef.current = live;
-    setDoorBrowseLiveState(live);
+  const [browseLive, setBrowseLiveState] = useState(false);
+  const browseLiveRef = useRef(false);
+  browseLiveRef.current = browseLive;
+  const setBrowseLive = useCallback((live: boolean) => {
+    browseLiveRef.current = live;
+    setBrowseLiveState(live);
   }, []);
   const setPlaceTokens = useCallback((shown: boolean) => {
     plateRef.current?.toggleAttribute('data-tokens-off', !shown);
@@ -607,7 +607,7 @@ export function MapStageProvider({
   postureRef.current = posture;
   /** True while the plate is the Door's own Orbit, not its browse posture: lines wait for
    * `ORBIT_MAX_ZOOM` there (`applyOrbitLineFloor`). */
-  const bareOrbit = posture === 'ambient' && !doorBrowseLive;
+  const bareOrbit = posture === 'ambient' && !browseLive;
   const bareOrbitRef = useRef(bareOrbit);
   bareOrbitRef.current = bareOrbit;
   useEffect(() => {
@@ -1859,7 +1859,7 @@ export function MapStageProvider({
       heldSlotRef.current = null;
     }
     lastFramedMomentRef.current = null;
-    if (doorBrowseLiveRef.current) {
+    if (browseLiveRef.current) {
       setPosture('live');
       return;
     }
@@ -1867,12 +1867,12 @@ export function MapStageProvider({
   }, [surfaceClass]);
 
   useEffect(() => {
-    if (doorBrowseLive) {
+    if (browseLive) {
       setPosture('live');
       return;
     }
     setPosture(defaultPostureFor(surfaceClass));
-  }, [doorBrowseLive, surfaceClass]);
+  }, [browseLive, surfaceClass]);
 
   /**
    * Posture changes reach the gesture handlers directly. The Framed path below does the same
@@ -1929,7 +1929,7 @@ export function MapStageProvider({
     // Door browse hands the plate to the reader. This per-frame resolver used to ignore that and
     // put the Door's `ambient` posture back on every frame — on a touch screen that is a full
     // gesture lock, so /explore on a phone could not be dragged or pinched at all.
-    const next = doorBrowseLiveRef.current
+    const next = browseLiveRef.current
       ? 'live'
       : resolvePlatePosture({
           surface: surfaceClass,
@@ -2058,7 +2058,7 @@ export function MapStageProvider({
         ensureMap();
         resize();
       },
-      setDoorBrowseLive,
+      setBrowseLive,
       setPlaceTokens,
       setMapLabels,
       getMap: () => {
@@ -2077,7 +2077,7 @@ export function MapStageProvider({
       clearSearchCenterMarker,
       setSearchArea,
       resize,
-      setDoorBrowseLive,
+      setBrowseLive,
       setPlaceTokens,
       setMapLabels,
       getMap,

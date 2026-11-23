@@ -4,7 +4,7 @@
  *
  * The scenes are complete without this (retelling.tsx) and their layout and word change are CSS
  * (front.css). This adds three things: the camera (the country for a word scene, a landing on a
- * record's place, the tour's own dive and traverse between them, from `door-tour-scrub.ts`); the
+ * record's place, the tour's own dive and traverse between them, from `camera-path.ts`); the
  * rail's current scene; and, on the front page, landing a returning reader on the last scene.
  *
  * One passive scroll listener, coalesced to a frame. Nothing is timed and nothing captures the
@@ -27,8 +27,8 @@ import { holdStill } from '../../lib/map-experience/world-prefs';
 import { useMapStage } from '../../components/map-stage/MapStage';
 import { groundFrameFor } from '../../components/map-stage/ground-frame';
 import { ORBIT_MAX_ZOOM } from '../map/explore-style';
-import { doorFramePadding } from '../door-field-frame';
-import { easeTourCamera, type TourCamera } from '../door-tour-scrub';
+import { framePadding } from './frame-padding';
+import { easeTourCamera, type TourCamera } from './camera-path';
 import {
   retellingCameraAt,
   retellingPhase,
@@ -210,7 +210,7 @@ export function RetellingFilm({
         pitch: 0,
         padding: NO_PADDING,
       };
-      const padding = doorFramePadding(landing, plateBox) ?? NO_PADDING;
+      const padding = framePadding(landing, plateBox) ?? NO_PADDING;
       orbit = country;
       span = Math.min(plateBox.width, plateBox.height);
       anchors = sceneIds.map((id, i) => {

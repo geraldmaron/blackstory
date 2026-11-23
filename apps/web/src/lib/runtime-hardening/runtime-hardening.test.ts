@@ -145,15 +145,17 @@ test('Explore and entity route segment config stays after all imports', () => {
     'revalidate',
     /\d+/,
   );
-  assertSegmentConfigAfterImports(
-    readFileSync(join(APP_ROOT, 'explore/page.tsx'), 'utf8'),
-    'explore/page.tsx',
-    'dynamic',
-    /force-dynamic/,
-  );
+  for (const page of ['archive/page.tsx', 'explore/page.tsx']) {
+    assertSegmentConfigAfterImports(
+      readFileSync(join(APP_ROOT, page), 'utf8'),
+      page,
+      'dynamic',
+      /force-dynamic/,
+    );
+  }
 });
 
-test('Explore is `/`; `/explore` mounts the same Door browse shell', () => {
+test('the map is a view of /archive; /explore mounts the same view for the rollback', () => {
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
     /(^|\/)explore\/page\.tsx$/.test(
       file
@@ -168,8 +170,11 @@ test('Explore is `/`; `/explore` mounts the same Door browse shell', () => {
   const explore = readFileSync(join(APP_ROOT, 'explore/page.tsx'), 'utf8');
   assert.match(home, /front\/front-page/);
   assert.doesNotMatch(home, /AtlasHome|HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
-  assert.match(explore, /DoorHome/);
-  assert.match(explore, /initialBrowse/);
+  const archive = readFileSync(join(APP_ROOT, 'archive/page.tsx'), 'utf8');
+  assert.match(explore, /MapView/);
+  assert.match(archive, /MapView/);
+  assert.match(archive, /ListView/);
+  assert.doesNotMatch(`${explore}${archive}`, /DoorHome|initialBrowse/);
   assert.doesNotMatch(explore, /AtlasHome/);
 
   assert.equal(

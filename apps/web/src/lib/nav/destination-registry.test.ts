@@ -66,22 +66,22 @@ describe('destination registry · coverage', () => {
     }
   });
 
-  it('the four product axes parent to the door, not to each other', () => {
-    // Stories and Records used to parent through the old hub, which was the old Library hierarchy
-    // surviving a rename: it told a reader that the archive index was a supporting page rather
-    // than one of the four ways into the product.
-    for (const path of ['/explore', '/stories', '/records', '/collections']) {
-      assert.equal(destinationFor(path)?.parent, '/', `${path} is an axis and parents to the door`);
+  it('the primary destinations parent to the front page, not to each other', () => {
+    for (const path of ['/archive', '/stories', '/data', '/memorial']) {
+      assert.equal(destinationFor(path)?.parent, '/', `${path} parents to the front page`);
     }
+    // The map is a view of the Archive, not a destination beside it.
+    assert.equal(destinationFor('/archive?view=map')?.parent, '/archive');
   });
 
-  it('/collections and /about are the two hubs every supporting page hangs off', () => {
-    assert.notEqual(destinationFor('/collections'), undefined);
-    assert.equal(destinationFor('/rooms'), undefined);
-
-    for (const path of ['/presidents', '/books', '/law', '/data', '/lives', '/memorial']) {
-      assert.equal(destinationFor(path)?.parent, '/collections', `${path} is a collection`);
+  it('the lenses hang off the Archive, and the old addresses are not destinations', () => {
+    for (const path of ['/explore', '/records', '/collections', '/rooms']) {
+      assert.equal(destinationFor(path), undefined, `${path} redirects; it is not a destination`);
     }
+    for (const path of ['/presidents', '/books', '/law']) {
+      assert.equal(destinationFor(path)?.parent, '/archive', `${path} is an Archive lens`);
+    }
+    assert.equal(destinationFor('/lives')?.parent, '/data');
     for (const path of [
       '/faq',
       '/methodology',
@@ -98,10 +98,10 @@ describe('destination registry · coverage', () => {
   });
 
   it('a record goes up to the catalog that lists it', () => {
-    // An entity and a place both parent to Records. A breadcrumb states where a page SITS; the
-    // way back to a map selection is return state, not hierarchy.
-    assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/records');
-    assert.equal(parentPathFor('/place/paul-laurence-dunbar-high-school'), '/records');
+    // An entity and a place both parent to the Archive. A breadcrumb states where a page SITS;
+    // the way back to a map selection is return state, not hierarchy.
+    assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/archive');
+    assert.equal(parentPathFor('/place/paul-laurence-dunbar-high-school'), '/archive');
     assert.equal(parentPathFor('/books/beloved'), '/books');
     assert.equal(parentPathFor('/law/plessy'), '/law');
     assert.equal(parentPathFor('/stories/redlining'), '/stories');
@@ -173,7 +173,7 @@ describe('destination registry · the footer is derived, not authored', () => {
     // The door is not a Find item: the footer wordmark already links home, on every surface.
     assert.deepEqual(
       find.items.map((item) => item.href),
-      ['/explore', '/stories', '/records', '/collections'],
+      ['/archive', '/archive?view=map', '/stories'],
     );
     const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
     const palette = browsableDestinations().map((destination) => destination.path);
@@ -183,14 +183,16 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(hrefs.includes('/lives'));
     assert.ok(hrefs.includes('/sources'));
     assert.ok(hrefs.includes('/submit'));
-    assert.ok(hrefs.includes('/explore'));
-    assert.ok(hrefs.includes('/records'));
+    assert.ok(hrefs.includes('/archive?view=map'));
+    assert.ok(hrefs.includes('/archive'));
+    assert.ok(!hrefs.includes('/explore'));
+    assert.ok(!hrefs.includes('/records'));
+    assert.ok(!hrefs.includes('/collections'));
     assert.ok(!hrefs.includes('/history'));
     assert.ok(!hrefs.includes('/banned-books'));
     assert.ok(!hrefs.includes('/how-it-works'));
-    assert.ok(!palette.includes('/explore'));
-    assert.ok(!palette.includes('/records'));
-    assert.ok(!palette.includes('/collections'));
+    assert.ok(!palette.includes('/archive?view=map'));
+    assert.ok(!palette.includes('/archive'));
     for (const path of palette) {
       assert.ok(hrefs.includes(path), `${path} missing from footer`);
     }
@@ -200,9 +202,10 @@ describe('destination registry · the footer is derived, not authored', () => {
     const home = destinationFor('/');
     assert.ok(home);
     assert.equal(home.description, undefined);
-    const explore = destinationFor('/explore');
-    assert.equal(explore?.label, 'Map');
-    assert.equal(explore?.description, 'The map.');
+    const map = destinationFor('/archive?view=map');
+    assert.equal(map?.label, 'Map');
+    assert.equal(map?.description, 'The map.');
+    assert.equal(destinationFor('/archive')?.label, 'Archive');
   });
 
   it('ships banned books as a browsable room without listing /banned-books', () => {

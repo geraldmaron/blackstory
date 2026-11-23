@@ -64,7 +64,9 @@ import { buildExploreMapSource } from '../../../lib/map-experience/build-explore
 import { ERA_NOT_DOCUMENTED_LABEL } from '../../../lib/map-experience/entity-era-facts';
 import { findUsStateFromJurisdictionLabel } from '@repo/domain/map/geography';
 import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
-import { precisionInWords, recordMarkFor } from '../../../lib/map-experience/geo-precision';
+import { mapPrecisionFor, precisionInWords } from '../../../lib/map-experience/geo-precision';
+
+export { mapPrecisionFor };
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { kindIconFor } from '../../../lib/map-experience/kind-icons';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
@@ -200,22 +202,6 @@ function gapsFor(entity: PublicEntityView, shownClaims: number): readonly string
   if (isThinRecord(entity)) lines.push(THIN_RECORD_COPY.title);
   if (isSingleSourceRecord(entity)) lines.push(SINGLE_SOURCE_COPY.title);
   return lines;
-}
-
-/**
- * The precision the record's map is drawn at. A law has a jurisdiction, not a site: the catalog
- * stores the building it was passed or signed in, and drawing that as an exact site says the law
- * happened at one address. A state's law is drawn as its state; any other law (federal ones sit
- * in Washington) is drawn no sharper than its city. Every other record keeps its stored
- * precision. This only ever coarsens (P-03).
- */
-export function mapPrecisionFor(
-  entity: Pick<PublicEntityView, 'kind' | 'locationPrecision' | 'jurisdictionLabel'>,
-): PublicEntityView['locationPrecision'] {
-  if (String(entity.kind) !== 'law') return entity.locationPrecision;
-  const state = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)?.postalCode;
-  if (state && state !== 'DC') return 'state';
-  return recordMarkFor(entity.locationPrecision) === 'dot' ? 'city' : entity.locationPrecision;
 }
 
 /* The view. */

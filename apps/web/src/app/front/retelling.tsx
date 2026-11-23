@@ -22,8 +22,8 @@ import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-dat
 import { precisionInWords } from '../../lib/map-experience/geo-precision';
 import { RecordImage } from '../../components/entity/RecordImage';
 import { EvidenceList } from '../../components/evidence/EvidenceList';
-import { doorRecords, type DoorRecord } from '../door-decade-walk';
-import { DoorRecordLink } from '../door-record-link';
+import { shownRecords, type ShownRecord } from './shown-records';
+import { RecordLink } from './record-link';
 import { legText, shortPlace } from './journey';
 import { loadRecordsIndex, recordsQueryCacheKey } from '../records/load-records-index';
 import { FRONT_ROUTES } from './front-routes';
@@ -37,9 +37,9 @@ import './front.css';
 void React;
 
 /** A record as the scene shows it: its public href and its pin on the map. */
-type Shown = DoorRecord & { readonly pinId: string | null };
+type Shown = ShownRecord & { readonly pinId: string | null };
 
-const placeOf = (record: DoorRecord) => shortPlace(record.locality ?? record.name);
+const placeOf = (record: ShownRecord) => shortPlace(record.locality ?? record.name);
 
 /** The scene's word as its heading: the changing word in italic, "story" plain. */
 function SceneWord({ prefix, heading }: { readonly prefix: string; readonly heading: string }) {
@@ -66,7 +66,7 @@ export async function Retelling({
   const hrefByPin = new Map(
     pins.features.map((pin) => [pin.properties.entityId, pin.properties.href] as const),
   );
-  const records = doorRecords(features, entities);
+  const records = shownRecords(features, entities);
   const shownFor = (id: RetellingSceneId): Shown | null => {
     if (!isRecordScene(id)) return null;
     const record = pickedRecord(records, RETELLING_PICKS[id]);
@@ -216,9 +216,9 @@ export async function Retelling({
               {record ? (
                 <>
                   <p className="ds-scene__record">
-                    <DoorRecordLink className="ds-scene__name" href={record.href}>
+                    <RecordLink className="ds-scene__name" href={record.href}>
                       {record.name}
-                    </DoorRecordLink>
+                    </RecordLink>
                     <span className="ds-scene__place">
                       {record.locality ? `${record.locality}. ` : ''}
                       {precisionInWords(record.precision)}.

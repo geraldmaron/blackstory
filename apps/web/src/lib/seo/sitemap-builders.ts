@@ -3,6 +3,7 @@
  * Consumed by `app/sitemap.xml/route.ts`; keeps release-scoped routing logic testable.
  */
 import type { MetadataRoute } from 'next';
+import { ARCHIVE_REDIRECTS_ENABLED } from '../redirects/archive-redirects.mjs';
 import { crawlableDestinations } from '../nav/destination-registry';
 import { canStandHere } from '../place/public-place-path';
 import { publicRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
@@ -34,6 +35,11 @@ export type BuildSitemapOptions = {
   readonly figures?: readonly string[];
 };
 
+const ARCHIVE_PATHS_BEFORE: Readonly<Record<string, string>> = {
+  '/archive': '/records',
+  '/archive?view=map': '/explore',
+};
+
 /**
  * The static routes, derived from the destination registry rather than restated here (SP-19).
  *
@@ -48,7 +54,11 @@ function staticRoutes(): readonly {
   readonly priority: number;
 }[] {
   return crawlableDestinations().map((destination) => ({
-    path: destination.path,
+    // With the phase 4b redirects switched off, the Archive's 4a addresses are the canonical
+    // ones again, so they are the ones listed.
+    path: ARCHIVE_REDIRECTS_ENABLED
+      ? destination.path
+      : (ARCHIVE_PATHS_BEFORE[destination.path] ?? destination.path),
     changeFrequency: destination.crawl?.changeFrequency,
     priority: destination.crawl?.priority ?? 0.5,
   }));

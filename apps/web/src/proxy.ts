@@ -14,6 +14,7 @@ import { handleWebSecurity } from './lib/web-security/edge-security';
 import { CSP_NONCE_HEADER } from './lib/web-security/constants';
 import { buildGlobalSecurityHeaders } from './lib/web-security/security-headers';
 import { surfaceClassFor } from './lib/nav/surface-classes';
+import { archiveLensRedirect, legacyArchiveRedirect } from './lib/redirects/archive-routing';
 import {
   isPublicRecordPath,
   normalizeQueryString,
@@ -82,7 +83,7 @@ function isUncacheableDiscoveryDocument(request: NextRequest): boolean {
     return normalizeQueryString(pathname, searchParams).length > 0;
   }
   return (
-    (pathname === '/records' || pathname === '/explore') &&
+    (pathname === '/archive' || pathname === '/records' || pathname === '/explore') &&
     searchParams.getAll('collection').some((value) => value.trim().length > 0)
   );
 }
@@ -174,6 +175,17 @@ async function resolveProxyResponse(request: NextRequest): Promise<NextResponse>
     return adminAuthGate(request);
   }
 
+  // Phase 4b: an old Archive address, or a lens spelled on `/archive`, answers one TEMPORARY
+  // redirect to its canonical address (archive-url-contract.md, 10.4). Never cached: a stored 307
+  // would outlive the one-line rollback in `lib/redirects/archive-redirects.mjs`.
+  const requested = new URL(request.nextUrl.href);
+  const moved = legacyArchiveRedirect(requested) ?? archiveLensRedirect(requested);
+  if (moved !== null) {
+    const response = NextResponse.redirect(new URL(moved, requested), 307);
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
+  }
+
   // Outside the security/normalization surface this is a bare pass-through, which is what these
   // paths got before the matcher was widened for maintenance mode. See `config` below.
   // `{ request }` (rather than a bare `NextResponse.next()`) forwards the nonce header set
@@ -216,6 +228,7 @@ async function resolveProxyResponse(request: NextRequest): Promise<NextResponse>
 const SECURITY_NORMALIZED_EXACT = new Set([
   '/',
   '/search',
+  '/archive',
   '/explore',
   '/records',
   '/atlas/catalog',

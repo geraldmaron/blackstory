@@ -1,5 +1,5 @@
 /**
- * `/records` — the register: research rows and pager. The toolbar, menus, sheet, active-filter
+ * The Archive's list and timeline: research rows and pager. The head is archive-head.css. The toolbar, menus, sheet, active-filter
  * row, outcome block and wait placeholder are shared with /law and /books in room-kit.css. The
  * page frame, buttons, chips and Segmented come from @repo/ui; the timeline bands are
  * records-chronology.css.
@@ -17,30 +17,6 @@ body:has(.ds-records) .ds-reading-progress {
   /* The sticky toolbar's height, which the timeline's sticky decade labels and every jump
      target clear. 44px controls plus 12px above and below. */
   --records-bar-h: 68px;
-}
-
-/* —— header: the title, then the count and the map membership as sentences ———————— */
-.ds-records-head {
-  padding-block: var(--ds-space-12) var(--ds-space-8);
-}
-
-.ds-records-head__views {
-  margin-top: var(--ds-space-4);
-}
-
-.ds-records-head__membership {
-  margin: var(--ds-space-3) 0 0;
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-body-sm);
-}
-
-.ds-records-head__dek {
-  margin: var(--ds-space-4) 0 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  font-style: italic;
-  line-height: 1.3;
 }
 
 /* —— the list: one paper sheet, square, no bands, no shadow (DESIGN.md 7.4) ———————— */
@@ -400,10 +376,6 @@ body:has(.ds-records) .ds-reading-progress {
 
 /* —— phone ————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
-  .ds-records-head {
-    padding-block: var(--ds-space-8) var(--ds-space-4);
-  }
-
   .ds-records-paper {
     margin-inline: calc(var(--ds-gutter) * -1);
   }

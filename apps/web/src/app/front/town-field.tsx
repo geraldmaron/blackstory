@@ -24,7 +24,7 @@ import {
 } from '../../lib/map-experience/explore-place-radius';
 import { nearbyDistances, type NearbyArea } from '../../lib/map-experience/nearby';
 import { useLocateMe } from '../explore/hooks/use-locate-me';
-import { DoorRecordLink } from '../door-record-link';
+import { RecordLink } from './record-link';
 import { legText } from './journey';
 import { useSetRetellingTown, type RetellingStop } from './retelling-film';
 
@@ -164,7 +164,7 @@ export function TownField({
               <ul>
                 {answer.near.map((record) => (
                   <li key={record.id}>
-                    <DoorRecordLink href={record.href}>{record.name}</DoorRecordLink>
+                    <RecordLink href={record.href}>{record.name}</RecordLink>
                     <span>{formatExploreDistance(record.meters)}</span>
                   </li>
                 ))}
@@ -177,9 +177,8 @@ export function TownField({
                 <>
                   {' '}
                   The nearest record is{' '}
-                  <DoorRecordLink href={answer.nearest.href}>
-                    {answer.nearest.name}
-                  </DoorRecordLink>, {formatExploreDistance(answer.nearest.meters)}.
+                  <RecordLink href={answer.nearest.href}>{answer.nearest.name}</RecordLink>,{' '}
+                  {formatExploreDistance(answer.nearest.meters)}.
                 </>
               ) : null}
             </p>

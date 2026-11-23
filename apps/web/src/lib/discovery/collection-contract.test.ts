@@ -240,7 +240,7 @@ describe('cross-view handoffs', () => {
     assert.equal(qs.get('periodEnd'), '1900');
     assert.equal(qs.get('includeUndated'), '1');
     assert.equal(qs.get('layout'), 'chronology');
-    assert.equal(recordsHref({ ...EMPTY_RECORDS_QUERY, includeUndated: true }), '/records');
+    assert.equal(recordsHref({ ...EMPTY_RECORDS_QUERY, includeUndated: true }), '/archive');
   });
 
   it('carries collection, range, layout and every other narrowing Records to Map and back', () => {
@@ -279,17 +279,17 @@ describe('cross-view handoffs', () => {
 
   it('turns malformed input into finite sentinels at the edge instead of a bare archive', () => {
     assert.equal(
-      normalizeQueryString('/records', { collection: 'story:bad slug' }),
+      normalizeQueryString('/archive', { collection: 'story:bad slug' }),
       'collection=invalid',
     );
     assert.equal(
-      normalizeQueryString('/records', { periodStart: '1885', includeUndated: '1' }),
+      normalizeQueryString('/archive', { periodStart: '1885', includeUndated: '1' }),
       'periodStart=invalid&includeUndated=1',
     );
-    assert.equal(normalizeQueryString('/records', { includeUndated: '1' }), '');
+    assert.equal(normalizeQueryString('/archive', { includeUndated: '1' }), '');
     assert.equal(
-      normalizeQueryString('/records', { collection: 'story:Dunbar', layout: 'chronology' }),
-      'collection=story%3Adunbar&layout=chronology',
+      normalizeQueryString('/archive', { collection: 'story:Dunbar', layout: 'chronology' }),
+      'view=timeline&collection=story%3Adunbar',
     );
   });
 });

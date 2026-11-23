@@ -1,5 +1,5 @@
 /**
- * `/records` — the register. Presentation only; every number and href comes from
+ * The Archive's list and timeline. Presentation only; every number and href comes from
  * `lib/records/build-records-index.ts`.
  *
  * Header with the count as one sentence (how many match, how many of those the map can show),
@@ -12,8 +12,9 @@
  */
 
 import React, { type ReactNode } from 'react';
-import { Chip, PageTitle, Segmented, Sheet, buttonClassName } from '@repo/ui';
+import { Chip, Sheet, buttonClassName } from '@repo/ui';
 import { Room } from '../../components/room';
+import { DecadeFigure } from '../../components/discovery/DecadeFigure';
 import { RecordsTimeline } from '../../components/discovery/records-chronology';
 import {
   RECORDS_FILTER_KEYS,
@@ -26,9 +27,10 @@ import {
   type RecordsRow,
   type RecordsSort,
 } from '../../lib/records/build-records-index';
-import { recordsQueryString } from '../../lib/records/records-query';
+import { archiveQueryString } from '../../lib/records/records-query';
 import { earliestDecade } from '../../lib/records/records-matching';
 import { membershipSentence } from '../../lib/discovery/continuity-label';
+import { ArchiveHead, INVENTIONS_KIND } from '../archive/ArchiveHead';
 import { DecadeJump } from './DecadeJump';
 import { RecordRow } from './RecordRow';
 import { BandArt } from '../../components/atmosphere/BandArt';
@@ -150,7 +152,7 @@ export function Outcome({
   also,
   ground = 'sand',
 }: {
-  /** `paper` on a Parked page (parked.css): the outcome is the page's sheet, with no band art. */
+  /** `paper` on a lens page: the outcome stands on the page, with no band art. */
   readonly ground?: 'sand' | 'paper';
   readonly title: string;
   readonly children: React.ReactNode;
@@ -201,7 +203,7 @@ function NoMatch({ model }: { readonly model: RecordsIndexModel }) {
   }
   if (constraints.length === 0) {
     return (
-      <Outcome title="The release is empty" action={{ href: '/', label: 'Go to the map' }}>
+      <Outcome title="The release is empty" action={{ href: '/', label: 'Go to the front page' }}>
         The archive failed to load its records. That’s a fault in the site, not an absence of
         history.
       </Outcome>
@@ -217,11 +219,26 @@ function NoMatch({ model }: { readonly model: RecordsIndexModel }) {
           label: `Search all records for “${query.q}”`,
         }
       : { href: clearAllHref, label: narrowed ? 'Clear filters' : 'Clear search' };
+  const { didYouMean } = model;
+  if (didYouMean !== undefined) {
+    // The nearest spelling the records hold, offered and never applied: the reader chooses it.
+    return (
+      <Outcome
+        title="No records match"
+        action={{ href: didYouMean.href, label: `Search for “${didYouMean.q}”` }}
+        also={action}
+      >
+        Nothing in the archive matches {searchedPhrase(model)}. Did you mean “{didYouMean.q}”? It
+        matches {didYouMean.count.toLocaleString('en-US')}{' '}
+        {didYouMean.count === 1 ? 'record' : 'records'}.
+      </Outcome>
+    );
+  }
   return (
     <Outcome
       title="No records match"
       action={action}
-      also={{ href: '/explore', label: 'Browse the map' }}
+      also={{ href: '/archive?view=map', label: 'Browse the map' }}
     >
       Nothing in the archive matches {searchedPhrase(model)}.
     </Outcome>
@@ -311,22 +328,40 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
     body = <NoMatch model={model} />;
   } else if (timeline && chronology !== undefined) {
     const startPage = new Map(chronology.coverage.map((item) => [item.decade, item.page]));
+    const hrefByDecade = new Map(decadeJumps.map((jump) => [jump.decade, jump.href]));
     body = (
-      <RecordsTimeline
-        bands={chronology.sections.map((section) => ({
-          decade: section.decade,
-          anchor: decadeAnchor(section.decade),
-          total: section.total,
-          continuedFrom: section.continued
-            ? section.decade === null
-              ? chronology.undatedPage
-              : (startPage.get(section.decade) ?? null)
-            : null,
-          rows: section.rows.map((row) => (
-            <RecordRow key={row.id} row={row} query={query.q} compact photoUrl={photos[row.id]} />
-          )),
-        }))}
-      />
+      <>
+        <DecadeFigure
+          decades={chronology.coverage.map((item) => ({
+            decade: item.decade,
+            count: item.count,
+            href: hrefByDecade.get(item.decade) ?? chronologyHref,
+          }))}
+          undated={chronology.undatedCount}
+          onPage={
+            new Set(
+              chronology.sections.flatMap((section) =>
+                section.decade === null ? [] : [section.decade],
+              ),
+            )
+          }
+        />
+        <RecordsTimeline
+          bands={chronology.sections.map((section) => ({
+            decade: section.decade,
+            anchor: decadeAnchor(section.decade),
+            total: section.total,
+            continuedFrom: section.continued
+              ? section.decade === null
+                ? chronology.undatedPage
+                : (startPage.get(section.decade) ?? null)
+              : null,
+            rows: section.rows.map((row) => (
+              <RecordRow key={row.id} row={row} query={query.q} compact photoUrl={photos[row.id]} />
+            )),
+          }))}
+        />
+      </>
     );
   } else {
     const anchors = decadeJumps.length > 0 ? decadeAnchors(rows) : new Map<string, string>();
@@ -348,7 +383,7 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
   }
 
   const preserved = [
-    ...new URLSearchParams(recordsQueryString({ ...query, page: 1 })).entries(),
+    ...new URLSearchParams(archiveQueryString({ ...query, page: 1 })).entries(),
   ] as const;
 
   return (
@@ -356,26 +391,15 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
       {/* The count is a sentence, never a numeral on its own (DESIGN.md rule 4): how many match,
           the span they cover, and how many of them the map can show, so a record missing from
           the map reads as unmapped, not deleted. */}
-      <header className="ds-records-head">
-        <PageTitle className="ds-records-head__title">Records</PageTitle>
-        <p className="ds-records-head__dek">
-          {countLabel}.{constraints.length === 0 && span ? ` ${span}` : ''}
-        </p>
-        {/* The same filter set on the map, in a list or along time: plain links, so the switch
-            works without JavaScript. */}
-        <div className="ds-records-head__views" data-archive-views>
-          <Segmented
-            label="Show records as"
-            value={timeline ? 'timeline' : 'list'}
-            options={[
-              { value: 'map', label: 'Map', href: atlasHref },
-              { value: 'list', label: 'List', href: indexHref },
-              { value: 'timeline', label: 'Timeline', href: chronologyHref },
-            ]}
-          />
-        </div>
+      <ArchiveHead
+        title="Archive"
+        dek={`${countLabel}.${constraints.length === 0 && span ? ` ${span}` : ''}`}
+        view={timeline ? 'timeline' : 'list'}
+        hrefs={{ map: atlasHref, list: indexHref, timeline: chronologyHref }}
+        lens={query.kind === INVENTIONS_KIND ? 'inventions' : null}
+      >
         {notice === undefined ? (
-          <p className="ds-records-head__membership" data-membership>
+          <p className="ds-archive-head__membership" data-membership>
             {membershipSentence({
               view: timeline ? 'timeline' : 'list',
               matched: model.totalMatched,
@@ -386,7 +410,7 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
             })}
           </p>
         ) : null}
-      </header>
+      </ArchiveHead>
       {toolbar}
 
       {constraints.length > 0 ? (

@@ -28,7 +28,7 @@ export type RecordPlace = {
   readonly href: string;
 };
 
-/** `/explore?place=<key>&selected=<id>`: the place entered, the record found inside it. */
+/** The map view at `place=<key>&selected=<id>`: the place entered, the record found inside it. */
 export function recordPlaceHref(placeKey: string, entityId: string): string {
   return buildExploreHref({
     filters: DEFAULT_EXPLORE_FILTERS,
@@ -38,9 +38,9 @@ export function recordPlaceHref(placeKey: string, entityId: string): string {
   });
 }
 
-/** A map hand-off (`/explore?selected=…`, filters and all) with the record's place entered. */
+/** A map hand-off (the map view at `selected=…`, filters and all) with the record's place entered. */
 export function mapHrefInPlace(mapHref: string, placeKey: string): string {
-  const [path = '/explore', query = ''] = mapHref.split('?');
+  const [path = '/archive', query = ''] = mapHref.split('?');
   const params = new URLSearchParams(query);
   params.set('place', placeKey);
   return `${path}?${params}`;

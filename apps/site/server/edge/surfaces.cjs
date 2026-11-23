@@ -9,10 +9,10 @@ const { isPublicRecordPath, normalizeQueryString } = require('./query-normalizat
 
 const SURFACE_CLASS_BY_PATH = new Map([
   ['/', 'door'],
-  ['/explore', 'door'],
-  ['/collections', 'reading'],
-  ['/presidents', 'reading'],
+  ['/archive', 'reading'],
+  ['/explore', 'reading'],
   ['/records', 'reading'],
+  ['/presidents', 'reading'],
   ['/stories', 'reading'],
   ['/books', 'reading'],
   ['/law', 'reading'],
@@ -47,6 +47,7 @@ const SURFACE_CLASS_PREFIXES = [
 
 const ENDPOINT_ROUTES = new Set([
   '/facts',
+  '/collections',
   '/search',
   '/map',
   '/history',
@@ -108,7 +109,7 @@ function isCollectionScopedDocument({ pathname, searchParams }) {
   if (!searchParams) return false;
   if (isPublicRecordPath(pathname)) return normalizeQueryString(pathname, searchParams).length > 0;
   return (
-    (pathname === '/records' || pathname === '/explore') &&
+    (pathname === '/archive' || pathname === '/records' || pathname === '/explore') &&
     searchParams.getAll('collection').some((value) => value.trim().length > 0)
   );
 }

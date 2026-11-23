@@ -1,17 +1,9 @@
 /**
  * `/law`, Parked: the head and toolbar on the night ground, the time rail, and the chronology on
- * one reading sheet (parked.css lays the stage out). The toolbar, menus, active chips and outcome
+ * one reading sheet (archive/lens.css lays the page out). The toolbar, menus, active chips and outcome
  * states are the register's (room-kit.css). Spacing uses the shared scale only
  * (4, 8, 12, 16, 24, 32, 48, 72).
  */
-
-/* —— head ——————————————————————————————————————————————————————————————————————— */
-.ds-law-head .ds-page-header__dek {
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-editorial-lede);
-  font-style: italic;
-  line-height: 1.3;
-}
 
 .ds-law-stage .ds-records-toolbar,
 .ds-law-stage .ds-records-active {
@@ -124,7 +116,7 @@
 }
 
 @media (min-width: 64rem) {
-  .ds-law-stage > .ds-parked__main > .ds-law-axis {
+  .ds-law-stage > .ds-lens__main > .ds-law-axis {
     grid-column: 1;
     grid-row: 1 / span 8;
     margin-bottom: 0;

@@ -22,7 +22,6 @@ const WALK_ROOMS = [
   'submit/page.tsx',
   'corrections/CorrectionsSections.tsx',
   'support/page.tsx',
-  'collections/page.tsx',
   'privacy/page.tsx',
 ] as const;
 

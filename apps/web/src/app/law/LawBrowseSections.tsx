@@ -37,7 +37,7 @@ export type LawBrowseSectionsProps = {
   readonly view: LawBrowseViewModel;
   /** Full, unfiltered catalog: the source of each row's jurisdiction. */
   readonly catalog: readonly LegalSnapshotDocument[];
-  /** The page's head (crumb, title, dek), set above the toolbar on the night ground. */
+  /** The page's head (crumb, title, dek), set above the toolbar. */
   readonly head?: React.ReactNode;
 };
 
@@ -342,7 +342,7 @@ export function LawBrowseSections({ view, catalog, head }: LawBrowseSectionsProp
     );
   } else if (view.groups.length === 0) {
     body = (
-      <div className="ds-parked__sheet ds-law-sheet" data-ground="paper">
+      <div className="ds-lens__sheet ds-law-sheet">
         <ol className="ds-law-list">
           {view.items.map((item) => (
             <LawRow key={item.id} item={item} jurisdiction={jurisdictionOf(item)} />
@@ -352,7 +352,7 @@ export function LawBrowseSections({ view, catalog, head }: LawBrowseSectionsProp
     );
   } else {
     body = (
-      <div className="ds-parked__sheet ds-law-sheet" data-ground="paper">
+      <div className="ds-lens__sheet ds-law-sheet">
         {view.groups.map((group) => {
           const span = eraSpan(group.era, group.items);
           return (
@@ -399,12 +399,10 @@ export function LawBrowseSections({ view, catalog, head }: LawBrowseSectionsProp
   return (
     <div
       // Without a rail (nothing dated to place) the stage is one column.
-      className={railed ? 'ds-parked ds-parked--railed ds-law-stage' : 'ds-parked ds-law-stage'}
-      data-ground="ink"
-      data-ground-fixed=""
+      className={railed ? 'ds-lens ds-lens--railed ds-law-stage' : 'ds-lens ds-law-stage'}
       style={timelines ? ({ timelineScope: timelines } as CSSProperties) : undefined}
     >
-      <div className="ds-parked__main">
+      <div className="ds-lens__main">
         {head}
         <RecordsToolbar
           filters={facetMenus(view)}

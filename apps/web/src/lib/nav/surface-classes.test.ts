@@ -10,12 +10,7 @@ import { readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import {
-  CLASSIFIED_PATHS,
-  ENDPOINT_ROUTES,
-  isParkedPath,
-  surfaceClassFor,
-} from './surface-classes';
+import { CLASSIFIED_PATHS, ENDPOINT_ROUTES, surfaceClassFor } from './surface-classes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appDir = join(here, '../../app');
@@ -42,13 +37,11 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the front door and /explore browse on the door class', () => {
+  it('puts the front page on the door class', () => {
     assert.equal(surfaceClassFor('/'), 'door');
     assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?state=DC'), 'door');
-    assert.equal(surfaceClassFor('/explore'), 'door');
-    assert.equal(surfaceClassFor('/explore?state=DC'), 'door');
   });
 
   it("renders /story on the front page's ground without listing it as a destination", () => {
@@ -60,29 +53,17 @@ describe('surface class resolution', () => {
     assert.ok(!CLASSIFIED_PATHS.includes('/story'));
   });
 
-  it('knows which routes still stand on the night ground, so the header holds it there', () => {
-    for (const path of ['/law', '/books']) {
-      assert.equal(isParkedPath(path), true, path);
+  it('reads the Archive as one reading page in every view, at its old addresses too', () => {
+    // The map view hands the plate to the reader itself; the class is the pathname only.
+    for (const path of ['/archive', '/archive?view=map', '/archive?view=timeline&kind=people']) {
+      assert.equal(surfaceClassFor(path), 'reading', path);
     }
-    for (const path of [
-      '/',
-      '/explore',
-      '/records',
-      '/stories',
-      '/stories/the-count',
-      '/memorial',
-      '/presidents/george-washington',
-      '/law/hb-1557',
-      '/place/somewhere',
-      '/design-system',
-      '/about',
-      '/data',
-      '/privacy',
-      '/collections',
-      '/no-such-page',
-    ]) {
-      assert.equal(isParkedPath(path), false, path);
+    // The 4a addresses keep their pages for the one-line rollback, and stay out of every list.
+    for (const path of ['/explore', '/explore?state=DC', '/records']) {
+      assert.equal(surfaceClassFor(path), 'reading', path);
+      assert.ok(!CLASSIFIED_PATHS.includes(path.split('?')[0]!), path);
     }
+    assert.equal(surfaceClassFor('/collections'), null);
   });
 
   it('separates a catalog index from its record pages', () => {
@@ -115,7 +96,6 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'door');
     assert.equal(surfaceClassFor('/about#sources'), 'reading');
     assert.equal(surfaceClassFor('/?junk=1'), 'door');
-    assert.equal(surfaceClassFor('/explore?era=1960s'), 'door');
   });
 
   it('falls back to utility so an unknown path still gets the 404 surface chrome', () => {

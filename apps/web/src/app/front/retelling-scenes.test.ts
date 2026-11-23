@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { TourCamera } from '../door-tour-scrub';
+import type { TourCamera } from './camera-path';
 import {
   MAX_PIN_SCREENS,
   MAX_TOTAL_SCREENS,

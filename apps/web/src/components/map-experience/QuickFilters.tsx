@@ -1,11 +1,11 @@
 /**
  * The three most-used narrowings on the map, always in view above the list (owner decision
- * 2026-11-16): kind, era and state. Native selects in the shared pill-select dress, so each one
+ * 2026-11-16): kind, era and state. Native selects in the kit's secondary button dress, so each one
  * works by keyboard and screen reader exactly as the platform does. The Filters panel keeps the
  * rest (evidence, topic, order, layers).
  */
 import React from 'react';
-import { cx } from '@repo/ui';
+import { buttonClassName, cx } from '@repo/ui';
 import type { MapKindFamily } from '../../lib/map-experience/kind-encoding';
 import { MAP_KIND_FAMILY_ENCODING } from '../../lib/map-experience/kind-encoding';
 
@@ -38,10 +38,10 @@ function Pill({
   readonly children: React.ReactNode;
 }) {
   return (
-    <label className="ds-pill-select ds-xquick__field" data-set={value !== '' || undefined}>
+    <label className="ds-xquick__field" data-set={value !== '' || undefined}>
       <span className="ds-visually-hidden">{label}</span>
       <select
-        className="ds-pill-select__control"
+        className={buttonClassName('secondary', 'ds-xquick__select')}
         value={value}
         onChange={(event) => onChange(event.currentTarget.value)}
       >

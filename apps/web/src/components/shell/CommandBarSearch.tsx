@@ -171,7 +171,7 @@ export function CommandBarSearch({ placeholder, query }: CommandBarSearchProps) 
        The combobox only calls `preventDefault` on Enter when a suggestion is highlighted, so
        arrow-then-Enter still opens that record and plain Enter falls through to this submit. */
     <form
-      action="/records"
+      action="/archive"
       method="get"
       role="search"
       className="ds-bar__search-form"

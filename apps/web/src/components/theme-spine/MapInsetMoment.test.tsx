@@ -1,6 +1,6 @@
 /**
  * Unit coverage for the theme-spine MapInsetMoment: a chapter's map inset is the shared
- * RecordMap, framed by the record's stored precision, with one hand-off into /explore.
+ * RecordMap, framed by the record's stored precision, with one hand-off into the Archive's map view.
  */
 
 import assert from 'node:assert/strict';
@@ -37,11 +37,11 @@ describe('MapInsetMoment', () => {
     );
   });
 
-  it('links into /explore with the entity pre-selected via the shared selected= convention', async () => {
+  it('links into the map view with the entity pre-selected via the shared selected= convention', async () => {
     const html = renderToStaticMarkup(await MapInsetMoment(baseProps));
     assert.match(
       html,
-      /href="\/explore\?[^"]*selected=ent_15th_st_church_001[^"]*">Open on the map</,
+      /href="\/archive\?view=map[^"]*selected=ent_15th_st_church_001[^"]*">Open on the map</,
     );
   });
 

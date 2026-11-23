@@ -107,7 +107,7 @@ import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-m
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
 import { clearPinContinuity, readPinContinuity } from '../../lib/discovery/pin-continuity';
-import './atlas.css';
+import './explore.css';
 
 void React;
 
@@ -825,8 +825,24 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     selected: selectedId ?? '',
     place: placeKey ?? '',
   };
-  const listHref = recordsHref({ ...listQuery, layout: 'index' });
-  const timelineHref = recordsHref({ ...listQuery, layout: 'chronology' });
+  // The page the reader left belongs to the layout it was counted in, and only while the filters
+  // are the ones it was counted under (the address sync above drops it when they change).
+  const returned = new URLSearchParams(mapHref.split('?')[1] ?? '');
+  const page = Number(returned.get('page') ?? 1);
+  const seed = returned.get('seed') ?? '';
+  const cameFromTimeline = view.viewState.layout === 'chronology';
+  const listHref = recordsHref({
+    ...listQuery,
+    seed,
+    layout: 'index',
+    page: cameFromTimeline ? 1 : page,
+  });
+  const timelineHref = recordsHref({
+    ...listQuery,
+    seed,
+    layout: 'chronology',
+    page: cameFromTimeline ? page : 1,
+  });
 
   /* —— What the column shows. —— */
   const columnView = inspector ? 'inspector' : filtersOpen ? 'filters' : 'list';

@@ -206,11 +206,31 @@ export function recordsQueryString(query: Partial<RecordsQuery>): string {
   return params.toString();
 }
 
+/** The one route the list, the timeline and the map answer on (archive-url-contract.md, 10). */
+export const ARCHIVE_PATH = '/archive';
+
 /**
- * Builds a `/records` href. Params are emitted in a fixed order so a given narrowing has exactly
- * one URL, which is what makes the self-referential canonical honest.
+ * The `/archive` spelling of a list or timeline narrowing: `recordsQueryString` with the timeline
+ * as `view=timeline`, first, instead of `layout=chronology`. The list is the default view and is
+ * never written.
+ */
+export function archiveQueryString(query: Partial<RecordsQuery>): string {
+  const rest = recordsQueryString({ ...query, layout: 'index' });
+  const view = query.layout === 'chronology' ? 'view=timeline' : '';
+  return view && rest ? `${view}&${rest}` : view || rest;
+}
+
+/**
+ * Builds the list's href on `/archive`. Params are emitted in a fixed order so a given narrowing
+ * has exactly one URL, which is what makes the self-referential canonical honest.
  */
 export function recordsHref(query: Partial<RecordsQuery>): string {
+  const search = archiveQueryString(query);
+  return search.length > 0 ? `${ARCHIVE_PATH}?${search}` : ARCHIVE_PATH;
+}
+
+/** The same narrowing at its 4a address. Only the rollback canonical and the edge print it. */
+export function legacyRecordsHref(query: Partial<RecordsQuery>): string {
   const search = recordsQueryString(query);
   return search.length > 0 ? `/records?${search}` : '/records';
 }

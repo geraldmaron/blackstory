@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { DoorRecord } from '../door-decade-walk';
+import type { ShownRecord } from './shown-records';
 import { RETELLING_SENTENCES } from './retelling-copy';
 import { RETELLING_PICKS, pickedRecord } from './retelling-picks';
 import { RECORD_SCENE_IDS, RETELLING_SCENES } from './retelling-scenes';
 
-function record(over: Partial<DoorRecord> = {}): DoorRecord {
+function record(over: Partial<ShownRecord> = {}): ShownRecord {
   return {
     entityId: 'rec-1',
     name: 'Example Church',

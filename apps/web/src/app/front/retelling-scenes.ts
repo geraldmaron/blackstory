@@ -13,7 +13,7 @@ import {
   HERO_HEADLINE_PHASES,
   type HeroHeadlinePhaseId,
 } from '../../lib/story/hero-headline-morph';
-import { tourBetween, tourDive, type TourCamera, type TourCameras } from '../door-tour-scrub';
+import { tourBetween, tourDive, type TourCamera, type TourCameras } from './camera-path';
 
 export type RetellingSceneId = HeroHeadlinePhaseId;
 
@@ -122,7 +122,7 @@ export function retellingScreens(layout: RetellingLayout): number {
  * The camera for a phase. Each scene has one camera (`anchors`, in scene order): the country for
  * a word scene, a landing for a record or a town. Between two scenes the camera is the tour's
  * own: down from the country onto a record, up from one, or up until two landings fit and down
- * into the second (`door-tour-scrub.ts`).
+ * into the second (`camera-path.ts`).
  */
 export function retellingCameraAt(
   phase: RetellingPhase,

@@ -1,0 +1,37 @@
+/* The Archive's head: the title, the count and the map membership as sentences, the view switch
+   and the lens chips. Shared by the list, the timeline, /law and /books. */
+.ds-archive-head {
+  padding-block: var(--ds-space-12) var(--ds-space-8);
+}
+
+.ds-archive-head__dek {
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.ds-archive-head__views {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-archive-head__lenses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-3);
+}
+
+.ds-archive-head__membership {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-archive-head {
+    padding-block: var(--ds-space-8) var(--ds-space-6);
+  }
+}

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { DoorRecord } from '../door-decade-walk';
+import type { ShownRecord } from './shown-records';
 import { legBetween, legText, pickJourney, pickTitlePlates, shortPlace } from './journey';
 
-const make = (id: string, state: string, decade: number, over: Partial<DoorRecord> = {}) =>
+const make = (id: string, state: string, decade: number, over: Partial<ShownRecord> = {}) =>
   ({
     entityId: id,
     name: `Record ${id}`,
@@ -31,7 +31,7 @@ const make = (id: string, state: string, decade: number, over: Partial<DoorRecor
       level: 'high',
     },
     ...over,
-  }) as DoorRecord;
+  }) as ShownRecord;
 
 test('the journey is oldest first, never thinly evidenced, and varies kind', () => {
   const records = [

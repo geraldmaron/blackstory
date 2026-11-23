@@ -112,22 +112,24 @@
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-/* Kind, era and state: three equal pills on one row. A select sizes itself to its longest option
-   (a state name), so the grid, not the content, sets the width; a long choice truncates. */
+/* Kind, era and state: three equal controls on one row. A select sizes itself to its longest
+   option (a state name), so the grid, not the content, sets the width; a long choice truncates. */
 .ds-xquick {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--ds-space-2);
 }
 
-.ds-xquick__field .ds-pill-select__control {
+.ds-xquick__select {
   width: 100%;
+  min-width: 0;
   padding-inline: var(--ds-space-3);
+  text-overflow: ellipsis;
+  cursor: pointer;
 }
 
-.ds-xquick__field[data-set] .ds-pill-select__control {
+.ds-xquick__field[data-set] .ds-xquick__select {
   border-color: var(--ds-ink);
-  background: var(--ds-surface-raised);
   font-weight: 600;
 }
 
@@ -356,7 +358,7 @@
 
 .ds-xcol__loading span {
   display: block;
-  height: 84px;
+  height: 104px;
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
   background:
     linear-gradient(var(--ds-surface), var(--ds-surface)) var(--ds-space-6) 20px / 58% 12px
@@ -412,7 +414,7 @@ body:has(.ds-atlas .ds-xcol) {
     bottom: var(--ds-tabbar-h);
     width: auto;
     left: 0;
-    height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 176px));
+    height: var(--ds-xcol-sheet-h, var(--ds-xcol-detent-h, 196px));
     transition: height var(--ds-duration-base) var(--ds-ease-entrance);
   }
 
@@ -493,7 +495,7 @@ body:has(.ds-atlas .ds-xcol) {
   body:has(.ds-atlas .ds-xcol) {
     --ds-map-attrib-left: var(--ds-space-3);
     /* Above the sheet at its peek; a raised sheet covers it, as it covers the map. */
-    --ds-map-attrib-bottom: calc(var(--ds-tabbar-h) + 176px + var(--ds-space-3));
+    --ds-map-attrib-bottom: calc(var(--ds-tabbar-h) + 196px + var(--ds-space-3));
   }
 }
 
@@ -515,7 +517,7 @@ body:has(.ds-atlas .ds-xcol) {
     right: 0;
     bottom: var(--ds-tabbar-h);
     width: auto;
-    height: 176px;
+    height: 196px;
     overflow: hidden;
     left: 0;
   }

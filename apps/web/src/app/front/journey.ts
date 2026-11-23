@@ -9,8 +9,8 @@
  * These are examples from the archive, not a narrative: nothing here says one record led to the
  * next. The only connective facts are computed from the two records (distance and direction).
  */
-import { isTourEligible, regionOf } from '../door-tour';
-import type { DoorRecord } from '../door-decade-walk';
+import { isTourEligible, regionOf } from './regions';
+import type { ShownRecord } from './shown-records';
 
 export const JOURNEY_TARGET = 5;
 export const JOURNEY_MIN = 3;
@@ -25,27 +25,27 @@ function stableHash(text: string): number {
   return hash;
 }
 
-const byHash = (a: DoorRecord, b: DoorRecord) =>
+const byHash = (a: ShownRecord, b: ShownRecord) =>
   stableHash(a.entityId) - stableHash(b.entityId) || (a.entityId < b.entityId ? -1 : 1);
 
-export function isJourneyEligible(record: DoorRecord): boolean {
+export function isJourneyEligible(record: ShownRecord): boolean {
   return isTourEligible(record) && record.claim.level !== 'low';
 }
 
 export function pickJourney(
-  records: readonly DoorRecord[],
+  records: readonly ShownRecord[],
   excludeIds: ReadonlySet<string> = new Set(),
   target = JOURNEY_TARGET,
-): readonly DoorRecord[] {
+): readonly ShownRecord[] {
   const pool = records
     .filter((record) => isJourneyEligible(record) && !excludeIds.has(record.entityId))
     .sort(byHash);
-  const chosen: DoorRecord[] = [];
+  const chosen: ShownRecord[] = [];
   while (chosen.length < target && pool.length > 0) {
     const kinds = new Set(chosen.map((record) => record.kind));
     const states = new Set(chosen.map((record) => record.statePostal));
     const regions = new Set(chosen.map((record) => regionOf(record.statePostal)));
-    const apart = (record: DoorRecord) =>
+    const apart = (record: ShownRecord) =>
       chosen.length === 0
         ? 0
         : Math.min(...chosen.map((other) => Math.abs(other.decade - record.decade))) / 10;
@@ -70,12 +70,12 @@ export function pickJourney(
 
 /** Photographs for the title: one per state, never a journey record. */
 export function pickTitlePlates(
-  records: readonly DoorRecord[],
+  records: readonly ShownRecord[],
   excludeIds: ReadonlySet<string>,
   count: number,
-): readonly DoorRecord[] {
+): readonly ShownRecord[] {
   const states = new Set<string | undefined>();
-  const picked: DoorRecord[] = [];
+  const picked: ShownRecord[] = [];
   for (const record of records.filter(isTourEligible).sort(byHash).reverse()) {
     if (picked.length >= count) break;
     if (excludeIds.has(record.entityId) || states.has(record.statePostal)) continue;

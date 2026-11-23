@@ -347,7 +347,7 @@ export function RoomKitGallery() {
         <MapMoment
           camera={{ center: [-87.635, 41.901], zoom: 12.8, pitch: 36, bearing: -12 }}
           note="Chicago's Black Belt, 1919. The camera flies in because the subject is a neighborhood, not a killing."
-          atlasHref="/explore?find=place"
+          atlasHref="/archive?view=map&find=place"
         />
         <MapMoment
           subject={{ topicTags: ['Lynching'] }}

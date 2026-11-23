@@ -282,7 +282,7 @@ function BookRow({ item }: { readonly item: BooksBrowseItem }) {
 function BookBands({ view }: { readonly view: BooksBrowseViewModel }) {
   const bands = bandBooks(view.items, view.sort);
   return (
-    <div className="ds-parked__sheet ds-books-sheet" data-ground="paper">
+    <div className="ds-lens__sheet ds-books-sheet">
       {bands.map((band) => {
         const total = band.reduce((sum, group) => sum + group.items.length, 0);
         return (
@@ -342,7 +342,7 @@ function PlaceRail({ view }: { readonly view: BooksBrowseViewModel }) {
   const max = Math.max(...view.stateCounts.map((entry) => entry.count));
   return (
     <div className="ds-books-rail">
-      <div className="ds-books-map" aria-hidden="true">
+      <div className="ds-books-map" data-ground="ink" data-ground-fixed="" aria-hidden="true">
         <div className="ds-books-tiles">
           {Object.entries(STATE_TILES).map(([code, [row, column]]) => {
             const step = tileStep(counts.get(code) ?? 0, max);
@@ -379,7 +379,7 @@ function StateRanks({ view }: { readonly view: BooksBrowseViewModel }) {
   const params = currentParams(view);
   const max = Math.max(...view.stateCounts.map((entry) => entry.count));
   return (
-    <div className="ds-parked__sheet ds-books-sheet" data-ground="paper">
+    <div className="ds-lens__sheet ds-books-sheet">
       <ol className="ds-books-ranks" aria-label="States by challenged titles">
         {view.stateCounts.map((entry) => (
           <li key={entry.code}>
@@ -450,12 +450,8 @@ export function BooksBrowseSections({ view, head }: BooksBrowseSectionsProps) {
   const railed = view.stateCounts.length > 0;
 
   return (
-    <div
-      className={railed ? 'ds-parked ds-parked--railed ds-books-stage' : 'ds-parked ds-books-stage'}
-      data-ground="ink"
-      data-ground-fixed=""
-    >
-      <div className="ds-parked__main">
+    <div className={railed ? 'ds-lens ds-lens--railed ds-books-stage' : 'ds-lens ds-books-stage'}>
+      <div className="ds-lens__main">
         {head}
         <RecordsToolbar
           filters={filterMenus(view)}

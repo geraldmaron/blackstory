@@ -256,7 +256,7 @@ export const FAQ_SECTIONS: readonly FaqSection[] = [
           'Yes. Open a record on the map and the Copy citation command, the C key, puts one on your clipboard, with the record name, its place and era, its evidence grade, how many sources it rests on, the date you read it, and the link. The same format is shown on the methodology page.',
           'Cite the underlying sources as well. They are listed on the record, and they are the thing actually holding it up.',
         ],
-        links: [{ href: '/explore', label: 'Open the map' }],
+        links: [{ href: '/archive?view=map', label: 'Open the map' }],
       },
       {
         question: 'Will this still be here in five years?',

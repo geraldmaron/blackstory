@@ -67,6 +67,7 @@ import {
   type ChronologyPage,
 } from '../discovery/collection-chronology';
 import { exploreHrefFromRecordsQuery } from '../discovery/explore-collection';
+import { nearestQuery } from './nearest-query';
 import {
   decadeLabel,
   documentedDecades,
@@ -241,6 +242,11 @@ export type RecordsIndex = {
   readonly decadeJumps: readonly RecordsDecadeJump[];
   /** Present for `layout=chronology`: the page's rows grouped by documented decade. */
   readonly chronology: ChronologyPage<RecordsRow> | undefined;
+  /**
+   * A search that matched nothing, respelled with the nearest words the records hold, when that
+   * spelling does match under the same filters (`nearest-query.ts`). An offer, never applied.
+   */
+  readonly didYouMean?: { readonly q: string; readonly count: number; readonly href: string };
 };
 
 function humanize(value: string): string {
@@ -547,6 +553,26 @@ function labelFor(key: RecordsFilterKey, value: string, stateNames: Map<string, 
   }
 }
 
+/** The nearest spelling that does match, for a search that matched nothing. */
+function respelled(
+  facts: readonly RecordFacts[],
+  matched: number,
+  query: RecordsQuery,
+  members: ReadonlySet<string> | undefined,
+): RecordsIndex['didYouMean'] {
+  if (matched > 0 || query.q.length === 0) return undefined;
+  const q = nearestQuery(
+    query.q,
+    facts.map((record) => record.haystack),
+  );
+  if (q === null) return undefined;
+  const respelledQuery = { ...query, q, page: 1 };
+  const count = facts.filter((record) =>
+    matchesExcept(record, respelledQuery, 'none', members),
+  ).length;
+  return count > 0 ? { q, count, href: recordsHref(respelledQuery) } : undefined;
+}
+
 /**
  * Builds everything `/records` renders for one request.
  *
@@ -611,6 +637,7 @@ export function buildRecordsIndex(
   const matched = facts
     .filter((record) => matchesExcept(record, query, 'none', members))
     .sort(recordsComparator(query));
+  const didYouMean = respelled(facts, matched.length, query, members);
   const mappableMatched = matched.filter((record) =>
     drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
   ).length;
@@ -793,6 +820,7 @@ export function buildRecordsIndex(
   return {
     query: { ...query, page },
     rows,
+    ...(didYouMean === undefined ? {} : { didYouMean }),
     totalMatched: matched.length,
     totalAll: facts.length,
     page,
@@ -811,7 +839,7 @@ export function buildRecordsIndex(
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
     facets,
     constraints,
-    clearAllHref: '/records',
+    clearAllHref: recordsHref({}),
     atlasHref: buildAtlasHref(query),
     mappableMatched,
     undatedMatched: matched.filter((record) => documentedDecades(record.eraBuckets).length === 0)

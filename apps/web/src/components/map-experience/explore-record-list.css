@@ -1,5 +1,5 @@
 /*
- * The Explore record list: register rows, windowed. Row height is RESULTS_ROW_HEIGHT (84px) in
+ * The Explore record list: register rows, windowed. Row height is RESULTS_ROW_HEIGHT (104px) in
  * ExploreRecordList.tsx, set inline on each row.
  */
 .ds-xlist {
@@ -119,16 +119,19 @@
   text-underline-offset: 0.18em;
 }
 
+/* The kind and the place: a long place runs to a second line before it is cut, so a town and
+   its state are both read without opening the record. */
 .ds-xlist__meta {
   flex: 1 1 auto;
+  display: -webkit-box;
   min-width: 0;
   overflow: hidden;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   line-height: 1.4;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .ds-xlist__grade .ds-grade-tag {

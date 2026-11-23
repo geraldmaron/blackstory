@@ -18,9 +18,8 @@ test('buildPublicSitemapEntries includes static core journeys', () => {
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
   });
   const urls = entries.map((entry) => entry.url);
-  // `/records` replaced `/history` here with SP-09: the record index is the crawlable list the
-  // decade view used to stand in for, and `/history` is now only a redirect into it.
-  assert.ok(urls.some((url) => url.endsWith('/records')));
+  // The Archive's list is the crawlable index; `/records` and `/history` redirect into it.
+  assert.ok(urls.some((url) => url.endsWith('/archive')));
   assert.ok(urls.some((url) => url.endsWith('/stories')));
   assert.ok(urls.some((url) => url.endsWith('/corrections')));
   assert.ok(urls.some((url) => url.endsWith('/law')));
@@ -33,10 +32,12 @@ test('the sitemap never advertises a URL that redirects', () => {
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
   });
   const urls = entries.map((entry) => entry.url);
-  // `/` is the map door. `/explore` remains a listed instrument URL.
-  assert.ok(urls.some((url) => url.endsWith('/explore')));
-  // `/history` 308s into `/records` for the same reason.
-  assert.ok(!urls.some((url) => url.endsWith('/history')));
+  // The map view is listed at its own address, the one sitemap URL with a query. The 4a
+  // addresses redirect to `/archive` in phase 4b, so none of them is listed.
+  assert.ok(urls.some((url) => url.endsWith('/archive?view=map')));
+  for (const retired of ['/explore', '/records', '/collections', '/history']) {
+    assert.ok(!urls.some((url) => url.endsWith(retired)), `${retired} redirects`);
+  }
   assert.ok(urls.some((url) => url === 'https://blackbook.example/'));
 });
 
@@ -120,7 +121,7 @@ test('every path the sitemap advertises is a page that exists', () => {
   const rendered = renderedStaticRoutes(join(import.meta.dirname, '../../app'));
   for (const destination of crawlableDestinations()) {
     assert.ok(
-      rendered.has(destination.path),
+      rendered.has(destination.path.split('?')[0]!),
       `${destination.path} is in the sitemap but has no page.tsx`,
     );
   }

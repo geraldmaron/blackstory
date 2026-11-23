@@ -144,7 +144,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
           <Button variant="secondary" onClick={another}>
             Send another lead
           </Button>
-          <a className={buttonClassName('quiet')} href="/records">
+          <a className={buttonClassName('quiet')} href="/archive">
             Browse the records
           </a>
         </div>

@@ -46,12 +46,12 @@ describe('bar search', () => {
     assert.match(markup, /value=""/);
   });
 
-  it('submits to /records, so Enter means something on every route', () => {
+  it('submits to /archive, so Enter means something on every route', () => {
     // The regression this locks: the field advertised `enterKeyHint="search"` and sat outside any
     // form, so a reader who typed a phrase and pressed Enter got nothing at all. On the twelve
     // rooms where this is the only search, that was the whole search.
     const markup = renderToStaticMarkup(<CommandBarSearch placeholder="Search" />);
-    assert.match(markup, /<form[^>]*action="\/records"/);
+    assert.match(markup, /<form[^>]*action="\/archive"/);
     assert.match(markup, /<form[^>]*method="get"/);
     assert.match(markup, /<form[^>]*role="search"/);
     // Without `name="q"` the submit lands on a bare /records and drops what the reader typed.

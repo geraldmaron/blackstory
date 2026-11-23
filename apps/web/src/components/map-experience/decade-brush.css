@@ -1,7 +1,7 @@
 /*
  * The decade histogram strip. 56px tall. Where it sits is the caller's (explore-column.css docks
  * it on the map's bottom edge on a wide screen, and sets it inside the filter state on a phone).
- * The home walk's histogram idiom (door-home.css): bars in a rule tone on an ink baseline, the
+ * A histogram: bars in a rule tone on an ink baseline, the
  * bars inside the brushed range in the plate's type color, the range's edges copper, decade
  * labels in mono capitals. The map's key sits in the leading cell on a wide screen.
  */

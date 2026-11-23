@@ -14,8 +14,8 @@ import { parseCollectionToken } from './story-collection';
 /**
  * The shared filter model is `RecordsQuery` (`records-query.ts`): kind, era, decade range, state,
  * topic, evidence, status, query, sort, page, and the record or place selected on the map. These
- * two functions are the only translation between it and the map's view state. The map spells two
- * of its keys differently (`theme` for topic, `floor` for evidence); nothing else differs.
+ * two functions are the only translation between it and the map's view state. Both views spell
+ * every shared key the same way in the address.
  *
  * Map-only state (layers, satellite, lines, radius, exact `tone` and `confidence`) is not part of
  * the model and does not survive a visit to the list. The camera is never in either.
@@ -45,10 +45,12 @@ export function recordsQueryFromExplore(state: ExploreViewState): RecordsQuery {
     layout: state.layout === 'chronology' ? 'chronology' : 'index',
     selected: state.selected ?? '',
     place: state.place ?? '',
+    seed: state.seed ?? '',
+    page: state.page ?? 1,
   };
 }
 
-/** The inverse. `page` and `seed` belong to the list and have no meaning on the map. */
+/** The inverse. The map never reads `page` and `seed`; it carries them back to the list. */
 export function exploreViewFromRecordsQuery(query: RecordsQuery): ExploreViewState {
   const value = (input: string) => (input === '' ? 'all' : input);
   return {
@@ -74,10 +76,12 @@ export function exploreViewFromRecordsQuery(query: RecordsQuery): ExploreViewSta
     ...(query.includeUndated ? { includeUndated: true } : {}),
     // Return context only: the map ignores it for matching and hands it back with the reader.
     ...(query.layout === 'chronology' ? { layout: 'chronology' as const } : {}),
+    ...(query.seed ? { seed: query.seed } : {}),
+    ...(query.page > 1 ? { page: query.page } : {}),
   };
 }
 
-/** `/explore` showing the same filter set. No camera: the view state built above has none. */
+/** The map view showing the same filter set. No camera: the view state built above has none. */
 export function exploreHrefFromRecordsQuery(query: RecordsQuery): string {
   return buildExploreHref(exploreViewFromRecordsQuery(query));
 }

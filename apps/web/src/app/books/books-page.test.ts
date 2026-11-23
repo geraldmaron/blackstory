@@ -17,9 +17,10 @@ const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
 
 test('books index is the cover wall under a page header, with no edition chrome', () => {
   assert.match(indexSource, /BooksBrowseSections/);
-  assert.match(indexSource, /<PageHeader/);
+  assert.match(indexSource, /<ArchiveHead/);
   assert.match(indexSource, /title: 'Banned books'/);
-  assert.match(indexSource, /crumb: parentCrumb\('\/books'\)/);
+  // The books lens stands under the Archive's head, with its chip selected.
+  assert.match(indexSource, /lens="books"/);
   for (const gone of [
     'RoomStats',
     'OrientationInstrument',

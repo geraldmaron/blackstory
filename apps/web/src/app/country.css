@@ -50,8 +50,7 @@
   }
 
   /* The title and its count share a narrower column than a document gives them. */
-  html:not([data-world-off]) .ds-country .ds-records-head__title,
-  html:not([data-world-off]) .ds-country .ds-records-head__count {
+  html:not([data-world-off]) .ds-country .ds-archive-head__title {
     font-size: clamp(3rem, 1rem + 4.2vw, 4.75rem);
   }
 

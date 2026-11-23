@@ -15,7 +15,7 @@ const detailViewSource = readFileSync(join(here, '[slug]', 'LawRecordView.tsx'),
 
 test('law index is the chronology: page header, the register toolbar, no edition chrome', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
-  assert.match(indexPageSource, /<PageHeader/);
+  assert.match(indexPageSource, /<ArchiveHead/);
   assert.match(indexPageSource, /<Room width="wide"/);
   assert.match(indexPageSource, /title="Law"/);
   assert.match(indexPageSource, /title: 'Law'/);

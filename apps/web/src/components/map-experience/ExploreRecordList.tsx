@@ -30,7 +30,7 @@ void React;
 
 /** Fixed row height (explore-record-list.css). Windowing needs a known row box. */
 /** Tall enough for a two-line name over its place line; a cut-off name tells a reader nothing. */
-export const RESULTS_ROW_HEIGHT = 84;
+export const RESULTS_ROW_HEIGHT = 104;
 /** Rows rendered above and below the viewport so a fast scroll does not show blank space. */
 const OVERSCAN = 6;
 

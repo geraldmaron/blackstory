@@ -164,9 +164,16 @@ function recordsQueryString(query) {
   return params.toString();
 }
 
+/** The web app's list now answers on `/archive`, with the timeline as `view=timeline`. */
+function archiveQueryString(query) {
+  const rest = recordsQueryString({ ...query, layout: 'index' });
+  const view = query.layout === 'chronology' ? 'view=timeline' : '';
+  return view && rest ? `${view}&${rest}` : view || rest;
+}
+
 function recordsHref(query) {
-  const search = recordsQueryString(query);
-  return search.length > 0 ? `/records?${search}` : '/records';
+  const search = archiveQueryString(query);
+  return search.length > 0 ? `/archive?${search}` : '/archive';
 }
 
 /** True for a multi-constraint or free-text narrowing, which is a crawl trap (noindex upstream). */

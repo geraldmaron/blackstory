@@ -8,7 +8,7 @@ import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const atlasCss = readFileSync(join(here, 'atlas.css'), 'utf8');
+const atlasCss = readFileSync(join(here, 'explore.css'), 'utf8');
 
 describe('Explore pointer-events', () => {
   it('keeps the Explore wrapper pass-through so map gaps stay pannable', () => {

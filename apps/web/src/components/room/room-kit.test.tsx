@@ -165,28 +165,28 @@ describe('room kit · a catalog block a second room renders is styled by the kit
 });
 
 describe('room kit · the trail is computed, never hand-written', () => {
-  // A collection crumbs to Collections and a trust page to About. The site root is never a
+  // An Archive lens crumbs to the Archive and a trust page to About. The site root is never a
   // step: it is the site, not a place in it.
   it('a collection prints its hub, never the site root', () => {
     assert.deepEqual(resolveTrail('/books'), [
-      { label: 'Collections', href: '/collections' },
+      { label: 'Archive', href: '/archive' },
       { label: 'Banned books', href: null },
     ]);
   });
 
   it("a record's parent is its catalog, not the site root", () => {
     assert.deepEqual(resolveTrail('/books/the-bluest-eye', 'The Bluest Eye'), [
-      { label: 'Collections', href: '/collections' },
+      { label: 'Archive', href: '/archive' },
       { label: 'Banned books', href: '/books' },
       { label: 'The Bluest Eye', href: null },
     ]);
   });
 
-  it("an entity's parent is Records — the catalog that lists it", () => {
+  it("an entity's parent is the Archive, the catalog that lists it", () => {
     // Not the site root: a reader on a record page needs a step up into the archive, and
     // Records is the catalog that lists the record.
     assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
-      { label: 'Records', href: '/records' },
+      { label: 'Archive', href: '/archive' },
       { label: 'Isaac McGhie', href: null },
     ]);
   });
@@ -1154,7 +1154,6 @@ describe('room kit · every page picks one of the three containers', () => {
     'methodology/page.tsx',
     'privacy/page.tsx',
     'records/RecordsIndex.tsx',
-    'collections/page.tsx',
     'presidents/(index)/page.tsx',
     'sources/page.tsx',
     'stories/(index)/page.tsx',

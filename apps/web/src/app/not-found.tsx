@@ -64,7 +64,7 @@ export default async function NotFound() {
             <p className="ds-utility-exits__line">The map is where the archive starts.</p>
           </li>
           <li className="ds-utility-exits__row">
-            <Link className="ds-utility-exits__link" href="/records">
+            <Link className="ds-utility-exits__link" href="/archive">
               Find in the archive
             </Link>
             <p className="ds-utility-exits__line">Every published record, searchable.</p>
