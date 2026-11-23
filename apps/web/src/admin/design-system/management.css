@@ -408,7 +408,6 @@
 }
 @media (pointer: fine) {
   .admin-base-shell .ds-button,
-  .admin-base-shell .ds-button--compact,
   .admin-base-shell .acq__button,
   .admin-base-shell .work-inbox button,
   .admin-base-shell [data-baseweb='button'] {

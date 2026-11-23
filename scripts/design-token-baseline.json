@@ -56,7 +56,7 @@
       "apps/web/src/components/story/story.css": 1,
       "apps/web/src/components/theme-impact/theme-impact.css": 2,
       "packages/ui/src/styles/base.css": 1,
-      "packages/ui/src/styles/components.css": 16,
+      "packages/ui/src/styles/components.css": 15,
       "packages/ui/src/styles/workbench.css": 25
     },
     "breakpoint": {

@@ -5,7 +5,17 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { formatAccessedDate, formatCitation, type CitationInput } from './format';
+import {
+  formatAccessedDate,
+  formatApa,
+  formatChicago,
+  formatCitation,
+  formatMla,
+  formatStyledCitations,
+  type CitationInput,
+  type StyledCitationInput,
+  type StyledCitationPart,
+} from './format';
 
 const SAMPLE: CitationInput = {
   name: 'A.G. Gaston Motel',
@@ -51,4 +61,66 @@ test('an invalid accessed date is refused rather than rendered as NaN', () => {
 
 test('citation carries no em dash', () => {
   assert.ok(!formatCitation(SAMPLE).includes('—'));
+});
+
+const text = (parts: readonly StyledCitationPart[]) =>
+  parts.map((part) => (typeof part === 'string' ? part : part.i)).join('');
+
+const PAGE: StyledCitationInput = {
+  title: 'Roberts Chapel',
+  url: 'https://blackstory.example/place/roberts-chapel',
+  accessed: new Date('2026-11-23T23:30:00.000Z'),
+  published: new Date('2026-08-07T02:00:00.000Z'),
+};
+
+test('MLA: title in quotes, site italic, page date, URL, access date', () => {
+  const parts = formatMla(PAGE);
+  assert.equal(
+    text(parts),
+    '"Roberts Chapel." BlackStory, 7 Aug. 2026, https://blackstory.example/place/roberts-chapel. Accessed 23 Nov. 2026.',
+  );
+  assert.deepEqual(parts[1], { i: 'BlackStory' });
+});
+
+test('APA: site as author, title italic, retrieval date', () => {
+  const parts = formatApa(PAGE);
+  assert.equal(
+    text(parts),
+    'BlackStory. (2026, August 7). Roberts Chapel. Retrieved November 23, 2026, from https://blackstory.example/place/roberts-chapel',
+  );
+  assert.deepEqual(parts[1], { i: 'Roberts Chapel.' });
+});
+
+test('Chicago: site as author, title in quotes, last modified, accessed', () => {
+  assert.equal(
+    text(formatChicago(PAGE)),
+    'BlackStory. "Roberts Chapel." Last modified August 7, 2026. Accessed November 23, 2026. https://blackstory.example/place/roberts-chapel.',
+  );
+});
+
+test('a page with no date on record: APA says n.d., MLA and Chicago leave the date out', () => {
+  const undated = { ...PAGE, published: undefined };
+  assert.match(text(formatApa(undated)), /^BlackStory\. \(n\.d\.\)\. /);
+  assert.equal(
+    text(formatMla(undated)),
+    '"Roberts Chapel." BlackStory, https://blackstory.example/place/roberts-chapel. Accessed 23 Nov. 2026.',
+  );
+  assert.doesNotMatch(text(formatChicago(undated)), /Last modified/);
+});
+
+test('a title that already ends a sentence gets no second period', () => {
+  assert.match(text(formatMla({ ...PAGE, title: 'Who Counts?' })), /^"Who Counts\?" BlackStory/);
+});
+
+test('dates are UTC and an invalid access date is refused', () => {
+  const late = { ...PAGE, accessed: new Date('2026-11-23T23:59:59.000Z') };
+  assert.match(text(formatChicago(late)), /Accessed November 23, 2026/);
+  assert.throws(() => formatMla({ ...PAGE, accessed: new Date('nope') }), /invalid accessed date/);
+});
+
+test('all three styles come back in display order', () => {
+  assert.deepEqual(
+    formatStyledCitations(PAGE).map((format) => format.style),
+    ['MLA', 'APA', 'Chicago'],
+  );
 });

@@ -7,16 +7,20 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { readVerifiedAdminIdentity } from '@/admin/auth/supabase-server';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { formatStyledCitations } from '../../lib/citation/format';
 import Link from 'next/link';
 import {
   Button,
   Citation,
+  Cite,
   Confidence,
   EmptyState,
+  ExhibitFrame,
   FilterBar,
   MapFrame,
   Notice,
   PageHeader,
+  Receipt,
   ResultList,
   Surface,
   ThemeToggle,
@@ -52,6 +56,63 @@ export default async function DesignSystemPage() {
           Back to home
         </Link>
       </div>
+
+      <section className="ds-gallery-section" aria-labelledby="exhibit-heading">
+        <h2 id="exhibit-heading">Exhibit, receipt, cite</h2>
+        <p>
+          The one unit (DESIGN.md section 7.3): the object in crop marks, a label that says what it
+          is and what its year means, and a receipt that says where it came from. A map exhibit
+          stays on ink in both themes. The quiet variant is for harm-adjacent material.
+        </p>
+        <div className="ds-row" style={{ alignItems: 'start', gap: 'var(--ds-space-8)' }}>
+          <ExhibitFrame
+            id="gallery-figure"
+            kind="figure"
+            number="D-01"
+            basis="1790 to 2020"
+            receipt={
+              <Receipt
+                source="U.S. Census Bureau"
+                detail="Working Paper 56"
+                action={
+                  <Cite
+                    formats={formatStyledCitations({
+                      title: 'Black share of the U.S. population, 1790 to 2020',
+                      url: 'https://example.org/data/d-01',
+                      accessed: new Date(),
+                    })}
+                  />
+                }
+              />
+            }
+          >
+            <svg viewBox="0 0 240 90" role="img" aria-label="Three example bars">
+              <rect x="0" y="10" width="232" height="18" fill="currentColor" />
+              <rect x="0" y="36" width="117" height="18" fill="currentColor" />
+              <rect x="0" y="62" width="149" height="18" fill="currentColor" />
+            </svg>
+          </ExhibitFrame>
+          <ExhibitFrame
+            id="gallery-map"
+            kind="map"
+            number="02"
+            basis="exact site"
+            ground="ink"
+            receipt={<Receipt source="OpenFreeMap" detail="OpenStreetMap contributors" />}
+          >
+            <div style={{ aspectRatio: '16 / 9' }} />
+          </ExhibitFrame>
+          <ExhibitFrame
+            id="gallery-quiet"
+            kind="document"
+            variant="quiet"
+            basis="date not on record"
+            receipt={<Receipt source="Library of Congress" />}
+          >
+            <div style={{ aspectRatio: '16 / 9', border: '1px solid var(--ds-rule)' }} />
+          </ExhibitFrame>
+        </div>
+      </section>
 
       <section className="ds-gallery-section" aria-labelledby="actions-heading">
         <h2 id="actions-heading">Actions</h2>

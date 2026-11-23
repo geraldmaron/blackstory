@@ -496,12 +496,6 @@
   text-decoration-color: currentColor;
 }
 
-/* Map chrome's dense control (instrument panels). Still 44px; owned by the map surfaces. */
-.ds-button--compact {
-  padding: 0 var(--ds-space-3);
-  font-size: 0.75rem;
-}
-
 /* —— Chip: filter values and active-filter echoes only ———————————————————————— */
 .ds-chip {
   position: relative;
@@ -511,7 +505,7 @@
   height: 2rem;
   padding: 0 var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-border-control);
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-full);
   background: transparent;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
@@ -1434,5 +1428,219 @@ span.ds-tabs__tab {
   h3,
   h4 {
     break-after: avoid;
+  }
+}
+
+/*
+ * Exhibit frame and receipt (DESIGN.md section 7.3). Square corners, no shadow. The crop marks
+ * are the only ornament: eight short hairlines drawn as backgrounds, in the label's ink.
+ */
+.ds-exhibit {
+  margin: 0;
+  display: grid;
+  gap: var(--ds-space-2);
+  break-inside: avoid;
+}
+
+.ds-exhibit__label {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-exhibit__label > span + span::before {
+  content: '\00b7';
+  margin-right: var(--ds-space-2);
+}
+
+.ds-exhibit__object {
+  --ds-exhibit-mark: var(--ds-space-3);
+  --ds-exhibit-line: var(--ds-border-width);
+  padding: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  background:
+    linear-gradient(currentColor, currentColor) top left / var(--ds-exhibit-mark)
+      var(--ds-exhibit-line) no-repeat,
+    linear-gradient(currentColor, currentColor) top left / var(--ds-exhibit-line)
+      var(--ds-exhibit-mark) no-repeat,
+    linear-gradient(currentColor, currentColor) top right / var(--ds-exhibit-mark)
+      var(--ds-exhibit-line) no-repeat,
+    linear-gradient(currentColor, currentColor) top right / var(--ds-exhibit-line)
+      var(--ds-exhibit-mark) no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / var(--ds-exhibit-mark)
+      var(--ds-exhibit-line) no-repeat,
+    linear-gradient(currentColor, currentColor) bottom left / var(--ds-exhibit-line)
+      var(--ds-exhibit-mark) no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / var(--ds-exhibit-mark)
+      var(--ds-exhibit-line) no-repeat,
+    linear-gradient(currentColor, currentColor) bottom right / var(--ds-exhibit-line)
+      var(--ds-exhibit-mark) no-repeat;
+}
+
+/* An ink object (a map) fills its frame; the marks sit on the ink. */
+.ds-exhibit__object[data-ground='ink'] {
+  background-color: var(--ds-canvas);
+}
+
+.ds-exhibit__object > img,
+.ds-exhibit__object > svg,
+.ds-exhibit__object > picture > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ds-exhibit--compact .ds-exhibit__object {
+  --ds-exhibit-mark: var(--ds-space-2);
+  padding: var(--ds-space-1);
+}
+
+/* Harm-adjacent material: no marks, nothing that draws the eye. */
+.ds-exhibit--quiet .ds-exhibit__object {
+  padding: 0;
+  background: none;
+}
+
+.ds-exhibit__receipt {
+  margin: 0;
+}
+
+.ds-receipt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.4;
+}
+
+.ds-receipt__source a {
+  color: var(--ds-ink);
+  text-underline-offset: 0.18em;
+}
+
+.ds-receipt__detail {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-receipt__grade {
+  color: var(--ds-ink);
+}
+
+.ds-receipt__action {
+  margin-left: auto;
+}
+
+/* Cite: a native disclosure. The toggle is a 44px target with a small outlined face. */
+.ds-cite {
+  position: relative;
+  display: inline-block;
+}
+
+.ds-cite__toggle {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  cursor: pointer;
+  list-style: none;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-cite__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.ds-cite__toggle::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--ds-space-2);
+  inset-inline: calc(var(--ds-space-2) * -1);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  pointer-events: none;
+}
+
+.ds-cite[open] > .ds-cite__toggle::before {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-cite__panel {
+  position: absolute;
+  z-index: var(--ds-z-typeahead);
+  inset-inline-end: 0;
+  width: min(26rem, calc(100vw - var(--ds-space-8)));
+  margin-top: var(--ds-space-1);
+  padding: var(--ds-space-4);
+  display: grid;
+  gap: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  box-shadow: var(--ds-shadow-lift);
+}
+
+.ds-cite__format {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-cite__style {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-cite__text {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.ds-cite__copy {
+  justify-self: start;
+  padding-inline: 0;
+}
+
+/*
+ * Print (DESIGN.md decision 7). An exhibit stays whole on a page and keeps its label and receipt;
+ * a receipt's link prints its address; controls that do nothing on paper are dropped.
+ */
+@media print {
+  .ds-exhibit,
+  .ds-receipt {
+    break-inside: avoid;
+  }
+
+  .ds-receipt__source a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-micro);
+    overflow-wrap: anywhere;
+  }
+
+  .ds-cite,
+  .ds-button {
+    display: none;
   }
 }
