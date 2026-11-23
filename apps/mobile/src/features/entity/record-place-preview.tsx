@@ -15,7 +15,7 @@
  */
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { radius, Text, space, useThemeColors } from '@/ui';
+import { Text, space, useThemeColors } from '@/ui';
 import { MapScreen, type MapCameraCommand, type MapFeatureCollection } from '@/features/map';
 import type { RecordAnatomyPlace } from './entity-anatomy-facts';
 
@@ -74,7 +74,7 @@ export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewPr
         accessibilityLabel="Place not pinned on the archive map"
         testID="record-place-empty"
       >
-        <Text variant="code" colorRole="inkMuted">
+        <Text variant="meta" colorRole="inkMuted">
           Place not pinned
         </Text>
       </View>
@@ -118,7 +118,6 @@ export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewPr
 const styles = StyleSheet.create({
   frame: {
     height: PREVIEW_HEIGHT,
-    borderRadius: radius.md,
     borderWidth: StyleSheet.hairlineWidth,
     // The map paints to its own edges; without this the plate's corners square off over the radius.
     overflow: 'hidden',

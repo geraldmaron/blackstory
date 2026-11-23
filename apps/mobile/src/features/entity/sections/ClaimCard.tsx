@@ -9,7 +9,7 @@
  * Evidence uses the stored qualitative label; legacy numeric scores are not displayed.
  */
 import { StyleSheet, View } from 'react-native';
-import { evidenceLabel } from '@repo/public-contracts/evidence';
+import { evidenceLabel } from '@/lib/evidence-words';
 import { Notice, RecordMeter, Text, space } from '@/ui';
 import { CitationLink } from '../CitationLink';
 import { formatEvidenceScoreLabel, formatIsoDate, humanizeToken } from '../format';
@@ -37,7 +37,7 @@ export function ClaimCard({ claim, isOnline }: ClaimCardProps) {
         accessibilityLabel={formatEvidenceScoreLabel(claim.confidenceScore, claim.confidenceLevel)}
       >
         {/* The grade word is right there; a letter on the meter would print "A" twice. */}
-        <RecordMeter tier={claim.confidenceLevel} showLetter={false} decorative />
+        <RecordMeter tier={claim.confidenceLevel} decorative />
         <Text variant="caption" colorRole="inkMuted">
           {evidenceLabel(claim.confidenceLevel)}
         </Text>

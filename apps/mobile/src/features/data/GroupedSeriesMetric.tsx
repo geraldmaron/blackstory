@@ -25,10 +25,10 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
 
   return (
     <View style={styles.block} accessibilityRole="summary">
-      <Text variant="rowTitle" isHeading>
+      <Text variant="bodyEmphasis" isHeading>
         {series.title}
       </Text>
-      <Text variant="sectionLabel" colorRole="inkMuted" style={styles.meta}>
+      <Text variant="meta" colorRole="inkMuted" style={styles.meta}>
         {series.geographyLabel}
       </Text>
       <Text variant="caption" colorRole="inkMuted">
@@ -42,7 +42,7 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
             slug={row.label}
             title={row.period}
             trailing={
-              <Text variant="code" style={styles.value}>
+              <Text variant="meta" style={styles.value}>
                 {formatDataValue(row.raw, series.unit)}
               </Text>
             }
@@ -54,7 +54,7 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
       <View style={styles.sources}>
         {series.sources.map((source) => (
           <View key={source.url} style={styles.sourceItem}>
-            <Link href={source.url} textRole="code">
+            <Link href={source.url} textRole="meta">
               {source.label}
             </Link>
           </View>

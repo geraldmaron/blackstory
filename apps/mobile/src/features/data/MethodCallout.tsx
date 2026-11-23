@@ -24,7 +24,7 @@ export function MethodCallout({ label, body }: MethodCalloutProps) {
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         />
-        <Text variant="sectionLabel" colorRole="accent" style={styles.label}>
+        <Text variant="meta" colorRole="accent" style={styles.label}>
           {label}
         </Text>
       </View>
@@ -38,7 +38,6 @@ export function MethodCallout({ label, body }: MethodCalloutProps) {
 const styles = StyleSheet.create({
   block: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: space['2'],
     padding: space['3'],
     gap: space['1'],
   },
@@ -50,7 +49,6 @@ const styles = StyleSheet.create({
   tick: {
     width: 3,
     height: 14,
-    borderRadius: 1,
   },
   label: {
     letterSpacing: 1,

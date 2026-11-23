@@ -16,7 +16,7 @@ describe('buildEntityAnatomyInputs', () => {
     expect(inputs.eraLabel).toBe('Reconstruction');
     // Every claim in the full fixture cites BASE_CITATION, so the record rests on one lineage
     // and cannot be grade A however its claims are graded — see `recordConfidenceTier`.
-    expect(inputs.evidenceLabel).toMatch(/Grade B · \d+ sources/);
+    expect(inputs.evidenceLabel).toMatch(/Partly evidenced · \d+ sources/);
     expect(inputs.whereLabel).toBe('Dunbar County, GA');
   });
 

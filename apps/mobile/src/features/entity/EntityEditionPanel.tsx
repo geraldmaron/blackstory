@@ -35,7 +35,7 @@ export function EntityEditionPanel({
   return (
     <View testID={testID} style={styles.panel}>
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Text variant="sectionLabel" colorRole="inkMuted" style={styles.label}>
+        <Text variant="meta" colorRole="inkMuted" style={styles.label}>
           {sectionLabel}
         </Text>
         {headerExtra}

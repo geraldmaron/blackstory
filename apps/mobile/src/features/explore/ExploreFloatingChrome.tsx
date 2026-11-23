@@ -94,7 +94,7 @@ function GhostIconButton({
           importantForAccessibility="no-hide-descendants"
           testID={`${testID ?? 'ghost'}-badge`}
         >
-          <Text variant="code" style={[styles.filterBadgeText, { color: chrome.mapInk }]}>
+          <Text variant="meta" style={[styles.filterBadgeText, { color: chrome.mapInk }]}>
             {badgeCount > 9 ? '9+' : String(badgeCount)}
           </Text>
         </View>
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     right: 2,
     minWidth: 14,
     height: 14,
-    borderRadius: 7,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 3,

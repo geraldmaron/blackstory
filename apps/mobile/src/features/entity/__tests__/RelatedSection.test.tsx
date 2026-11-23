@@ -37,7 +37,7 @@ describe('RelatedSection evidence meter', () => {
       <RelatedSection relatedNeighbors={neighbors} continueLearning={[]} index="08" />,
     );
     // Grade A: strongest claim high, two lineages that can corroborate. Every row says so.
-    expect(getAllByLabelText(/Evidence: Evidence grade A/i)).toHaveLength(neighbors.length);
+    expect(getAllByLabelText(/Evidence: Well evidenced/i)).toHaveLength(neighbors.length);
   });
 
   it('steps a single-lineage neighbor down, from the same payload minus one lineage', async () => {
@@ -57,8 +57,8 @@ describe('RelatedSection evidence meter', () => {
         index="08"
       />,
     );
-    expect(getAllByLabelText(/Evidence: Evidence grade B/i).length).toBeGreaterThan(0);
-    expect(queryByLabelText(/Evidence: Evidence grade A/i)).toBeNull();
+    expect(getAllByLabelText(/Evidence: Partly evidenced/i).length).toBeGreaterThan(0);
+    expect(queryByLabelText(/Evidence: Well evidenced/i)).toBeNull();
   });
 
   it('draws no meter when the neighbor carries no inputs — unknown is not unrated', async () => {

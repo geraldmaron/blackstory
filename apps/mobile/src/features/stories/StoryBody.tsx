@@ -105,7 +105,7 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
     case 'heading':
       return (
         <Text
-          variant={block.level === 2 ? 'title' : 'rowTitle'}
+          variant={block.level === 2 ? 'headline' : 'title'}
           isHeading
           style={{ marginTop: space['5'] }}
         >
@@ -156,10 +156,9 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
             padding: space['3'],
             borderWidth: 1,
             borderColor: theme.border,
-            borderRadius: 8,
           }}
         >
-          <Text variant="sectionLabel">{`Where the sources disagree: ${block.label}`}</Text>
+          <Text variant="meta">{`Where the sources disagree: ${block.label}`}</Text>
           {block.sides.map((side, index) => (
             <View key={index} style={{ gap: space['1'] }}>
               <Text variant="bodySmall" style={{ fontWeight: '600' }}>
@@ -261,7 +260,7 @@ export function StoryReferences({
   if (references.length === 0) return null;
   return (
     <View style={{ gap: space['2'], marginTop: space['6'] }}>
-      <Text variant="sectionLabel" isHeading accessibilityRole="header">
+      <Text variant="meta" isHeading accessibilityRole="header">
         Sources
       </Text>
       {references.map((reference, index) => {

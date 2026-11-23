@@ -8,24 +8,17 @@ import { useState } from 'react';
 import { Image as ExpoImage, type ImageSource } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 import { EntityMark, type EntityMarkProps } from './EntityMark';
-import { radius, useThemeColors } from './tokens';
+import { useThemeColors } from './tokens';
 
 export type ImageProps = {
   source: ImageSource | string | number | null | undefined;
   alt: string;
   aspectRatio?: number;
-  borderRadiusKey?: keyof typeof radius;
   /** Required so the fallback mark can be labeled meaningfully; also used while loading. */
   fallback: Omit<EntityMarkProps, 'entityName'> & { entityName?: string };
 };
 
-export function Image({
-  source,
-  alt,
-  aspectRatio = 4 / 3,
-  borderRadiusKey = 'sm',
-  fallback,
-}: ImageProps) {
+export function Image({ source, alt, aspectRatio = 4 / 3, fallback }: ImageProps) {
   const theme = useThemeColors();
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -36,7 +29,6 @@ export function Image({
     {
       aspectRatio,
       backgroundColor: theme.surfaceRaised,
-      borderRadius: radius[borderRadiusKey],
       borderColor: theme.border,
       borderWidth: StyleSheet.hairlineWidth,
     },
@@ -72,7 +64,7 @@ export function Image({
         accessibilityLabel={alt}
         contentFit="cover"
         transition={150}
-        style={[StyleSheet.absoluteFill, { borderRadius: radius[borderRadiusKey] }]}
+        style={StyleSheet.absoluteFill}
         onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
       />

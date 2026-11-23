@@ -28,7 +28,7 @@ import {
   type TypeScaleRole,
 } from './generated/typography.generated';
 import { logoConstraints } from './generated/logo.generated';
-import { getShadowStyle, type ShadowLevel } from './elevation';
+import { getFloatShadowStyle } from './elevation';
 
 export {
   brandCore,
@@ -44,10 +44,9 @@ export {
   fontFamilies,
   typeScale,
   logoConstraints,
-  getShadowStyle,
+  getFloatShadowStyle,
 };
 export type {
-  ShadowLevel,
   ConfidenceLevel,
   StatusName,
   ThemeName,
@@ -95,9 +94,9 @@ export function useThemeName(): ThemeName {
   return resolveThemeName(useColorScheme());
 }
 
-/** Shadow style for the active theme: `sheet`, `lift` or `float`; `none` for a flush surface. */
-export function useShadowStyle(level: ShadowLevel): ViewStyle {
-  return getShadowStyle(level, useThemeName());
+/** The shadow of a sheet floating over the map, the only shadow in the app. */
+export function useFloatShadowStyle(): ViewStyle {
+  return getFloatShadowStyle(useThemeName());
 }
 
 /** Resolves the full semantic color-role palette for the active color scheme. */

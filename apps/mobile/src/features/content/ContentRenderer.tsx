@@ -74,7 +74,7 @@ function Block({
   if (block.kind === 'heading') {
     return (
       <Text
-        variant="rowTitle"
+        variant="bodyEmphasis"
         isHeading
         style={{
           marginTop: presentation === 'longform' ? space['5'] : space['4'],
@@ -103,7 +103,7 @@ function SourcesList({ sources }: { readonly sources: readonly CitationV1[] }) {
   return (
     <View style={{ marginTop: space['4'], gap: space['1'] }} accessible={false}>
       <Text
-        variant="sectionLabel"
+        variant="meta"
         colorRole="inkMuted"
         isHeading
         accessibilityRole="header"
@@ -160,7 +160,7 @@ export function ContentRenderer({
     >
       {!hideTitle ? (
         <>
-          <Text variant="entityTitle" isHeading>
+          <Text variant="title" isHeading>
             {page.title}
           </Text>
           {page.dek ? (

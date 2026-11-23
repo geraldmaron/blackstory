@@ -13,7 +13,7 @@ export {
   type LayoutSizeClass,
   type LayoutWindow,
 } from './layout';
-export { Text, type TextProps, type TextRole } from './Text';
+export { Accent, Text, type TextProps, type TextRole } from './Text';
 export { Button, type ButtonProps, type ButtonVariant, type ButtonDensity } from './Button';
 export { EXTERNAL_LINK_HINT, externalLinkHint, Link, type LinkProps } from './Link';
 export { Surface, type SurfaceProps } from './Surface';
@@ -23,6 +23,7 @@ export { Divider, type DividerProps } from './Divider';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { ErrorState, type ErrorStateProps } from './ErrorState';
 export { Image, type ImageProps } from './Image';
+export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
 export { Plate, type PlateProps } from './Plate';
 export {
   EntityMark,
@@ -31,7 +32,6 @@ export {
   type EntityMarkReason,
 } from './EntityMark';
 export { Logo, logoClearSpaceDp, type LogoProps } from './Logo';
-export { LiftedSurface, type LiftedSurfaceProps } from './LiftedSurface';
 export { ListRow, type ListRowProps, type ListRowDensity } from './ListRow';
 export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
 export {
@@ -47,8 +47,6 @@ export { useReduceMotion } from './useReduceMotion';
 export { BackControl, type BackControlProps } from './BackControl';
 export { EditionPanelHeader, type EditionPanelHeaderProps } from './EditionPanelHeader';
 export { BrowseScreenShell, type BrowseScreenShellProps } from './BrowseScreenShell';
-export { EditionSurfacePanel, type EditionSurfacePanelProps } from './EditionSurfacePanel';
-export { EditionSurfaceStack, type EditionSurfaceStackProps } from './EditionSurfaceStack';
 export { LedgerRow, type LedgerRowProps } from './LedgerRow';
 export { LedgerSectionLabel, type LedgerSectionLabelProps } from './LedgerSectionLabel';
 export { EditionFactCell, type EditionFactCellProps } from './EditionFactCell';

@@ -32,7 +32,7 @@ export function FeaturedStoryCard({ story: page, onPress }: FeaturedStoryCardPro
     >
       <View style={styles.inner}>
         {facts.length > 0 ? <RecordFactStrip facts={facts} valueVariant="bodySmall" /> : null}
-        <Text variant="rowTitle" isHeading>
+        <Text variant="bodyEmphasis" isHeading>
           {page.title}
         </Text>
         {page.summary ? (

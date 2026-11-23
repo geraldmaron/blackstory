@@ -23,7 +23,7 @@ export function BrowseScreenShell({
   title,
   dek,
   compact = true,
-  dense = true,
+  dense = false,
   children,
 }: BrowseScreenShellProps) {
   const insets = useScreenScrollInsets();

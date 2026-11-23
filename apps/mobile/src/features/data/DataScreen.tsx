@@ -69,7 +69,7 @@ export function DataScreen() {
           <View style={styles.beats}>
             {DATA_ORIENTATION_BEATS.map((beat) => (
               <View key={beat.kicker} style={styles.beat}>
-                <Text variant="sectionLabel" colorRole="accent" style={styles.beatKicker}>
+                <Text variant="meta" colorRole="accent" style={styles.beatKicker}>
                   {beat.kicker}
                 </Text>
                 <Text variant="caption" colorRole="inkMuted">

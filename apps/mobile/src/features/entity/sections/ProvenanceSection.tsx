@@ -71,7 +71,7 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
           <RecordBeatRow
             label="Release"
             valueNode={
-              <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+              <Text variant="meta" colorRole="inkMuted" style={styles.dataValue}>
                 {entity.revision.releaseId}
               </Text>
             }
@@ -81,7 +81,7 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
         <RecordBeatRow
           label="Updated"
           valueNode={
-            <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+            <Text variant="meta" colorRole="inkMuted" style={styles.dataValue}>
               {tracked(entity.revision.recordUpdatedAt)}
             </Text>
           }
@@ -90,7 +90,7 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
         <RecordBeatRow
           label="Generated"
           valueNode={
-            <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+            <Text variant="meta" colorRole="inkMuted" style={styles.dataValue}>
               {tracked(entity.revision.generatedAt)}
             </Text>
           }

@@ -9,10 +9,8 @@
  * a letter to print (see `../types.ts`'s `EvidenceInputs`).
  */
 import { StyleSheet, View } from 'react-native';
-import {
-  confidenceTierFromEvidenceInputs,
-  evidenceMeterLabel,
-} from '@repo/public-contracts/evidence';
+import { confidenceTierFromEvidenceInputs } from '@repo/public-contracts/evidence';
+import { evidenceLabel, evidenceMeterLabel } from '@/lib/evidence-words';
 import { Ionicons } from '@expo/vector-icons';
 import {
   ListRow,
@@ -48,7 +46,14 @@ function NeighborRow({
       : undefined;
   // Kind · relation only — the full summary is often a paragraph, which blows out the row on one
   // unbounded line. The record it links to carries the summary.
-  const subtitle = `${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)}`;
+  const subtitle = [
+    humanizeToken(neighbor.kind),
+    humanizeToken(neighbor.relationType),
+    // The grade in words: the bars beside the row are its glyph, never the only cue.
+    tier ? evidenceLabel(tier) : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <ListRow
@@ -60,7 +65,7 @@ function NeighborRow({
       // label — nesting a second accessible node there would drop the sentence, not add it.
       accessibilityLabel={
         tier
-          ? `${neighbor.displayName}, ${subtitle}. Evidence: ${evidenceMeterLabel(tier)}.`
+          ? `${neighbor.displayName}, ${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)}. Evidence: ${evidenceMeterLabel(tier)}.`
           : `${neighbor.displayName}, ${subtitle}`
       }
       // Passing `trailing` replaces ListRow's own chevron, so the row draws both: the meter
@@ -68,7 +73,6 @@ function NeighborRow({
       trailing={
         tier ? (
           <View style={styles.trailing}>
-            {/* The letter rides beside the bars — color is never the only cue at this density. */}
             <RecordMeter tier={tier} decorative testID={`entity-related-meter-${neighbor.id}`} />
             <Ionicons
               name="chevron-forward"

@@ -10,7 +10,6 @@ import { forwardRef } from 'react';
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View, type ScrollViewProps } from 'react-native';
 import { ScreenHeader } from './ScreenHeader';
-import { LiftedSurface } from './LiftedSurface';
 import type { Edge } from 'react-native-safe-area-context';
 import { ScreenCanvas, screenScrollInsets } from './ScreenCanvas';
 import { space } from './tokens';
@@ -48,9 +47,7 @@ export const UtilityScreenShell = forwardRef<ScrollView, UtilityScreenShellProps
           {...scrollProps}
         >
           <ScreenHeader kicker={kicker} title={title} dek={dek} compact dense />
-          <LiftedSurface tone="surface" paddingKey="3">
-            <View style={styles.body}>{children}</View>
-          </LiftedSurface>
+          <View style={styles.body}>{children}</View>
         </ScrollView>
       </ScreenCanvas>
     );

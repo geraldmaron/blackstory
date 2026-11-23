@@ -19,7 +19,7 @@ describe('Text', () => {
   });
 
   it('exposes a "header" accessibilityRole for heading variants (display/title/subtitle)', async () => {
-    const { getByRole } = await render(<Text variant="title">A Title</Text>);
+    const { getByRole } = await render(<Text variant="headline">A Title</Text>);
     expect(getByRole('header')).toBeTruthy();
   });
 

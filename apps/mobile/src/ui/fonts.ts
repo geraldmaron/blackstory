@@ -30,7 +30,7 @@ import {
   SchibstedGrotesk_700Bold,
   SchibstedGrotesk_800ExtraBold,
 } from '@expo-google-fonts/schibsted-grotesk';
-import { Newsreader_400Regular } from '@expo-google-fonts/newsreader';
+import { Newsreader_400Regular, Newsreader_400Regular_Italic } from '@expo-google-fonts/newsreader';
 import { GeistMono_500Medium } from '@expo-google-fonts/geist-mono';
 
 /**
@@ -51,6 +51,7 @@ const REGISTERED_FONTS = {
   'Geist-Medium': Geist_500Medium,
   'Geist-SemiBold': Geist_600SemiBold,
   'Newsreader-Regular': Newsreader_400Regular,
+  'Newsreader-Italic': Newsreader_400Regular_Italic,
   'GeistMono-Medium': GeistMono_500Medium,
 } as const;
 

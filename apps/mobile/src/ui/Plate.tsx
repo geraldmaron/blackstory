@@ -17,11 +17,11 @@ export type PlateProps = Omit<ImageProps, 'borderRadiusKey'> & {
   radiusKey?: 'sm' | 'md';
 };
 
-export function Plate({ credit, radiusKey = 'md', aspectRatio = 3 / 2, ...image }: PlateProps) {
+export function Plate({ credit, aspectRatio = 3 / 2, ...image }: PlateProps) {
   return (
     <View style={styles.plate} testID="plate">
-      <Image {...image} aspectRatio={aspectRatio} borderRadiusKey={radiusKey} />
-      <Text variant="code" colorRole="inkMuted" testID="plate-credit">
+      <Image {...image} aspectRatio={aspectRatio} />
+      <Text variant="meta" colorRole="inkMuted" testID="plate-credit">
         {credit}
       </Text>
     </View>

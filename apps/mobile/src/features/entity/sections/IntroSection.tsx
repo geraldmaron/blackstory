@@ -86,7 +86,7 @@ export function IntroSection({ entity }: IntroSectionProps) {
         titleLevel={1}
         testID="entity-intro-section"
         headerExtra={
-          <Text variant="code" colorRole="inkMuted" numberOfLines={2}>
+          <Text variant="meta" colorRole="inkMuted" numberOfLines={2}>
             {metaLine}
           </Text>
         }

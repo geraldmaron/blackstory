@@ -32,8 +32,8 @@ export type ScreenHeaderProps = {
 };
 
 function resolveTitleVariant(compact: boolean, dense: boolean): TextRole {
-  if (dense) return 'masthead';
-  if (compact) return 'title';
+  if (dense) return 'title';
+  if (compact) return 'headline';
   return 'display';
 }
 
@@ -61,7 +61,7 @@ export function ScreenHeader({
             accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
           />
-          <Text variant="code" colorRole="accent" numberOfLines={1} style={styles.kicker}>
+          <Text variant="meta" colorRole="accent" numberOfLines={1} style={styles.kicker}>
             {kicker}
           </Text>
         </View>
@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
   tick: {
     width: 3,
     height: 12,
-    borderRadius: 1,
   },
   kicker: {
     letterSpacing: 1,

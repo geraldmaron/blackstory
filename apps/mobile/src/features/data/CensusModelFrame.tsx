@@ -21,7 +21,7 @@ export function CensusModelFrame() {
         style={[styles.frame, { borderColor: theme.border, backgroundColor: theme.surface }]}
         accessibilityLabel="Census decade model frame. Timeline not on this release yet."
       >
-        <Text variant="sectionLabel" colorRole="inkMuted" style={styles.frameLabel}>
+        <Text variant="meta" colorRole="inkMuted" style={styles.frameLabel}>
           Decade axis
         </Text>
         <View
@@ -43,7 +43,7 @@ export function CensusModelFrame() {
                     },
                   ]}
                 />
-                <Text variant="sectionLabel" colorRole="inkMuted" style={styles.tick}>
+                <Text variant="meta" colorRole="inkMuted" style={styles.tick}>
                   {tick}
                 </Text>
               </View>
@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
   },
   frame: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: space['2'],
     padding: space['3'],
     gap: space['2'],
   },
@@ -89,7 +88,6 @@ const styles = StyleSheet.create({
   },
   ghostBar: {
     width: 10,
-    borderRadius: 1,
     borderWidth: StyleSheet.hairlineWidth,
   },
   tick: {

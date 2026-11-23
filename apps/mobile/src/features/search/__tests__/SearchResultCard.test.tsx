@@ -148,15 +148,15 @@ describe('SearchResultCard — evidence meter (a tier is an assessment, not a ra
     expect(
       getByTestId('search-result-evidence-meter', { includeHiddenElements: true }),
     ).toBeTruthy();
-    // Color is never the only cue: the grade letter renders beside the bars and the sentence
+    // Color is never the only cue: the grade in words rides in the row's meta line and the sentence
     // rides in the row's own accessibility label.
-    expect(getByLabelText(/Evidence grade A/i)).toBeTruthy();
+    expect(getByLabelText(/Well evidenced/i)).toBeTruthy();
   });
 
-  it('renders the grade letter as visible text, not color alone', async () => {
+  it('renders the grade in words as visible text, not color alone', async () => {
     const props = toSearchResultCardProps(baseResult({ confidenceTier: 'medium' }));
     const { getByText } = await render(<SearchResultCard {...props} />);
-    expect(getByText('B', { includeHiddenElements: true })).toBeTruthy();
+    expect(getByText(/Partly evidenced/, { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('draws no meter at all when the server could not grade the record', async () => {

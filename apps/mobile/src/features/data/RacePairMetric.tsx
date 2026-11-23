@@ -16,10 +16,10 @@ export function RacePairMetric({ series }: RacePairMetricProps) {
 
   return (
     <View style={styles.block} accessibilityRole="summary">
-      <Text variant="rowTitle" isHeading>
+      <Text variant="bodyEmphasis" isHeading>
         {series.title}
       </Text>
-      <Text variant="sectionLabel" colorRole="inkMuted" style={styles.meta}>
+      <Text variant="meta" colorRole="inkMuted" style={styles.meta}>
         {series.geographyLabel} · {series.referencePeriod}
       </Text>
       <Text variant="caption" colorRole="inkMuted">
@@ -46,13 +46,13 @@ export function RacePairMetric({ series }: RacePairMetricProps) {
           <Text variant="caption" colorRole="inkMuted">
             {series.ratioLabel}
           </Text>
-          <Text variant="code">{String(series.ratioValue)}</Text>
+          <Text variant="meta">{String(series.ratioValue)}</Text>
         </View>
       ) : null}
       <View style={styles.sources}>
         {series.sources.map((source) => (
           <View key={source.url} style={styles.sourceItem}>
-            <Link href={source.url} textRole="code">
+            <Link href={source.url} textRole="meta">
               {source.label}
             </Link>
           </View>

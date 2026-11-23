@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     height: MIN_TOUCH_TARGET,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: MIN_TOUCH_TARGET / 2,
+    borderRadius: radius.full,
     marginRight: -space['2'],
   },
   chipRow: {

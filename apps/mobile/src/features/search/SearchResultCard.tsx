@@ -11,7 +11,8 @@
  */
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { evidenceMeterLabel, type ConfidenceTier } from '@repo/public-contracts/evidence';
+import { type ConfidenceTier } from '@repo/public-contracts/evidence';
+import { evidenceLabel, evidenceMeterLabel } from '@/lib/evidence-words';
 import {
   Button,
   LedgerRow,
@@ -93,7 +94,13 @@ export function SearchResultCard({
   const kindLabel = recordKindLabel(kind);
   const eraLabel = recordEraLabel({ eraBuckets: eraBuckets ?? [] });
   const statusLabel = recordStatusLabel(status);
-  const slug = [kindLabel, eraLabel !== 'Undated' ? eraLabel : null, statusLabel]
+  const slug = [
+    kindLabel,
+    eraLabel !== 'Undated' ? eraLabel : null,
+    statusLabel,
+    // The grade in words: the bars beside the row are its glyph, never the only cue.
+    confidenceTier !== undefined ? evidenceLabel(confidenceTier) : null,
+  ]
     .filter(Boolean)
     .join(' · ');
 
@@ -118,7 +125,6 @@ export function SearchResultCard({
         trailing={
           confidenceTier !== undefined ? (
             <View style={styles.trailing}>
-              {/* The letter beside the bars is the non-color cue: color is never the only one. */}
               <RecordMeter tier={confidenceTier} decorative testID="search-result-evidence-meter" />
               {onPress ? (
                 <Ionicons

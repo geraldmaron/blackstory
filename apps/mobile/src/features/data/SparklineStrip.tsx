@@ -69,10 +69,10 @@ export function SparklineStrip({ series }: SparklineStripProps) {
                   style={[styles.bar, { height: comparisonH, backgroundColor: theme.border }]}
                 />
               </View>
-              <Text variant="sectionLabel" colorRole="inkMuted" style={styles.periodLabel}>
+              <Text variant="meta" colorRole="inkMuted" style={styles.periodLabel}>
                 {point.period}
               </Text>
-              <Text variant="code" style={styles.periodValue} numberOfLines={1}>
+              <Text variant="meta" style={styles.periodValue} numberOfLines={1}>
                 {formatDataValue(primary, series.unit)}
               </Text>
             </View>
@@ -100,7 +100,6 @@ const styles = StyleSheet.create({
   swatch: {
     width: 8,
     height: 8,
-    borderRadius: 1,
   },
   rail: {
     flexDirection: 'row',
@@ -122,7 +121,6 @@ const styles = StyleSheet.create({
   },
   bar: {
     width: 8,
-    borderRadius: 1,
   },
   periodLabel: {
     letterSpacing: 0.3,

@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import { evidenceMeterLabel } from '@repo/public-contracts/evidence';
+import { evidenceMeterLabel } from '@/lib/evidence-words';
 
 import {
   NavIcon,
@@ -120,7 +120,7 @@ const RecordRow = memo(function RecordRow({
         <NavIcon name={navIconForEntityKind(feature.kind)} size={18} selected={selected} />
       </View>
       <View style={styles.rowText}>
-        <Text variant="rowTitle" numberOfLines={titleLines} style={styles.rowTitle}>
+        <Text variant="bodyEmphasis" numberOfLines={titleLines} style={styles.rowTitle}>
           {feature.label}
         </Text>
         {story.caption ? (
@@ -219,10 +219,10 @@ export function ExploreRecordsRail({
             accessibilityRole="header"
             accessibilityLabel={headerCount.accessibilityLabel}
           >
-            <Text variant="code" colorRole="inkMuted" numberOfLines={1}>
+            <Text variant="meta" colorRole="inkMuted" numberOfLines={1}>
               {scopeLabel}
             </Text>
-            <Text variant="rowTitle" numberOfLines={1}>
+            <Text variant="bodyEmphasis" numberOfLines={1}>
               {headerCount.railInline}
             </Text>
           </View>
@@ -282,7 +282,7 @@ export function ExploreRecordsRail({
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               />
-              <Text variant="code" colorRole="inkMuted" style={styles.rowLabel}>
+              <Text variant="meta" colorRole="inkMuted" style={styles.rowLabel}>
                 Pull up for places
               </Text>
             </View>
@@ -306,7 +306,7 @@ export function ExploreRecordsRail({
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               />
-              <Text variant="code" style={[styles.rowLabel, { color: theme.inverseInk }]}>
+              <Text variant="meta" style={[styles.rowLabel, { color: theme.inverseInk }]}>
                 Expand the map
               </Text>
             </Pressable>
@@ -344,7 +344,7 @@ export function ExploreRecordsRail({
         >
           <Ionicons name="map-outline" size={22} color={theme.inkMuted} />
         </View>
-        <Text variant="subtitle" style={styles.emptyTitle}>
+        <Text variant="title" style={styles.emptyTitle}>
           {emptyTitle}
         </Text>
         <Text variant="body" colorRole="inkMuted" style={styles.emptyDescription}>

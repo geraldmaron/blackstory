@@ -36,6 +36,7 @@ import {
   useAccessibilityFocus,
   useThemeColors,
   MIN_TOUCH_TARGET,
+  radius,
 } from '@/ui';
 import {
   MapAttribution,
@@ -607,7 +608,7 @@ const styles = StyleSheet.create({
     right: space['2'],
     width: MIN_TOUCH_TARGET,
     height: MIN_TOUCH_TARGET,
-    borderRadius: MIN_TOUCH_TARGET / 2,
+    borderRadius: radius.full,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     justifyContent: 'center',

@@ -62,7 +62,7 @@ export function ListRow({
     <View style={styles.row}>
       {leading ? <View style={styles.leading}>{leading}</View> : null}
       <View style={styles.textColumn}>
-        <Text variant="rowTitle">{title}</Text>
+        <Text variant="bodyEmphasis">{title}</Text>
         {subtitle ? (
           <Text variant="caption" colorRole="inkMuted">
             {subtitle}

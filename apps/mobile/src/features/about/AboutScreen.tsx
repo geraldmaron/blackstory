@@ -72,7 +72,7 @@ export function AboutScreen() {
 
         <View style={styles.section}>
           <LedgerSectionLabel>What holds</LedgerSectionLabel>
-          <Text variant="rowTitle" isHeading>
+          <Text variant="bodyEmphasis" isHeading>
             Place, evidence and dignity
           </Text>
           <Text variant="caption" colorRole="inkMuted">
@@ -101,11 +101,11 @@ export function AboutScreen() {
                     importantForAccessibility="no-hide-descendants"
                   />
                   <NavIcon name={pillar.icon} size={20} />
-                  <Text variant="sectionLabel" colorRole="accent" style={styles.pillarKicker}>
+                  <Text variant="meta" colorRole="accent" style={styles.pillarKicker}>
                     {pillar.kicker}
                   </Text>
                 </View>
-                <Text variant="rowTitle">{pillar.title}</Text>
+                <Text variant="bodyEmphasis">{pillar.title}</Text>
                 <Text variant="caption" colorRole="inkMuted">
                   {pillar.body}
                 </Text>
@@ -116,7 +116,7 @@ export function AboutScreen() {
 
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>Why this exists</LedgerSectionLabel>
-          <Text variant="rowTitle" isHeading>
+          <Text variant="bodyEmphasis" isHeading>
             Three reasons
           </Text>
           <Text variant="caption" colorRole="inkMuted">
@@ -138,11 +138,11 @@ export function AboutScreen() {
                 accessibilityRole="text"
                 accessibilityLabel={`${beat.index}. ${beat.title}. ${beat.body}`}
               >
-                <Text variant="code" colorRole="accent" style={styles.beatIndex}>
+                <Text variant="meta" colorRole="accent" style={styles.beatIndex}>
                   {beat.index}
                 </Text>
                 <View style={styles.beatBody}>
-                  <Text variant="rowTitle">{beat.title}</Text>
+                  <Text variant="bodyEmphasis">{beat.title}</Text>
                   <Text variant="caption" colorRole="inkMuted">
                     {beat.body}
                   </Text>
@@ -209,7 +209,7 @@ export function AboutScreen() {
 
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>Close</LedgerSectionLabel>
-          <Text variant="rowTitle" isHeading>
+          <Text variant="bodyEmphasis" isHeading>
             {ABOUT_CLOSE.title}
           </Text>
           <Text variant="caption" colorRole="inkMuted">
@@ -258,7 +258,6 @@ const styles = StyleSheet.create({
   },
   pillar: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: space['2'],
     padding: space['3'],
     gap: space['1'],
   },
@@ -271,7 +270,6 @@ const styles = StyleSheet.create({
   pillarTick: {
     width: 3,
     height: 18,
-    borderRadius: 1,
   },
   pillarKicker: {
     letterSpacing: 1,

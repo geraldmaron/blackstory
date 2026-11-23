@@ -37,7 +37,7 @@ function PacketBlock({ packet }: { readonly packet: ThemePacketView }) {
       <LedgerSectionLabel ruleAbove meta={packet.questionId}>
         Packet
       </LedgerSectionLabel>
-      <Text variant="rowTitle" colorRole="ink">
+      <Text variant="bodyEmphasis" colorRole="ink">
         {plainDashCopy(packet.question)}
       </Text>
       <Text variant="caption" colorRole="accent">
@@ -81,7 +81,7 @@ function PacketBlock({ packet }: { readonly packet: ThemePacketView }) {
 
       {packet.observations.length > 0 ? (
         <View style={styles.stack}>
-          <Text variant="sectionLabel" colorRole="inkMuted">
+          <Text variant="meta" colorRole="inkMuted">
             {THEMES_DETAIL.observationsTitle}
           </Text>
           {packet.observations.map((obs) => (
@@ -103,7 +103,7 @@ function PacketBlock({ packet }: { readonly packet: ThemePacketView }) {
 
       {packet.derived.length > 0 ? (
         <View style={styles.stack}>
-          <Text variant="sectionLabel" colorRole="inkMuted">
+          <Text variant="meta" colorRole="inkMuted">
             {THEMES_DETAIL.derivedTitle}
           </Text>
           {packet.derived.map((row) => (
@@ -124,12 +124,12 @@ function PacketBlock({ packet }: { readonly packet: ThemePacketView }) {
 
       {packet.artifacts.length > 0 ? (
         <View style={styles.stack}>
-          <Text variant="sectionLabel" colorRole="inkMuted">
+          <Text variant="meta" colorRole="inkMuted">
             {THEMES_DETAIL.artifactsTitle}
           </Text>
           {packet.artifacts.map((art) => (
             <View key={art.id} style={styles.factRow}>
-              <Text variant="rowTitle" colorRole="ink">
+              <Text variant="bodyEmphasis" colorRole="ink">
                 {plainDashCopy(art.title)}
               </Text>
               {art.dateLabel ? (

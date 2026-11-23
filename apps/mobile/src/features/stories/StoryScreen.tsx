@@ -73,13 +73,13 @@ export function StoryScreen({ slug, base }: { readonly slug: string; readonly ba
               <Notice tone="info" title="Showing the copy saved on this phone" compact />
             ) : null}
             {story.collection ? (
-              <Text variant="sectionLabel" colorRole="accent">
+              <Text variant="meta" colorRole="accent">
                 {[story.collection.label, story.collection.positionLabel]
                   .filter(Boolean)
                   .join(' · ')}
               </Text>
             ) : null}
-            <Text variant="entityTitle" isHeading>
+            <Text variant="title" isHeading>
               {story.title}
             </Text>
             <Text variant="editorial" colorRole="inkMuted">

@@ -26,7 +26,7 @@ import {
   type TextProps as RNTextProps,
   type TextStyle,
 } from 'react-native';
-import { useThemeColors } from './tokens';
+import { brandCore, useThemeColors } from './tokens';
 import { typeScale, type TypeScaleRole } from './tokens';
 import { resolveFontFamily } from './fonts';
 
@@ -60,7 +60,7 @@ export function Text({
   const scale = typeScale[variant];
   const family = resolveFontFamily(scale.family, scale.weight);
   const lineHeight = scale.lineHeight * useFontScale(maxFontSizeMultiplier);
-  const headingRoles: TextRole[] = ['display', 'title', 'subtitle', 'masthead', 'entityTitle'];
+  const headingRoles: TextRole[] = ['display', 'headline', 'title'];
   const resolvedHeading = isHeading ?? headingRoles.includes(variant);
 
   return (
@@ -80,6 +80,30 @@ export function Text({
       ]}
       {...rest}
     />
+  );
+}
+
+/**
+ * The accent rule (docs/ui/DESIGN.md section 7.2): one word of a display or headline line set in
+ * Newsreader italic, the word the sentence turns on. Ink on paper by inheritance; copper on the
+ * ink ground (`onInk`). One per line, one line per screen. Nest it inside a `Text`.
+ */
+export function Accent({
+  children,
+  onInk = false,
+}: {
+  readonly children: string;
+  readonly onInk?: boolean;
+}) {
+  return (
+    <RNText
+      style={[
+        { fontFamily: 'Newsreader-Italic', fontWeight: '400' },
+        onInk ? { color: brandCore.copperPin } : null,
+      ]}
+    >
+      {children}
+    </RNText>
   );
 }
 

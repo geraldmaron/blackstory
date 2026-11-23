@@ -30,7 +30,14 @@ import BottomSheet, {
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
-import { useThemeColors, duration, radius, space, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui/tokens';
+import {
+  useFloatShadowStyle,
+  useThemeColors,
+  duration,
+  space,
+  MIN_TOUCH_TARGET,
+  Z_LAYER,
+} from '@/ui/tokens';
 
 export const SHEET_PEEK = 0;
 export const SHEET_HALF = 1;
@@ -128,6 +135,7 @@ export function AppBottomSheet({
   contentContainerStyle,
 }: AppBottomSheetProps) {
   const theme = useThemeColors();
+  const floatShadow = useFloatShadowStyle();
   const snapPoints = useMemo(
     () => [...(snapPointsProp ?? ['11%', '34%', '52%'])],
     [snapPointsProp],
@@ -231,7 +239,7 @@ export function AppBottomSheet({
         styles.background,
         { backgroundColor: theme.surface, borderColor: theme.border },
       ]}
-      style={styles.sheet}
+      style={[styles.sheet, floatShadow]}
       // Explicitly NOT `accessible`, and no role. gorhom defaults its content view to
       // `accessible` + "adjustable" when these are omitted, which collapses the whole sheet body
       // into one VoiceOver element and makes every row and button inside it unreachable.
@@ -257,8 +265,6 @@ const styles = StyleSheet.create({
     elevation: Z_LAYER.sheet,
   },
   background: {
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   handleWrap: {
@@ -272,7 +278,6 @@ const styles = StyleSheet.create({
   handlePill: {
     width: 36,
     height: 3,
-    borderRadius: 2,
   },
   content: {
     // No minHeight: a floor plus the handle exceeds the peek detent and clips peek content.

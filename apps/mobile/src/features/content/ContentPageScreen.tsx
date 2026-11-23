@@ -180,7 +180,6 @@ const styles = StyleSheet.create({
     marginBottom: space['5'],
   },
   skeletonBar: {
-    borderRadius: space['1'],
     borderWidth: StyleSheet.hairlineWidth,
   },
 });

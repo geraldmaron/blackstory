@@ -5,7 +5,7 @@
 import type { ReactNode, Ref } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LiftedSurface, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
+import { Surface, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
 
 const MIN_TOUCH = MIN_TOUCH_TARGET;
@@ -73,7 +73,7 @@ export function ExploreEditionSegmentTabs({
               />
             ) : null}
             <Text
-              variant="code"
+              variant="meta"
               style={{
                 color: selected ? theme.accent : theme.inkMuted,
                 letterSpacing: 0.8,
@@ -97,7 +97,7 @@ export type ExploreEditionKickerProps = {
 /** Mono copper slug above instrument body (e.g. "Map instruments"). */
 export function ExploreEditionKicker({ children }: ExploreEditionKickerProps) {
   return (
-    <Text variant="code" colorRole="accent" style={styles.kicker}>
+    <Text variant="meta" colorRole="accent" style={styles.kicker}>
       {children.toUpperCase()}
     </Text>
   );
@@ -117,7 +117,7 @@ export function ExploreFacetRow({ label, summary, children, testID }: ExploreFac
   return (
     <View style={[styles.facetRow, { borderBottomColor: theme.border }]} testID={testID}>
       <View style={styles.facetLabelBlock}>
-        <Text variant="code" colorRole="inkMuted" style={styles.facetLabel}>
+        <Text variant="meta" colorRole="inkMuted" style={styles.facetLabel}>
           {label.toUpperCase()}
         </Text>
         {summary ? (
@@ -169,7 +169,7 @@ export function ExplorePanelHeader({
             accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
           />
-          <Text variant="code" colorRole="inkMuted" style={styles.panelTitle}>
+          <Text variant="meta" colorRole="inkMuted" style={styles.panelTitle}>
             {title.toUpperCase()}
           </Text>
         </View>
@@ -226,7 +226,7 @@ export function ExploreRestoreChip({
         },
       ]}
     >
-      <Text variant="code" style={{ color: selected ? theme.accent : theme.inkMuted }}>
+      <Text variant="meta" style={{ color: selected ? theme.accent : theme.inkMuted }}>
         {label}
       </Text>
     </Pressable>
@@ -249,16 +249,15 @@ export function ExploreInstrumentsFrame({
   testID = 'explore-instruments-frame',
 }: ExploreInstrumentsFrameProps) {
   return (
-    <LiftedSurface
+    <Surface
       tone="surface"
-      shadow="none"
       radiusKey="sm"
       bordered
       style={[styles.instrumentsFrame, style]}
       testID={testID}
     >
       {children}
-    </LiftedSurface>
+    </Surface>
   );
 }
 

@@ -101,7 +101,7 @@ export function MapAttribution({
       <View style={styles.row}>
         {expanded ? (
           <Text
-            variant="code"
+            variant="meta"
             style={[styles.label, compact ? styles.labelCompact : null, { color: MAP_INK_MUTED }]}
             testID="map-attribution-text"
           >

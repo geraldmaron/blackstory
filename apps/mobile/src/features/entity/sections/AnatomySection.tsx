@@ -121,7 +121,6 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
                   trailing: (
                     <RecordMeter
                       tier={inputs.evidenceTier}
-                      showLetter={false}
                       decorative
                       testID="entity-anatomy-evidence-meter"
                     />
