@@ -132,6 +132,9 @@ const countyLinesLoadGeneration = new WeakMap<MapLibreMap, number>();
 /** Once a choropleth join is requested, ignore empty-level loads (even mid-flight). */
 const countyChoroplethJoinRequested = new WeakSet<MapLibreMap>();
 
+/** Ends the current task, so the work after it cannot add to one long task. */
+const nextTask = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
 /** Lazily fills the county source (hairlines + optional choropleth). Deliberately zoom-triggered
  * by the caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
  * national resting frame never pays for it — except population choropleths, which load at any
@@ -153,6 +156,10 @@ export async function loadCountyPolygons(
   const generation = (countyLinesLoadGeneration.get(map) ?? 0) + 1;
   countyLinesLoadGeneration.set(map, generation);
   const collection = await fetchCountyPolygons();
+  // Parsing the file and handing it to the map are each tens of milliseconds on the main
+  // thread. Run back to back they were one task of about 260ms at 4x CPU, mid-scroll on the front
+  // page (DESIGN.md section 7.5).
+  await nextTask();
   if (countyLinesLoadGeneration.get(map) !== generation) {
     // A newer load (usually with choropleth tiers) superseded this one mid-flight.
     return;
@@ -174,6 +181,7 @@ export function requestCountyPolygonLoad(map: MapLibreMap, cfg: StageConfig): vo
     ((cfg.layerMode === 'blackShare' || cfg.layerMode === 'blackChange') && popGeo === 'county');
   if (!needsCountyGeometry) return;
   void loadCountyPolygons(map, cfg.countyChoroplethLevels)
+    .then(nextTask)
     .then(() => {
       syncCountyHatch(map, cfg);
       refreshPlaceGroups(map, cfg);
