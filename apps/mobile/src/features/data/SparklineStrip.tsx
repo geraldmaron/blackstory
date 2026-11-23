@@ -72,7 +72,13 @@ export function SparklineStrip({ series }: SparklineStripProps) {
               <Text variant="meta" colorRole="inkMuted" style={styles.periodLabel}>
                 {point.period}
               </Text>
-              <Text variant="meta" style={styles.periodValue} numberOfLines={1}>
+              <Text
+                variant="caption"
+                style={styles.periodValue}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
                 {formatDataValue(primary, series.unit)}
               </Text>
             </View>
@@ -128,7 +134,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   periodValue: {
-    fontSize: 10,
     textAlign: 'center',
   },
 });

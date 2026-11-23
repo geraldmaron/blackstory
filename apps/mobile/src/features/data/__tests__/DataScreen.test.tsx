@@ -33,10 +33,26 @@ describe('DataScreen', () => {
     expect(getByText(/The national census picture, plus published figures/)).toBeTruthy();
   });
 
-  it('shows honest Census degraded empty state with model frame', async () => {
-    const { getByText } = await render(<DataScreen />);
+  it('says the Census timeline is missing in words, with no stand-in chart', async () => {
+    const { getByText, queryByText } = await render(<DataScreen />);
     expect(getByText('Census timeline not on this release yet')).toBeTruthy();
-    expect(getByText('Decade axis')).toBeTruthy();
+    expect(queryByText('Decade axis')).toBeNull();
+  });
+
+  it('opens every figure in Plain, with Numbers one tap away and its sources as the receipt', async () => {
+    const { getAllByTestId, getAllByRole, queryAllByTestId, getAllByLabelText } = await render(
+      <DataScreen />,
+    );
+    const plain = getAllByRole('tab', { name: 'Plain' });
+    expect(plain.length).toBeGreaterThan(0);
+    for (const tab of plain) expect(tab.props.accessibilityState).toEqual({ selected: true });
+    expect(queryAllByTestId('data-figure-numbers')).toHaveLength(0);
+    expect(getAllByTestId('exhibit-receipt').length).toBe(plain.length);
+
+    await fireEvent.press(getAllByRole('tab', { name: 'Numbers' })[0]!);
+    expect(getAllByTestId('data-figure-numbers')).toHaveLength(1);
+    // The table speaks each value with its label.
+    expect(getAllByLabelText(/Black families: \$44,900/).length).toBeGreaterThan(0);
   });
 
   it('renders coverage pulse and juxtaposition callout', async () => {

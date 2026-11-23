@@ -1,9 +1,8 @@
 /**
- * Grouped-series metric: sparkline strip plus period × group text rows with
- * trailing mono values. Flat matte; copper only on the primary series bars.
+ * Two series across periods, as a figure: paired bars by period in Plain, every value in
+ * Numbers. A period with no value for a series is left out of Numbers, never printed as zero.
  */
-import { StyleSheet, View } from 'react-native';
-import { LedgerRow, Link, MIN_TOUCH_TARGET, Text, space } from '@/ui';
+import { DataFigure } from './DataFigure';
 import { formatDataValue } from './format';
 import { SparklineStrip } from './SparklineStrip';
 import type { DataGroupedBarSeries } from './types';
@@ -13,73 +12,32 @@ export type GroupedSeriesMetricProps = {
 };
 
 export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
-  const rows = series.points.flatMap((point) =>
-    series.series
-      .map((def) => {
-        const raw = point.values[def.id];
-        if (typeof raw !== 'number') return null;
-        return { key: `${point.period}-${def.id}`, period: point.period, label: def.label, raw };
-      })
-      .filter((row): row is NonNullable<typeof row> => row !== null),
+  const numbers = series.points.flatMap((point) =>
+    series.series.flatMap((def) => {
+      const raw = point.values[def.id];
+      return typeof raw === 'number'
+        ? [
+            {
+              key: `${point.period}-${def.id}`,
+              label: `${point.period} · ${def.label}`,
+              value: formatDataValue(raw, series.unit),
+            },
+          ]
+        : [];
+    }),
   );
+  const periods = series.points.map((point) => point.period);
 
   return (
-    <View style={styles.block} accessibilityRole="summary">
-      <Text variant="bodyEmphasis" isHeading>
-        {series.title}
-      </Text>
-      <Text variant="meta" colorRole="inkMuted" style={styles.meta}>
-        {series.geographyLabel}
-      </Text>
-      <Text variant="caption" colorRole="inkMuted">
-        {series.caption}
-      </Text>
-      <SparklineStrip series={series} />
-      <View>
-        {rows.map((row, index) => (
-          <LedgerRow
-            key={row.key}
-            slug={row.label}
-            title={row.period}
-            trailing={
-              <Text variant="meta" style={styles.value}>
-                {formatDataValue(row.raw, series.unit)}
-              </Text>
-            }
-            showDivider={index < rows.length - 1}
-            showChevron={false}
-          />
-        ))}
-      </View>
-      <View style={styles.sources}>
-        {series.sources.map((source) => (
-          <View key={source.url} style={styles.sourceItem}>
-            <Link href={source.url} textRole="meta">
-              {source.label}
-            </Link>
-          </View>
-        ))}
-      </View>
-    </View>
+    <DataFigure
+      title={series.title}
+      scope={[series.geographyLabel, periods[0], periods.length > 1 ? periods.at(-1) : undefined]
+        .filter(Boolean)
+        .join(' · ')}
+      limits={series.caption}
+      sources={series.sources}
+      plain={<SparklineStrip series={series} />}
+      numbers={numbers}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  block: {
-    gap: space['2'],
-  },
-  meta: {
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  value: {
-    textAlign: 'right',
-  },
-  sources: {
-    gap: space['2'],
-  },
-  sourceItem: {
-    minHeight: MIN_TOUCH_TARGET,
-    justifyContent: 'center',
-  },
-});

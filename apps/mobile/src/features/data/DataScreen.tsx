@@ -53,8 +53,7 @@ export function DataScreen() {
           kicker={DATA_INTRO.kicker}
           title="Data behind the archive"
           dek={DATA_INTRO.lede}
-          compact
-          dense
+          dense={false}
         />
 
         <View style={styles.section}>
