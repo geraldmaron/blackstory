@@ -71,6 +71,6 @@ the existing pin continuity. Browse continues on the same map canvas.
 
 ## Related docs
 
-- [`design-direction-v6-home.md`](./design-direction-v6-home.md) §5.3 — hero inset
-- [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) §2 — full-bleed plate
-- [`design-direction-v6-entity.md`](./design-direction-v6-entity.md) §9 — map fail states
+- [`design-direction-v6-home.md`](./archive/design-direction-v6-home.md) §5.3 — hero inset
+- [`design-direction-v6-explore.md`](./archive/design-direction-v6-explore.md) §2 — full-bleed plate
+- [`design-direction-v6-entity.md`](./archive/design-direction-v6-entity.md) §9 — map fail states

@@ -11,7 +11,7 @@
  * height zero, not the floor. Lifting an empty decade to a visible bar would draw presence that
  * is not in the archive, and that is a different and worse lie than the one the floor fixes.
  *
- * Pure. See docs/ui/design-direction-v9-atlas.md §5.4.
+ * Pure. See docs/ui/archive/design-direction-v9-atlas.md §5.4.
  */
 
 export type DecadeCount = {

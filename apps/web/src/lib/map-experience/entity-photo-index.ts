@@ -72,7 +72,7 @@ export function buildEntityPhotoIndex(
   const index: Record<string, PinPhotoView> = {};
   for (const entity of entities) {
     // A quiet record keeps its photograph on its own page only, and a rendering is never shown
-    // as a photograph (docs/ui/patterns-living-archive.md, Plates).
+    // as a photograph (docs/ui/archive/patterns-living-archive.md, Plates).
     if (!entity.primaryImage || isQuietRecord(entity) || isRenderedImage(entity.primaryImage)) {
       continue;
     }

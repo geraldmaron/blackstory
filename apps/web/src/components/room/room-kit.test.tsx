@@ -1136,7 +1136,7 @@ describe('room kit · one public control system', () => {
 });
 
 /**
- * docs/ui/design-direction-v10-rooms.md: the standalone rooms share one look, and it is opt-in on
+ * docs/ui/archive/design-direction-v10-rooms.md: the standalone rooms share one look, and it is opt-in on
  * `Room` because Lives, the memorial wall and record pages share the kit. An opt-in drifts the
  * way the chapter pattern did, so the list of rooms that must carry it is pinned here.
  */

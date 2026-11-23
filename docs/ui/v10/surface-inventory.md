@@ -2,7 +2,7 @@
 
 **Status:** source-validated draft (2026-08-31). Rendered findings marked separately.  
 **Branch:** `cursor/v10-modernization`.  
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).  
+**Parent:** [`../design-direction-v10.md`](../archive/design-direction-v10.md).  
 **Audits:** [Web route inventory](9c0d6485-e773-46d8-9efa-1da92962f399), [Design doc drift](c062399d-d54d-49d1-9202-b7ca9ab225af), [Data schema cost](2af1e27f-f645-49bf-a2ae-760e9bdf262f), [Mobile + filters](4e28c3af-2658-413d-b1c4-b68e77073a8f).
 
 ## Public HTML routes

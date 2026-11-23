@@ -7,7 +7,7 @@
  * ESC. A shortcut spelled out in two places is the defect this package exists to prevent, so the
  * contract test asserts the two sets stay in step.
  *
- * Design law: docs/ui/design-direction-v9-atlas.md §7.
+ * Design law: docs/ui/archive/design-direction-v9-atlas.md §7.
  */
 
 import {

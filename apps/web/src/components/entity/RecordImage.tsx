@@ -1,7 +1,7 @@
 /**
  * A record's own rights-cleared photograph, or nothing.
  *
- * `plate` shows the same photograph as a plate (docs/ui/patterns-living-archive.md): toned in ink
+ * `plate` shows the same photograph as a plate (docs/ui/archive/patterns-living-archive.md): toned in ink
  * and copper by CSS (`.ds-plate`, packages/ui components.css), cover-fit to the box it leads, with
  * the same credit line beside it, unaltered. Only ever a real, sourced photograph; never on the
  * memorial or a sensitive or violence-adjacent record (callers decide; those show it plain).

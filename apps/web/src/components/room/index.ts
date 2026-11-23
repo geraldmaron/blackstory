@@ -1,7 +1,7 @@
 /**
  * The v9 room kit — the shared surface vocabulary for Reading, Record and Utility rooms.
  *
- * Design law: docs/ui/design-direction-v9-surfaces.md §2 and §4. Every room imports from here
+ * Design law: docs/ui/archive/design-direction-v9-surfaces.md §2 and §4. Every room imports from here
  * and from exactly one of `reading-room.css`, `record-page.css` or `utility.css`. Nothing
  * under `apps/web/src/app` may add another `*-edition.css` or `*-panel-chrome.ts`; the guard
  * lives in `room-kit.test.tsx`.

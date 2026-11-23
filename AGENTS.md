@@ -111,10 +111,10 @@ Serve from `apps/web/public/brand/` (masters in root `brand/`).
 | Doc | Scope |
 |---|---|
 | [`docs/ui/PROTECTED-EXPERIENCES.md`](docs/ui/PROTECTED-EXPERIENCES.md) | Memorial + evidence/precision/dignity/public/brand laws |
-| [`docs/ui/design-direction-v10.md`](docs/ui/design-direction-v10.md) | Product thesis, visual models, surface law, authority order |
+| [`docs/ui/DESIGN.md`](docs/ui/DESIGN.md) | The one design system: grounds, type, exhibit frame, components, anchor pages, gates, phases. Earlier directions are history in `docs/ui/archive/` |
 | [`docs/ui/brand.md`](docs/ui/brand.md) | Palette, type, mark, copper discipline |
 | [`docs/ui/v10/`](docs/ui/v10/) | Inventory, DiscoveryState, Place anatomy, research, cost, reconciliation |
-| [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` tab bar, More menu, shell chrome (until v10 mobile packet) |
+| [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` tab bar, More menu, shell chrome (until `DESIGN.md` phase 9) |
 | [`docs/ui/patterns-*.md`](docs/ui/) | Reusable site patterns (map encoding, record anatomy, …) |
 | [`docs/ui/story.md`](docs/ui/story.md) | Voice, microcopy, narrative arc |
 

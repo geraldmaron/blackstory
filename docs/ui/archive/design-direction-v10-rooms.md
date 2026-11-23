@@ -1,9 +1,9 @@
 # BlackStory design direction v10: rooms
 
 **Status:** binding for standalone rooms (2026-09-20). Companion to [`design-direction-v10.md`](./design-direction-v10.md); sits at authority level 4 in its order.
-**Decided by:** Gerald, 2026-09-20, from the review page at [`prototypes/rooms-directions.html`](./prototypes/rooms-directions.html): Direction A (Ledger, louder) plus Direction B's document plate. Headline copy approved the same day.
+**Decided by:** Gerald, 2026-09-20, from the review page at [`prototypes/rooms-directions.html`](../prototypes/rooms-directions.html): Direction A (Ledger, louder) plus Direction B's document plate. Headline copy approved the same day.
 **Tracked in:** repo-vac3x.1.14.
-**Amends:** [`patterns-room-section.md`](./patterns-room-section.md) (scale and plate weight). Does not amend `brand.md` or `PROTECTED-EXPERIENCES.md`.
+**Amends:** [`patterns-room-section.md`](../patterns-room-section.md) (scale and plate weight). Does not amend `brand.md` or `PROTECTED-EXPERIENCES.md`.
 
 ---
 

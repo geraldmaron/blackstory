@@ -4,7 +4,7 @@ explanation, `success` for a receipt, and `warning` only for something the reade
 The tone shows in the edge, the tint and the cue; the title and body stay in ink.
 # Brand: usage contract
 
-> **v11 (2026-11-20):** the visual half of this contract (palette roles, grounds, bands, the bans on gradient, glow and glass) is superseded on world surfaces by [`design-direction-v11.md`](./design-direction-v11.md) section 5. Marks, type families, the dignity rules and the accessibility floor are unchanged.
+> **v13 (2026-11-23):** [`DESIGN.md`](./DESIGN.md) is the design system. This file still binds for the marks, the brand swatches, the type families, the dignity rules and the accessibility floor. Its rules on grounds, radius, depth, plates, texture and motion (the sections marked below) are superseded by `DESIGN.md` section 7 and remain only as a description of what is still in code until each phase lands.
 
 > **Binding source (2026-07-18):** root `brand/` — BlackStory full polished kit
 > (book-and-pin symbol + wordmark, light/dark transparent lockups and symbols,
@@ -67,7 +67,7 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
    Inline links in operational notices use that theme-aware token, an underline, and a
    visible focus outline; browser-default blue does not provide dark-theme contrast.
 6. **Home layout.** The `/` surface follows
-   [design direction v10](./design-direction-v10.md) and its
+   [design direction v10](./archive/design-direction-v10.md) and its
    [reconciliation](./v10/design-doc-reconciliation.md); tokens and palette rules in this file
    govern the shared brand.
 
@@ -250,10 +250,14 @@ Every interactive element has all of these, in both themes:
 
 ## Shape and depth
 
+> Superseded by `DESIGN.md` sections 7.1 and 7.4: radius 0 for exhibits and sheets, 8px for
+> controls, full for chips; no glass or blur; a shadow only where something floats over the map.
+> The text below describes the code as it stands until phases 1 to 8 remove it.
+
 Radii 8/14/28px (sm/md/lg). The owner lifted the bans on gradients, glow,
 glass, backdrop blur, shadows and grain for the living-archive redesign
 (2026-11-15). Depth now comes from four planes, defined in
-[`patterns-living-archive.md`](./patterns-living-archive.md): the masthead
+[`patterns-living-archive.md`](./archive/patterns-living-archive.md): the masthead
 **field** a plate stands in (plain since the 2026-11-15 critique pass: a glow,
 vignette or grain that carries no information is decoration), **grounds** (ink,
 paper, sand, copper bands), **sheets** (paper with a real layered shadow,
@@ -268,13 +272,20 @@ no motion, and never lifted onto the home page.
 Place first; evidence visible; people with context — a person is always
 identified (PERSON / ROLE / PLACE / YEAR), never anonymous decoration.
 Avoid generic “Black history” stock imagery, sepia filters dropped on any
-image to make it look old, and maps without source/precision context. No
-AI-generated image ships anywhere on the site (owner decision 2026-11-15;
-`/about` promises it publicly).
+image to make it look old, and maps without source/precision context.
 
-**Plates.** The one large image treatment is the plate: a record's own sourced
-`primary_image` shown large and toned ink and copper (`.ds-plate`, see
-[`patterns-living-archive.md`](./patterns-living-archive.md#plates)). Real
+**Generated imagery (owner decision 2026-11-23, replacing 2026-11-15).** Nothing
+generated may depict a person, a place, a building, a document, a map or an
+event, anywhere on the site or in the app. Abstract textures made with an image
+generator may ship (the two named in `DESIGN.md` section 7.1), each recorded
+with its prompt in a manifest, and never over a photograph, a document or body
+text. Article covers stay hand-drawn scans, as `/about` and the FAQ say.
+
+**Plates.** Superseded by the exhibit frame (`DESIGN.md` section 7.3):
+photographs are shown in their own color, never toned, with the date basis
+stated. Until phase 3 the code still has the plate: a record's own sourced
+`primary_image` shown large (`.ds-plate`, see
+[`patterns-living-archive.md`](./archive/patterns-living-archive.md#plates)). Real
 sourced photographs only, never generated or stock; the credit line always
 visible beside it and never altered; never on the memorial or a sensitive or
 violence-adjacent record, which show the photograph plain or not at all; and

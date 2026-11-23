@@ -2,7 +2,7 @@
  * The record page (components/patterns/RecordPage.tsx): one anatomy for entity, place, invention,
  * law and book. The only stylesheet a record route loads besides the shared kit.
  *
- * Living archive (docs/ui/patterns-living-archive.md). The page changes ground as it goes down:
+ * Living archive (docs/ui/archive/patterns-living-archive.md). The page changes ground as it goes down:
  *
  *   field   the masthead, a plain ground: the record's name at display weight, the era numeral
  *           secondary beside the meta line. With the record's own photograph (`data-plate`) the

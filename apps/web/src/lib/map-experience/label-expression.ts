@@ -14,7 +14,7 @@
  * (county lines, memorial names) carry a plain `name` property and must keep using `['get','name']`
  * — routing them through this expression would imply a localisation they do not have.
  *
- * See docs/ui/design-direction-v9-atlas.md §3.
+ * See docs/ui/archive/design-direction-v9-atlas.md §3.
  */
 import type { ExpressionSpecification } from 'maplibre-gl';
 

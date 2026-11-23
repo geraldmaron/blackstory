@@ -1,5 +1,5 @@
 /**
- * `/` is the home page (docs/ui/design-direction-v12.md): the title, a journey across the shared
+ * `/` is the home page (docs/ui/archive/design-direction-v12.md): the title, a journey across the shared
  * map plate, the country, the stories and the receipts. The map itself is `/explore`.
  */
 import type { Metadata } from 'next';

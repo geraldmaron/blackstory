@@ -1,23 +1,23 @@
 # BlackStory design direction v10
 
 **Status:** binding (2026-08-31) for product architecture, surface law, and modernization work. Its visual models are superseded by [`design-direction-v11.md`](./design-direction-v11.md) (binding 2026-11-20).  
-**Protected overrides:** [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md).  
-**Brand (unchanged):** [`brand.md`](./brand.md).  
+**Protected overrides:** [`PROTECTED-EXPERIENCES.md`](../PROTECTED-EXPERIENCES.md).  
+**Brand (unchanged):** [`brand.md`](../brand.md).  
 **Audit/implementation branch:** `cursor/v10-modernization` @ merge of door tip `f101724f` + `staging` launch-gate.
 
-Companion packets live under [`v10/`](./v10/):
+Companion packets live under [`v10/`](../v10):
 
 | Packet | File |
 |---|---|
-| Surface inventory | [`v10/surface-inventory.md`](./v10/surface-inventory.md) |
-| Mobile inventory | [`v10/mobile-inventory.md`](./v10/mobile-inventory.md) |
-| Research findings | [`v10/research-findings.md`](./v10/research-findings.md) |
-| DiscoveryState / filters | [`v10/discovery-state.md`](./v10/discovery-state.md) |
-| Place anatomy | [`v10/place-anatomy.md`](./v10/place-anatomy.md) |
-| Element × data matrix | [`v10/element-data-matrix.md`](./v10/element-data-matrix.md) |
-| Schema & cost | [`v10/schema-cost-audit.md`](./v10/schema-cost-audit.md) |
-| Design-doc reconciliation | [`v10/design-doc-reconciliation.md`](./v10/design-doc-reconciliation.md) |
-| Implementation plan | [`v10/implementation-plan.md`](./v10/implementation-plan.md) |
+| Surface inventory | [`v10/surface-inventory.md`](../v10/surface-inventory.md) |
+| Mobile inventory | [`v10/mobile-inventory.md`](../v10/mobile-inventory.md) |
+| Research findings | [`v10/research-findings.md`](../v10/research-findings.md) |
+| DiscoveryState / filters | [`v10/discovery-state.md`](../v10/discovery-state.md) |
+| Place anatomy | [`v10/place-anatomy.md`](../v10/place-anatomy.md) |
+| Element × data matrix | [`v10/element-data-matrix.md`](../v10/element-data-matrix.md) |
+| Schema & cost | [`v10/schema-cost-audit.md`](../v10/schema-cost-audit.md) |
+| Design-doc reconciliation | [`v10/design-doc-reconciliation.md`](../v10/design-doc-reconciliation.md) |
+| Implementation plan | [`v10/implementation-plan.md`](../v10/implementation-plan.md) |
 
 ---
 
@@ -158,12 +158,12 @@ Emitted by `apps/web/src/lib/nav/surface-classes.ts`. v10 locks this as the live
 
 When documents conflict:
 
-1. [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md)
-2. [`brand.md`](./brand.md)
+1. [`PROTECTED-EXPERIENCES.md`](../PROTECTED-EXPERIENCES.md)
+2. [`brand.md`](../brand.md)
 3. **This document (v10)**
 4. v10 companion packets under `docs/ui/v10/`
 5. Still-valid pattern docs amended by v10 (`patterns-map-*`, `patterns-record-*`, Memorial implementation notes)
-6. v9 docs — **amended or superseded** per [`v10/design-doc-reconciliation.md`](./v10/design-doc-reconciliation.md)
+6. v9 docs — **amended or superseded** per [`v10/design-doc-reconciliation.md`](../v10/design-doc-reconciliation.md)
 7. v6 and earlier — archival provenance only
 
 Running code on `cursor/v10-modernization` that conflicts with a lower document wins until the document is updated in the same change.

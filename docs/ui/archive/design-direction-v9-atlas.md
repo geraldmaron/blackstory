@@ -5,10 +5,10 @@
 Live Atlas instrument scope is `/explore` only. Product thesis amended: relationships are the product; the map is the spatial spine.
 
 **Historical status:** binding (2026-07-30) until v10.  
-**Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html). Runnable, MapLibre-backed, owner-reviewed. The same build now carries the room layer for the four non-instrument surface classes.
+**Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../../.design-mocks/blackstory-atlas-v9.html). Runnable, MapLibre-backed, owner-reviewed. The same build now carries the room layer for the four non-instrument surface classes.
 **Companion:** [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) — also superseded by v10 for route membership.
-**Supersedes:** `design-direction-v6-home.md` (all), `design-direction-v6-explore.md` (all), `design-direction-v6-search.md` (already a redirect stub). Every other v6 surface doc is superseded by the companion, not by this one. None is deleted: they stay in `docs/ui/` as the provenance record, and [`README.md`](./README.md) marks each one superseded in the pattern index.
-**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type, dignity law; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); (rewritten 2026-11-13: point marks by precision, grouping in [`patterns-place-map.md`](./patterns-place-map.md)); [`patterns-map-canvas.md`](./patterns-map-canvas.md); `../decisions-carryover.md`, "Persistent map canvas", ADR-017 map handoff; WCAG AA floor.
+**Supersedes:** `design-direction-v6-home.md` (all), `design-direction-v6-explore.md` (all), `design-direction-v6-search.md` (already a redirect stub). Every other v6 surface doc is superseded by the companion, not by this one. None is deleted: they stay in `docs/ui/` as the provenance record, and [`README.md`](../README.md) marks each one superseded in the pattern index.
+**Unchanged and still binding:** [`brand.md`](../brand.md) tokens, palette, type, dignity law; [`patterns-map-entity-encoding.md`](../patterns-map-entity-encoding.md); (rewritten 2026-11-13: point marks by precision, grouping in [`patterns-place-map.md`](../patterns-place-map.md)); [`patterns-map-canvas.md`](../patterns-map-canvas.md); `../decisions-carryover.md`, "Persistent map canvas", ADR-017 map handoff; WCAG AA floor.
 
 ---
 
@@ -160,7 +160,7 @@ Mobile (<820px): drop the mode switch labels and the `ATLAS` tag; keep symbol + 
 
 #### The brand zone carries no wordmark
 
-An earlier version of this section specified "book-and-pin symbol (24px) + `BlackStory` wordmark + `ATLAS` mono tag". That is a reconstructed lockup, and [`brand.md`](./brand.md) lists it under Misuse (never): "Reconstruct the lockup by typing the wordmark beside a symbol render." `brand.md` is the usage contract and it wins. The bar renders official symbol artwork alone, plus the mono tag.
+An earlier version of this section specified "book-and-pin symbol (24px) + `BlackStory` wordmark + `ATLAS` mono tag". That is a reconstructed lockup, and [`brand.md`](../brand.md) lists it under Misuse (never): "Reconstruct the lockup by typing the wordmark beside a symbol render." `brand.md` is the usage contract and it wins. The bar renders official symbol artwork alone, plus the mono tag.
 
 Both symbol files ship as a light and dark transparent pair, `BRAND_ASSETS.symbol.light` and `BRAND_ASSETS.symbol.dark`. Swap the source on `data-theme`. Never recolor one variant into the other with a CSS filter: brand.md permits no recolor beyond the approved pair.
 
@@ -419,8 +419,8 @@ This document supersedes, in full:
 - `design-direction-v6-explore.md`
 - `design-direction-v6-search.md`
 
-They are not deleted. They stay in `docs/ui/` as the provenance record for why v9 exists, and [`README.md`](./README.md)'s pattern index marks each one superseded.
+They are not deleted. They stay in `docs/ui/` as the provenance record for why v9 exists, and [`README.md`](../README.md)'s pattern index marks each one superseded.
 
 `brand.md`, `patterns-map-entity-encoding.md` (rewritten 2026-11-13; see `patterns-place-map.md`), `patterns-map-canvas.md`, `patterns-record-anatomy.md`, `patterns-browse-mode.md` and `patterns-edition-fact-icon.md` remain binding and are consumed by v9 unchanged.
 
-Every surface outside the instrument is resolved by [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) and the pattern docs it spawned: [`patterns-surface-classes.md`](./patterns-surface-classes.md), [`patterns-plate-posture.md`](./patterns-plate-posture.md), [`patterns-reading-room.md`](./patterns-reading-room.md), [`patterns-record-page.md`](./patterns-record-page.md), [`patterns-lens-handoff.md`](./patterns-lens-handoff.md) and [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md). An earlier version of this line parked those surfaces on their v6 documents until separately revised. That revision is the companion, and it is written.
+Every surface outside the instrument is resolved by [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) and the pattern docs it spawned: [`patterns-surface-classes.md`](../patterns-surface-classes.md), [`patterns-plate-posture.md`](../patterns-plate-posture.md), [`patterns-reading-room.md`](../patterns-reading-room.md), [`patterns-record-page.md`](../patterns-record-page.md), [`patterns-lens-handoff.md`](../patterns-lens-handoff.md) and [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md). An earlier version of this line parked those surfaces on their v6 documents until separately revised. That revision is the companion, and it is written.

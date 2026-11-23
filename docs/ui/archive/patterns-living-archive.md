@@ -53,7 +53,7 @@ depth, and stays out (door-home.test.ts asserts it).
 
 ## Type roles
 
-Seven roles; weight is an axis. Full table in [`brand.md`](./brand.md#type).
+Seven roles; weight is an axis. Full table in [`brand.md`](../brand.md#type).
 
 - **Display** `--ds-text-display`, Schibsted 800, once per surface (the home opening, a record's
   name). Ceiling 6.5rem.

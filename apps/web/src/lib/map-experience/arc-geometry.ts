@@ -11,7 +11,7 @@
  * distance: unclamped, a Houston to Los Angeles corridor at continental zoom bows so far it
  * leaves the viewport and the endpoints stop reading as connected at all.
  *
- * See docs/ui/design-direction-v9-atlas.md §6 and docs/ui/patterns-atlas-instrument.md.
+ * See docs/ui/archive/design-direction-v9-atlas.md §6 and docs/ui/patterns-atlas-instrument.md.
  */
 
 export type ScreenPoint = { readonly x: number; readonly y: number };

@@ -128,9 +128,9 @@ The hero is **one Surface card** containing copy and map. It is **not** a full-v
 - Camera: after inset apply, national `fitBounds` uses `heroNationalCameraPadding` (left ≈ 22% copy width on desktop; top ≈ 35% copy height when stacked) so western states sit under the words while CONUS framing stays mostly in the map readout. Bounds padding is applied once in `cameraForBounds` only.
 - `engage()` clears the hero geometry before routing to `/explore` (`../decisions-carryover.md`, "Persistent map canvas", ADR-017 handoff).
 
-**Cross-browser (Safari, Chrome, Firefox; mobile WebKit):** Hero inset uses viewport-fixed geometry from `hero-map-inset.ts`, not `clip-path` (Safari WebGL compositing). Inset resyncs on scroll, resize, and `orientationchange`; MapStage calls `resize()` after each apply and reframes national when panel size changes. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
+**Cross-browser (Safari, Chrome, Firefox; mobile WebKit):** Hero inset uses viewport-fixed geometry from `hero-map-inset.ts`, not `clip-path` (Safari WebGL compositing). Inset resyncs on scroll, resize, and `orientationchange`; MapStage calls `resize()` after each apply and reframes national when panel size changes. See [`patterns-map-canvas.md`](../patterns-map-canvas.md).
 
-**Binding pattern:** The hero map implements the **Rest → Invite → Engaged** state machine from [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) — map locked on load (Rest), scroll-driven camera flights on beats 01–05 (Invite), and manual explore hand-off to `/explore` (Engaged).
+**Binding pattern:** The hero map implements the **Rest → Invite → Engaged** state machine from [`patterns-cinematic-map.md`](../patterns-cinematic-map.md) — map locked on load (Rest), scroll-driven camera flights on beats 01–05 (Invite), and manual explore hand-off to `/explore` (Engaged).
 
 ### 5.4 Mobile
 
@@ -168,7 +168,7 @@ Header separated from body by bottom Rule hairline (except beat 05 inline header
 - **Record carousel** (primary column): focusable region (`tabindex="0"`), `aria-roledescription="carousel"`.
   - Toolbar: shared `RecordBrowseControls` pattern — prev/next arrows (44px targets), optional dot rail (≤12 items), segmented **Ordered / Random** toggle, live position (`n / N` mono in ordered mode; `Random · N records` in random mode). See `docs/ui/patterns-browse-mode.md`.
   - Data: full active-release entity set (curated featured ids lead when present; every other release record follows without duplicates).
-  - **Facts strip:** inline Kind / Where / Era / Evidence rows beside map preview (see [`patterns-record-anatomy.md`](./patterns-record-anatomy.md)).
+  - **Facts strip:** inline Kind / Where / Era / Evidence rows beside map preview (see [`patterns-record-anatomy.md`](../patterns-record-anatomy.md)).
   - Slide body: kind slug, Sora name, serif one-line story, actions.
   - **One copper CTA per slide:** "Open full record". Quiet secondary: "Show on map".
   - Keyboard: ArrowLeft / ArrowRight. Reduced motion: cut transitions, no auto-advance.
@@ -209,7 +209,7 @@ Population data is **context for place**, not a substitute for it. No hate-crime
 
 ## 7. Footer on home
 
-Home footer is a **Surface card**, not the v5 fixed-ink band. Sitewide footer follows the same pattern — see [`patterns-site-footer.md`](./patterns-site-footer.md).
+Home footer is a **Surface card**, not the v5 fixed-ink band. Sitewide footer follows the same pattern — see [`patterns-site-footer.md`](../patterns-site-footer.md).
 
 | Element | Spec |
 |---|---|

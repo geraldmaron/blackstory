@@ -2,7 +2,7 @@
  * The breadcrumb chain, computed once from the destination registry rather than hand-written
  * per page.
  *
- * Design law: docs/ui/design-direction-v9-surfaces.md §4 — "Explore / <parent chain> / here, every
+ * Design law: docs/ui/archive/design-direction-v9-surfaces.md §4 — "Explore / <parent chain> / here, every
  * step a real link". The reason this is resolved from a table and not a prop each room fills in
  * is that a hand-written chain drifts: twenty-one screens each typing their own parent is how the
  * v6 edition system ended up with twenty-one different headers.

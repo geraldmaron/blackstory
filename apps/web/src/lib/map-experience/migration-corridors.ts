@@ -8,7 +8,7 @@
  * literal type, so a caller cannot widen a corridor into an itinerary without changing the type
  * and reading this comment.
  *
- * Every corridor carries the honesty note required by docs/ui/design-direction-v9-atlas.md §6.
+ * Every corridor carries the honesty note required by docs/ui/archive/design-direction-v9-atlas.md §6.
  * Any surface that renders a corridor must surface that note.
  */
 

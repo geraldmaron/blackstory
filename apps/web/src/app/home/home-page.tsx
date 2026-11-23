@@ -1,5 +1,5 @@
 /**
- * `/`: the home page (docs/ui/design-direction-v12.md, "On the Ground").
+ * `/`: the home page (docs/ui/archive/design-direction-v12.md, "On the Ground").
  *
  * A page of ordinary sections over the persistent map, in reading order: the title (what this
  * is, in one sentence, with real photographs and the lead story), the journey (a few records,

@@ -12,7 +12,7 @@
  * The context's members are required, not optional: a surface that mounts the palette without
  * wiring `copyCitation` should fail to typecheck, not silently give the reader a dead menu row.
  *
- * See docs/ui/design-direction-v9-atlas.md §7 and docs/ui/patterns-atlas-instrument.md.
+ * See docs/ui/archive/design-direction-v9-atlas.md §7 and docs/ui/patterns-atlas-instrument.md.
  */
 
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';

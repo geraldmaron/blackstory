@@ -4,7 +4,7 @@
  * The accessed date is injected rather than read from the clock so a citation is reproducible in
  * tests and identical for every reader rendering the same record on the same day.
  *
- * Format is fixed by docs/ui/design-direction-v9-atlas.md §7 and must not be re-punctuated:
+ * Format is fixed by docs/ui/archive/design-direction-v9-atlas.md §7 and must not be re-punctuated:
  *   "{name}." BlackStory Archive, {place}, {era}. Evidence grade {grade}, {n} sources. Accessed {YYYY-MM-DD}. {url}
  */
 

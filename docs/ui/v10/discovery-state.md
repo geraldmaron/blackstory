@@ -1,7 +1,7 @@
 # v10 DiscoveryState and filter architecture
 
 **Status:** draft binding (implementation in progress).  
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).
+**Parent:** [`../design-direction-v10.md`](../archive/design-direction-v10.md).
 
 ## Canonical shape
 

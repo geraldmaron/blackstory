@@ -1,6 +1,6 @@
 # v10 implementation plan (P0–P3)
 
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).
+**Parent:** [`../design-direction-v10.md`](../archive/design-direction-v10.md).
 
 ## P0 — Architecture contradictions and comprehension failures
 

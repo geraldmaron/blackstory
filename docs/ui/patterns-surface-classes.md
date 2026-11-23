@@ -1,8 +1,8 @@
 # Surface classes
 
-**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) sections 2 and 4. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html), where the same attribute drives the room layer's `data-cls`.
+**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) sections 2 and 4. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html), where the same attribute drives the room layer's `data-cls`.
 
-> **v11 (2026-11-20):** [`design-direction-v11.md`](./design-direction-v11.md) is binding and changes this pattern on home, Explore and place records. This document still describes every surface v11 has not reached; its rewrite is owed (v11 section 21).
+> **v11 (2026-11-20):** [`design-direction-v11.md`](./archive/design-direction-v11.md) is binding and changes this pattern on home, Explore and place records. This document still describes every surface v11 has not reached; its rewrite is owed (v11 section 21).
 
 ---
 
@@ -27,7 +27,7 @@ That attribute is the single switch every shell rule, plate posture, keyboard sc
 
 ## 2. Which routes are in each class
 
-Verdicts and URL dispositions are in [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) section 4. This is the class membership only.
+Verdicts and URL dispositions are in [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) section 4. This is the class membership only.
 
 ### Door (`/` + `/explore`)
 
@@ -62,7 +62,7 @@ Kept in `SurfaceClass` for plate-posture helpers and shell CSS. Do not classify 
 | `/methodology` | Built from the live `Citation`, `Confidence` and `Notice` components. |
 | `/errata` | The corrections log as a plain reverse chronological list. |
 
-Pattern: [`patterns-reading-room.md`](./patterns-reading-room.md). `/chapters` and `/chapters/[slug]` additionally have [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md).
+Pattern: [`patterns-reading-room.md`](./patterns-reading-room.md). `/chapters` and `/chapters/[slug]` additionally have [`design-direction-v9-chapters.md`](./archive/design-direction-v9-chapters.md).
 
 ### Record page (4)
 

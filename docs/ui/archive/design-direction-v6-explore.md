@@ -40,11 +40,11 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 
 **Banned on explore (carried from brand + v6 home):** shadows, gradients, glows, bevels, `backdrop-filter` blur, fixed-ink panel stamps (`--ds-fixed-*`) on instrument/results/restore surfaces.
 
-**Gesture contract:** `.ds-explore-stage` is `pointer-events: none` so map gaps stay pannable; instruments, records, notice, and spotlight panels re-enable hits with `touch-action: pan-y` and `overscroll-behavior: contain` so sheet/rail scroll does not leak into MapLibre drag. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
+**Gesture contract:** `.ds-explore-stage` is `pointer-events: none` so map gaps stay pannable; instruments, records, notice, and spotlight panels re-enable hits with `touch-action: pan-y` and `overscroll-behavior: contain` so sheet/rail scroll does not leak into MapLibre drag. See [`patterns-map-canvas.md`](../patterns-map-canvas.md).
 
-**Cross-browser:** Explore clears hero inset on mount and calls `MapStage.resize()` for full-bleed geometry. The persistent plate uses shared lifecycle hooks (`orientationchange`, `visibilitychange`, `ResizeObserver`) and degrades to the accessible list when WebGL fails. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
+**Cross-browser:** Explore clears hero inset on mount and calls `MapStage.resize()` for full-bleed geometry. The persistent plate uses shared lifecycle hooks (`orientationchange`, `visibilitychange`, `ResizeObserver`) and degrades to the accessible list when WebGL fails. See [`patterns-map-canvas.md`](../patterns-map-canvas.md).
 
-**Binding pattern:** The map interaction implements the **Rest → Engaged** state machine from [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) (dense utility surface, no Invite scroll-scene). Instruments and records stay locked to the page; the full map surface activates only when the reader explicitly engages.
+**Binding pattern:** The map interaction implements the **Rest → Engaged** state machine from [`patterns-cinematic-map.md`](../patterns-cinematic-map.md) (dense utility surface, no Invite scroll-scene). Instruments and records stay locked to the page; the full map surface activates only when the reader explicitly engages.
 
 ---
 
@@ -100,7 +100,7 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 1. **Edition kicker** — mono uppercase copper slug: `Map instruments` (visible label; tabs remain primary).
 2. **Place search** — address/entity finder + radius chips (44px targets).
 3. **Place focus status** — live region when a radius search is active.
-4. **Kind chips** — five-family segment strip (see [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md)) with counts; All + families, aria-pressed selection.
+4. **Kind chips** — five-family segment strip (see [`patterns-map-entity-encoding.md`](../patterns-map-entity-encoding.md)) with counts; All + families, aria-pressed selection.
 5. **Primary facet rows** — Theme · Where; label + select per row. Era lives on the decade rail (§4.4), never as a dropdown here.
 6. **More filters disclosure** — Tone · Status · Confidence selects. URL-addressable archival instruments; the disclosure opens automatically when a deep link carries one.
 7. **Clear filters** — quiet secondary when any facet differs from default.
@@ -120,7 +120,7 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 ### 4.3 Color key tab
 
 - Embedded `MapExperienceLegend` (no separate floating legend box).
-- Lists **five kind families**, three historical tones, single-record size scale, cluster size steps, and confidence tiers — same vocabulary as map paint ([`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md)).
+- Lists **five kind families**, three historical tones, single-record size scale, cluster size steps, and confidence tiers — same vocabulary as map paint ([`patterns-map-entity-encoding.md`](../patterns-map-entity-encoding.md)).
 - Mono subheads; family glyphs match explore pins; population tiers cite source notes.
 
 ---

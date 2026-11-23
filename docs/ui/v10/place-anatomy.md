@@ -1,7 +1,7 @@
 # v10 Place / Entity anatomy
 
 **Status:** binding target for `/place/[slug]`.  
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).  
+**Parent:** [`../design-direction-v10.md`](../archive/design-direction-v10.md).  
 **Protected:** evidence honesty, precision honesty, dignity ([`../PROTECTED-EXPERIENCES.md`](../PROTECTED-EXPERIENCES.md)).
 
 ## Current state (source-validated)

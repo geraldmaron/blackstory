@@ -1,7 +1,7 @@
 # v9 Atlas — implementation plan for delegated agents
 
 **Companion to:** [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) (the design law)
-**Reference build:** [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (runnable; open it before writing any code)
+**Reference build:** [`.design-mocks/blackstory-atlas-v9.html`](../../../.design-mocks/blackstory-atlas-v9.html) (runnable; open it before writing any code)
 **Written:** 2026-07-30
 **Target executors:** Claude Sonnet and Claude Haiku subagents, one work package per agent.
 
@@ -29,7 +29,7 @@ Do not send a Sonnet package to Haiku. Packages are marked; the mark is binding.
 > You are implementing one work package for the BlackStory v9 Atlas redesign.
 >
 > **Read first, in this order:**
-> 1. `docs/ui/design-direction-v9-atlas.md` — the binding design law
+> 1. `docs/ui/archive/design-direction-v9-atlas.md` — the binding design law
 > 2. `docs/ui/brand.md` — tokens, palette, type, dignity rules (still binding, unchanged)
 > 3. `.design-mocks/blackstory-atlas-v9.html` — the reference implementation. Open it in a browser. Your output should match its behavior, not its code structure.
 > 4. The specific files listed in your work package
@@ -601,7 +601,7 @@ that is still the old surface loses a working route and gains nothing.
 ### WP-26 · Docs and supersession — **Haiku**
 
 **Depends on:** all of P0 to P5.
-**Touches:** `docs/ui/README.md`, `docs/ui/design-direction-v6-home.md`, `design-direction-v6-explore.md`, `design-direction-v9-atlas.md`, `docs/ui/patterns-registry.md`, root `AGENTS.md` § UI Design Patterns.
+**Touches:** `docs/ui/README.md`, `docs/ui/archive/design-direction-v6-home.md`, `design-direction-v6-explore.md`, `design-direction-v9-atlas.md`, `docs/ui/patterns-registry.md`, root `AGENTS.md` § UI Design Patterns.
 
 - Flip v9's status line from `proposed` to `binding`
 - Add a supersession banner to the top of v6 home and v6 explore

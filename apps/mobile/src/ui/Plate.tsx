@@ -1,7 +1,7 @@
 /**
  * Photo plate: a record's own sourced photograph shown large, with its credit line always
  * shown beside it and never on the photograph. Mobile counterpart of web `.ds-plate`
- * (`docs/ui/patterns-living-archive.md`, "Plates"). Real, credited photographs only; callers
+ * (`docs/ui/archive/patterns-living-archive.md`, "Plates"). Real, credited photographs only; callers
  * skip the plate for the memorial and for sensitive or violence-adjacent records.
  * shortcut: the photograph is not duotone-toned as on web, add the tone when it can be done
  * without a second image file.

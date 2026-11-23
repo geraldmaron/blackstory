@@ -41,7 +41,7 @@ Import from `components/room`. CSS arrives with the kit.
 
 ## Ledger style (2026-09-20)
 
-[`design-direction-v10-rooms.md`](./design-direction-v10-rooms.md) restyles these blocks for the standalone rooms. It is opt-in on `<Room ledger>` because Lives, the memorial wall and record pages share the kit; `room-kit.test.tsx` pins the sixteen routes that carry it. Under it the plate is 64px and inverse (ink ground, canvas glyph), the heading takes `--ds-text-display-2`, the jump nav is one scrolling row of 44px pills with the current chapter inverse, and handoffs are ruled with 2px ink instead of hairlines. "No copper fill, no radius lift" still holds.
+[`design-direction-v10-rooms.md`](./archive/design-direction-v10-rooms.md) restyles these blocks for the standalone rooms. It is opt-in on `<Room ledger>` because Lives, the memorial wall and record pages share the kit; `room-kit.test.tsx` pins the sixteen routes that carry it. Under it the plate is 64px and inverse (ink ground, canvas glyph), the heading takes `--ds-text-display-2`, the jump nav is one scrolling row of 44px pills with the current chapter inverse, and handoffs are ruled with 2px ink instead of hairlines. "No copper fill, no radius lift" still holds.
 
 New kit modules that ship with it:
 

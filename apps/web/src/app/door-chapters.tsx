@@ -1,5 +1,5 @@
 /**
- * The Door below the fold, scrolling up over the fixed map (docs/ui/patterns-living-archive.md):
+ * The Door below the fold, scrolling up over the fixed map (docs/ui/archive/patterns-living-archive.md):
  *
  *   ink     how evidence is graded: one ruled row in the claims block's own language (the grade's
  *           glyph and word, the records holding it), on the table's ground, so the dark map

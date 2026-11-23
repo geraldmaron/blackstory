@@ -1,6 +1,6 @@
 /**
  * Design-system fixture gallery (Storybook equivalent) for component and token states.
- * Stays current with docs/ui/design-direction-v5.md — new shell patterns land here too.
+ * Stays current with docs/ui/archive/design-direction-v5.md — new shell patterns land here too.
  */
 
 import type { Metadata } from 'next';

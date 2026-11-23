@@ -1,6 +1,6 @@
 /**
  * Mobile elevation tokens: the web living-archive planes
- * (`docs/ui/patterns-living-archive.md`), from the same values.
+ * (`docs/ui/archive/patterns-living-archive.md`), from the same values.
  *
  *   sheet  reading paper and record surfaces (web `--ds-shadow-sheet`)
  *   lift   a linked sheet while pressed (web `--ds-shadow-lift`)

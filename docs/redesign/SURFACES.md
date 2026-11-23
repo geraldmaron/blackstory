@@ -10,7 +10,7 @@ describes the audit baseline; it is not a claim that every listed defect still e
 
 **v11:** this spec and the inventory predate the One World direction (binding 2026-11-20) and carry
 no v11 status. For which surfaces the v11 flagship branch has changed, see
-[`../ui/design-direction-v11.md`](../ui/design-direction-v11.md) section 20.
+[`../ui/design-direction-v11.md`](../ui/archive/design-direction-v11.md) section 20.
 
 **Inventory:** [`surface-inventory.json`](surface-inventory.json) maps all 66
 page modules and six shared surface groups to component sources, state applicability,

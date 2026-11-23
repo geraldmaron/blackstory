@@ -1,7 +1,7 @@
 /**
  * Record sheet: paper standing off the canvas with the web sheet shadow and an optional
  * hairline border. Mobile counterpart of web `.ds-sheet`
- * (`docs/ui/patterns-living-archive.md`). Pass `shadow="none"` for a panel that sits flush.
+ * (`docs/ui/archive/patterns-living-archive.md`). Pass `shadow="none"` for a panel that sits flush.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';

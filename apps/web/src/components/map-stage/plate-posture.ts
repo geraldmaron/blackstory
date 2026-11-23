@@ -2,7 +2,7 @@
  * The three postures the persistent map plate can hold, and the rule that resolves one from a
  * route's surface class.
  *
- * Design law: `docs/ui/design-direction-v9-surfaces.md` §3 and `docs/ui/patterns-plate-posture.md`.
+ * Design law: `docs/ui/archive/design-direction-v9-surfaces.md` §3 and `docs/ui/patterns-plate-posture.md`.
  *
  * The plate mounts once, above every route, and never reloads. What changes between routes is
  * only how it is painted:

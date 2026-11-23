@@ -1,6 +1,6 @@
 # Reading room
 
-**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) sections 2.2, 4.2 and 5. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`#doc`, `#docprog`, `.docwrap`, `.mapmoment`).
+**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) sections 2.2, 4.2 and 5. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`#doc`, `#docprog`, `.docwrap`, `.mapmoment`).
 
 The class covers the 11 routes listed in [`patterns-surface-classes.md`](./patterns-surface-classes.md): `/records`, `/history`, `/chapters`, `/chapters/[slug]`, `/books`, `/law`, `/data`, `/memorial`, `/about`, `/methodology`, `/errata`.
 

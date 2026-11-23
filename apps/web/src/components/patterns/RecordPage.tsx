@@ -13,7 +13,7 @@
  * On a phone the rail dissolves into the column (`display: contents`): media sits under the meta
  * line, and the actions become the sticky bottom row. Everything renders on the server.
  *
- * Living archive (docs/ui/patterns-living-archive.md): the masthead is a lamplit field with the
+ * Living archive (docs/ui/archive/patterns-living-archive.md): the masthead is a lamplit field with the
  * record's name leading at display weight and its era numeral secondary beside the meta line.
  * When the record has its own sourced photograph, that photograph leads the field as a plate
  * beside the name, toned ink and copper, its credit line under it. The record itself is one paper

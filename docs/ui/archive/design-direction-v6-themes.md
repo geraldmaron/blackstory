@@ -71,7 +71,7 @@ prose format and includes a labeled illustrative sample chapter.
 | Q3 | Cook County household · renter seeking ownership · South Side · 1990–2024 | Multi-year ownership spine | Fair Housing Act, Community Reinvestment Act |
 | Q4 | Robert S. Abbott · publisher · State Street, Bronzeville · 1919–1945 | Defender / YMCA streetscape | place entity binding |
 
-Validate current theme surfaces in the application under the maintained [design direction](design-direction-v10.md).
+Validate current theme surfaces in the application under the maintained [design direction](./design-direction-v10.md).
 
 ---
 

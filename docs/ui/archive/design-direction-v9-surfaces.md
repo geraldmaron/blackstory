@@ -4,10 +4,10 @@
 **Kept as provenance.** Route membership in this file (`/chapters`, Instrument on `/`, `/story`) does not match shipped code (`/stories`, Door on `/`, `/explore` instrument).
 
 **Historical status:** proposed (2026-07-30).  
-**Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html), extended with a room layer, the reading rooms, the record room, the records index, the legend overlay and the single-key toggle (packages SP-01 to SP-03 below).
+**Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../../.design-mocks/blackstory-atlas-v9.html), extended with a room layer, the reading rooms, the record room, the records index, the legend overlay and the single-key toggle (packages SP-01 to SP-03 below).
 **Companion:** [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) — also superseded for product shape.
 **Supersedes on approval (historical):** `design-direction-v6-history.md` (the route dissolves), `design-direction-v6-about.md`, `design-direction-v6-books.md`, `design-direction-v6-data.md`, `design-direction-v6-law.md`, `design-direction-v6-memorial.md`, `design-direction-v6-methodology.md`, `design-direction-v6-entity.md`, and `design-direction-v6-stories.md` and `design-direction-v6-themes.md`, whose routes no longer exist in the app directory. `patterns-utility-edition.md` is folded into the Utility class in section 2.4.
-**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type and dignity law; [`story.md`](./story.md) voice; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); (rewritten 2026-11-13: point marks by precision, grouping in [`patterns-place-map.md`](./patterns-place-map.md)); [`patterns-map-canvas.md`](./patterns-map-canvas.md); [`patterns-record-anatomy.md`](./patterns-record-anatomy.md); [`patterns-browse-mode.md`](./patterns-browse-mode.md); [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md); [`patterns-site-footer.md`](./patterns-site-footer.md); `../decisions-carryover.md`, "Persistent map canvas", ADR-017 map handoff; WCAG AA floor. Protected experiences and v10 override conflicts.
+**Unchanged and still binding:** [`brand.md`](../brand.md) tokens, palette, type and dignity law; [`story.md`](../story.md) voice; [`patterns-map-entity-encoding.md`](../patterns-map-entity-encoding.md); (rewritten 2026-11-13: point marks by precision, grouping in [`patterns-place-map.md`](../patterns-place-map.md)); [`patterns-map-canvas.md`](../patterns-map-canvas.md); [`patterns-record-anatomy.md`](../patterns-record-anatomy.md); [`patterns-browse-mode.md`](../patterns-browse-mode.md); [`patterns-edition-fact-icon.md`](../patterns-edition-fact-icon.md); [`patterns-site-footer.md`](../patterns-site-footer.md); `../decisions-carryover.md`, "Persistent map canvas", ADR-017 map handoff; WCAG AA floor. Protected experiences and v10 override conflicts.
 
 ---
 
@@ -409,7 +409,7 @@ Mobile and editorial: folding `/locate` into a rail that is `display:none` below
 
 ## 7. New patterns this requires
 
-Each of these gets a pattern doc under `docs/ui/` and a row in [`README.md`](./README.md)'s pattern index (SP-04).
+Each of these gets a pattern doc under `docs/ui/` and a row in [`README.md`](../README.md)'s pattern index (SP-04).
 
 | Pattern | Law |
 |---|---|
@@ -468,7 +468,7 @@ Twenty packages. SP-01 to SP-03 extend the mock (room layer and registry, palett
 
 **SP-03.** `.design-mocks/blackstory-atlas-v9.html`. `ROOMS.records`, `ROOMS.catalog`, `ROOMS.corrections`, `ROOMS.notfound`, the `#legendov` overlay, and the single-key toggle with a KEYMAP-generated shortcut table. Done when the records index renders from `visible()` so it and the results rail are provably the same query, the legend opens from three places, and every addition is reachable from at least two.
 
-**SP-04.** `docs/ui/design-direction-v9-atlas.md` (proposed to binding), this document, plus `patterns-plate-posture.md`, `patterns-surface-classes.md`, `patterns-reading-room.md`, `patterns-record-page.md`, `patterns-lens-handoff.md`, `design-direction-v9-chapters.md` (there is no binding doc for the largest publication surface today), and `README.md`. Done when every route in the resolution map has a named binding doc and README's pattern and route tables match the actual app directory.
+**SP-04.** `docs/ui/archive/design-direction-v9-atlas.md` (proposed to binding), this document, plus `patterns-plate-posture.md`, `patterns-surface-classes.md`, `patterns-reading-room.md`, `patterns-record-page.md`, `patterns-lens-handoff.md`, `design-direction-v9-chapters.md` (there is no binding doc for the largest publication surface today), and `README.md`. Done when every route in the resolution map has a named binding doc and README's pattern and route tables match the actual app directory.
 
 **SP-05.** `apps/web/src/lib/runtime-hardening/constants.ts`, `query-normalization.ts`, `edge-query-normalization.ts`, `apps/web/src/middleware.ts`, `apps/web/src/lib/map-experience/url-state.ts`. Done when a test fails if the parser reads a key the allowlist lacks or the builder emits one it lacks, `/law?q=voting&kind=statute` reaches the page with its filters, `/corrections?target=x&targetType=entity` reaches `CorrectionForm` with the prefill, `/history/api` receives its own query, and `lat`/`lng`/`zoom` are dropped by a documented policy line rather than by omission.
 

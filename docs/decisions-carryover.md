@@ -95,7 +95,7 @@ stay out of that cache. The explicit recent-search feature uses bounded, user-cl
 SecureStore storage and clears on fresh install. OTA releases follow signing, channel,
 compatibility, and rollback checks in `apps/mobile/src/updates/`.
 
-Map and interface behavior follows `docs/ui/design-direction-v10.md`, protected experiences,
+Map and interface behavior follows `docs/ui/archive/design-direction-v10.md`, protected experiences,
 brand tokens, and the existing components. Dark theme, focus behavior, precision context, and
 map dignity are requirements. Code comments explain behavior or constraints; session narration,
 issue IDs, old-state comparisons, and incidental verification dates belong in Git or Beads.

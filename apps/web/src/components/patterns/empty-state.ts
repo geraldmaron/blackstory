@@ -5,7 +5,7 @@
  * name the cause and offer the specific loosening that would refill the view, because a bare
  * "no results" invites the reader to conclude the record does not exist.
  *
- * Pure so the copy is testable without rendering. See docs/ui/design-direction-v9-atlas.md §7.
+ * Pure so the copy is testable without rendering. See docs/ui/archive/design-direction-v9-atlas.md §7.
  */
 
 export type LensConstraints = {

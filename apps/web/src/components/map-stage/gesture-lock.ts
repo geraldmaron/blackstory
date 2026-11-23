@@ -9,7 +9,7 @@
  *     and it replaces the two-finger "cooperative" mode this file used to apply, which nothing on
  *     a phone could reach because the page's own content sat on top of the map.
  *
- * Design law: `docs/ui/design-direction-v9-surfaces.md` §3.
+ * Design law: `docs/ui/archive/design-direction-v9-surfaces.md` §3.
  *
  *   live     the Instrument (Explore, the Door's "Browse the map"): `reader`.
  *   ambient  the Door's journey backdrop: `backdrop` on a precise pointer — a mouse drag is not

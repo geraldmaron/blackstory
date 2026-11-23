@@ -109,7 +109,7 @@ Framing label derives from status lifecycle (`deriveHistoricalFraming`), never h
 |---|---|
 | Index | `01` |
 | Kicker | `Anatomy` |
-| Body | `RecordAnatomyPanel` with inline Kind / Where / Era / Evidence rows (see [`patterns-record-anatomy.md`](./patterns-record-anatomy.md)) |
+| Body | `RecordAnatomyPanel` with inline Kind / Where / Era / Evidence rows (see [`patterns-record-anatomy.md`](../patterns-record-anatomy.md)) |
 | Facts | Kind · Where · Era · Evidence (same contract as home/explore) |
 | Place slot | `RecordPlacePreview` when geo exists; **Place not pinned** empty state when absent |
 | CTAs | Copper **Open in maps** (when href resolves) + quiet **View on national map** |
@@ -172,7 +172,7 @@ Context (the story) precedes Relevance (the archival justification).
 | Missing status (non-event) | Status beat omitted; gap disclosed in Provenance "Still being researched" list — not a silent empty |
 | MapLibre / WebGL fail | `EntityLocationMap` `role="status"` message; maps external link remains |
 
-**Cross-browser:** Mini-map mounts wait for non-zero layout (`waitForContainerLayout`), call `map.resize()` on orientation and tab visibility changes, and probe WebGL before construction. Record anatomy frames use explicit `7.5rem` height. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
+**Cross-browser:** Mini-map mounts wait for non-zero layout (`waitForContainerLayout`), call `map.resize()` on orientation and tab visibility changes, and probe WebGL before construction. Record anatomy frames use explicit `7.5rem` height. See [`patterns-map-canvas.md`](../patterns-map-canvas.md).
 | Why-this-appears throws | Fail-closed: section renders gap notice, page does not crash |
 
 ---
@@ -205,7 +205,7 @@ Context (the story) precedes Relevance (the archival justification).
 | View-model | `entity-view-model.ts` |
 | Media fail-closed | `EntityMastMedia.tsx`, `EntityRecordMark.tsx` |
 | Map fail-closed | `EntityLocationMap.tsx`, `RecordPlacePreview.tsx` |
-| Patterns | `RecordAnatomyPanel`, `EditionFactIcon`, `EditionAtmosphereMosaic`; layout [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) |
+| Patterns | `RecordAnatomyPanel`, `EditionFactIcon`, `EditionAtmosphereMosaic`; layout [`patterns-record-anatomy.md`](../patterns-record-anatomy.md) |
 
 ---
 

@@ -3,7 +3,7 @@
 /**
  * MapMoment — the plate, borrowed, inside a reading column.
  *
- * Design law: docs/ui/design-direction-v9-surfaces.md §4, patterns-reading-room.md.
+ * Design law: docs/ui/archive/design-direction-v9-surfaces.md §4, patterns-reading-room.md.
  * Reference build: `.design-mocks/blackstory-atlas-v9.html`, the `decorateDoc` moment builder and
  * the `frameMoment` / `pickMoment` pair.
  *

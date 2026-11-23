@@ -2,7 +2,7 @@
 
 **Status:** reusable site pattern (2026-07-23).  
 **Scope:** compact public pages that need v6 Surface stack + gutter mosaic without a full surface direction doc.  
-**Binding:** shares atmosphere + header vocabulary with [`design-direction-v6-about.md`](./design-direction-v6-about.md) §2.
+**Binding:** shares atmosphere + header vocabulary with [`design-direction-v6-about.md`](./archive/design-direction-v6-about.md) §2.
 
 ---
 

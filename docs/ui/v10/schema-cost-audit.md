@@ -1,7 +1,7 @@
 # v10 schema and cost audit
 
 **Status:** source-validated draft (2026-08-31).
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).
+**Parent:** [`../design-direction-v10.md`](../archive/design-direction-v10.md).
 **Branch:** `cursor/v10-modernization`.
 
 ## Persistence one-liner

@@ -19,7 +19,7 @@ const appDir = dirname(fileURLToPath(import.meta.url));
  *
  * `/locate` left this list in SP-14: it did not convert to the room kit, it folded into the
  * Atlas Lens's Where group (wide) and a dedicated place sheet (narrow) instead, per
- * `docs/ui/design-direction-v9-surfaces.md`'s `/locate` row. The standalone page and
+ * `docs/ui/archive/design-direction-v9-surfaces.md`'s `/locate` row. The standalone page and
  * `LocateExperience` are deleted; `/locate` now 308s to `/explore?find=place`
  * (`next-config-redirects.mjs`), and `/locate/api` is unchanged.
  */

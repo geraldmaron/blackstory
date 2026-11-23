@@ -14,7 +14,7 @@
  * into four color-blocked chapters (`door-chapters.tsx`) that slide up over the fixed map, then
  * the footer. Browse has neither.
  *
- * Living archive (docs/ui/patterns-living-archive.md): the map is the field. On a wide screen the
+ * Living archive (docs/ui/archive/patterns-living-archive.md): the map is the field. On a wide screen the
  * opening is a solid column down the left edge, beside the map rather than over it, led by the
  * spotlight record's own photograph as a plate with its name and receipts under it, then the
  * headline at headline scale. The map window is everything right of the column, so the country

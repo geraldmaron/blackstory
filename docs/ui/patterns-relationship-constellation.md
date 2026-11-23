@@ -1,7 +1,7 @@
 # Relationship constellation
 
 **Status:** binding for Place typed connections (v10).  
-**Parent:** [`design-direction-v10.md`](./design-direction-v10.md), [`v10/place-anatomy.md`](./v10/place-anatomy.md).
+**Parent:** [`design-direction-v10.md`](./archive/design-direction-v10.md), [`v10/place-anatomy.md`](./v10/place-anatomy.md).
 
 ## What it is
 

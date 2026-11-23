@@ -72,8 +72,8 @@ export function RoomKitGallery() {
         <code className="ds-mono">reading-room.css</code>,{' '}
         <code className="ds-mono">record-page.css</code> or{' '}
         <code className="ds-mono">utility.css</code>. Design law:{' '}
-        <code className="ds-mono">docs/ui/design-direction-v9-surfaces.md</code> §2 and §4, amended
-        by plan.md entry postures.
+        <code className="ds-mono">docs/ui/archive/design-direction-v9-surfaces.md</code> §2 and §4,
+        amended by plan.md entry postures.
       </p>
 
       <Specimen name="Breadcrumb" tokens={['--ds-accent', '--ds-ink-subtle', '--ds-font-mono']}>

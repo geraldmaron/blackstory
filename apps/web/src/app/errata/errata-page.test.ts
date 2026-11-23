@@ -1,7 +1,7 @@
 /**
  * Structural checks on the errata page and its feed route handlers: one shared entry list,
  * absolute feed URLs, and no disclosure markup anywhere on the surface.
- * docs/ui/design-direction-v9-surfaces.md §4.2, §4.5.
+ * docs/ui/archive/design-direction-v9-surfaces.md §4.2, §4.5.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

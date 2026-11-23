@@ -144,7 +144,7 @@ export const ABOUT_NEO = {
   ],
   hand: 'One part of this is made with a pen and stays that way. The cover plate on an article is a scan of a real drawing: dry felt-tip on cream paper, one weight of line, hatch fills, a sliver of burnt ochre. It is not a generated image and not a stock photo, and that’s enforced rather than promised. A plate whose file, link or caption points at a stock library or an image generator can’t publish.',
   photographs:
-    "A photograph shown large, at the top of a record or beside the map on the front page, is that record's own sourced image, toned to match the page. Its credit and license sit right beside it.",
+    "A photograph shown large, at the top of a record or beside the map on the front page, is that record's own sourced image, in its own color. Its credit and license sit right beside it. A few background textures, like paper fiber and a print dot screen, are made with an image generator. They're patterns, and they show no person, place, document or event.",
 } as const;
 
 /**

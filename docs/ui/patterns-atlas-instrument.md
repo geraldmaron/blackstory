@@ -1,6 +1,6 @@
 # Explore Instrument
 
-**Status: In build (v9).** The pattern the Instrument surface class is made of: `/` (the Explore map) and `/story`. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md), binding since 2026-07-30. Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./v9-atlas-implementation-plan.md).
+**Status: In build (v9).** The pattern the Instrument surface class is made of: `/` (the Explore map) and `/story`. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./archive/design-direction-v9-atlas.md), binding since 2026-07-30. Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./archive/v9-atlas-implementation-plan.md).
 
 Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, `../decisions-carryover.md`, "Persistent map canvas", ADR-017), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin shape by stored precision), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the 2×2 fact grid), [`brand.md`](./brand.md) (flat matte, copper discipline, dignity law).
 
@@ -144,7 +144,7 @@ Five instruments, each independently hideable to a dock chip.
 
 The center slot is the single most important change in v9: navigation moves into the palette, and the bar carries two modes instead of fourteen destinations. Below 820px, drop the mode-switch labels and the `ATLAS` tag.
 
-**No wordmark in the bar, and the symbol is sized by its visible mark, not its box.** Typing the wordmark beside a symbol render is a reconstructed lockup, which [`brand.md`](./brand.md) lists under Misuse (never). The symbol PNG is a 512x512 box holding a 181x292 mark, so visible height is box height x 0.57 and visible width is box height x 0.35. A 40px box in the 56px bar and a 36px box in the 50px compact bar clear brand.md's 20px compact-mark minimum; the 32px primary-mark minimum needs a 57px box, which does not fit. Full derivation and the lockup arithmetic are in [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) section 5.1.
+**No wordmark in the bar, and the symbol is sized by its visible mark, not its box.** Typing the wordmark beside a symbol render is a reconstructed lockup, which [`brand.md`](./brand.md) lists under Misuse (never). The symbol PNG is a 512x512 box holding a 181x292 mark, so visible height is box height x 0.57 and visible width is box height x 0.35. A 40px box in the 56px bar and a 36px box in the 50px compact bar clear brand.md's 20px compact-mark minimum; the 32px primary-mark minimum needs a 57px box, which does not fit. Full derivation and the lockup arithmetic are in [`design-direction-v9-atlas.md`](./archive/design-direction-v9-atlas.md) section 5.1.
 
 **Adoption gate:** every destination that leaves the bar (Data, Law, Banned books, Memorial, Methodology, Corrections, Errata, Submit) must be reachable from the palette **and** the site footer before this ships. No route may become unreachable.
 
