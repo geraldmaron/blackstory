@@ -3,21 +3,19 @@
  * Storage key and bootstrap script keep SSR HTML and ThemeToggle in sync
  * without a hydration flash.
  *
- * Ink direction (design handoff): "The light theme stays as it is; the direction changes
- * which one the bootstrap prefers by default." Before this, an unset preference fell through
- * to `prefers-color-scheme`, so a reader on a light-mode system saw the untouched light theme
- * — the Ink redesign only changed dark-theme tokens — and the whole redesign read as absent.
- * Dark is now the default whenever there is no explicit stored choice; a reader who explicitly
- * picks light still gets it, every time, via THEME_STORAGE_KEY.
+ * Paper is the default (docs/ui/DESIGN.md section 7.1, owner decision 2026-11-23): reading pages
+ * are paper sheets because classroom projectors and printers need them, and the map stays ink in
+ * both themes. The system preference is not consulted, so every reader without a stored choice
+ * sees the same page; a reader who picks dark keeps it via THEME_STORAGE_KEY.
  */
 
 import type { ThemeName } from '../tokens/colors.js';
 
 export const THEME_STORAGE_KEY = 'ds-theme';
 
-/** Resolve theme from localStorage, else dark (the Ink default). */
+/** Resolve theme from localStorage, else light (paper, the default). */
 export function resolvePreferredTheme(stored: string | null | undefined): ThemeName {
-  return stored === 'light' || stored === 'dark' ? stored : 'dark';
+  return stored === 'light' || stored === 'dark' ? stored : 'light';
 }
 
 /**
@@ -30,7 +28,7 @@ export function resolvePreferredTheme(stored: string | null | undefined): ThemeN
  * the tag regardless of quoting. `document-theme.test.ts` asserts this literal still equals
  * THEME_STORAGE_KEY, so the two cannot drift apart silently.
  */
-export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k='ds-theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`;
+export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k='ds-theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`;
 
 /**
  * Compile-time guarantee that the key inlined in THEME_BOOTSTRAP_SCRIPT is THEME_STORAGE_KEY.

@@ -341,7 +341,7 @@
 .ds-datafig__key {
   display: block;
   margin-bottom: var(--ds-space-3);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
 }
 
 .ds-datafig--half .ds-datafig__key {

@@ -143,7 +143,7 @@ A ground is a full surface with a meaning. There are four, and a page states whi
 
 | Ground | Color | Means | Used by |
 | ------ | ----- | ----- | ------- |
-| Ink | Black Ink, Charcoal for raised parts | The map: where | Archive map, map frames inside exhibits, the retelling, the memorial |
+| Ink | Black Ink, Charcoal for raised parts | The map: where | Archive map, map frames inside exhibits, the retelling |
 | Paper | Archive Paper, Surface for raised parts | The page: what is known | Records, stories, data, method pages, lists |
 | Copper | Copper, ink type | A turning point | At most once per page, and only in stories and the retelling's last scene |
 | Sand | Page Sand, ink type and an ink outline | A measured quantity | Fills inside figures only, never a page section |
@@ -268,7 +268,7 @@ Eight anchors. Everything else is a redirect or an arrangement of these.
 | Record | `/place/[slug]`, `/entity/[id]`, `/law/[slug]`, `/books/[slug]`, `/invention/[slug]` | Paper | One exhibit and its claims | Five page designs become one anatomy |
 | Story | `/stories`, `/stories/[slug]`, `/presidents/[slug]` | Paper, one copper turn | Documents | Stories index, chapters |
 | Data | `/data`, `/data/[figure]`, `/lives` and its children | Paper | Figures | Data, Lives, Lives explorer |
-| Memorial | `/memorial` | Ink, quiet | Names | Unchanged in substance |
+| Memorial | `/memorial` | Follows the theme: paper by default, ink in dark (owner, 2026-11-23). Quiet | Names | Unchanged in substance |
 | Method | `/about`, `/methodology`, `/sources`, `/errata`, `/faq`, corrections, legal | Paper | Text | One document layout for all |
 | System | `/design-system`, 404, error | Paper | The kit | Generated |
 
@@ -346,8 +346,9 @@ with the story, not derived from position.
 ### 9.4 Memorial
 
 **Is:** unchanged. The wall, its fading names, its press behavior and its accessible list stay
-exactly as built. The page picks up the kit's ink color tokens and type roles where the values
-are already equal, and nothing else. No exhibit frame, no crop marks, no figure numbers, no
+exactly as built. The page follows the reader's theme as it always has, so it opens on paper by default
+since phase 1 and on ink in dark (owner decision 2026-11-23). It picks up the kit's color
+tokens and type roles where the values are already equal, and nothing else. No exhibit frame, no crop marks, no figure numbers, no
 cite popover on a name (a name is not a source); the page itself is citable from its footer,
 and the print view is the accessible list with its provenance line.
 **Objection:** touching a protected surface for consistency is how it gets damaged, and a
@@ -506,7 +507,7 @@ working tip first, no git writes, diff reviewed by the lead. Work lands on a new
 | Phase | Scope | Lead / helpers | Done when |
 | ----- | ----- | -------------- | --------- |
 | 0. Canon (done 2026-11-23) | This file became `docs/ui/DESIGN.md`. v4 to v12 and living-archive moved to `archive/`; `docs/ui/README.md` rewritten as a one-screen index; `brand.md`, `/about` copy, `apps/web/PRODUCT.md`, `AGENTS.md` and `apps/site/README.md` amended. Left in place on purpose: `docs/redesign/` (marked as history), `design-direction-v6-mobile.md` (the app's shell until phase 9), and pattern docs whose code is still live (they move with that code) | Opus | One binding design doc; relative links no worse than before (20 broken before, 19 after, none new) |
-| 1. Tokens | Prune `tokens.css` to the grounds, roles and steps in section 7; fold the world and night-atlas palettes into ink; paper-first defaults; mobile generator reads the kit; delete alias tokens with their users; two textures regenerated and manifest updated | Opus / Sonnet | Parity, contrast and mobile token tests pass; baseline lower; both apps build |
+| 1. Tokens (done 2026-11-23) | Done: 31 unused tokens and the four alias type tokens removed with their users; the always-night map palette set to brand swatches (Black Ink, Copper Pin, copper-on-dark, Archive Paper), which removes the blue rim and blue-black; the six fixed ink tokens moved from `base.css` into `tokens.css`; mobile spacing, radius and motion read from the kit's modules; light is the default theme; token lint baseline 523 to 517. Deferred to the phase that removes the last caller: the 14px and 28px radius steps (phases 3 to 8), the four home textures (phase 7), the `--ds-world-*` names themselves (4b). Ground tokens for the exhibit system are added in 2a with their first user. The memorial opens on paper for readers with no stored theme; the owner chose to let it follow the theme (section 9.4) | Opus | Kit 101, web 2,832, mobile 186 tests pass; site app sees no new failures; no production build was run |
 | 2a. Kit core | Motion spike. `Button`, `Segmented`, `Chip`, `ExhibitFrame`, `Receipt`, `Cite` (extending `lib/citation`), `ContentNote`, `Sheet` in `packages/ui` with tests; print stylesheet | Opus / Sonnet per component, in worktrees | Components pass their tests; gallery renders them |
 | 2b. Method | Generate `/design-system` from the kit. Rebuild the trust pages on it | Opus / Sonnet | Method passes section 12 including the trace task; `.ds-band` deleted. `.ds-cta` and the room kit stay until their last callers go (admin, Records) |
 | 3. Record | Section 9.1 across the five record routes | Opus / Sonnet | Gates pass; `record-page.css` and plate code replaced |

@@ -39,7 +39,7 @@
 
 /* Never under the 72px display floor, however narrow the screen. */
 .ds-errata__day-numeral.ds-numeral--title {
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
 }
 
 .ds-errata__year {

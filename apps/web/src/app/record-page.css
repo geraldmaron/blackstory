@@ -682,7 +682,7 @@
 }
 
 .ds-recpage__beat > .ds-evidence .ds-evidence__item::before {
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
 }
 
 .ds-recpage__prose {

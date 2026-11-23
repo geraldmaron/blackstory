@@ -774,7 +774,7 @@ span.ds-tabs__tab {
   /* Schibsted's ascenders rise above a 0.9 line box; this keeps them off a block's top edge. */
   padding-top: 0.04em;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-title);
+  font-size: var(--ds-text-display);
   /* The display role: Schibsted at 800, the record page's name weight (patterns-living-archive). */
   font-weight: var(--ds-weight-display);
   line-height: 0.92;
@@ -1231,7 +1231,7 @@ span.ds-tabs__tab {
 }
 
 .ds-numeral--title {
-  font-size: var(--ds-text-display-title);
+  font-size: var(--ds-text-display);
 }
 
 @keyframes ds-numeral-settle {

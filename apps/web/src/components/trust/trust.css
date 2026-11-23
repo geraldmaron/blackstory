@@ -95,7 +95,7 @@
 
 /* A long figure steps down to the title size, but never under the 72px display floor. */
 .ds-trust-mast__numeral.ds-numeral--title {
-  font-size: max(4.5rem, var(--ds-text-display-title));
+  font-size: max(4.5rem, var(--ds-text-display));
 }
 
 .ds-trust-mast__label {
@@ -252,7 +252,7 @@
 .ds-trust-band .ds-room-section > .ds-section-heading::before {
   content: counter(trust-section, decimal-leading-zero) / '';
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: 600;
   font-variant-numeric: lining-nums;
   line-height: var(--ds-leading-numeral);

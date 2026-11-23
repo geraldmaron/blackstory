@@ -764,7 +764,7 @@ details[open] > summary > .lives-caret {
 .lives-era__years {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: 600;
   font-variant-numeric: lining-nums;
   line-height: var(--ds-leading-numeral);
@@ -775,7 +775,7 @@ details[open] > summary > .lives-caret {
 
 .lives-era__header .lives-era__years--heading {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   line-height: var(--ds-leading-numeral);
   letter-spacing: var(--ds-tracking-numeral);
   color: var(--ds-numeral-accent);
@@ -1383,7 +1383,7 @@ details[open] > summary > .lives-caret {
 .lives-panel__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: 600;
   font-variant-numeric: lining-nums;
   line-height: var(--ds-leading-numeral);

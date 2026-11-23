@@ -161,7 +161,7 @@
   grid-area: title;
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-title);
+  font-size: var(--ds-text-display);
   /* Headline weight: the page's h1 holds the display role, once per surface. */
   font-weight: 700;
   line-height: 0.9;
@@ -336,7 +336,7 @@
   grid-area: title;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: 600;
   line-height: 0.92;
   letter-spacing: -0.035em;
@@ -344,7 +344,7 @@
 }
 
 .ds-stories-browse[data-first] .ds-stories-head__title {
-  font-size: var(--ds-text-display-title);
+  font-size: var(--ds-text-display);
 }
 
 .ds-stories-head__count {

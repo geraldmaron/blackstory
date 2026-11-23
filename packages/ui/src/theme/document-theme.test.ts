@@ -41,10 +41,10 @@ describe('resolvePreferredTheme', () => {
     assert.equal(resolvePreferredTheme('light'), 'light');
   });
 
-  it('falls back to dark — the Ink default — when storage has no explicit choice', () => {
-    assert.equal(resolvePreferredTheme(null), 'dark');
-    assert.equal(resolvePreferredTheme(undefined), 'dark');
-    assert.equal(resolvePreferredTheme('garbage'), 'dark');
+  it('falls back to light, the paper default, when storage has no explicit choice', () => {
+    assert.equal(resolvePreferredTheme(null), 'light');
+    assert.equal(resolvePreferredTheme(undefined), 'light');
+    assert.equal(resolvePreferredTheme('garbage'), 'light');
   });
 });
 
@@ -77,12 +77,11 @@ describe('THEME_BOOTSTRAP_SCRIPT', () => {
     assert.match(THEME_BOOTSTRAP_SCRIPT, /setAttribute\('data-theme'/);
   });
 
-  it('defaults to dark — not prefers-color-scheme — when storage has no explicit choice', () => {
-    // Ink direction: the light theme is unchanged, so following system preference here would
-    // show a first-time reader on a light-mode system the old design with no visible redesign.
+  it('defaults to light, not prefers-color-scheme, when storage has no explicit choice', () => {
+    // DESIGN.md section 7.1: paper is the default for every reader without a stored choice.
     assert.doesNotMatch(THEME_BOOTSTRAP_SCRIPT, /prefers-color-scheme/);
-    assert.match(THEME_BOOTSTRAP_SCRIPT, /:'dark'/);
-    assert.match(THEME_BOOTSTRAP_SCRIPT, /setAttribute\('data-theme','dark'\)/);
+    assert.match(THEME_BOOTSTRAP_SCRIPT, /:'light'/);
+    assert.match(THEME_BOOTSTRAP_SCRIPT, /setAttribute\('data-theme','light'\)/);
   });
 });
 

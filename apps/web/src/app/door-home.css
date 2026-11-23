@@ -1504,7 +1504,7 @@ body:has(.ds-door) .ds-door-journey {
 .ds-door-ch__grade-numeral {
   color: var(--ds-numeral-accent);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: var(--ds-weight-numeral);
   font-variant-numeric: lining-nums;
   letter-spacing: -0.04em;

@@ -74,7 +74,6 @@
    * cue reads as a rendering bug. It is not an elevation ramp, and it must never be applied to a
    * card that is flush with the page.
    */
-  --ds-contact-hairline: 0 1px 0 rgb(10 10 10 / 5%);
   --ds-contact-overlap: 0 2px 10px rgb(10 10 10 / 8%);
   --ds-contact-plate: 0 6px 28px rgb(10 10 10 / 10%);
 
@@ -110,15 +109,30 @@
 }
 
 /*
- * The world (design-direction-v11.md section 5). Always night: these do not follow the theme.
+ * The ink ground (DESIGN.md section 7.1): brand values that never follow the theme. A surface on
+ * ink uses these, so it stays ink in light and dark. Moved here from base.css so every token is
+ * declared in one file. The map colors below are the same swatches under their map names.
+ */
+:root {
+  --ds-fixed-ink: #0a0a0a;
+  --ds-fixed-charcoal: #161616;
+  --ds-fixed-paper: #f4efe5;
+  --ds-fixed-stone: #bdb5a9;
+  --ds-fixed-rule: #34302c;
+  --ds-fixed-accent: #d07a32;
+}
+
+/*
+ * The ink ground's map colors (DESIGN.md section 7.1). Always night: these do not follow the
+ * theme. Brand swatches only since v13: Black Ink, Copper Pin, copper-on-dark, Archive Paper.
  * Mirrors `worldPalette` in colors.ts; world.test.ts asserts parity and the contrast pairs.
  * Ember is the only saturated color in the world and means "a published record", nothing more.
  */
 :root {
-  --ds-world-space: #04060c;
-  --ds-world-rim: #7eaad6;
-  --ds-world-ember: #f2a35c;
-  --ds-world-hud-ink: #e9e2d6;
+  --ds-world-space: #0a0a0a;
+  --ds-world-rim: #b86b2a;
+  --ds-world-ember: #d07a32;
+  --ds-world-hud-ink: #f4efe5;
   /* The one ground for a label over the world: space, let through a little. */
   --ds-world-hud-ground: color-mix(in srgb, var(--ds-world-space) 80%, transparent);
 }
@@ -186,7 +200,6 @@
 
   /* Contact on dark is the absence of bounce light, not a cast shadow: near-black at a tight
      radius. Same law as light — overlap only, never a ramp. */
-  --ds-contact-hairline: 0 1px 0 rgb(0 0 0 / 30%);
   --ds-contact-overlap: 0 2px 10px rgb(0 0 0 / 38%);
   --ds-contact-plate: 0 6px 28px rgb(0 0 0 / 46%);
 
@@ -484,10 +497,9 @@
    */
   --ds-space-24: 6rem;
   --ds-space-32: 8rem;
-  --ds-space-48: 12rem;
+  --ds-space-48: 12rem; /* used by apps/site as $48 */
   --ds-section-sm: clamp(var(--ds-space-10), 6vw, var(--ds-space-24));
   --ds-section-md: clamp(var(--ds-space-12), 9vw, var(--ds-space-32));
-  --ds-section-lg: clamp(var(--ds-space-16), 13vw, var(--ds-space-48));
 
   /*
    * The type scale. Until now this file declared four families and zero steps, so every surface
@@ -542,14 +554,10 @@
   --ds-map-ring: 14px;
   --ds-map-keyline: 2px;
 
-  --ds-text-display-numeral: var(--ds-text-numeral);
-  --ds-text-display-title: var(--ds-text-display);
   --ds-tracking-numeral: -0.04em;
   /* Tall enough that the line box holds the digits and a count's comma: a rule or a line set
      under a numeral meets the glyphs' edge, never cuts them. */
   --ds-leading-numeral: 0.92;
-  --ds-text-display-hero: var(--ds-text-display);
-  --ds-text-display-1: var(--ds-text-headline);
   --ds-text-display-2: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
   --ds-text-display-3: clamp(1.5rem, 1.22rem + 1.2vw, 2.125rem);
   --ds-text-title: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
@@ -583,7 +591,6 @@
    * tall, plus its 16px offset and a 12px gap — so a panel's max-height is
    * `100dvh - top - bottom` rather than a hand-computed subtraction per file.
    */
-  --ds-atlas-top: 88px;
   --ds-atlas-bottom: 168px;
   /*
    * The right column's own floor. The camera console lives under the results rail, not under the
@@ -599,19 +606,14 @@
    * console and overrides this on the root — the same clearance pattern the command bar uses for
    * `--ds-island-clearance`.
    */
-  --ds-atlas-bottom-right: 246px;
   /* Narrow instrument sheets sit above the dock; visible map above them stays hittable. */
   /* The dock sits 8px + 28px (attribution) off the bottom and is 54px tall (44px chips + 4px
      padding + hairlines); sheets and the on-map controls stack 8px above it. The old 66px
      predated the attribution offset, so every compact sheet slid 16px under the dock. */
-  --ds-atlas-dock-clearance: calc(var(--ds-space-2) * 2 + 28px + 54px);
-  --ds-atlas-sheet-peek: min(42dvh, 22.5rem);
 
   /* Fixed instrument-panel widths (map-experience lens-panel/results-rail/pin-photo-card).
      Named to match the design mock's --rail-w/--results-w; the photo card has no mock
      counterpart so it gets its own token rather than borrowing an unrelated one. */
-  --ds-rail-w: 300px;
-  --ds-results-w: 344px;
   --ds-pin-photo-card-w: 168px;
 
   --ds-radius-sm: 8px;
@@ -627,9 +629,7 @@
   --ds-focus-width: 3px;
   --ds-focus-offset: 2px;
 
-  --ds-icon-sm: 1rem;
   --ds-icon-md: 1.25rem;
-  --ds-icon-lg: 1.5rem;
 
   --ds-duration-fast: 160ms;
   --ds-duration-base: 280ms;
@@ -653,17 +653,12 @@
 
   /* Chapter pacing, also from the door journey: how long one beat of a sequenced surface holds
      before the next is allowed to begin. */
-  --ds-duration-cinematic: 900ms;
-  --ds-duration-chapter: 1200ms;
-  --ds-stagger-beat: 90ms;
 
   /*
    * Living-archive motion: each move played once. A line drawing draws itself in (a mask wipe), a
    * ground slides in (`<Block wipe>`). Content is visible before either runs, and both collapse to
    * instant under reduced motion (below). No count-up: a number is printed at its value.
    */
-  --ds-duration-draw: 1600ms;
-  --ds-ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
 
   --ds-grid-max: 72rem;
   --ds-content-max: 38rem;
@@ -683,18 +678,10 @@
    */
 
   /* Band A — local/component stacking (route content, page decoration, panel internals). */
-  --ds-z-decoration: 0; /* shell.css .ds-page-field: decorative motif behind page content */
   --ds-z-map-plate: 0; /* persistent MapLibre plate baseline (map-surfaces.css, entity-page) */
   --ds-z-content: 1; /* route/page content sitting one level above a local plate or decoration */
-  --ds-z-map-scrim: 1; /* Cinematic Map Backdrop legibility scrim over the plate */
-  --ds-z-map-plate-engaged: 1; /* map plate raised to scrim tier while Cinematic is Engaged */
-  --ds-z-restore-dock: 2; /* explore stage's collapsed-panel restore chips */
   --ds-z-memorial-jump: 2; /* memorial edition's sticky jump rail */
-  --ds-z-cinematic-content: 2; /* Cinematic Map Backdrop route-owned content wrapper */
   --ds-z-instrument-panel: 3; /* explore stage's fixed notice/instruments/results panels */
-  --ds-z-cinematic-rail: 3; /* Cinematic Map Backdrop Explore/Close rail controls */
-  --ds-z-spotlight: 4; /* explore stage's native-dialog spotlight */
-  --ds-z-cinematic-rail-engaged: 5; /* cinematic rail pinned above the header while Engaged */
   --ds-z-annotation: 5; /* map-experience annotation overlay */
   --ds-z-decade-dock: 6; /* explore edition's persistent decade scrub dock */
   --ds-z-atlas-modal: 6; /* Atlas spotlight dialog */
@@ -702,8 +689,6 @@
   /* Band B — route-level fixed chrome. */
   --ds-z-atlas-instruments: 20; /* camera console, time panel, lens panel, results rail, Atlas
                                     dock — mode==='atlas' only, mutually exclusive with Story Mode */
-  --ds-z-story-mode: 20; /* full-screen story surface — mode==='story' only */
-  --ds-z-atlas-pill: 21; /* camera readout, deliberately above the instrument band */
   --ds-z-typeahead: 22; /* shell search dropdown; mounted independent of atlas/story mode, must
                             outrank both (e.g. open while Story Mode is running) */
   --ds-z-atlas-search: 30; /* top status notice, deliberately above the readout pill */
@@ -786,7 +771,6 @@
    <html> the later rule is the one that must win, and that has to be the band. */
 :root {
   --ds-canvas-era: var(--ds-canvas);
-  --ds-surface-era: var(--ds-surface);
 }
 
 [data-era-band] {
@@ -800,11 +784,6 @@
     in srgb,
     var(--ds-era-tint) calc(var(--ds-era-warmth) * 1%),
     var(--ds-canvas)
-  );
-  --ds-surface-era: color-mix(
-    in srgb,
-    var(--ds-era-tint) calc(var(--ds-era-warmth) * 1%),
-    var(--ds-surface)
   );
 
   background-color: var(--ds-canvas-era);
@@ -836,9 +815,5 @@
     --ds-duration-base: 0.01ms;
     --ds-duration-slow: 0.01ms;
     --ds-duration-sheet: 0.01ms;
-    --ds-duration-cinematic: 0.01ms;
-    --ds-duration-chapter: 0.01ms;
-    --ds-stagger-beat: 0ms;
-    --ds-duration-draw: 0.01ms;
   }
 }

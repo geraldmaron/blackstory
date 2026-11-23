@@ -4,7 +4,7 @@
  * (`'self' 'nonce-X' 'strict-dynamic'`). The theme bootstrap hash is kept so the policy stays a
  * superset of today's until the site has its own theme bootstrap (design package task).
  */
-const THEME_BOOTSTRAP_SCRIPT_SHA256 = "'sha256-51ZZphqguJf2bHn9CnelhCzdAtWW/oDmMD+ATk0tpAk='";
+const THEME_BOOTSTRAP_SCRIPT_SHA256 = "'sha256-oGV+jz0YdIrBxj133+321l2uDtwLlcR7YbRckzon+LQ='";
 
 const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreemap.org'];
 const SATELLITE_TILE_SRC = ['https://basemap.nationalmap.gov'];

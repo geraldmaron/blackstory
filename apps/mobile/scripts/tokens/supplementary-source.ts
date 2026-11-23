@@ -5,55 +5,42 @@
  * from so nothing here reads as invented.
  */
 
-/**
- * Spacing scale, rem units, carried over verbatim from the shipped web
- * design system: packages/ui/src/tokens/spacing.ts `space` (4px base rhythm).
- * Converted to React Native dp at render time using 1rem = 16dp, RN's
- * standard density-independent-pixel base (RN has no native rem/em unit).
- */
-export const SPACE_REM: Record<string, number> = {
-  '0': 0,
-  '1': 0.25,
-  '2': 0.5,
-  '3': 0.75,
-  '4': 1,
-  '5': 1.25,
-  '6': 1.5,
-  '8': 2,
-  '10': 2.5,
-  '12': 3,
-  '16': 4,
-  '20': 5,
-  '24': 6,
-};
-export const REM_TO_DP = 16;
+import { borders, motion } from '../../../../packages/ui/src/tokens/foundation.ts';
+import { space } from '../../../../packages/ui/src/tokens/spacing.ts';
 
 /**
- * Radius scale, px, carried over verbatim from
- * packages/ui/src/tokens/foundation.ts `borders` + tokens.css `--ds-radius-full`.
+ * Spacing, radius and motion are read from the web kit's token modules (docs/ui/DESIGN.md
+ * section 11), so the app cannot drift from the web by a hand-copied number. Edit the kit, then
+ * re-run the generator.
+ *
+ * Spacing is rem in the kit and is converted to React Native dp at render time using
+ * 1rem = 16dp (RN has no rem unit).
  */
+export const SPACE_REM: Record<string, number> = Object.fromEntries(
+  Object.entries(space).map(([step, rem]) => [step, Number.parseFloat(rem)]),
+);
+export const REM_TO_DP = 16;
+
+/** Radius scale in px. `full` mirrors tokens.css `--ds-radius-full`. */
 export const RADIUS_PX = {
-  none: 0,
-  sm: 8,
-  md: 14,
-  lg: 28,
+  none: Number.parseFloat(borders.radiusNone),
+  sm: Number.parseFloat(borders.radiusSm),
+  md: Number.parseFloat(borders.radiusMd),
+  lg: Number.parseFloat(borders.radiusLg),
   full: 999,
 } as const;
 
 /**
- * Motion tokens, carried over verbatim from
- * packages/ui/src/tokens/foundation.ts `motion`. `easingStandardCss` is kept
- * as the literal source string; the generator also emits its parsed numeric
- * control points (`easingStandardBezier`) for direct use with
- * react-native-reanimated's `Easing.bezier(x1, y1, x2, y2)`.
+ * Durations in ms and the standard easing. `EASING_STANDARD_CSS` stays the literal CSS string;
+ * the generator also emits its control points for react-native-reanimated's `Easing.bezier`.
  */
 export const MOTION_MS = {
-  durationInstant: 0,
-  durationFast: 160,
-  durationBase: 280,
-  durationSlow: 480,
+  durationInstant: Number.parseFloat(motion.durationInstant),
+  durationFast: Number.parseFloat(motion.durationFast),
+  durationBase: Number.parseFloat(motion.durationBase),
+  durationSlow: Number.parseFloat(motion.durationSlow),
 } as const;
-export const EASING_STANDARD_CSS = 'cubic-bezier(0.16, 1, 0.3, 1)';
+export const EASING_STANDARD_CSS = motion.easingStandard;
 
 /**
  * Type scale (role -> size/lineHeight/weight). No canonical type-scale token

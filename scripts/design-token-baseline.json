@@ -4,8 +4,7 @@
     "hex": {
       "apps/web/src/admin/cases/case-queue.css": 44,
       "apps/web/src/app/admin/admin.css": 55,
-      "apps/web/src/app/shell.css": 1,
-      "packages/ui/src/styles/base.css": 6
+      "apps/web/src/app/shell.css": 1
     },
     "spacing": {
       "apps/web/src/admin/cases/case-queue.css": 11,

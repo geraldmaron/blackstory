@@ -731,7 +731,7 @@
   display: block;
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: 600;
   font-variant-numeric: lining-nums proportional-nums;
   line-height: 1;
@@ -1196,7 +1196,7 @@
 
   /* An entry's year steps up to the full numeral scale (72px at phone width). */
   .ds-story-mast__text .ds-story-mast__numeral {
-    font-size: var(--ds-text-display-numeral);
+    font-size: var(--ds-text-numeral);
   }
 
   /* The portrait leads the masthead at 4:3, its credit under it. */

@@ -56,7 +56,7 @@
 .ds-records-timeline__band:not(:has(.ds-records-timeline__rows > :nth-child(4)))
   .ds-records-timeline__year
   .ds-numeral {
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
 }
 
 .ds-records-timeline__total {
