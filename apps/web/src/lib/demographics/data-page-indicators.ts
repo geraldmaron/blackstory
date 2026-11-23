@@ -68,12 +68,21 @@ async function fetchDataPageObservations(): Promise<readonly DataPageObservation
   }
 }
 
-export async function getDataPageIndicatorBundle(): Promise<DataPageIndicatorBundle> {
+/**
+ * The bundle, and the time its data was built when that is on record. A materialized snapshot and
+ * the dated fixture carry a stored build time. Rows merged live from
+ * `reference.statistical_observations` carry none: that bundle's `generatedAt` is only the moment
+ * of the merge, so it is not a version of the data and is never printed as one.
+ */
+export async function getDataPageIndicatorBuild(): Promise<{
+  readonly bundle: DataPageIndicatorBundle;
+  readonly builtAt?: string;
+}> {
   if (resolvePostgresConnectionString()) {
     try {
       const snapshot = await fetchMaterializedSnapshot('dataPageIndicatorSeries');
       if (isDataPageIndicatorBundle(snapshot)) {
-        return snapshot;
+        return { bundle: snapshot, builtAt: snapshot.generatedAt };
       }
     } catch {
       // Fall through to live observation query or fixture bundle.
@@ -82,10 +91,19 @@ export async function getDataPageIndicatorBundle(): Promise<DataPageIndicatorBun
 
   const observations = await fetchDataPageObservations();
   if (observations.length > 0) {
-    return mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, observations);
+    return {
+      bundle: mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, observations),
+    };
   }
 
-  return DATA_PAGE_INDICATOR_FIXTURE_BUNDLE;
+  return {
+    bundle: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE,
+    builtAt: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.generatedAt,
+  };
+}
+
+export async function getDataPageIndicatorBundle(): Promise<DataPageIndicatorBundle> {
+  return (await getDataPageIndicatorBuild()).bundle;
 }
 
 export type { DataPageIndicatorBundle };

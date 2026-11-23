@@ -237,3 +237,32 @@
     break-after: avoid;
   }
 }
+
+/* —— Embed: a figure on a record page or in a story (`FigureEmbed.tsx`) ——————————— */
+/* The radio switch picks the view with no script. Where `:has()` is unknown every view shows. */
+.ds-figure--embed:not(:has(input[value='portrait']:checked)) [data-figure-view='portrait'],
+.ds-figure--embed:not(:has(input[value='numbers']:checked)) [data-figure-view='numbers'],
+.ds-figure--embed:has(input:not([value='plain']):checked) [data-figure-view='plain'] {
+  display: none;
+}
+
+/* The scope line stands off the finding it comes before. */
+.ds-figure__head > .ds-figure__change {
+  margin-bottom: var(--ds-space-3);
+}
+
+/* The record's own state in a figure that compares states; the scope line says it in words. */
+.ds-figure [data-focus] :is(th, td, .ds-diverge__name, .ds-diverge__value) {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+@media print {
+  .ds-figure--embed [data-figure-view='portrait'] {
+    display: none;
+  }
+
+  .ds-figure--embed:has(input[value='portrait']:checked) [data-figure-view='plain'] {
+    display: block;
+  }
+}

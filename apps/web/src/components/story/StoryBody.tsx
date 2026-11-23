@@ -39,7 +39,19 @@ export type StoryBodyProps = {
   readonly story: HydratedStory;
   /** Set each dated section's year as a copper numeral over its heading (the story page). */
   readonly numerals?: boolean;
+  /**
+   * Draws a block's registry figure. The story page passes `FigureEmbed`; a caller that passes
+   * nothing (the staff preview, Lives) keeps the packet chart. Returning nothing does the same.
+   */
+  readonly renderFigure?: StoryFigureRenderer;
 };
+
+export type StoryFigureRenderer = (embed: {
+  readonly figureId: string;
+  readonly writtenAsOf?: string;
+  /** What to show if the figure cannot load: the packet chart. */
+  readonly fallback: React.ReactNode;
+}) => React.ReactNode;
 
 /**
  * Anchor id for an h3 subheading. Prefixed with the block's own index in `story.blocks` (stable
@@ -101,7 +113,9 @@ function Block({
   refNumberById,
   headingId,
   numerals = false,
+  renderFigure,
 }: {
+  readonly renderFigure?: StoryFigureRenderer;
   readonly block: HydratedStoryBlock;
   readonly index: number;
   readonly refNumberById: ReadonlyMap<string, number>;
@@ -160,11 +174,10 @@ function Block({
           {block.attribution ? <cite>{block.attribution}</cite> : null}
         </blockquote>
       );
-    case 'figure':
-      // Seam for phase 6c (DESIGN.md 9.3): this chart becomes a `Figure` embed from the Data
-      // registry, pinned to the data version the story was written against, with that version and
-      // a link to the current figure in its receipt. Until then it is the story's own packet chart.
-      return (
+    case 'figure': {
+      // The story's own packet chart: what a figure block draws when it names no registry figure,
+      // and what stands in when the registry figure cannot load.
+      const packetChart = (
         <figure className="ds-story-wide ds-story-chart">
           <ThemeImpactMetricChart observations={block.observations} />
           <figcaption className="ds-story-caption">
@@ -173,6 +186,26 @@ function Block({
           </figcaption>
         </figure>
       );
+      // A block that names a registry figure is that figure, embedded on the wide track, with
+      // the build of the data the story was written against in its receipt (DESIGN.md 9.3).
+      const embed = block.figureId
+        ? renderFigure?.({
+            figureId: block.figureId,
+            ...(block.figureAsOf ? { writtenAsOf: block.figureAsOf } : {}),
+            fallback: packetChart,
+          })
+        : undefined;
+      if (!embed) return packetChart;
+      return (
+        <div className="ds-story-wide">
+          {embed}
+          <p className="ds-story-caption">
+            {block.caption}
+            <StoryCitationMarks numbers={block.sourceNumbers} />
+          </p>
+        </div>
+      );
+    }
     case 'stat':
       // Stats never render standalone; StoryBody coalesces runs into FigureCallouts.
       return null;
@@ -330,7 +363,7 @@ function Block({
   }
 }
 
-export function StoryBody({ story, numerals = false }: StoryBodyProps) {
+export function StoryBody({ story, numerals = false, renderFigure }: StoryBodyProps) {
   const rendered: React.ReactNode[] = [];
   const blocks = story.blocks;
   const headingIdByBlockIndex = new Map(
@@ -357,6 +390,7 @@ export function StoryBody({ story, numerals = false }: StoryBodyProps) {
         index={i}
         refNumberById={story.refNumberById}
         numerals={numerals}
+        {...(renderFigure ? { renderFigure } : {})}
         {...(headingId === undefined ? {} : { headingId })}
       />,
     );

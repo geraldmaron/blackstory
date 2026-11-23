@@ -46,8 +46,10 @@ import {
   type RecordGapKind,
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
+import { RecordFigures } from '../../../components/data/figures/RecordFigures';
 import { RecordMap } from '../../../components/map-embed/RecordMap';
 import {
+  loadRecordCounty,
   loadRecordPlace,
   mapHrefInPlace,
   type RecordPlace,
@@ -218,6 +220,8 @@ export type EntityRecordViewProps = {
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
   /** The page's own address without arrival query, for the citation. Defaults to `/entity/{id}`. */
   readonly canonicalPath?: string;
+  /** Figures whose data covers the record's county or state (`RecordFigures`), the last beat. */
+  readonly figures?: React.ReactNode;
 };
 
 export function EntityRecordView({
@@ -229,6 +233,7 @@ export function EntityRecordView({
   citing = [],
   crossReferences = [],
   canonicalPath,
+  figures,
 }: EntityRecordViewProps) {
   const tone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
   const anatomy = buildEntityAnatomyInputs(entity, tone);
@@ -635,6 +640,8 @@ export function EntityRecordView({
           <RecordConnections connections={writtenAbout} />
         </RecordBeat>
       ) : null}
+
+      {figures}
     </RecordPage>
   );
 }
@@ -654,12 +661,27 @@ export async function EntityRecordPage({
   const point = feature
     ? { lng: feature.geometry.coordinates[0], lat: feature.geometry.coordinates[1] }
     : undefined;
-  const [returns, crossReferences, cites, place] = await Promise.all([
+  const isLaw = String(entity.kind) === 'law';
+  const jurisdiction = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel);
+  // A law labeled Washington, D.C. is a federal law, as `mapPrecisionFor` already reads it.
+  const state = isLaw && jurisdiction?.postalCode === 'DC' ? undefined : jurisdiction?.name;
+  const [returns, crossReferences, cites, place, county] = await Promise.all([
     recordDiscoveryReturn(entity.id, arrival, feature !== undefined),
     resolveEntityCrossReferences(entity.id),
     resolveCitesEdgeIndex(),
     feature ? loadRecordPlace(entity.id) : undefined,
+    feature ? loadRecordCounty(entity.id) : undefined,
   ]);
+  const figures = await RecordFigures({
+    record: {
+      id: entity.id,
+      ...(state ? { state } : {}),
+      ...(county ? { county } : {}),
+      // A law with no state of its own is a federal law: its jurisdiction is the country.
+      nationwide: isLaw && state === undefined,
+      quiet: isQuietRecord(entity),
+    },
+  });
   return (
     <EntityRecordView
       entity={entity}
@@ -670,6 +692,7 @@ export async function EntityRecordPage({
       citing={storiesCiting(cites, entity.id)}
       crossReferences={crossReferences}
       {...(canonicalPath ? { canonicalPath } : {})}
+      figures={figures}
     />
   );
 }

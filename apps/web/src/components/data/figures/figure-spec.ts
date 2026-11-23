@@ -77,8 +77,20 @@ export function figureViewsParam(
   return tokens.length > 0 ? tokens.join(',') : undefined;
 }
 
+/**
+ * The geography a figure's rows describe, read from the rows themselves. An embed is labeled with
+ * it and a record page shows a figure only where it covers the record (`figure-coverage.ts`).
+ * `states` holds full state names; more than one means the figure compares states row by row.
+ */
+export type FigureCoverage =
+  | { readonly level: 'nation' }
+  | { readonly level: 'state'; readonly states: readonly string[] }
+  | { readonly level: 'county'; readonly county: string; readonly state: string };
+
 export type FigureTable = {
   readonly columns: readonly string[];
+  /** The row an embed marks: a record's own state in a state-by-state figure. */
+  readonly focusRow?: number;
   /** Each cell as the table prints it and as the CSV writes it. */
   readonly rows: readonly (readonly { readonly text: string; readonly csv: string }[])[];
 };
@@ -88,6 +100,13 @@ export type FigureRows<Row, Extra = undefined> = {
   readonly sources: readonly DataSourceRef[];
   /** When the series was last built (ISO). The citation's date, never the subject's. */
   readonly revised?: string;
+  /**
+   * When the data itself was built (ISO), where the source keeps that: the one identifier a
+   * version of the data has. Absent where `revised` is only the time rows were read.
+   */
+  readonly built?: string;
+  /** The row an embed asks to mark (a state name), when the figure has one row a place. */
+  readonly focus?: string;
 } & (Extra extends undefined ? { readonly extra?: undefined } : { readonly extra: Extra });
 
 export type LoadedFigure = {
@@ -101,10 +120,17 @@ export type LoadedFigure = {
   readonly headline: string;
   readonly sources: readonly DataSourceRef[];
   readonly revised?: string;
+  /** When the data was built, where the source keeps that. An embed's as-of date. */
+  readonly built?: string;
   /** A change of definition or denominator, said in every view. */
   readonly definitionChange?: string;
   /** The published story behind the number, when there is one. */
   readonly chapterHref?: string;
+  readonly coverage?: FigureCoverage;
+  /** The theme-impact theme the series belongs to, when it has one. */
+  readonly themeId?: string;
+  /** The marked row in words, so the mark never depends on weight or color alone. */
+  readonly focusReading?: string;
   readonly table: FigureTable;
   readonly plain: ReactNode;
   readonly portrait?: ReactNode;
@@ -129,6 +155,13 @@ export type FigureSpec<Row, Extra = undefined> = {
   readonly headline: (data: FigureRows<Row, Extra>) => string;
   readonly definitionChange?: (data: FigureRows<Row, Extra>) => string | undefined;
   readonly chapterHref?: (data: FigureRows<Row, Extra>) => string | undefined;
+  readonly coverage?: (data: FigureRows<Row, Extra>) => FigureCoverage | undefined;
+  readonly themeId?: (data: FigureRows<Row, Extra>) => string | undefined;
+  /** A figure with one row a place: which row a place name marks, and that row in words. */
+  readonly focus?: {
+    readonly is: (row: Row, key: string) => boolean;
+    readonly reading: (row: Row) => string;
+  };
   readonly columns:
     readonly FigureColumn<Row>[] | ((data: FigureRows<Row, Extra>) => readonly FigureColumn<Row>[]);
   readonly plain: (data: FigureRows<Row, Extra>) => ReactNode;
@@ -145,6 +178,11 @@ export function buildFigure<Row, Extra = undefined>(
   const columns = typeof spec.columns === 'function' ? spec.columns(data) : spec.columns;
   const change = spec.definitionChange?.(data);
   const chapterHref = spec.chapterHref?.(data);
+  const coverage = spec.coverage?.(data);
+  const themeId = spec.themeId?.(data);
+  const focus = data.focus;
+  const focusRow =
+    focus && spec.focus ? data.rows.findIndex((row) => spec.focus!.is(row, focus)) : -1;
   return {
     title: say(spec.title),
     basis: say(spec.basis),
@@ -152,9 +190,14 @@ export function buildFigure<Row, Extra = undefined>(
     headline: spec.headline(data),
     sources: data.sources,
     ...(data.revised === undefined ? {} : { revised: data.revised }),
+    ...(data.built === undefined ? {} : { built: data.built }),
     ...(change === undefined ? {} : { definitionChange: change }),
     ...(chapterHref === undefined ? {} : { chapterHref }),
+    ...(coverage === undefined ? {} : { coverage }),
+    ...(themeId === undefined ? {} : { themeId }),
+    ...(focusRow === -1 ? {} : { focusReading: spec.focus!.reading(data.rows[focusRow]!) }),
     table: {
+      ...(focusRow === -1 ? {} : { focusRow }),
       columns: columns.map((column) => column.label),
       rows: data.rows.map((row) =>
         columns.map((column) => ({
@@ -168,10 +211,18 @@ export function buildFigure<Row, Extra = undefined>(
   };
 }
 
+/** What the record rule needs to know about a figure, without building its drawings. */
+export type FigureFacts = {
+  readonly id: string;
+  readonly coverage?: FigureCoverage;
+  readonly themeId?: string;
+};
+
 export type RegisteredFigure = {
   readonly id: string;
   readonly name: string;
-  readonly load: () => Promise<LoadedFigure | undefined>;
+  readonly load: (options?: { readonly focus?: string }) => Promise<LoadedFigure | undefined>;
+  readonly facts: () => Promise<FigureFacts>;
 };
 
 /** A figure that loads its own rows. Nothing to draw (no rows, or a failed read) is `undefined`. */
@@ -187,9 +238,20 @@ export function defineFigure<Row, Extra = undefined>(
     /** True when a Portrait form was built for this figure. */
     hasPortrait: spec.portrait !== undefined,
     fromRows,
-    load: async () => {
+    load: async (options?: { readonly focus?: string }) => {
       const data = await spec.loadRows();
-      return data && data.rows.length > 0 ? fromRows(data) : undefined;
+      if (!data || data.rows.length === 0) return undefined;
+      return fromRows(options?.focus ? { ...data, focus: options.focus } : data);
+    },
+    facts: async (): Promise<FigureFacts> => {
+      const data = await spec.loadRows();
+      const coverage = data && data.rows.length > 0 ? spec.coverage?.(data) : undefined;
+      const themeId = data ? spec.themeId?.(data) : undefined;
+      return {
+        id: spec.id,
+        ...(coverage === undefined ? {} : { coverage }),
+        ...(themeId === undefined ? {} : { themeId }),
+      };
     },
   };
 }

@@ -63,6 +63,10 @@ export type HydratedStoryFigure = {
   readonly caption: string;
   readonly observations: readonly ThemeImpactObservationView[];
   readonly sourceNumbers: readonly number[];
+  /** A Data registry figure to embed in place of the packet chart. */
+  readonly figureId?: string;
+  /** The build of that figure's data the story was written against (ISO). */
+  readonly figureAsOf?: string;
 };
 
 export type HydratedStoryStat = {
@@ -372,6 +376,8 @@ function hydrateBlock(
         caption: block.caption,
         observations,
         sourceNumbers: sourceNumbersFor(block, packet, numberByUrl),
+        ...(block.figureId ? { figureId: block.figureId } : {}),
+        ...(block.figureAsOf ? { figureAsOf: block.figureAsOf } : {}),
       };
     }
     case 'stat': {

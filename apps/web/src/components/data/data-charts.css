@@ -936,9 +936,10 @@ button.ds-mark {
 }
 
 .ds-diverge__bar {
-  /* The longest bar leaves room at its end for its printed value. */
+  /* The longest bar leaves room at its end for its printed value, at any width. Both sides are
+     the same width, so one length is one count on either side of the line. */
   flex: none;
-  width: calc(var(--len) * var(--bar-max, 72%));
+  width: calc(var(--len) * (100% - 4.5rem));
   height: 0.875rem;
   min-width: 2px;
 }
@@ -970,12 +971,8 @@ button.ds-mark {
 @container (max-width: 30rem) {
   .ds-diverge__head,
   .ds-diverge__row {
-    grid-template-columns: 6rem minmax(0, 1fr) minmax(0, 1.4fr);
+    grid-template-columns: 6rem minmax(0, 1fr) minmax(0, 1fr);
     column-gap: var(--ds-space-2);
-  }
-
-  .ds-diverge {
-    --bar-max: 48%;
   }
 
   /* A long name ("District of Columbia") takes a second line here instead of an ellipsis. */
