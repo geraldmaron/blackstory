@@ -9,24 +9,27 @@ export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
   // with it: the find-in-time journey now lands on /records, whose rows, filters and page steps
   // are server-rendered anchors, and the test below asserts exactly that.
   {
+    // SynchronizedResultList went with the Door (9cc8a7ab). The map view's column list is the
+    // peer now: a labelled listbox whose options carry the selection and their real position.
     journey: 'explore',
-    component: 'SynchronizedResultList',
-    webPath: 'apps/web/src/components/map-experience/SynchronizedResultList.tsx',
-    contract: 'Full accessibility peer for the map — aria-current tracks selection',
+    component: 'ExploreRecordList',
+    webPath: 'apps/web/src/components/map-experience/ExploreRecordList.tsx',
+    contract: 'Full accessibility peer for the map — aria-selected tracks selection',
   },
   {
+    // The Atlas left `/` (now the front page). Without JavaScript the map's records are the
+    // archive's list view at `/archive`: the record index, server-rendered anchors throughout.
     journey: 'atlas',
-    component: 'Atlas noscript filters',
-    // The Atlas now lives at `/`; `(map)/explore/page.tsx` was deleted, so the
-    // native GET FilterBar now ships from the Atlas page itself. Moved again when a216dd88
-    // deleted the `(map)` route group and the Atlas landed at the app root.
-    webPath: 'apps/web/src/app/page.tsx',
-    contract: 'Native GET FilterBar when JavaScript is unavailable',
+    component: 'Archive list view',
+    webPath: 'apps/web/src/app/archive/list-view.tsx',
+    contract: 'Server-rendered rows, link filters and page steps when JavaScript is unavailable',
   },
   {
+    // ManualPlaceSearchForm went with the Door (9cc8a7ab). The map's place field takes a typed
+    // city, state, ZIP or address and resolves it on the server, so location stays opt-in.
     journey: 'locate',
-    component: 'ManualPlaceSearchForm + search fallback link',
-    webPath: 'apps/web/src/components/location/ManualPlaceSearchForm.tsx',
-    contract: 'Manual address entry and /history deep link without geolocation',
+    component: 'PlaceControl',
+    webPath: 'apps/web/src/components/map-experience/PlaceControl.tsx',
+    contract: 'Manual place entry without geolocation',
   },
 ] as const);

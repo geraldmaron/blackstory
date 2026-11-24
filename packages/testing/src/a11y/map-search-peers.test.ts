@@ -19,14 +19,20 @@ test('documented map/search accessible peer modules exist in the repo', () => {
   }
 });
 
-test('SynchronizedResultList peer documents list-not-fallback contract in source', () => {
-  const listPath = join(
-    repoRoot,
-    'apps/web/src/components/map-experience/SynchronizedResultList.tsx',
-  );
+test('the map list peer is a named listbox that carries selection and real position', () => {
+  const listPath = join(repoRoot, 'apps/web/src/components/map-experience/ExploreRecordList.tsx');
   const source = readFileSync(listPath, 'utf8');
-  assert.match(source, /accessible list peer/i);
-  assert.match(source, /aria-labelledby/);
+  assert.match(source, /role="listbox"/);
+  assert.match(source, /aria-label="Records"/);
+  assert.match(source, /aria-selected=\{selected\}/);
+  // Windowed: assistive tech counts only rendered options without these.
+  assert.match(source, /aria-posinset=/);
+  assert.match(source, /aria-setsize=/);
+});
+
+test('the archive list view, the map without JavaScript, renders the record index', () => {
+  const source = readFileSync(join(repoRoot, 'apps/web/src/app/archive/list-view.tsx'), 'utf8');
+  assert.match(source, /RecordsIndexPage/);
 });
 
 test('search route redirects to the record index, which is a real list without JS', () => {
