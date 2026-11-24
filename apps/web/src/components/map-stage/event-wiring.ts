@@ -58,16 +58,6 @@ export type PlateCameraWiring = {
   readonly onUserInteract?: () => void;
 };
 
-/** Pointer affordance for a layer whose features answer a click. */
-function bindLayerHoverCursor(map: MapLibreMap, layerId: string): void {
-  map.on('mouseenter', layerId, () => {
-    map.getCanvas().style.cursor = 'pointer';
-  });
-  map.on('mouseleave', layerId, () => {
-    map.getCanvas().style.cursor = '';
-  });
-}
-
 /**
  * Binds the click handlers that turn a pointer into a selection. Call once the style has loaded:
  * each layer binding is conditional on the layer existing, and a plate built for a surface that
@@ -102,13 +92,14 @@ export function bindPlateClickListeners(map: MapLibreMap, wiring: PlateClickWiri
     wiring.onActivate(readViewport(map));
   }
 
+  // No hand cursor on the state fill or the relationship lines: no surface answers those clicks
+  // today, and the fill's enter event overrode the record hit test's cursor (MapStage.tsx), so a
+  // hand showed over empty land. The record hit test owns the cursor.
   if (map.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID)) {
     map.on('click', EXPLORE_STATE_DENSITY_LAYER_ID, handleStateClick);
-    bindLayerHoverCursor(map, EXPLORE_STATE_DENSITY_LAYER_ID);
   }
   if (map.getLayer(EXPLORE_HISTORY_EDGES_LAYER_ID)) {
     map.on('click', EXPLORE_HISTORY_EDGES_LAYER_ID, handleEdgeClick);
-    bindLayerHoverCursor(map, EXPLORE_HISTORY_EDGES_LAYER_ID);
   }
   map.on('click', wiring.onEntityPointerClick);
   map.on('click', handleBackgroundClick);
