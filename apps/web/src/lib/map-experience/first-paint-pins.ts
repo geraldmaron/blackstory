@@ -13,6 +13,7 @@ import {
   isInternalRecordLabel,
   isPublicPlaceSlug,
   placePageHolds,
+  publicPlaceSlug,
   staysOffPublicMap,
 } from '../place/public-place-path';
 import { locatorPinPercent } from './albers-usa';
@@ -68,14 +69,21 @@ function publicPinHref(properties: ExploreMapFeatureProperties): string {
   return properties.href;
 }
 
-function doorPlaceHref(href: string): string {
-  if (!href.startsWith('/place/')) return '';
-  const slug = href.slice('/place/'.length).split('--')[0] ?? '';
-  return isPublicPlaceSlug(slug) ? href : '';
+/**
+ * A record's public page (`/place/` or `/invention/`) when its slug cannot be an internal id: it
+ * passes the slug rule, or it is exactly the slug of the record's own public name. The id
+ * heuristic alone refuses readable slugs with a number in them ("369th Regiment Armory" is
+ * `369th-regiment-armory`), which left their lights on the front page with no link.
+ */
+function doorPublicHref(href: string, displayName: string): string {
+  const prefix = ['/place/', '/invention/'].find((start) => href.startsWith(start));
+  if (!prefix) return '';
+  const slug = href.slice(prefix.length).split('--')[0] ?? '';
+  return isPublicPlaceSlug(slug) || slug === publicPlaceSlug(displayName) ? href : '';
 }
 
 /**
- * Door Journey link for one pin. Public `/place/` hrefs ride the first document. `/entity/…`
+ * Door Journey link for one pin. Public `/place/` and `/invention/` hrefs ride the first document. `/entity/…`
  * stays server-side — the pin links to `/door/pin/{pinId}` instead.
  */
 function doorRecordHref(
@@ -89,8 +97,12 @@ function doorRecordHref(
   const href = sourceHref.trim();
   if (href.length === 0) return '';
 
-  const placeHref = doorPlaceHref(href);
-  if (placeHref.length > 0) return placeHref;
+  const publicHref = doorPublicHref(href, properties.displayName);
+  // A same-name record's address carries its id after `--`, which never rides the first
+  // document (`stripShopTokensFromJson`); the opaque pin redirect resolves it on the server.
+  if (publicHref.length > 0) {
+    return isShopToken(publicHref) ? `/door/pin/${encodeURIComponent(pinId)}` : publicHref;
+  }
 
   if (href.startsWith('/entity/')) {
     return `/door/pin/${encodeURIComponent(pinId)}`;
@@ -115,8 +127,8 @@ export function resolveDoorPinTarget(
   if (href.length === 0) return null;
   if (href.startsWith('/entity/')) return href;
 
-  const placeHref = doorPlaceHref(href);
-  return placeHref.length > 0 ? placeHref : null;
+  const publicHref = doorPublicHref(href, feature.properties.displayName);
+  return publicHref.length > 0 ? publicHref : null;
 }
 
 /** The record's earliest documented decade, as a start year, from its era buckets. */
