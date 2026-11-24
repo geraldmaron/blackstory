@@ -1,5 +1,5 @@
 /**
- * Surface class registry contracts (docs/ui/patterns-surface-classes.md §8).
+ * Surface class registry contracts (docs/ui/archive/patterns-surface-classes.md §8).
  *
  * The coverage assertion is the one that matters: it walks the App Router tree on disk and
  * fails when a route that actually renders has no class and is not declared an endpoint. That
@@ -42,15 +42,6 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?state=DC'), 'door');
-  });
-
-  it("renders /story on the front page's ground without listing it as a destination", () => {
-    // The retelling is on trial at `/story` (DESIGN.md section 9.7). It needs the door's plate,
-    // but a registry entry would put it in the footer, the palette and the sitemap before the
-    // read test has decided where it lives.
-    assert.equal(surfaceClassFor('/story'), 'door');
-    assert.equal(surfaceClassFor('/stories'), 'reading');
-    assert.ok(!CLASSIFIED_PATHS.includes('/story'));
   });
 
   it('reads the Archive as one reading page in every view, at its old addresses too', () => {

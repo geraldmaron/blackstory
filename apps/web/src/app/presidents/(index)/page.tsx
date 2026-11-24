@@ -10,7 +10,7 @@ import { Notice, PageHeader } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { listPublicStoryListItems } from '../../../lib/stories/source';
 import { storyBasePath } from '../../../lib/stories/story-routes';
-import { parentCrumb, Room } from '../../../components/room';
+import { parentCrumb, PageFrame } from '../../../components/page';
 import { TrustMast, TrustSheet } from '../../../components/trust';
 import { sortItems } from '../../stories/stories-index';
 import { StoryRow } from '../../stories/StoriesIndexParts';
@@ -31,9 +31,9 @@ export default async function PresidentsPage() {
   );
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room ds-stories ds-presidents"
+      className="ds-trust-doc ds-stories ds-presidents"
       masthead={
         <TrustMast
           numeral={
@@ -76,6 +76,6 @@ export default async function PresidentsPage() {
           </ol>
         )}
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

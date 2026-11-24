@@ -10,7 +10,7 @@
  */
 import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { buttonClassName, Segmented } from '@repo/ui';
-import { ChoiceField, Field, fieldControlProps, fieldErrorId } from '../../components/room';
+import { ChoiceField, Field, fieldControlProps, fieldErrorId } from '../../components/forms/fields';
 import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
 import { useFieldErrors } from '../../components/forms/use-field-errors';
 import { ReceiptBlock } from './ReceiptBlock';
@@ -186,8 +186,8 @@ export function CorrectionForm({
       <fieldset className="ds-form-group">
         <legend>The record</legend>
 
-        <div className="ds-room-field">
-          <span className="ds-room-field__label" aria-hidden="true">
+        <div className="ds-doc-field">
+          <span className="ds-doc-field__label" aria-hidden="true">
             What are you correcting?
           </span>
           <Segmented
@@ -335,7 +335,7 @@ export function CorrectionForm({
             <small>{CORRECTION_PRIVACY_NOTICE.body}</small>
           </label>
           {error('privacyConsent') ? (
-            <p className="ds-room-field__error" id={fieldErrorId(ids.privacy)} role="alert">
+            <p className="ds-doc-field__error" id={fieldErrorId(ids.privacy)} role="alert">
               {error('privacyConsent')}
             </p>
           ) : null}

@@ -17,7 +17,12 @@ import './world-controls.css';
 
 void React;
 
-export function WorldControls() {
+/**
+ * `inline` is the same switch set in a page's own bar instead of fixed over the corner. The front
+ * page uses it, because a fixed chip sat over each photograph's credit as its stacked scenes
+ * scrolled by; a page that carries it does not draw the fixed one (world-controls.css).
+ */
+export function WorldControls({ inline = false }: { readonly inline?: boolean } = {}) {
   const [still, setStill] = useState(false);
   const [documents, setDocuments] = useState(false);
   useEffect(() => {
@@ -30,7 +35,7 @@ export function WorldControls() {
 
   return (
     <section
-      className="ds-world-controls"
+      className={inline ? 'ds-world-controls ds-world-controls--inline' : 'ds-world-controls'}
       aria-label="Map display"
       data-documents={documents ? '' : undefined}
     >

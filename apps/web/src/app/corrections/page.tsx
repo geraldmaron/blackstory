@@ -7,7 +7,7 @@ import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { CorrectionsSections } from './CorrectionsSections';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { TrustMast, TrustSheet } from '../../components/trust';
 import { resolvePublicEntityView } from '../../lib/public-data/source';
 import { isCorrectionTargetType } from './categories';
@@ -44,9 +44,9 @@ export default async function CorrectionsPage({ searchParams }: CorrectionsPageP
       ? await resolvePublicEntityView(initialTarget).catch(() => undefined)
       : undefined;
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast>
           <PageHeader
@@ -67,6 +67,6 @@ export default async function CorrectionsPage({ searchParams }: CorrectionsPageP
           {...(record?.data ? { targetName: record.data.displayName } : {})}
         />
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

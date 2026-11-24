@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../../../components/room';
+import { parentCrumb, PageFrame } from '../../../../components/page';
 import { TrustMast, TrustSheet } from '../../../../components/trust';
 import '../../../utility.css';
 import '../../../../components/trust/trust.css';
@@ -39,9 +39,9 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
   if (!status) notFound();
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast>
           <PageHeader
@@ -57,6 +57,6 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
       <TrustSheet>
         <CorrectionStatusPanel status={status} />
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

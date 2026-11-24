@@ -2,7 +2,7 @@
  * Curated memorial name roll for the /memorial edition wall and readable list.
  *
  * Sourced from the shared verified archive at
- * `apps/web/src/components/atmosphere/memorial-names.json` (built from
+ * `apps/web/src/components/patterns/memorial-wall/memorial-name-archive.json` (built from
  * docs/research/police-violence-memorial-names.json and
  * docs/research/racial-terror-memorial-names.json — see
  * docs/research/memorial-names-wall.sources.json), merged with a small set of
@@ -15,7 +15,7 @@ import {
   MEMORIAL_NAMES_REQUIRED,
   isMemorialNamePlateEligible,
   type MemorialNameEntry,
-} from '../../atmosphere/memorial-names';
+} from './memorial-name-archive';
 
 export { MEMORIAL_NAMES_REQUIRED, isMemorialNamePlateEligible };
 export type { MemorialNameEntry };

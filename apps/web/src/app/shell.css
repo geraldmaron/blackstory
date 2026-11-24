@@ -54,20 +54,6 @@ body {
   }
 }
 
-/* —— Surface classes (docs/ui/patterns-surface-classes.md) ——————————————————————————
-   `data-surface` is emitted once, on the page-root wrapper, by ShellPageTransition. It is the
-   single switch every shell rule reads. The rules below are the only `:has()` hops in the
-   sheet, and they exist because the header and footer are siblings of `.ds-shell-body`, so a
-   rule that has to reach them must be scoped from `.ds-shell`. Everything at or below the page
-   root reads the attribute directly.
-
-   The Instrument owns the whole viewport: the plate is the content, the document does not
-   scroll, and the shell bar would push the map down by its own height on the one surface where
-   the map is the product. Reading, Record and Utility surfaces are ordinary documents. —— */
-.ds-shell-body:has([data-surface='instrument']) {
-  padding-top: 0;
-}
-
 /* Admin renders no public shell bar, so there is nothing to clear. */
 .ds-shell-body:has(.admin-base-shell) {
   padding-top: 0;
@@ -102,56 +88,12 @@ body {
   }
 }
 
-html:has([data-surface='instrument']) {
-  overflow: hidden;
-  overscroll-behavior: none;
-}
-
 /* Any full-screen map, including the Door's "Browse the map": the page under it must not scroll
    or rubber-band, or a pan that reaches the edge drags the document (and a phone's toolbar)
    instead of the map. */
 html:has(.ds-map-stage[data-plate-posture='live']) {
   overflow: hidden;
   overscroll-behavior: none;
-}
-
-.ds-shell:has([data-surface='instrument']) {
-  height: 100dvh;
-  max-height: 100dvh;
-  overflow: hidden;
-}
-
-.ds-shell:has([data-surface='instrument']) .ds-shell-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.ds-shell:has([data-surface='instrument']) .ds-shell-page-transition,
-.ds-shell:has([data-surface='instrument']) .ds-shell-page-transition__content {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-}
-
-/* Formerly `.ds-map-surface`, a wrapper div the deleted `(map)` route group's layout rendered
-   around every Instrument page. `data-surface='instrument'` is already on the page-root wrapper
-   (ShellPageTransition), so gating on the attribute directly makes the wrapper div unnecessary. */
-[data-surface='instrument'] {
-  position: relative;
-}
-
-/* Below-hero page content on the Instrument. The canvas plate is FIXED behind the whole
-   viewport, and positioned elements (even z-index: 0) paint over static flow content — so a
-   plain `<main>` on this surface would be swallowed by the ink plate the moment the reader
-   scrolls past the hero. Re-establish paint order and bring the theme canvas along as an
-   opaque backdrop. */
-[data-surface='instrument'] main {
-  position: relative;
-  z-index: var(--ds-z-content);
-  background: var(--ds-canvas);
 }
 
 /* Document surfaces keep the shared primary nav in full. Header chrome follows [data-theme]
@@ -467,14 +409,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   padding-block: var(--ds-space-12) var(--ds-space-16);
 }
 
-.ds-section__kicker {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
-}
-
 .ds-page__title {
   margin: var(--ds-space-6) 0 0;
   font-family: var(--ds-font-display);
@@ -502,21 +436,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   line-height: 1.65;
 }
 
-/* —— Sections — hairline-ruled rooms with an index numeral ——  */
-.ds-section {
-  position: relative;
-  padding-block: var(--ds-space-16);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-section:last-child {
-  border-bottom: 0;
-}
-
-.ds-section__kicker {
-  margin-bottom: var(--ds-space-4);
-}
-
 .ds-section__title {
   margin: 0;
   font-family: var(--ds-font-display);
@@ -529,180 +448,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 /* Keep multi-word brand phrases from mid-phrase wrapping. */
 .ds-phrase-nowrap {
   white-space: nowrap;
-}
-
-.ds-section__lede {
-  margin: var(--ds-space-5) 0 0;
-  max-width: 46rem;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body);
-  line-height: 1.65;
-}
-
-/* —— Ink band — full-bleed, no radius, one per page max ——  */
-.ds-band {
-  background: var(--ds-fixed-charcoal);
-  color: var(--ds-fixed-paper);
-  padding-block: var(--ds-space-16);
-}
-
-.ds-band .ds-section__kicker {
-  color: var(--ds-fixed-accent);
-}
-
-.ds-band .ds-section__title {
-  color: var(--ds-fixed-paper);
-}
-
-.ds-band .ds-section__lede,
-.ds-band a:not(.ds-cta) {
-  color: var(--ds-fixed-stone);
-}
-
-.ds-band a:not(.ds-cta):hover {
-  color: var(--ds-fixed-paper);
-}
-
-.ds-band__cta {
-  margin: var(--ds-space-8) 0 0;
-}
-
-/* —— Legacy action class. The kit `Button` (`.ds-button`, packages/ui components.css) is the one
-   button. `.ds-cta` stays only for call sites in page folders and the map surfaces that later
-   waves migrate; it takes the Button's geometry (44px, radius 8, 14/600) so the two match until
-   it is deleted. Do not add new uses. ——  */
-.ds-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-2);
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-4);
-  border-radius: var(--ds-radius-sm);
-  border: var(--ds-border-width) solid transparent;
-  font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: normal;
-  text-transform: none;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    background-color var(--ds-duration-fast) var(--ds-easing),
-    color var(--ds-duration-fast) var(--ds-easing),
-    border-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-/* Former dense size; now the same 44px target as every button. */
-.ds-cta--sm {
-  padding: 0 var(--ds-space-3);
-}
-
-/* THE primary action of a view — copper, max one per composition. */
-.ds-cta--copper {
-  background: var(--ds-accent-graphic);
-  color: var(--ds-fixed-ink);
-}
-
-.ds-cta--copper:hover {
-  opacity: 0.87;
-}
-
-/* Solid ink-on-paper; inverts with theme so it never sits ink-on-ink. */
-.ds-cta--solid,
-.ds-cta--ink {
-  background: var(--ds-ink);
-  color: var(--ds-inverse-ink);
-}
-
-.ds-cta--solid:hover,
-.ds-cta--ink:hover {
-  opacity: 0.84;
-}
-
-.ds-band .ds-cta--solid,
-.ds-band .ds-cta--ink {
-  background: var(--ds-fixed-paper);
-  color: var(--ds-fixed-ink);
-}
-
-/* Quiet — hairline pill, transparent fill, theme-following. */
-.ds-cta--quiet {
-  border-color: var(--ds-border-strong);
-  color: var(--ds-ink);
-}
-
-.ds-cta--quiet:hover {
-  background: var(--ds-surface-raised);
-}
-
-/* Quiet on fixed charcoal bands — paper hairline + paper text (same contract as
-   ghost-on-band). Theme --ds-ink is black in light mode and would vanish on charcoal. */
-.ds-band .ds-cta--quiet:link,
-.ds-band .ds-cta--quiet:visited,
-.ds-band .ds-cta--quiet {
-  border-color: color-mix(in srgb, var(--ds-fixed-paper) 45%, transparent);
-  color: var(--ds-fixed-paper);
-  background: transparent;
-}
-
-.ds-band .ds-cta--quiet:hover,
-.ds-band .ds-cta--quiet:focus-visible {
-  border-color: var(--ds-fixed-paper);
-  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
-  color: var(--ds-fixed-paper);
-}
-
-/* Ghost — hairline pill over themed surfaces (hero, cards).
-   `:link`/`:visited` beat a single class (UA visited color), so pin both. */
-.ds-cta.ds-cta--ghost:link,
-.ds-cta.ds-cta--ghost:visited,
-.ds-cta.ds-cta--ghost {
-  background: transparent;
-  border-color: color-mix(in srgb, var(--ds-ink) 38%, transparent);
-  color: var(--ds-ink);
-}
-
-.ds-cta.ds-cta--ghost:hover {
-  border-color: var(--ds-ink);
-  background: color-mix(in srgb, var(--ds-ink) 8%, transparent);
-}
-
-/* Ghost on fixed-ink bands only — paper hairline + paper text. */
-.ds-cta.ds-cta--ghost-dark:link,
-.ds-cta.ds-cta--ghost-dark:visited,
-.ds-cta.ds-cta--ghost-dark,
-.ds-band .ds-cta.ds-cta--ghost:link,
-.ds-band .ds-cta.ds-cta--ghost:visited,
-.ds-band .ds-cta.ds-cta--ghost {
-  background: transparent;
-  border-color: color-mix(in srgb, var(--ds-fixed-paper) 38%, transparent);
-  color: var(--ds-fixed-paper);
-}
-
-.ds-cta.ds-cta--ghost-dark:hover,
-.ds-band .ds-cta.ds-cta--ghost:hover {
-  border-color: var(--ds-fixed-paper);
-  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
-}
-
-/* Quiet text link — underline action without the pill. */
-.ds-cta-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 600;
-  text-decoration: none;
-  border-bottom: 2px solid var(--ds-accent);
-  transition: opacity var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-cta-link:hover {
-  opacity: 0.7;
 }
 
 /* —— Home hero — one Surface panel; copy left + live map readout right —— */
@@ -740,121 +485,12 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 
 /* —— Home data pulse —— archive strip + /data charts —— */
 
-.ds-state-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  color: var(--ds-ink);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  font-weight: 500;
-  text-decoration: none;
-  transition:
-    border-color var(--ds-duration-fast) var(--ds-easing),
-    background-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-state-chip:hover {
-  border-color: var(--ds-ink);
-  background: var(--ds-surface-raised);
-}
-
-.ds-state-chip:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
-  outline-offset: 2px;
-}
-
-.ds-state-chip__count {
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-}
-
 /* —— Home “How this works” — theme-aware section with methodology sketch —— */
 
 /*
  * Sketch keeps ordinary --ds-* tokens so it flips with [data-theme] like
  * /methodology — no fixed-ink remapping and no forced cream plate.
  */
-
-/* —— Story rail — top-rule entries, never boxes ——  */
-.ds-story-rail {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--ds-space-8);
-  margin: var(--ds-space-8) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 48rem) {
-  .ds-story-rail {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--ds-space-8);
-  }
-}
-
-.ds-story-link {
-  display: grid;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-5) 0 0;
-  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-story-link__meta {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
-  color: var(--ds-ink-subtle);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
-  transition: color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-story-link:hover .ds-story-link__meta,
-.ds-story-link:focus-visible .ds-story-link__meta {
-  color: var(--ds-accent);
-}
-
-.ds-story-link__title {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
-  letter-spacing: -0.02em;
-  line-height: 1.3;
-}
-
-.ds-story-link:hover .ds-story-link__title,
-.ds-story-link:focus-visible .ds-story-link__title {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-}
-
-.ds-story-link:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-  border-radius: var(--ds-radius-sm);
-}
-
-.ds-story-link__summary {
-  margin: 0;
-  max-width: 40rem;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-}
 
 /* —— Quiet entity links — inherit color; underline on hover/focus only —— */
 .ds-entity-link {
@@ -881,59 +517,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-family: var(--ds-font-sans);
   font-size: 0.875rem;
   line-height: 1.5;
-}
-
-/* —— Data strip — the archive in numbers, mono register, hairlines only ——  */
-.ds-data-strip {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-  margin: var(--ds-space-8) 0 0;
-}
-
-.ds-data-strip__item {
-  display: grid;
-  gap: var(--ds-space-1);
-  padding: var(--ds-space-4) 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-data-strip__value {
-  font-family: var(--ds-font-mono);
-  font-size: clamp(1.5rem, 1.3rem + 1.2vw, 2.25rem);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.ds-data-strip__label {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-}
-
-.ds-data-strip__note {
-  margin: var(--ds-space-2) 0 0;
-  color: var(--ds-ink-muted);
-}
-
-.ds-data-stat-strip {
-  margin-top: var(--ds-space-8);
-}
-
-.ds-data-stat-strip > .ds-data-strip {
-  margin-top: 0;
-}
-
-.ds-data-stat-strip > .ds-citation--group {
-  margin-top: var(--ds-space-4);
-}
-
-@media (min-width: 48rem) {
-  .ds-data-strip {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--ds-space-8);
-  }
 }
 
 /* —— Ledger index — the shared `@repo/ui` ResultList reskinned for search
@@ -967,7 +550,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   font-weight: 400;
-  transition: color var(--ds-duration-fast) var(--ds-easing);
+  transition: color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-index .ds-result-list__link:hover::before,
@@ -1017,7 +600,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   object-fit: cover;
   object-position: center center;
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   background: var(--ds-surface);
 }
 
@@ -1094,7 +677,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
 
 .ds-entity-photo--mark .ds-entity-mark {
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   background: var(--ds-surface);
   overflow: hidden;
 }
@@ -1163,169 +746,6 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   50% {
     opacity: 0.9;
   }
-}
-
-/* —— Kind badge + confidence mark — map-parity indicators reused on home,
-   entity, and explore surfaces. Glyph + label so color is never the only
-   signal (WCAG 1.4.1). ——  */
-.ds-kind-badge {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: var(--ds-space-2);
-  max-width: 100%;
-  white-space: nowrap;
-}
-
-.ds-kind-badge__label {
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.ds-kind-badge__icon {
-  flex-shrink: 0;
-  width: 0.75rem;
-  height: 0.75rem;
-}
-
-.ds-kind-badge--compact {
-  gap: var(--ds-space-1);
-}
-
-.ds-kind-badge--compact .ds-kind-badge__label {
-  font-size: inherit;
-  letter-spacing: inherit;
-}
-
-.ds-kind-badge--compact .ds-kind-badge__icon {
-  width: 0.625rem;
-  height: 0.625rem;
-}
-
-.ds-confidence-mark {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 0.3em;
-  max-width: 100%;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  line-height: 1.2;
-  font-weight: 500;
-  cursor: help;
-}
-
-.ds-confidence-mark__icon {
-  width: 0.75rem;
-  height: 0.75rem;
-  flex: 0 0 auto;
-}
-
-.ds-confidence-mark__text {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  letter-spacing: 0.02em;
-}
-
-/* Icon + word + green→orange confidence ramp (high=green, low=orange). The fg tokens re-point per
-   theme and per ground, so a mark on a paper sheet in the dark theme stays legible. */
-.ds-confidence-mark--high {
-  color: var(--ds-confidence-high-fg);
-}
-
-.ds-confidence-mark--medium {
-  color: var(--ds-confidence-medium-fg);
-}
-
-.ds-confidence-mark--low {
-  color: var(--ds-confidence-low-fg);
-}
-
-.ds-confidence-mark--unrated {
-  color: var(--ds-ink-subtle);
-}
-
-/* Dotted underline invites hover help on field titles (Kind, Status, …). */
-.ds-meta-field-label {
-  cursor: help;
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
-}
-
-/* External maps deep links — inherit meta/link styling; underline on hover/focus.
- * When also a `.ds-cta`, leave color to the CTA recipe (copper/ink). */
-.ds-maps-external-link:not(.ds-cta) {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-maps-external-link:not(.ds-cta):hover,
-.ds-maps-external-link:not(.ds-cta):focus-visible {
-  color: var(--ds-accent);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-}
-
-/* Status chips — icon + mono label (not color-only). */
-.ds-status-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3em;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  cursor: help;
-}
-
-.ds-status-mark__icon {
-  width: 0.75rem;
-  height: 0.75rem;
-  flex: 0 0 auto;
-}
-
-.ds-status-mark--active,
-.ds-status-mark--living,
-.ds-status-mark--in_force {
-  color: var(--ds-accent);
-}
-
-.ds-status-mark--historic,
-.ds-status-mark--inactive,
-.ds-status-mark--deceased,
-.ds-status-mark--archived,
-.ds-status-mark--draft,
-.ds-status-mark--repealed,
-.ds-status-mark--struck_down,
-.ds-status-mark--enjoined,
-.ds-status-mark--amended {
-  color: var(--ds-ink-muted);
-}
-
-/* —— Data charts — flat matte SVG figures ——  */
-.ds-data-chart {
-  margin: var(--ds-space-6) 0 0;
-}
-
-.ds-data-chart__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.ds-data-chart__svg line,
-.ds-data-chart__svg path.ds-data-chart__axis {
-  stroke: var(--ds-rule);
-  stroke-width: 1;
-  fill: none;
 }
 
 /* —— The persistent map plate ——————————————————————————————————————————————————————
@@ -1443,7 +863,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   width: var(--ds-plate-frame-width);
   height: var(--ds-plate-frame-height);
   /* Match `.ds-mapmoment__plate` so WebGL clips to the same copper frame. */
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -1543,18 +963,16 @@ html:not([data-world-on])
 }
 
 /* The one attribution treatment, on the plate and in every record embed (`.ds-record-map`): a
-   float-recipe chip (glass of the ground, keyline, float shadow) that is exactly the 44px "i"
+   solid chip (the ground, a keyline, the float shadow) that is exactly the 44px "i"
    when collapsed and opens leftward into its links. */
 :is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib {
   max-width: 16rem;
   border: 0;
   border-radius: var(--ds-radius-sm);
-  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  background: var(--ds-canvas);
   box-shadow:
     inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
     var(--ds-shadow-float);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-micro);
   line-height: 1.35;
@@ -1576,7 +994,7 @@ html:not([data-world-on])
   /* Room for the info button, which MapLibre pins to the right edge. Collapsed, the control is
      exactly that button. */
   padding: 0;
-  background-color: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  background-color: var(--ds-canvas);
   color: var(--ds-ink);
 }
 
@@ -1600,20 +1018,6 @@ html:not([data-world-on])
   .maplibregl-ctrl-attrib-button {
   right: auto;
   left: 0;
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib.maplibregl-compact {
-    background-color: var(--ds-canvas);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  :is(.ds-map-stage, .ds-record-map) .maplibregl-ctrl-attrib.maplibregl-compact {
-    background-color: var(--ds-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 :is(.ds-map-stage, .ds-record-map)
@@ -1713,85 +1117,6 @@ html:not([data-world-on])
   }
 }
 
-/* Explore: bottom-right zoom, inset when the records sheet/rail is open. */
-body:has([data-surface='instrument']) {
-  --ds-explore-edge: var(--ds-space-4);
-  /* % of the fixed containing block (viewport) — avoid 100vw scrollbar gutter. */
-  --ds-explore-results-width: min(22.5rem, 92%);
-  --ds-explore-restore-chip-width: 6.5rem;
-  --ds-explore-zoom-right: var(--ds-explore-edge);
-  --ds-explore-zoom-bottom: var(--ds-explore-edge);
-  --ds-map-attrib-left: var(--ds-explore-edge);
-  --ds-map-attrib-bottom: var(--ds-explore-edge);
-}
-
-body:has([data-surface='instrument']) .ds-map-stage .maplibregl-ctrl-top-right {
-  top: auto;
-  right: var(--ds-explore-zoom-right);
-  bottom: var(--ds-explore-zoom-bottom);
-  display: block;
-}
-
-body:has(.ds-explore-stage[data-results='open']) {
-  --ds-explore-zoom-right: calc(
-    var(--ds-explore-edge) + var(--ds-explore-results-width) + var(--ds-space-3)
-  );
-}
-
-@media (max-width: 64rem) {
-  body:has([data-surface='instrument']) {
-    --ds-explore-results-width: min(22.5rem, 92%);
-  }
-
-  /* Records become a bottom sheet — park zoom above it, not beside a right rail. */
-  body:has(.ds-explore-stage[data-results='open']) {
-    --ds-explore-zoom-right: var(--ds-explore-edge);
-    --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
-    --ds-map-attrib-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
-  }
-
-  body:has(.ds-explore-stage[data-instruments='open']) {
-    --ds-explore-zoom-right: calc(
-      var(--ds-explore-edge) + var(--ds-explore-restore-chip-width) + var(--ds-space-2)
-    );
-    --ds-explore-zoom-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
-    --ds-map-attrib-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
-  }
-
-  body:has(.ds-explore-stage[data-instruments='open'][data-results='open']) {
-    --ds-explore-zoom-bottom: calc(
-      min(42vh, 22rem) + 2.75rem + var(--ds-explore-edge) + var(--ds-space-3)
-    );
-    --ds-map-attrib-bottom: calc(
-      min(42vh, 22rem) + 2.75rem + var(--ds-explore-edge) + var(--ds-space-3)
-    );
-  }
-}
-
-@media (max-width: 39.9375rem) {
-  body:has([data-surface='instrument']) {
-    --ds-explore-edge: var(--ds-space-3);
-    /* Width comes from left+right insets on the panel; keep a length for zoom math. */
-    --ds-explore-results-width: calc(100% - var(--ds-explore-edge) * 2);
-  }
-
-  body:has(.ds-explore-stage[data-results='open']) {
-    --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
-    --ds-map-attrib-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
-  }
-}
-
-/*
- * The map's narrow layout puts the dock switcher on the bottom edge, where the attribution was.
- * Attribution is a license obligation, so it moves up rather than being covered: dock height plus
- * its offset and a gap. Explore is the only surface with that bar, hence `:has(.ds-atlas)`.
- */
-@media (max-width: 819px) {
-  body:has([data-surface='instrument']):has(.ds-atlas) {
-    --ds-map-attrib-bottom: calc(var(--ds-space-2) + 60px);
-  }
-}
-
 /* Place-search orientation pin — copper head + stem; not an entity hit target. */
 .ds-map-search-center-marker {
   display: flex;
@@ -1865,19 +1190,6 @@ body:has(.ds-explore-stage[data-results='open']) {
 }
 
 /*
- * Dense link lists on touch screens: source links in a record's fact tiles and citations, a book's
- * challenge and evidence lists, a law's agency and source links. They render 15–19px tall. Inline
- * padding grows the tap area to ~27px without moving a single line of the layout (padding on an
- * inline box does not change line height).
- */
-@media (pointer: coarse) {
-  :where(dd, li, .ds-citation, .ds-room-src__t, .ds-room-anat__v, .ds-empty__body)
-    > a:not([class*='ds-cta']):not(.ds-button) {
-    padding-block: 6px;
-  }
-}
-
-/*
  * Form fields on touch screens are at least 16px. iOS Safari zooms the whole page into any field
  * set smaller than that on focus and leaves it zoomed after — on the map, that is a page stuck
  * half-zoomed with the field still hogging the screen. `!important` because this is a platform
@@ -1934,20 +1246,13 @@ main[tabindex='-1']:focus-visible {
   box-shadow: var(--ds-shadow-float);
 }
 
-.ds-map-callout__body,
-.ds-map-callout__link {
+.ds-map-callout__body {
   display: grid;
   gap: var(--ds-space-1);
   padding: var(--ds-space-2) var(--ds-space-3);
   border-radius: inherit;
   color: var(--ds-ink);
   text-decoration: none;
-}
-
-/* The link is a 44px target; the card keeps its weight by centering the two lines inside it. */
-.ds-map-callout__link {
-  align-content: center;
-  min-height: 2.75rem;
 }
 
 .ds-map-callout__name {
@@ -2039,20 +1344,20 @@ main[tabindex='-1']:focus-visible {
   translate: -50% -50%;
   /* v12: a count is a label, not a record, so it is never ember. The world is night in both
      themes, so it takes the night's ink and a night halo whatever the reader's theme is. */
-  color: var(--ds-world-hud-ink);
+  color: var(--ds-fixed-paper);
   font-family: var(--ds-font-display);
   font-size: var(--ds-place-count);
   font-variant-numeric: tabular-nums;
   font-weight: 650;
   line-height: 1;
   text-shadow:
-    0 0 2px var(--ds-world-space),
-    0 0 5px var(--ds-world-space);
+    0 0 2px var(--ds-fixed-ink),
+    0 0 5px var(--ds-fixed-ink);
   white-space: nowrap;
   transition:
-    color var(--ds-duration-fast) var(--ds-easing),
-    scale var(--ds-duration-fast) var(--ds-easing);
-  animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
+    color var(--ds-duration-fast) var(--ds-ease-entrance),
+    scale var(--ds-duration-fast) var(--ds-ease-entrance);
+  animation: ds-place-in var(--ds-duration-base) var(--ds-ease-entrance) both;
 }
 
 /* The name starts past the numeral: half its digits (about 0.31em each) and a gap. */
@@ -2061,19 +1366,19 @@ main[tabindex='-1']:focus-visible {
   top: 0;
   left: calc(var(--ds-place-digits, 2) * var(--ds-place-count) * 0.31 + 8px);
   translate: 0 -50%;
-  color: var(--ds-world-hud-ink);
+  color: var(--ds-fixed-paper);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-place-name);
   font-weight: 500;
   letter-spacing: var(--ds-tracking-meta);
   line-height: 1;
   text-shadow:
-    0 0 2px var(--ds-world-space),
-    0 0 5px var(--ds-world-space);
+    0 0 2px var(--ds-fixed-ink),
+    0 0 5px var(--ds-fixed-ink);
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity var(--ds-duration-fast) var(--ds-easing);
+  transition: opacity var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-place-token.is-named .ds-place-token__name {
@@ -2121,7 +1426,7 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
 }
 
 .ds-place-leaders g {
-  animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
+  animation: ds-place-in var(--ds-duration-base) var(--ds-ease-entrance) both;
 }
 
 /* A label is its mark: the numeral, a shown place name and a record's name beside its pin each open
@@ -2224,7 +1529,7 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   font-weight: 650;
   line-height: 1.15;
   text-shadow: var(--ds-place-halo);
-  animation: ds-place-in var(--ds-duration-base) var(--ds-easing) both;
+  animation: ds-place-in var(--ds-duration-base) var(--ds-ease-entrance) both;
 }
 
 @keyframes ds-place-in {
@@ -2267,43 +1572,9 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   visibility: hidden;
 }
 
-/* Space, not page ground, behind the globe. Two soft hazes give the night some depth: the rim's
-   blue from the upper right, a trace of ember from the lower left. */
+/* The map stands on the ink ground (docs/ui/DESIGN.md section 7.1), in both themes. */
 .ds-map-stage {
-  background:
-    radial-gradient(
-      ellipse 70% 60% at 85% 10%,
-      color-mix(in srgb, var(--ds-world-rim) 9%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 60% 55% at 5% 100%,
-      color-mix(in srgb, var(--ds-world-ember) 5%, transparent),
-      transparent 70%
-    ),
-    var(--ds-world-space);
-}
-
-/* The star field (design-direction-v11.md §8: procedural, not generated). One seeded tile used
-   as a mask at two sizes, so the larger copy reads as a nearer plane and the repeat never lines
-   up. It sits under the canvas, which is clear outside the globe: the globe hides the stars
-   behind it and a flat map hides them all. Cool white and still, never ember, so no star can be
-   taken for a record's light. */
-.ds-map-stage::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--ds-world-hud-ink);
-  opacity: 0.8;
-  pointer-events: none;
-  mask-image: var(--ds-star-tile), var(--ds-star-tile);
-  mask-size:
-    640px 640px,
-    910px 910px;
-  mask-position:
-    0 0,
-    317px 131px;
-  --ds-star-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Ccircle cx='422' cy='495' r='0.5' opacity='0.40'/%3E%3Ccircle cx='154' cy='364' r='0.5' opacity='0.57'/%3E%3Ccircle cx='328' cy='420' r='0.75' opacity='0.48'/%3E%3Ccircle cx='457' cy='459' r='0.5' opacity='0.64'/%3E%3Ccircle cx='350' cy='102' r='0.75' opacity='0.56'/%3E%3Ccircle cx='475' cy='316' r='0.5' opacity='0.37'/%3E%3Ccircle cx='228' cy='235' r='0.5' opacity='0.52'/%3E%3Ccircle cx='570' cy='47' r='0.5' opacity='0.66'/%3E%3Ccircle cx='425' cy='404' r='0.75' opacity='0.63'/%3E%3Ccircle cx='26' cy='476' r='0.75' opacity='0.27'/%3E%3Ccircle cx='287' cy='145' r='0.5' opacity='0.60'/%3E%3Ccircle cx='183' cy='463' r='0.5' opacity='0.38'/%3E%3Ccircle cx='86' cy='517' r='0.5' opacity='0.64'/%3E%3Ccircle cx='583' cy='494' r='0.5' opacity='0.58'/%3E%3Ccircle cx='539' cy='445' r='0.5' opacity='0.40'/%3E%3Ccircle cx='270' cy='401' r='0.5' opacity='0.50'/%3E%3Ccircle cx='452' cy='607' r='0.5' opacity='0.29'/%3E%3Ccircle cx='411' cy='158' r='0.5' opacity='0.62'/%3E%3Ccircle cx='159' cy='179' r='0.5' opacity='0.26'/%3E%3Ccircle cx='557' cy='554' r='0.5' opacity='0.57'/%3E%3Ccircle cx='524' cy='487' r='0.5' opacity='0.48'/%3E%3Ccircle cx='66' cy='554' r='0.5' opacity='0.65'/%3E%3Ccircle cx='62' cy='221' r='0.75' opacity='0.42'/%3E%3Ccircle cx='201' cy='292' r='0.5' opacity='0.46'/%3E%3Ccircle cx='422' cy='137' r='0.5' opacity='0.28'/%3E%3Ccircle cx='516' cy='108' r='0.5' opacity='0.65'/%3E%3Ccircle cx='384' cy='589' r='0.5' opacity='0.28'/%3E%3Ccircle cx='390' cy='104' r='0.5' opacity='0.52'/%3E%3Ccircle cx='146' cy='227' r='0.75' opacity='0.66'/%3E%3Ccircle cx='617' cy='221' r='0.75' opacity='0.48'/%3E%3Ccircle cx='521' cy='333' r='0.5' opacity='0.31'/%3E%3Ccircle cx='541' cy='196' r='0.5' opacity='0.37'/%3E%3Ccircle cx='259' cy='75' r='0.75' opacity='0.62'/%3E%3Ccircle cx='359' cy='35' r='0.5' opacity='0.44'/%3E%3Ccircle cx='450' cy='608' r='0.5' opacity='0.41'/%3E%3Ccircle cx='263' cy='373' r='0.75' opacity='0.37'/%3E%3Ccircle cx='3' cy='86' r='0.75' opacity='0.44'/%3E%3Ccircle cx='260' cy='148' r='0.5' opacity='0.55'/%3E%3Ccircle cx='340' cy='129' r='1.1' opacity='0.95'/%3E%3Ccircle cx='275' cy='34' r='0.5' opacity='0.66'/%3E%3Ccircle cx='352' cy='540' r='0.75' opacity='0.65'/%3E%3Ccircle cx='575' cy='128' r='0.5' opacity='0.65'/%3E%3Ccircle cx='246' cy='535' r='1.1' opacity='0.95'/%3E%3Ccircle cx='280' cy='546' r='0.5' opacity='0.65'/%3E%3Ccircle cx='32' cy='321' r='1.1' opacity='0.95'/%3E%3Ccircle cx='542' cy='103' r='0.5' opacity='0.61'/%3E%3C/svg%3E");
+  background: var(--ds-fixed-ink);
 }
 
 /*
@@ -2315,7 +1586,7 @@ pointer, because its hit circle is no longer under it; the pseudo-element pads i
   .ds-tabbar,
   .ds-world-controls,
   .ds-skip-link,
-  .ds-room-toc {
+  .ds-doc-toc {
     display: none;
   }
 }

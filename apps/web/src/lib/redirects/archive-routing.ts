@@ -48,6 +48,8 @@ export function legacyArchiveRedirect(
 ): string | null {
   const path = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, '') : url.pathname;
   if (path === '/collections') return ARCHIVE_PATH;
+  // `/story` was the retelling on trial; it is the front page now (docs/ui/DESIGN.md 9.7).
+  if (path === '/story') return '/';
   if (!enabled) return null;
   const query = new URLSearchParams(url.search);
   if (path === '/records') {
@@ -71,13 +73,20 @@ export function legacyArchiveRedirect(
 /**
  * `/archive?lens=`: the law and books lenses answer on `/law` and `/books`, which are their own
  * canonical addresses, and the presidents are a story collection. `lens=inventions` is a filter
- * on the shared model and is rewritten by the `/archive` normalizer instead.
+ * on the shared model: it moves to `kind=inventions` here, temporarily like the rest, so the
+ * `/archive` normalizer never answers it with a permanent redirect.
  */
 export function archiveLensRedirect(url: URL): string | null {
   if (url.pathname !== ARCHIVE_PATH) return null;
   const lens = url.searchParams.get('lens')?.trim().toLowerCase();
   if (lens === 'law') return canonical(url, '/law', new URLSearchParams(url.search));
   if (lens === 'presidents') return '/presidents';
+  if (lens === 'inventions') {
+    const query = new URLSearchParams(url.search);
+    query.delete('lens');
+    query.set('kind', 'inventions');
+    return canonical(url, ARCHIVE_PATH, query);
+  }
   if (lens === 'books') {
     const query = new URLSearchParams();
     for (const key of BOOKS_LENS_KEYS) {

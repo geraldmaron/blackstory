@@ -12,7 +12,7 @@ import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { Button, PageHeader } from '@repo/ui';
-import { parentCrumb, Room, RoomSection } from '../../components/room';
+import { parentCrumb, PageFrame, PageSection } from '../../components/page';
 import { TrustLinks, TrustMast, TrustSheet } from '../../components/trust';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import '../utility.css';
@@ -30,9 +30,9 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function SupportPage() {
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast>
           <PageHeader
@@ -47,7 +47,7 @@ export default function SupportPage() {
     >
       <TrustSheet>
         <div className="ds-support__pair">
-          <RoomSection id="record" title="Something in a record is wrong">
+          <PageSection id="record" title="Something in a record is wrong">
             <p className="ds-trust-lead">
               File it as a correction. A person reads it against the published sources, and you get
               a receipt code to check the outcome.
@@ -55,9 +55,9 @@ export default function SupportPage() {
             <div className="ds-support__action">
               <Button href="/corrections">Report a correction</Button>
             </div>
-          </RoomSection>
+          </PageSection>
 
-          <RoomSection id="contact" title="Anything else">
+          <PageSection id="contact" title="Anything else">
             <p className="ds-trust-lead">
               Write to me directly about how the archive is run, a privacy request, or an
               accessibility barrier that keeps you out of a page.
@@ -69,10 +69,10 @@ export default function SupportPage() {
               A reply can take a few days. Most privacy questions are already answered in the{' '}
               <Link href="/privacy">privacy policy</Link>.
             </p>
-          </RoomSection>
+          </PageSection>
         </div>
 
-        <RoomSection id="answers" title="Answers that already exist">
+        <PageSection id="answers" title="Answers that already exist">
           <TrustLinks
             links={[
               {
@@ -92,8 +92,8 @@ export default function SupportPage() {
               },
             ]}
           />
-        </RoomSection>
+        </PageSection>
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

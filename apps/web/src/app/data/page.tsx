@@ -12,7 +12,7 @@ import { permanentRedirect } from 'next/navigation';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { TrustMast } from '../../components/trust';
 import {
   buildLivesHref,
@@ -24,7 +24,7 @@ import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections } from './DataSections';
 import { loadDataPageModel } from './load-data-page-model';
 import { parseFigureViews } from '../../components/data/figures/registry';
-import '../reading-room.css';
+import '../reading-page.css';
 import './data-page.css';
 
 void React;
@@ -55,9 +55,9 @@ export default async function DataPage({
   const latest = model.latestCensus;
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
           numeral={
@@ -87,6 +87,6 @@ export default async function DataPage({
         indicatorsAsOf={model.indicatorsAsOf}
         views={parseFigureViews(raw.view)}
       />
-    </Room>
+    </PageFrame>
   );
 }

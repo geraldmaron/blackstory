@@ -19,7 +19,7 @@ import {
   ABOUT_SOURCE_LIBRARY_HANDOFF,
 } from './about-copy';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
-import { Prose, RoomFactList, RoomJump, RoomSection } from '../../components/room';
+import { Prose, FactList, ContentsList, PageSection } from '../../components/page';
 import { TrustBand, TrustFlow, TrustLinks, TrustSheet } from '../../components/trust';
 import { RecordsByState, type StateCount } from './RecordsByState';
 
@@ -65,13 +65,13 @@ export function AboutSections({ states }: AboutSectionsProps) {
   return (
     <>
       <TrustSheet>
-        <RoomJump sections={ABOUT_JUMP} />
+        <ContentsList sections={ABOUT_JUMP} />
 
-        <RoomSection rule="weave" id="origin" title="Why this exists">
+        <PageSection id="origin" title="Why this exists">
           <LeadThenProse paragraphs={ABOUT_ORIGIN} />
-        </RoomSection>
+        </PageSection>
 
-        <RoomSection rule="weave" id="stance" title={ABOUT_STANCE.heading}>
+        <PageSection id="stance" title={ABOUT_STANCE.heading}>
           <LeadThenProse paragraphs={ABOUT_STANCE.paragraphs} />
           <Prose>
             <p>
@@ -82,9 +82,9 @@ export function AboutSections({ states }: AboutSectionsProps) {
               .
             </p>
           </Prose>
-        </RoomSection>
+        </PageSection>
 
-        <RoomSection rule="weave" id="pillars" title="What every record stands on">
+        <PageSection id="pillars" title="What every record stands on">
           <p className="ds-trust-lead">
             Four rules travel with every record, enforced where the record is built, so you can
             check each one on any record page instead of taking it on faith.
@@ -92,7 +92,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
           {states === undefined || states.counts.length === 0 ? null : (
             <RecordsByState states={states.counts} totalRecords={states.total} />
           )}
-          <RoomFactList items={ABOUT_PILLARS} />
+          <FactList items={ABOUT_PILLARS} />
           <TrustLinks
             links={[
               {
@@ -107,13 +107,13 @@ export function AboutSections({ states }: AboutSectionsProps) {
               },
             ]}
           />
-        </RoomSection>
+        </PageSection>
       </TrustSheet>
 
       {/* How the writing is made stands on its own ink band, and what the archive will not do on
           sand: the page changes ground between chapters instead of running one sheet. */}
       <TrustBand tone="ink" fixed>
-        <RoomSection rule="weave" id="neo" title={ABOUT_NEO.heading}>
+        <PageSection id="neo" title={ABOUT_NEO.heading}>
           <Prose>
             {ABOUT_NEO.rules.slice(0, 2).map((paragraph) => (
               <p key={paragraph.slice(0, 40)}>{paragraph}</p>
@@ -130,11 +130,11 @@ export function AboutSections({ states }: AboutSectionsProps) {
             <p>{ABOUT_NEO.hand}</p>
             <p>{ABOUT_NEO.photographs}</p>
           </Prose>
-        </RoomSection>
+        </PageSection>
       </TrustBand>
 
       <TrustBand tone="sand">
-        <RoomSection rule="weave" id="refusals" title="What it won’t do">
+        <PageSection id="refusals" title="What it won’t do">
           <ul className="ds-trust-list" aria-label="What it won’t do">
             {ABOUT_REFUSALS.map((refusal) => {
               const stop = refusal.indexOf('. ');
@@ -160,11 +160,11 @@ export function AboutSections({ states }: AboutSectionsProps) {
               },
             ]}
           />
-        </RoomSection>
+        </PageSection>
       </TrustBand>
 
       <TrustSheet>
-        <RoomSection rule="weave" id="contribute" title={ABOUT_CONTRIBUTE.heading}>
+        <PageSection id="contribute" title={ABOUT_CONTRIBUTE.heading}>
           <LeadThenProse paragraphs={[ABOUT_CONTRIBUTE.lede, ABOUT_CONTRIBUTE.terms]} />
           <Prose>
             <p>
@@ -179,9 +179,9 @@ export function AboutSections({ states }: AboutSectionsProps) {
               ...(destination.description === undefined ? {} : { line: destination.description }),
             }))}
           />
-        </RoomSection>
+        </PageSection>
 
-        <RoomSection rule="weave" id="decides" title="How it decides">
+        <PageSection id="decides" title="How it decides">
           <TrustLinks
             label="How the archive decides"
             links={decides.map((destination) => ({
@@ -190,9 +190,9 @@ export function AboutSections({ states }: AboutSectionsProps) {
               ...(destination.description === undefined ? {} : { line: destination.description }),
             }))}
           />
-        </RoomSection>
+        </PageSection>
 
-        <RoomSection rule="weave" id="begin" title="Where to begin">
+        <PageSection id="begin" title="Where to begin">
           <p className="ds-trust-lead">{ABOUT_COLLECTIONS_HANDOFF.lede}</p>
           <TrustLinks
             links={[
@@ -203,7 +203,7 @@ export function AboutSections({ states }: AboutSectionsProps) {
               },
             ]}
           />
-        </RoomSection>
+        </PageSection>
 
         <div className="ds-about-page__foot">
           <MakerCredit variant="inline" />

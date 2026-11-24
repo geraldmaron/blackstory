@@ -3,8 +3,8 @@
  * (docs/ui/DESIGN.md section 9.6). A title, its line, and the sections under a 2px rule. No night
  * mast, no horizon, no display numeral and no color bands: a count is said in a sentence.
  *
- * Render `TrustMast` as the room's `masthead` and wrap the body in `TrustSheet`; give the room
- * `className="ds-trust-room"`. Styles: `./trust.css`.
+ * Render `TrustMast` as the page's `masthead` and wrap the body in `TrustSheet`; give the page
+ * `className="ds-trust-doc"`. Styles: `./trust.css`.
  */
 import React, { type ReactNode } from 'react';
 import { cx } from '@repo/ui';
@@ -54,7 +54,7 @@ export function TrustSheet({
   readonly children: ReactNode;
   readonly className?: string;
 }) {
-  // The folio keeps the sheet one level below the room column, out of reach of the room kit's
+  // The folio keeps the sheet one level below the page column, out of reach of the page kit's
   // contents-list grid, which would otherwise dissolve the sheet with `display: contents`.
   return (
     <div className="ds-trust-folio">

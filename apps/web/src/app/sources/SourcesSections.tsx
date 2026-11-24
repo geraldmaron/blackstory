@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { RoomJump, RoomSection } from '../../components/room';
+import { ContentsList, PageSection } from '../../components/page';
 import { TrustFlow } from '../../components/trust';
 import { SOURCE_LINEAGE_STAGES, SOURCE_PUBLISHER_KINDS } from '../methodology/methodology-copy';
 import type { SourceLibrary } from './source-library';
@@ -34,9 +34,9 @@ export function sourcesDek(library: SourceLibrary | undefined): string {
 export function SourcesSections({ library }: { readonly library: SourceLibrary | undefined }) {
   return (
     <>
-      <RoomJump sections={SOURCES_JUMP} />
+      <ContentsList sections={SOURCES_JUMP} />
 
-      <RoomSection id="publishers" title="Publishers">
+      <PageSection id="publishers" title="Publishers">
         {library === undefined ? (
           <p className="ds-trust-note" role="status">
             <strong>The publisher list could not be loaded just now.</strong> Every record page
@@ -56,16 +56,16 @@ export function SourcesSections({ library }: { readonly library: SourceLibrary |
           independent sources a grade needs. How a grade reads these sources is on the{' '}
           <Link href="/methodology#evidence-grades">methodology page</Link>.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="citation-chain" title="How a URL becomes a citation">
+      <PageSection id="citation-chain" title="How a URL becomes a citation">
         <p className="ds-trust-lead">
           A source is captured when it’s found, so the reading survives even if the page doesn’t.
         </p>
         <TrustFlow caption="From a research run to a record" steps={SOURCE_LINEAGE_STAGES} />
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="publisher-kinds" title="Kinds of publisher">
+      <PageSection id="publisher-kinds" title="Kinds of publisher">
         <p className="ds-trust-lead">
           A government archive isn’t the same kind of source as a newsroom or a crowd-edited wiki,
           and a news or reference source never corroborates a claim alone.
@@ -79,7 +79,7 @@ export function SourcesSections({ library }: { readonly library: SourceLibrary |
             </div>
           ))}
         </dl>
-      </RoomSection>
+      </PageSection>
     </>
   );
 }

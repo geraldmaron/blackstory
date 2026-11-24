@@ -184,11 +184,7 @@ import {
 import { createReducedMotionListener, type ReducedMotionListener } from './reduced-motion-listener';
 // The plate is the subscriber half of the seam `MapMoment` documents: the stage publishes which
 // moment is live and where, and never touches a map itself.
-import {
-  resolveMomentCamera,
-  useMapMomentFrame,
-  useReportMapAvailability,
-} from '../room/MapMoment';
+import { resolveMomentCamera, useMapMomentFrame, useReportMapAvailability } from './MapMoment';
 
 /**
  * Give the slot geometry back, so the plate returns to its resting full-viewport box and the
@@ -1837,7 +1833,7 @@ export function MapStageProvider({
   const getMap = useCallback(() => mapRef.current as unknown as AtlasCameraTarget | null, []);
 
   /* —— The Framed posture ————————————————————————————————————————————————————————
-     This is the seam `components/room/MapMoment.tsx` documents and SP-08 owes it: the stage
+     This is the seam `components/page/MapMoment.tsx` documents and SP-08 owes it: the stage
      publishes which moment is live and where its slot is, and the plate moves into that slot
      rather than a second MapLibre instance being built inside the document.
 

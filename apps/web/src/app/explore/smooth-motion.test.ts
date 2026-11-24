@@ -13,7 +13,6 @@ const mapStage = read('../../components/map-stage/MapStage.tsx');
 const mapControlsCss = read('../../components/map-experience/map-controls.css');
 const atlasCss = read('./explore.css');
 const columnCss = read('../../components/map-experience/explore-column.css');
-const heroMorph = read('../../components/story/HeroHeadlineMorph.tsx');
 const shellCss = read('../shell.css');
 
 test('records are drawn by the map, not as one HTML marker each', () => {
@@ -44,9 +43,4 @@ test('the map controls slide by transform, never by animating an inset', () => {
 test('the phone sheet eases between heights, and follows the finger with no transition', () => {
   assert.match(columnCss, /\.ds-xcol--sheet\s*\{[^}]*transition:\s*height/s);
   assert.match(columnCss, /\.ds-xcol--sheet\[data-dragging='true'\]\s*\{[^}]*transition:\s*none/s);
-});
-
-test('the Door headline is paced by timers and settles when it is not on screen', () => {
-  assert.doesNotMatch(heroMorph, /requestAnimationFrame\(tick\)/);
-  assert.match(heroMorph, /new IntersectionObserver/);
 });

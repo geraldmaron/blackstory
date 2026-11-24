@@ -36,7 +36,7 @@
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink);
   cursor: pointer;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-xlist__row:hover {

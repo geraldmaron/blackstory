@@ -365,7 +365,7 @@
       no-repeat,
     linear-gradient(var(--ds-surface), var(--ds-surface)) var(--ds-space-6) 42px / 38% 10px
       no-repeat;
-  animation: ds-xcol-pulse 1.4s var(--ds-ease-standard) infinite alternate;
+  animation: ds-xcol-pulse 1.4s var(--ds-ease-entrance) infinite alternate;
 }
 
 .ds-xcol__error {

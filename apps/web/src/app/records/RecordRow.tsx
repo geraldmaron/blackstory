@@ -2,7 +2,7 @@
  * One research row of the Records register. The whole row is the link.
  *
  * The row reads as a small catalog card. At the left, the record's mark: its own photograph
- * toned as a plate, or, without one, a tile in its kind's map shade with the kind's icon (the
+ * in its own color, or, without one, a tile in its kind's map shade with the kind's icon (the
  * one `KindBadge` draws), and the kind's word on both. Then
  * the name with the decade at the right, the place led by its state's postal code (the code the
  * map prints on its counts) or a pin outside the states, the summary (or, when the reader
@@ -75,13 +75,13 @@ export function RecordRow({ row, query, compact = false, anchor, photoUrl }: Rec
         data-photo={photoUrl === undefined ? undefined : 'true'}
       >
         <span
-          className={photoUrl === undefined ? 'ds-record__mark' : 'ds-record__mark ds-plate__tone'}
+          className={photoUrl === undefined ? 'ds-record__mark' : 'ds-record__mark ds-thumb'}
           style={{ '--kind-shade': encoding.shade } as CSSProperties}
         >
           {photoUrl === undefined ? null : (
-            // The record's own photograph, toned as a plate; its credit is on the record page.
+            // The record's own photograph, in its own color; its credit is on the record page.
             // eslint-disable-next-line @next/next/no-img-element -- remote Commons thumbnail
-            <img className="ds-plate__img" src={photoUrl} alt="" loading="lazy" decoding="async" />
+            <img className="ds-thumb__img" src={photoUrl} alt="" loading="lazy" decoding="async" />
           )}
           <span className="ds-record__kind">
             <FontAwesomeIcon icon={kindIconFor(row.kind)} className="ds-record__kind-icon" />

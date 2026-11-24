@@ -28,7 +28,7 @@ import {
   STORY_SORT_KEYS,
   STORY_SORT_LABELS,
 } from '../stories-index';
-import { Room } from '../../../components/room';
+import { PageFrame } from '../../../components/page';
 import { ChapterCover, StoriesToolbar, StoryRow } from '../StoriesIndexParts';
 import '../stories.css';
 
@@ -85,7 +85,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const countLine = `${listed.toLocaleString('en-US')} ${listed === 1 ? 'story' : 'stories'}`;
 
   return (
-    <Room width="wide" className="ds-stories">
+    <PageFrame width="wide" className="ds-stories">
       <PageTitle className="ds-stories-title">Stories</PageTitle>
 
       {front?.lead ? (
@@ -167,6 +167,6 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           ) : null}
         </section>
       )}
-    </Room>
+    </PageFrame>
   );
 }

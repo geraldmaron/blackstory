@@ -6,7 +6,7 @@
 
 The class covers four surfaces: `/entity/[id]`, `/books/[slug]`, `/law/[slug]`, and the entity loading state.
 
-Builds on, and does not replace: [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the fact grid), [`patterns-plate-posture.md`](./patterns-plate-posture.md) (the Framed plate), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (glyph and color).
+Builds on, and does not replace: [`patterns-record-anatomy.md`](./archive/patterns-record-anatomy.md) (the fact grid), [`patterns-plate-posture.md`](./patterns-plate-posture.md) (the Framed plate), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (glyph and color).
 
 ---
 

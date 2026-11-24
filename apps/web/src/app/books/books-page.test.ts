@@ -61,10 +61,10 @@ test('books browse is the register toolbar over ruled bands, not kit rows or a s
   assert.doesNotMatch(browseSectionsSource, /ds-books-wall/);
   for (const gone of [
     'FindBar',
-    'RoomSection',
+    'PageSection',
     'HairlineIndex',
     'BooksRipRow',
-    'ds-room-idx',
+    'ds-doc-idx',
     'Typeahead',
   ]) {
     assert.doesNotMatch(browseSectionsSource, new RegExp(gone), `${gone} is back on /books`);

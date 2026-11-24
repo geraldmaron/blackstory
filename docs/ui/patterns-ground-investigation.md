@@ -5,7 +5,7 @@
 record without losing the investigation. Composition only: query, URL, source, citation and
 precision contracts are unchanged.
 
-Builds on, and does not replace: [`patterns-collection-context.md`](./patterns-collection-context.md),
+Builds on, and does not replace: [`patterns-collection-context.md`](./archive/patterns-collection-context.md),
 [`patterns-plate-posture.md`](./patterns-plate-posture.md), [`patterns-record-page.md`](./patterns-record-page.md),
 [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md) (P-02, P-03, P-04, P-06).
 

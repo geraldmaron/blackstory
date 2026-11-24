@@ -2,9 +2,9 @@
 
 **Status:** binding (2026-07-30).
 **Scope:** `/chapters` and `/chapters/[slug]`, the archive's long form publication surface. `/chapters/mosaic-credits` is a Utility surface and is covered in [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) section 4.4, not here.
-**Surface class:** Reading room. Chrome and exits are governed by [`patterns-reading-room.md`](../patterns-reading-room.md); the plate by [`patterns-plate-posture.md`](../patterns-plate-posture.md); the Atlas handoff by [`patterns-lens-handoff.md`](../patterns-lens-handoff.md).
+**Surface class:** Reading room. Chrome and exits are governed by [`patterns-reading-room.md`](./patterns-reading-room.md); the plate by [`patterns-plate-posture.md`](../patterns-plate-posture.md); the Atlas handoff by [`patterns-lens-handoff.md`](../patterns-lens-handoff.md).
 **Supersedes:** the `/chapters` rows in `design-direction-v6-stories.md` and `design-direction-v6-themes.md`, whose routes no longer exist. Neither file is deleted: both are the provenance record for how four publication surfaces became one.
-**Unchanged and still binding:** [`brand.md`](../brand.md), [`story.md`](../story.md) voice, [`neo-voice.md`](../../content/neo-voice.md) chapter voice, [`patterns-record-anatomy.md`](../patterns-record-anatomy.md).
+**Unchanged and still binding:** [`brand.md`](../brand.md), [`story.md`](../story.md) voice, [`neo-voice.md`](../../content/neo-voice.md) chapter voice, [`patterns-record-anatomy.md`](./patterns-record-anatomy.md).
 
 ---
 

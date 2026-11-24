@@ -1,6 +1,6 @@
 /**
  * The Archive's list and timeline: research rows and pager. The head is archive-head.css. The toolbar, menus, sheet, active-filter
- * row, outcome block and wait placeholder are shared with /law and /books in room-kit.css. The
+ * row, outcome block and wait placeholder are shared with /law and /books in page-kit.css. The
  * page frame, buttons, chips and Segmented come from @repo/ui; the timeline bands are
  * records-chronology.css.
  *
@@ -23,8 +23,6 @@ body:has(.ds-records) .ds-reading-progress {
 .ds-records-paper.ds-sheet {
   margin-top: var(--ds-space-6);
   padding-block: var(--ds-space-2);
-  border-radius: 0;
-  box-shadow: none;
 }
 
 .ds-records-list {
@@ -57,7 +55,7 @@ body:has(.ds-records) .ds-reading-progress {
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-record__link:hover {
@@ -84,7 +82,7 @@ body:has(.ds-records) .ds-reading-progress {
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--kind-shade) 50%, transparent);
 }
 
-.ds-record__mark.ds-plate__tone {
+.ds-record__mark.ds-thumb {
   box-shadow: none;
 }
 
@@ -100,7 +98,7 @@ body:has(.ds-records) .ds-reading-progress {
   height: 1.625rem;
 }
 
-.ds-plate__tone > .ds-record__kind .ds-record__kind-icon {
+.ds-thumb > .ds-record__kind .ds-record__kind-icon {
   width: 0.6875rem;
   height: 0.6875rem;
 }
@@ -117,8 +115,8 @@ body:has(.ds-records) .ds-reading-progress {
   white-space: nowrap;
 }
 
-/* On a photograph the kind rides as a chip in the plate's corner, on the paper's own ground. */
-.ds-plate__tone > .ds-record__kind {
+/* On a photograph the kind rides as a chip in the photograph's corner, on the paper's own ground. */
+.ds-thumb > .ds-record__kind {
   position: absolute;
   bottom: 0.3125rem;
   left: 0.3125rem;
@@ -131,7 +129,7 @@ body:has(.ds-records) .ds-reading-progress {
   box-shadow: 0 1px 2px rgb(0 0 0 / 18%);
 }
 
-.ds-plate__tone > .ds-record__kind .ds-record__kind-word {
+.ds-thumb > .ds-record__kind .ds-record__kind-word {
   color: var(--ds-ink);
 }
 
@@ -289,7 +287,7 @@ body:has(.ds-records) .ds-reading-progress {
   white-space: nowrap;
 }
 
-.ds-record__link--compact .ds-plate__tone > .ds-record__kind {
+.ds-record__link--compact .ds-thumb > .ds-record__kind {
   padding: 0.1875rem;
 }
 
@@ -425,9 +423,4 @@ body:has(.ds-records) .ds-reading-progress {
   .ds-records-jump__select {
     width: 100%;
   }
-}
-
-/* —— the wait: placeholder rows keep still under the pointer ———————————————————— */
-.ds-records-list--waiting .ds-record__link:hover {
-  background: none;
 }

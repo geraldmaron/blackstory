@@ -9,7 +9,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ATMOSPHERE_TILE_CREDITS } from '../../components/atmosphere/tile-credits';
+import { ATMOSPHERE_TILE_CREDITS } from '../../app/stories/mosaic-credits/tile-credits';
 import { listPublicEntityViewsByIds } from './source';
 
 test('listPublicEntityViewsByIds returns empty for empty input', async () => {

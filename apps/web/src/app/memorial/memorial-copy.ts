@@ -28,6 +28,20 @@ export const MEMORIAL_LIST_NOTE =
   'This list is incomplete and always will be. If a name belongs here and is missing, send the evidence through Submit, or write to me@geralddagher.com.';
 
 /**
+ * The content note (docs/ui/DESIGN.md 9.4). Never over the wall: it sits above the names list and,
+ * in its short form, beside a link that leads here. New copy, 2026-11-23, not yet read by the owner.
+ */
+export const MEMORIAL_CONTENT_NOTE =
+  'This memorial holds the names of people killed or harmed by police violence and racial terror. The list gives a name, a year and a place, and no description of what happened.';
+
+export const MEMORIAL_LINK_NOTE =
+  'It names people killed or harmed by police violence and racial terror.';
+
+/** Printed under the list. The sources are the ones recorded in docs/research/memorial-names-wall.sources.json. */
+export const MEMORIAL_PROVENANCE =
+  'Sources for these names: The Guardian, The Counted; The Washington Post, Fatal Force; the Southern Poverty Law Center, Civil Rights Memorial; cases documented by the NAACP and the Equal Justice Initiative; and Wikipedia’s lists of lynching victims and of unarmed African Americans killed by law enforcement. BlackStory, Memorial.';
+
+/**
  * Deterministic seed for the wall's handwriting layout. The value still reads `v6` and is
  * deliberately unchanged: it is a seed, not a label, and rewriting the string would reshuffle
  * every name's position, size and ink on a memorial wall. It moved here from the route's

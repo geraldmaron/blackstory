@@ -181,7 +181,7 @@ body:has(.ds-books) .ds-reading-progress {
   padding: var(--ds-space-4) var(--ds-space-3);
   color: var(--ds-ink);
   text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-books-row:hover {
@@ -262,7 +262,7 @@ body:has(.ds-books) .ds-reading-progress {
   gap: var(--ds-space-4);
   /* A map stands on ink (DESIGN.md 7.1), in either theme, so its shades keep one meaning. */
   padding: var(--ds-space-4);
-  background: var(--ds-world-space);
+  background: var(--ds-fixed-ink);
 }
 
 .ds-books-tiles {
@@ -290,25 +290,25 @@ body:has(.ds-books) .ds-reading-progress {
 
 .ds-books-tiles__tile:not([data-step='0']) {
   border-color: transparent;
-  color: var(--ds-world-space);
+  color: var(--ds-fixed-ink);
 }
 
 .ds-books-tiles__tile[data-step='1'] {
-  background: color-mix(in srgb, var(--ds-world-ember) 30%, var(--ds-world-space));
-  color: var(--ds-world-hud-ink);
+  background: color-mix(in srgb, var(--ds-fixed-accent) 30%, var(--ds-fixed-ink));
+  color: var(--ds-fixed-paper);
 }
 
 .ds-books-tiles__tile[data-step='2'] {
-  background: color-mix(in srgb, var(--ds-world-ember) 70%, var(--ds-world-space));
+  background: color-mix(in srgb, var(--ds-fixed-accent) 70%, var(--ds-fixed-ink));
 }
 
 .ds-books-tiles__tile[data-step='3'] {
-  background: var(--ds-world-ember);
+  background: var(--ds-fixed-accent);
 }
 
 .ds-books-tiles__tile[data-step='4'] {
-  background: var(--ds-world-hud-ink);
-  box-shadow: 0 0 var(--ds-space-3) color-mix(in srgb, var(--ds-world-ember) 70%, transparent);
+  background: var(--ds-fixed-paper);
+  box-shadow: 0 0 var(--ds-space-3) color-mix(in srgb, var(--ds-fixed-accent) 70%, transparent);
 }
 
 /* The key under the grid: one swatch per step and the range of titles it stands for. */
@@ -339,7 +339,7 @@ body:has(.ds-books) .ds-reading-progress {
 
 /* The state the list is filtered to: an outline, not a color. */
 .ds-books-tiles__tile[data-current='true'] {
-  outline: 2px solid var(--ds-world-rim);
+  outline: 2px solid var(--ds-material-copper);
   outline-offset: 2px;
 }
 

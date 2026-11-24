@@ -10,7 +10,7 @@
 .ds-surface {
   background: var(--ds-surface-raised);
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   padding: var(--ds-space-6);
 }
 
@@ -186,7 +186,7 @@
   position: relative;
   min-height: 12rem;
   border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   background: var(--ds-surface);
   overflow: hidden;
 }
@@ -235,8 +235,7 @@
   width: 100%;
   overflow: hidden;
   border: var(--ds-border-width) solid var(--ds-border-strong);
-  /* The map frame on interior pages reads radius-lg per the v3 radius scale. */
-  border-radius: var(--ds-radius-lg);
+  border-radius: 0;
   /* Fixed ink regardless of [data-theme] — see base.css's --ds-fixed-* note. */
   background: var(--ds-fixed-ink);
 }
@@ -246,7 +245,7 @@
   gap: var(--ds-space-2);
   padding: var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   background: var(--ds-surface);
   color: var(--ds-ink);
 }
@@ -310,7 +309,7 @@
   padding: var(--ds-space-5) 0;
   color: inherit;
   text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-result-list__link:hover {
@@ -351,7 +350,7 @@
   gap: var(--ds-space-4);
   padding: var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   background: var(--ds-surface);
 }
 
@@ -441,10 +440,10 @@
   white-space: nowrap;
   cursor: pointer;
   transition:
-    background-color var(--ds-duration-fast) var(--ds-easing),
-    color var(--ds-duration-fast) var(--ds-easing),
-    border-color var(--ds-duration-fast) var(--ds-easing),
-    text-decoration-color var(--ds-duration-fast) var(--ds-easing);
+    background-color var(--ds-duration-fast) var(--ds-ease-entrance),
+    color var(--ds-duration-fast) var(--ds-ease-entrance),
+    border-color var(--ds-duration-fast) var(--ds-ease-entrance),
+    text-decoration-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-button:hover:not(:disabled) {
@@ -601,8 +600,8 @@
   white-space: nowrap;
   cursor: pointer;
   transition:
-    color var(--ds-duration-fast) var(--ds-easing),
-    background-color var(--ds-duration-fast) var(--ds-easing);
+    color var(--ds-duration-fast) var(--ds-ease-entrance),
+    background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-tabs__tab:hover {
@@ -815,22 +814,12 @@ span.ds-tabs__tab {
   margin: auto;
   padding: 0;
   border: 0;
-  border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  border-radius: 0;
+  background: var(--ds-canvas);
   box-shadow:
     inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
     var(--ds-shadow-float);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink);
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .ds-dialog {
-    background: var(--ds-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .ds-dialog__header,
@@ -947,42 +936,6 @@ span.ds-tabs__tab {
   margin-bottom: 0;
 }
 
-/* Collapsed-by-default locate disclosure: quiet summary, not a warning card. */
-.ds-location-privacy-notice {
-  border-radius: var(--ds-radius-sm);
-}
-
-.ds-location-privacy-notice__summary {
-  cursor: pointer;
-  list-style: none;
-  padding: 0;
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-caption);
-  line-height: 1.4;
-}
-
-.ds-location-privacy-notice__summary::-webkit-details-marker {
-  display: none;
-}
-
-.ds-location-privacy-notice__summary::before {
-  content: '▸ ';
-  color: var(--ds-ink-subtle);
-}
-
-.ds-location-privacy-notice[open] > .ds-location-privacy-notice__summary::before {
-  content: '▾ ';
-}
-
-.ds-location-privacy-notice__body {
-  margin-top: var(--ds-space-2);
-  padding: var(--ds-space-3) 0 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-}
-
 .ds-empty {
   display: grid;
   gap: var(--ds-space-3);
@@ -1025,8 +978,8 @@ span.ds-tabs__tab {
   color: var(--ds-ink);
   cursor: pointer;
   transition:
-    border-color var(--ds-duration-fast) var(--ds-easing),
-    background-color var(--ds-duration-fast) var(--ds-easing);
+    border-color var(--ds-duration-fast) var(--ds-ease-entrance),
+    background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-theme-toggle:hover {
@@ -1112,65 +1065,18 @@ span.ds-tabs__tab {
 }
 
 /* —— Sheet: reading paper on the table (the sheet plane) ——————————————————————— */
-/* Paper with a 1px edge, radius 14, a real layered shadow under it (--ds-shadow-sheet), and three
-   page bands (sand, copper, ink, 4px each) along one edge: a pattern echoing the logo's page
-   bands, never the book or pin shape. The bands are inset fills, so they follow the radius
-   without clipping the sheet's popovers. A sheet that is one link (`.ds-sheet--lift`) rises on
-   hover. */
+/* Paper with a 1px edge: square, flat, no shadow (docs/ui/DESIGN.md section 7.4). */
 .ds-sheet {
   --ds-sheet-pad: var(--ds-space-8);
-  --ds-sheet-bands:
-    inset var(--ds-band-w) 0 0 var(--ds-band-1),
-    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
-    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3);
   position: relative;
   padding: var(--ds-sheet-pad);
-  padding-left: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-sheet-bands), var(--ds-shadow-sheet);
-  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
-}
-
-.ds-sheet--lift {
-  transition:
-    transform var(--ds-duration-base) var(--ds-ease-entrance),
-    box-shadow var(--ds-duration-base) var(--ds-ease-entrance);
-}
-
-.ds-sheet--lift:hover,
-.ds-sheet--lift:focus-within {
-  transform: translateY(-4px);
-  box-shadow: var(--ds-sheet-bands), var(--ds-shadow-lift);
-}
-
-.ds-sheet--bands-end {
-  --ds-sheet-bands:
-    inset calc(var(--ds-band-w) * -1) 0 0 var(--ds-band-1),
-    inset calc(var(--ds-band-w) * -2) 0 0 var(--ds-band-2),
-    inset calc(var(--ds-band-w) * -3) 0 0 var(--ds-band-3);
-  padding-left: var(--ds-sheet-pad);
-  padding-right: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
-}
-
-.ds-sheet--bands-none {
-  --ds-sheet-bands: 0 0 0 transparent;
-  padding-left: var(--ds-sheet-pad);
-}
-
-/* Sheets slide up onto the table from where they already are: no fade, so nothing is ever
-   invisible if the animation does not run. Collapses with --ds-duration-sheet. */
-@keyframes ds-sheet-in {
-  from {
-    transform: translateY(16px);
-  }
 }
 
 @media (max-width: 47.9375rem) {
   .ds-sheet {
     --ds-sheet-pad: var(--ds-space-4);
     border-inline: 0;
-    border-radius: 0;
   }
 }
 
@@ -1235,51 +1141,8 @@ span.ds-tabs__tab {
 }
 
 /* —— Field: the ground a masthead's plate stands in ————————————————————————————— */
-/* A plain ground with its own stacking context, so a plate can sit under the head. No lamplight,
-   vignette or grain: a glow that carries no information is decoration (owner, 2026-11-15). */
-.ds-field {
-  position: relative;
-  isolation: isolate;
-  overflow: clip;
-  background: var(--ds-canvas);
-}
-
-/* —— Float: glass chrome over the map ———————————————————————————————————————— */
-.ds-float {
-  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
-  box-shadow:
-    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
-    var(--ds-shadow-float);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .ds-float {
-    background: var(--ds-canvas);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .ds-float {
-    background: var(--ds-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
 
 /* —— Reveal: one entrance primitive ———————————————————————————————————————————— */
-/* Content is visible by default. Where the browser can tie motion to scroll, a revealed element
-   slides up into place once as it enters. A whole band slides in with `<Block wipe>`. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .ds-reveal {
-      animation: ds-reveal-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 60%;
-    }
-  }
-}
 
 @keyframes ds-reveal-rise {
   from {
@@ -1287,76 +1150,32 @@ span.ds-tabs__tab {
   }
 }
 
-/* —— Plate: a real photograph toned to the page ————————————————————————————————— */
-/* A record's own sourced photograph shown large, toned in two inks so it belongs to the page:
-   the shadows in --ds-plate-lo, the lights in --ds-plate-hi (a duotone by blend modes; no new
-   file, no server processing). It still reads as a photograph. The credit line (`.ds-plate__credit`)
-   is never on the photograph and never altered. Only real, sourced photographs; never generated
-   imagery, never the memorial or a sensitive record. Forced colors show the photograph as it is. */
-.ds-plate {
-  display: grid;
-  gap: var(--ds-space-2);
-  min-width: 0;
-  margin: 0;
-}
-
-.ds-plate__tone {
+/* —— Thumb: a photograph cover-fit to a small box, in its own color ————————————— */
+.ds-thumb {
   position: relative;
-  isolation: isolate;
   display: block;
   overflow: hidden;
-  width: 100%; /* explicit, so a max-height trims the box's height and never its width */
+  width: 100%;
   aspect-ratio: 3 / 2; /* a default box; each placement sets its own */
-  background: var(--ds-plate-hi);
 }
 
-.ds-plate__img {
+.ds-thumb__img {
   position: absolute;
   inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(1) contrast(1.12);
-  mix-blend-mode: multiply;
 }
 
 /* A portrait keeps the face in a cover crop: the crop favors the top of the frame. */
-.ds-plate--upper .ds-plate__img {
+.ds-thumb--upper .ds-thumb__img {
   object-position: 50% 18%;
-}
-
-.ds-plate__tone::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--ds-plate-lo);
-  mix-blend-mode: lighten;
-  pointer-events: none;
-}
-
-.ds-plate__credit {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-caption);
-  line-height: 1.45;
-}
-
-@media (forced-colors: active) {
-  .ds-plate__img {
-    filter: none;
-    mix-blend-mode: normal;
-  }
-
-  .ds-plate__tone::after {
-    content: none;
-  }
 }
 
 /* —— Print: public pages on white paper ————————————————————————————————————————— */
 /* Ink on white. Site chrome, maps, floating layers and controls are left off; a sheet runs the full
-   page width without its shadow, spine bands or radius; grounds lose their fills; a plate prints
-   untoned with its credit; external links print their address after the text. */
+   page width; grounds lose their fills; external links print their address after the text. */
 @media print {
   :root,
   body,
@@ -1373,7 +1192,6 @@ span.ds-tabs__tab {
   .ds-shell-footer,
   .ds-map-stage,
   .ds-record-map__frame,
-  .ds-float,
   .ds-dialog,
   .ds-command-palette,
   .ds-toast-stack,
@@ -1389,27 +1207,12 @@ span.ds-tabs__tab {
   }
 
   .ds-sheet {
-    --ds-sheet-bands: 0 0 0 transparent;
     width: auto;
     max-width: none;
     padding: 0;
-    border-radius: 0;
     background: none;
     box-shadow: none;
     animation: none;
-  }
-
-  .ds-plate__tone {
-    background: none;
-  }
-
-  .ds-plate__img {
-    filter: none;
-    mix-blend-mode: normal;
-  }
-
-  .ds-plate__tone::after {
-    content: none;
   }
 
   a[href^='http']:not([href*='blackstory'])::after {

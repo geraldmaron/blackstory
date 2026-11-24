@@ -29,11 +29,11 @@ Goal: one authoritative current design contract. Stale docs must not instruct ag
 | [`story.md`](../story.md) | Voice/microcopy | Unchanged | **Binding** |
 | [`design-direction-v9-atlas.md`](../archive/design-direction-v9-atlas.md) | `/` is Explore; “map is the product”; first paint live MapLibre | `/` is Door (`DoorHome`); Explore on `/explore`; `/` surface class `reading` | **Superseded** by v10 for product shape; map plate tokens / dignity / instrument chrome details **Amended** into Explore Instrument on `/explore` only |
 | [`design-direction-v9-surfaces.md`](../archive/design-direction-v9-surfaces.md) | Proposed; `/story`, `/chapters`, Instrument includes `/` | Code: `/stories`, `/library`, `/place`, `/` reading | **Superseded** — surface class membership follows `surface-classes.ts` + v10 |
-| [`patterns-surface-classes.md`](../patterns-surface-classes.md) | Instrument includes `/` and `/story` | Code registry differs | **Amended** — align membership to code; keep class semantics |
-| [`patterns-atlas-instrument.md`](../patterns-atlas-instrument.md) | Instruments on Atlas | Valid for `/explore` | **Amended** — scope = `/explore` (+ framed story moments), not `/` |
+| [`patterns-surface-classes.md`](../archive/patterns-surface-classes.md) | Instrument includes `/` and `/story` | Code registry differs | **Amended** — align membership to code; keep class semantics |
+| [`patterns-atlas-instrument.md`](../archive/patterns-atlas-instrument.md) | Instruments on Atlas | Valid for `/explore` | **Amended** — scope = `/explore` (+ framed story moments), not `/` |
 | [`patterns-plate-posture.md`](../patterns-plate-posture.md) | Live/Framed/Parked | Still useful | **Amended** — Door Rest may use pin plate without Live WebGL |
 | [`patterns-cinematic-map.md`](../patterns-cinematic-map.md) | Rest→Invite→Engaged | Mobile still uses; web Door differs | **Amended** — mobile binding; web Rest is Door/pin plate |
-| [`patterns-record-page.md`](../patterns-record-page.md) / [`patterns-record-anatomy.md`](../patterns-record-anatomy.md) | Record anatomy | Place thinned in `HomeFirstPaint` | **Amended** — full anatomy required on Place; first-paint thinning is not the end state |
+| [`patterns-record-page.md`](../patterns-record-page.md) / [`patterns-record-anatomy.md`](../archive/patterns-record-anatomy.md) | Record anatomy | Place thinned in `HomeFirstPaint` | **Amended** — full anatomy required on Place; first-paint thinning is not the end state |
 | [`design-direction-v9-chapters.md`](../archive/design-direction-v9-chapters.md) | `/chapters` | `/stories` in app | **Superseded** by Story Spine under v10; route name is `/stories` |
 | [`design-direction-v6-*.md`](../README.md) | Per-route v6 | Mostly superseded already | **Archival** |
 | [`design-direction-v5.md`](../archive/design-direction-v5.md) / v4 | Historical | — | **Archival** |

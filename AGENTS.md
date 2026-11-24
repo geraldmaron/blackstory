@@ -104,7 +104,7 @@ Serve from `apps/web/public/brand/` (masters in root `brand/`).
 ## UI Design Patterns
 
 **Index:** [`docs/ui/README.md`](docs/ui/README.md) — living pattern catalog and adoption checklists.  
-**Component registry:** [`docs/ui/patterns-registry.md`](docs/ui/patterns-registry.md) — reusable modules under `apps/web/src/components/patterns/`.
+**Components:** the kit's index (`packages/ui/src/components/index.ts`), drawn at `/design-system` (staff), which is generated from it; the page kit is `apps/web/src/components/page`.
 
 ### Binding docs (read before UI edits)
 
@@ -133,7 +133,7 @@ Kit implementation: `@repo/ui` (`packages/ui`). Where a pattern doc and the kit 
 7. **Map dignity:** no alarm hues for violence-adjacent records; confidence never color-alone; points never sharper than stored precision.
 8. **File naming:** lowercase-kebab for new docs, CSS, and components.
 
-When adding a reusable control, prefer `apps/web/src/components/patterns/` + a pattern doc + a row in `patterns-registry.md`. Surface-specific layout stays in route folders (`app/`, `components/home/`, etc.) but must cite its binding direction doc.
+When adding a reusable control, prefer the kit (`packages/ui`) with a fixture in `apps/web/src/app/design-system/Gallery.tsx`, or `apps/web/src/components/patterns/` with a pattern doc. Surface-specific layout stays in route folders (`app/`, `components/home/`, etc.) but must cite its binding direction doc.
 
 ## Session completion and branching
 

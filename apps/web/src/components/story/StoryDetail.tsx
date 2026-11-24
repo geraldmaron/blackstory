@@ -19,7 +19,7 @@ import { DisplayNumeral, Notice, PageTitle } from '@repo/ui';
 import { FigureEmbed } from '../data/figures/FigureEmbed';
 import { isFigureId } from '../data/figures/figure-ids';
 import { RecordCite } from '../patterns/RecordCite';
-import { Room } from '../room';
+import { PageFrame } from '../page';
 import { StoryBody } from './StoryBody';
 import { StoryEnd } from './StoryEnd';
 import { StoryFigure } from './StoryFigure';
@@ -117,12 +117,12 @@ export async function StoryDetail({
 
   if (result.source === 'unavailable') {
     return (
-      <Room width="read" className="ds-story">
+      <PageFrame width="read" className="ds-story">
         <Notice tone="warning" title="This story is unavailable">
           The live record could not be reached, so this story cannot be shown right now. Reload to
           try again, or <Link href={base}>go back to the list</Link>.
         </Notice>
-      </Room>
+      </PageFrame>
     );
   }
 
@@ -201,7 +201,7 @@ export async function StoryDetail({
   ].filter(Boolean);
 
   return (
-    <Room width="wide" className={`ds-story ds-story--${noun}`}>
+    <PageFrame width="wide" className={`ds-story ds-story--${noun}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
@@ -331,6 +331,6 @@ export async function StoryDetail({
           </div>
         </div>
       </article>
-    </Room>
+    </PageFrame>
   );
 }

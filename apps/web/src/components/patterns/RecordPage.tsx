@@ -339,9 +339,9 @@ export function RecordPage({
 }: RecordPageProps) {
   const numeral = numeralOverride ?? recordNumeral(facts);
   return (
-    <main className="ds-room ds-recpage" id="main" data-quiet={quiet ? '' : undefined}>
+    <main className="ds-doc ds-recpage" id="main" data-quiet={quiet ? '' : undefined}>
       <article className="ds-recpage__record ds-wrap" aria-labelledby="record-title">
-        <Sheet bands="none" className="ds-recpage__grid">
+        <Sheet className="ds-recpage__grid">
           {/* Name to body. On a desktop this is the two-column grid, the side column starting
               beside the name; elsewhere it and the side column are `display: contents`, so their
               children take the sheet's own order. */}

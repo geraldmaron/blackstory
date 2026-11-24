@@ -1,5 +1,5 @@
 /** Public presentation only: a copied tile is not proof its source image is still unchanged. */
-import type { AtmosphereTileCredit } from '../../../components/atmosphere/tile-credits';
+import type { AtmosphereTileCredit } from './tile-credits';
 import type { PublicEntityView } from '../../../data/public-seed';
 import { sanitizePublicProseText } from '@repo/domain/editorial';
 

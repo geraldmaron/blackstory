@@ -1,5 +1,5 @@
 /* The credits list on the trust sheet: ruled rows, each a copper index numeral, the tile as a
-   toned plate and the record it belongs to. */
+   photograph and the record it belongs to. */
 .ds-mosaic-credits {
   margin: var(--ds-space-8) 0 var(--ds-space-6);
   padding: 0;
@@ -26,7 +26,7 @@
 }
 
 /* The stored tiles are portrait; the mosaic crops them square, and so does the list. */
-.ds-mosaic-credit__plate .ds-plate__tone {
+.ds-mosaic-credit__thumb .ds-thumb {
   aspect-ratio: 1;
 }
 

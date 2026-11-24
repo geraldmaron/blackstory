@@ -322,21 +322,13 @@ export function LawBrowseSections({ view, catalog, head }: LawBrowseSectionsProp
   let body: React.ReactNode;
   if (view.totalAvailable === 0) {
     body = (
-      <Outcome
-        ground="paper"
-        title="The law catalog did not load"
-        action={{ href: '/law', label: 'Try again' }}
-      >
+      <Outcome title="The law catalog did not load" action={{ href: '/law', label: 'Try again' }}>
         The entries are kept, only this page failed to read them.
       </Outcome>
     );
   } else if (view.items.length === 0) {
     body = (
-      <Outcome
-        ground="paper"
-        title="No laws match"
-        action={{ href: '/law', label: 'Clear filters' }}
-      >
+      <Outcome title="No laws match" action={{ href: '/law', label: 'Clear filters' }}>
         Nothing in the catalog matches {active.map((filter) => filter.label).join(', ')}.
       </Outcome>
     );

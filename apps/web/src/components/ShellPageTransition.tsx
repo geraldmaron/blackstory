@@ -2,7 +2,7 @@
  * The page-root wrapper the App Router remounts on every navigation.
  *
  * It carries `data-surface`, the surface class of the route being rendered
- * (`docs/ui/patterns-surface-classes.md`). This is the one place the class is emitted, and it
+ * (`docs/ui/archive/patterns-surface-classes.md`). This is the one place the class is emitted, and it
  * is emitted here rather than on each page's `<main>` so that a new route cannot ship without
  * one: `lib/nav/surface-classes.ts` owns the table and its coverage test walks the route tree.
  * The wrapper is server-rendered, so the attribute is in the first painted HTML and shell CSS
@@ -32,7 +32,7 @@
 import { type ReactNode } from 'react';
 import type { SurfaceClass } from '../lib/nav/surface-classes';
 import { useSurfaceClass } from '../lib/nav/use-surface-class';
-import { ReadingProgress } from './room/ReadingProgress';
+import { ReadingProgress } from './page/ReadingProgress';
 
 export type ShellPageTransitionProps = {
   readonly children: ReactNode;

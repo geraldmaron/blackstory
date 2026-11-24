@@ -1,5 +1,5 @@
 import React from 'react';
-import { CatalogLoading } from '../../../../components/room/catalog-loading';
+import { CatalogLoading } from '../../../../components/page/catalog-loading';
 
 void React;
 

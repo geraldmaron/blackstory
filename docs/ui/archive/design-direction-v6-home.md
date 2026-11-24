@@ -166,9 +166,9 @@ Header separated from body by bottom Rule hairline (except beat 05 inline header
 **Job:** Show the grain of the archive — one featured record with anatomy visible.
 
 - **Record carousel** (primary column): focusable region (`tabindex="0"`), `aria-roledescription="carousel"`.
-  - Toolbar: shared `RecordBrowseControls` pattern — prev/next arrows (44px targets), optional dot rail (≤12 items), segmented **Ordered / Random** toggle, live position (`n / N` mono in ordered mode; `Random · N records` in random mode). See `docs/ui/patterns-browse-mode.md`.
+  - Toolbar: shared `RecordBrowseControls` pattern — prev/next arrows (44px targets), optional dot rail (≤12 items), segmented **Ordered / Random** toggle, live position (`n / N` mono in ordered mode; `Random · N records` in random mode). See `docs/ui/archive/patterns-browse-mode.md`.
   - Data: full active-release entity set (curated featured ids lead when present; every other release record follows without duplicates).
-  - **Facts strip:** inline Kind / Where / Era / Evidence rows beside map preview (see [`patterns-record-anatomy.md`](../patterns-record-anatomy.md)).
+  - **Facts strip:** inline Kind / Where / Era / Evidence rows beside map preview (see [`patterns-record-anatomy.md`](./patterns-record-anatomy.md)).
   - Slide body: kind slug, Sora name, serif one-line story, actions.
   - **One copper CTA per slide:** "Open full record". Quiet secondary: "Show on map".
   - Keyboard: ArrowLeft / ArrowRight. Reduced motion: cut transitions, no auto-advance.

@@ -1,15 +1,14 @@
 /**
- * Segment error boundary for public routes: the same sand mast as the 404, the failure in plain
- * words, then the two ways on. The sanitized detail sits in a Notice under the mast.
+ * Segment error boundary for public routes: the same paper document frame as the 404, the failure
+ * in one sentence, then the two ways on. The sanitized detail sits in a Notice under the title.
  */
 
 'use client';
 
 import React, { useEffect } from 'react';
-import Link from 'next/link';
-import { Notice, PageHeader } from '@repo/ui';
+import { Button, Notice, PageHeader } from '@repo/ui';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
-import { Room } from '../components/room';
+import { PageFrame } from '../components/page';
 import { TrustMast, TrustSheet } from '../components/trust/TrustFrame';
 import './utility.css';
 
@@ -29,15 +28,15 @@ export default function Error({
   const display = sanitizeClientErrorDisplay(error);
 
   return (
-    <Room
+    <PageFrame
       width="read"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast>
           <PageHeader
             display
             title="This page failed to load"
-            dek="That is a fault in the site, not in the record. Try again, or go back to the map."
+            dek="That is a fault in the site, not in the record."
           />
         </TrustMast>
       }
@@ -46,21 +45,14 @@ export default function Error({
         <Notice tone="error" title={display.title}>
           {display.detail}
         </Notice>
-        <ul className="ds-utility-exits" aria-label="Where to go next">
-          <li className="ds-utility-exits__row ds-utility-exits__row--primary">
-            <button type="button" className="ds-button ds-button--primary" onClick={reset}>
-              Try again
-            </button>
-            <p className="ds-utility-exits__line">Loads this page once more.</p>
-          </li>
-          <li className="ds-utility-exits__row">
-            <Link className="ds-utility-exits__link" href="/">
-              Back to the map
-            </Link>
-            <p className="ds-utility-exits__line">The map is where the archive starts.</p>
-          </li>
-        </ul>
+        <p className="ds-utility-ways">
+          <Button onClick={reset}>Try again</Button>
+          {/* A plain anchor on purpose: the router may be what failed. */}
+          <Button href="/" variant="quiet">
+            Back to the front page
+          </Button>
+        </p>
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

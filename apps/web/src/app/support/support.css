@@ -14,13 +14,13 @@
     column-gap: var(--ds-space-12);
   }
 
-  .ds-trust-sheet .ds-support__pair .ds-room-section > .ds-section-heading {
+  .ds-trust-sheet .ds-support__pair .ds-doc-section > .ds-section-heading {
     margin-top: 0;
   }
 }
 
 /* The pair wrapper makes the next section first-of-type again; give it back its section space. */
-.ds-trust-sheet .ds-support__pair + .ds-room-section.ds-room-section > .ds-section-heading {
+.ds-trust-sheet .ds-support__pair + .ds-doc-section.ds-doc-section > .ds-section-heading {
   margin-top: var(--ds-space-16);
 }
 

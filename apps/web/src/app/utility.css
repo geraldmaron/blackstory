@@ -1,69 +1,18 @@
 /**
- * Utility surface class: the stylesheet a Utility route imports for the room kit.
+ * Utility surface class: the stylesheet a Utility route imports for the page kit.
  *
- * A utility room is a task surface, finished and left. Its width is chosen by the page: the read
+ * A utility page is a task surface, finished and left. Its width is chosen by the page: the read
  * container for policy and lookup pages, the record container for a form beside its "what
  * happens next" aside. Trust blocks come from `components/trust/trust.css`, form parts from
  * `components/forms/form-kit.css`.
  */
 
-@import '../components/room/room-kit.css';
+@import '../components/page/page-kit.css';
 
-/* —— the 404's exits: a short ruled list on the paper sheet under the sand mast ——————— */
-.ds-utility-exits {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-utility-exits:not(:first-child) {
-  margin-top: var(--ds-space-6);
-}
-
-.ds-utility-exits__row {
+/* The ways on from a 404 or a failed page: one button and one quiet link under the sentence. */
+.ds-utility-ways {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2) var(--ds-space-6);
-  min-height: 44px;
-  padding-block: var(--ds-space-4);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-utility-exits__link {
-  color: var(--ds-ink);
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.ds-utility-exits__line {
-  flex: 1 1 14rem;
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-}
-
-.ds-utility-exits__search {
-  max-width: 52ch;
+  gap: var(--ds-space-3);
   margin: var(--ds-space-6) 0 0;
-  color: var(--ds-ink-muted);
-}
-
-/* A phone has no ⌘K; it has the search button in the bar. */
-.ds-utility-exits__touch {
-  display: none;
-}
-
-@media (max-width: 47.9375rem), (pointer: coarse) {
-  .ds-utility-exits__keys {
-    display: none;
-  }
-
-  .ds-utility-exits__touch {
-    display: inline;
-  }
 }

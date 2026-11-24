@@ -58,7 +58,7 @@
   /* Icons are 1.5px strokes in the plate's type color, the way the plate's own type reads. */
   color: var(--ds-map-label-hi);
   cursor: pointer;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-map-controls__btn:hover {
@@ -78,7 +78,7 @@
 }
 
 .ds-map-controls__locate[data-state='locating'] svg {
-  animation: ds-map-controls-seek 1.1s var(--ds-ease-standard) infinite alternate;
+  animation: ds-map-controls-seek 1.1s var(--ds-ease-entrance) infinite alternate;
 }
 
 @keyframes ds-map-controls-seek {

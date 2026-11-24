@@ -16,7 +16,7 @@ import {
   type RecordsQuery,
   type RecordsRow,
 } from '../../lib/records/build-records-index';
-import { RecordsIndexRoom } from './RecordsIndex';
+import { RecordsIndexPage } from './RecordsIndex';
 
 void React;
 
@@ -70,7 +70,7 @@ function render(query: Partial<RecordsQuery> = {}, overrides: Partial<RecordsInd
     notice: undefined,
     ...overrides,
   } as unknown as RecordsIndexModel;
-  return renderToStaticMarkup(<RecordsIndexRoom model={model} />);
+  return renderToStaticMarkup(<RecordsIndexPage model={model} />);
 }
 
 function menu(markup: string, key: string): string {

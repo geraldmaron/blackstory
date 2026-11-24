@@ -1,5 +1,5 @@
 import React from 'react';
-import { Room } from '../../../components/room';
+import { PageFrame } from '../../../components/page';
 import '../stories.css';
 
 void React;
@@ -8,7 +8,7 @@ void React;
  *  wraps a story page, which must read without script. */
 export default function Loading() {
   return (
-    <Room width="wide" className="ds-stories">
+    <PageFrame width="wide" className="ds-stories">
       <div className="ds-stories-wait" aria-busy="true">
         <p className="ds-visually-hidden" role="status">
           Loading stories
@@ -19,6 +19,6 @@ export default function Loading() {
           <span />
         </span>
       </div>
-    </Room>
+    </PageFrame>
   );
 }

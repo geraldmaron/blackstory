@@ -5,7 +5,7 @@ import { LIVES_NATIONAL, livesAreaBySlug } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../../components/room';
+import { parentCrumb, PageFrame } from '../../../components/page';
 import { TrustMast, TrustSheet } from '../../../components/trust';
 import { livesDecadeNumeral } from '../../../components/lives/lives-mast';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../../lib/lives/lives-source';
@@ -19,7 +19,7 @@ import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
 import { LivesSourceNotice } from '../../../components/lives/LivesSourceNotice';
 import { LivesTimeline } from '../../../components/lives/LivesTimeline';
 import { LivesTimelineStatic } from '../../../components/lives/LivesTimelineStatic';
-import '../../reading-room.css';
+import '../../reading-page.css';
 import '../lives.css';
 
 void React;
@@ -49,9 +49,9 @@ export default async function LivesExplorerPage({
   };
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast numeral={livesDecadeNumeral(bundle)}>
           <PageHeader
@@ -84,6 +84,6 @@ export default async function LivesExplorerPage({
           <LivesTimeline bundle={bundle} areaSlug={area.slug} frame={frame} />
         </Suspense>
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

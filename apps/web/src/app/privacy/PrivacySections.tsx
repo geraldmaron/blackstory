@@ -12,7 +12,7 @@
 import React from 'react';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import Link from 'next/link';
-import { RoomJump, RoomSection } from '../../components/room';
+import { ContentsList, PageSection } from '../../components/page';
 
 void React;
 
@@ -94,9 +94,9 @@ function InventoryLedger({
 export function PrivacySections() {
   return (
     <>
-      <RoomJump sections={PAGE_SECTIONS} />
+      <ContentsList sections={PAGE_SECTIONS} />
 
-      <RoomSection id="scope" title="BlackStory public website">
+      <PageSection id="scope" title="BlackStory public website">
         <p className="ds-trust-copy">
           This policy describes how BlackStory handles information on{' '}
           <span className="ds-phrase-nowrap">blackstory.app</span>. It covers what the site does
@@ -106,9 +106,9 @@ export function PrivacySections() {
           Data controller: <strong>Gerald Dagher</strong> (individual).
         </p>
         <p className="ds-trust-meta">Last updated: August 2026</p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="web" title="What this site may process">
+      <PageSection id="web" title="What this site may process">
         <p className="ds-trust-copy">
           You can read everything here without handing anything over. The interactive parts are
           optional, and each one is labeled before you use it.
@@ -119,9 +119,9 @@ export function PrivacySections() {
           <Link href="/methodology">methodology</Link> and the{' '}
           <Link href="/corrections">corrections lane</Link>.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="not-collected" title="What I don’t collect">
+      <PageSection id="not-collected" title="What I don’t collect">
         <p className="ds-trust-copy">
           These are rules the software follows. If a release ever adds one of the things listed
           here, this page changes before that release ships.
@@ -131,25 +131,25 @@ export function PrivacySections() {
             <li key={rule}>{rule}</li>
           ))}
         </ul>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="location" title="Location is never required">
+      <PageSection id="location" title="Location is never required">
         <p className="ds-trust-copy">
           Location lookup starts only after you press a labeled control; the page never requests
           device location automatically. You can always browse by state or search by place name
           instead.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="integrity" title="What the abuse checks look at">
+      <PageSection id="integrity" title="What the abuse checks look at">
         <p className="ds-trust-copy">
           Pages that could be hit at scale (search, corrections, lead submission) sit behind rate
           limits and same-origin checks. Nothing those checks record is used to build a marketing
           profile.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="corrections" title="Corrections and leads">
+      <PageSection id="corrections" title="Corrections and leads">
         <p className="ds-trust-copy">
           When you file a correction, appeal, abuse report, or research lead, you choose what to
           write. Submissions go into a private queue, are kept so they can be opened later, and are
@@ -164,16 +164,16 @@ export function PrivacySections() {
           anyone&apos;s home address or other sensitive personal details about a living person
           unless strictly necessary for the correction.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="changes" title="Changes and contact">
+      <PageSection id="changes" title="Changes and contact">
         <p className="ds-trust-copy">
           A material change to this policy is posted here, with a new date at the top. For a privacy
           request, or a question about how any of this runs, write to{' '}
           <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
           <Link href="/support">support page</Link>.
         </p>
-      </RoomSection>
+      </PageSection>
     </>
   );
 }

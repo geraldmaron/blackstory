@@ -3,7 +3,7 @@
  * one paper sheet. The figures themselves are drawn by `components/data/figures/figure.css` and
  * `components/data/data-charts.css`, which each figure imports.
  *
- * Named data-page.css, not data-edition.css: room-kit.test.tsx forbids new `*-edition.css`
+ * Named data-page.css, not data-edition.css: page-kit.test.tsx forbids new `*-edition.css`
  * files under `app/`.
  */
 

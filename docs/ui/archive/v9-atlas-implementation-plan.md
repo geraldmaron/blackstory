@@ -601,7 +601,7 @@ that is still the old surface loses a working route and gains nothing.
 ### WP-26 · Docs and supersession — **Haiku**
 
 **Depends on:** all of P0 to P5.
-**Touches:** `docs/ui/README.md`, `docs/ui/archive/design-direction-v6-home.md`, `design-direction-v6-explore.md`, `design-direction-v9-atlas.md`, `docs/ui/patterns-registry.md`, root `AGENTS.md` § UI Design Patterns.
+**Touches:** `docs/ui/README.md`, `docs/ui/archive/design-direction-v6-home.md`, `design-direction-v6-explore.md`, `design-direction-v9-atlas.md`, `docs/ui/archive/patterns-registry.md`, root `AGENTS.md` § UI Design Patterns.
 
 - Flip v9's status line from `proposed` to `binding`
 - Add a supersession banner to the top of v6 home and v6 explore

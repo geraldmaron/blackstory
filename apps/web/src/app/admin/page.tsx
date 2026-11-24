@@ -3,6 +3,7 @@
  */
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { buttonClassName } from '@repo/ui';
 import { DeskTitleBar, Panel } from '../../admin/design-system/ui';
 import { readVerifiedAdminIdentity } from '../../admin/auth/supabase-server';
 import { listStories } from '../../admin/editorial/store';
@@ -69,7 +70,7 @@ export default async function AdminHomePage() {
         <Panel
           title="Pick up where I left off"
           actions={
-            <Link className="ds-cta ds-cta--solid ds-cta--sm" href="/admin/stories/new">
+            <Link className={buttonClassName('primary')} href="/admin/stories/new">
               New story
             </Link>
           }

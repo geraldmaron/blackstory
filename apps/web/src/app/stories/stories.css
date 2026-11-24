@@ -2,10 +2,10 @@
  * /stories and /presidents, on paper (docs/ui/DESIGN.md section 9.3): the chapters as ruled
  * entries, each with its cover as a compact exhibit when the cover is safe on a front page, then
  * one ruled list. A cover is whole and in its own color. No toned plate, panel, shadow or band.
- * Type sizes come from the --ds-text-* scale (room-kit.test guards this file).
+ * Type sizes come from the --ds-text-* scale (page-kit.test guards this file).
  */
 
-.ds-stories .ds-room__doc {
+.ds-stories .ds-doc__column {
   padding-block: var(--ds-space-12) var(--ds-space-18);
 }
 
@@ -392,7 +392,7 @@
 
 /* —— Phone ————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
-  .ds-stories .ds-room__doc {
+  .ds-stories .ds-doc__column {
     padding-top: var(--ds-space-8);
   }
 

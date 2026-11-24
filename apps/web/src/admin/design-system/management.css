@@ -289,10 +289,7 @@
   line-height: 1.6;
   max-width: 78ch;
 }
-.admin-base-content .ds-page__eyebrow {
-  font-size: var(--ds-text-micro);
-  margin-bottom: 6px;
-}
+
 .admin-base-content .ds-section__title {
   font-size: 18px;
   margin-top: var(--ds-space-6);

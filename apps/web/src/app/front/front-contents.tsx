@@ -13,6 +13,7 @@ import { frontSafeCover } from '../../lib/stories/cover-safety';
 import { listPublicStoryListItems } from '../../lib/stories/source';
 import { buildStoriesFront } from '../stories/stories-index';
 import { CoverImage } from '../stories/StoriesIndexParts';
+import { MEMORIAL_LINK_NOTE } from '../memorial/memorial-copy';
 import { FRONT_ROUTES } from './front-routes';
 
 void React;
@@ -83,7 +84,9 @@ export async function FrontContents() {
           </li>
           <li>
             <h3>Memorial</h3>
-            <p>{lineOf('memorial')}</p>
+            <p>
+              {lineOf('memorial')} {MEMORIAL_LINK_NOTE}
+            </p>
             <p className="ds-front-contents__links">
               <Link href={FRONT_ROUTES.memorial}>Visit the memorial</Link>
             </p>

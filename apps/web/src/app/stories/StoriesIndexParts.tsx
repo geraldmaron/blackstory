@@ -30,7 +30,7 @@ export function CoverImage({
   readonly item: PublicStoryListItemDoc;
   readonly width: number;
   readonly eager?: boolean;
-  /** `ds-plate__img` when the cover stands as a toned plate (home's lead story). */
+  /** The image's own class, where a caller lays the cover out differently. */
   readonly className?: string;
 }) {
   // Hidden unless the story is listed as safe; home and the old Explore front read this too.

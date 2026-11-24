@@ -20,7 +20,7 @@
   --story-anchor: calc(var(--ds-island-clearance) + var(--ds-space-18));
 }
 
-.ds-story .ds-room__doc {
+.ds-story .ds-doc__column {
   padding-block: var(--ds-space-12) var(--ds-space-18);
 }
 
@@ -985,7 +985,7 @@
 
 /* —— Phone ——————————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
-  .ds-story .ds-room__doc {
+  .ds-story .ds-doc__column {
     padding-top: var(--ds-space-6);
   }
 
@@ -1074,7 +1074,7 @@
   color: var(--ds-accent);
   text-decoration: underline;
   text-underline-offset: 0.18em;
-  transition: color var(--ds-duration-fast) var(--ds-ease-standard);
+  transition: color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-reading__extlink:hover {
@@ -1203,7 +1203,7 @@
   border: 0;
   border-radius: var(--ds-radius-sm);
   cursor: pointer;
-  transition: background var(--ds-duration-fast) var(--ds-ease-standard);
+  transition: background var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-reading-video__play:hover {

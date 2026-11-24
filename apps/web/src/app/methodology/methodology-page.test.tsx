@@ -102,7 +102,7 @@ test('methodology contents list names every section the page renders', () => {
       `${section.label} is on the page`,
     );
   }
-  assert.match(sectionsSource, /RoomJump/);
+  assert.match(sectionsSource, /ContentsList/);
   assert.match(sectionsSource, /Open the source library/);
 });
 

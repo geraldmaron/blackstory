@@ -10,7 +10,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@repo/ui';
-import { Room } from '../../../components/room';
+import { PageFrame } from '../../../components/page';
 import { TrustMast, TrustSheet } from '../../../components/trust';
 import { Figure } from '../../../components/data/figures/Figure';
 import {
@@ -20,7 +20,7 @@ import {
   parseFigureViews,
 } from '../../../components/data/figures/registry';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
-import '../../reading-room.css';
+import '../../reading-page.css';
 import '../data-page.css';
 
 void React;
@@ -55,9 +55,9 @@ export default async function FigurePage({ params, searchParams }: FigurePagePro
   const path = figurePagePath(id);
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast>
           <PageHeader
@@ -80,6 +80,6 @@ export default async function FigurePage({ params, searchParams }: FigurePagePro
           elsewhere={{ href: `/data#${id}`, label: 'See this figure in its place on Data' }}
         />
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

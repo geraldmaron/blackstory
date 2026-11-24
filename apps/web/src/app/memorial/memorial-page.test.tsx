@@ -28,7 +28,7 @@ test('the memorial root is the wall atmosphere on the room class, not a photo mo
   // The literal class is the positioned root against which the wall is measured.
   assert.match(pageSource, /className="ds-memorial"/);
   // The route carries the class stylesheet and no per-route stylesheet of its own.
-  assert.match(pageSource, /import '\.\.\/reading-room\.css'/);
+  assert.match(pageSource, /import '\.\.\/reading-page\.css'/);
   assert.doesNotMatch(pageSource, /memorial-edition\.css/);
   assert.doesNotMatch(pageSource, /<ReadingEntry/);
   assert.doesNotMatch(pageSource, /Every name the archive has been given/);

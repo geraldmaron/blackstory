@@ -12,7 +12,7 @@
  * above the tab bar.
  */
 
-@import '../components/room/room-kit.css';
+@import '../components/page/page-kit.css';
 
 .ds-recpage {
   /* One pill box for every capsule on the page: masthead tags, decades, grade, topics. */
@@ -20,12 +20,6 @@
   --recpage-pill-pad: 0.65rem;
   padding-block: var(--ds-space-8) var(--ds-space-18);
   color: var(--ds-ink);
-}
-
-/* The record sheet is the page's paper: square, no bands, no shadow (DESIGN.md section 7.4). */
-.ds-recpage__grid.ds-sheet {
-  border-radius: 0;
-  box-shadow: none;
 }
 
 .ds-recpage__grid {
@@ -124,7 +118,7 @@
 }
 
 .ds-recpage__crumb .ds-recpage__icon {
-  transition: transform var(--ds-duration-fast) var(--ds-easing);
+  transition: transform var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-recpage__crumb:hover .ds-recpage__icon {
@@ -212,7 +206,7 @@
 .ds-recpage__pill--link {
   position: relative;
   text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 /* The pill stays compact; its hit area still reaches 44px. */
@@ -517,7 +511,7 @@
 
 .ds-recpage__prose {
   max-width: 65ch;
-  color: var(--room-ink-2);
+  color: var(--doc-ink-2);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-subtitle);
   line-height: 1.62;
@@ -830,11 +824,11 @@
   gap: var(--ds-space-2);
   min-height: 44px;
   padding: var(--ds-space-6) var(--ds-space-8);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ground-edge);
   color: var(--ds-ink);
   text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-recpage__step:hover {

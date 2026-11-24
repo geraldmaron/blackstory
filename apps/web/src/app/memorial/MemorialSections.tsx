@@ -6,16 +6,21 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { Sheet } from '@repo/ui';
+import { Notice, Sheet } from '@repo/ui';
 import {
   memorialNamePlace,
   memorialNameYear,
   memorialNamesByInitial,
 } from '../../components/patterns/memorial-wall/memorial-names';
-import { MEMORIAL_LIST_LEDE, MEMORIAL_LIST_NOTE } from './memorial-copy';
+import {
+  MEMORIAL_CONTENT_NOTE,
+  MEMORIAL_LIST_LEDE,
+  MEMORIAL_LIST_NOTE,
+  MEMORIAL_PROVENANCE,
+} from './memorial-copy';
 import { memorialGroupId } from './memorial-group-id';
 import { MemorialNameFinder } from './MemorialNameFinder';
-import { RoomHandoff } from '../../components/room';
+import { RelatedLink } from '../../components/page';
 
 void React;
 
@@ -64,6 +69,9 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
               it doesn’t, the name is written plainly. Both are held here the same.
             </p>
           ) : null}
+          <Notice tone="note" title="Content note" className="ds-memorial-index__content-note">
+            <p>{MEMORIAL_CONTENT_NOTE}</p>
+          </Notice>
         </header>
 
         <Sheet className="ds-memorial-index__sheet">
@@ -116,23 +124,24 @@ export function MemorialSections({ entityLinksByName = {} }: MemorialSectionsPro
             </p>
 
             <p className="ds-memorial__note">{MEMORIAL_LIST_NOTE}</p>
+            <p className="ds-memorial__provenance">{MEMORIAL_PROVENANCE}</p>
           </div>
         </Sheet>
 
-        <div className="ds-memorial__related ds-room-handoffs">
-          <RoomHandoff
+        <div className="ds-memorial__related ds-doc-handoffs">
+          <RelatedLink
             href="/submit"
             icon="submit"
             title="Submit a name"
             line="A lead is reviewed before anything is added. Nothing publishes on arrival."
           />
-          <RoomHandoff
+          <RelatedLink
             href="/methodology"
             icon="methodology"
             title="How names are held"
             line="Living-person protection, and why a memorial name isn’t a map pin."
           />
-          <RoomHandoff
+          <RelatedLink
             href="/about"
             icon="about"
             title="Who keeps this"

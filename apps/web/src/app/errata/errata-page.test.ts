@@ -50,7 +50,7 @@ test('the page links both feeds and filters by kind of change through plain link
 test('the log hands off to /corrections and /methodology, with no off-ramp card', () => {
   assert.match(pageSource, /href: '\/corrections'/);
   assert.match(pageSource, /href: '\/methodology#how-a-record-gets-in'/);
-  assert.doesNotMatch(pageSource, /WalkOffRamp|RoomHandoff/);
+  assert.doesNotMatch(pageSource, /WalkOffRamp|RelatedLink/);
 });
 
 test('errata does not print shop record ids', () => {

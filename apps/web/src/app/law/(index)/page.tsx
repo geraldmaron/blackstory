@@ -7,11 +7,11 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { loadLegalCatalog } from '../../../lib/legal/public-source';
-import { Room } from '../../../components/room';
+import { PageFrame } from '../../../components/page';
 import { ArchiveHead } from '../../archive/ArchiveHead';
 import { buildLawBrowseViewModel, lawBrowseHref, type RawLawBrowseParams } from '../law-view-model';
 import { LawBrowseSections } from '../LawBrowseSections';
-import '../../reading-room.css';
+import '../../reading-page.css';
 import '../../archive/lens.css';
 import '../law.css';
 
@@ -54,13 +54,13 @@ export default async function LawPage({ searchParams }: LawPageProps) {
   const view = buildLawBrowseViewModel(await searchParams, source);
 
   return (
-    <Room width="wide" className="ds-law">
+    <PageFrame width="wide" className="ds-law">
       {/* The dek states the count in words; no numeral repeats it. */}
       <LawBrowseSections
         view={view}
         catalog={source.snapshots}
         head={<ArchiveHead title="Law" dek={dek(view)} view={null} lens="law" />}
       />
-    </Room>
+    </PageFrame>
   );
 }

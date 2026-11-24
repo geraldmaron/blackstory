@@ -16,7 +16,7 @@
   border: var(--ds-border-width) solid var(--ds-border-control);
   border-radius: var(--ds-radius-sm);
   background: var(--ds-surface-sunken);
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-place__field:hover {

@@ -1,7 +1,7 @@
 /**
  * The surface class registry: which of the four rendered classes a public route belongs to.
  *
- * Design law: `docs/ui/patterns-surface-classes.md` and `design-direction-v9-surfaces.md` §2.
+ * Design law: `docs/ui/archive/patterns-surface-classes.md` and `design-direction-v9-surfaces.md` §2.
  * Every public rendered route belongs to exactly one class, and the class is the single switch
  * that shell layout, plate posture, keyboard scope and the footer decision all read. Before this
  * module those decisions were made by roughly 25 `:has()` selectors keyed on marker classes a
@@ -22,7 +22,7 @@
 /**
  * The five rendered surface classes. Endpoints are represented by `null`.
  *
- * `door` is the front page (`/`, and `/story` on trial): the map plate under the scroll scenes,
+ * `door` is the front page (`/`): the map plate under the scroll scenes,
  * painted and never steered by hand. `instrument` remains in the type union for plate-posture
  * and legacy CSS, but no public route emits it.
  */
@@ -82,10 +82,6 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // `/corrections/appeal` and `/corrections/abuse` are API-only directories. Their forms render
   // inside the receipt status page, so classifying the directory paths would advertise chrome for
   // URLs that return 404.
-  // The retelling as its own page: the front page's ground and plate, on trial (DESIGN.md
-  // section 9.7). A prefix entry, not an exact one, keeps it out of `CLASSIFIED_PATHS` and so out
-  // of the footer, the palette and the sitemap until the read test decides where it lives.
-  ['/story', 'door'],
   ['/stories/', 'reading'],
   ['/presidents/', 'reading'],
   ['/data/', 'reading'],

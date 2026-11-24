@@ -184,5 +184,5 @@ Per [`story.md`](./story.md): evidence-before-assertion, sentence case, no em da
 2. Choose the surface's home camera preset and, if a landing/narrative surface, its Invite beats (`MapIntroBeat` list).
 3. Wire selection through feature-state; confirm deselect leaves neighbors unchanged.
 4. Verify reduced motion, keyboard, 44px targets, light + dark.
-5. Add the surface to the adopters table in [`patterns-registry.md`](./patterns-registry.md) and cite this doc in the surface's `design-direction-v6-*.md`.
+5. Add the surface to the adopters table in [`patterns-registry.md`](./archive/patterns-registry.md) and cite this doc in the surface's `design-direction-v6-*.md`.
 6. Mobile: verify on a Release build via `pnpm mobile:ios:verify` (not Metro).

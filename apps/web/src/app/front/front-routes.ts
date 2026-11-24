@@ -16,6 +16,4 @@ export const FRONT_ROUTES = {
   memorial: pathOf('memorial', '/memorial'),
   method: pathOf('methodology', '/methodology'),
   search: pathOf('archive', '/archive'),
-  /** The retelling as its own page. */
-  opening: '/story',
 } as const;

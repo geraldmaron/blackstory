@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../../components/room';
+import { parentCrumb, PageFrame } from '../../../components/page';
 import { TrustMast, TrustSheet } from '../../../components/trust';
 import '../../utility.css';
 import '../../../components/trust/trust.css';
@@ -24,9 +24,9 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function CorrectionStatusLandingPage() {
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast>
           <PageHeader
@@ -45,6 +45,6 @@ export default function CorrectionStatusLandingPage() {
           No code? <Link href="/corrections">Send a correction</Link> to get one.
         </p>
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

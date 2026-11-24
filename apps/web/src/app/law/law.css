@@ -1,7 +1,7 @@
 /**
  * `/law`, Parked: the head and toolbar on the night ground, the time rail, and the chronology on
  * one reading sheet (archive/lens.css lays the page out). The toolbar, menus, active chips and outcome
- * states are the register's (room-kit.css). Spacing uses the shared scale only
+ * states are the register's (page-kit.css). Spacing uses the shared scale only
  * (4, 8, 12, 16, 24, 32, 48, 72).
  */
 
@@ -109,10 +109,6 @@
   padding: 0;
   list-style: none;
   color: var(--ds-ink-muted);
-}
-
-.ds-law-axis--waiting .ds-law-axis__track::before {
-  opacity: 0.4;
 }
 
 @media (min-width: 64rem) {
@@ -279,7 +275,7 @@
   padding: var(--ds-space-6) var(--ds-space-2);
   color: var(--ds-ink);
   text-decoration: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-law-row__link:hover {
@@ -361,10 +357,6 @@
   color: var(--ds-ink-muted);
   font-size: var(--ds-text-body-sm);
   line-height: var(--ds-leading-body);
-}
-
-.ds-law-list--waiting .ds-law-row__link:hover {
-  background: none;
 }
 
 @media (max-width: 47.9375rem) {

@@ -1,11 +1,10 @@
 /**
- * Tests for shared vs compact source partitioning and DataStatStrip markup.
+ * Tests for shared vs compact source partitioning.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { DataStatStrip } from './DataStatStrip';
 import {
   dedupeSources,
   humanSourceLabel,
@@ -72,38 +71,4 @@ test('humanSourceLabel keeps prose labels and remaps ingest ids', () => {
     humanSourceLabel('opportunity-insights-tract-outcomes'),
     'Opportunity Insights, Opportunity Atlas',
   );
-});
-
-test('DataStatStrip renders one group Source for matching sources, not one per item', () => {
-  const html = renderToStaticMarkup(
-    createElement(DataStatStrip, {
-      sources: [FBI],
-      items: [
-        { value: '11,508', label: 'Reported incidents' },
-        { value: '3,128', label: 'Anti-Black bias' },
-        { value: '74.2%', label: 'Agencies participating' },
-      ],
-    }),
-  );
-  const sourceLabels = html.match(/ds-citation__label/g) ?? [];
-  assert.equal(sourceLabels.length, 1);
-  assert.match(html, /ds-citation--group/);
-  assert.doesNotMatch(html, /ds-citation--compact/);
-  assert.match(html, /11,508/);
-  assert.match(html, /3,128/);
-});
-
-test('DataStatStrip keeps compact unique extras under the owning figure', () => {
-  const html = renderToStaticMarkup(
-    createElement(DataStatStrip, {
-      sources: [FBI],
-      items: [
-        { value: '1', label: 'Shared only' },
-        { value: '2', label: 'Has extra', sources: [CENSUS] },
-      ],
-    }),
-  );
-  assert.match(html, /ds-citation--group/);
-  assert.match(html, /ds-citation--compact/);
-  assert.match(html, /census/);
 });

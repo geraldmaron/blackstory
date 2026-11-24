@@ -18,7 +18,7 @@
  * traveled unless something says otherwise. The honesty line from design-direction-v9-atlas.md §6
  * ships with the graphic, in the same component, so the two cannot be separated by a later edit.
  *
- * See docs/ui/patterns-atlas-instrument.md.
+ * See docs/ui/archive/patterns-atlas-instrument.md.
  */
 'use client';
 

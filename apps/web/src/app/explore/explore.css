@@ -84,7 +84,7 @@ body:has(.ds-archive-map) .ds-shell-footer {
 /* Chrome hidden (`\`): the column and controls go, the bar stays but recedes. */
 .ds-atlas[data-chrome='hidden'] .ds-bar {
   opacity: 0.15;
-  transition: opacity var(--ds-duration-base) var(--ds-easing);
+  transition: opacity var(--ds-duration-base) var(--ds-ease-entrance);
 }
 
 .ds-atlas[data-chrome='hidden'] .ds-bar:hover,
@@ -134,42 +134,3 @@ body:has(.ds-archive-map) .ds-shell-footer {
 }
 
 /* Kind color arrives as an inline border-color; it is drawn as a leading dot, not a side stripe. */
-
-.ds-kind-badge {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: var(--ds-space-2);
-  max-width: 100%;
-  white-space: nowrap;
-}
-
-.ds-kind-badge__label {
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-  white-space: nowrap;
-}
-
-.ds-kind-badge__icon {
-  flex-shrink: 0;
-  width: 0.75rem;
-  height: 0.75rem;
-}
-
-.ds-kind-badge--compact {
-  gap: var(--ds-space-1);
-}
-
-.ds-kind-badge--compact .ds-kind-badge__label {
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-}
-
-.ds-kind-badge--compact .ds-kind-badge__icon {
-  width: 0.625rem;
-  height: 0.625rem;
-}

@@ -13,7 +13,7 @@ import { cache } from 'react';
 import { parseRecordsQuery, recordsHref } from '../../lib/records/build-records-index';
 import { legacyRecordsHref } from '../../lib/records/records-query';
 import { ARCHIVE_REDIRECTS_ENABLED } from '../../lib/redirects/archive-redirects.mjs';
-import { RecordsIndexRoom } from '../records/RecordsIndex';
+import { RecordsIndexPage } from '../records/RecordsIndex';
 import { SeedInAddress } from '../records/SeedInAddress';
 import { loadRecordsIndex, recordsQueryCacheKey } from '../records/load-records-index';
 import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
@@ -21,7 +21,7 @@ import { buildEntityPhotoIndex } from '../../lib/map-experience/entity-photo-ind
 import { exploreMapSourceFor } from '../../lib/map-experience/build-explore-map-source';
 import { IndexCountry } from '../../components/map-stage/IndexCountry';
 import '../country.css';
-import '../reading-room.css';
+import '../reading-page.css';
 import '../records/records-index.css';
 
 export type ArchiveParams = Record<string, string | string[] | undefined>;
@@ -124,7 +124,7 @@ export async function ListView({ params }: { readonly params: ArchiveParams }) {
         <link rel="next" href={new URL(model.nextHref, SITE_URL).toString()} />
       )}
       {query.seed.length > 0 ? <SeedInAddress seed={query.seed} /> : null}
-      <RecordsIndexRoom
+      <RecordsIndexPage
         model={model}
         photos={photos}
         // The timeline lays its decades out across the full window, so it stays a document. So

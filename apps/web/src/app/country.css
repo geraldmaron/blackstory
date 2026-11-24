@@ -63,9 +63,9 @@
     max-width: min(26rem, 100vw - var(--ds-country-sheet-w) - 14rem);
     margin: 0;
     padding: var(--ds-space-2) var(--ds-space-3);
-    border-radius: var(--ds-radius-md);
-    background: var(--ds-world-hud-ground);
-    color: var(--ds-world-hud-ink);
+    border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, var(--ds-fixed-ink) 80%, transparent);
+    color: var(--ds-fixed-paper);
     font-family: var(--ds-font-mono);
     font-size: var(--ds-text-caption);
     line-height: 1.5;

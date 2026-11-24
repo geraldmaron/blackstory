@@ -56,7 +56,7 @@ test('no row is behind a details disclosure, and a long note keeps its full text
       recordHrefs={new Map([['errata_sample_many#Lake Nixon', '/entity/ent_lake']])}
     />,
   );
-  assert.doesNotMatch(html, /<details|<summary|ds-room-draw/);
+  assert.doesNotMatch(html, /<details|<summary|ds-doc-draw/);
   // Short notes are not clamped; the long one is, with its whole text and its records present.
   assert.equal(html.match(/data-clamp/g)?.length, 1);
   assert.match(html, new RegExp(long));

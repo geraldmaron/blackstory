@@ -13,7 +13,7 @@
   pointer-events: none;
   background: var(--ds-surface-raised);
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   padding: var(--ds-space-2);
 
   animation: ds-pin-photo-card-rise 180ms ease-out;

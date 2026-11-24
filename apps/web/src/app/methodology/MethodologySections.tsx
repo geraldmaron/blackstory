@@ -9,7 +9,8 @@ import React from 'react';
 import { Citation } from '@repo/ui';
 import { getDisclaimer } from '@repo/domain/disclaimers';
 import { formatCitation } from '../../lib/citation/format';
-import { Prose, RoomFactList, RoomJump, RoomSection } from '../../components/room';
+import { MEMORIAL_LINK_NOTE } from '../memorial/memorial-copy';
+import { Prose, FactList, ContentsList, PageSection } from '../../components/page';
 import { TrustBand, TrustFlow, TrustLinks, TrustSheet } from '../../components/trust';
 import { GradeKey, GradeMatrix, PrecisionLadder } from './MethodologyFigures';
 import {
@@ -80,9 +81,9 @@ export function MethodologySections() {
   return (
     <>
       <TrustSheet>
-        <RoomJump sections={METHODOLOGY_PAGE_SECTIONS} />
+        <ContentsList sections={METHODOLOGY_PAGE_SECTIONS} />
 
-        <RoomSection id="how-a-record-gets-in" title="How a record gets in">
+        <PageSection id="how-a-record-gets-in" title="How a record gets in">
           <Lead>{ADMISSION_LEAD}</Lead>
           <TrustFlow
             caption="From a lead to a public page"
@@ -92,12 +93,12 @@ export function MethodologySections() {
           <Prose>
             <p>{ADMISSION_OWNERSHIP}</p>
           </Prose>
-          <RoomFactList items={METHODOLOGY_PUBLISH_RULES} />
+          <FactList items={METHODOLOGY_PUBLISH_RULES} />
           <h3 className="ds-trust-subhead">How a claim is verified</h3>
           <PlainList items={VERIFICATION_STEPS} label="How a claim is verified" />
-        </RoomSection>
+        </PageSection>
 
-        <RoomSection id="evidence-grades" title="What the evidence grades mean">
+        <PageSection id="evidence-grades" title="What the evidence grades mean">
           <Lead>{GRADES_LEAD}</Lead>
           <GradeKey />
           <GradeMatrix />
@@ -107,13 +108,13 @@ export function MethodologySections() {
             command puts on your clipboard. Here is one.
           </p>
           <Citation label="Example citation" source={EXAMPLE_CITATION} />
-        </RoomSection>
+        </PageSection>
 
-        <RoomSection id="editorial-standards" title="Editorial standards">
-          <RoomFactList items={EDITORIAL_STANDARDS} />
-        </RoomSection>
+        <PageSection id="editorial-standards" title="Editorial standards">
+          <FactList items={EDITORIAL_STANDARDS} />
+        </PageSection>
 
-        <RoomSection
+        <PageSection
           id="how-a-point-is-drawn"
           title="Why a point is never drawn sharper than its source"
         >
@@ -126,13 +127,13 @@ export function MethodologySections() {
           <PlainList items={DIGNITY_RULES} label="Map dignity rules" />
           <h3 className="ds-trust-subhead">What the map and the grades cannot tell you</h3>
           <PlainList items={LIMITATION_RULES} label="Limitations" />
-        </RoomSection>
+        </PageSection>
       </TrustSheet>
 
       {/* The page changes ground between chapters: how a record is built stands on sand, and the
           rule that protects living people on its own ink band. */}
       <TrustBand tone="sand">
-        <RoomSection id="how-it-holds-together" title="How it holds together">
+        <PageSection id="how-it-holds-together" title="How it holds together">
           <Lead>{STRUCTURE_LEAD}</Lead>
           <TrustFlow caption="What one record is made of" steps={RECORD_ANATOMY_STEPS} />
           <dl className="ds-trust-dl ds-trust-dl--split" aria-label="One catalog, three ways in">
@@ -143,14 +144,14 @@ export function MethodologySections() {
               </div>
             ))}
           </dl>
-        </RoomSection>
+        </PageSection>
       </TrustBand>
 
       <TrustSheet>
-        <RoomSection id="lives-across-decades" title="Lives across the decades">
+        <PageSection id="lives-across-decades" title="Lives across the decades">
           <Lead>{LIVES_METHOD_LEAD}</Lead>
           <PlainList items={LIVES_METHOD_POINTS} label="How Lives reads its figures" />
-          <RoomFactList items={LIVES_METHOD_RULES} />
+          <FactList items={LIVES_METHOD_RULES} />
           <TrustLinks
             links={[
               {
@@ -168,9 +169,9 @@ export function MethodologySections() {
           <Prose>
             <p>{FIGURE_LINEAGE_CREDIT}</p>
           </Prose>
-        </RoomSection>
+        </PageSection>
 
-        <RoomSection id="where-the-evidence-comes-from" title="Where the evidence comes from">
+        <PageSection id="where-the-evidence-comes-from" title="Where the evidence comes from">
           <Lead>{SOURCE_LIBRARY_LEAD}</Lead>
           <TrustLinks
             links={[
@@ -181,11 +182,11 @@ export function MethodologySections() {
               },
             ]}
           />
-        </RoomSection>
+        </PageSection>
       </TrustSheet>
 
       <TrustBand tone="ink" fixed>
-        <RoomSection id="living-person-protection" title="Living person protection">
+        <PageSection id="living-person-protection" title="Living person protection">
           <Lead>{LIVING_LEAD}</Lead>
           <Prose>
             <p>{METHODOLOGY_DIGNITY_LINE}</p>
@@ -195,13 +196,19 @@ export function MethodologySections() {
             </p>
           </Prose>
           <TrustLinks
-            links={[{ href: '/memorial', title: 'The memorial wall', line: 'A name, held.' }]}
+            links={[
+              {
+                href: '/memorial',
+                title: 'The memorial wall',
+                line: `A name, held. ${MEMORIAL_LINK_NOTE}`,
+              },
+            ]}
           />
-        </RoomSection>
+        </PageSection>
       </TrustBand>
 
       <TrustSheet>
-        <RoomSection id="internet-archive" title="Internet Archive handoff">
+        <PageSection id="internet-archive" title="Internet Archive handoff">
           <Lead>{INTERNET_ARCHIVE_LEAD}</Lead>
           <Prose>
             <p>
@@ -215,7 +222,7 @@ export function MethodologySections() {
               by itself.
             </p>
           </Prose>
-        </RoomSection>
+        </PageSection>
 
         <p className="ds-trust-foot">
           {disclaimer.body} Language reviewed {disclaimer.reviewDate}.

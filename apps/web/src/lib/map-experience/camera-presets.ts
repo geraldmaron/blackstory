@@ -73,7 +73,7 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number): CameraEasi
   };
 }
 
-/** Shared slow-out register for every preset: mirrors `@repo/ui`'s `--ds-easing`
+/** Shared slow-out register for every preset: mirrors `@repo/ui`'s `--ds-ease-entrance`
  * (`cubic-bezier(0.16, 1, 0.3, 1)`, `packages/ui/src/tokens/foundation.ts`'s `motion.easingStandard`)
  * so the map's camera register and the rest of the brand's motion register are the same curve —
  * fast departure, long unhurried settle. Motion that reads as descent into place, never a jump

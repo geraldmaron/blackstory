@@ -124,8 +124,15 @@ test('a lens spelled on /archive answers its own address with its own keys', () 
     '/books?state=GA',
   );
   assert.equal(archiveLensRedirect(at('/archive?lens=presidents&kind=people')), '/presidents');
-  // The inventions lens is a filter on the shared model; the /archive normalizer rewrites it.
-  assert.equal(archiveLensRedirect(at('/archive?lens=inventions')), null);
+  // The inventions lens is a filter on the shared model: one temporary hop onto `kind`, with the
+  // reader's other keys kept, so the /archive normalizer never answers it with a 308.
+  assert.equal(archiveLensRedirect(at('/archive?lens=inventions')), '/archive?kind=inventions');
+  assert.equal(
+    archiveLensRedirect(at('/archive?lens=inventions&q=lamp')),
+    '/archive?q=lamp&kind=inventions',
+  );
+  // `/story`, the retelling's trial address, is the front page.
+  assert.equal(legacyArchiveRedirect(at('/story')), '/');
   assert.equal(archiveLensRedirect(at('/archive?lens=nope')), null);
   assert.equal(archiveLensRedirect(at('/law?lens=law')), null);
 });

@@ -20,7 +20,7 @@ import React from 'react';
 import Link from 'next/link';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import { CORRECTION_PRIVACY_NOTICE } from '../corrections/copy';
-import { RoomJump, RoomSection } from '../../components/room';
+import { ContentsList, PageSection } from '../../components/page';
 import { TAKEDOWN_ACKNOWLEDGEMENT_SLA_HOURS, TAKEDOWN_RESOLUTION_SLA_DAYS } from '@repo/domain';
 
 void React;
@@ -62,9 +62,9 @@ const NOT_THIS_RULES = [
 export function TermsSections() {
   return (
     <>
-      <RoomJump sections={PAGE_SECTIONS} />
+      <ContentsList sections={PAGE_SECTIONS} />
 
-      <RoomSection id="scope" title="BlackStory, and who runs it">
+      <PageSection id="scope" title="BlackStory, and who runs it">
         <p className="ds-trust-copy">
           This page covers BlackStory at <span className="ds-phrase-nowrap">blackstory.app</span>{' '}
           and the archive it publishes. It is a notice rather than an agreement: you are not asked
@@ -76,9 +76,9 @@ export function TermsSections() {
           anything on this page.
         </p>
         <p className="ds-trust-meta">Last updated: September 2026</p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="what-this-is" title="What this is, and what it is not">
+      <PageSection id="what-this-is" title="What this is, and what it is not">
         <p className="ds-trust-copy">
           BlackStory is a free, public archive of Black American history. There is nothing to buy
           and nothing to subscribe to, and reading a published page never asks you to sign in. Every
@@ -96,9 +96,9 @@ export function TermsSections() {
             );
           })}
         </ul>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="using" title="Read it, link it, cite it">
+      <PageSection id="using" title="Read it, link it, cite it">
         <p className="ds-trust-copy">
           No permission is needed to read BlackStory, to link to any page on it, to quote it with
           attribution, or to cite it in your own work. That is what it is for, and asking would
@@ -111,9 +111,9 @@ export function TermsSections() {
           <a href="/ai.txt">/ai.txt</a>, and those two files are the current answer for machine
           access.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="reuse" title="Reusing what BlackStory writes">
+      <PageSection id="reuse" title="Reusing what BlackStory writes">
         <p className="ds-trust-copy">
           The writing on BlackStory is published under{' '}
           <a href={LICENSE_DEED} rel="license noopener noreferrer" target="_blank">
@@ -139,9 +139,9 @@ export function TermsSections() {
           Archive, USGS National Map imagery, and OpenStreetMap by way of OpenMapTiles. Check the
           record, and then the source, before reusing an image or a tile.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="submissions" title="Corrections, leads, and what happens to what you send">
+      <PageSection id="submissions" title="Corrections, leads, and what happens to what you send">
         <p className="ds-trust-copy">
           You can file a correction, send a research lead, appeal a closed correction, or report
           abuse. Nothing you send appears on the public site as you sent it, and nothing you send is
@@ -162,9 +162,9 @@ export function TermsSections() {
           something already published, or <Link href="/submit">submit a lead</Link> for something
           that is not.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="about-you" title="If a record about you is wrong">
+      <PageSection id="about-you" title="If a record about you is wrong">
         <p className="ds-trust-copy">
           Tell me. Use the <Link href="/corrections">corrections lane</Link> and say what is wrong
           and which page it is on, or write to{' '}
@@ -178,9 +178,9 @@ export function TermsSections() {
           <Link href="/errata">errata log</Link> rather than quietly swapped in. If it turns out to
           be right, you get told that and why, and you can appeal it once.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="copyright" title="If something published here is yours">
+      <PageSection id="copyright" title="If something published here is yours">
         <p className="ds-trust-copy">
           Write to <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>. Say what the
           material is, give the address of the page it is on, say what right you hold in it, and
@@ -192,9 +192,9 @@ export function TermsSections() {
           think the use was lawful I will say so and say why, and the material stays up while that
           is settled.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="accuracy" title="Accuracy, and the limits of this archive">
+      <PageSection id="accuracy" title="Accuracy, and the limits of this archive">
         <p className="ds-trust-copy">
           The research here is provided as it stands, without warranty of completeness or currency.
           Sources sit on the record itself so you can check the work rather than take it on trust,
@@ -207,26 +207,26 @@ export function TermsSections() {
           wrong record less wrong, and it does not relieve me of the work of putting it right. If
           something here is inaccurate, the answer is a correction, not this sentence.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="liability" title="Limits on liability">
+      <PageSection id="liability" title="Limits on liability">
         <p className="ds-trust-copy">
           BlackStory is free to read and is run by one person rather than a company. To the extent
           the law allows, I am not liable for indirect or consequential loss arising from the use of
           this archive.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="affiliate" title="Affiliate links">
+      <PageSection id="affiliate" title="Affiliate links">
         <p className="ds-trust-copy">
           Some book pages link to Bookshop.org through an affiliate program, and a purchase made
           through one of those links pays BlackStory a commission. Nothing here is paid placement,
           and the affiliate relationship never decides which books appear or what a record says
           about them.
         </p>
-      </RoomSection>
+      </PageSection>
 
-      <RoomSection id="changes" title="Changes and contact">
+      <PageSection id="changes" title="Changes and contact">
         <p className="ds-trust-copy">
           A material change to this notice is posted here, with a new date at the top. For a
           question about anything on this page, or about how the archive runs, write to{' '}
@@ -234,7 +234,7 @@ export function TermsSections() {
           <Link href="/support">support page</Link>. For how information is handled, see the{' '}
           <Link href="/privacy">privacy policy</Link>.
         </p>
-      </RoomSection>
+      </PageSection>
     </>
   );
 }

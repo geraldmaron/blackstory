@@ -27,7 +27,7 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   background: var(--ds-surface-raised);
   border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   overflow: hidden;
 }
 

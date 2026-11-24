@@ -21,7 +21,7 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { syncThemeColorMeta } from '@repo/ui';
-import { MapMomentStage } from './room/MapMoment';
+import { MapMomentStage } from './map-stage/MapMoment';
 import { MapStageProvider } from './map-stage/MapStage';
 import { OfflineNotice } from './OfflineNotice';
 import { SiteShellFooter } from './SiteShellFooter';

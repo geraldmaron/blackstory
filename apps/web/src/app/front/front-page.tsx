@@ -1,6 +1,6 @@
 /**
  * The front page in its v13 form (docs/ui/DESIGN.md section 9.7): the retelling on ink, then the
- * contents on paper. Rendered at `/story`, and at `/` when the opening flag is on (page.tsx).
+ * contents on paper. Rendered at `/` (page.tsx).
  */
 import React from 'react';
 import { FrontContents } from './front-contents';

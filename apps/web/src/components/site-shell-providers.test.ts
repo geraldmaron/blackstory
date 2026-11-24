@@ -27,7 +27,7 @@ describe('the shell renders on the server', () => {
   });
 
   it('imports both providers as plain, synchronously-rendered components', () => {
-    assert.match(code, /import \{ MapMomentStage \} from '\.\/room\/MapMoment'/);
+    assert.match(code, /import \{ MapMomentStage \} from '\.\/map-stage\/MapMoment'/);
     assert.match(code, /import \{ MapStageProvider \} from '\.\/map-stage\/MapStage'/);
   });
 

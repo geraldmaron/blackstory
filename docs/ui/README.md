@@ -24,25 +24,24 @@ what exists before changing it; do not build a new look from them.
 
 | Area | Documents |
 | ---- | --------- |
-| Map | [`patterns-map-canvas.md`](./patterns-map-canvas.md), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md), [`patterns-place-map.md`](./patterns-place-map.md), [`patterns-lens-handoff.md`](./patterns-lens-handoff.md), [`patterns-browse-mode.md`](./patterns-browse-mode.md) |
-| Records | [`patterns-record-page.md`](./patterns-record-page.md), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md), [`patterns-relationship-constellation.md`](./patterns-relationship-constellation.md), [`learning-index-entity.md`](./learning-index-entity.md) |
-| Stories, data, lives | [`patterns-story-reading.md`](./patterns-story-reading.md), [`patterns-lives-scene.md`](./patterns-lives-scene.md), [`patterns-collection-context.md`](./patterns-collection-context.md) |
+| Map | [`patterns-map-canvas.md`](./patterns-map-canvas.md), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md), [`patterns-place-map.md`](./patterns-place-map.md), [`patterns-lens-handoff.md`](./patterns-lens-handoff.md), [`patterns-plate-posture.md`](./patterns-plate-posture.md) (how the one map is covered, framed or live under a page), [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) (the camera) |
+| Records | [`patterns-record-page.md`](./patterns-record-page.md), [`learning-index-entity.md`](./learning-index-entity.md) |
+| Stories, data, lives | [`patterns-story-reading.md`](./patterns-story-reading.md), [`patterns-lives-scene.md`](./patterns-lives-scene.md) |
 | Handoffs and shell | [`patterns-visit-handoff.md`](./patterns-visit-handoff.md), [`patterns-internet-archive-handoff.md`](./patterns-internet-archive-handoff.md), [`patterns-site-footer.md`](./patterns-site-footer.md), [`patterns-destination-icon.md`](./patterns-destination-icon.md), [`official-properties.md`](./official-properties.md) |
 | Admin | [`patterns-admin-intake.md`](./patterns-admin-intake.md), [`patterns-admin-editorial.md`](./patterns-admin-editorial.md), [`patterns-source-library.md`](./patterns-source-library.md), [`patterns-work-review.md`](./patterns-work-review.md), [`patterns-ground-investigation.md`](./patterns-ground-investigation.md) |
-| Component import paths | [`patterns-registry.md`](./patterns-registry.md) |
+| Components | The kit's own index, `packages/ui/src/components/index.ts`, drawn at `/design-system` (staff), which is generated from it. The page kit (frame, section, contents list, prose) is `apps/web/src/components/page` |
 | Product model | [`v10/`](./v10/): discovery state, place anatomy, schema and cost. Reference until `DESIGN.md` phase 4a writes the Archive contract |
 | App | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md): the app's current shell, until `DESIGN.md` phase 9 replaces it |
 
-## Retiring with their code
+## Retired in phase 8
 
-Each of these describes a look `DESIGN.md` removes. The document goes to `archive/` in the
-phase that deletes the code it describes.
-
-| Document | Code | Goes in phase |
-| -------- | ---- | ------------- |
-| [`patterns-room-section.md`](./patterns-room-section.md), [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/room/*` | 4a |
-| [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md), [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) (web half), [`patterns-plate-posture.md`](./patterns-plate-posture.md) | Door, `explore/atlas.css`, plate code | 3 and 4b |
-| [`patterns-surface-classes.md`](./patterns-surface-classes.md), [`patterns-utility-edition.md`](./patterns-utility-edition.md), [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | `components/patterns/*edition*` | 2b and 8 |
+The documents that described a deleted look went to [`archive/`](./archive/) on 2026-11-23, each
+with a line at its top saying so: the room kit and reading room, the surface classes, the
+utility edition, the edition fact icon, browse mode, the relationship tree, record anatomy,
+collection context, the Atlas instrument and the hand-kept component registry. Some of the
+behavior references above still name files that earlier phases deleted
+(`patterns-record-page.md`, `patterns-lives-scene.md`, `patterns-ground-investigation.md`,
+`patterns-internet-archive-handoff.md`); read them for behavior, and trust the code for paths.
 
 ## History, not instruction
 

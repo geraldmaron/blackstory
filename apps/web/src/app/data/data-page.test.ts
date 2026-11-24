@@ -74,7 +74,7 @@ test('data page keeps a deep-linkable anchor for every section, under a plain he
     assert.match(sectionsSource, new RegExp(`id="${section.id}"`));
   }
   assert.match(sectionsSource, /<SectionHeading/);
-  assert.doesNotMatch(sectionsSource, /DataPageNav|RoomStats|ds-room-section__plate/);
+  assert.doesNotMatch(sectionsSource, /DataPageNav|RoomStats|ds-doc-section__plate/);
 });
 
 test('reading rules and section heads carry no icon plates or kickers', () => {

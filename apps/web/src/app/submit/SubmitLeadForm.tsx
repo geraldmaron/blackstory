@@ -11,7 +11,7 @@
  */
 import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Button, buttonClassName } from '@repo/ui';
-import { Field, fieldControlProps } from '../../components/room';
+import { Field, fieldControlProps } from '../../components/forms/fields';
 import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
 import { useFieldErrors } from '../../components/forms/use-field-errors';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';

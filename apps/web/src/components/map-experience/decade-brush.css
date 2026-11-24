@@ -123,7 +123,7 @@
      decades. A set range sends the rest back to the rule tone. */
   background: var(--ds-ink-muted);
   pointer-events: none;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-xbrush--active .ds-xbrush__bar {

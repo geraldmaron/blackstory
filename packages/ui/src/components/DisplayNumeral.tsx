@@ -1,6 +1,6 @@
 /**
- * A date, decade or count set huge as a graphic element (Schibsted at the numeral weight, 72-200px, tight
- * tracking). `accent` is copper on paper and ink grounds and ink on copper and sand; `soft` is sand
+ * A year, decade or day set huge as a graphic element (Schibsted at the numeral weight, 72-200px,
+ * tight tracking). Never a count: docs/ui/DESIGN.md rule 4. `accent` is copper on paper and ink grounds and ink on copper and sand; `soft` is sand
  * on ink and steps to copper on paper, where sand fails 3:1; `ink` follows the ground's ink.
  *
  * When the same value is stated in text nearby, pass `decorative` so a screen reader does not

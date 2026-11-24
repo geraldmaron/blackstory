@@ -24,10 +24,10 @@ export function WalkOffRampView({
   readonly children: React.ReactNode;
 }) {
   return (
-    <aside className="ds-room-offramp" aria-label="Where to go next">
-      <h2 className="ds-room-offramp__title">{title ?? placeName}</h2>
+    <aside className="ds-doc-offramp" aria-label="Where to go next">
+      <h2 className="ds-doc-offramp__title">{title ?? placeName}</h2>
       <p>{children}</p>
-      <div className="ds-room-offramp__acts">
+      <div className="ds-doc-offramp__acts">
         {/* Secondary, in ink: the memorial takes no copper accent, and this card is drawn only here. */}
         <Link className={buttonClassName('secondary')} href={href}>
           {placeName}

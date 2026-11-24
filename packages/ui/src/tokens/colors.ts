@@ -144,22 +144,6 @@ export const darkMap: MapPalette = {
   halo: '#38332d',
 };
 
-/**
- * The ink ground's map colors (docs/ui/DESIGN.md section 7.1), brand swatches only since v13.
- * It is always night, so these do not change with
- * the reader's theme. `--ds-world-*` in tokens.css mirrors them; `world.test.ts` holds the pairs.
- */
-export const worldPalette = {
-  /** Space behind the globe, and the ground of every label laid over the world. */
-  space: '#0a0a0a',
-  /** Copper Pin as a graphic edge (was the globe's blue rim). Graphic only. */
-  rim: '#b86b2a',
-  /** The one emission color: a published record. Never encodes grade, count or importance. */
-  ember: '#d07a32',
-  /** Mono labels laid over the world (imagery credit, location, controls). */
-  hudInk: '#f4efe5',
-} as const;
-
 export const mapPalettes = {
   light: lightMap,
   dark: darkMap,

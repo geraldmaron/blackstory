@@ -12,7 +12,7 @@ import type {
   LineLayerSpecification,
   StyleSpecification,
 } from 'maplibre-gl';
-import { brandPalette, worldPalette } from '@repo/ui';
+import { brandPalette } from '@repo/ui';
 import {
   DENSITY_TIER_FILL,
   DIGNITY_PALETTE,
@@ -629,7 +629,7 @@ export const ORBIT_MAX_ZOOM = 2.7;
 // must keep its state lines, names and tints.
 export const ORBIT_LINE_MIN_ZOOM = 1.9;
 /** The one emission color of the world: the brand copper pushed toward an ember. */
-export const ORBIT_LIGHT_COLOR = worldPalette.ember;
+export const ORBIT_LIGHT_COLOR = brandPalette.copperDark.toLowerCase();
 /** Where the lights give way to record pins when they are kept lit on the way down. */
 export const LIGHTS_DEEP_MAX_ZOOM = 11;
 

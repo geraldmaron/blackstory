@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import { loadBannedBooksListing } from '../../../lib/banned-books/public-source.js';
-import { Room } from '../../../components/room';
+import { PageFrame } from '../../../components/page';
 import { ArchiveHead } from '../../archive/ArchiveHead';
 import { Outcome } from '../../records/RecordsIndex';
 import {
@@ -19,7 +19,7 @@ import {
 import { BooksBrowseSections } from '../BooksBrowseSections';
 import { isbnsKnownWithoutCovers } from '../books-cover-availability';
 import { BOOKS_PAGE_DESCRIPTION } from '../books-copy';
-import '../../reading-room.css';
+import '../../reading-page.css';
 import '../../archive/lens.css';
 import '../books.css';
 
@@ -56,12 +56,11 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const snapshot = await loadBannedBooksListing();
   if (snapshot.books.length === 0) {
     return (
-      <Room width="wide" className="ds-books">
+      <PageFrame width="wide" className="ds-books">
         <div className="ds-lens ds-books-stage">
           <div className="ds-lens__main">
             <ArchiveHead title="Banned books" view={null} lens="books" />
             <Outcome
-              ground="paper"
               title="The catalog did not load"
               action={{ href: '/books', label: 'Try again' }}
             >
@@ -69,7 +68,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
             </Outcome>
           </div>
         </div>
-      </Room>
+      </PageFrame>
     );
   }
 
@@ -88,12 +87,12 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   };
 
   return (
-    <Room width="wide" className="ds-books">
+    <PageFrame width="wide" className="ds-books">
       {/* The dek states the count in words; no numeral repeats it. */}
       <BooksBrowseSections
         view={view}
         head={<ArchiveHead title="Banned books" dek={dek(view)} view={null} lens="books" />}
       />
-    </Room>
+    </PageFrame>
   );
 }

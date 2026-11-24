@@ -15,7 +15,7 @@
  * tiering the address typeahead and book suggester use. What this module adds is where to draw the
  * `<mark>`, which is presentation, not a second matcher.
  *
- * See docs/ui/archive/design-direction-v9-atlas.md §7 and docs/ui/patterns-atlas-instrument.md.
+ * See docs/ui/archive/design-direction-v9-atlas.md §7 and docs/ui/archive/patterns-atlas-instrument.md.
  */
 'use client';
 

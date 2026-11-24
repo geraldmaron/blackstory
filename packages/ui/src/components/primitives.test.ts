@@ -121,8 +121,8 @@ test('PageHeader is crumb, h1, dek and actions; SectionHeading is an h2', () => 
 test('Sheet and Block set the ground their children read their colors from', () => {
   const sheet = renderToStaticMarkup(createElement(Sheet, { as: 'article' }, 'Text'));
   assert.match(sheet, /^<article class="ds-sheet" data-ground="paper">/);
-  const inner = renderToStaticMarkup(createElement(Sheet, { bands: 'end' }, 'List'));
-  assert.match(inner, /class="ds-sheet ds-sheet--bands-end"/);
+  const inner = renderToStaticMarkup(createElement(Sheet, {}, 'List'));
+  assert.match(inner, /class="ds-sheet"/);
   const block = renderToStaticMarkup(createElement(Block, { tone: 'copper', wipe: true }, 'x'));
   assert.match(
     block,

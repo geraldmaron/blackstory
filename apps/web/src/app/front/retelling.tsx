@@ -22,6 +22,7 @@ import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-dat
 import { precisionInWords } from '../../lib/map-experience/geo-precision';
 import { RecordImage } from '../../components/entity/RecordImage';
 import { EvidenceList } from '../../components/evidence/EvidenceList';
+import { WorldControls } from '../../components/shell/WorldControls';
 import { shownRecords, type ShownRecord } from './shown-records';
 import { RecordLink } from './record-link';
 import { legText, shortPlace } from './journey';
@@ -163,6 +164,7 @@ export async function Retelling({
         <Link className="ds-retelling__skip" href={FRONT_ROUTES.archive} data-skip="">
           Skip to the archive
         </Link>
+        <WorldControls inline />
       </nav>
 
       <h1 className="ds-retelling__title">BlackStory</h1>

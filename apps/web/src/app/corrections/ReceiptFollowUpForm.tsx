@@ -7,7 +7,7 @@
  * Neither ever exposes moderation-sensitive detail.
  */
 import React, { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
-import { Field, fieldControlProps, fieldErrorId } from '../../components/room';
+import { Field, fieldControlProps, fieldErrorId } from '../../components/forms/fields';
 import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
 import { useFieldErrors, type FieldErrors } from '../../components/forms/use-field-errors';
 import {
@@ -244,7 +244,7 @@ export function ReceiptFollowUpForm({
           <small>{CORRECTION_PRIVACY_NOTICE.body}</small>
         </label>
         {error('privacyConsent') ? (
-          <p className="ds-room-field__error" id={fieldErrorId(ids.privacy)} role="alert">
+          <p className="ds-doc-field__error" id={fieldErrorId(ids.privacy)} role="alert">
             {error('privacyConsent')}
           </p>
         ) : null}

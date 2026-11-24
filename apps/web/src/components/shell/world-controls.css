@@ -21,7 +21,7 @@ html[data-world-on] .ds-world-controls,
   min-height: 44px;
   padding: 0 var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-sm);
   background: var(--ds-canvas);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
@@ -49,6 +49,34 @@ html[data-world-on] .ds-world-controls,
    are on the front page and on every record page. */
 body:has(.ds-archive-map) .ds-world-controls:not([data-documents]) {
   display: none;
+}
+
+/* The switch set in a page's own bar: in flow. The front page's scenes stack on a phone, a
+   tablet, a short window, under reduced motion and once the switch itself is on, and a chip fixed
+   over stacked scenes covers each photograph's credit as it scrolls by. So wherever a page
+   carries the switch in its bar, the fixed one is not drawn. `body` lifts these over the show
+   rules above, which carry a `:has()`. */
+body .ds-world-controls.ds-world-controls--inline {
+  position: static;
+  display: flex;
+  flex: none;
+}
+
+body:has(.ds-world-controls--inline) .ds-world-controls:not(.ds-world-controls--inline) {
+  display: none;
+}
+
+/* In a bar the switch is one of the bar's own items: no box, and a copper line under it when on,
+   the way the bar marks its current item. */
+.ds-world-controls--inline .ds-world-controls__button {
+  padding: 0 var(--ds-space-3);
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.ds-world-controls--inline .ds-world-controls__button[aria-pressed='true'] {
+  box-shadow: inset 0 -2px 0 var(--ds-accent-graphic);
 }
 
 /* Phone: clear of the tab bar. */

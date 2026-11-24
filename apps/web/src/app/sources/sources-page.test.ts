@@ -34,8 +34,8 @@ test('the page lists publishers from the catalog, then the chain and the kinds',
   assert.match(sectionsSource, /<SourcesTable/);
   assert.match(sectionsSource, /SOURCE_LINEAGE_STAGES/);
   assert.match(sectionsSource, /SOURCE_PUBLISHER_KINDS/);
-  assert.match(sectionsSource, /RoomJump/);
-  assert.doesNotMatch(sectionsSource, /WalkOffRamp|RoomHandoff/);
+  assert.match(sectionsSource, /ContentsList/);
+  assert.doesNotMatch(sectionsSource, /WalkOffRamp|RelatedLink/);
   assert.doesNotMatch(sectionsSource, /—/);
 });
 

@@ -13,9 +13,9 @@ import {
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { MethodologySections } from './MethodologySections';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { ADMISSION_STEPS, METHODOLOGY_INTRO_LEDE } from './methodology-copy';
-import '../reading-room.css';
+import '../reading-page.css';
 import '../../components/trust/trust.css';
 import './methodology.css';
 
@@ -32,9 +32,9 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function MethodologyPage() {
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
           numeral={{
@@ -58,6 +58,6 @@ export default function MethodologyPage() {
         pageTitle="Methodology"
       />
       <MethodologySections />
-    </Room>
+    </PageFrame>
   );
 }

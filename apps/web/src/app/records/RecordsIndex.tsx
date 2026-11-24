@@ -13,7 +13,7 @@
 
 import React, { type ReactNode } from 'react';
 import { Chip, Sheet, buttonClassName } from '@repo/ui';
-import { Room } from '../../components/room';
+import { PageFrame } from '../../components/page';
 import { DecadeFigure } from '../../components/discovery/DecadeFigure';
 import { RecordsTimeline } from '../../components/discovery/records-chronology';
 import {
@@ -33,7 +33,6 @@ import { membershipSentence } from '../../lib/discovery/continuity-label';
 import { ArchiveHead, INVENTIONS_KIND } from '../archive/ArchiveHead';
 import { DecadeJump } from './DecadeJump';
 import { RecordRow } from './RecordRow';
-import { BandArt } from '../../components/atmosphere/BandArt';
 import { RecordsToolbar, type ToolbarMenu } from './RecordsToolbar';
 
 void React;
@@ -150,10 +149,7 @@ export function Outcome({
   children,
   action,
   also,
-  ground = 'sand',
 }: {
-  /** `paper` on a lens page: the outcome stands on the page, with no band art. */
-  readonly ground?: 'sand' | 'paper';
   readonly title: string;
   readonly children: React.ReactNode;
   readonly action: { readonly href: string; readonly label: string };
@@ -161,8 +157,7 @@ export function Outcome({
   readonly also?: { readonly href: string; readonly label: string } | undefined;
 }) {
   return (
-    <div className="ds-records-outcome" role="status" data-ground={ground}>
-      {ground === 'sand' ? <BandArt motifs={['mapline']} /> : null}
+    <div className="ds-records-outcome" role="status">
       <h2 className="ds-records-outcome__title">{title}</h2>
       <p className="ds-records-outcome__body">{children}</p>
       <div className="ds-records-outcome__actions">
@@ -267,7 +262,7 @@ export type RecordsIndexProps = {
   readonly world?: ReactNode;
 };
 
-export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProps) {
+export function RecordsIndexPage({ model, photos = {}, world }: RecordsIndexProps) {
   const {
     query,
     rows,
@@ -366,7 +361,7 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
   } else {
     const anchors = decadeJumps.length > 0 ? decadeAnchors(rows) : new Map<string, string>();
     body = (
-      <Sheet bands="none" className="ds-records-paper">
+      <Sheet className="ds-records-paper">
         <ol className="ds-records-list">
           {rows.map((row) => (
             <RecordRow
@@ -387,7 +382,7 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
   ] as const;
 
   return (
-    <Room width="wide" className={world ? 'ds-records ds-country' : 'ds-records'}>
+    <PageFrame width="wide" className={world ? 'ds-records ds-country' : 'ds-records'}>
       {/* The count is a sentence, never a numeral on its own (DESIGN.md rule 4): how many match,
           the span they cover, and how many of them the map can show, so a record missing from
           the map reads as unmapped, not deleted. */}
@@ -475,6 +470,6 @@ export function RecordsIndexRoom({ model, photos = {}, world }: RecordsIndexProp
         </nav>
       ) : null}
       {world}
-    </Room>
+    </PageFrame>
   );
 }

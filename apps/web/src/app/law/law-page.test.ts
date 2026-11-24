@@ -16,7 +16,7 @@ const detailViewSource = readFileSync(join(here, '[slug]', 'LawRecordView.tsx'),
 test('law index is the chronology: page header, the register toolbar, no edition chrome', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
   assert.match(indexPageSource, /<ArchiveHead/);
-  assert.match(indexPageSource, /<Room width="wide"/);
+  assert.match(indexPageSource, /<PageFrame width="wide"/);
   assert.match(indexPageSource, /title="Law"/);
   assert.match(indexPageSource, /title: 'Law'/);
   assert.doesNotMatch(indexPageSource, /OrientationInstrument|RoomStats|WalkOffRamp|rail=/);
@@ -26,8 +26,8 @@ test('law index is the chronology: page header, the register toolbar, no edition
   assert.match(browseSectionsSource, /<RecordsToolbar/);
   for (const gone of [
     'FindBar',
-    'RoomSection',
-    'RoomJump',
+    'PageSection',
+    'ContentsList',
     'KeepGoing',
     'LegalDisclaimer',
     'Pagination',
@@ -59,7 +59,7 @@ test('law detail page renders the shared record anatomy, with no edition chrome 
   assert.match(detailViewSource, /<RecordPage/);
   for (const src of [detailPageSource, detailViewSource]) {
     assert.doesNotMatch(src, /EditionAtmosphereMosaic|law-panel-chrome|law-edition\.css/);
-    assert.doesNotMatch(src, /LawAnatomyStrip|RoomJump|LegalDisclaimer/);
+    assert.doesNotMatch(src, /LawAnatomyStrip|ContentsList|LegalDisclaimer/);
   }
 });
 
