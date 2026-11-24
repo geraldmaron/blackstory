@@ -332,8 +332,10 @@ export function RetellingFilm({
         // Centered where there is room; where the list is narrower than the word (a phone), the
         // word starts at the list's edge, never cut at its first letters.
         if (link && list) {
-          const centered = link.offsetLeft - (list.clientWidth - link.offsetWidth) / 2;
-          list.scrollLeft = Math.min(link.offsetLeft, centered);
+          // offsetLeft counts from the rail, not the list, so take off the list's own inset.
+          const left = link.offsetLeft - list.offsetLeft;
+          const centered = left - (list.clientWidth - link.offsetWidth) / 2;
+          list.scrollLeft = Math.min(left, centered);
         }
         if (current === lastScene) markSeen();
       }
