@@ -8,15 +8,15 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const indexPageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const indexPageSource = readFileSync(join(here, '(index)', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'LawBrowseSections.tsx'), 'utf8');
 const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailViewSource = readFileSync(join(here, '[slug]', 'LawRecordView.tsx'), 'utf8');
 
 test('law index is the chronology: page header, the register toolbar, no edition chrome', () => {
   assert.match(indexPageSource, /LawBrowseSections/);
-  assert.match(indexPageSource, /<PageHeader/);
-  assert.match(indexPageSource, /<Room width="wide"/);
+  assert.match(indexPageSource, /<ArchiveHead/);
+  assert.match(indexPageSource, /<PageFrame width="wide"/);
   assert.match(indexPageSource, /title="Law"/);
   assert.match(indexPageSource, /title: 'Law'/);
   assert.doesNotMatch(indexPageSource, /OrientationInstrument|RoomStats|WalkOffRamp|rail=/);
@@ -26,8 +26,8 @@ test('law index is the chronology: page header, the register toolbar, no edition
   assert.match(browseSectionsSource, /<RecordsToolbar/);
   for (const gone of [
     'FindBar',
-    'RoomSection',
-    'RoomJump',
+    'PageSection',
+    'ContentsList',
     'KeepGoing',
     'LegalDisclaimer',
     'Pagination',
@@ -59,7 +59,7 @@ test('law detail page renders the shared record anatomy, with no edition chrome 
   assert.match(detailViewSource, /<RecordPage/);
   for (const src of [detailPageSource, detailViewSource]) {
     assert.doesNotMatch(src, /EditionAtmosphereMosaic|law-panel-chrome|law-edition\.css/);
-    assert.doesNotMatch(src, /LawAnatomyStrip|RoomJump|LegalDisclaimer/);
+    assert.doesNotMatch(src, /LawAnatomyStrip|ContentsList|LegalDisclaimer/);
   }
 });
 

@@ -1,7 +1,7 @@
 /**
  * A live read of `prefers-reduced-motion`, for the plate's imperative camera path.
  *
- * Design law: `docs/ui/brand.md` (dignity) and `docs/ui/design-direction-v9-surfaces.md` §3.
+ * Design law: `docs/ui/brand.md` (dignity) and `docs/ui/archive/design-direction-v9-surfaces.md` §3.
  *
  * The plate must CUT rather than fly when a reader has asked for reduced motion, and it must do
  * so from a live media query: a reader who turns the preference on mid-session is asking for it

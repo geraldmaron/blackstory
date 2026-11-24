@@ -1,5 +1,5 @@
 /**
- * exploreHrefFromLens — Lens → shareable /explore URL (floor, state, kind, theme).
+ * exploreHrefFromLens — the map's filters → its shareable address (evidence, state, kind, topic).
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -25,7 +25,7 @@ describe('exploreHrefFromLens', () => {
       lines: false,
       selectedId: undefined,
     });
-    assert.equal(href.includes('floor=B'), true);
+    assert.equal(href.includes('evidence=B'), true);
   });
 
   it('omits floor when the Lens is open to any grade', () => {
@@ -40,10 +40,10 @@ describe('exploreHrefFromLens', () => {
       lines: false,
       selectedId: 'ent_dunbar_school_001',
     });
-    assert.equal(href.includes('floor='), false);
+    assert.equal(href.includes('evidence='), false);
     assert.equal(href.includes('state=DC'), true);
     assert.equal(href.includes('kind=places'), true);
-    assert.equal(href.includes('theme=abolition'), true);
+    assert.equal(href.includes('topic=abolition'), true);
     assert.equal(href.includes('selected=ent_dunbar_school_001'), true);
     assert.equal(href.includes('lat='), false);
   });

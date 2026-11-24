@@ -1,7 +1,7 @@
 /**
  * The one-Framed-slot-per-viewport guard.
  *
- * Design law: `docs/ui/design-direction-v9-surfaces.md` §3.
+ * Design law: `docs/ui/archive/design-direction-v9-surfaces.md` §3.
  *
  * There is one plate, so at most one in-flow slot can hold it. `MapMomentStage` already makes a
  * double claim structurally impossible WITHIN one stage — `pickLiveMoment` is a winner-take-all

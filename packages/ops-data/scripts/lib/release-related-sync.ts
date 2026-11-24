@@ -127,6 +127,20 @@ export async function planReleaseRelatedSync(
   }>(DERIVE_SQL, [releaseId]);
 
   const byEntity = new Map<string, ReleaseRelatedEntry[]>();
+  // A pair joined by the same type in both directions (A related_to B and B related_to A) has no
+  // meaningful direction, and DERIVE_SQL's ORDER BY does not rank direction, so which one comes
+  // first is arbitrary. Record those pairs so a published entry that carries the other direction
+  // is not reported as drift, which would rewrite signed entries for no reader-visible reason.
+  const directionsByEdge = new Map<string, Set<string>>();
+  for (const row of derived.rows) {
+    const edgeKey = `${row.entity_id}|${row.other_id}|${row.relationship_type}`;
+    let directions = directionsByEdge.get(edgeKey);
+    if (!directions) {
+      directions = new Set();
+      directionsByEdge.set(edgeKey, directions);
+    }
+    directions.add(row.direction);
+  }
   for (const row of derived.rows) {
     let entries = byEntity.get(row.entity_id);
     if (!entries) {
@@ -157,7 +171,14 @@ export async function planReleaseRelatedSync(
 
   for (const row of published.rows) {
     const before = asRelatedEntries(row.related);
-    const after = byEntity.get(row.entity_id) ?? [];
+    const after = (byEntity.get(row.entity_id) ?? []).map((entry) => {
+      const bothWays =
+        directionsByEdge.get(`${row.entity_id}|${entry.id}|${entry.type}`)?.size === 2;
+      const stored = bothWays
+        ? before.find((item) => item.id === entry.id && item.type === entry.type)
+        : undefined;
+      return stored ? { ...entry, direction: stored.direction } : entry;
+    });
     if (sameEntries(before, after)) {
       unchanged += 1;
       continue;

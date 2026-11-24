@@ -1,18 +1,12 @@
 /**
- * Shared loader for the Data ledger figures. Used by `/data` (canonical) and kept
- * colocated with the DataSections props so the figure math stays in one place.
+ * What `/data` needs beyond its figures: which registry figures have rows in this release, the
+ * two as-of dates, and the latest census row for the line under the title. The figures load their
+ * own rows; the reads are shared, so asking here costs nothing twice.
  */
-import { US_STATES } from '@repo/domain/map/geography';
-import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summaries';
-import {
-  getNationalPopulationTimelineSnapshot,
-  getStatePopulationChanges,
-  type NationalPopulationTimelineSnapshot,
-  type StatePopulationChange,
-} from '../../lib/demographics/public-stats-source';
+import type { NationalPopulationTimelineRow } from '@repo/domain/statistics/public-data-summaries';
+import { getNationalPopulationTimelineSnapshot } from '../../lib/demographics/public-stats-source';
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
-import { timelineChangeStripItems } from '../../components/data/population-change';
-import type { DataDeltaItem, DataSectionsProps } from './DataSections';
+import { FIGURES, FIGURE_IDS, type FigureId } from '../../components/data/figures/registry';
 
 async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | undefined> {
   try {
@@ -23,8 +17,6 @@ async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | unde
   }
 }
 
-const STATE_NAME_BY_FIPS = buildStateFipsNameMap(US_STATES);
-
 function formatAsOf(value: string | undefined): string {
   if (!value) return 'release date not recorded';
   const date = new Date(value);
@@ -32,65 +24,29 @@ function formatAsOf(value: string | undefined): string {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-/**
- * The Data section's own content. The Lives bundle is NOT part of it: /lives folded into the
- * how-it-works room, and the how-it-works page loads the reader's chosen area alongside this model and
- * passes it to `DataSections` itself. Typing `sections` as the full props would claim this loader
- * supplies an area bundle it never reads.
- */
 export type DataPageModel = {
-  readonly sections: Omit<DataSectionsProps, 'livesBundle' | 'livesAreaSlug'>;
+  /** The figures with something to draw, in registry order. */
+  readonly figures: readonly FigureId[];
+  readonly latestCensus: NationalPopulationTimelineRow | undefined;
+  readonly populationAsOf: string;
+  readonly indicatorsAsOf: string;
 };
 
 export async function loadDataPageModel(): Promise<DataPageModel> {
-  const [timelineSnapshot, stateChanges2010to2020, indicators] = await Promise.all([
+  const [timeline, indicators, loaded] = await Promise.all([
     safe(getNationalPopulationTimelineSnapshot()),
-    safe(getStatePopulationChanges('2010', '2020')),
     safe(getDataPageIndicatorBundle()),
+    Promise.all(FIGURE_IDS.map((id) => FIGURES[id].load())),
   ]);
 
   if (!indicators) {
     throw new Error('Data page indicator bundle unavailable');
   }
 
-  const timeline = timelineSnapshot as NationalPopulationTimelineSnapshot | undefined;
-  const timelineRows = timeline?.rows ?? [];
-  const stateChanges = (stateChanges2010to2020 ?? []) as readonly StatePopulationChange[];
-  const chartSources = (timeline?.sources ?? []).map((source) => ({
-    label: source.label,
-    url: source.sourceUrl,
-  }));
-  const lastRow = timelineRows.at(-1);
-  const primarySource = lastRow
-    ? (() => {
-        const match = timeline?.sources.find((source) => source.sourceId === lastRow.sourceId);
-        return match
-          ? { label: match.label, url: match.sourceUrl }
-          : { label: lastRow.sourceId, url: lastRow.sourceUrl };
-      })()
-    : { label: 'U.S. Census Bureau', url: 'https://www.census.gov' };
-  const deltaItems: readonly DataDeltaItem[] = timeline
-    ? timelineChangeStripItems(timeline.changes, primarySource, 3).map((item) => ({
-        id: item.id,
-        value: item.value,
-        label: item.label,
-        ...(item.note === undefined ? {} : { note: item.note }),
-      }))
-    : [];
-
-  const indicatorsAsOf = formatAsOf(indicators.generatedAt);
-  const populationAsOf = formatAsOf(timeline?.generatedAt);
-
   return {
-    sections: {
-      timelineRows,
-      chartSources,
-      deltaItems,
-      stateChanges,
-      stateNameByFips: STATE_NAME_BY_FIPS,
-      indicators,
-      populationAsOf,
-      indicatorsAsOf,
-    },
+    figures: FIGURE_IDS.filter((_, index) => loaded[index] !== undefined),
+    latestCensus: timeline?.rows.at(-1),
+    populationAsOf: formatAsOf(timeline?.generatedAt),
+    indicatorsAsOf: formatAsOf(indicators.generatedAt),
   };
 }

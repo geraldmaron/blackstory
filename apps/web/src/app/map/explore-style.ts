@@ -90,6 +90,8 @@ import {
   EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_GHOSTS_SOURCE_ID,
   EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_LIGHTS_LAYER_ID,
+  EXPLORE_LIGHTS_SOURCE_ID,
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
   EXPLORE_COUNTY_HATCH_LAYER_ID,
@@ -620,6 +622,63 @@ function pinPaint(plate: MapPlate, opacity: number) {
  * jurisdiction-area polygon layer (area records render as geometry, never as a point;
  * empty today, see `build-explore-map-source.ts`). A token tap selects its place (MapStage).
  */
+/** Below this zoom the plate is at Orbit: lights, no place tokens (MapStage sets `data-orbit`). */
+export const ORBIT_MAX_ZOOM = 2.7;
+/** Line, text and non-water fill layers stand down below this zoom (see the end of the builder). */
+// 1.9, not 2: the national frame on a 320px phone fits the country at about zoom 1.95, and it
+// must keep its state lines, names and tints.
+export const ORBIT_LINE_MIN_ZOOM = 1.9;
+/** The one emission color of the world: the brand copper pushed toward an ember. */
+export const ORBIT_LIGHT_COLOR = brandPalette.copperDark.toLowerCase();
+/** Where the lights give way to record pins when they are kept lit on the way down. */
+export const LIGHTS_DEEP_MAX_ZOOM = 11;
+
+/** The lights' level under the state counts. v12: the lights lead. Ember is only ever a record,
+ * and the counts over them are plain labels in the map's type color (shell.css). */
+const LIGHTS_UNDER_COUNTS_OPACITY = 0.85;
+
+/**
+ * How bright the lights are by zoom. At rest they step down as the state counts arrive and stay
+ * under them until the counts fade for the place tokens. They used to be gone by zoom 3.3, but
+ * the national frame's zoom follows the window: on a window from about 1366 wide it sits above
+ * that, so the widest screens opened on a map with no light on it at all. `deep` is for a surface that has stood the tokens down and is flying to one
+ * record (the Door's tour; MapStage, `setPlaceTokens`): the lights stay lit the whole way down
+ * and fade as the record pins arrive, so the descent is into the lights, not across an empty map.
+ */
+export function lightsOpacity(deep: boolean): ExpressionSpecification {
+  return deep
+    ? ['interpolate', ['linear'], ['zoom'], LIGHTS_DEEP_MAX_ZOOM - 2, 0.85, LIGHTS_DEEP_MAX_ZOOM, 0]
+    : [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        ORBIT_MAX_ZOOM,
+        0.85,
+        ORBIT_MAX_ZOOM + 0.6,
+        LIGHTS_UNDER_COUNTS_OPACITY,
+        STATE_LABEL_FADE_START_ZOOM,
+        LIGHTS_UNDER_COUNTS_OPACITY,
+        STATE_LABEL_FADE_END_ZOOM,
+        0,
+      ];
+}
+
+/**
+ * The lights are every drawn record, about four thousand points, and the style is rebuilt on
+ * every patch. Building them once per feature collection keeps that off the main thread's
+ * repeat work, and hands `applyGeographyStyle` the same object so it can skip a redundant
+ * `setData` (which re-serializes the lot to the worker).
+ */
+const LIGHTS_BY_COLLECTION = new WeakMap<object, ReturnType<typeof drawnRecordCollection>>();
+function lightsFor(collection: BuildExploreMapStyleInput['featureCollection']) {
+  let lights = LIGHTS_BY_COLLECTION.get(collection);
+  if (!lights) {
+    lights = drawnRecordCollection(collection);
+    LIGHTS_BY_COLLECTION.set(collection, lights);
+  }
+  return lights;
+}
+
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   const colorScheme = input.colorScheme ?? 'dark';
   const satellite = input.satellite === true;
@@ -694,7 +753,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
     POPULATION_CHANGE_TIER_FILL.lossStrong,
     plate.densityUnknown,
   ] as unknown as ExpressionSpecification;
-  return {
+  const style: StyleSpecification = {
     version: 8,
     name: 'BlackStory — Explore',
     glyphs: OPENFREEMAP_GLYPHS_URL,
@@ -746,6 +805,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         promoteId: 'entityId',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: drawn as any,
+      },
+      [EXPLORE_LIGHTS_SOURCE_ID]: {
+        type: 'geojson',
+        // The same precision-honest marks the plate draws ungrouped: a county or state record
+        // has no point here either.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
+        data: lightsFor(input.featureCollection) as any,
       },
       [EXPLORE_PLACE_LEADERS_SOURCE_ID]: {
         type: 'geojson',
@@ -804,7 +870,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'raster',
         source: USGS_IMAGERY_SOURCE_ID,
         layout: { visibility: satellite ? 'visible' : 'none' },
-        paint: { ...SATELLITE_RASTER_PAINT[colorScheme] },
+        // Held at 0 while hidden, so switching imagery on eases it in over the plate instead of
+        // cutting to it. The transition is listed first: paint is pushed in this order.
+        paint: {
+          'raster-opacity-transition': { duration: 700, delay: 0 },
+          ...SATELLITE_RASTER_PAINT[colorScheme],
+          ...(satellite ? {} : { 'raster-opacity': 0 }),
+        },
       },
       /* —— Base cartography ————————————————————————————————————————————————————————
          The plate is a map before it is a chart. These layers come from the
@@ -1125,6 +1197,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_COUNTY_LINES_SOURCE_ID,
         minzoom: COUNTY_LABELS_MIN_ZOOM,
         layout: {
+          // Ungrouped is one record's own ground (a place page). The basemap prints a county's
+          // name once per tile it crosses and nothing there thins them (`hideNamedCounties` runs
+          // on tokens), so one view repeated a county five times around the record.
+          visibility: clusteringEnabled ? 'visible' : 'none',
           'text-field': ['upcase', ['get', 'name']] as unknown as ExpressionSpecification,
           'text-font': ['Noto Sans Regular'],
           'text-size': 9,
@@ -1316,6 +1392,37 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        // Orbit: one light per drawn record. Every light is the same size and strength; count,
+        // grade and kind are never encoded (design-direction-v11.md, "Darkness is not absence").
+        // Gone by the national frame, where the place tokens take over.
+        id: EXPLORE_LIGHTS_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_LIGHTS_SOURCE_ID,
+        // The layer reaches as deep as the lights ever go; at rest its opacity is 0 past the
+        // national frame, and a layer at 0 is not drawn.
+        maxzoom: LIGHTS_DEEP_MAX_ZOOM,
+        paint: {
+          // Past Orbit a light keeps growing a little with the ground, or the country frame on
+          // a wide window is 4,000 specks nobody can see.
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0,
+            1.4,
+            ORBIT_MAX_ZOOM,
+            2.6,
+            5,
+            4,
+            9,
+            5.5,
+          ],
+          'circle-color': ORBIT_LIGHT_COLOR,
+          'circle-blur': 0.7,
+          'circle-opacity': lightsOpacity(false),
+        },
+      },
+      {
         // Brushed-out records: a sand ghost at the record's own drawn place, under every live mark.
         id: EXPLORE_GHOST_POINT_LAYER_ID,
         type: 'circle',
@@ -1504,5 +1611,24 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
     ],
+  };
+  // Orbit shows lights and water, nothing else: lines and names stand down below
+  // `ORBIT_LINE_MIN_ZOOM`, and the GeoJSON fills (state land, tints, hatches) cost about half a
+  // second of main-thread work at load to drape over the sphere, for a US land shape the
+  // background already paints. The water stays: it is what draws the coasts.
+  // This comment used to say MapLibre's globe tears line and text layers into spikes down here.
+  // It does not: with every line and symbol layer forced on at zoom 1.5 they all draw cleanly
+  // (2026-11-20). The spikes were the place tokens' DOM tethers left visible after the tokens
+  // were hidden (shell.css, "v11 Orbit").
+  return {
+    ...style,
+    layers: style.layers.map((layer) =>
+      (layer.type === 'symbol' ||
+        layer.type === 'line' ||
+        (layer.type === 'fill' && layer.id !== 'plate-water')) &&
+      (layer.minzoom ?? 0) < ORBIT_LINE_MIN_ZOOM
+        ? { ...layer, minzoom: ORBIT_LINE_MIN_ZOOM }
+        : layer,
+    ),
   };
 }

@@ -273,8 +273,9 @@ test('drift: the map-surface allowlist covers every key the URL parser reads', (
     [],
   );
 
-  // ...and nothing is allowlisted that the parser cannot read.
-  assert.deepEqual([...allowed].filter((key) => !readByParser.includes(key)).sort(), []);
+  // ...and nothing is allowlisted that the parser cannot read, except `view`: the page reads it
+  // to choose the map view, and the builder writes it; the map's own parser never needs it.
+  assert.deepEqual([...allowed].filter((key) => !readByParser.includes(key)).sort(), ['view']);
 
   // The viewport-policy exclusion is a decision about keys the parser genuinely reads, not a
   // leftover (`docs/decisions-carryover.md`, "Persistent map canvas": viewport policy).
@@ -541,8 +542,35 @@ test('/explore free-value keys no longer mint cache keys', () => {
   const badState = new URL('https://blackstory.app/explore?state=Georgia&decade=19x0s');
   assert.equal(buildNormalizedUrl(badState).search, '');
 
-  const real = new URL('https://blackstory.app/explore?state=GA&kind=school&theme=education');
+  const real = new URL(
+    'https://blackstory.app/archive?view=map&state=GA&kind=school&topic=education',
+  );
   assert.equal(needsQueryNormalizationRedirect(real), false);
+  // The map's 4a spellings are read and rewritten to the one spelling both views share.
+  const before = new URL('https://blackstory.app/archive?view=map&theme=education&floor=b');
+  assert.equal(buildNormalizedUrl(before).search, '?view=map&topic=education&evidence=B');
+});
+
+test('/archive prints the list keys or the map keys by view, and one spelling of each', () => {
+  const norm = (search: string) =>
+    buildNormalizedUrl(new URL(`https://blackstory.app/archive${search}`)).search;
+  assert.equal(norm(''), '');
+  assert.equal(norm('?view=list&kind=PEOPLE'), '?kind=people');
+  assert.equal(norm('?layout=chronology&era=1950s'), '?view=timeline&era=1950s');
+  assert.equal(norm('?view=timeline&sat=1&lines=1'), '?view=timeline');
+  assert.equal(norm('?lens=inventions&state=ga'), '?kind=inventions&state=GA');
+  assert.equal(norm('?theme=education&floor=a'), '?topic=education&evidence=A');
+  assert.equal(norm('?view=map&lat=1&lng=2&zoom=3&sat=1'), '?view=map&sat=1');
+  assert.equal(
+    norm('?view=map&seed=abc&page=4&kind=people'),
+    '?view=map&kind=people&seed=abc&page=4',
+  );
+  assert.equal(norm('?utm_source=x&zz=1'), '');
+  // A reordering alone never redirects.
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://blackstory.app/archive?state=GA&kind=people')),
+    false,
+  );
 });
 
 test('the /stories edge allowlist names every param the stories index writes', () => {
@@ -641,3 +669,8 @@ for (const path of ['/entity/ent_test', '/place/test-place', '/invention/test-in
     );
   });
 }
+
+test('the front page keeps no query: the trial switch is gone', () => {
+  assert.equal(normalizeQueryString('/', { opening: '1' }), '');
+  assert.equal(normalizeQueryString('/', { opening: '1', utm_source: 'x', state: 'dc' }), '');
+});

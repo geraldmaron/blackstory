@@ -83,7 +83,8 @@ export function PlaceControl({
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [listOpen, setListOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
+  /** The option the arrow keys are on: 0 is the place lookup, then the records. -1 is none. */
+  const [active, setActive] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldId = useId();
   const listId = useId();
@@ -93,16 +94,6 @@ export function PlaceControl({
     if (autoFocus) inputRef.current?.focus();
   }, [autoFocus]);
 
-  // Suggestions belong to the moment of typing: any pointer outside closes them, the map included.
-  useEffect(() => {
-    if (!listOpen) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setListOpen(false);
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [listOpen]);
-
   const deferred = useDeferredValue(query);
   const suggestions = useMemo(
     () => (deferred.trim().length < 2 ? [] : suggestCatalogRecords(deferred, catalogFeatures, 5)),
@@ -111,6 +102,14 @@ export function PlaceControl({
   // Two groups, so both kinds of search are visible: a place moves the map, a record opens it.
   const typed = deferred.trim();
   const showList = listOpen && typed.length >= 2;
+  const optionCount = showList ? 1 + suggestions.length : 0;
+  const optionId = (index: number) => `${listId}-option-${index}`;
+  useEffect(() => setActive(-1), [typed, showList]);
+
+  function chooseActive() {
+    if (active === 0) void lookUp(typed);
+    else if (suggestions[active - 1]) pickRecord(suggestions[active - 1]!);
+  }
 
   function pickRecord(record: CatalogRecordSuggestion) {
     setListOpen(false);
@@ -161,7 +160,7 @@ export function PlaceControl({
   const loading = status.kind === 'loading';
 
   return (
-    <div className={cx('ds-place', className)} ref={rootRef}>
+    <div className={cx('ds-place', className)}>
       <form
         className="ds-place__field"
         role="search"
@@ -188,6 +187,7 @@ export function PlaceControl({
           id={fieldId}
           className="ds-place__input"
           type="search"
+          role="combobox"
           name="place"
           autoComplete="off"
           enterKeyHint="search"
@@ -197,13 +197,39 @@ export function PlaceControl({
           aria-controls={showList ? listId : undefined}
           aria-expanded={showList}
           aria-autocomplete="list"
+          aria-activedescendant={showList && active >= 0 ? optionId(active) : undefined}
           aria-busy={loading || undefined}
           onFocus={() => setListOpen(true)}
+          // Suggestions belong to the moment of typing: leaving the field closes them.
+          onBlur={() => setListOpen(false)}
           onKeyDown={(event) => {
             if (event.key === 'Escape' && listOpen) {
               event.preventDefault();
               event.stopPropagation();
               setListOpen(false);
+              return;
+            }
+            // Focus stays in the field; the arrows move a highlight the field points at.
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+              if (typed.length < 2) return;
+              event.preventDefault();
+              if (!showList) {
+                setListOpen(true);
+                return;
+              }
+              const step = event.key === 'ArrowDown' ? 1 : -1;
+              setActive((current) =>
+                current < 0
+                  ? step > 0
+                    ? 0
+                    : optionCount - 1
+                  : (current + step + optionCount) % optionCount,
+              );
+              return;
+            }
+            if (event.key === 'Enter' && showList && active >= 0) {
+              event.preventDefault();
+              chooseActive();
             }
           }}
           onChange={(event) => {
@@ -236,13 +262,26 @@ export function PlaceControl({
       </form>
 
       {showList ? (
-        <div className="ds-place__list" id={listId} role="listbox" aria-label="Places and records">
+        <div
+          className="ds-place__list"
+          id={listId}
+          role="listbox"
+          aria-label="Places and records"
+          // A press on an option must not blur the field, or the list closes before the click.
+          onMouseDown={(event) => event.preventDefault()}
+        >
           <ul className="ds-place__group" role="group" aria-labelledby={`${listId}-places`}>
             <li className="ds-place__group-label" id={`${listId}-places`} role="presentation">
               Places
             </li>
-            <li role="option" aria-selected={false}>
-              <button type="button" className="ds-place__option" onClick={() => void lookUp(typed)}>
+            <li role="option" id={optionId(0)} aria-selected={active === 0}>
+              <button
+                type="button"
+                tabIndex={-1}
+                className="ds-place__option"
+                data-active={active === 0 || undefined}
+                onClick={() => void lookUp(typed)}
+              >
                 <span className="ds-place__option-name">Find “{typed}” on the map</span>
                 <span className="ds-place__option-kind">Place</span>
               </button>
@@ -253,11 +292,18 @@ export function PlaceControl({
               <li className="ds-place__group-label" id={`${listId}-records`} role="presentation">
                 Records
               </li>
-              {suggestions.map((record) => (
-                <li key={record.entityId} role="option" aria-selected={false}>
+              {suggestions.map((record, index) => (
+                <li
+                  key={record.entityId}
+                  role="option"
+                  id={optionId(index + 1)}
+                  aria-selected={active === index + 1}
+                >
                   <button
                     type="button"
+                    tabIndex={-1}
                     className="ds-place__option"
+                    data-active={active === index + 1 || undefined}
                     onClick={() => pickRecord(record)}
                   >
                     <span className="ds-place__option-name">{record.displayName}</span>

@@ -10,7 +10,7 @@ import racialTerrorRaw from '../../../../../../docs/research/racial-terror-memor
 import {
   isMemorialNamePlateEligible,
   MEMORIAL_NAMES as ARCHIVE_ENTRIES,
-} from '../../atmosphere/memorial-names';
+} from './memorial-name-archive';
 import {
   MEMORIAL_NAMES,
   MEMORIAL_NAMES_REQUIRED,

@@ -160,7 +160,7 @@ export function EntityPreviewSheet({
         >
           <Ionicons name="chevron-back" size={18} color={theme.accent} />
         </Pressable>
-        <Text variant="code" colorRole="inkMuted">
+        <Text variant="meta" colorRole="inkMuted">
           {browsePosition.index + 1}/{browsePosition.total}
         </Text>
         <Pressable
@@ -224,7 +224,7 @@ export function EntityPreviewSheet({
               <NavIcon name={navIconForEntityKind(feature.kind)} size={20} selected />
             </View>
             <View style={styles.headerText}>
-              <Text variant="code" colorRole="accent" numberOfLines={1} style={styles.kicker}>
+              <Text variant="meta" colorRole="accent" numberOfLines={1} style={styles.kicker}>
                 Pinned here
               </Text>
               <Text variant="caption" colorRole="inkMuted" numberOfLines={1}>
@@ -261,7 +261,7 @@ export function EntityPreviewSheet({
             onPress={() => onOpenEntity(feature.entityId)}
             style={({ pressed }) => [styles.titlePress, { opacity: pressed ? 0.85 : 1 }]}
           >
-            <Text variant="entityTitle" isHeading numberOfLines={2} style={styles.title}>
+            <Text variant="title" isHeading numberOfLines={2} style={styles.title}>
               {feature.label}
             </Text>
           </Pressable>
@@ -293,7 +293,6 @@ export function EntityPreviewSheet({
                     {...(storyMeta.sourceCount !== undefined
                       ? { sourceCount: storyMeta.sourceCount }
                       : {})}
-                    showLetter={false}
                     decorative
                     testID="entity-preview-evidence-meter"
                   />
@@ -312,7 +311,7 @@ export function EntityPreviewSheet({
 
           {linkedThemes && linkedThemes.length > 0 ? (
             <View style={styles.linkedRow} testID="entity-preview-linked">
-              <Text variant="code" colorRole="inkMuted" style={styles.linkedKicker}>
+              <Text variant="meta" colorRole="inkMuted" style={styles.linkedKicker}>
                 Linked
               </Text>
               <Text variant="caption" colorRole="ink" numberOfLines={1} style={styles.linkedThemes}>
@@ -323,7 +322,7 @@ export function EntityPreviewSheet({
 
           {citingStories.length > 0 ? (
             <View style={styles.citedRow} testID="entity-preview-cited-in">
-              <Text variant="code" colorRole="inkMuted" style={styles.linkedKicker}>
+              <Text variant="meta" colorRole="inkMuted" style={styles.linkedKicker}>
                 Cited in
               </Text>
               <View style={styles.citedList}>

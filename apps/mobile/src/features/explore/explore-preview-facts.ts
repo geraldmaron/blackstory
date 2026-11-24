@@ -7,7 +7,7 @@
  * "High confidence" for the tier, so a record the site called "Grade A · 3 sources" arrived on the
  * phone as two unrelated strings, neither of which named a grade.
  */
-import { evidenceLabel } from '@repo/public-contracts/evidence';
+import { evidenceLabel } from '@/lib/evidence-words';
 
 import type { RecordFactStripItem } from '@/ui';
 import { recordEraLabel, recordKindLabel } from '@/features/record-facts/record-facts';

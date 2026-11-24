@@ -3,12 +3,17 @@
  * (`/presidents/{slug}`). A story requested under the wrong base is sent to its own address, the
  * same rule the site follows, so a shared link opens the same piece on both.
  */
-import { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { useCallback, useEffect, useRef } from 'react';
+import {
+  ActivityIndicator,
+  ScrollView,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import { router } from 'expo-router';
 import {
   ErrorState,
-  Image,
   Link,
   Notice,
   RecordFactStrip,
@@ -17,12 +22,29 @@ import {
   space,
   useScreenScrollInsets,
 } from '@/ui';
+import { CiteButton } from '@/features/cite/CiteButton';
 import { plainRangeText } from '../record-facts/record-facts';
-import { StoryBlocks, StoryReferences, storyWebUrl } from './StoryBody';
+import { StoryBlocks, StoryImageExhibit, StoryReferences, storyWebUrl } from './StoryBody';
+import { StoryProgress, type StoryProgressHandle } from './StoryProgress';
+import { storyPosition, type ChapterMark } from './story-progress';
 import { useStory } from './use-stories';
 
 export function StoryScreen({ slug, base }: { readonly slug: string; readonly base: string }) {
   const insets = useScreenScrollInsets();
+  const progress = useRef<StoryProgressHandle>(null);
+  // Chapter offsets are measured inside the blocks; `blocksTop` places the blocks in the scroll.
+  const chapters = useRef(new Map<string, number>());
+  const blocksTop = useRef(0);
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const marks: ChapterMark[] = [...chapters.current].map(([text, y]) => ({
+      text,
+      y: y + blocksTop.current,
+    }));
+    progress.current?.set(
+      storyPosition(contentOffset.y, layoutMeasurement.height, contentSize.height, marks),
+    );
+  }, []);
   const { state, retry } = useStory(slug);
   const story = state.kind === 'ready' ? state.result.value : undefined;
   const misplaced = story !== undefined && !story.webPath.startsWith(`${base}/`);
@@ -33,7 +55,10 @@ export function StoryScreen({ slug, base }: { readonly slug: string; readonly ba
 
   return (
     <ScreenCanvas edges={['left', 'right', 'bottom']}>
+      {story && !misplaced ? <StoryProgress ref={progress} title={story.title} /> : null}
       <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={32}
         contentContainerStyle={{
           paddingHorizontal: insets.paddingHorizontal,
           paddingTop: space['4'],
@@ -73,13 +98,17 @@ export function StoryScreen({ slug, base }: { readonly slug: string; readonly ba
               <Notice tone="info" title="Showing the copy saved on this phone" compact />
             ) : null}
             {story.collection ? (
-              <Text variant="sectionLabel" colorRole="accent">
+              <Text
+                variant="meta"
+                colorRole="inkMuted"
+                style={{ letterSpacing: 1, textTransform: 'uppercase' }}
+              >
                 {[story.collection.label, story.collection.positionLabel]
                   .filter(Boolean)
                   .join(' · ')}
               </Text>
             ) : null}
-            <Text variant="entityTitle" isHeading>
+            <Text variant="display" isHeading>
               {story.title}
             </Text>
             <Text variant="editorial" colorRole="inkMuted">
@@ -100,25 +129,30 @@ export function StoryScreen({ slug, base }: { readonly slug: string; readonly ba
                   : []),
               ]}
             />
+            {/* The page's date is its last revision; the subject's years never enter a citation. */}
+            <CiteButton
+              source={{
+                title: story.title,
+                url: storyWebUrl(story.webPath),
+                published: story.updatedAt ?? story.publishedAt,
+              }}
+            />
             {story.heroImage ? (
-              <View style={{ gap: space['1'] }}>
-                <Image
-                  source={story.heroImage.url}
-                  alt={story.heroImage.alt}
-                  aspectRatio={
-                    story.heroImage.width && story.heroImage.height
-                      ? story.heroImage.width / story.heroImage.height
-                      : 4 / 3
-                  }
-                  fallback={{ entityName: story.title, reason: 'absent' }}
-                />
-                <Text variant="caption" colorRole="inkMuted">
-                  {story.heroImage.credit}
-                </Text>
-              </View>
+              <StoryImageExhibit image={story.heroImage} bleed={insets.paddingHorizontal} />
             ) : null}
 
-            <StoryBlocks blocks={story.body} webUrl={storyWebUrl(story.webPath)} />
+            <View
+              onLayout={(event) => {
+                blocksTop.current = event.nativeEvent.layout.y + space['4'];
+              }}
+            >
+              <StoryBlocks
+                blocks={story.body}
+                webUrl={storyWebUrl(story.webPath)}
+                bleed={insets.paddingHorizontal}
+                onChapterLayout={(text, y) => chapters.current.set(text, y)}
+              />
+            </View>
             <StoryReferences references={story.references} />
 
             <View style={{ gap: space['2'], marginTop: space['4'] }}>

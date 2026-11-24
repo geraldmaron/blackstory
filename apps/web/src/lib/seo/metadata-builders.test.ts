@@ -116,7 +116,7 @@ test('every static room routes its head through the builder', () => {
       }
       if (item.name !== 'page.tsx') continue;
       // Explore (`app/page.tsx`) builds `alternates` directly — it must carry no `title`, which
-      // `buildStaticPageMetadata` always sets — so it is excluded the same way `/records` is.
+      // `buildStaticPageMetadata` always sets — so it is excluded the same way `/archive` is.
       if (dir === appDir) continue;
       const source = readFileSync(join(dir, item.name), 'utf8');
       if (!/^export const metadata/m.test(source)) continue; // generateMetadata builds its own
@@ -137,7 +137,7 @@ test('robots.txt adds no Disallow for the routes that carry a noindex', () => {
   // ships the noindex ALONE for exactly this reason, and this is the standing guard.
   //
   // Since 2026-09-29 the general crawler is also kept off unbounded filter-combination URLs on
-  // /records and /explore (crawl cost, repo-4wb0e). Those query URLs also say noindex for
+  // /archive (and its 4a addresses, /records and /explore) (crawl cost, repo-4wb0e). Those query URLs also say noindex for
   // crawlers that ignore wildcards, but none of them is a registry noindex route, so the guard
   // still holds: no Disallow the general crawler sees may reach a noindexed route.
   const rules = [robots().rules].flat();
@@ -148,7 +148,7 @@ test('robots.txt adds no Disallow for the routes that carry a noindex', () => {
   for (const pattern of wildcardDisallows) {
     assert.match(
       pattern,
-      /^\/(records|explore)\?/,
+      /^\/(archive|records|explore)\?/,
       `${pattern} must be a query shape, not a route`,
     );
     for (const noindexed of ['/design-system', '/corrections/status/abc123']) {
@@ -157,15 +157,29 @@ test('robots.txt adds no Disallow for the routes that carry a noindex', () => {
     const bare = pattern.slice(0, pattern.indexOf('?'));
     assert.equal(isNoIndexPath(bare), false, `${bare} is a noindex route; do not Disallow it`);
   }
-  // Bare pages stay crawlable: a prefix Disallow on `/records?` would not match `/records`.
-  for (const bare of ['/records', '/explore', '/records?kind=school', '/records?page=3']) {
+  // Bare pages stay crawlable: a prefix Disallow on `/archive` would not match `/archive`.
+  for (const bare of ['/archive', '/archive?view=map', '/archive?kind=school', '/archive?page=3']) {
     const blocked = wildcardDisallows.some((pattern) => {
       const [head, tail] = pattern.split('*') as [string, string | undefined];
       return (
         bare.startsWith(head) && (tail === undefined || bare.slice(head.length).includes(tail))
       );
     });
-    assert.equal(blocked, bare.startsWith('/explore?'), `${bare} crawlability changed`);
+    assert.equal(blocked, false, `${bare} crawlability changed`);
+  }
+  // ...and the unbounded shapes are closed: any combination, any search, any narrowed map.
+  for (const trap of [
+    '/archive?kind=school&state=GA',
+    '/archive?q=x',
+    '/archive?view=map&state=GA',
+  ]) {
+    const blocked = wildcardDisallows.some((pattern) => {
+      const [head, tail] = pattern.split('*') as [string, string | undefined];
+      return (
+        trap.startsWith(head) && (tail === undefined || trap.slice(head.length).includes(tail))
+      );
+    });
+    assert.equal(blocked, true, `${trap} should be disallowed`);
   }
 
   const named = rules.filter((rule) => rule?.userAgent !== '*');

@@ -14,11 +14,12 @@ import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
 import { markPerf } from '@/lib/perf-marks';
 import type { EntityDetailState } from './useEntityDetail';
-import { entityBeatIndices } from './entity-beat-indices';
+import { CiteButton } from '@/features/cite/CiteButton';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
+import { buildCanonicalEntityUrl, CANONICAL_WEB_ORIGIN } from './share';
 import { CitedInSection } from './sections/CitedInSection';
 import { ClaimsSection } from './sections/ClaimsSection';
-import { AnatomySection } from './sections/AnatomySection';
+import { AnatomySection, RecordMapSection } from './sections/AnatomySection';
 import { IntroSection } from './sections/IntroSection';
 import { HowToReadThisRecord } from './sections/HowToReadThisRecord';
 import { NarrativeSections } from './sections/NarrativeSections';
@@ -123,8 +124,15 @@ export function EntityDetailScreen({
   }
 
   const { entity, freshness } = state.result;
-  const beats = entityBeatIndices(entity);
+  const mapSection = (
+    <RecordMapSection
+      entity={entity}
+      {...(onBackToMap ? { onBackToMap: () => onBackToMap(entity.id) } : {})}
+    />
+  );
 
+  // Phone order (docs/ui/DESIGN.md section 9.1): exhibit, name, summary, facts, claims, map,
+  // the rest. The photograph leads; with none, the map does.
   return (
     <ScrollView
       testID="entity-detail-screen"
@@ -133,48 +141,43 @@ export function EntityDetailScreen({
         paddingHorizontal: screenScrollInsets.paddingHorizontal,
         paddingTop: screenScrollInsets.paddingTop,
         paddingBottom: screenScrollInsets.paddingBottom,
-        gap: space['4'],
+        gap: space['5'],
       }}
     >
       {freshness.degraded || entity.sensitivity ? (
-        // Both trust banners lead the record together (differentiated tones), so the sensitivity
-        // context frames the content it precedes instead of surfacing a screen-and-a-half later
-        // as an apparent duplicate of the staleness banner.
         <View style={{ gap: space['2'] }}>
           {freshness.degraded ? <OfflineBanner fetchedAt={freshness.fetchedAt} /> : null}
           {entity.sensitivity ? <SensitivityBanner sensitivity={entity.sensitivity} /> : null}
         </View>
       ) : null}
 
-      <IntroSection entity={entity} />
-
-      <AnatomySection
-        entity={entity}
-        {...(onBackToMap ? { onBackToMap: () => onBackToMap(entity.id) } : {})}
+      <IntroSection entity={entity} {...(entity.primaryImage ? {} : { lead: mapSection })} />
+      {/* The page's date is its last revision; the subject's years never enter a citation. */}
+      <CiteButton
+        source={{
+          title: entity.displayName,
+          url: buildCanonicalEntityUrl(entity.id) ?? CANONICAL_WEB_ORIGIN,
+          published: entity.revision.recordUpdatedAt,
+        }}
       />
+      <AnatomySection entity={entity} />
+      <ClaimsSection claims={entity.claims} isOnline={isOnline} />
+      {entity.primaryImage ? mapSection : null}
 
-      <HowToReadThisRecord {...(onMethodologyPress ? { onMethodologyPress } : {})} />
-
-      <NarrativeSections entity={entity} beats={beats} />
-      <ClaimsSection claims={entity.claims} isOnline={isOnline} index={beats.claims} />
-      <StatusSection entity={entity} index={beats.status} />
-      {beats.timeline ? (
-        <TimelineSection timeline={entity.timeline} index={beats.timeline} />
-      ) : null}
+      <NarrativeSections entity={entity} />
+      <StatusSection entity={entity} />
+      <TimelineSection timeline={entity.timeline} />
       <RelatedSection
         relatedNeighbors={entity.relatedNeighbors ?? []}
         continueLearning={entity.continueLearning ?? []}
-        index={beats.connected}
         {...(onOpenEntity ? { onOpenEntity } : {})}
       />
-      {beats.citedIn ? (
-        <CitedInSection
-          citingStories={entity.citingStories ?? []}
-          index={beats.citedIn}
-          {...(onOpenStory ? { onOpenStory } : {})}
-        />
-      ) : null}
-      <ProvenanceSection entity={entity} index={beats.provenance} />
+      <CitedInSection
+        citingStories={entity.citingStories ?? []}
+        {...(onOpenStory ? { onOpenStory } : {})}
+      />
+      <ProvenanceSection entity={entity} />
+      <HowToReadThisRecord {...(onMethodologyPress ? { onMethodologyPress } : {})} />
       {sessionNav ?? null}
     </ScrollView>
   );

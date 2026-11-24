@@ -16,17 +16,15 @@ import type { TimelineEvent } from '../types';
 
 export type TimelineSectionProps = {
   readonly timeline: readonly TimelineEvent[];
-  readonly index: string;
 };
 
-export function TimelineSection({ timeline, index }: TimelineSectionProps) {
+export function TimelineSection({ timeline }: TimelineSectionProps) {
   if (timeline.length === 0) {
     return null;
   }
 
   return (
     <EntityEditionPanel
-      index={index}
       kicker="Chronology"
       title={SECTION_HEADINGS.timeline}
       testID="entity-timeline-section"
@@ -41,7 +39,7 @@ export function TimelineSection({ timeline, index }: TimelineSectionProps) {
               <Text variant="caption" colorRole="inkMuted">
                 {event.atLabel} · {datePrecisionCaption(event.datePrecision)}
               </Text>
-              <Text variant="rowTitle">{event.title}</Text>
+              <Text variant="bodyEmphasis">{event.title}</Text>
               {showBody ? <Text variant="bodySmall">{body}</Text> : null}
             </View>
           );

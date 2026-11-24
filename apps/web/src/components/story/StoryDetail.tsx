@@ -2,30 +2,30 @@
  * The story page, rendered for `/stories/[slug]` and for a collection's own route
  * (`/presidents/[slug]`), chapters and entries alike, on one frame:
  *
- *   masthead on the ink table: display title, the opening year as a numeral, the dek, then a
- *     copper band of facts (years, place or office, sources, byline); chapters then show their
- *     hero image whole on the wide track
- *   section spine (sticky, left of the sheet on wide screens; a Contents bar and sheet below)
- *   the paper sheet: prose on the 680px measure, every artifact open on the wide track, section
- *     years as copper numerals, then the numbered sources, then the copper end block (where to
- *     read next, the records the story links to) across the sheet's foot
+ *   masthead on paper: display title, the opening year as a numeral, the dek, then a ruled strip
+ *     of facts (years, place or office, sources, byline, Cite); chapters then show their cover
+ *     as an exhibit
+ *   chapter rail (sticky, beside the column from 64rem; a bar naming the section below that)
+ *   the reading column: prose at the content measure, every exhibit breaking it, section years
+ *     as numerals, then the numbered sources, then where to read next and the linked records
  *
- * Entries use the same frame with a short masthead: the portrait large beside the title.
+ * Entries use the same frame with a short masthead: the portrait beside the title.
  * Emits schema.org Article JSON-LD only.
  */
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
-import { DisplayNumeral, Notice, PageTitle, Sheet } from '@repo/ui';
-import { Room } from '../room';
+import { DisplayNumeral, Notice, PageTitle } from '@repo/ui';
+import { FigureEmbed } from '../data/figures/FigureEmbed';
+import { isFigureId } from '../data/figures/figure-ids';
+import { RecordCite } from '../patterns/RecordCite';
+import { PageFrame } from '../page';
 import { StoryBody } from './StoryBody';
 import { StoryEnd } from './StoryEnd';
 import { StoryFigure } from './StoryFigure';
-import { StoryImage } from './StoryImage';
 import { StoryReferences } from './StoryReferences';
 import { StoryRecords } from './story-records';
 import { StorySpine } from './StorySpine';
-import { storyImageSrc } from './story-image';
 import { firstYear, splitLede } from './story-text';
 import type { HydratedStory } from '../../lib/stories/hydrate';
 import { extractChapterHeadings } from '../../lib/stories/heading-anchors';
@@ -34,8 +34,8 @@ import { nextInCollection, prevInCollection, sortItems } from '../../app/stories
 import { storyCitedEntities } from '../../lib/release/build-cites-edge';
 import { listPublicEntityViewsByIds } from '../../lib/public-data/source';
 import { IMPLICIT_AUTHOR_NAME, storyBylineLines } from '../../lib/stories/byline';
+import { absolutePublicUrl } from '../../lib/seo/metadata-builders';
 import { COLLECTION_ROUTES, storyBasePath, storyHref } from '../../lib/stories/story-routes';
-import { BandRule } from '../atmosphere/BandArt';
 import './story.css';
 
 /** The route a page was requested on: `/stories`, or a collection's own path. */
@@ -71,7 +71,12 @@ function buildStoryJsonLd(story: HydratedStory) {
     description: doc.summary,
     datePublished: doc.publishedAt,
     ...(doc.updatedAt ? { dateModified: doc.updatedAt } : {}),
-    '@id': storyHref(doc),
+    '@id': absolutePublicUrl(storyHref(doc)),
+    url: absolutePublicUrl(storyHref(doc)),
+    mainEntityOfPage: absolutePublicUrl(storyHref(doc)),
+    ...(doc.collection
+      ? { isPartOf: { '@type': 'CreativeWorkSeries', name: doc.collection.label } }
+      : {}),
     author: doc.contributors.some((c) => c.roles.includes('author'))
       ? doc.contributors
           .filter((c) => c.roles.includes('author'))
@@ -112,14 +117,12 @@ export async function StoryDetail({
 
   if (result.source === 'unavailable') {
     return (
-      <Room width="read" className="ds-story">
-        <Sheet className="ds-story-unavailable">
-          <Notice tone="warning" title="This story is unavailable">
-            The live record could not be reached, so this story cannot be shown right now. Reload to
-            try again, or <Link href={base}>go back to the list</Link>.
-          </Notice>
-        </Sheet>
-      </Room>
+      <PageFrame width="read" className="ds-story">
+        <Notice tone="warning" title="This story is unavailable">
+          The live record could not be reached, so this story cannot be shown right now. Reload to
+          try again, or <Link href={base}>go back to the list</Link>.
+        </Notice>
+      </PageFrame>
     );
   }
 
@@ -198,7 +201,7 @@ export async function StoryDetail({
   ].filter(Boolean);
 
   return (
-    <Room width="wide" className={`ds-story ds-story--${noun}`}>
+    <PageFrame width="wide" className={`ds-story ds-story--${noun}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
@@ -212,7 +215,6 @@ export async function StoryDetail({
             <PageTitle className="ds-story-mast__title">{doc.title}</PageTitle>
             <p className="ds-story-mast__dek">{lede.dek}</p>
             {lede.rest ? <p className="ds-story-mast__rest">{lede.rest}</p> : null}
-            <BandRule motif="architecture" className="ds-story-mast__art" />
           </div>
           {year && !isEntry ? (
             <DisplayNumeral className="ds-story-mast__numeral" tone="soft" decorative>
@@ -220,20 +222,7 @@ export async function StoryDetail({
             </DisplayNumeral>
           ) : null}
           {hero && isEntry ? (
-            <figure className="ds-plate ds-plate--upper ds-story-mast__portrait">
-              <span className="ds-plate__tone">
-                <StoryImage
-                  className="ds-plate__img"
-                  src={storyImageSrc(hero.url, 320, hero.width)}
-                  fallbackSrc={hero.url}
-                  alt={hero.alt}
-                  {...(hero.width ? { width: hero.width } : {})}
-                  {...(hero.height ? { height: hero.height } : {})}
-                  eager
-                />
-              </span>
-              <figcaption className="ds-plate__credit">{hero.credit}</figcaption>
-            </figure>
+            <StoryFigure className="ds-story-mast__portrait" image={hero} width={320} eager />
           ) : null}
           <dl className="ds-story-mast__band" aria-label={`This ${noun}`}>
             <div>
@@ -262,6 +251,11 @@ export async function StoryDetail({
                 {storyBylineLines(doc.contributors).map((line) => (
                   <span key={line}>{line}</span>
                 ))}
+                {/* The authorship line (DESIGN.md 9.3). Its wording is the owner's and is not
+                    decided; until it is, the byline stands and this link says where to check it. */}
+                <span>
+                  <Link href="/about#neo">How stories are written and checked</Link>
+                </span>
                 <span>
                   <time dateTime={doc.publishedAt}>{formatDate(doc.publishedAt)}</time>
                 </span>
@@ -273,8 +267,15 @@ export async function StoryDetail({
               </dd>
             </div>
             <div className="ds-story-mast__report">
-              <dt className="ds-visually-hidden">Corrections</dt>
+              <dt className="ds-visually-hidden">Cite and correct</dt>
               <dd>
+                {/* The page's date is its last revision; the subject's years never enter a citation. */}
+                <RecordCite
+                  title={doc.title}
+                  url={absolutePublicUrl(storyHref(doc))}
+                  published={doc.updatedAt ?? doc.publishedAt}
+                  accessed={new Date().toISOString()}
+                />
                 <Link href="/corrections">Report an error</Link>
               </dd>
             </div>
@@ -286,8 +287,20 @@ export async function StoryDetail({
 
         <StorySpine headings={headings} {...(hasSources ? { sourcesHref: '#sources' } : {})} />
 
-        <Sheet as="div" className="ds-story__main">
-          <StoryBody story={story} numerals />
+        <div className="ds-story__main">
+          <StoryBody
+            story={story}
+            numerals
+            renderFigure={({ figureId, writtenAsOf, fallback }) =>
+              isFigureId(figureId) ? (
+                <FigureEmbed
+                  id={figureId}
+                  fallback={fallback}
+                  {...(writtenAsOf ? { writtenAsOf } : {})}
+                />
+              ) : undefined
+            }
+          />
 
           <div className="ds-story-body">
             {hasSources ? (
@@ -316,8 +329,8 @@ export async function StoryDetail({
               }
             />
           </div>
-        </Sheet>
+        </div>
       </article>
-    </Room>
+    </PageFrame>
   );
 }

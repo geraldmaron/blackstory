@@ -1,7 +1,7 @@
 /**
  * Structural checks on the errata page and its feed route handlers: one shared entry list,
  * absolute feed URLs, and no disclosure markup anywhere on the surface.
- * docs/ui/design-direction-v9-surfaces.md §4.2, §4.5.
+ * docs/ui/archive/design-direction-v9-surfaces.md §4.2, §4.5.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -50,7 +50,7 @@ test('the page links both feeds and filters by kind of change through plain link
 test('the log hands off to /corrections and /methodology, with no off-ramp card', () => {
   assert.match(pageSource, /href: '\/corrections'/);
   assert.match(pageSource, /href: '\/methodology#how-a-record-gets-in'/);
-  assert.doesNotMatch(pageSource, /WalkOffRamp|RoomHandoff/);
+  assert.doesNotMatch(pageSource, /WalkOffRamp|RelatedLink/);
 });
 
 test('errata does not print shop record ids', () => {

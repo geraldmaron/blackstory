@@ -5,7 +5,7 @@
  *
  * Prefers already-promoted Supabase public-media objects from the Commons dry-run
  * auto_propose set (we hold display rights via the promote path). Also regenerates
- * apps/web/src/components/atmosphere/tile-credits.ts from the written manifest.
+ * apps/web/src/app/stories/mosaic-credits/tile-credits.ts from the written manifest.
  *
  * Usage (repo root):
  *   node --conditions development --import tsx \
@@ -28,7 +28,7 @@ const dryRunPath = join(scriptDir, '../fixtures/release-artifacts/commons-media-
 const outDir = join(scriptDir, '../../../apps/web/public/brand/collage/tiles');
 const tileCreditsPath = join(
   scriptDir,
-  '../../../apps/web/src/components/atmosphere/tile-credits.ts',
+  '../../../apps/web/src/app/stories/mosaic-credits/tile-credits.ts',
 );
 /** Cap high; dry-run currently supplies ~238 auto_propose (PD first, then licensed). */
 const TILE_COUNT = 500;

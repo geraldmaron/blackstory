@@ -1,8 +1,8 @@
 # Lens handoff
 
-**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) sections 5.2, 5.3, 5.5 and 5.6. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`applyLensRef`, `openRecord`, `citedIn`).
+**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) sections 5.2, 5.3, 5.5 and 5.6. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`applyLensRef`, `openRecord`, `citedIn`).
 
-Builds on `../decisions-carryover.md`, "Persistent map canvas", ADR-017 (no viewport in a shareable URL) and [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) (the Lens and the Results rail that receive the handoff).
+Builds on `../decisions-carryover.md`, "Persistent map canvas", ADR-017 (no viewport in a shareable URL) and [`patterns-atlas-instrument.md`](./archive/patterns-atlas-instrument.md) (the Lens and the Results rail that receive the handoff).
 
 ---
 

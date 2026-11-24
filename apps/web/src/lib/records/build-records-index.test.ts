@@ -1,5 +1,5 @@
 /**
- * `/records` index tests.
+ * `/archive` index tests.
  *
  * The drift suite at the bottom is the acceptance criterion "the filter vocabulary is generated
  * from the same source as the Lens, with a test that fails on drift". It does not compare two
@@ -58,16 +58,16 @@ function manyEntities(count: number): readonly PublicEntityView[] {
 
 describe('/records · query parsing and href construction', () => {
   it('page=1 is never written into an href, so one page never has two URLs', () => {
-    assert.equal(recordsHref({ page: 1 }), '/records');
-    assert.equal(recordsHref({ page: 2 }), '/records?page=2');
-    assert.equal(recordsHref({ kind: 'people', page: 1 }), '/records?kind=people');
+    assert.equal(recordsHref({ page: 1 }), '/archive');
+    assert.equal(recordsHref({ page: 2 }), '/archive?page=2');
+    assert.equal(recordsHref({ kind: 'people', page: 1 }), '/archive?kind=people');
   });
 
   it('params are emitted in a fixed order, so a narrowing has exactly one canonical URL', () => {
     const a = recordsHref({ q: 'tulsa', kind: 'people', era: '1920s', state: 'OK' });
     const b = recordsHref({ state: 'OK', era: '1920s', kind: 'people', q: 'tulsa' });
     assert.equal(a, b);
-    assert.equal(a, '/records?q=tulsa&kind=people&era=1920s&state=OK');
+    assert.equal(a, '/archive?q=tulsa&kind=people&era=1920s&state=OK');
   });
 
   it('a junk or negative page collapses to page one rather than throwing', () => {
@@ -96,11 +96,11 @@ describe('/records · paging', () => {
     assert.equal(first.rows.length, RECORDS_PAGE_SIZE);
     assert.equal(first.pageCount, 3);
     assert.equal(first.previousHref, undefined);
-    assert.equal(first.nextHref, '/records?page=2');
+    assert.equal(first.nextHref, '/archive?page=2');
 
     const last = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, page: 3 });
     assert.equal(last.rows.length, 50);
-    assert.equal(last.previousHref, '/records?page=2');
+    assert.equal(last.previousHref, '/archive?page=2');
     assert.equal(last.nextHref, undefined);
   });
 
@@ -108,12 +108,12 @@ describe('/records · paging', () => {
     const model = buildRecordsIndex(manyEntities(120), { ...EMPTY_RECORDS_QUERY, page: 99 });
     assert.equal(model.page, 2);
     assert.equal(model.rows.length, 20);
-    assert.equal(model.canonicalPath, '/records?page=2');
+    assert.equal(model.canonicalPath, '/archive?page=2');
   });
 
   it('/records?page=2 declares itself canonical, not /records', () => {
     const model = buildRecordsIndex(manyEntities(250), { ...EMPTY_RECORDS_QUERY, page: 2 });
-    assert.equal(model.canonicalPath, '/records?page=2');
+    assert.equal(model.canonicalPath, '/archive?page=2');
   });
 });
 
@@ -170,10 +170,10 @@ describe('/records · filtering', () => {
     const events = kindFamilyFor('event');
     const places = kindFamilyFor('place');
     const model = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: events, page: 1 });
-    assert.equal(model.facets.kind.find((facet) => facet.id === events)?.href, '/records');
+    assert.equal(model.facets.kind.find((facet) => facet.id === events)?.href, '/archive');
     assert.equal(
       model.facets.kind.find((facet) => facet.id === places)?.href,
-      `/records?kind=${places}`,
+      `/archive?kind=${places}`,
     );
   });
 
@@ -187,8 +187,8 @@ describe('/records · filtering', () => {
       model.constraints.map((constraint) => constraint.key),
       ['q', 'kind'],
     );
-    assert.equal(model.constraints[0]?.clearHref, `/records?kind=${kindFamilyFor('event')}`);
-    assert.equal(model.clearAllHref, '/records');
+    assert.equal(model.constraints[0]?.clearHref, `/archive?kind=${kindFamilyFor('event')}`);
+    assert.equal(model.clearAllHref, '/archive');
   });
 
   it('an unrecognized param narrows nothing rather than emptying the room', () => {
@@ -205,7 +205,7 @@ describe('/records · the Explore handoff', () => {
   it('maps topic onto the Lens name for the same thing', () => {
     assert.equal(
       buildAtlasHref({ ...EMPTY_RECORDS_QUERY, topic: 'abolition' }),
-      '/explore?theme=abolition',
+      '/archive?view=map&topic=abolition',
     );
   });
 
@@ -215,7 +215,7 @@ describe('/records · the Explore handoff', () => {
       q: 'tulsa',
       state: 'OK',
     });
-    assert.equal(href, '/explore?q=tulsa&state=OK');
+    assert.equal(href, '/archive?view=map&q=tulsa&state=OK');
   });
 
   it('sends the evidence floor as `floor`, now that SP-16 landed it on the Lens', () => {
@@ -224,11 +224,11 @@ describe('/records · the Explore handoff', () => {
       evidence: 'B',
       state: 'OK',
     });
-    assert.equal(href, '/explore?state=OK&floor=B');
+    assert.equal(href, '/archive?view=map&state=OK&evidence=B');
   });
 
   it('an unnarrowed index hands over the Explore instrument', () => {
-    assert.equal(buildAtlasHref(EMPTY_RECORDS_QUERY), '/explore');
+    assert.equal(buildAtlasHref(EMPTY_RECORDS_QUERY), '/archive?view=map');
   });
 });
 
@@ -460,7 +460,7 @@ describe('/records · place hrefs and map continuity', () => {
     assert.equal(searchIndexReadyForRecords(docs), true);
     const { evidenceInputs: _evidenceInputs, ...withoutEvidenceInputs } = docs[0]!;
     assert.equal(searchIndexReadyForRecords([withoutEvidenceInputs]), false);
-    // A row carrying only the retired derived tier is NOT coverage: `/records` must fall back to
+    // A row carrying only the retired derived tier is NOT coverage: `/archive` must fall back to
     // full entities rather than serve a cached conclusion.
     assert.equal(
       searchIndexReadyForRecords([{ ...withoutEvidenceInputs, confidenceTier: 'high' } as never]),
@@ -545,9 +545,9 @@ describe('/records · order and decade jumps', () => {
     assert.deepEqual(
       plain.decadeJumps.map((jump) => [jump.label, jump.page, jump.href]),
       [
-        ['1790s', 1, '/records#decade-1790'],
-        ['1880s', 1, '/records#decade-1880'],
-        ['1950s', 1, '/records#decade-1950'],
+        ['1790s', 1, '/archive#decade-1790'],
+        ['1880s', 1, '/archive#decade-1880'],
+        ['1950s', 1, '/archive#decade-1950'],
       ],
     );
     const byName = buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, sort: 'name' });
@@ -567,7 +567,7 @@ describe('/records · order and decade jumps', () => {
         ['1950s', 2],
       ],
     );
-    assert.equal(model.decadeJumps[1]?.href, '/records?page=2#decade-1950');
+    assert.equal(model.decadeJumps[1]?.href, '/archive?page=2#decade-1950');
   });
 
   it('a seeded visit opens on a shuffle that pages stably and stays out of the canonical', () => {
@@ -585,10 +585,34 @@ describe('/records · order and decade jumps', () => {
     );
     assert.equal(new Set([...ids('abc', 1), ...ids('abc', 2)]).size, 150, 'no row repeats');
     const seeded = buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, seed: 'abc' });
-    assert.equal(seeded.canonicalPath, '/records');
-    assert.equal(seeded.nextHref, '/records?seed=abc&page=2');
+    assert.equal(seeded.canonicalPath, '/archive');
+    assert.equal(seeded.nextHref, '/archive?seed=abc&page=2');
     assert.deepEqual(seeded.decadeJumps, [], 'a shuffle has no decade to jump to');
-    assert.equal(earliest.canonicalPath, '/records?sort=era');
+    assert.equal(earliest.canonicalPath, '/archive?sort=era');
+
+    // A card on page 2 of the shuffle carries the seed, and the record page that reads it back
+    // finds the record at the position the reader saw, so Return lands on page 2 again.
+    const second = buildRecordsIndex(many, { ...EMPTY_RECORDS_QUERY, seed: 'abc', page: 2 });
+    const card = second.rows[0]!;
+    assert.match(card.href, /\?from=list&seed=abc$/);
+    const found = findRecordsNeighbors(many, { ...EMPTY_RECORDS_QUERY, seed: 'abc' }, card.id);
+    assert.equal(found?.index, 100);
+    assert.doesNotMatch(earliest.rows[0]!.href, /seed=/, 'an explicit sort has no shuffle');
+  });
+
+  it('never renders a row with an empty address', () => {
+    const tokens = ['42Cb1758', '42Cb242', '42Dc682', '42Dc696'].map((displayName, index) =>
+      entity({ id: `ent_site_${index}`, kind: 'place', displayName, summary: 'A site.' }),
+    );
+    // What a plate built before the shared fix handed over for token-named records.
+    const stale = new Map(tokens.map((record) => [record.id, '']));
+    for (const drawn of [undefined, stale]) {
+      const rows = buildRecordsIndex(tokens, EMPTY_RECORDS_QUERY, drawn).rows;
+      assert.deepEqual(
+        rows.map((row) => row.href).sort(),
+        tokens.map((record) => `/entity/${record.id}?from=list`),
+      );
+    }
   });
 });
 

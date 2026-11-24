@@ -1,0 +1,1394 @@
+/**
+ * The v9 page kit — the shared surface vocabulary for every Reading, Record and utility page.
+ *
+ * Design law: docs/ui/archive/design-direction-v9-surfaces.md §2 and §4, patterns-surface-classes.md,
+ * patterns-reading-room.md, patterns-record-page.md, patterns-utility-edition.md.
+ * Reference build: .design-mocks/blackstory-atlas-v9.html.
+ *
+ * WHY THIS FILE EXISTS. The app carried twelve per-route `*-edition.css` files and eleven
+ * `*-panel-chrome.ts` modules: every surface invented its own header, its own kicker, its own
+ * panel frame. That is the specific reason the site reads as a patchwork next to the mock.
+ * This sheet is the one place a page's header, index, prose, sources, cards, table, off-ramp
+ * and empty state are drawn, and `reading-page.css`, `record-page.css` and `utility.css` are
+ * the only three sheets a page route imports — each of them a thin class-specific layer over
+ * this one.
+ *
+ * TOKENS. The mock's four ink steps map onto the app's three plus one derived tint; nothing
+ * here hardcodes a color. The aliases below exist so the rules read like the mock while
+ * still resolving through `--ds-*`, which is what makes the kit theme-flip correctly.
+ */
+
+/* Atom stylesheets the kit re-exports. `@import` is only legal ahead of the rules below, which
+   is why this sits above the token block rather than beside the section it belongs to. */
+
+/* Re-declared on every ground inside a page, so a paper sheet or a copper block resolves the
+   aliases against its own ink and canvas rather than inheriting the table's. */
+.ds-doc,
+.ds-doc [data-ground] {
+  /* Mock --ink-2: body prose, one step down from a heading but not yet muted. */
+  --doc-ink-2: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+  /* Mock --ink-3 / --ink-4: secondary copy and mono data. */
+  --doc-ink-3: var(--ds-ink-muted);
+  --doc-ink-4: var(--ds-ink-subtle);
+  /* Mock --surface-sunk: the hover wash and idle plate ground. */
+  --doc-sunk: color-mix(in srgb, var(--ds-canvas) 94%, var(--ds-ink));
+  --doc-rule-2: color-mix(in srgb, var(--ds-rule) 72%, transparent);
+  --doc-copper-wash: color-mix(in oklab, var(--ds-accent) 10%, transparent);
+  --doc-note-wash: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
+
+  color: var(--ds-ink);
+}
+
+/* The base content link. An unclassed anchor anywhere in a page (a byline, an anatomy value,
+   a count that opens its sources) otherwise falls to the browser default, which is #0000EE in
+   light and a dark-scheme lavender in dark. Zero specificity on purpose: every classed link and
+   every block-level `.x a` rule still wins, so this only catches what nothing else styles.
+   Focus is the global `:focus-visible` ring from @repo/ui base.css. */
+:where(.ds-doc) :where(a:not([class])) {
+  color: var(--ds-accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--ds-border-width);
+  text-underline-offset: 3px;
+}
+
+:where(.ds-doc) :where(a:not([class])):hover {
+  text-decoration-thickness: 2px;
+}
+
+/* —— the frame ——————————————————————————————————————————————————————————————
+   The body is one of the three shared containers (`.ds-wrap`, `.ds-wrap--read`,
+   `.ds-wrap--record` from @repo/ui); PageFrame picks it. The column takes the container's full width
+   and adds no inline padding, so every page's left edge is the container's left edge. */
+.ds-doc__column {
+  box-sizing: border-box;
+  min-width: 0;
+  padding-block: 0 var(--ds-space-16);
+}
+
+/* A page that opens on its PageHeader takes its top space from the header. The memorial wall,
+   which opens on its own plate, keeps the column's old top space. */
+.ds-doc__column:not(:has(.ds-page-header)) {
+  padding-top: var(--ds-space-10);
+}
+
+/* —— the full-bleed blocks —————————————————————————————————————————————————
+   A masthead above the column and an apparatus band below it, both outside the container. */
+.ds-doc__mast {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ds-doc__foot {
+  margin-top: var(--ds-space-12);
+  padding: var(--ds-space-12) var(--ds-gutter) var(--ds-space-18);
+  background: var(--ds-surface-sunken);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* —— the right rail ————————————————————————————————————————————————————————
+   Beside the column from 64rem inside the same container; below that it stacks under the
+   column, which is also its reading order in the document. */
+.ds-doc__body--railed {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ds-doc__rail {
+  min-width: 0;
+  padding-block: 0 var(--ds-space-12);
+}
+
+@media (min-width: 64rem) {
+  .ds-doc__body--railed {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    column-gap: var(--ds-space-12);
+  }
+
+  .ds-doc__rail {
+    padding-block: var(--ds-space-12) var(--ds-space-16);
+  }
+}
+
+/* Shared documentary object: preserve the frame, pair the image with evidence in words. */
+.ds-archive-figure {
+  min-width: 0;
+  margin: 0;
+  align-self: start;
+}
+.ds-archive-figure > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 42rem;
+  object-fit: contain;
+}
+.ds-archive-figure figcaption {
+  border-top: 1px solid var(--ds-rule);
+  margin-top: var(--ds-space-3);
+  padding-top: var(--ds-space-3);
+  font-size: var(--ds-text-caption);
+  line-height: 1.55;
+}
+.ds-archive-figure figcaption p {
+  margin: 0 0 var(--ds-space-2);
+}
+.ds-archive-figure__credit {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-ink-muted);
+}
+.ds-archive-figure__source {
+  display: inline-flex;
+  gap: var(--ds-space-2);
+  align-items: center;
+  min-height: 44px;
+  color: var(--ds-accent);
+  text-underline-offset: 0.2em;
+}
+.ds-archive-figure__source:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: 3px;
+}
+
+/* —— Prose ————————————————————————————————————————————————————————————————— */
+.ds-doc-prose {
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.66;
+  color: var(--doc-ink-2);
+}
+
+.ds-doc-prose > * + * {
+  margin-top: var(--ds-space-5);
+}
+
+.ds-doc-prose p,
+.ds-doc-prose ul,
+.ds-doc-prose ol {
+  /* About 75 characters a line in Geist; `ch` is the zero's width, wider than an average letter. */
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.ds-doc-prose h2 {
+  margin-top: var(--ds-space-10);
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--doc-rule-2);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: var(--ds-text-display-3);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: var(--ds-ink);
+}
+
+.ds-doc-prose h3 {
+  margin-top: var(--ds-space-8);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: var(--ds-text-title);
+  letter-spacing: -0.018em;
+  color: var(--ds-ink);
+}
+
+.ds-doc-prose h2 em,
+.ds-doc-prose h3 em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ds-accent);
+}
+
+.ds-doc-prose ul,
+.ds-doc-prose ol {
+  padding-left: var(--ds-space-5);
+}
+
+.ds-doc-prose li + li {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-doc-prose li::marker {
+  color: var(--ds-accent-graphic);
+}
+
+.ds-doc-prose strong {
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-doc-prose a {
+  color: var(--ds-accent);
+  text-underline-offset: 3px;
+}
+
+/* Section hairlines between prose blocks that are not headed. */
+.ds-doc-prose hr {
+  border: 0;
+  border-top: var(--ds-border-width) solid var(--doc-rule-2);
+  margin-block: var(--ds-space-8);
+}
+
+/* —— Precision: what this coordinate does and does not claim ——————————————————
+   Drawn in `precision.css`, imported at the top of this file. It lives beside the atom because
+   `Precision` also renders on the map surface, which imports no page stylesheet at all. */
+
+/* —— HairlineIndex: the archive read as a list, not a map ————————————————— */
+.ds-doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  color: var(--doc-ink-2);
+  font-size: var(--ds-text-caption);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all var(--ds-duration-fast) var(--ds-ease-entrance);
+}
+
+.ds-doc-chip:hover {
+  background: var(--doc-sunk);
+  border-color: var(--ds-border-strong);
+}
+
+/* Anchor chips (the `/records` GET filters) carry `aria-current`, not `aria-pressed`. */
+a.ds-doc-chip {
+  text-decoration: none;
+}
+
+.ds-doc-chip[aria-pressed='true'],
+.ds-doc-chip[aria-current='true'] {
+  background: var(--doc-copper-wash);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+/* These are not the facet chips. A facet chip adds a constraint; these say what is currently
+   true of the set and remove it. The design law requires the second thing to be visible on any
+   surface a URL can arrive at pre-filtered. */
+.ds-records-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: var(--ds-space-4) 0 var(--ds-space-2);
+}
+
+/* Touch targets. A tablet is a touch device too, so this follows the pointer as well as the
+   width: the sweep on 2026-09-20 found 36px chips and 32px sort links at 768. */
+@media (max-width: 64rem), (pointer: coarse) {
+  /* The radio inside is 1px; the label is the target, and it was 38px. */
+  .ds-doc-field__choice {
+    min-height: 44px;
+  }
+
+  /* A chip outside a find bar, such as the errata feed links. */
+  .ds-doc .ds-doc-chip {
+    height: auto;
+    min-height: 44px;
+    padding-inline: 14px;
+  }
+}
+
+/* —— Field ————————————————————————————————————————————————————————————————— */
+/* The label sits above the control, in the sans face at reading size, and the box is drawn by
+   the control itself. It used to be a mono-caps micro-label *inside* a bordered wrapper, which
+   made every question look like a data field in a console rather than a question being asked of
+   a person — and left the label competing with the value for the same box. */
+/* `fieldset` when the field is a choice set, `div` otherwise — so the reset has to cover the
+   agent stylesheet's fieldset box, which otherwise draws a second border around the pills. */
+.ds-doc-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ds-doc-field > legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+/* `float` takes the legend out of flow, so the choices need the row back. */
+.ds-doc-field > legend + * {
+  clear: both;
+}
+
+.ds-doc-field__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+/* The quiet half of a label: "Optional, but it speeds review up". */
+.ds-doc-field__label small {
+  font-size: inherit;
+  font-weight: 400;
+  color: var(--doc-ink-3);
+}
+
+/* One line under the control, for the sentence that tells a person how to answer. */
+.ds-doc-field__hint {
+  margin: 0;
+  font-size: var(--ds-text-caption);
+  line-height: 1.5;
+  color: var(--doc-ink-3);
+}
+
+.ds-doc-field input,
+.ds-doc-field select,
+.ds-doc-field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 13px var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  border-radius: var(--ds-radius-sm);
+  outline: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body);
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
+.ds-doc-field input:focus-visible,
+.ds-doc-field select:focus-visible,
+.ds-doc-field textarea:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 1px;
+}
+
+.ds-doc-field select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.ds-doc-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* A field whose answer is a small closed set: real radios, drawn as pills. Radios rather than
+   buttons because the answer has to survive JavaScript being off, and a chip that is not an
+   input cannot be submitted. */
+.ds-doc-field__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-doc-field__choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ds-doc-field__choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-caption);
+  cursor: pointer;
+}
+
+.ds-doc-field__choice input:checked + span {
+  background: var(--doc-copper-wash);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-doc-field__choice input:focus-visible + span {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-doc-ustep {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-3);
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--doc-rule-2);
+}
+
+.ds-doc-ustep:last-child {
+  border-bottom: 0;
+}
+
+.ds-doc-ustep__i {
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: 50%;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  color: var(--doc-ink-4);
+}
+
+.ds-doc-ustep[data-done='1'] .ds-doc-ustep__i {
+  background: var(--ds-accent-graphic);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-surface);
+}
+
+.ds-doc-ustep__t {
+  font-size: var(--ds-text-body-sm);
+}
+
+.ds-doc-ustep__t small {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.05em;
+  color: var(--doc-ink-4);
+}
+
+/* —— OffRamp: no reading page is a dead end ———————————————————————————————— */
+.ds-doc-offramp {
+  margin-top: var(--ds-space-10);
+  padding: var(--ds-space-6);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 28px;
+}
+
+.ds-doc .ds-doc-offramp__title {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: var(--ds-text-title);
+  letter-spacing: -0.022em;
+}
+
+.ds-doc-offramp p {
+  max-width: 34em;
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.55;
+  color: var(--doc-ink-3);
+}
+
+.ds-doc-offramp__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-5);
+}
+
+/* —— map moment ————————————————————————————————————————————————————————————
+   The plate, borrowed, inside the flow. The slot is a 16:9 box the persistent map is moved into
+   when this moment is the one on screen; it never contains a map of its own.
+
+   Never full bleed behind prose. §4 states it as design law and this is where it is enforced:
+   the moment is a bounded figure in the column, so a route cannot opt into running body text
+   over a live map by styling its own wrapper. */
+
+.ds-mapmoment {
+  margin: var(--ds-space-8) 0;
+}
+
+.ds-mapmoment__plate {
+  position: relative;
+  /* 16:9 is the reading-column moment. A page whose slot sits somewhere narrower — the record
+     page's 15rem rail is the case that forced this — sets the token on its own container rather
+     than restating `.ds-mapmoment__plate`, which the ratchet below forbids on purpose. The page
+     picks the proportion; the kit still owns the block. */
+  aspect-ratio: var(--ds-mapmoment-aspect, 16 / 9);
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 0;
+  /* The plate's own ground (the slot is `data-ground="ink"`, so this follows the site theme, not
+     the paper sheet around it): idle, the slot is the map before it paints. */
+  background: var(--ds-map-land);
+  transition: border-color var(--ds-duration-base) ease;
+}
+
+/* Live is signaled by the copper edge AND by the tag text, never by color alone. */
+.ds-mapmoment[data-live='1'] .ds-mapmoment__plate {
+  border-color: var(--ds-accent-graphic);
+  /*
+   * The slot becomes a window onto the borrowed plate.
+   *
+   * The plate is `position: fixed` at `--ds-z-map-plate` (0) and the document column sits at
+   * `--ds-z-content` (1), so a plate holding this slot paints BEHIND the column by design —
+   * that ordering is what keeps a live plate from reading through prose everywhere else. The
+   * slot kept its opaque idle ground when live, which meant the map was positioned perfectly
+   * over the slot and then covered by it: every MapMoment on every reading surface rendered
+   * an empty box. Dropping the ground here lets the plate show through without touching the
+   * z-order that protects the rest of the page. The tag and the Explore control sit at local
+   * `z-index: 2`, so they stay above the map.
+   *
+   * `pointer-events: none` keeps this transparent shell from intercepting hover/mousemove over
+   * the aligned map; interactive chrome re-enables hits below. No border transition while live:
+   * animating the frame edge repaints over the WebGL layer on every hover crossing.
+   */
+  background: transparent;
+  pointer-events: none;
+  transition: none;
+}
+
+.ds-mapmoment__idle {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding-inline: var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  text-align: center;
+  color: var(--ds-map-label-hi);
+  transition: opacity var(--ds-duration-base) ease;
+  /* Decorative text that covers the whole slot. Left interactive it swallowed clicks meant for
+     the Explore control beneath it, including once it had faded to nothing on a live moment. */
+  pointer-events: none;
+}
+
+.ds-mapmoment[data-live='1'] .ds-mapmoment__idle {
+  opacity: 0;
+}
+
+.ds-mapmoment__tag {
+  position: absolute;
+  left: var(--ds-space-3);
+  top: var(--ds-space-3);
+  z-index: 2; /* local: above the borrowed plate within this figure only, never the global ladder */
+  padding: 3px 8px;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  color: var(--ds-accent);
+  background: var(--ds-canvas);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 0;
+  opacity: 0;
+  transition: opacity var(--ds-duration-base) ease;
+}
+
+.ds-mapmoment[data-live='1'] .ds-mapmoment__tag {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The Explore hand-off. Hidden until the moment is live, because a control that opens "this view"
+   is a lie when the plate is somewhere else on the page. `visibility` rather than `opacity`
+   alone: an invisible control must also leave the tab order. */
+.ds-mapmoment__open {
+  position: absolute;
+  right: var(--ds-space-3);
+  bottom: var(--ds-space-3);
+  z-index: 2; /* local: same as the tag, above the borrowed plate within this figure only */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  letter-spacing: 0.08em;
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 0;
+  text-decoration: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-duration-base) ease,
+    visibility var(--ds-duration-base) ease;
+}
+
+.ds-mapmoment[data-live='1'] .ds-mapmoment__open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.ds-mapmoment__open:hover,
+.ds-mapmoment__open:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-mapmoment__open:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* No scripting means no stage, which means the plate can never be borrowed into this slot. Holding
+   a 16:9 box open for a map that is never coming is dead space on seven pages, so the slot
+   collapses to its message and the caption carries the moment on its own. Scoped to
+   `scripting: none` rather than done in the component, because a JS reader must not pay a layout
+   shift on hydration for a state that only ever applies to a reader who has none. */
+@media (scripting: none) {
+  .ds-mapmoment__plate {
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+
+  .ds-mapmoment__idle {
+    position: static;
+    padding-block: var(--ds-space-4);
+    text-align: left;
+    place-content: start;
+  }
+
+  .ds-mapmoment__tag {
+    display: none;
+  }
+}
+
+/* —— ContentsList: the page's contents ———————————————————————————————————————————
+   A plain text list that stays in view in the left margin beside a read-width column, from
+   80rem, where that margin is wide enough to hold it. Below that it is not drawn at all: the
+   section headings are the contents. The list sits at the wide container's left edge, so it
+   lines up with the header lockup above it. */
+.ds-doc-toc {
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .ds-doc__column:has(> .ds-doc-toc, > * > .ds-doc-toc) {
+    --doc-toc-w: calc((var(--ds-width-wide) - var(--ds-width-read)) / 2 - var(--ds-space-12));
+
+    display: grid;
+    grid-template-columns: var(--doc-toc-w) minmax(0, 1fr);
+    column-gap: var(--ds-space-12);
+    margin-inline-start: calc(-1 * (var(--doc-toc-w) + var(--ds-space-12)));
+  }
+
+  /* A page whose sections component wraps the list in its own block (privacy, terms) lends that
+     block's children to the grid. */
+  .ds-doc__column > :has(> .ds-doc-toc) {
+    display: contents;
+  }
+
+  .ds-doc__column:has(> .ds-doc-toc, > * > .ds-doc-toc) > *,
+  .ds-doc__column > :has(> .ds-doc-toc) > * {
+    grid-column: 2;
+    min-width: 0;
+  }
+
+  /* Spans every row the column fills, so the sticky list below has the whole page to travel. */
+  .ds-doc__column .ds-doc-toc {
+    display: block;
+    grid-column: 1;
+    grid-row: 1 / span 200;
+  }
+}
+
+.ds-doc-toc__list {
+  position: sticky;
+  top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border-left: var(--ds-border-width) solid var(--ds-rule);
+  list-style: none;
+}
+
+/* The first entry lines up with the page title. */
+.ds-doc__column .ds-doc-toc .ds-doc-toc__list {
+  margin-top: var(--ds-space-12);
+}
+
+.ds-doc-toc__link {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-left: -1px;
+  padding: var(--ds-space-2) 0 var(--ds-space-2) var(--ds-space-4);
+  border-left: 2px solid transparent;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.35;
+  text-decoration: none;
+  text-wrap: balance;
+  transition: color var(--ds-duration-fast) var(--ds-ease-entrance);
+}
+
+.ds-doc-toc__link:hover {
+  color: var(--ds-ink);
+}
+
+/* Current is a copper bar plus ink and weight, never color alone. */
+.ds-doc-toc__link[aria-current='location'] {
+  border-left-color: var(--ds-accent-graphic);
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+.ds-doc-section {
+  scroll-margin-top: calc(var(--ds-island-clearance, 56px) + var(--ds-space-6));
+}
+
+.ds-doc-section > .ds-section-heading + * {
+  margin-top: 0;
+}
+
+/* The first section under the page header: the header's own 32px foot plus 16 makes the 48
+   a section heading gets, instead of stacking 48 on top of 32. */
+:is(.ds-page-header, .ds-page-header + .ds-doc-toc)
+  + .ds-doc-section
+  > .ds-section-heading:first-child {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-doc-section > * + :not(.ds-section-heading) {
+  margin-top: var(--ds-space-4);
+}
+
+/* —— FactList: ruled rows, a short title and its sentence ——————————————— */
+.ds-doc-facts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-doc-fact {
+  padding-block: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-doc-fact__title {
+  margin: 0;
+  text-wrap: balance;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-doc-fact__body {
+  max-width: 64ch;
+  margin: var(--ds-space-1) 0 0;
+  text-wrap: pretty;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: var(--ds-leading-body);
+  color: var(--ds-ink-muted);
+}
+
+.ds-doc-fact__body p {
+  margin: 0;
+}
+
+/* —— RelatedLink: a related page as a ruled link row ——————————————————————— */
+.ds-doc-handoffs {
+  display: grid;
+  margin-top: var(--ds-space-4);
+}
+
+.ds-doc-handoff {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-4);
+  min-height: 2.75rem;
+  padding-block: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-doc-handoffs .ds-doc-handoff:last-child {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-doc-handoff__plate {
+  box-sizing: border-box;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-canvas);
+  color: var(--ds-accent);
+}
+
+.ds-doc-handoff:hover .ds-doc-handoff__plate,
+.ds-doc-handoff:focus-visible .ds-doc-handoff__plate {
+  border-color: var(--ds-accent-graphic);
+}
+
+.ds-doc-handoff__copy {
+  min-width: 0;
+  padding-top: var(--ds-space-1);
+}
+
+.ds-doc-handoff__copy strong {
+  display: block;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 600;
+  letter-spacing: var(--ds-tracking-title);
+  color: var(--ds-ink);
+}
+
+.ds-doc-handoff__copy small {
+  display: block;
+  margin-top: var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-doc-toc__link {
+    transition: none;
+  }
+}
+
+.ds-mapmoment__caption {
+  max-width: 40em;
+  margin-top: var(--ds-space-3);
+  padding-left: var(--ds-space-3);
+  border-left: 2px solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-micro);
+  line-height: 1.5;
+  color: var(--doc-ink-4);
+}
+
+@media (max-width: 39.9375rem) {
+  .ds-doc-prose {
+    overflow-wrap: break-word;
+    min-width: 0;
+  }
+}
+
+/*
+ * A field error is not a hint. Before Field owned errors, every caller rendered one with
+ * `ds-doc-field__hint`, so a rejection looked exactly like help text.
+ */
+.ds-doc-field__error {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-error-fg);
+  font-size: var(--ds-text-caption);
+  line-height: var(--ds-leading-body);
+}
+
+.ds-doc-field[data-invalid='true'] input,
+.ds-doc-field[data-invalid='true'] select,
+.ds-doc-field[data-invalid='true'] textarea {
+  border-color: var(--ds-error-border);
+}
+
+/*
+ * This lives with the kit, not with a route. It was briefly in corrections.css, which
+ * /corrections/status never loads — the same trap ReceiptLookupForm already documents — so
+ * the lookup form would have rendered an unstyled error.
+ */
+
+/* —— the register toolbar: /records, /law, /books ————————————————————————————————
+   One toolbar row of FilterButtons whose menus are native popovers of GET links (RecordsToolbar),
+   the active-filter chip row, the designed outcome block and the waiting placeholder. Moved here
+   from records-index.css so every index that renders them loads them. */
+/* —— toolbar ———————————————————————————————————————————————————————————————— */
+/* The bar's ground and its rule run the full width of the window, whatever the column's width:
+   two outward shadows (ground, then the rule one pixel lower), clipped to the bar's own height. */
+.ds-records-toolbar {
+  position: sticky;
+  top: var(--ds-island-clearance);
+  z-index: var(--ds-z-content, 1);
+  background: var(--ds-canvas);
+  box-shadow:
+    0 0 0 100vmax var(--ds-canvas),
+    0 var(--ds-border-width) 0 100vmax var(--ds-rule);
+  clip-path: inset(0 -100vmax calc(var(--ds-border-width) * -1));
+}
+
+.ds-records-toolbar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: var(--records-bar-h, 68px);
+}
+
+.ds-records-toolbar__facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-records-toolbar__end {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin-left: auto;
+}
+
+.ds-records-toolbar__glyph {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-records-toolbar__sheet-button {
+  display: none;
+}
+
+/* The glyph and label sit on one line inside the kit button's label span. */
+.ds-records-toolbar__sort > span:first-child,
+.ds-records-toolbar__sheet-button > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+/* Each menu drops from its own button. Anchor names pair a button with its menu by key. */
+.ds-records-toolbar__facet[data-key='kind'] {
+  anchor-name: --records-kind;
+}
+.ds-records-toolbar__facet[data-key='era'] {
+  anchor-name: --records-era;
+}
+.ds-records-toolbar__facet[data-key='state'] {
+  anchor-name: --records-state;
+}
+.ds-records-toolbar__facet[data-key='topic'] {
+  anchor-name: --records-topic;
+}
+.ds-records-toolbar__facet[data-key='status'] {
+  anchor-name: --records-status;
+}
+.ds-records-toolbar__facet[data-key='evidence'] {
+  anchor-name: --records-evidence;
+}
+.ds-records-toolbar__facet[data-key='sort'] {
+  anchor-name: --records-sort;
+}
+.ds-records-menu[data-key='kind'] {
+  position-anchor: --records-kind;
+}
+.ds-records-menu[data-key='era'] {
+  position-anchor: --records-era;
+}
+.ds-records-menu[data-key='state'] {
+  position-anchor: --records-state;
+}
+.ds-records-menu[data-key='topic'] {
+  position-anchor: --records-topic;
+}
+.ds-records-menu[data-key='status'] {
+  position-anchor: --records-status;
+}
+.ds-records-menu[data-key='evidence'] {
+  position-anchor: --records-evidence;
+}
+.ds-records-menu[data-key='sort'] {
+  position-anchor: --records-sort;
+}
+
+/* —— menus: native popovers of GET links ——————————————————————————————————————— */
+.ds-records-menu,
+.ds-records-sheet {
+  box-sizing: border-box;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
+    var(--ds-shadow-float);
+  color: var(--ds-ink);
+}
+
+.ds-records-menu {
+  width: min(20rem, 100vw - var(--ds-space-8));
+  max-height: min(26rem, 100dvh - var(--ds-space-12));
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.ds-records-menu:popover-open {
+  display: flex;
+}
+
+.ds-records-menu::backdrop,
+.ds-records-sheet::backdrop {
+  background: none;
+}
+
+@supports (position-area: bottom) {
+  .ds-records-menu {
+    position-area: bottom span-right;
+    position-try-fallbacks:
+      bottom span-left,
+      top span-right;
+    margin: var(--ds-space-2) 0 0;
+    max-height: min(26rem, 100dvh - var(--ds-island-clearance) - 140px);
+  }
+
+  /* Sort sits at the right edge, so its menu opens leftward and stays inside the column. */
+  .ds-records-menu[data-key='sort'] {
+    position-area: bottom span-left;
+  }
+}
+
+.ds-records-menu__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* On wide screens the button names the menu, so its title is for assistive tech only and the
+   head shows only when there is a Clear. The phone sheet restores both. */
+.ds-records-menu:not(:has(.ds-records-menu__clear)) .ds-records-menu__head {
+  display: none;
+}
+
+.ds-records-menu .ds-records-menu__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ds-records-menu__clear {
+  margin-left: auto;
+}
+
+.ds-records-menu__title {
+  margin: 0 auto 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.ds-records-menu__clear {
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-caption);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-border-control);
+  text-underline-offset: 0.25em;
+}
+
+.ds-records-menu__clear:hover {
+  color: var(--ds-ink);
+  text-decoration-color: currentColor;
+}
+
+/* The menu closes on Escape and outside click; Close is for touch, where neither is obvious. */
+.ds-records-menu__close {
+  display: none;
+}
+
+.ds-records-menu__list {
+  margin: 0;
+  padding: var(--ds-space-1) 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+}
+
+.ds-records-menu__option {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-4);
+  color: var(--ds-ink);
+  font-size: var(--ds-text-body-sm);
+  text-decoration: none;
+}
+
+.ds-records-menu__option:hover {
+  background: var(--ds-surface-sunken);
+}
+
+.ds-records-menu__option:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: calc(var(--ds-focus-width) * -1);
+}
+
+.ds-records-menu__option[aria-current='true'] {
+  font-weight: 600;
+}
+
+.ds-records-menu__check {
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink);
+}
+
+.ds-records-menu__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-records-menu__count {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-records-menu__empty {
+  margin: 0;
+  padding: var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+}
+
+/* —— the phone and tablet sheet ———————————————————————————————————————————————— */
+.ds-records-sheet__list {
+  margin: 0;
+  padding: 0 0 var(--ds-space-2);
+  list-style: none;
+}
+
+.ds-records-sheet__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 1rem;
+  align-items: center;
+  gap: var(--ds-space-3);
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0 var(--ds-space-4);
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  font-size: var(--ds-text-body-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-records-sheet__list li:last-child .ds-records-sheet__row {
+  border-bottom: 0;
+}
+
+.ds-records-sheet__name {
+  font-weight: 600;
+}
+
+.ds-records-sheet__value {
+  overflow: hidden;
+  color: var(--ds-ink-muted);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-records-sheet__chevron {
+  width: 1rem;
+  height: 1rem;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-records-sheet__foot {
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-records-sheet__show {
+  width: 100%;
+}
+
+/* Below 64rem the six buttons and Sort fold into one Filters button and its bottom sheet; each
+   menu then opens as its own sheet over it. */
+@media (max-width: 63.9375rem) {
+  .ds-records-toolbar__facets,
+  .ds-records-toolbar__sort {
+    display: none;
+  }
+
+  .ds-records-toolbar__sheet-button {
+    display: inline-flex;
+  }
+
+  .ds-records-menu,
+  .ds-records-sheet {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    max-width: 40rem;
+    max-height: 85dvh;
+    margin: 0 auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-width: var(--ds-border-width) 0 0;
+    border-radius: var(--ds-radius-sm) var(--ds-radius-sm) 0 0;
+    position-area: none;
+  }
+
+  .ds-records-sheet:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ds-records-sheet__list {
+    overflow-y: auto;
+  }
+
+  .ds-records-menu::backdrop,
+  .ds-records-sheet::backdrop {
+    background: var(--ds-overlay);
+  }
+
+  .ds-records-menu__close {
+    display: inline-flex;
+    width: 2.75rem;
+    margin-right: calc(var(--ds-space-3) * -1);
+    padding: 0;
+  }
+
+  .ds-records-menu__close .ds-records-toolbar__glyph {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* A sheet opens on its title, set as the page's section headings are. */
+  .ds-records-menu__head {
+    padding: var(--ds-space-6) var(--ds-space-4) var(--ds-space-4);
+  }
+
+  .ds-records-menu__title {
+    font-family: var(--ds-font-display);
+    font-size: var(--ds-text-title);
+    font-weight: 650;
+    line-height: 1.5rem;
+    letter-spacing: var(--ds-tracking-title);
+  }
+
+  .ds-records-menu:not(:has(.ds-records-menu__clear)) .ds-records-menu__head {
+    display: flex;
+  }
+
+  .ds-records-menu .ds-records-menu__title {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 63.9375rem) {
+  .ds-records-menu,
+  .ds-records-sheet {
+    transition:
+      transform var(--ds-duration-base) cubic-bezier(0.16, 1, 0.3, 1),
+      overlay var(--ds-duration-base) allow-discrete,
+      display var(--ds-duration-base) allow-discrete;
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .ds-records-menu:popover-open,
+    .ds-records-sheet:popover-open {
+      transform: translateY(100%);
+    }
+  }
+}
+
+/* —— active filters ————————————————————————————————————————————————————————— */
+.ds-records-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  /* One height whatever the row holds, so the list never shifts between states. */
+  box-sizing: border-box;
+  min-height: 3.5rem;
+  padding-block: var(--ds-space-1);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Text actions in the row sit on the gutter, not inset by a button's padding. */
+.ds-records-active > a {
+  padding-inline: 0;
+}
+
+.ds-records-active__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A long echo (a story title) truncates inside its chip rather than widening the row. */
+.ds-records-active__chips > li {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* —— outcomes: empty, no match, unreadable ————————————————————————————————————— */
+/* An outcome (nothing matched, nothing to show) stands on the page under a section rule: a
+   headline, what was asked for, and the ways out. */
+.ds-records-outcome {
+  display: grid;
+  justify-items: start;
+  gap: var(--ds-space-3);
+  max-width: var(--ds-width-read);
+  margin-block: var(--ds-space-8);
+  padding-top: var(--ds-space-5);
+  border-top: 2px solid var(--ds-ink);
+}
+
+.ds-records-outcome__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-headline);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: var(--ds-tracking-title);
+  text-wrap: balance;
+}
+
+.ds-records-outcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+}
+
+.ds-records-outcome__body {
+  margin: 0 0 var(--ds-space-3);
+  color: inherit;
+  font-size: var(--ds-text-body);
+  line-height: var(--ds-leading-body);
+  overflow-wrap: anywhere;
+}
+
+@keyframes ds-records-wait {
+  to {
+    opacity: 0.45;
+  }
+}

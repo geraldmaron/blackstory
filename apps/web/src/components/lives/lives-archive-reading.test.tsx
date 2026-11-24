@@ -7,7 +7,7 @@ import type { LivesAreaBundle } from '@repo/domain/statistics/lives';
 import { LIVES_MILESTONES } from '../../lib/lives/lives-milestones';
 import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
 import { LivesMilestoneExperience } from './LivesMilestoneExperience';
-import { ArchiveFigure } from '../room/Evidence';
+import { ArchiveFigure } from '../page/ArchiveFigure';
 
 test('every life question has inspected visual evidence, a reading, limits and real destinations', () => {
   for (const milestone of LIVES_MILESTONES) {
@@ -61,7 +61,7 @@ test('a remembered childhood is distinguished from the photograph and later empl
 });
 
 test('focus rules use the color token with an explicit width and style', () => {
-  for (const path of ['../../app/lives/lives.css', '../room/room-kit.css']) {
+  for (const path of ['../../app/lives/lives.css', '../page/page-kit.css']) {
     const css = readFileSync(new URL(path, import.meta.url), 'utf8');
     assert.doesNotMatch(css, /outline:\s*var\(--ds-focus-ring\);/);
     assert.match(css, /outline: var\(--ds-focus-width\) solid var\(--ds-focus-ring\)/);

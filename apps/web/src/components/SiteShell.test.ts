@@ -11,10 +11,11 @@ import { surfaceClassFor } from '../lib/nav/surface-classes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('`/` and `/explore` share the door class; browse is a posture, not instrument chrome', () => {
+test('the front page is the door class; the Archive is a reading page in every view', () => {
   assert.equal(surfaceClassFor('/'), 'door');
   assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
-  assert.equal(surfaceClassFor('/explore'), 'door');
+  assert.equal(surfaceClassFor('/archive'), 'reading');
+  assert.equal(surfaceClassFor('/explore'), 'reading');
   assert.equal(surfaceClassFor('/explore/api'), null);
   assert.equal(surfaceClassFor('/locate'), 'utility');
   assert.equal(surfaceClassFor('/stories'), 'reading');

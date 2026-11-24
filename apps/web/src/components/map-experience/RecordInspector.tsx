@@ -83,18 +83,16 @@ export function RecordInspector({ record, position, onStep, className }: RecordI
 
   return (
     <article className={cx('ds-inspector', className)} aria-labelledby="ds-inspector-name">
+      {/* The photograph as it is: in color, at the column's width, its credit under it. The
+          archive does not store when it was taken, so the panel says so (v12). */}
       {record.photoUrl ? (
-        <figure className="ds-plate ds-inspector__photo">
-          <span className="ds-plate__tone">
-            {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
-            <img
-              className="ds-plate__img"
-              src={record.photoUrl}
-              alt={record.photoAlt ?? ''}
-              decoding="async"
-            />
-          </span>
-          {record.photoCredit ? <p className="ds-plate__credit">{record.photoCredit}</p> : null}
+        <figure className="ds-inspector__photo">
+          {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
+          <img src={record.photoUrl} alt={record.photoAlt ?? ''} decoding="async" />
+          <figcaption>
+            {record.photoCredit ? <span>{record.photoCredit}</span> : null}
+            <span>The photograph’s date is not on record.</span>
+          </figcaption>
         </figure>
       ) : null}
 
@@ -105,11 +103,13 @@ export function RecordInspector({ record, position, onStep, className }: RecordI
             {kind}
             {place ? ` · ${place}` : ''}
           </span>
-          {record.decade ? <span className="ds-inspector__decade">{record.decade}</span> : null}
         </p>
         <h2 className="ds-inspector__name" id="ds-inspector-name" tabIndex={-1} ref={headingRef}>
           {record.name}
         </h2>
+        {record.decade ? (
+          <p className="ds-inspector__when">First documented in the {record.decade}</p>
+        ) : null}
         {record.story ? <p className="ds-inspector__summary">{record.story}</p> : null}
 
         <dl className="ds-inspector__facts">

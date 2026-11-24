@@ -3,9 +3,12 @@
  *
  * MapLibre 5.24 can throw "Out of bounds. Index requested n=0 ..." from a GeoJSON tile whose
  * feature index outlives its tile data while a `setData` is in flight (the tile's layer table
- * decodes empty). The next frame queries a settled tile, so an empty answer for this one frame is
- * correct; any other error is a real bug and still throws.
+ * decodes empty). The same race in a vector tile throws "feature index out of bounds" instead.
+ * The next frame queries a settled tile, so an empty answer for this one frame is correct; any
+ * other error is a real bug and still throws.
  */
+const TILE_RACE = /^(Out of bounds\. Index requested|feature index out of bounds)/;
+
 type QueryableMap = {
   getLayer(id: string): unknown;
   queryRenderedFeatures(...args: never[]): unknown[];
@@ -24,9 +27,7 @@ export function queryRenderedLayers<F>(
       ? query.call(map, { layers })
       : query.call(map, geometry, { layers });
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith('Out of bounds. Index requested')) {
-      return [];
-    }
+    if (error instanceof Error && TILE_RACE.test(error.message)) return [];
     throw error;
   }
 }

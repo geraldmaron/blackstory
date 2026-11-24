@@ -17,16 +17,18 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { EntityRecordPage } from '../../entity/[id]/EntityRecordPage';
 import { familyForKind } from '../../record-family';
+import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
+import {
+  buildRecordJsonLd,
+  recordCanonicalPath,
+  serializeJsonLd,
+} from '../../../lib/seo/record-json-ld';
 import {
   discoveryFromSearchParams,
   recordArrivalQuery,
   withQuery,
 } from '../../../lib/discovery/discovery-state';
-import {
-  isResolvablePlaceSlug,
-  resolvePlaceSlugFromSearchIndex,
-} from '../../../lib/place/place-slug';
-import { getPublicSearchIndex, resolvePublicEntityView } from '../../../lib/public-data/source';
+import { loadInventionRecord } from '../invention-record';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,33 +37,53 @@ type InventionPageProps = {
   readonly searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-/** Resolve a public invention slug to its release entity, or nothing. */
-async function resolveInventionSlug(slug: string) {
-  if (!isResolvablePlaceSlug(slug)) return undefined;
-  const index = await getPublicSearchIndex();
-  const id = resolvePlaceSlugFromSearchIndex(index.data, slug);
-  if (id === undefined) return undefined;
-  return (await resolvePublicEntityView(id)).data ?? undefined;
-}
-
 export async function generateMetadata({ params }: InventionPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const entity = await resolveInventionSlug(slug);
+  const entity = await loadInventionRecord(slug);
   if (!entity) {
     return { title: 'Invention not found' };
   }
-  return { title: entity.displayName, description: entity.summary };
+  // The canonical is the record's own family address with no arrival query. A record page is
+  // reachable under many arrival variants (map and list returns, prev/next), and without a
+  // canonical each one reads to a crawler as a separate thin page.
+  return {
+    title: entity.displayName,
+    description: entity.summary,
+    alternates: {
+      canonical: absolutePublicUrl(recordCanonicalPath(familyForKind(entity.kind), slug)),
+    },
+  };
 }
 
 export default async function InventionPage({ params, searchParams }: InventionPageProps) {
   const { slug } = await params;
   const rawArrival = (await searchParams) ?? {};
-  const entity = await resolveInventionSlug(slug);
+  const entity = await loadInventionRecord(slug);
   if (!entity) {
     notFound();
   }
   if (familyForKind(entity.kind) !== 'invention') {
     permanentRedirect(withQuery(`/place/${slug}`, recordArrivalQuery(rawArrival)));
   }
-  return EntityRecordPage({ entity, arrival: discoveryFromSearchParams(rawArrival) });
+  const jsonLd = buildRecordJsonLd({
+    family: 'invention',
+    slug,
+    displayName: entity.displayName,
+    summary: entity.summary,
+    jurisdictionLabel: entity.jurisdictionLabel,
+  });
+  // No nonce: a JSON-LD block is data, never executed, so script-src does not govern it.
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+      {await EntityRecordPage({
+        entity,
+        arrival: discoveryFromSearchParams(rawArrival),
+        canonicalPath: recordCanonicalPath('invention', slug),
+      })}
+    </>
+  );
 }

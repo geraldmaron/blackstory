@@ -46,7 +46,7 @@ export function ProportionBar({ rows, accessibilityLabel }: ProportionBarProps) 
               <Text variant="caption" colorRole="ink" style={styles.label} numberOfLines={1}>
                 {row.label}
               </Text>
-              <Text variant="code" style={styles.value}>
+              <Text variant="meta" style={styles.value}>
                 {formatDataValue(row.value, row.unit)}
               </Text>
             </View>
@@ -96,12 +96,10 @@ const styles = StyleSheet.create({
   },
   track: {
     height: 8,
-    borderRadius: 2,
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    borderRadius: 2,
   },
 });

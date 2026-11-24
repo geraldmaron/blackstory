@@ -40,6 +40,9 @@ export const EXPLORE_HOVER_POINT_LAYER_ID = 'explore-point-hover';
 /** Records the lens matches but the brushed decades exclude: a sand ghost, never hittable. */
 export const EXPLORE_GHOSTS_SOURCE_ID = 'explore-ghosts';
 export const EXPLORE_GHOST_POINT_LAYER_ID = 'explore-ghost-point';
+/** v11 Orbit: every drawn record as one soft light, below the national frame only. */
+export const EXPLORE_LIGHTS_SOURCE_ID = 'explore-lights';
+export const EXPLORE_LIGHTS_LAYER_ID = 'explore-lights';
 /** The lower-48 one paper step off its neighbors, so the country reads on the chart. */
 export const EXPLORE_US_LAND_LAYER_ID = 'plate-us-land';
 /** Area precision shown as an area: a flat copper tint over states holding state-precision records. */

@@ -37,9 +37,9 @@ export type SectionHeadingProps = {
 };
 
 const VARIANT_BY_LEVEL: Record<SectionHeadingLevel, TextRole> = {
-  1: 'title',
-  2: 'subtitle',
-  3: 'rowTitle',
+  1: 'display',
+  2: 'title',
+  3: 'bodyEmphasis',
 };
 
 export function SectionHeading({ level, fieldLabel = false, children }: SectionHeadingProps) {

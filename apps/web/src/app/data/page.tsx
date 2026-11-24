@@ -1,9 +1,10 @@
 /**
- * `/data`: the reference ledger. Census counts, a door into Lives, and published indicator
- * series, with a sticky contents list on desktop. Every figure names the series behind it.
+ * `/data`: census counts, a link into Lives, and published indicator series, with a sticky
+ * contents list on desktop. Every figure names the series behind it and has its own page at
+ * `/data/[figure]`.
  *
- * Primary arrivals (Rooms, footer, bare `/data`) must paint at the top. Deep links into the
- * Lived act use `/data#lives`. Legacy `?s=lives` hops once to the immersive `/lives` room.
+ * A bare `/data` paints at the top. `/data#lives` is the Lives section. Legacy `?s=lives` hops once
+ * to `/lives`.
  */
 import type { Metadata } from 'next';
 import React from 'react';
@@ -11,7 +12,7 @@ import { permanentRedirect } from 'next/navigation';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { TrustMast } from '../../components/trust';
 import {
   buildLivesHref,
@@ -20,9 +21,10 @@ import {
   type RawLivesSearchParams,
 } from '../../lib/lives/lives-url-state';
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
-import { DataSections, millionsFigure } from './DataSections';
+import { DataSections } from './DataSections';
 import { loadDataPageModel } from './load-data-page-model';
-import '../reading-room.css';
+import { parseFigureViews } from '../../components/data/figures/registry';
+import '../reading-page.css';
 import './data-page.css';
 
 void React;
@@ -49,25 +51,22 @@ export default async function DataPage({
     permanentRedirect(buildLivesHref(parseLivesAreaSlug(raw), parseLivesSearchParams(raw)));
   }
 
-  const dataModel = await loadDataPageModel();
-
-  const latest = dataModel.sections.timelineRows.at(-1);
+  const model = await loadDataPageModel();
+  const latest = model.latestCensus;
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
-          art={['decades', 'grain']}
-          tone="copper"
           numeral={
             latest === undefined
               ? undefined
               : {
-                  // The figure the population chart's finding states ("41.3 million in 2020"), with
-                  // the census category the chart's table scopes it to.
-                  value: `${millionsFigure(latest.blackPopulation)}M`,
+                  // The count figure D-03's finding states ("41.3 million in 2020"), with the
+                  // census category its table scopes it to. `TrustMast` sets it as a sentence.
+                  value: `${(latest.blackPopulation / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })}M`,
                   label: `${latest.raceCategoryLabel}, counted in ${latest.decade}`,
                 }
           }
@@ -82,7 +81,12 @@ export default async function DataPage({
         </TrustMast>
       }
     >
-      <DataSections {...dataModel.sections} />
-    </Room>
+      <DataSections
+        figures={model.figures}
+        populationAsOf={model.populationAsOf}
+        indicatorsAsOf={model.indicatorsAsOf}
+        views={parseFigureViews(raw.view)}
+      />
+    </PageFrame>
   );
 }

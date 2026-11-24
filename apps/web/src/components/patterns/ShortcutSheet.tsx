@@ -5,7 +5,7 @@
  * shortcut list of its own, which is the point: a sheet that is hand-maintained is a sheet that
  * lies about the keyboard within a release or two.
  *
- * Design law: docs/ui/design-direction-v9-atlas.md §7.
+ * Design law: docs/ui/archive/design-direction-v9-atlas.md §7.
  */
 'use client';
 

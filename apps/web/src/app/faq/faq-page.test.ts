@@ -48,8 +48,8 @@ test('section ids are unique, because the contents list links to them', () => {
 
 test('sections render as plain headings with a contents list', () => {
   assert.doesNotMatch(pageSource, /kicker|icon=/);
-  assert.match(pageSource, /RoomJump/);
-  assert.match(pageSource, /RoomSection/);
+  assert.match(pageSource, /ContentsList/);
+  assert.match(pageSource, /PageSection/);
 });
 
 test('every answer is a native disclosure with its own address', () => {

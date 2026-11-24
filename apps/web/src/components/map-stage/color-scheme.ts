@@ -1,6 +1,7 @@
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 
 export function readDocumentColorScheme(): MapColorScheme {
-  if (typeof document === 'undefined') return 'dark';
-  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  // v11: the world is always night (design-direction-v11.md §1). The reader's light or dark
+  // choice governs the reading sheets, never the plate.
+  return 'dark';
 }

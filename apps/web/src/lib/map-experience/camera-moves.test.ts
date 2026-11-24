@@ -347,13 +347,36 @@ test('frameRecord eases once to the precision zoom, padded for the post-selectio
 
   assert.equal(h.calls.length, 1);
   const move = h.calls[0];
-  assert.equal(move?.method, 'easeTo', 'one ease, never a flight');
+  assert.equal(move?.method, 'easeTo', 'a record beside the screen is one ease, not a flight');
   assert.equal(move?.options.zoom, 10, 'city precision frames at 10');
-  assert.equal(move?.options.duration, 900);
+  // Six zoom levels down takes about 1.8s, not the 0.9s meant for a pan at the same zoom.
+  const duration = Number(move?.options.duration);
+  assert.ok(duration > 1700 && duration < 2000, `lasts as long as the zoom it covers: ${duration}`);
   assert.equal(move?.options.pitch, undefined, 'pitch is preserved');
   assert.equal(move?.options.bearing, undefined, 'bearing is preserved');
   assert.deepEqual(move?.options.padding, padding, 'padding is the chrome after selection');
   assert.equal(h.announcements[0], 'Record · Birmingham, Alabama');
+});
+
+test('frameRecord flies to a record a screen or more away, out by distance and back down', () => {
+  // From a street in the east to a site on the west coast: far more than a screen at zoom 11.
+  const h = harness({ zoom: 11 });
+  h.camera.frameRecord({ center: [-122.42, 37.76], precision: 'site', place: 'San Francisco' });
+  assert.equal(h.calls.length, 1);
+  const move = h.calls[0];
+  assert.equal(move?.method, 'flyTo', 'a far record is a flight, not a 0.9s ease across a country');
+  assert.equal(move?.options.zoom, 14);
+  // Out until both coasts fit the map (about zoom 4.7 on a 1000px map), never past the country.
+  const peak = Number(move?.options.minZoom);
+  assert.ok(peak >= 3.3 && peak < 5.5, `pulls out to the country, got ${peak}`);
+  const duration = Number(move?.options.duration);
+  assert.ok(duration > 2500 && duration <= 3200, `as long as the ground takes: ${duration}`);
+  assert.equal(move?.options.pitch, undefined, 'pitch is preserved');
+  // Reduced motion is still a cut, however far.
+  const still = harness({ zoom: 11, reducedMotion: true });
+  still.camera.frameRecord({ center: [-122.42, 37.76], precision: 'site', place: 'San Francisco' });
+  assert.equal(still.calls[0]?.method, 'easeTo');
+  assert.equal(still.calls[0]?.options.duration, 0);
 });
 
 test('frameRecord does not move when the mark is already visible at or above target zoom', () => {

@@ -82,7 +82,6 @@
 .lives-turn__records a,
 .lives-rule__link,
 .lives-milestone__footer a,
-.lives-cell__why,
 a.lives-anchors__chip .lives-anchors__name,
 .lives-archive .ds-archive-figure__source {
   color: var(--ds-ink);
@@ -102,7 +101,6 @@ a.lives-anchors__chip .lives-anchors__name,
 .lives-turn__records a:hover,
 .lives-rule__link:hover,
 .lives-milestone__footer a:hover,
-.lives-cell__why:hover,
 a.lives-anchors__chip:hover .lives-anchors__name,
 .lives-archive .ds-archive-figure__source:hover {
   text-decoration-color: currentColor;
@@ -599,7 +597,8 @@ details[open] > summary > .lives-caret {
   font-size: var(--ds-text-micro);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
-  color: var(--ds-numeral-accent);
+  /* The text accent, not the numeral one: at this size the graphic copper fails on paper. */
+  color: var(--ds-accent);
 }
 
 .lives-scrub__era[aria-selected='true'] .lives-scrub__label {
@@ -763,7 +762,7 @@ details[open] > summary > .lives-caret {
 .lives-era__years {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: 600;
   font-variant-numeric: lining-nums;
   line-height: var(--ds-leading-numeral);
@@ -774,7 +773,7 @@ details[open] > summary > .lives-caret {
 
 .lives-era__header .lives-era__years--heading {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   line-height: var(--ds-leading-numeral);
   letter-spacing: var(--ds-tracking-numeral);
   color: var(--ds-numeral-accent);
@@ -1382,7 +1381,7 @@ details[open] > summary > .lives-caret {
 .lives-panel__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
   font-weight: 600;
   font-variant-numeric: lining-nums;
   line-height: var(--ds-leading-numeral);
@@ -1713,87 +1712,4 @@ details[open] > summary > .lives-caret {
   padding: 0;
   list-style: none;
   font-size: var(--ds-text-caption);
-}
-
-/* —— numbers tables behind a figure's Numbers toggle —————————————————————————— */
-.lives-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-}
-
-.lives-table caption {
-  padding-bottom: var(--ds-space-2);
-  font-size: var(--ds-text-caption);
-  text-align: left;
-  color: var(--ds-ink-muted);
-}
-
-.lives-table th,
-.lives-table td {
-  padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-2) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  text-align: left;
-  vertical-align: top;
-}
-
-.lives-table thead th {
-  font-weight: 500;
-  color: var(--ds-ink-muted);
-}
-
-.lives-table [data-emphasis='true'] {
-  font-weight: 600;
-}
-
-.lives-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.lives-cell__value {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  color: var(--ds-ink);
-}
-
-.lives-cell__detail,
-.lives-cell__definition {
-  font-size: var(--ds-text-micro);
-  font-weight: 400;
-  color: var(--ds-ink-muted);
-}
-
-.lives-cell__definition {
-  display: block;
-}
-
-.lives-cell--muted .lives-cell__value {
-  font-family: var(--ds-font-sans);
-  color: var(--ds-ink-muted);
-}
-
-.lives-cell--wide .lives-cell__value::after {
-  content: ' ~';
-  color: var(--ds-ink-muted);
-}
-
-.lives-cell__why {
-  font-size: var(--ds-text-micro);
-}
-
-/* The tools still life rests above the sheet that overlaps the mast's foot. */
-.ds-trust-mast .ds-band-art__layer--tools {
-  bottom: calc(var(--trust-overlap) + var(--ds-space-3));
-}
-
-/* Wide: the tools still life stands between the title column and the decade numeral, clear of
-   both. Narrow screens keep the shared corner placement, beside the numeral's caption. */
-@media (min-width: 80rem) {
-  .ds-trust-mast .ds-band-art__layer--tools {
-    right: 19%;
-    width: 34%;
-  }
 }

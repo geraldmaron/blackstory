@@ -11,7 +11,7 @@
  */
 import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Button, buttonClassName } from '@repo/ui';
-import { Field, fieldControlProps } from '../../components/room';
+import { Field, fieldControlProps } from '../../components/forms/fields';
 import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
 import { useFieldErrors } from '../../components/forms/use-field-errors';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
@@ -104,7 +104,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
             ? { status: 'idle' }
             : {
                 status: 'failed',
-                title: 'The lead was not accepted.',
+                title: 'The lead wasn’t accepted.',
                 detail: elsewhere.map((issue) => issue.message).join(' '),
               },
         );
@@ -114,7 +114,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
     } catch {
       setState({
         status: 'failed',
-        title: 'The lead was not sent.',
+        title: 'The lead wasn’t sent.',
         detail: `Nothing you typed has been lost. Try again in a moment, or email it to ${contact}.`,
       });
     }
@@ -130,7 +130,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
       <div className="ds-form-done" ref={doneRef} tabIndex={-1}>
         <h2 className="ds-form-done__title">Lead received.</h2>
         <p className="ds-form-done__body">
-          It is in the review queue, not on the site. If it is worth pursuing it becomes a private
+          It’s in the review queue, not on the site. If it’s worth pursuing it becomes a private
           research candidate, and nothing about it is published until it clears the same checks as
           every record.
         </p>
@@ -144,7 +144,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
           <Button variant="secondary" onClick={another}>
             Send another lead
           </Button>
-          <a className={buttonClassName('quiet')} href="/records">
+          <a className={buttonClassName('quiet')} href="/archive">
             Browse the records
           </a>
         </div>

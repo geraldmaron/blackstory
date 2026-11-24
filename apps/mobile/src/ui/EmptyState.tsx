@@ -39,7 +39,7 @@ export function EmptyState({ title, description, action, compact = false }: Empt
           style={[styles.glyph, { backgroundColor: theme.accentMuted }]}
         />
       )}
-      <Text variant="subtitle" style={styles.title}>
+      <Text variant="title" style={styles.title}>
         {title}
       </Text>
       {description ? (

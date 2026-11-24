@@ -30,36 +30,34 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
   claims: {
     title: 'No accepted claims yet',
     body:
-      'No claims have cleared the evidence bar for this record yet. This reflects the current ' +
-      'state of research, not an absence of history. Coverage deepens as research continues.',
+      'Nothing on this record has cleared the evidence bar yet. That’s where the research ' +
+      'stands, and it doesn’t mean there’s no history here.',
   },
   related: {
     title: 'No linked records yet',
-    body:
-      'No related people, places, institutions, or events have been linked through the published ' +
-      'history graph yet for this record.',
+    body: 'This record isn’t linked to other people, places, institutions or events yet.',
   },
   timeline: {
     title: 'No dated history yet',
     body:
-      'No dated timeline entries are available yet for this record’s published history graph ' +
-      'and status history.',
+      'No dated entries have been published for this record yet. ' +
+      'The research hasn’t gotten that far.',
   },
   statusHistory: {
     title: 'No status history recorded',
-    body: 'No time-scoped status designation has been entered for this record yet.',
+    body: 'No status with dates has been entered for this record yet.',
   },
   context: {
-    title: 'Historical context forthcoming',
+    title: 'Background still to come',
     body:
-      'Framing prose for this record has not been published yet. Accepted claims below remain ' +
-      'the sourced factual layer when available.',
+      'The background for this record hasn’t been written yet. ' +
+      'Any accepted claims below are still sourced.',
   },
   relevance: {
-    title: 'Relevance basis pending',
+    title: 'Why it’s here, still to come',
     body:
-      'A substantiated notability basis has not been published for this record yet, so the ' +
-      '"why this appears" explanation is withheld rather than asserted. The documented claims ' +
+      'The sourced reason this record belongs here hasn’t been published yet, so the ' +
+      '"why this appears" note is left off until it can be backed up. The documented claims ' +
       'and connections below still carry the record.',
   },
 };
@@ -82,16 +80,16 @@ export const SECTION_HEADINGS = {
 } as const;
 
 export const EVENT_WINDOW_NOTE =
-  'Events carry no active/historic status of their own. A when-span is authoritative instead.';
+  'An event doesn’t have an active or historic status. It has the dates it happened.';
 
 /** Shared 404 copy — deliberately identical whether the id never existed or was withdrawn
  * (threat-model T3: the server's `/v1/entity/:id` returns one indistinguishable NOT_FOUND for
  * both cases, so the client must not imply it knows which). Dignified, not alarming. */
 export const NOT_PUBLIC_COPY = {
-  title: 'This record is not currently public',
+  title: 'This record isn’t public right now',
   body:
-    'This entry is not part of the current published edition. It may have been withdrawn, ' +
-    'is under review, or the link may be out of date. Other BlackStory records are unaffected.',
+    'This entry isn’t in the current published edition. It may have been withdrawn, it may be ' +
+    'under review, or the link may be out of date. Other BlackStory records aren’t affected.',
   action: 'Back to Explore',
 };
 
@@ -115,7 +113,7 @@ export const OFFLINE_CITATION_COPY = {
 
 export const UNSAFE_LINK_COPY = {
   title: 'This link can’t be opened',
-  description: 'The source link for this citation is not a valid web address.',
+  description: 'The source link for this citation isn’t a valid web address.',
 };
 
 export function cachedBannerTitle(): string {

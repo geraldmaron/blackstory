@@ -24,7 +24,7 @@ export type DecadeJumpProps = {
 export function DecadeJump({ jumps, preserved }: DecadeJumpProps) {
   const router = useRouter();
   return (
-    <form className="ds-records-jump" action="/records" method="get">
+    <form className="ds-records-jump" action="/archive" method="get">
       {preserved.map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}

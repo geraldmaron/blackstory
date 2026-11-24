@@ -27,7 +27,7 @@ export function EditionFactCell({
     <View style={styles.cell} accessibilityRole="text">
       <View style={styles.labelRow}>
         {leading ? <View style={styles.leading}>{leading}</View> : null}
-        <Text variant="code" colorRole="inkMuted" style={styles.label}>
+        <Text variant="meta" colorRole="inkMuted" style={styles.label}>
           {label.toUpperCase()}
         </Text>
       </View>

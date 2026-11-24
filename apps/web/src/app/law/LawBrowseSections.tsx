@@ -1,16 +1,16 @@
 /**
- * The `/law` index body: the register's toolbar, the active narrowing as removable chips, the
- * time axis drawn large on a sand band, then the chronology: each era a full-bleed color block
- * with its span as a display numeral beside a paper sheet of rows (the year, the law's name,
- * one line on what it did, its jurisdiction as a word).
+ * The `/law` index, Parked (design-direction-v11.md §4.1): no map, a document on the night
+ * ground. The time axis is a rail pinned at the left edge, the way the home globe carries its
+ * time rail; beside it the page's head, the register's toolbar and the active narrowing, then
+ * one reading sheet holding the chronology, an era at a time (the year, the law's name, one
+ * line on what it did, its jurisdiction as a word).
  *
  * Server-rendered and JavaScript-free: menus are the register's native popovers of GET links,
  * and rows are anchors.
  */
-import React from 'react';
-import { BandArt } from '../../components/atmosphere/BandArt';
+import React, { type CSSProperties } from 'react';
 import Link from 'next/link';
-import { Block, Chip, DisplayNumeral, Sheet, buttonClassName } from '@repo/ui';
+import { Chip, buttonClassName } from '@repo/ui';
 import { US_STATES } from '@repo/domain';
 import {
   humanizeLegalKind,
@@ -37,6 +37,8 @@ export type LawBrowseSectionsProps = {
   readonly view: LawBrowseViewModel;
   /** Full, unfiltered catalog: the source of each row's jurisdiction. */
   readonly catalog: readonly LegalSnapshotDocument[];
+  /** The page's head (crumb, title, dek), set above the toolbar. */
+  readonly head?: React.ReactNode;
 };
 
 /**
@@ -154,18 +156,35 @@ function eraSpan(era: LawEra, items: readonly LegalBrowseItem[]): readonly [numb
   return [era.from, Math.max(...years)];
 }
 
-/**
- * Era blocks alternate ink and copper down the page, counted from the last, which is always ink:
- * the copper footer follows it, and two copper blocks in a row would read as one.
- */
-const eraTone = (index: number, count: number) =>
-  (count - 1 - index) % 2 === 0 ? 'ink' : 'copper';
+/** Scroll timeline name for an era's section; its bar on the rail reads the same name. */
+const eraTimeline = (era: LawEra) => `--law-era-${era.id}`;
+
+/** A stretch of the catalog this long with no entry is named on the rail. */
+const RAIL_GAP_YEARS = 25;
 
 /**
- * The time axis: one mark per dated entry at its year, decade ticks under a hairline, and a band
- * under each era that holds entries. A picture of where the laws cluster, hidden from assistive
- * tech: the era headings and rows below carry the same information and are the links. The span
- * is the whole catalog's, so a law keeps its place on the axis whatever the filters.
+ * Stretches of at least {@link RAIL_GAP_YEARS} years in which the catalog holds no entry, as
+ * inclusive year pairs. Exported for the test.
+ */
+export function catalogGaps(years: readonly number[]): readonly (readonly [number, number])[] {
+  const sorted = [...new Set(years)].sort((a, b) => a - b);
+  return sorted.flatMap((year, index) => {
+    const next = sorted[index + 1];
+    return next !== undefined && next - year > RAIL_GAP_YEARS
+      ? [[year + 1, next - 1] as const]
+      : [];
+  });
+}
+
+/**
+ * The time rail: one mark per dated entry at its year, decade ticks on a hairline, a bar for
+ * each era that holds entries, and the long stretches the catalog has nothing in yet, named. A
+ * picture of where the laws cluster, hidden from assistive tech: the era headings and rows in the
+ * sheet carry the same information and are the links. The span and the gaps are the whole
+ * catalog's, so a law keeps its place and a filter never invents a silence.
+ *
+ * Each mark carries its position as `--at`; law.css runs the rail down the page from 64rem and
+ * across it below.
  */
 function TimeAxis({
   view,
@@ -183,88 +202,79 @@ function TimeAxis({
   if (dated.length === 0 || view.groups.length === 0 || years.length === 0) return null;
   const from = Math.floor((Math.min(...years) - 1) / 10) * 10;
   const to = Math.ceil((Math.max(...years) + 1) / 10) * 10;
-  const at = (year: number) => `${(((year - from) / (to - from)) * 100).toFixed(3)}%`;
+  const pct = (span: number) => `${((span / (to - from)) * 100).toFixed(3)}%`;
+  const at = (year: number) => pct(year - from);
   const ticks: number[] = [];
   for (let year = Math.ceil(from / 20) * 20; year <= to; year += 20) ticks.push(year);
   const stack = new Map<number, number>();
-  // Each era's bar takes the tone of its block below, with a 2px gap between neighbors.
-  const eras = view.groups.flatMap(({ era, items }, index) => {
+  const eras = view.groups.flatMap(({ era, items }) => {
     if (era.id === LAW_UNDATED.id) return [];
-    // An open-ended era's band stops at its last entry, not at the edge of the axis.
+    // An open-ended era's bar stops at its last entry, not at the edge of the axis.
     const last = Math.max(...items.map((item) => item.effectiveYear ?? from));
     const start = Math.max(era.from ?? from, from);
     const end = Math.min((era.to ?? last) + 1, to);
-    return [{ era, tone: eraTone(index, view.groups.length), start, end }];
+    return [{ era, start, end, count: items.length }];
   });
+  const place = (year: number, span?: number) =>
+    ({ '--at': at(year), ...(span === undefined ? {} : { '--span': pct(span) }) }) as CSSProperties;
 
   return (
-    <Block tone="sand" className="ds-law-axis-band">
-      <div className="ds-wrap">
-        <div className="ds-law-axis" aria-hidden="true">
-          <div className="ds-law-axis__track">
-            {eras.map(({ era, tone, start, end }) => (
-              <span
-                key={era.id}
-                className="ds-law-axis__band"
-                data-tone={tone}
-                style={{ left: at(start), width: `calc(${at(from + end - start)} - 2px)` }}
-              />
-            ))}
-            {eras.map(({ era, start }, index) => (
-              <span
-                key={era.id}
-                className="ds-law-axis__era"
-                // The name may wrap inside the room up to the next era, never over it.
-                style={{
-                  left: at(start),
-                  maxWidth: at(from + (eras[index + 1]?.start ?? to) - start),
-                }}
-              >
-                {era.name}
-              </span>
-            ))}
-            {dated.map((item, index) => {
-              const level = stack.get(item.effectiveYear) ?? 0;
-              stack.set(item.effectiveYear, level + 1);
-              return (
-                <span
-                  key={item.id}
-                  className="ds-law-axis__mark"
-                  style={
-                    {
-                      left: at(item.effectiveYear),
-                      '--law-stack': level,
-                      '--law-i': index,
-                    } as React.CSSProperties
-                  }
-                />
-              );
-            })}
-            {ticks.map((year) => (
-              <span
-                key={year}
-                className={
-                  year % 40 === 0
-                    ? 'ds-law-axis__tick'
-                    : 'ds-law-axis__tick ds-law-axis__tick--minor'
-                }
-                style={{ left: at(year) }}
-              >
-                {year}
-              </span>
-            ))}
-          </div>
-          {/* At phone width the names cannot sit under their bars; they read as a key instead. */}
-          <ul className="ds-law-axis__legend">
-            {eras.map(({ era, tone }) => (
-              <li key={era.id} data-tone={tone}>
-                {era.name}
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div className="ds-law-axis" aria-hidden="true">
+      <div className="ds-law-axis__track">
+        {eras.map(({ era, start, end }) => (
+          <span
+            key={era.id}
+            className="ds-law-axis__band"
+            style={{ ...place(start, end - start), animationTimeline: eraTimeline(era) }}
+          />
+        ))}
+        {eras.map(({ era, start, count }) => (
+          <span key={era.id} className="ds-law-axis__era" style={place(start)}>
+            {era.name}
+            <span className="ds-law-axis__count">{count}</span>
+          </span>
+        ))}
+        {catalogGaps(years).map(([first, last]) => (
+          <span key={first} className="ds-law-axis__gap" style={place(first, last - first + 1)}>
+            No entries yet, {first} to {last}
+          </span>
+        ))}
+        {dated.map((item, index) => {
+          const level = stack.get(item.effectiveYear) ?? 0;
+          stack.set(item.effectiveYear, level + 1);
+          return (
+            <span
+              key={item.id}
+              className="ds-law-axis__mark"
+              style={
+                {
+                  ...place(item.effectiveYear),
+                  '--law-stack': level,
+                  '--law-i': index,
+                } as CSSProperties
+              }
+            />
+          );
+        })}
+        {ticks.map((year) => (
+          <span
+            key={year}
+            className={
+              year % 40 === 0 ? 'ds-law-axis__tick' : 'ds-law-axis__tick ds-law-axis__tick--minor'
+            }
+            style={place(year)}
+          >
+            {year}
+          </span>
+        ))}
       </div>
-    </Block>
+      {/* Across the page the names cannot sit beside their bars; they read as a key instead. */}
+      <ul className="ds-law-axis__legend">
+        {eras.map(({ era }) => (
+          <li key={era.id}>{era.name}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -300,7 +310,7 @@ function LawRow({
   );
 }
 
-export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
+export function LawBrowseSections({ view, catalog, head }: LawBrowseSectionsProps) {
   const jurisdictionById = new Map(
     catalog.map((snapshot) => [snapshot.id, jurisdictionLabel(snapshot.jurisdictionId)] as const),
   );
@@ -309,7 +319,6 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
   const active = activeFilters(view);
   const facets = active.filter((filter) => filter.key !== 'q').length;
 
-  const endsOnEra = view.items.length > 0 && view.groups.length > 0;
   let body: React.ReactNode;
   if (view.totalAvailable === 0) {
     body = (
@@ -325,96 +334,102 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
     );
   } else if (view.groups.length === 0) {
     body = (
-      <Sheet className="ds-law-sheet ds-law-sheet--flat">
+      <div className="ds-lens__sheet ds-law-sheet">
         <ol className="ds-law-list">
           {view.items.map((item) => (
             <LawRow key={item.id} item={item} jurisdiction={jurisdictionOf(item)} />
           ))}
         </ol>
-      </Sheet>
+      </div>
     );
   } else {
-    body = view.groups.map((group, index) => {
-      const span = eraSpan(group.era, group.items);
-      const tone = eraTone(index, view.groups.length);
-      const last = index === view.groups.length - 1;
-      return (
-        <Block
-          key={group.era.id}
-          tone={tone}
-          className="ds-law-era"
-          aria-labelledby={eraAnchor(group.era)}
-        >
-          <BandArt motifs={['decades']} />
-          <div className="ds-wrap ds-law-era__inner">
-            <header className="ds-law-era__mark">
-              <h2 className="ds-law-era__title" id={eraAnchor(group.era)}>
-                {group.era.name}
-              </h2>
-              {span === null ? null : (
-                <DisplayNumeral
-                  as="p"
-                  size="title"
-                  tone={tone === 'ink' ? 'soft' : 'accent'}
-                  className="ds-law-era__span"
-                >
-                  <span>{span[0]}</span>
-                  <span className="ds-law-era__to"> to </span>
-                  <span>{span[1]}</span>
-                </DisplayNumeral>
-              )}
-              <p className="ds-law-era__count">{lawsPhrase(group.items.length)}</p>
-            </header>
-            <Sheet className="ds-law-sheet">
+    body = (
+      <div className="ds-lens__sheet ds-law-sheet">
+        {view.groups.map((group) => {
+          const span = eraSpan(group.era, group.items);
+          return (
+            <section
+              key={group.era.id}
+              className="ds-law-era"
+              aria-labelledby={eraAnchor(group.era)}
+              style={{ viewTimelineName: eraTimeline(group.era) }}
+            >
+              <header className="ds-law-era__mark">
+                <h2 className="ds-law-era__title" id={eraAnchor(group.era)}>
+                  {group.era.name}
+                </h2>
+                <p className="ds-law-era__count">
+                  {span === null ? null : (
+                    <span className="ds-law-era__span">
+                      {span[0]} to {span[1]}
+                    </span>
+                  )}
+                  <span>{lawsPhrase(group.items.length)}</span>
+                </p>
+              </header>
               <ol className="ds-law-list">
                 {group.items.map((item) => (
                   <LawRow key={item.id} item={item} jurisdiction={jurisdictionOf(item)} />
                 ))}
               </ol>
-            </Sheet>
-            {/* The closing note rides the last era, so the page meets the footer on a block. */}
-            {last ? <LawNote className="ds-law-note ds-law-note--in-era" /> : null}
-          </div>
-        </Block>
-      );
-    });
+            </section>
+          );
+        })}
+      </div>
+    );
   }
 
+  const railed =
+    view.groups.length > 0 &&
+    view.items.some((item) => item.effectiveYear !== undefined) &&
+    catalog.some((snapshot) => snapshot.effectiveYear !== undefined);
+
+  // The rail's bars light as their era's section crosses the window (law.css); the scope lets a
+  // bar in one column read a timeline declared in the other.
+  const timelines = view.groups.map((group) => eraTimeline(group.era)).join(', ');
+
   return (
-    <>
-      <RecordsToolbar
-        filters={facetMenus(view)}
-        sort={sortMenu(view)}
-        activeCount={facets}
-        showLabel={`Show ${lawsPhrase(view.totalMatched)}`}
-        {...(facets > 0 ? { clearAllHref: lawBrowseHref({ q: view.q, sort: view.sort }) } : {})}
-      />
+    <div
+      // Without a rail (nothing dated to place) the stage is one column.
+      className={railed ? 'ds-lens ds-lens--railed ds-law-stage' : 'ds-lens ds-law-stage'}
+      style={timelines ? ({ timelineScope: timelines } as CSSProperties) : undefined}
+    >
+      <div className="ds-lens__main">
+        {head}
+        <RecordsToolbar
+          filters={facetMenus(view)}
+          sort={sortMenu(view)}
+          activeCount={facets}
+          showLabel={`Show ${lawsPhrase(view.totalMatched)}`}
+          {...(facets > 0 ? { clearAllHref: lawBrowseHref({ q: view.q, sort: view.sort }) } : {})}
+        />
 
-      {active.length > 0 ? (
-        <div className="ds-records-active">
-          <ul className="ds-records-active__chips" aria-label="Active filters">
-            {active.map((filter) => (
-              <li key={filter.key}>
-                <Chip removable href={filter.href} label={filter.label}>
-                  {filter.label}
-                </Chip>
-              </li>
-            ))}
-          </ul>
-          {/* The empty state carries its own Clear filters; one control per job. */}
-          {active.length > 1 && view.items.length > 0 ? (
-            <a className={buttonClassName('quiet')} href="/law">
-              Clear all
-            </a>
-          ) : null}
-        </div>
-      ) : null}
+        {active.length > 0 ? (
+          <div className="ds-records-active">
+            <ul className="ds-records-active__chips" aria-label="Active filters">
+              {active.map((filter) => (
+                <li key={filter.key}>
+                  <Chip removable href={filter.href} label={filter.label}>
+                    {filter.label}
+                  </Chip>
+                </li>
+              ))}
+            </ul>
+            {/* The empty state carries its own Clear filters; one control per job. */}
+            {active.length > 1 && view.items.length > 0 ? (
+              <a className={buttonClassName('quiet')} href="/law">
+                Clear all
+              </a>
+            ) : null}
+          </div>
+        ) : null}
 
-      <TimeAxis view={view} catalog={catalog} />
+        <TimeAxis view={view} catalog={catalog} />
 
-      {body}
+        {body}
 
-      {view.totalAvailable > 0 && !endsOnEra ? <LawNote className="ds-law-note" /> : null}
-    </>
+        {view.totalAvailable > 0 ? <LawNote className="ds-law-note" /> : null}
+      </div>
+    </div>
   );
 }

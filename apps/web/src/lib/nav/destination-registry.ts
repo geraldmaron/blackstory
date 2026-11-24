@@ -30,7 +30,6 @@
 import {
   allSemanticDestinations,
   normalizeDestinationPath,
-  primaryAxes,
   semanticDestinationsInFamily,
   type DestinationFamily,
   type DestinationIconId,
@@ -104,7 +103,7 @@ type WebPresentation = {
 
 const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freeze({
   home: { kind: 'PLACE', crawl: { changeFrequency: 'daily', priority: 1 } },
-  explore: {
+  'archive-map': {
     kind: 'MAP',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
@@ -112,11 +111,10 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
     kind: 'LONG FORM',
     crawl: { changeFrequency: 'weekly', priority: 0.8 },
   },
-  records: {
+  archive: {
     kind: 'INDEX',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
-  collections: { kind: 'HUB', crawl: { changeFrequency: 'monthly', priority: 0.7 } },
 
   presidents: {
     kind: 'SERIES',
@@ -216,7 +214,47 @@ const FAMILY_GROUP = new Map<DestinationFamily, DestinationGroup>(
  * A family with no rendered group (`policy`, `record`, `utility`) yields no group, which is what
  * keeps a privacy notice and a fixture gallery off every list.
  */
-const DESTINATIONS: readonly Destination[] = allSemanticDestinations().map((semantic) => {
+/**
+ * Where the web's routes differ from the shared catalog (docs/ui/DESIGN.md section 8, phase 4b).
+ *
+ * The catalog in `@repo/public-contracts` is also the app's, and the app keeps its Map, Records
+ * and collections screens until its own phase, so the catalog is not edited here. On the web the
+ * list and the map are two views of one Archive, the collections hub is the Archive's lens
+ * chips, and the old addresses redirect (`lib/redirects/archive-routing.ts`).
+ */
+const WEB_ROUTES: Readonly<Record<string, Partial<SemanticDestination> | null>> = Object.freeze({
+  records: {
+    id: 'archive',
+    label: 'Archive',
+    path: '/archive',
+    description: 'Every record: on the map, in a list or along time.',
+  },
+  explore: { id: 'archive-map', path: '/archive?view=map', parent: '/archive' },
+  collections: null,
+  presidents: { parent: '/archive' },
+  law: { parent: '/archive' },
+  books: { parent: '/archive' },
+  data: { parent: '/' },
+  lives: { parent: '/data' },
+  memorial: { parent: '/' },
+});
+
+const onWeb = (semantic: SemanticDestination): readonly SemanticDestination[] => {
+  const route = WEB_ROUTES[semantic.id];
+  if (route === null) return [];
+  return [route === undefined ? semantic : { ...semantic, ...route }];
+};
+
+/** In catalog order, except that the Archive leads its own map view. */
+const WEB_SEMANTIC: readonly SemanticDestination[] = allSemanticDestinations().flatMap(
+  (semantic, _index, all) => {
+    if (semantic.id === 'records') return [];
+    if (semantic.id !== 'explore') return onWeb(semantic);
+    return [...all.filter((other) => other.id === 'records').flatMap(onWeb), ...onWeb(semantic)];
+  },
+);
+
+const DESTINATIONS: readonly Destination[] = WEB_SEMANTIC.map((semantic) => {
   const presentation = WEB_PRESENTATION[semantic.id] ?? {};
   const group = semantic.browsable ? FAMILY_GROUP.get(semantic.family) : undefined;
   return group === undefined
@@ -224,12 +262,13 @@ const DESTINATIONS: readonly Destination[] = allSemanticDestinations().map((sema
     : { ...semantic, ...presentation, group };
 });
 
-/** The four product axes as web destinations, in order. Primary navigation renders exactly this. */
+/** The header's and the phone tab bar's four destinations, in order (DESIGN.md 7.6, `Nav`). */
+export const PRIMARY_NAV_IDS = ['archive', 'stories', 'data', 'memorial'] as const;
+
 export function primaryNavDestinations(): readonly Destination[] {
-  const byPath = new Map(DESTINATIONS.map((destination) => [destination.path, destination]));
-  return primaryAxes().map((axis) => {
-    const found = byPath.get(axis.path);
-    if (!found) throw new Error(`primaryNavDestinations: ${axis.path} is not in the registry`);
+  return PRIMARY_NAV_IDS.map((id) => {
+    const found = DESTINATIONS.find((destination) => destination.id === id);
+    if (!found) throw new Error(`primaryNavDestinations: ${id} is not in the registry`);
     return found;
   });
 }
@@ -256,11 +295,12 @@ export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   // where a page SITS, not how the reader got there, and the way back to a map selection is
   // return state, not hierarchy. With Records a top-level axis, the catalog that lists a record
   // is the honest parent.
-  ['/place/', '/records'],
-  ['/invention/', '/records'],
-  ['/entity/', '/records'],
+  ['/place/', '/archive'],
+  ['/invention/', '/archive'],
+  ['/entity/', '/archive'],
   ['/books/', '/books'],
   ['/law/', '/law'],
+  ['/data/', '/data'],
   ['/lives/', '/lives'],
 ];
 
@@ -274,7 +314,10 @@ export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
 export { normalizeDestinationPath };
 
 export function destinationFor(pathname: string): Destination | undefined {
-  return DESTINATION_BY_PATH.get(normalizeDestinationPath(pathname));
+  // The Archive's map view is the one destination whose address carries a query.
+  return (
+    DESTINATION_BY_PATH.get(pathname) ?? DESTINATION_BY_PATH.get(normalizeDestinationPath(pathname))
+  );
 }
 
 /** Lookup by catalog id. Paths can 308; the id is what a TOC or deep-link section keys on. */

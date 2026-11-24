@@ -9,19 +9,27 @@
  */
 import { Linking, Text as NativeText, View, type TextStyle } from 'react-native';
 import { router } from 'expo-router';
-import type { StoryBlockV1, StoryReferenceV1, StoryRunV1 } from '@repo/public-contracts/v1/story';
+import type {
+  StoryBlockV1,
+  StoryImageV1,
+  StoryReferenceV1,
+  StoryRunV1,
+} from '@repo/public-contracts/v1/story';
 import {
   Divider,
   EXTERNAL_LINK_HINT,
+  ExhibitFrame,
   Image,
   LedgerRow,
   Link,
   Notice,
+  Receipt,
   Text,
   space,
   useThemeColors,
 } from '@/ui';
 import { sanitizeExternalHref } from '@/features/content/link-safety';
+import { isQuietImage, storyImageBasis, storyImageKind } from './story-exhibit';
 
 const WEB_ORIGIN = 'https://blackstory.app';
 
@@ -99,15 +107,77 @@ export function Runs({ runs }: { readonly runs: readonly StoryRunV1[] }) {
   );
 }
 
-function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUrl: string }) {
+/**
+ * A story image as an exhibit: shown whole and in its own color, with its credit as the receipt.
+ * An image whose words do not say what it is (a painting) gets crop marks and no kind; a
+ * harm-adjacent one gets no crop marks.
+ */
+export function StoryImageExhibit({
+  image,
+  caption,
+  bleed = 0,
+}: {
+  readonly image: StoryImageV1;
+  readonly caption?: string | undefined;
+  /** The reading column's side padding: the exhibit runs that far past it, to the screen edge. */
+  readonly bleed?: number;
+}) {
+  const kind = storyImageKind(image);
+  const quiet = isQuietImage(image);
+  const picture = (
+    <Image
+      source={image.url}
+      alt={image.alt}
+      aspectRatio={image.width && image.height ? image.width / image.height : 4 / 3}
+      contentFit="contain"
+      fallback={{ entityName: image.alt, reason: 'absent' }}
+    />
+  );
+  const receipt = <Receipt source={image.credit} {...(caption ? { detail: caption } : {})} />;
+  if (quiet && !kind) {
+    return (
+      <View style={{ gap: space['2'] }}>
+        {picture}
+        {receipt}
+      </View>
+    );
+  }
+  return (
+    <View style={{ marginHorizontal: -bleed }}>
+      <ExhibitFrame
+        kind={kind ?? 'photograph'}
+        basis={storyImageBasis(image)}
+        variant={quiet ? 'quiet' : kind ? 'full' : 'compact'}
+        receipt={receipt}
+        gutter={bleed}
+        testID="story-image-exhibit"
+      >
+        {picture}
+      </ExhibitFrame>
+    </View>
+  );
+}
+
+type BlockProps = {
+  readonly block: StoryBlockV1;
+  readonly webUrl: string;
+  readonly bleed: number;
+  /** Reports a chapter heading's offset inside the blocks, for the progress line. */
+  readonly onChapterLayout?: ((text: string, y: number) => void) | undefined;
+};
+
+function Block({ block, webUrl, bleed, onChapterLayout }: BlockProps) {
   const theme = useThemeColors();
   switch (block.type) {
     case 'heading':
       return (
         <Text
-          variant={block.level === 2 ? 'title' : 'rowTitle'}
+          variant={block.level === 2 ? 'headline' : 'title'}
           isHeading
           style={{ marginTop: space['5'] }}
+          {...(block.level === 2 && onChapterLayout
+            ? { onLayout: (event) => onChapterLayout(block.text, event.nativeEvent.layout.y) }
+            : {})}
         >
           {block.text}
         </Text>
@@ -135,9 +205,7 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
       );
     case 'quote':
       return (
-        <View
-          style={{ borderLeftWidth: 3, borderLeftColor: theme.accent, paddingLeft: space['3'] }}
-        >
+        <View style={{ borderLeftWidth: 2, borderLeftColor: theme.ink, paddingLeft: space['3'] }}>
           <Text variant="editorial" style={{ fontStyle: 'italic' }}>
             <Runs runs={block.runs} />
           </Text>
@@ -156,10 +224,9 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
             padding: space['3'],
             borderWidth: 1,
             borderColor: theme.border,
-            borderRadius: 8,
           }}
         >
-          <Text variant="sectionLabel">{`Where the sources disagree: ${block.label}`}</Text>
+          <Text variant="meta">{`Where the sources disagree: ${block.label}`}</Text>
           {block.sides.map((side, index) => (
             <View key={index} style={{ gap: space['1'] }}>
               <Text variant="bodySmall" style={{ fontWeight: '600' }}>
@@ -171,22 +238,7 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
         </View>
       );
     case 'image':
-      return (
-        <View style={{ gap: space['1'] }}>
-          <Image
-            source={block.image.url}
-            alt={block.image.alt}
-            {...(block.image.width && block.image.height
-              ? { aspectRatio: block.image.width / block.image.height }
-              : { aspectRatio: 4 / 3 })}
-            fallback={{ entityName: block.image.alt, reason: 'absent' }}
-          />
-          {block.caption ? <Text variant="caption">{block.caption}</Text> : null}
-          <Text variant="caption" colorRole="inkMuted">
-            {block.image.credit}
-          </Text>
-        </View>
-      );
+      return <StoryImageExhibit image={block.image} caption={block.caption} bleed={bleed} />;
     case 'table':
       return (
         <View style={{ gap: space['2'] }}>
@@ -240,14 +292,24 @@ function Block({ block, webUrl }: { readonly block: StoryBlockV1; readonly webUr
 export function StoryBlocks({
   blocks,
   webUrl,
+  bleed = 0,
+  onChapterLayout,
 }: {
   readonly blocks: readonly StoryBlockV1[];
   readonly webUrl: string;
+  readonly bleed?: number;
+  readonly onChapterLayout?: BlockProps['onChapterLayout'];
 }) {
   return (
     <View style={{ gap: space['4'] }}>
       {blocks.map((block, index) => (
-        <Block key={index} block={block} webUrl={webUrl} />
+        <Block
+          key={index}
+          block={block}
+          webUrl={webUrl}
+          bleed={bleed}
+          onChapterLayout={onChapterLayout}
+        />
       ))}
     </View>
   );
@@ -261,7 +323,7 @@ export function StoryReferences({
   if (references.length === 0) return null;
   return (
     <View style={{ gap: space['2'], marginTop: space['6'] }}>
-      <Text variant="sectionLabel" isHeading accessibilityRole="header">
+      <Text variant="meta" isHeading accessibilityRole="header">
         Sources
       </Text>
       {references.map((reference, index) => {

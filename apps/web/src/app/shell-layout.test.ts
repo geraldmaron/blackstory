@@ -17,14 +17,10 @@ const uiShellHeaderCss = readFileSync(
 );
 
 describe('shell sticky clearance', () => {
-  it('gives document surfaces top clearance and zeros it on the instrument', () => {
+  it('gives document surfaces top clearance', () => {
     assert.match(
       shellCss,
       /\.ds-shell-body\s*\{[^}]*padding-top:\s*calc\(var\(--ds-island-clearance\)\)/s,
-    );
-    assert.match(
-      shellCss,
-      /\.ds-shell-body:has\(\[data-surface='instrument'\]\)\s*\{[^}]*padding-top:\s*0/s,
     );
   });
 
@@ -69,11 +65,7 @@ describe('surface class is the only shell switch', () => {
 });
 
 describe('instrument shell layout', () => {
-  it('locks the instrument to the viewport (not a footer-over-map document)', () => {
-    assert.match(
-      shellCss,
-      /html:has\(\[data-surface='instrument'\]\)\s*\{[^}]*overflow:\s*hidden/s,
-    );
+  it('a live plate takes touch itself, and a covered one does not track the phone toolbar', () => {
     assert.match(
       shellCss,
       /\.ds-map-stage\[data-plate-posture='live'\]\s*\{[^}]*touch-action:\s*none/s,
@@ -83,18 +75,6 @@ describe('instrument shell layout', () => {
     assert.match(
       shellCss,
       /\.ds-map-stage:not\(\[data-plate-posture='live'\]\):not\(\[data-plate-slot\]\)\s*\{[^}]*height:\s*100lvh/s,
-    );
-    assert.match(
-      shellCss,
-      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s*\{[^}]*height:\s*100dvh[^}]*overflow:\s*hidden/s,
-    );
-    assert.match(
-      shellCss,
-      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-body\s*\{[^}]*min-height:\s*0[^}]*overflow:\s*hidden/s,
-    );
-    assert.match(
-      shellCss,
-      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-page-transition,[\s\S]*?\.ds-shell-page-transition__content\s*\{[^}]*height:\s*100%/s,
     );
   });
 
@@ -148,35 +128,26 @@ describe('horizontal overflow guards', () => {
     );
   });
 
-  it('the header is glass over the map, solid when the reader asks for less transparency', () => {
-    // Living archive float plane (owner lifted the glass ban, 2026-11-15).
+  it('the header is solid: no blur, no see-through ground, no elevation (DESIGN.md 7.4)', () => {
     const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
-    assert.match(commandBarCss, /\.ds-bar\s*\{[^}]*backdrop-filter:\s*blur/s);
-    assert.match(
-      commandBarCss,
-      /prefers-reduced-transparency: reduce\)\s*\{\s*\.ds-bar\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
-    );
+    assert.doesNotMatch(commandBarCss, /backdrop-filter/);
+    assert.match(commandBarCss, /\.ds-bar\s*\{[^}]*background:\s*var\(--ds-canvas\);/s);
     assert.doesNotMatch(commandBarCss, /box-shadow:\s*0\s+\d+px/, 'command-bar must not elevate');
   });
 
-  it('Explore chrome blurs only on the float plane: the column and dock, nothing inside them', () => {
+  it('Explore chrome never blurs: the column, dock and controls are solid sheets (DESIGN.md 7.4)', () => {
     const mapCss = (file: string) =>
       readFileSync(join(here, '../components/map-experience', file), 'utf8');
-    const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
+    const atlasCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
     for (const [name, source] of [
       ['column', mapCss('explore-column.css')],
+      ['controls', mapCss('map-controls.css')],
       ['list', mapCss('explore-record-list.css')],
       ['inspector', mapCss('record-inspector.css')],
       ['histogram', mapCss('decade-brush.css')],
       ['atlas', atlasCss],
     ] as const) {
-      // Glass lives on the float surfaces (column, dock, controls); parts inside stay unblurred.
-      if (name === 'column') {
-        assert.match(source, /backdrop-filter:\s*blur\(18px\)/, 'column is glass');
-        assert.match(source, /prefers-reduced-transparency/, 'column has a solid fallback');
-      } else {
-        assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
-      }
+      assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
       assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);
       assert.doesNotMatch(
         source,
@@ -242,8 +213,10 @@ describe('the plate is styled globally, not from the route group', () => {
     // once the Instrument built MapLibre the live map stayed lit under every subsequent route
     // and state labels read through the prose column. Only reproduces after visiting Explore
     // first, which is why a cold load of /rooms looked fine.
-    // The Door is the one other surface whose plate is content (posture `ambient`), so it is
-    // excluded from the cover in the same rule rather than uncovered by a second one.
+    // The Door is another surface whose plate is content (posture `ambient`). It is excluded from
+    // the cover in the same rule rather than uncovered by a second one. A record page is covered:
+    // its map is an exhibit in the page (DESIGN.md section 9.1).
+    assert.doesNotMatch(shellCss, /ds-recpage\[data-ground\]/);
     assert.match(
       shellCss,
       /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
@@ -286,10 +259,6 @@ describe('the plate is styled globally, not from the route group', () => {
     // `.ds-explore-stage` is route content. Whether the zoom control parks bottom-right is a
     // question about the surface class, so it reads the attribute; whether it clears an open
     // panel is runtime state, so those rules keep the stage's own [data-*] attributes.
-    assert.match(
-      shellCss,
-      /body:has\(\[data-surface='instrument'\]\)\s+\.ds-map-stage\s+\.maplibregl-ctrl-top-right\s*\{/,
-    );
     assert.doesNotMatch(shellCss, /:has\(\.ds-explore-stage\)/);
   });
 
@@ -322,31 +291,34 @@ describe('the plate is styled globally, not from the route group', () => {
   });
 
   it('clips the slotted plate to the same radius as the MapMoment frame', () => {
-    assert.match(
-      shellCss,
-      /\.ds-map-stage\[data-plate-slot\]\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
-    );
+    assert.match(shellCss, /\.ds-map-stage\[data-plate-slot\]\s*\{[^}]*border-radius:\s*0/s);
   });
 });
 
-/*
- * The CSS build (Lightning CSS) keeps only the LAST of `backdrop-filter` and
- * `-webkit-backdrop-filter` in a rule. With the standard one first it shipped only the prefix,
- * which current Chrome ignores, so every glass surface rendered unblurred.
- */
-describe('glass survives the CSS build', () => {
-  it('declares -webkit-backdrop-filter before backdrop-filter, never after', () => {
+describe('nothing blurs what is behind it', () => {
+  it('no public or kit stylesheet declares a backdrop-filter', () => {
     const files = [
       join(here, 'shell.css'),
       join(here, '../components/shell/command-bar.css'),
       join(here, '../components/map-embed/record-map.css'),
-      join(here, '../components/map-experience/map-controls.css'),
-      join(here, '../components/map-experience/explore-column.css'),
+      join(here, '../components/patterns/toast.css'),
+      join(here, '../components/page/page-kit.css'),
       join(here, '../../../../packages/ui/src/styles/components.css'),
+      join(here, '../../../../packages/ui/src/styles/workbench.css'),
     ];
-    for (const file of files) {
-      const css = readFileSync(file, 'utf8');
-      assert.doesNotMatch(css, /^\s*backdrop-filter:[^;]*;\s*-webkit-backdrop-filter:/m, file);
-    }
+    for (const file of files)
+      assert.doesNotMatch(readFileSync(file, 'utf8'), /backdrop-filter/, file);
   });
+});
+
+it('Orbit hides the tokens and their tethers together, never the tokens alone', () => {
+  // The tethers are a sibling SVG, not children of the tokens. Hidden tokens with visible tethers
+  // drew a burst of white spikes across the globe between the count zoom and the national frame.
+  const rule = shellCss.match(
+    /\.ds-map-stage:is\(\[data-orbit\], \[data-tokens-off\]\)\s*:is\(([^)]*)\)\s*\{\s*visibility:\s*hidden/,
+  );
+  assert.ok(rule, 'the stand-down rule exists');
+  for (const part of ['.ds-place-token', '.ds-site-name', '.ds-place-leaders']) {
+    assert.ok(rule[1]!.includes(part), part);
+  }
 });

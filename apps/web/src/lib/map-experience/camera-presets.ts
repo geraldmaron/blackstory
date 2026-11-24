@@ -17,6 +17,8 @@
  * reduced motion, full functional parity.
  */
 
+import { holdStill } from './world-prefs';
+
 export type CameraPresetName = 'national' | 'state' | 'locality' | 'point';
 
 /** A time-based easing curve: elapsed-time fraction `t` in [0, 1] -> eased-progress fraction in
@@ -71,7 +73,7 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number): CameraEasi
   };
 }
 
-/** Shared slow-out register for every preset: mirrors `@repo/ui`'s `--ds-easing`
+/** Shared slow-out register for every preset: mirrors `@repo/ui`'s `--ds-ease-entrance`
  * (`cubic-bezier(0.16, 1, 0.3, 1)`, `packages/ui/src/tokens/foundation.ts`'s `motion.easingStandard`)
  * so the map's camera register and the rest of the brand's motion register are the same curve —
  * fast departure, long unhurried settle. Motion that reads as descent into place, never a jump
@@ -130,6 +132,69 @@ export function cameraPresetFor(name: CameraPresetName, reducedMotion: boolean):
   return reducedMotion ? REDUCED_MOTION_CAMERA_PRESETS[name] : CAMERA_PRESETS[name];
 }
 
+/** How long a flight gets per zoom level it has to cross, and the most any flight may take. */
+const FLIGHT_MS_PER_ZOOM_LEVEL = 300;
+const FLIGHT_MAX_MS = 3200;
+
+/**
+ * A preset's duration is authored for its own tier (`point` is a 1200ms landing from a city).
+ * The same preset now also carries the globe down to a street and one city across the country to
+ * another, eleven zoom levels in the time meant for two: no tile along the way can load, so the
+ * flight read as a blank cut. This stretches a flight to the distance it actually covers:
+ * the zoom levels between the two frames, plus the levels `flyTo` climbs to cross `screensAway`
+ * widths of ground. Never shorter than the preset, never longer than `FLIGHT_MAX_MS`.
+ */
+export function flightDurationFor(
+  presetDuration: number,
+  zoomFrom: number,
+  zoomTo: number,
+  screensAway: number,
+): number {
+  const levels = Math.abs(zoomTo - zoomFrom) + Math.log2(1 + Math.max(0, screensAway));
+  if (!Number.isFinite(levels)) return presetDuration;
+  return Math.round(
+    Math.min(FLIGHT_MAX_MS, Math.max(presetDuration, levels * FLIGHT_MS_PER_ZOOM_LEVEL)),
+  );
+}
+
+/** A flight that starts and ends above this never pulls out past it: the country, not the globe. */
+const FLIGHT_PEAK_FLOOR_ZOOM = 3.3;
+
+/**
+ * How many map widths of ground lie between a camera and a point, at the camera's own zoom.
+ * Plain degrees on a 512px world: close enough to size a flight, never used to place anything.
+ */
+export function screensBetween(
+  from: { readonly lng: number; readonly lat: number },
+  to: readonly [lng: number, lat: number],
+  zoom: number,
+  mapWidthPx: number,
+): number {
+  const degrees = Math.hypot(
+    (to[0] - from.lng) * Math.cos((from.lat * Math.PI) / 180),
+    to[1] - from.lat,
+  );
+  const screens = ((degrees / 360) * 512 * 2 ** zoom) / (mapWidthPx || 1000);
+  return Number.isFinite(screens) ? screens : 0;
+}
+
+/**
+ * How far out a flight pulls before it comes down: the zoom at the top of its arc (`flyTo`'s
+ * `minZoom`). By distance: a record a few blocks away barely lifts the camera, one across the
+ * state lifts it until both ends fit, and one across the country lifts it to the country. It is
+ * never above either end (a flight from the globe just descends) and, between two closer
+ * views, never past the country.
+ */
+export function flightPeakZoom(zoomFrom: number, zoomTo: number, screensAway: number): number {
+  const low = Math.min(zoomFrom, zoomTo);
+  // The trip's width measured where the flight is widest, at the lower of its two ends.
+  const screensAtLow = Math.max(0, screensAway) * 2 ** (low - zoomFrom);
+  const peak = low - Math.log2(1 + screensAtLow);
+  // A camera that has not been sized yet has no arc to shape: go straight to the target.
+  if (!Number.isFinite(peak)) return zoomTo;
+  return Math.max(Math.min(low, FLIGHT_PEAK_FLOOR_ZOOM), peak);
+}
+
 /**
  * Explore / hero MapLibre zoom envelope (design-direction-v5 + street-orientation posture).
  * National floor at 3; ceiling stops short of address-invasive rooftop framing while still
@@ -159,6 +224,8 @@ export const CAMERA_COUNTY_ZOOM = 9;
  * any non-DOM environment (SSR, plain-Node tests) never a client-only crash. */
 export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  // v11 "Hold still": the reader's own switch counts the same as the system preference.
+  if (holdStill()) return true;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 

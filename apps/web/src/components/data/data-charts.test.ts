@@ -1,27 +1,21 @@
 /**
- * SSR markup smoke tests for `/data` page SVG charts — key labels present, no fabricated
- * zeros when input aggregates are empty.
+ * SSR markup smoke tests for the `/data` plain drawings and the registry figures built on them:
+ * key labels present, the table carrying what the drawing shows, and nothing to draw meaning no
+ * figure at all, never a fabricated zero.
  */
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import type {
-  HateCrimeYearSummary,
-  NationalPopulationTimelineRow,
-  OpportunityAtlasCoverageSummary,
-} from '@repo/domain/statistics/public-data-summaries';
+import type { NationalPopulationTimelineRow } from '@repo/domain/statistics/public-data-summaries';
 import { formatSharePct } from './chart-utils';
-import { HateCrimeCompositionChart } from './HateCrimeCompositionChart';
-import { HateCrimeYearSeriesChart } from './HateCrimeYearSeriesChart';
-import {
-  compactOutcomeFieldLabel,
-  OpportunityAtlasCoverageChart,
-} from './OpportunityAtlasCoverageChart';
 import { PopulationByDecadeChart } from './PopulationByDecadeChart';
 import { RacePairComparisonChart } from './RacePairComparisonChart';
 import { GroupedBarIndicatorChart } from './GroupedBarIndicatorChart';
-import { StatePopulationShiftChart } from './StatePopulationShiftChart';
+import { StatePopulationShiftChart, stateShiftRows } from './StatePopulationShiftChart';
+import { D03 } from './figures/census';
+import { pairData, seriesData } from './figures/indicators';
+import { FIGURES } from './figures/registry';
 import { TrendLineChart } from './TrendLineChart';
 import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
 
@@ -82,21 +76,26 @@ const SAMPLE_SOURCES = [
   },
 ] as const;
 
-test('PopulationByDecadeChart renders the 1790–2020 span, the 2000 boundary, and a source', () => {
+const numbers = (table: { readonly rows: readonly (readonly { readonly text: string }[])[] }) =>
+  table.rows.map((row) => row.map((cell) => cell.text).join(' | ')).join('\n');
+
+test('the population drawing shows the 1790 to 2020 span and the 2000 boundary; D-03 carries the table and source', () => {
   const html = renderToStaticMarkup(
-    createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES }),
+    createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE }),
   );
   assert.match(html, /1790/);
   assert.match(html, /2020/);
-  assert.match(html, /Black population by decade/);
   assert.match(html, /Black alone/); // 2000 definition-boundary marker
-  assert.match(html, /59,527/); // free count in the accessible table
-  assert.match(html, /U\.S\. Census Bureau/);
+  const figure = D03.fromRows({ rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES });
+  assert.equal(figure.title, 'Black population at each census, 1790 to 2020');
+  assert.match(numbers(figure.table), /59,527/); // free count in the table
+  assert.match(figure.sources[0]!.label, /U\.S\. Census Bureau/);
+  assert.equal(figure.headline, 'From 757,208 Black people in 1790 to 41.1 million in 2020');
 });
 
 test('PopulationByDecadeChart keeps enslaved, free, and post-1860 total as distinct series', () => {
   const html = renderToStaticMarkup(
-    createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES }),
+    createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE }),
   );
   // The key never conflates enslaved with the Black total under one swatch.
   assert.doesNotMatch(html, /Enslaved \/ Black total/);
@@ -116,21 +115,36 @@ test('PopulationByDecadeChart keeps enslaved, free, and post-1860 total as disti
   assert.doesNotMatch(html, /--ds-viz-2|accent/);
 });
 
-test('PopulationByDecadeChart returns nothing when rows are empty', () => {
-  const html = renderToStaticMarkup(
-    createElement(PopulationByDecadeChart, { rows: [], sources: [] }),
-  );
-  assert.equal(html, '');
-  assert.doesNotMatch(html, />0</);
+test('a census with no free and enslaved split says "no data" in Numbers, never a zero or a dash', () => {
+  const table = numbers(D03.fromRows({ rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES }).table);
+  // 2000, 2010, and 2020 rows carry no free/enslaved split (post-1860 total only).
+  assert.match(table, /2000 \| 34,658,190 \| no data \| no data/);
+  assert.doesNotMatch(table, /—/);
 });
 
-test('PopulationByDecadeChart shows N/A instead of an em dash for decades with no free/enslaved split', () => {
-  const html = renderToStaticMarkup(
-    createElement(PopulationByDecadeChart, { rows: SAMPLE_TIMELINE, sources: SAMPLE_SOURCES }),
+test('a figure with no rows is no figure', async () => {
+  assert.equal(
+    seriesData({ ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.hmdaDenialRates, series: [] }),
+    undefined,
   );
-  // 2000, 2010, and 2020 rows carry no free/enslaved split (post-1860 total only).
-  assert.match(html, /N\/A/);
-  assert.doesNotMatch(html, /—/);
+  assert.equal(seriesData(undefined), undefined);
+  const empty = { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthComparison };
+  assert.equal(
+    pairData(
+      {
+        ...empty,
+        primary: { ...empty.primary, value: 0 },
+        comparison: { ...empty.comparison, value: 0 },
+      },
+      'pair',
+    ),
+    undefined,
+  );
+  // The unit drawing needs a stated multiple; a difference in points is not one.
+  assert.equal(
+    pairData(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.costBurdenComparison, 'ratio'),
+    undefined,
+  );
 });
 
 test('formatSharePct returns N/A instead of an em dash when total population is zero', () => {
@@ -138,187 +152,47 @@ test('formatSharePct returns N/A instead of an em dash when total population is 
   assert.doesNotMatch(formatSharePct(0, 0), /—/);
 });
 
-test('HateCrimeCompositionChart labels both composition series and participation', () => {
-  const summary: HateCrimeYearSummary = {
-    year: '2024',
-    incidents: 1000,
-    antiBlackIncidents: 620,
-    reportingCountyYears: 800,
-    nationalParticipatingAgenciesPct: 87.4,
-    source: 'FBI Crime Data Explorer',
-    sourceUrl: 'https://ucr.fbi.gov/hate-crime',
-  };
-  const html = renderToStaticMarkup(createElement(HateCrimeCompositionChart, { summary }));
-  assert.match(html, /Anti-Black or African American bias/);
-  assert.match(html, /Other reported bias categories/);
-  assert.match(html, /87\.4%/);
-  assert.match(html, /620/);
-  assert.match(html, /380/);
-});
-
-test('HateCrimeCompositionChart returns nothing when incidents are zero', () => {
-  const summary: HateCrimeYearSummary = {
-    year: '2024',
-    incidents: 0,
-    antiBlackIncidents: 0,
-    reportingCountyYears: 0,
-    source: 'FBI Crime Data Explorer',
-    sourceUrl: 'https://ucr.fbi.gov/hate-crime',
-  };
-  const html = renderToStaticMarkup(createElement(HateCrimeCompositionChart, { summary }));
-  assert.equal(html, '');
-  assert.doesNotMatch(html, />0</);
-});
-
-test('HateCrimeYearSeriesChart renders per-year share and participation labels', () => {
-  const summaries: readonly HateCrimeYearSummary[] = [
-    {
-      year: '2020',
-      incidents: 800,
-      antiBlackIncidents: 480,
-      reportingCountyYears: 700,
-      nationalParticipatingAgenciesPct: 85,
-      source: 'FBI Crime Data Explorer',
-      sourceUrl: 'https://ucr.fbi.gov/hate-crime',
-    },
-    {
-      year: '2024',
-      incidents: 1000,
-      antiBlackIncidents: 620,
-      reportingCountyYears: 800,
-      nationalParticipatingAgenciesPct: 87.4,
-      source: 'FBI Crime Data Explorer',
-      sourceUrl: 'https://ucr.fbi.gov/hate-crime',
-    },
-  ];
-  const html = renderToStaticMarkup(createElement(HateCrimeYearSeriesChart, { summaries }));
-  assert.match(html, /Hate crime reports by year/);
-  assert.match(html, /Anti-Black share of reported incidents/);
-  assert.match(html, /Agencies participating nationally/);
-  assert.match(html, /2020/);
-  assert.match(html, /2024/);
-});
-
-test('HateCrimeYearSeriesChart shows N/A instead of an em dash for a year with no incidents or participation data', () => {
-  const summaries: readonly HateCrimeYearSummary[] = [
-    {
-      year: '2019',
-      incidents: 0,
-      antiBlackIncidents: 0,
-      reportingCountyYears: 0,
-      source: 'FBI Crime Data Explorer',
-      sourceUrl: 'https://ucr.fbi.gov/hate-crime',
-    },
-  ];
-  const html = renderToStaticMarkup(createElement(HateCrimeYearSeriesChart, { summaries }));
-  assert.match(html, /N\/A/);
-  assert.doesNotMatch(html, /—/);
-});
-
 test('StatePopulationShiftChart labels Puerto Rico instead of State 72', () => {
   const html = renderToStaticMarkup(
     createElement(StatePopulationShiftChart, {
       fromDecade: '2010',
       toDecade: '2020',
-      changes: [
-        {
-          stateFips: '72',
-          blackAbsoluteChange: -12_000,
-          shareChangePp: -0.3,
-          blackPopulationTo: 900_000,
-        },
-      ],
-      stateNameByFips: { '72': 'Puerto Rico' },
+      rows: stateShiftRows(
+        [
+          {
+            stateFips: '72',
+            blackAbsoluteChange: -12_000,
+            shareChangePp: -0.3,
+            blackPopulationTo: 900_000,
+          },
+        ],
+        { '72': 'Puerto Rico' },
+      ),
     }),
   );
   assert.match(html, /Puerto Rico/);
   assert.doesNotMatch(html, /State 72/);
 });
 
-test('OpportunityAtlasCoverageChart renders outcome coverage and histogram bins', () => {
-  const coverage: OpportunityAtlasCoverageSummary = {
-    tractCount: 3,
-    outcomeFieldCoverage: [
-      {
-        field: 'kfrBlackP25',
-        label: 'Household income rank (Black children, parents p25)',
-        tractCount: 3,
-      },
-      {
-        field: 'kfrWhiteP25',
-        label: 'Household income rank (white children, parents p25)',
-        tractCount: 1,
-      },
-    ],
-    kfrBlackP25Histogram: [
-      { id: '0-20', label: '0–20th', minInclusive: 0, maxExclusive: 0.2, tractCount: 1 },
-      {
-        id: '80-100',
-        label: '80–100th',
-        minInclusive: 0.8,
-        maxExclusive: 1.0000001,
-        tractCount: 2,
-      },
-    ],
-    source: 'Opportunity Insights',
-    sourceUrl: 'https://opportunityinsights.org/data/',
-    license: 'Opportunity Insights data-use terms — attribution required',
-  };
-  const html = renderToStaticMarkup(createElement(OpportunityAtlasCoverageChart, { coverage }));
-  assert.match(html, /Which measures we have/);
-  assert.match(html, /Income ranks for Black children/);
-  assert.match(html, /0–20th/);
-  assert.match(html, /Opportunity Insights/);
-  // Horizontal bars: compact axis labels + full names in the accessible table.
-  assert.match(html, /Income \(Black, p25\)/);
-  assert.match(html, /Household income rank \(Black children, parents p25\)/);
-  assert.match(html, /text-anchor="end"/);
-});
-
-test('compactOutcomeFieldLabel shortens long Opportunity Atlas field names', () => {
-  assert.equal(
-    compactOutcomeFieldLabel('Household income rank (Black children, parents p25)'),
-    'Income (Black, p25)',
-  );
-  assert.equal(
-    compactOutcomeFieldLabel('Incarceration rate (pooled, parents p25)'),
-    'Jail (pooled, p25)',
-  );
-});
-
-test('RacePairComparisonChart renders wealth juxtaposition with a chapter link', () => {
-  const html = renderToStaticMarkup(
-    createElement(RacePairComparisonChart, {
-      series: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthComparison,
-    }),
-  );
-  assert.match(html, /Median family net worth/);
+test('the wealth pair draws both values, and its figure links the chapter behind the number', () => {
+  const series = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthComparison;
+  const html = renderToStaticMarkup(createElement(RacePairComparisonChart, { series }));
   assert.match(html, /\$44,900/);
   assert.match(html, /\$285,000/);
-  assert.match(html, /Read the chapter/);
-  assert.match(html, /\/stories\/the-gap-that-never-closed/);
+  const figure = FIGURES['D-07'].fromRows(pairData(series, 'pair')!);
+  assert.match(figure.title, /Median family net worth/);
+  assert.equal(figure.chapterHref, '/stories/the-gap-that-never-closed');
+  assert.equal(figure.limits, series.caption);
 });
 
 test('GroupedBarIndicatorChart renders NHGIS homeownership decades', () => {
-  const html = renderToStaticMarkup(
-    createElement(GroupedBarIndicatorChart, {
-      series: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.cookHomeownership,
-    }),
-  );
+  const series = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.cookHomeownership;
+  const html = renderToStaticMarkup(createElement(GroupedBarIndicatorChart, { series }));
   assert.match(html, /Homeownership by householder race/);
   assert.match(html, /1990/);
   assert.match(html, /2010/);
   assert.match(html, /37\.1%/);
   assert.match(html, /Black householder/);
-});
-
-test('GroupedBarIndicatorChart returns nothing when points are empty', () => {
-  const html = renderToStaticMarkup(
-    createElement(GroupedBarIndicatorChart, {
-      series: { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.hmdaDenialRates, points: [] },
-    }),
-  );
-  assert.equal(html, '');
 });
 
 test('TrendLineChart renders the DKKS wealth ratio benchmark years back to 1860', () => {
@@ -328,8 +202,9 @@ test('TrendLineChart renders the DKKS wealth ratio benchmark years back to 1860'
   assert.match(html, /White-to-Black per-capita wealth ratio/);
   assert.match(html, /1860/);
   assert.match(html, /2019/);
-  assert.match(html, /6\.6×/); // 2019 ratio in the accessible table
-  assert.doesNotMatch(html, /1929/); // no white-side estimate that year: point is skipped
+  const table = numbers(FIGURES['D-09'].fromRows(seriesData(series)!).table);
+  assert.match(table, /2019 \| 6\.6×/);
+  assert.doesNotMatch(table, /1929/); // no white-side estimate that year: point is skipped
 });
 
 test('TrendLineChart renders the national homeownership long arc with two named series', () => {
@@ -342,13 +217,4 @@ test('TrendLineChart renders the national homeownership long arc with two named 
   assert.match(html, /1900/);
   assert.match(html, /2024/);
   assert.doesNotMatch(html, />2020</); // no standard ACS 1-year release that year
-});
-
-test('TrendLineChart returns nothing when points are empty', () => {
-  const html = renderToStaticMarkup(
-    createElement(TrendLineChart, {
-      series: { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.cookHomeownership, points: [] },
-    }),
-  );
-  assert.equal(html, '');
 });

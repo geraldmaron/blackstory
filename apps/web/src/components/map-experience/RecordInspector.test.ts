@@ -83,19 +83,22 @@ test('the evidence signal is the grade tag (glyph plus word) and the count, neve
   assert.match(html, /6 sources/);
 });
 
-test('the decade prints once, in the meta line', () => {
+test('the decade prints once, in words that say what it is', () => {
   const html = render({ record: { ...RECORD, decade: '1950s' } });
   assert.equal(html.split('1950s').length - 1, 1);
+  assert.match(html, /First documented in the 1950s/);
 });
 
 test('a photo shows only when the archive holds one; never a placeholder box', () => {
   assert.doesNotMatch(render(), /ds-inspector__photo/);
   const html = render({ record: { ...RECORD, photoUrl: 'https://cdn.example/gaston.jpg' } });
-  assert.match(html, /<img class="ds-plate__img" src="https:\/\/cdn.example\/gaston.jpg" alt=""/);
-  assert.doesNotMatch(html, /ds-plate__credit/);
+  assert.match(html, /<img src="https:\/\/cdn.example\/gaston.jpg" alt=""/);
+  // In color: never the toned plate (design-direction-v12.md).
+  assert.doesNotMatch(html, /ds-plate/);
+  assert.match(html, /date is not on record/);
 });
 
-test('the photo is a plate with its alt, and the credit sits under it', () => {
+test('the photo carries its alt, and the credit sits under it', () => {
   const html = render({
     record: {
       ...RECORD,
@@ -105,5 +108,5 @@ test('the photo is a plate with its alt, and the credit sits under it', () => {
     },
   });
   assert.match(html, /alt="The motel in 1963"/);
-  assert.ok(html.indexOf('</span><p class="ds-plate__credit">Library of Congress') > 0);
+  assert.match(html, /<figcaption><span>Library of Congress<\/span>/);
 });

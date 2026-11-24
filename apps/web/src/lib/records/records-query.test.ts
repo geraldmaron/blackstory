@@ -14,7 +14,7 @@ import {
 
 test('real narrowings survive parse and build unchanged', () => {
   const query = parseRecordsQuery({ kind: 'school', era: '1950s', state: 'ga', evidence: 'b' });
-  assert.equal(recordsHref(query), '/records?kind=school&era=1950s&state=GA&evidence=B');
+  assert.equal(recordsHref(query), '/archive?kind=school&era=1950s&state=GA&evidence=B');
 });
 
 test('values outside a facet shape narrow nothing', () => {
@@ -53,7 +53,7 @@ test('combination shapes are search results or two-plus constraints', () => {
 
 test('the timeline layout accepts its hand-typed spellings and canonicalizes to layout=chronology', () => {
   for (const raw of [{ view: 'chronology' }, { view: 'timeline' }, { layout: 'timeline' }]) {
-    assert.equal(recordsHref(parseRecordsQuery(raw)), '/records?layout=chronology');
+    assert.equal(recordsHref(parseRecordsQuery(raw)), '/archive?view=timeline');
   }
   assert.equal(parseRecordsQuery({ view: 'map' }).layout, 'index');
 });

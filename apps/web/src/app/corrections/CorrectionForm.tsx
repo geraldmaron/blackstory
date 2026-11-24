@@ -10,7 +10,7 @@
  */
 import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { buttonClassName, Segmented } from '@repo/ui';
-import { ChoiceField, Field, fieldControlProps, fieldErrorId } from '../../components/room';
+import { ChoiceField, Field, fieldControlProps, fieldErrorId } from '../../components/forms/fields';
 import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
 import { useFieldErrors } from '../../components/forms/use-field-errors';
 import { ReceiptBlock } from './ReceiptBlock';
@@ -134,7 +134,7 @@ export function CorrectionForm({
             ? { status: 'idle' }
             : {
                 status: 'failed',
-                title: 'The correction was not accepted.',
+                title: 'The correction wasn’t accepted.',
                 detail: elsewhere.map((issue) => issue.message).join(' '),
               },
         );
@@ -144,7 +144,7 @@ export function CorrectionForm({
     } catch {
       setState({
         status: 'failed',
-        title: 'The correction was not sent.',
+        title: 'The correction wasn’t sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }
@@ -186,8 +186,8 @@ export function CorrectionForm({
       <fieldset className="ds-form-group">
         <legend>The record</legend>
 
-        <div className="ds-room-field">
-          <span className="ds-room-field__label" aria-hidden="true">
+        <div className="ds-doc-field">
+          <span className="ds-doc-field__label" aria-hidden="true">
             What are you correcting?
           </span>
           <Segmented
@@ -216,7 +216,7 @@ export function CorrectionForm({
             </>
           }
           htmlFor={ids.target}
-          hint="Name the place or paste its page address. You do not need an internal id."
+          hint="Name the place or paste its page address. You don’t need an internal id."
           {...errorProps('targetRecordId')}
         >
           <input
@@ -329,13 +329,13 @@ export function CorrectionForm({
             required
           />
           <label htmlFor={ids.privacy}>
-            I have read how a correction is handled, and understand it enters a restricted review
+            I’ve read how a correction is handled, and understand it enters a restricted review
             queue.
             <RequiredMark />
             <small>{CORRECTION_PRIVACY_NOTICE.body}</small>
           </label>
           {error('privacyConsent') ? (
-            <p className="ds-room-field__error" id={fieldErrorId(ids.privacy)} role="alert">
+            <p className="ds-doc-field__error" id={fieldErrorId(ids.privacy)} role="alert">
               {error('privacyConsent')}
             </p>
           ) : null}

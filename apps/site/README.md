@@ -1,5 +1,8 @@
 # @repo/site: Expo web (SDK 58) + Tamagui
 
+> **2026-11-23:** the v13 redesign (`docs/ui/DESIGN.md`) is being built in `apps/web` by owner
+> decision. This app is not the target of that work and is not replacing `apps/web` during it.
+
 The public BlackStory site, replacing `apps/web` (Next.js). Decision and plan:
 `docs/ui/expo-tamagui-migration-plan.md` (sections 10 to 12) and epic `repo-v0lfu`.
 

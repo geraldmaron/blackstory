@@ -8,14 +8,23 @@ describe('IntroSection photograph', () => {
   const sensitive = normalizeEntity(fullEntityFixture('place'))!;
   const { sensitivity: _s, sensitivityClass: _c, ...plain } = sensitive;
 
-  it('shows a credited photograph as a plate with its credit line', async () => {
-    const { getByTestId } = await render(<IntroSection entity={plain} />);
-    expect(getByTestId('plate-credit').props.children).toBe(plain.primaryImage!.credit);
+  it('shows a credited photograph as an exhibit with its credit as the receipt', async () => {
+    const { getByTestId, getByText } = await render(<IntroSection entity={plain} />);
+    expect(getByTestId('exhibit-label').props.children).toBe('Photograph · date not on record');
+    expect(getByTestId('exhibit-crop-marks', { includeHiddenElements: true })).toBeTruthy();
+    expect(getByText(plain.primaryImage!.credit)).toBeTruthy();
   });
 
-  it('keeps the photograph plain, still credited, on a sensitive record', async () => {
+  it('gives a sensitive record the quiet frame: no crop marks, still credited', async () => {
     const { queryByTestId, getByText } = await render(<IntroSection entity={sensitive} />);
-    expect(queryByTestId('plate')).toBeNull();
+    expect(queryByTestId('exhibit-crop-marks', { includeHiddenElements: true })).toBeNull();
     expect(getByText(sensitive.primaryImage!.credit)).toBeTruthy();
+  });
+
+  it('shows no photograph exhibit, and no stand-in picture, when the record has none', async () => {
+    const { primaryImage: _image, ...bare } = plain;
+    const { queryByTestId } = await render(<IntroSection entity={bare} />);
+    expect(queryByTestId('entity-photograph')).toBeNull();
+    expect(queryByTestId('image-fallback')).toBeNull();
   });
 });

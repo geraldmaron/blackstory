@@ -68,6 +68,9 @@ export type EvidenceAlternateValue = {
   readonly value: string;
   readonly credible: boolean;
   readonly kind: EvidenceAlternateValueKind;
+  /** The source this value came from, when the record holds it. Never the primary's source. */
+  readonly source?: string;
+  readonly sourceHref?: string;
 };
 
 /** Disputes retain the primary value and credible alternatives. */

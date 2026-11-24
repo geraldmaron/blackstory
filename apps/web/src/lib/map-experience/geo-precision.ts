@@ -15,7 +15,7 @@ import {
   type GeoPrecisionTier,
   type JurisdictionBBox,
 } from '@repo/domain/geography/display-radius';
-import { US_STATES } from '@repo/domain/map/geography';
+import { US_STATES, findUsStateFromJurisdictionLabel } from '@repo/domain/map/geography';
 import {
   CLASSIFIED_PRECISIONS,
   precisionBandFor,
@@ -153,4 +153,22 @@ export function resolveDisplayRadiusMeters(
     return { ok: true, radiusMeters: displayRadiusMeters({ tier, jurisdictionBBox: state.bbox }) };
   }
   return { ok: false, reason: 'jurisdiction_bbox_unresolved' };
+}
+
+/**
+ * The precision the record's map is drawn at. A law has a jurisdiction, not a site: the catalog
+ * stores the building it was passed or signed in, and drawing that as an exact site says the law
+ * happened at one address. The record page and the Archive map both draw through this. A state's law is drawn as its state; any other law (federal ones sit
+ * in Washington) is drawn no sharper than its city. Every other record keeps its stored
+ * precision. This only ever coarsens (P-03).
+ */
+export function mapPrecisionFor<P extends string>(entity: {
+  readonly kind: string;
+  readonly locationPrecision: P;
+  readonly jurisdictionLabel: string;
+}): P | 'state' | 'city' {
+  if (String(entity.kind) !== 'law') return entity.locationPrecision;
+  const state = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)?.postalCode;
+  if (state && state !== 'DC') return 'state';
+  return recordMarkFor(entity.locationPrecision) === 'dot' ? 'city' : entity.locationPrecision;
 }

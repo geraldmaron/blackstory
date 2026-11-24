@@ -203,25 +203,25 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
         {
           heading: 'Mission & scope',
           paragraphs: [
-            'BlackStory publishes released historical projections: place-connected Black history with provenance, confidence grades, and living-person protections. History should not be erased: corrections append, disagreements stay visible, and withdrawn records remain resolvable. History should not be hard to find: every public claim carries citations and a path back to sources.',
+            'BlackStory publishes Black history tied to the places it happened, with its sources, a confidence grade and protections for living people. History shouldn’t be erased, so corrections get added on, disagreements stay visible and a withdrawn record keeps its address. It shouldn’t be hard to find either, so every public claim carries citations and a path back to its sources.',
           ],
         },
         {
           heading: 'Verification & triangulation',
           paragraphs: [
-            'Every published fact passes an independent citation-completeness gate: structured references, supporting excerpts, retrieval dates, and archived captures for web sources. Triangulation means at least two independent lineages before a fact reaches corroborated grade; syndicated copies do not inflate scores.',
+            'Before a fact is published, a separate check confirms its citations are complete. That means a structured reference, the excerpt that supports it, the date it was retrieved, and a saved copy for anything from the web. A fact needs at least two independent lines of evidence before it’s graded corroborated, and reprints of the same story don’t count twice.',
           ],
         },
         {
           heading: 'What a fact carries',
           paragraphs: [
-            'Every fact on BlackStory carries its own citations and a status: published, corrected, superseded, or deprecated. Open a record to see its full evidence and its revision history. This is the one claim the old Quick facts digest made, and it belongs here, where a reader goes to ask how the archive decides.',
+            'Every fact on BlackStory carries its own citations and a status, which is one of published, corrected, superseded or deprecated. Open a record to see its full evidence and its revision history.',
           ],
         },
         {
           heading: 'Corrections',
           paragraphs: [
-            'Errors are fixed fully, quickly, and without defensiveness. Every change is timestamped, categorized, and preserved. Nothing is silently edited. See Errata for the change log.',
+            'When something’s wrong it gets fixed in full, and nobody gets defensive about it. Every change is dated, labeled and kept, and nothing is edited silently. Errata has the change log.',
           ],
         },
       ],
@@ -235,7 +235,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     page: {
       slug: 'about',
       title: 'History, pinned to place.',
-      dek: 'BlackStory is a place-connected Black history research platform.',
+      dek: 'Black history, pinned to the places it happened, with the source attached to every claim.',
       publishedAt: '2026-07-01',
       eraLabel: '',
       placeLabel: '',
@@ -243,21 +243,21 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
       relatedFactIds: [],
       body: [
         {
-          heading: 'History should not be erased',
+          heading: 'History shouldn’t be erased',
           paragraphs: [
-            'When sources disagree, both claims stay on the record instead of one quietly winning. When a fact is corrected, the earlier wording remains visible in revision history. Withdrawals stay resolvable with a plain-language reason.',
+            'When sources disagree, both claims stay on the record, and neither one quietly wins. When a fact is corrected, the earlier wording stays visible in the revision history. A withdrawn record keeps its address and says why in plain language.',
           ],
         },
         {
-          heading: 'It should not be hard to find',
+          heading: 'It shouldn’t be hard to find',
           paragraphs: [
-            'Most people pass documented Black history without knowing it is there. BlackStory puts the record back on the ground: open the map, start with a state, search by name or place, or follow a decade of movement. Every published claim carries citations and confidence you can read in words and glyphs, never color alone.',
+            'Most people pass documented Black history without knowing it’s there. BlackStory puts the record back on the ground. Open the map, start with a state, search by name or place, or follow a decade of movement. Every published claim carries citations, and a confidence level you can read in words and marks, never in color alone.',
           ],
         },
         {
-          heading: 'Accessible because it is about you',
+          heading: 'Accessible because it’s about you',
           paragraphs: [
-            'This is not a remote museum shelf. It is history pinned to the places people live, teach, report from, and visit, with evidence attached, dignity rules enforced, and living people protected.',
+            'This isn’t a museum shelf somewhere far off. It’s history pinned to the places people live, teach, report from and visit, with the evidence attached, the dignity rules enforced and living people protected.',
           ],
         },
       ],
@@ -289,7 +289,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
         {
           heading: 'Who runs this',
           paragraphs: [
-            'One person: Gerald Dagher. There is no staff, no department, and no institution behind the name. This is a personal project that publishes public records with their sources attached, so the only thing holding a claim up is the citation next to it.',
+            'One person: Gerald Dagher. There’s no staff, no department, and no institution behind the name. This is a personal project that publishes public records with their sources attached, so the only thing holding a claim up is the citation next to it.',
           ],
         },
         {
@@ -302,19 +302,19 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
         {
           heading: 'What does a confidence grade mean?',
           paragraphs: [
-            'Established: several independent, high-authority sources agree and there is no serious dispute. Corroborated: two or more independent sources support it. Single source: one source that meets the citation bar, not yet checked against another. Contested: credible sources disagree, and the record names the disagreement. A grade measures independence and closeness to the event, nothing else.',
+            'Established: several independent, high-authority sources agree and there’s no serious dispute. Corroborated: two or more independent sources support it. Single source: one source that meets the citation bar, not yet checked against another. Contested: credible sources disagree, and the record names the disagreement. A grade measures independence and closeness to the event, nothing else.',
           ],
         },
         {
           heading: 'I found a mistake. What do I do?',
           paragraphs: [
-            'Use the corrections form. You get a receipt code, the only credential for checking what happened to your report. A person reads it against the published sources; if accepted, the record changes and the change is published in the errata with the earlier wording still readable. There is no promised turnaround: one person reads these.',
+            'Use the corrections form. You get a receipt code, the only credential for checking what happened to your report. A person reads it against the published sources; if accepted, the record changes and the change is published in the errata with the earlier wording still readable. There’s no promised turnaround. One person reads these.',
           ],
         },
         {
-          heading: 'Can I add something that is missing?',
+          heading: 'Can I add something that’s missing?',
           paragraphs: [
-            'Yes. Use the lead form. You do not need an account, an affiliation, or a credential. Every lead is read before anything is published, and nothing goes public without a source someone else can check.',
+            'Yes. Use the lead form. You don’t need an account, an affiliation or a credential. Every lead is read before anything is published, and nothing goes public without a source someone else can check.',
           ],
         },
         {
@@ -342,7 +342,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     page: {
       slug: 'privacy',
       title: 'Privacy',
-      dek: 'What this app collects, and what it deliberately does not.',
+      dek: 'What this app collects, and what it deliberately doesn’t.',
       publishedAt: '2026-06-01',
       eraLabel: '',
       placeLabel: '',
@@ -350,15 +350,15 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
       relatedFactIds: [],
       body: [
         {
-          heading: 'What we do not do',
+          heading: 'What this app doesn’t do',
           paragraphs: [
-            'This app ships with no advertising or tracking SDKs. Query text you type, correction-submission content, and precise device location are never written to on-device storage and never appear in logs or crash reports.',
+            'This app has no advertising or tracking code in it. What you type into search, what you write in a correction and your precise location are never saved on your device, and they never show up in logs or crash reports.',
           ],
         },
         {
           heading: 'What is cached on your device',
           paragraphs: [
-            'Previously-viewed records, evidence, and content pages are cached so they remain readable offline. Cached search results are keyed by a salted hash of your query shape, never the raw text you typed.',
+            'Records, evidence and pages you’ve already opened are saved on your device so you can read them offline. Saved search results are filed under a salted hash of the shape of your search, never the text you typed.',
           ],
         },
       ],
@@ -392,7 +392,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
         {
           heading: 'What this covers',
           paragraphs: [
-            'This covers the BlackStory app and the archive it publishes. It is a notice, not a contract: opening the app never asks you to agree to anything, and nothing below is written to work only if you had. BlackStory is run by Gerald Dagher, an individual — there is no company behind it.',
+            'This covers the BlackStory app and the archive it publishes. It is a notice, not a contract: opening the app never asks you to agree to anything, and nothing below is written to work only if you had. BlackStory is run by Gerald Dagher, an individual. There is no company behind it.',
             'BlackStory is not a government register, a court file, or an archive of record, and a page here proves nothing on its own. Nothing published is legal advice, and nothing certifies a lineage or a claim of descent. Where a record cites a source, the source is the authority; the record is the finding aid that points you to it.',
           ],
         },
@@ -400,7 +400,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
           heading: 'Reusing what BlackStory writes',
           paragraphs: [
             'The writing on BlackStory is published under Creative Commons Attribution 4.0 International (CC BY 4.0). Copy it, republish it, translate it, quote it, build something else on top of it, commercially or not. The condition is credit: name BlackStory, link back to the page you took it from, and say if you changed it.',
-            'That license reaches the writing and the arrangement, not the facts themselves — a date, a name, a place belongs to nobody, and you may use it with no credit owed. The license also does not reach material BlackStory does not own: photographs, scanned documents, and map tiles come from third parties on their own terms, named on the record that displays them.',
+            'That license reaches the writing and the arrangement, not the facts themselves. A date, a name, a place belongs to nobody, and you may use it with no credit owed. The license also does not reach material BlackStory does not own: photographs, scanned documents, and map tiles come from third parties on their own terms, named on the record that displays them.',
           ],
         },
         {
@@ -420,7 +420,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
         {
           heading: 'Accuracy, liability, and affiliate links',
           paragraphs: [
-            'The research here is provided as it stands, without a warranty of completeness or currency. Sources sit on the record so it can be checked, and records change as evidence changes. A disclaimer does not make a wrong record less wrong — the fix is a correction, not this sentence.',
+            'The research here is provided as it stands, without a warranty of completeness or currency. Sources sit on the record so it can be checked, and records change as evidence changes. A disclaimer does not make a wrong record less wrong. The fix is a correction, not this sentence.',
             'BlackStory is free to use and run by one person rather than a company. To the extent the law allows, I am not liable for indirect or consequential loss arising from use of the app.',
             'Some book pages link to Bookshop.org through an affiliate program, and a purchase made through one of those links pays a commission. The affiliate relationship never decides which books appear or what a record says about them.',
           ],
@@ -436,7 +436,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     page: {
       slug: 'errata',
       title: 'Errata log',
-      dek: 'Reverse-chronological corrections, clarifications, updates, and editor notes.',
+      dek: 'Corrections, clarifications, updates and editor’s notes, newest first.',
       publishedAt: '2026-07-15',
       eraLabel: '',
       placeLabel: '',
@@ -483,14 +483,14 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
       body: [
         {
           paragraphs: [
-            'BlackStory is one person’s archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted.',
+            'BlackStory is one person’s archive of Black history, tied to the places it happened. If something in a record is wrong, the corrections form is the fastest way in. It’s moderated, it gives you a receipt code, and nothing is published as you sent it.',
           ],
         },
         {
           heading: 'Ways to get help',
           paragraphs: [
-            'Report a correction to say a published record is wrong, or point at evidence it is missing. Submissions enter moderated review, and nothing changes publicly until a person accepts it.',
-            'Read the methodology for the source rules, confidence grades, and map dignity limits. Browse the errata log for corrections, clarifications, and updates already applied, newest first.',
+            'Report a correction to say a published record is wrong, or to point at evidence it’s missing. What you send goes into moderated review, and nothing changes publicly until a person accepts it.',
+            'Read the methodology for the source rules, the confidence grades and the limits on what the map will show. The errata log has the corrections, clarifications and updates already made, newest first.',
           ],
         },
         {

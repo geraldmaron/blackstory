@@ -33,6 +33,8 @@ import {
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   EXPLORE_GHOST_POINT_LAYER_ID,
+  EXPLORE_LIGHTS_LAYER_ID,
+  EXPLORE_LIGHTS_SOURCE_ID,
   EXPLORE_HOVER_POINT_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
   EXPLORE_COUNTY_HATCH_LAYER_ID,
@@ -42,7 +44,11 @@ import {
   EXPLORE_SITE_NAME_LAYER_ID,
   PLATE_WATERLINE_LAYER_IDS,
 } from '../../app/map/explore-layer-ids';
-import { buildExploreMapStyle, stateLabelFilters } from '../../app/map/explore-style';
+import {
+  buildExploreMapStyle,
+  ORBIT_MAX_ZOOM,
+  stateLabelFilters,
+} from '../../app/map/explore-style';
 import {
   DECADE_CROSSFADE_IN_TARGETS,
   DECADE_CROSSFADE_OUT_TARGETS,
@@ -57,8 +63,12 @@ import { loadedCountyPolygons } from './geo-source-loaders';
 export const SELECTED_FILL_ID = 'explore-state-selected-fill';
 export const SELECTED_LINE_ID = 'explore-state-selected-line';
 
+const LIGHTS_LAST_SET = new WeakMap<object, unknown>();
+
 export const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
+  // Under the entity stack, like the geography: a light is ground, not a mark to click.
+  EXPLORE_LIGHTS_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_US_LAND_LAYER_ID,
   EXPLORE_JURISDICTION_HATCH_LAYER_ID,
@@ -163,7 +173,13 @@ export function applyGeographyStyle(
   },
 ): void {
   const recreateEntities = options?.recreateEntitiesSource === true;
+  // While a surface has the place tokens stood down, the lights' opacity is the stage's
+  // (`setPlaceTokens` keeps them lit down to the pins): a style sync must not dim them again.
+  const tokensDown = map.getContainer().closest('[data-tokens-off]') !== null;
   const paintOmit = options?.preserveDecadeFadeOpacities ? DECADE_FADE_OMIT_CHANNELS : undefined;
+  const geographyOmit = tokensDown
+    ? new Set([...(paintOmit ?? []), `${EXPLORE_LIGHTS_LAYER_ID}:circle-opacity`])
+    : paintOmit;
 
   if (recreateEntities) {
     // A grouping flip (place tokens on or off) rebuilds the entities source and its layers
@@ -199,6 +215,12 @@ export function applyGeographyStyle(
         continue;
       }
       const data = (source as { data?: unknown }).data;
+      // The lights are the same object until the field itself changes (explore-style.ts,
+      // `lightsFor`): re-sending four thousand unchanged points on every patch is pure cost.
+      if (id === EXPLORE_LIGHTS_SOURCE_ID) {
+        if (LIGHTS_LAST_SET.get(existing) === data) continue;
+        LIGHTS_LAST_SET.set(existing, data);
+      }
       if (typeof existing.setData === 'function' && data && typeof data === 'object') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         existing.setData(data as any);
@@ -220,8 +242,15 @@ export function applyGeographyStyle(
         const beforeId = layer.id === 'background' ? undefined : entityAnchor;
         map.addLayer(layer as LayerSpecification, beforeId);
       } else {
-        syncSingleLayerPaint(map, layer, paintOmit ? { omitChannels: paintOmit } : undefined);
-        syncLayerLayoutVisibility(map, layer);
+        syncSingleLayerPaint(
+          map,
+          layer,
+          geographyOmit ? { omitChannels: geographyOmit } : undefined,
+        );
+        // County names stay down with the tokens (`setPlaceTokens`).
+        if (!(tokensDown && layer.id === EXPLORE_COUNTY_LABEL_LAYER_ID)) {
+          syncLayerLayoutVisibility(map, layer);
+        }
       }
       continue;
     }
@@ -290,4 +319,30 @@ export function buildStyleForScheme(
     hatchedCountyKeys: hatchedCountyKeys(cfg.featureCollection, loadedCountyPolygons()),
     ...(loadedCountyPolygons() ? { counties: loadedCountyPolygons()! } : {}),
   });
+}
+
+/**
+ * The Door's Orbit is lights and water at every window size. The style starts lines, names and
+ * land fills at `ORBIT_LINE_MIN_ZOOM` so a small phone's national frame on Explore keeps them;
+ * on the Door they wait for `ORBIT_MAX_ZOOM`, which lets the opening globe grow with a large
+ * window without drawing the states on it. `bare` false puts every layer back where the style
+ * has it. Safe to call on every style event: it writes only what differs.
+ */
+export function applyOrbitLineFloor(
+  map: MapLibreMap,
+  style: StyleSpecification,
+  bare: boolean,
+): void {
+  for (const layer of style.layers) {
+    const gated =
+      layer.type === 'symbol' ||
+      layer.type === 'line' ||
+      (layer.type === 'fill' && layer.id !== 'plate-water');
+    const styled = layer.minzoom ?? 0;
+    if (!gated || styled >= ORBIT_MAX_ZOOM) continue;
+    const live = map.getLayer(layer.id);
+    if (!live) continue;
+    const want = bare ? ORBIT_MAX_ZOOM : styled;
+    if (live.minzoom !== want) map.setLayerZoomRange(layer.id, want, layer.maxzoom ?? 24);
+  }
 }

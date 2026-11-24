@@ -156,7 +156,8 @@ export function instrumentRecordHref(
   },
   collisions?: ReadonlyMap<string, number>,
 ): string {
-  if (isInternalRecordLabel(entity.displayName)) return '';
+  // A token name has no slug, but its record still has a page; '' rendered as a link to nowhere.
+  if (isInternalRecordLabel(entity.displayName)) return `/entity/${entity.id}`;
   if (staysOffPublicMap(entity)) return '';
   if (entity.kind === 'person') return `/entity/${entity.id}`;
   // A statute or case has no address of its own on the plate; `/law` is an index, not the record.

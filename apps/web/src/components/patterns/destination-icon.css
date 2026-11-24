@@ -25,30 +25,8 @@
   gap: 0.45em;
 }
 
-.ds-room .ds-room-grouphd:has(.ds-destination-icon),
-.ds-room .ds-room-card__title:has(.ds-destination-icon) {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
 .ds-palette__title:has(.ds-destination-icon) {
   display: inline-flex;
   align-items: center;
   gap: 0.45em;
-}
-
-/* Muted orientation glyph beside a kicker or nav label. Copper inherits from the label when active. */
-.ds-kicker-glyph {
-  width: 0.72em;
-  height: 0.72em;
-  flex-shrink: 0;
-  color: var(--ds-ink-subtle, var(--ds-ink-muted));
-  transition: color var(--ds-duration-fast) var(--ds-easing);
-}
-
-a:hover .ds-kicker-glyph,
-a:focus-visible .ds-kicker-glyph,
-[aria-current='location'] .ds-kicker-glyph {
-  color: currentColor;
 }

@@ -268,8 +268,8 @@ describe('isUrlLengthSafe', () => {
 
 describe('parseRestoredRoute (cold-start / process-restoration safety)', () => {
   it('restores a valid persisted static route', () => {
-    // A restored `/search` normalizes to Records, where search now lives.
-    expect(parseRestoredRoute({ pathname: '/search' })).toEqual({ pathname: '/records' });
+    // A restored `/search` normalizes to the Archive, where search now lives.
+    expect(parseRestoredRoute({ pathname: '/search' })).toEqual({ pathname: '/archive' });
     expect(parseRestoredRoute({ pathname: '/stories' })).toEqual({ pathname: '/stories' });
   });
 
@@ -305,7 +305,7 @@ describe('parseRestoredRoute (cold-start / process-restoration safety)', () => {
   it('falls back to the safe default for a prototype-pollution-shaped blob without throwing', () => {
     const hostile = JSON.parse('{"__proto__": {"polluted": true}, "pathname": "/explore"}');
     expect(() => parseRestoredRoute(hostile)).not.toThrow();
-    expect(parseRestoredRoute(hostile)).toEqual({ pathname: '/explore' });
+    expect(parseRestoredRoute(hostile)).toEqual({ pathname: '/archive' });
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 });

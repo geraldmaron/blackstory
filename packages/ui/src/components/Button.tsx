@@ -4,8 +4,6 @@
  *
  * Renders `<a>` when given `href`, `<button>` otherwise. A framework link (Next's `Link`) takes
  * the same look through {@link buttonClassName}, so there is one recipe and no second component.
- *
- * `compact` is the map chrome's dense control (radius 8, smaller type), kept for the instrument.
  */
 
 import React, { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from 'react';
@@ -14,7 +12,7 @@ import { cx } from '../utils/cx.js';
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;
 
-export type ButtonVariant = 'primary' | 'secondary' | 'quiet' | 'compact';
+export type ButtonVariant = 'primary' | 'secondary' | 'quiet';
 
 /** The class list for a button-looking element the kit does not render itself. */
 export function buttonClassName(variant: ButtonVariant = 'primary', className?: string): string {

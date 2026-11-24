@@ -59,15 +59,15 @@ test('the page states what the archive refuses to do', () => {
   assert.match(sectionsSource, /ABOUT_REFUSALS/);
 });
 
-test('trust and contribution links come from the registry; collections hand off to /collections', () => {
+test('trust and contribution links come from the registry; collections hand off to the Archive', () => {
   assert.match(sectionsSource, /destinationsInGroup\('take-part'\)/);
   assert.match(sectionsSource, /destinationsInGroup\('check'\)/);
   assert.match(sectionsSource, /cardTitleFor/);
   // Flat link rows: no icon plates and no cards.
-  assert.doesNotMatch(sectionsSource, /DestinationIcon|CardGrid|RoomCard|RoomHandoff/);
+  assert.doesNotMatch(sectionsSource, /DestinationIcon|CardGrid|RoomCard|RelatedLink/);
   assert.match(sectionsSource, /TrustLinks/);
   assert.match(sectionsSource, /ABOUT_COLLECTIONS_HANDOFF/);
-  assert.equal(ABOUT_COLLECTIONS_HANDOFF.href, '/collections');
+  assert.equal(ABOUT_COLLECTIONS_HANDOFF.href, '/archive');
   assert.doesNotMatch(sectionsSource, /readRooms|checkRooms|\[\.\.\.readRooms/);
   // The old page hardcoded six links, two of them into `/history`, which is a redirect endpoint.
   assert.doesNotMatch(sectionsSource, /href="\/history"/);
@@ -106,19 +106,19 @@ test('about links to the source library room', () => {
 });
 
 test('about sections are deep-linkable through a contents list', () => {
-  assert.match(sectionsSource, /RoomJump/);
+  assert.match(sectionsSource, /ContentsList/);
   assert.match(sectionsSource, /id: 'stance'/);
   assert.match(sectionsSource, /id: 'pillars'/);
   assert.match(sectionsSource, /id: 'refusals'/);
   assert.match(sectionsSource, /id="origin"/);
   assert.match(sectionsSource, /id="stance"/);
-  assert.match(sectionsSource, /RoomSection/);
+  assert.match(sectionsSource, /PageSection/);
 });
 
 test('about sections carry no kicker or icon plate', () => {
-  assert.match(sectionsSource, /RoomFactList/);
+  assert.match(sectionsSource, /FactList/);
   assert.doesNotMatch(sectionsSource, /kicker[=:]/);
-  assert.doesNotMatch(sectionsSource, /<RoomSection[^>]*icon=/);
+  assert.doesNotMatch(sectionsSource, /<PageSection[^>]*icon=/);
 });
 
 test('about is a room on the walk, not the old board', () => {

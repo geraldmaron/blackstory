@@ -18,18 +18,20 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Chip, FilterButton, Notice } from '@repo/ui';
+import { Button, Chip, FilterButton, Notice, Segmented } from '@repo/ui';
 import { recordsHref } from '../../lib/records/records-query';
 import { featuresInView, narrowingBounds } from '../../lib/map-experience/view-scope';
 import { QuickFilters } from '../../components/map-experience/QuickFilters';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import type { ExploreMapBounds } from '../../lib/map-experience/url-state';
+import type { ExploreMapBounds, ExploreViewState } from '../../lib/map-experience/url-state';
 import {
   drawableCollection,
   matchExploreCollection,
   recordsQueryFromExplore,
 } from '../../lib/discovery/explore-collection';
+import { membershipSentence } from '../../lib/discovery/continuity-label';
 import {
+  documentedDecades,
   normalizePeriod,
   periodIsActive,
   periodIsInvalid,
@@ -42,8 +44,6 @@ import {
 import { CommandBar } from '../../components/shell/CommandBar';
 import { CommandPalette } from '../../components/patterns/command-palette/CommandPalette';
 import { ShortcutSheet } from '../../components/patterns/ShortcutSheet';
-import { SelectionGround } from '../../components/map-experience/SelectionGround';
-import type { Map as MapLibreMap } from 'maplibre-gl';
 import { CollectionsDrawer } from '../../components/patterns/CollectionsDrawer';
 import { EmptyState } from '../../components/patterns/EmptyState';
 import { ToastStack, useToasts } from '../../components/patterns/Toast';
@@ -107,7 +107,7 @@ import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-m
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
 import { clearPinContinuity, readPinContinuity } from '../../lib/discovery/pin-continuity';
-import './atlas.css';
+import './explore.css';
 
 void React;
 
@@ -386,7 +386,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
     ],
   );
 
-  useExploreUrlSync(view.viewState, {
+  const mapHref = useExploreUrlSync(view.viewState, {
     collectionState,
     stateCode,
     kindFamily,
@@ -802,8 +802,47 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
         : null,
     [view.collectionFacts, view.allFeatures, collectionState, collectionMembers],
   );
-  const unmapped = drawable !== null ? Math.max(0, collectionMatched - drawable) : 0;
-  const matchingRecordsHref = recordsHref(recordsQueryFromExplore(collectionState));
+  /** Records every other filter keeps that the decade range leaves out for having no decade. */
+  const undatedExcluded = useMemo(() => {
+    if (!view.collectionFacts || !periodIsActive(period) || period.includeUndated) return 0;
+    if (periodIsInvalid(period)) return 0;
+    const {
+      periodStart: _start,
+      periodEnd: _end,
+      includeUndated: _undated,
+      ...unbrushed
+    } = collectionState as ExploreViewState;
+    return matchExploreCollection(view.collectionFacts, unbrushed, collectionMembers).filter(
+      (fact) => documentedDecades(fact.eraBuckets).length === 0,
+    ).length;
+  }, [view.collectionFacts, period, collectionState, collectionMembers]);
+  /**
+   * The same filter set in the list and the timeline, carrying the selected record and place so
+   * the list's Map link brings the reader back to them. Plain links: no script needed to follow.
+   */
+  const listQuery = {
+    ...recordsQueryFromExplore(collectionState),
+    selected: selectedId ?? '',
+    place: placeKey ?? '',
+  };
+  // The page the reader left belongs to the layout it was counted in, and only while the filters
+  // are the ones it was counted under (the address sync above drops it when they change).
+  const returned = new URLSearchParams(mapHref.split('?')[1] ?? '');
+  const page = Number(returned.get('page') ?? 1);
+  const seed = returned.get('seed') ?? '';
+  const cameFromTimeline = view.viewState.layout === 'chronology';
+  const listHref = recordsHref({
+    ...listQuery,
+    seed,
+    layout: 'index',
+    page: cameFromTimeline ? 1 : page,
+  });
+  const timelineHref = recordsHref({
+    ...listQuery,
+    seed,
+    layout: 'chronology',
+    page: cameFromTimeline ? page : 1,
+  });
 
   /* —— What the column shows. —— */
   const columnView = inspector ? 'inspector' : filtersOpen ? 'filters' : 'list';
@@ -857,7 +896,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   /** Kind and state already show, set and emphasized, in the quick pills over the list. */
   const shownEchoes =
     columnView === 'list'
-      ? echoes.filter((echo) => echo.key !== 'kind' && echo.key !== 'state')
+      ? // An exact kind (`kind=school`) is narrower than the family its pill shows, so it stays.
+        echoes.filter((echo) => (echo.key !== 'kind' || exactKind !== null) && echo.key !== 'state')
       : echoes;
 
   const header = !ready ? (
@@ -870,8 +910,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   ) : (
     <>
       <h2 className="ds-xcol__count" tabIndex={-1} ref={countHeadingRef} aria-live="polite">
-        <span className="ds-xcol__count-num">{count.toLocaleString('en-US')}</span>{' '}
-        <span className="ds-xcol__count-unit">{count === 1 ? 'record' : 'records'}</span>
+        {count.toLocaleString('en-US')} {count === 1 ? 'record' : 'records'} listed
       </h2>
       <FilterButton
         count={filterCount}
@@ -951,8 +990,34 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       </p>
     ) : null;
 
+  /** Shown over the list and over an open record, so a selection can travel to the list too. */
+  const views = (
+    <div className="ds-xcol__views" data-archive-views>
+      <Segmented
+        label="Show records as"
+        value="map"
+        options={[
+          { value: 'map', label: 'Map', href: mapHref },
+          { value: 'list', label: 'List', href: listHref },
+          { value: 'timeline', label: 'Timeline', href: timelineHref },
+        ]}
+      />
+    </div>
+  );
+
   const list = (
     <>
+      {views}
+      {drawable !== null && unresolvedScope === undefined && !overlapIds ? (
+        <p className="ds-xcol__note" role="status" data-membership>
+          {membershipSentence({
+            view: 'map',
+            matched: collectionMatched,
+            mapped: drawable,
+            undatedExcluded,
+          })}
+        </p>
+      ) : null}
       {scopeLine}
       {unresolvedScope !== undefined ? (
         <p className="ds-xcol__note" role="status">
@@ -996,22 +1061,21 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           <EmptyState
             constraints={{
               ...(evidenceFloor !== 'any' ? { evidenceFloor } : {}),
-              ...(era !== 'all' ? { decade: era } : {}),
+              // A brushed range or an exact kind is a filter too: without them an emptied list
+              // read as "No records loaded yet", which blames the archive for the reader's filter.
+              ...(era !== 'all'
+                ? { decade: era }
+                : periodIsActive(period)
+                  ? { decade: `${period.start}-${period.end}` }
+                  : {}),
               ...(stateCode ? { state: stateCode } : {}),
-              ...(kindFamily ? { kind: kindFamily } : {}),
+              ...((exactKind ?? kindFamily) ? { kind: exactKind ?? kindFamily! } : {}),
               ...(query ? { query } : {}),
             }}
             onReset={resetLens}
           />
         }
       />
-      {unmapped > 0 && !overlapIds ? (
-        <p className="ds-xcol__note">
-          {unmapped.toLocaleString('en-US')} matching{' '}
-          {unmapped === 1 ? 'record has' : 'records have'} no place on the map.{' '}
-          <a href={matchingRecordsHref}>See them in Records</a>
-        </p>
-      ) : null}
     </>
   );
 
@@ -1053,17 +1117,6 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
             Records.
           </Notice>
         </div>
-      ) : null}
-
-      {/* The selected record's photograph as the map's ground, clear over its pin. */}
-      {inspector?.photoUrl && selectedFeature && mode === 'atlas' && !chromeHidden ? (
-        <SelectionGround
-          key={inspector.id}
-          map={stage.getMap() as unknown as MapLibreMap | null}
-          lngLat={selectedFeature.geometry.coordinates}
-          photoUrl={inspector.photoUrl}
-          person={inspector.kind === 'person'}
-        />
       ) : null}
 
       <AnnotationOverlay
@@ -1109,7 +1162,7 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
               }
             : columnView === 'filters'
               ? { search: placeSearch }
-              : {})}
+              : { search: views })}
           echoes={
             ready && columnView !== 'inspector' && shownEchoes.length > 0 ? (
               <div className="ds-xcol__echoes" role="group" aria-label="Active filters">

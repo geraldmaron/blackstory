@@ -2,7 +2,7 @@
  * RSS export for the public errata log.
  *
  * Entry URLs must be absolute against `NEXT_PUBLIC_SITE_URL`, and this feed is built from the
- * same `listErrataEntries()` list the page renders, per docs/ui/design-direction-v9-surfaces.md
+ * same `listErrataEntries()` list the page renders, per docs/ui/archive/design-direction-v9-surfaces.md
  * §4.5. `NEXT_PUBLIC_SITE_URL` is preferred over the request origin so the feed's canonical
  * identity does not shift with the host a crawler happened to hit.
  */

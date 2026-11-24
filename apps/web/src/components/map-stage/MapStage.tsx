@@ -47,12 +47,14 @@ import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
+  EXPLORE_COUNTY_LABEL_LAYER_ID,
+  EXPLORE_LIGHTS_LAYER_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
-import { buildExploreMapStyle } from '../../app/map/explore-style';
+import { buildExploreMapStyle, lightsOpacity, ORBIT_MAX_ZOOM } from '../../app/map/explore-style';
 import {
   applyDensityBlendProgress,
   applyDecadeHoldFeatureState,
@@ -128,6 +130,7 @@ import { recordMarkFor } from '../../lib/map-experience/geo-precision';
 import { EMPTY_EDGE_COLLECTION, EMPTY_FEATURE_COLLECTION, type StageConfig } from './stage-config';
 import {
   applyGeographyStyle,
+  applyOrbitLineFloor,
   buildStyleForScheme,
   setSelectedStateFilter,
 } from './style-application';
@@ -181,11 +184,7 @@ import {
 import { createReducedMotionListener, type ReducedMotionListener } from './reduced-motion-listener';
 // The plate is the subscriber half of the seam `MapMoment` documents: the stage publishes which
 // moment is live and where, and never touches a map itself.
-import {
-  resolveMomentCamera,
-  useMapMomentFrame,
-  useReportMapAvailability,
-} from '../room/MapMoment';
+import { resolveMomentCamera, useMapMomentFrame, useReportMapAvailability } from './MapMoment';
 
 /**
  * Give the slot geometry back, so the plate returns to its resting full-viewport box and the
@@ -352,7 +351,21 @@ export type MapStageHandle = {
    * Door browse morph: force Live posture (reader-steered gestures) while the journey surface
    * stays mounted on `/`. Clears back to the surface-class default when browse ends.
    */
-  readonly setDoorBrowseLive: (live: boolean) => void;
+  readonly setBrowseLive: (live: boolean) => void;
+  /**
+   * Whether place tokens (counts and names) and site names draw. A surface that flies the camera
+   * to one record (the Door's tour) turns them off, so the flight does not pass through every
+   * state, county and city count on the way; the surface turns them back on when it is done.
+   */
+  readonly setPlaceTokens: (shown: boolean) => void;
+  /**
+   * Whether the map's own text (street, city, state and county names) draws. A surface that
+   * moves the camera every frame (the Door's scroll scrub) turns it off while it travels: at
+   * that speed no name can be read, and placing them is the largest per-frame cost of a dive
+   * (about a third of main-thread time on a throttled phone). On again, each layer returns to
+   * the visibility it had.
+   */
+  readonly setMapLabels: (shown: boolean) => void;
   /**
    * The live MapLibre map, or null before it starts and after it fails.
    *
@@ -384,6 +397,8 @@ export type AtlasCameraTarget = {
   project(lngLat: never): { x: number; y: number };
   /** Whether a flight, ease or gesture is in progress — a refit must not cut one short. */
   isMoving(): boolean;
+  /** One callback when the current move ends: for work that must wait for the camera to land. */
+  once(type: 'moveend', listener: () => void): unknown;
   stop(): unknown;
 };
 
@@ -395,6 +410,16 @@ export function useMapStage(): MapStageHandle {
     throw new Error('useMapStage() must be called within a MapStageProvider');
   }
   return ctx;
+}
+
+/**
+ * The stage, or null where no provider is above. A driver can render inside a server-streamed
+ * page, and its server render does not see the root shell's context (the throw above made
+ * React abandon server rendering for the record's whole boundary). It only acts in effects, so on
+ * the server it needs nothing.
+ */
+export function useOptionalMapStage(): MapStageHandle | null {
+  return useContext(MapStageContext);
 }
 
 /** Hover-intent delay before a pin's photo card opens (`PinPhotoCard`'s own doc comment). */
@@ -525,16 +550,66 @@ export function MapStageProvider({
     defaultPostureFor(surfaceClassFor(pathname ?? '/')),
   );
   /** Door in-place browse: Live gestures without leaving the Door route tree. */
-  const [doorBrowseLive, setDoorBrowseLiveState] = useState(false);
-  const doorBrowseLiveRef = useRef(false);
-  doorBrowseLiveRef.current = doorBrowseLive;
-  const setDoorBrowseLive = useCallback((live: boolean) => {
-    doorBrowseLiveRef.current = live;
-    setDoorBrowseLiveState(live);
+  const [browseLive, setBrowseLiveState] = useState(false);
+  const browseLiveRef = useRef(false);
+  browseLiveRef.current = browseLive;
+  const setBrowseLive = useCallback((live: boolean) => {
+    browseLiveRef.current = live;
+    setBrowseLiveState(live);
+  }, []);
+  const setPlaceTokens = useCallback((shown: boolean) => {
+    plateRef.current?.toggleAttribute('data-tokens-off', !shown);
+    const map = mapRef.current;
+    // With the tokens down the lights carry the records all the way to the pins
+    // (`lightsOpacity`); `applyGeographyStyle` leaves this channel alone while they are down.
+    if (map?.getLayer(EXPLORE_LIGHTS_LAYER_ID)) {
+      map.setPaintProperty(EXPLORE_LIGHTS_LAYER_ID, 'circle-opacity', lightsOpacity(!shown));
+    }
+    // County names go with the tokens. The basemap prints one per tile a county crosses and only
+    // the token layer thins them (`hideNamedCounties`), so with it down a landing repeated its
+    // county four times around the record.
+    if (map?.getLayer(EXPLORE_COUNTY_LABEL_LAYER_ID)) {
+      map.setLayoutProperty(
+        EXPLORE_COUNTY_LABEL_LAYER_ID,
+        'visibility',
+        shown && configRef.current.clusteringEnabled ? 'visible' : 'none',
+      );
+    }
+    // The token layer lays out on `render` (place-labels.ts): ask for one so it catches up.
+    if (shown) map?.triggerRepaint();
+  }, []);
+  /** The symbol layers `setMapLabels(false)` hid, with the visibility each had. */
+  const hiddenLabelsRef = useRef<Map<string, 'visible' | 'none'> | null>(null);
+  const setMapLabels = useCallback((shown: boolean) => {
+    const map = mapRef.current;
+    if (!map || shown === (hiddenLabelsRef.current === null)) return;
+    if (shown) {
+      for (const [id, visibility] of hiddenLabelsRef.current ?? []) {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility);
+      }
+      hiddenLabelsRef.current = null;
+      return;
+    }
+    const hidden = new Map<string, 'visible' | 'none'>();
+    for (const layer of map.getStyle().layers) {
+      if (layer.type !== 'symbol') continue;
+      hidden.set(layer.id, layer.layout?.visibility === 'none' ? 'none' : 'visible');
+      map.setLayoutProperty(layer.id, 'visibility', 'none');
+    }
+    hiddenLabelsRef.current = hidden;
   }, []);
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
   postureRef.current = posture;
+  /** True while the plate is the Door's own Orbit, not its browse posture: lines wait for
+   * `ORBIT_MAX_ZOOM` there (`applyOrbitLineFloor`). */
+  const bareOrbit = posture === 'ambient' && !browseLive;
+  const bareOrbitRef = useRef(bareOrbit);
+  bareOrbitRef.current = bareOrbit;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map?.isStyleLoaded()) applyOrbitLineFloor(map, configRef.current.style, bareOrbit);
+  }, [bareOrbit]);
   /** The custom rotate gestures currently attached (`custom-rotate-gestures.ts`), or all null
    * when the posture has them detached. One ref, not three independent booleans, so the set
    * attaches and detaches together — see that module's doc comment for why they are one
@@ -663,9 +738,21 @@ export function MapStageProvider({
    */
   const markPlateReady = useCallback(() => {
     if (canceledRef.current || plateReadyRef.current) return;
-    plateReadyRef.current = true;
-    stampPlateReady(plateRef.current);
-    notify(listenersRef.current, 'ready');
+    const reveal = () => {
+      if (canceledRef.current || plateReadyRef.current) return;
+      plateReadyRef.current = true;
+      stampPlateReady(plateRef.current);
+      notify(listenersRef.current, 'ready');
+    };
+    const map = mapRef.current;
+    if (!map) {
+      reveal();
+      return;
+    }
+    // v12: the plate is flat everywhere (design-direction-v12.md, "Don't show the planet"). It
+    // used to open as, or switch to, MapLibre's globe here; nothing shows the ball any more, so
+    // the plate reveals as it painted.
+    reveal();
   }, []);
 
   const entityPoint = useCallback((entityId: string): EntityPoint | undefined => {
@@ -1156,12 +1243,16 @@ export function MapStageProvider({
         setSelectedEntityFilter(map, selectedEntity);
         syncSelectionFlag(map, selectedEntity);
       };
+      // Apply now: each setter skips a layer the style does not have yet, and a layer that is
+      // there takes a filter whether or not tiles are still loading. Waiting for the map to
+      // settle held the mark back for a whole flight, and for a whole scrubbed dive on home,
+      // where the map never settles until the scroll rests: the ring arrived after the camera.
+      apply();
       // A selection made while sources are still loading (the home hand-off lands mid-flight,
       // as the catalog replaces the first-paint pins) used to be dropped, leaving the record
-      // framed with no copper mark. Apply it as soon as the map settles instead, reading the
-      // latest selection then.
-      if (map.isStyleLoaded()) apply();
-      else map.once('idle', apply);
+      // framed with no copper mark. Apply it again once the map settles, reading the latest
+      // selection then.
+      if (!map.isStyleLoaded()) map.once('idle', apply);
     },
     [syncSelectionFlag],
   );
@@ -1404,10 +1495,10 @@ export function MapStageProvider({
           style: buildArchiveBaseStyle(mountScheme),
           attributionControl: false,
           clickTolerance: MAP_CLICK_TOLERANCE_PX,
-          // Keep the camera US-centered without a tight maxBounds box (see the former
-          // ExploreMapCanvas's identical comment): a portrait canvas cannot show full CONUS
-          // east-west if maxBounds also caps latitude.
-          renderWorldCopies: false,
+          // v11: the plate is a globe, which has no world copies to render. `false` here made
+          // MapLibre clamp a world-scale center to keep the Mercator map's edge off screen, both
+          // before the globe style loaded and on any flight that crossed the globe-to-Mercator
+          // handover, so the Door's Orbit landed over the Atlantic.
           // Street-level context is available (OpenFreeMap roads from z8); stop short of
           // address-level invasion — precision redaction still governs marker honesty.
           minZoom: MAP_MIN_ZOOM,
@@ -1419,6 +1510,13 @@ export function MapStageProvider({
         });
 
         mapRef.current = map;
+        // v11 Orbit: below the national frame the plate shows lights, not place tokens. The
+        // tokens are DOM, so the plate says which altitude it is at and shell.css hides them.
+        const orbitMap = map;
+        const syncOrbit = () =>
+          plateRef.current?.toggleAttribute('data-orbit', orbitMap.getZoom() < ORBIT_MAX_ZOOM);
+        orbitMap.on('zoom', syncOrbit);
+        orbitMap.on('load', syncOrbit);
         placeLabelsRef.current = bindPlaceLabels(map);
         placeLabelsRef.current.setSelectedPlace(
           configRef.current.selectedState
@@ -1449,6 +1547,10 @@ export function MapStageProvider({
         };
         map.on('styledata', collapseAttribution);
         map.on('sourcedata', collapseAttribution);
+        // A theme switch or a patch can put layers back at the style's own floor.
+        map.on('styledata', () => {
+          if (map) applyOrbitLineFloor(map, configRef.current.style, bareOrbitRef.current);
+        });
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
         });
@@ -1479,6 +1581,15 @@ export function MapStageProvider({
        * National discs are a few pixels; query a padded box so a near-miss still opens
        * the record sheet instead of selecting the state fill underneath.
        */
+      function pointerOffsetPx(
+        map: MapLibreMap,
+        coordinates: readonly number[],
+        point: { x: number; y: number },
+      ): number {
+        const at = map.project([coordinates[0]!, coordinates[1]!]);
+        return Math.hypot(at.x - point.x, at.y - point.y);
+      }
+
       function pointerHitAt(point: { x: number; y: number }) {
         if (!ENTITY_POINTER_HIT_LAYER_IDS.some((id) => activeMap.getLayer(id))) return undefined;
         const features = queryRenderedLayers<MapLibreNamespace.MapGeoJSONFeature>(
@@ -1491,7 +1602,7 @@ export function MapStageProvider({
             layerId: feature.layer.id,
             properties: feature.properties ?? null,
             ...(feature.geometry.type === 'Point'
-              ? { coordinates: feature.geometry.coordinates }
+              ? { offsetPx: pointerOffsetPx(activeMap, feature.geometry.coordinates, point) }
               : {}),
           })),
         );
@@ -1514,13 +1625,20 @@ export function MapStageProvider({
           return;
         }
         const [west, south, east, north] = hit.bounds;
-        const framed = activeMap.cameraForBounds(
-          [
-            [west, south],
-            [east, north],
-          ],
-          { padding: 48 },
-        );
+        // Not `fitBoundsCamera`: this move lands on the fitted center with the camera's held
+        // padding still on it, so the fit has to be computed against that padding too.
+        let framed: ReturnType<typeof activeMap.cameraForBounds>;
+        try {
+          framed = activeMap.cameraForBounds(
+            [
+              [west, south],
+              [east, north],
+            ],
+            { padding: 48 },
+          );
+        } catch {
+          // MapLibre's globe throws when the paddings leave no canvas; the fallback frame below.
+        }
         activeMap.easeTo({
           center: framed?.center ?? [(west + east) / 2, (south + north) / 2],
           zoom: placeDrillZoom(hit.level, framed?.zoom, MAP_MAX_ZOOM, hit.openZoom),
@@ -1724,7 +1842,7 @@ export function MapStageProvider({
   const getMap = useCallback(() => mapRef.current as unknown as AtlasCameraTarget | null, []);
 
   /* —— The Framed posture ————————————————————————————————————————————————————————
-     This is the seam `components/room/MapMoment.tsx` documents and SP-08 owes it: the stage
+     This is the seam `components/page/MapMoment.tsx` documents and SP-08 owes it: the stage
      publishes which moment is live and where its slot is, and the plate moves into that slot
      rather than a second MapLibre instance being built inside the document.
 
@@ -1746,7 +1864,7 @@ export function MapStageProvider({
       heldSlotRef.current = null;
     }
     lastFramedMomentRef.current = null;
-    if (doorBrowseLiveRef.current) {
+    if (browseLiveRef.current) {
       setPosture('live');
       return;
     }
@@ -1754,12 +1872,12 @@ export function MapStageProvider({
   }, [surfaceClass]);
 
   useEffect(() => {
-    if (doorBrowseLive) {
+    if (browseLive) {
       setPosture('live');
       return;
     }
     setPosture(defaultPostureFor(surfaceClass));
-  }, [doorBrowseLive, surfaceClass]);
+  }, [browseLive, surfaceClass]);
 
   /**
    * Posture changes reach the gesture handlers directly. The Framed path below does the same
@@ -1816,7 +1934,7 @@ export function MapStageProvider({
     // Door browse hands the plate to the reader. This per-frame resolver used to ignore that and
     // put the Door's `ambient` posture back on every frame — on a touch screen that is a full
     // gesture lock, so /explore on a phone could not be dragged or pinched at all.
-    const next = doorBrowseLiveRef.current
+    const next = browseLiveRef.current
       ? 'live'
       : resolvePlatePosture({
           surface: surfaceClass,
@@ -1945,7 +2063,9 @@ export function MapStageProvider({
         ensureMap();
         resize();
       },
-      setDoorBrowseLive,
+      setBrowseLive,
+      setPlaceTokens,
+      setMapLabels,
       getMap: () => {
         ensureMap();
         return getMap();
@@ -1962,7 +2082,9 @@ export function MapStageProvider({
       clearSearchCenterMarker,
       setSearchArea,
       resize,
-      setDoorBrowseLive,
+      setBrowseLive,
+      setPlaceTokens,
+      setMapLabels,
       getMap,
     ],
   );

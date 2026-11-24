@@ -13,11 +13,11 @@ import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room, RoomJump, RoomSection } from '../../components/room';
+import { parentCrumb, PageFrame, ContentsList, PageSection } from '../../components/page';
 import { TrustMast, TrustSheet } from '../../components/trust';
 import { FAQ_ENTRIES, FAQ_LEDE, FAQ_SECTIONS, faqEntryId, type FaqLink } from './faq-copy';
 import { FaqHashOpener } from './FaqHashOpener';
-import '../reading-room.css';
+import '../reading-page.css';
 import '../../components/trust/trust.css';
 import './faq.css';
 
@@ -27,7 +27,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/faq',
   title: 'Questions',
   description:
-    'Who makes BlackStory, how AI is and is not used, how a record gets in, what a grade means, why coverage is uneven, and how to report an error.',
+    'Who makes BlackStory, how AI is and isn’t used, how a record gets in, what a grade means, why coverage is uneven, and how to report an error.',
 });
 
 /** An internal room link, a mailto, or an off-site page. Only the first needs the client router. */
@@ -45,13 +45,11 @@ function FaqLinkRow({ link }: { readonly link: FaqLink }) {
 
 export default function FaqPage() {
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
-          art={['weave']}
-          tone="copper"
           numeral={{
             value: String(FAQ_ENTRIES.length),
             label: 'questions, each with its own address',
@@ -68,13 +66,13 @@ export default function FaqPage() {
       }
     >
       <TrustSheet>
-        <RoomJump
+        <ContentsList
           sections={FAQ_SECTIONS.map((section) => ({ id: section.id, label: section.heading }))}
         />
         <FaqHashOpener />
 
         {FAQ_SECTIONS.map((section) => (
-          <RoomSection key={section.id} id={section.id} title={section.heading}>
+          <PageSection key={section.id} id={section.id} title={section.heading}>
             <div className="ds-faq">
               {section.entries.map((entry) => {
                 const [first, ...rest] = entry.answer;
@@ -112,13 +110,13 @@ export default function FaqPage() {
                 );
               })}
             </div>
-          </RoomSection>
+          </PageSection>
         ))}
 
         <p className="ds-trust-foot">
-          A question that is not here? <Link href="/support">Ask it directly</Link>.
+          A question that isn’t here? <Link href="/support">Ask it directly</Link>.
         </p>
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

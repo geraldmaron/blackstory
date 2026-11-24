@@ -1,0 +1,519 @@
+/**
+ * reading page surface class — the only stylesheet a Reading route imports.
+ *
+ * Design law: docs/ui/archive/patterns-reading-room.md, design-direction-v9-surfaces.md §4.
+ * Everything drawn here comes from the shared kit; this file holds the rules that are specific
+ * to a page you read rather than scan. Widths come from the page's container (`PageFrame width`).
+ */
+
+@import '../components/page/page-kit.css';
+
+/* The memorial wall (protected) still ends on its off-ramp card; nothing else renders one. */
+[data-surface='reading'] .ds-doc-offramp:not(:last-child) {
+  margin-bottom: var(--ds-space-8);
+}
+
+/* Reading progress: a hairline that fills as the reader scrolls the
+   document. One rule for the whole Reading class, not a per-screen decision. Design law:
+   docs/ui/archive/patterns-reading-room.md, design-direction-v9-surfaces.md §4; reference build
+   .design-mocks/blackstory-atlas-v9.html #docprog (line 965).
+
+   The element (components/page/ReadingProgress.tsx) is mounted once, in ShellPageTransition, on
+   every route. This selector is what actually decides whether a reader ever sees it — `display`
+   lives here rather than as an inline style so "paints only on Reading" is a property of this
+   stylesheet, checkable in one place, rather than of every future page remembering to leave the
+   component out. `top` reads the same live island-clearance token the header itself measures
+   into, so the bar sits directly under the bar on every viewport without restating its height. */
+.ds-reading-progress {
+  display: none;
+  position: fixed;
+  top: var(--ds-island-clearance);
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ds-accent-graphic);
+  z-index: var(--ds-z-content);
+  pointer-events: none;
+  transition: width var(--ds-duration-fast) linear;
+}
+
+[data-surface='reading'] .ds-reading-progress {
+  display: block;
+}
+
+/* =====================================================================================
+* SP-11h — errata log rules
+ * Folded from apps/web/src/app/errata/errata.css (now deleted). The log is a plain
+ * reverse-chronological hairline list, never a set of disclosures: docs/ui/
+ * design-direction-v9-surfaces.md §4.2 "/errata".
+ * ============================================================================================ */
+
+/* —— /methodology hand-drawn figures ————————————————————————————————————————
+ * Bounded figures in the reading column, styled after the page kit's own MapMoment
+ * plate (hairline border, sunk ground, mono caption with a left rule) rather than the
+ * superseded v6 copper-mosaic sketch. SVG shapes and text sizing live in
+ * MethodologyDiagrams.tsx; this sheet only owns the frame and the caption. */
+
+/* —— end /methodology hand-drawn figures ————————————————————————————————————— */
+
+/* ===========================================================================
+   /memorial — the reading page whose canvas is the handwritten wall.
+   Shared reading-page styles own this rule. `.ds-memorial` is the positioned
+   root so the wall (absolute, z-index 0) cannot paint over the page content
+   that follows it in the document.
+   =========================================================================== */
+
+.ds-memorial {
+  position: relative;
+  min-height: 100%;
+  background: var(--ds-canvas);
+}
+
+/* The wall is `position: absolute; z-index: 0`, so it paints above any
+   unpositioned page content that follows it in the document. Without this the
+   handwritten names run straight through the header and the list. */
+.ds-memorial .ds-doc {
+  position: relative;
+  z-index: var(--ds-z-content);
+}
+
+/* The wall is the page's masthead (one screen plus the step-closer stretch, memorial-wall.css).
+   The body rises over its last 40svh, so the list arrives in front of the dimming wall instead of
+   after it. Positioned so it paints over the sticky wall it overlaps. */
+.ds-memorial .ds-doc__body {
+  position: relative;
+  margin-top: -40vh;
+  margin-top: -40svh;
+}
+
+/* ---- the names index ------------------------------------------------------
+   A heading on the table, rising over the dimming wall, then one paper sheet with page bands
+   that holds every name: a finder column (Find a name, letter jump) beside the letter groups.
+   Each group is marked by its letter at display size and read down in columns, like a wall.
+   Ink on paper in both themes; no copper on this surface. */
+
+.ds-memorial-index__head {
+  max-width: 46rem;
+  padding-bottom: var(--ds-space-10);
+}
+
+.ds-memorial-index__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--ds-ink);
+  text-wrap: balance;
+}
+
+.ds-memorial-index__lede {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 38em;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial-lede);
+  line-height: 1.6;
+  color: var(--ds-ink-muted);
+}
+
+/* The list's sheet keeps the look it was built with (PROTECTED-EXPERIENCES.md P-01, DESIGN.md 9.4):
+   the kit's Sheet is square and flat now, so the rounded corners, the three page bands, the shadow
+   and the slide onto the page are stated here, for this one sheet. */
+.ds-memorial-index__sheet {
+  display: grid;
+  grid-template-columns: 12.75rem minmax(0, 1fr);
+  gap: var(--ds-space-12);
+  --ds-sheet-pad: var(--ds-space-12);
+  padding-left: calc(var(--ds-sheet-pad) + var(--ds-band-w) * 3);
+  border-radius: 14px;
+  box-shadow:
+    inset var(--ds-band-w) 0 0 var(--ds-band-1),
+    inset calc(var(--ds-band-w) * 2) 0 0 var(--ds-band-2),
+    inset calc(var(--ds-band-w) * 3) 0 0 var(--ds-band-3),
+    var(--ds-shadow-sheet);
+  animation: ds-memorial-sheet-in 240ms var(--ds-ease-entrance) both;
+}
+
+@keyframes ds-memorial-sheet-in {
+  from {
+    transform: translateY(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-memorial-index__sheet {
+    animation: none;
+  }
+}
+
+/* The finder holds still beside the names while the reader scrolls through them. */
+.ds-memorial-index__finder {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-8));
+  align-self: start;
+  display: grid;
+  gap: var(--ds-space-8);
+}
+
+.ds-memorial-index__find {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-memorial-index__find-label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__find-input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border-control, var(--ds-ink));
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-subtitle);
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__find-input:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
+  outline-offset: 2px;
+}
+
+/* Reserves its line so a result count appearing never pushes the letters down. */
+.ds-memorial-index__find-status {
+  min-height: 1.5em;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-memorial-index__jump-list {
+  display: grid;
+  grid-template-columns: repeat(4, 2.75rem);
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-memorial-index__jump-link {
+  display: grid;
+  place-items: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-subtitle);
+  font-weight: 500;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+a.ds-memorial-index__jump-link:hover {
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-ink);
+}
+
+/* The letter being read: a solid ink tile in heavier type, so it reads by shape and weight. */
+.ds-memorial-index__jump-link[aria-current='location'] {
+  background: var(--ds-ink);
+  color: var(--ds-canvas);
+  font-weight: 700;
+}
+
+.ds-memorial-index__jump-link[aria-disabled='true'] {
+  color: var(--ds-ink-subtle, var(--ds-ink-muted));
+  opacity: 0.45;
+}
+
+.ds-memorial-index__jump-link:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
+  outline-offset: 2px;
+}
+
+.ds-memorial-index__group {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: var(--ds-space-8);
+  padding-bottom: var(--ds-space-10);
+}
+
+/* A rule between groups, counted from the first one still showing while the list is filtered. */
+.ds-memorial-index__group:not([hidden]) ~ .ds-memorial-index__group {
+  padding-top: var(--ds-space-10);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Outranks `.ds-memorial [id]` below, which would otherwise set the jump offset. */
+.ds-memorial section.ds-memorial-index__group {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+/* The letter stays in view while its names scroll past. */
+.ds-memorial-index__letter {
+  position: sticky;
+  top: calc(var(--ds-island-clearance) + var(--ds-space-8));
+  align-self: start;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: var(--ds-text-display-2);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ds-ink);
+}
+
+.ds-memorial-index__names {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 3 15rem;
+  column-gap: var(--ds-space-10);
+}
+
+.ds-memorial-index__entry {
+  display: grid;
+  gap: 0.125rem;
+  padding-block: 0.625rem;
+  break-inside: avoid;
+}
+
+.ds-memorial-index__entry[hidden],
+.ds-memorial-index__group[hidden] {
+  display: none;
+}
+
+.ds-memorial-index__name {
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.35;
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+.ds-memorial-index__name a,
+.ds-memorial-index__empty a {
+  color: var(--ds-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-memorial-index__name a:focus-visible,
+.ds-memorial-index__empty a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-ink));
+  outline-offset: 2px;
+}
+
+.ds-memorial-index__meta {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-muted);
+}
+
+.ds-memorial-index__empty {
+  max-width: 34em;
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: var(--ds-text-editorial);
+  line-height: 1.6;
+  color: var(--ds-ink);
+}
+
+/* Phone: the sheet runs full-bleed; the field sits at its top and only the letters stick, as one
+   row that scrolls sideways, so the stuck chrome stays one 44px line. */
+@media (max-width: 47.9375rem) {
+  .ds-memorial-index__sheet {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    margin-inline: calc(var(--ds-gutter) * -1);
+    --ds-sheet-pad: var(--ds-space-5);
+    border-radius: 0;
+  }
+
+  .ds-memorial-index__finder {
+    display: contents;
+  }
+
+  .ds-memorial-index__find {
+    padding-bottom: var(--ds-space-2);
+  }
+
+  .ds-memorial-index__jump {
+    position: sticky;
+    top: var(--ds-island-clearance);
+    z-index: var(--ds-z-memorial-jump);
+    margin-inline: calc(var(--ds-sheet-pad) * -1) 0;
+    padding: var(--ds-space-2) var(--ds-sheet-pad);
+    border-bottom: var(--ds-border-width) solid var(--ds-rule);
+    background: var(--ds-canvas);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  .ds-memorial-index__jump::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-memorial-index__jump-list {
+    display: flex;
+    gap: var(--ds-space-1);
+  }
+
+  .ds-memorial-index__jump-link {
+    flex: none;
+  }
+
+  .ds-memorial-index__groups {
+    padding-top: var(--ds-space-6);
+  }
+
+  .ds-memorial-index__group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-3);
+    padding-bottom: var(--ds-space-8);
+  }
+
+  .ds-memorial-index__group:not([hidden]) ~ .ds-memorial-index__group {
+    padding-top: var(--ds-space-8);
+  }
+
+  /* Clears the stuck letter row. */
+  .ds-memorial section.ds-memorial-index__group {
+    scroll-margin-top: calc(var(--ds-island-clearance) + 3.75rem);
+  }
+
+  .ds-memorial-index__letter {
+    position: static;
+    font-size: var(--ds-text-display-2);
+  }
+}
+
+/*
+ * Widened out of `.ds-doc__column`'s prose measure, which is right for the page's paragraphs and
+ * wrong for an index of 1,600 names. `50% - 50vw` is the standard full-bleed escape plus a 2rem
+ * gutter; the clamp stops it sprawling on an ultrawide and makes it a no-op on narrow screens.
+ */
+.ds-memorial__list-zone {
+  margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
+}
+
+/* The content note sits under the heading, above the sheet of names; never over the wall. */
+.ds-memorial-index__content-note {
+  max-width: 38em;
+  margin-top: var(--ds-space-6);
+}
+
+/* Where the names come from: printed under the list, not shown on screen. */
+.ds-memorial__provenance {
+  display: none;
+}
+
+/*
+ * Print (docs/ui/DESIGN.md 9.4): the page prints as the list of names with its two closing lines.
+ * The wall is a canvas and does not print; the finder, the handoffs and the closing card are
+ * controls and links, which do nothing on paper.
+ */
+@media print {
+  .ds-memorial-stage,
+  .ds-memorial-index__finder,
+  .ds-memorial__related,
+  .ds-memorial .ds-doc-offramp {
+    display: none;
+  }
+
+  .ds-memorial .ds-doc__body,
+  .ds-memorial__list-zone {
+    margin: 0;
+  }
+
+  .ds-memorial-index__sheet {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
+    animation: none;
+  }
+
+  .ds-memorial-index__entry[hidden],
+  .ds-memorial-index__group[hidden] {
+    display: revert;
+  }
+
+  .ds-memorial-index__entry {
+    break-inside: avoid;
+  }
+
+  .ds-memorial__provenance {
+    display: block;
+    max-width: 44em;
+    margin: var(--ds-space-4) 0 0;
+    font-size: var(--ds-text-body-sm);
+    line-height: 1.6;
+  }
+}
+
+/* The sheet's colophon: the list is incomplete, said once, after the last name. */
+.ds-memorial__note {
+  max-width: 44em;
+  margin: var(--ds-space-6) 0 0;
+  padding-top: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.6;
+  color: var(--ds-ink-muted);
+}
+
+.ds-memorial__related {
+  margin-top: var(--ds-space-16);
+}
+
+/* The closing card lines up with the list's width and ends the page with room before the footer. */
+.ds-memorial .ds-doc-offramp {
+  margin-block: var(--ds-space-16) var(--ds-space-24);
+  margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
+}
+
+/* Related pages sit after the names. Ink plates, not copper: this surface takes no accent. */
+.ds-memorial .ds-doc-handoff__plate {
+  color: var(--ds-ink);
+}
+
+.ds-memorial .ds-doc-handoff:hover .ds-doc-handoff__plate,
+.ds-memorial .ds-doc-handoff:focus-visible .ds-doc-handoff__plate {
+  color: var(--ds-ink);
+  border-color: var(--ds-ink);
+}
+
+.ds-memorial__note a {
+  color: var(--ds-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.ds-memorial__note a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: 2px;
+}
+
+.ds-memorial [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+/* A link to #memorial-names moves focus here so keyboard/AT users land where the link took them;
+   `tabindex="-1"` makes that possible without adding it to the normal tab order, so no visible
+   focus ring is needed for it. */
+#memorial-names:focus {
+  outline: none;
+}

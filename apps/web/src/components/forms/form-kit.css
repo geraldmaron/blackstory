@@ -90,7 +90,7 @@
 }
 
 /* Labels are the meta role, the same as the record facts strip's labels. */
-.ds-form .ds-room-field__label {
+.ds-form .ds-doc-field__label {
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-meta);
   font-weight: 600;
@@ -99,14 +99,14 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-form .ds-room-field__error {
+.ds-form .ds-doc-field__error {
   display: flex;
   gap: var(--ds-space-2);
   margin-top: 0;
   font-weight: 500;
 }
 
-.ds-form .ds-room-field__error::before {
+.ds-form .ds-doc-field__error::before {
   content: '';
   flex: none;
   width: 0.875rem;
@@ -119,19 +119,19 @@
 }
 
 /* —— radio cards ————————————————————————————————————————————————————————————— */
-.ds-form-cards .ds-room-field__choices {
+.ds-form-cards .ds-doc-field__choices {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-form-cards .ds-room-field__choice {
+.ds-form-cards .ds-doc-field__choice {
   display: flex;
   min-width: 0;
 }
 
 /* Ruled rows, not boxes: the mark and the weight say which is chosen. */
-.ds-form-cards .ds-room-field__choice span {
+.ds-form-cards .ds-doc-field__choice span {
   position: relative;
   display: flex;
   align-items: center;
@@ -146,7 +146,7 @@
   color: var(--ds-ink);
 }
 
-.ds-form-cards .ds-room-field__choice span::before {
+.ds-form-cards .ds-doc-field__choice span::before {
   content: '';
   position: absolute;
   left: 0;
@@ -159,20 +159,20 @@
   border-radius: 50%;
 }
 
-.ds-form-cards .ds-room-field__choice span:hover {
+.ds-form-cards .ds-doc-field__choice span:hover {
   color: var(--ds-accent);
 }
 
-.ds-form-cards .ds-room-field__choice input:checked + span {
+.ds-form-cards .ds-doc-field__choice input:checked + span {
   color: var(--ds-ink);
   font-weight: 600;
 }
 
-.ds-form-cards .ds-room-field__choice input:checked + span::before {
+.ds-form-cards .ds-doc-field__choice input:checked + span::before {
   border: 5px solid var(--ds-ink);
 }
 
-.ds-form-cards[data-invalid='true'] .ds-room-field__choice span::before {
+.ds-form-cards[data-invalid='true'] .ds-doc-field__choice span::before {
   border-color: var(--ds-error-border);
 }
 
@@ -208,7 +208,7 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-form-check .ds-room-field__error {
+.ds-form-check .ds-doc-field__error {
   grid-column: 2;
   margin-top: var(--ds-space-2);
 }
@@ -324,7 +324,7 @@
 /* —— success: replaces the form, same column ——————————————————————————————————— */
 .ds-form-done {
   padding-block: var(--ds-space-4);
-  animation: ds-form-done-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
+  animation: ds-form-done-in var(--ds-duration-base) var(--ds-ease-entrance) both;
 }
 
 @keyframes ds-form-done-in {

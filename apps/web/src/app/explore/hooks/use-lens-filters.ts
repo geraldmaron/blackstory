@@ -17,13 +17,16 @@ import type { UseToasts } from '../../../components/patterns/Toast';
 import { decadeRangeLabel } from '../../../components/map-experience/DecadeBrush';
 import { floorLabel, type EvidenceFloor } from '../../../lib/map-experience/evidence-grade';
 import { decadeDensityBars } from '../../../lib/map-experience/decade-density';
-import { buildTopicCounts, type TopicCount } from '../../../lib/map-experience/filters';
+import {
+  buildTopicCounts,
+  kindFilterLabel,
+  type TopicCount,
+} from '../../../lib/map-experience/filters';
 import { lensPermitsAreaFill } from '../../../lib/map-experience/lens-composition';
 import {
   MAP_KIND_FAMILY_ENCODING,
   isKnownMapKind,
   isKnownMapKindFamily,
-  kindEncodingFor,
   kindFamilyEncodingFor,
   kindFamilyFor,
   type MapKindFamily,
@@ -70,9 +73,12 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   const [stateCode, setStateCode] = useState(view.viewState.state ?? '');
   const [query, setQuery] = useState(view.viewState.query ?? '');
   const [era, setEra] = useState(view.viewState.filters.era);
-  const [exactKind, setExactKind] = useState<string | null>(
-    isKnownMapKind(view.viewState.filters.kind) ? view.viewState.filters.kind : null,
-  );
+  // Any kind that is not a family is kept as it came, known or not: a value the list reads as
+  // "matches nothing" must not quietly widen to everything here.
+  const [exactKind, setExactKind] = useState<string | null>(() => {
+    const kind = view.viewState.filters.kind;
+    return kind !== 'all' && !isKnownMapKindFamily(kind) ? kind : null;
+  });
   const [kindFamily, setKindFamilyState] = useState<MapKindFamily | null>(() => {
     const kind = view.viewState.filters.kind;
     if (isKnownMapKindFamily(kind)) return kind;
@@ -296,13 +302,11 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       const name = findUsStateByPostalCode(stateCode)?.name ?? stateCode;
       rows.push({ key: 'state', label: name, onClear: () => setStateCode('') });
     }
-    if (kindFamily) {
+    if (kindFamily || exactKind) {
       rows.push({
         key: 'kind',
         // A URL kind (`kind=person`) is a slug; the chip shows its label, never the raw value.
-        label: exactKind
-          ? kindEncodingFor(exactKind).label
-          : kindFamilyEncodingFor(kindFamily).label,
+        label: exactKind ? kindFilterLabel(exactKind) : kindFamilyEncodingFor(kindFamily!).label,
         onClear: () => setKindFamily(null),
       });
     }

@@ -1,0 +1,24 @@
+/* The gallery's token tables: a name, a swatch where the value is a color, and the value. */
+.ds-gallery-tokens {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ds-text-meta);
+}
+
+.ds-gallery-tokens th,
+.ds-gallery-tokens td {
+  padding: var(--ds-space-1) var(--ds-space-3) var(--ds-space-1) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  text-align: start;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.ds-gallery-tokens__swatch {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  vertical-align: -0.125em;
+}

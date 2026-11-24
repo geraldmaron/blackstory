@@ -1,7 +1,7 @@
 # v10 research findings
 
 **Status:** binding decisions for modernization.  
-**Parent:** [`../design-direction-v10.md`](../design-direction-v10.md).  
+**Parent:** [`../design-direction-v10.md`](../archive/design-direction-v10.md).  
 **Method:** authoritative accessibility/archive sources and real implementations; trend articles deprioritized.
 
 | Pattern | Source/example | User problem | Applicable to Blackstory? | Why | Risks | Adopt / reject |

@@ -6,21 +6,21 @@
 
 export const DATA_INTRO = {
   kicker: 'Numbers',
-  lede: 'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source.',
+  lede: 'The national census picture, plus published figures on wealth, housing, credit and justice. Every chart names its source.',
 } as const;
 
 export const DATA_ORIENTATION_BEATS = [
   {
     kicker: 'National first',
-    body: 'Census sections show the country-wide picture; indicator charts zoom into published series.',
+    body: 'The census sections show the whole country. Each indicator chart goes deeper on one published series.',
   },
   {
     kicker: 'Sources visible',
-    body: 'Every figure links to its source. Fixture-backed charts say so.',
+    body: 'Every figure links to its source. A chart built on sample data says so.',
   },
   {
     kicker: 'Gaps are not silence',
-    body: 'Uneven coverage means the feed is incomplete, not that nothing happened. Juxtaposition is not causation.',
+    body: 'Where coverage is thin, the data is incomplete. It doesn’t mean nothing happened. And two numbers side by side don’t show that one caused the other.',
   },
 ] as const;
 
@@ -29,7 +29,7 @@ export const DATA_SECTION_COPY = {
     index: '01',
     kicker: 'Orientation',
     title: 'How to read these numbers',
-    lede: 'Census decades carry the national picture. The Phase 1 indicators are published series the archive reads beside its own records.',
+    lede: 'The census decades give the national picture. The indicators are published series the archive reads next to its own records.',
   },
   population: {
     index: '02',
@@ -41,25 +41,25 @@ export const DATA_SECTION_COPY = {
     index: '03',
     kicker: 'Survey of Consumer Finances',
     title: 'Wealth gap at a glance',
-    lede: 'Median family net worth from the Federal Reserve triennial survey. Juxtaposition, not a single cause.',
+    lede: 'Median family net worth from the Federal Reserve triennial survey. The figures sit side by side and don’t point to a single cause.',
   },
   housing: {
     index: '04',
     kicker: 'NHGIS · HMDA · CHAS',
     title: 'Housing, credit, and cost burden',
-    lede: 'Cook County Phase 1 spine: homeownership, mortgage denial rates, and HUD CHAS cost burden.',
+    lede: 'Cook County homeownership, mortgage denial rates and housing cost burden from HUD’s CHAS data.',
   },
   justice: {
     index: '05',
     kicker: 'BJS · USSC',
     title: 'Imprisonment and federal drug sentences',
-    lede: 'State imprisonment rates and federal cocaine sentencing averages. Context for drug-policy eras, not proof of cause.',
+    lede: 'State imprisonment rates and federal cocaine sentencing averages. They give context for the drug-policy eras and don’t prove a cause.',
   },
   themes: {
     index: '06',
     kicker: 'Phase 1',
     title: 'Curated indicator coverage',
-    lede: 'These indicators sit beside artifacts and policy eras in research packets, without causal overclaim.',
+    lede: 'These indicators sit next to the documents and policy eras they relate to, with no claim that one caused the other.',
   },
   next: {
     index: '07',

@@ -1,10 +1,12 @@
 # Record page
 
-**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) sections 2.3 and 4.3. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`ROOMS.record`, `citedIn`).
+**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) sections 2.3 and 4.3. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`ROOMS.record`, `citedIn`).
+
+> **v11 (2026-11-20):** [`design-direction-v11.md`](./archive/design-direction-v11.md) is binding and changes this pattern on home, Explore and place records. This document still describes every surface v11 has not reached; its rewrite is owed (v11 section 21).
 
 The class covers four surfaces: `/entity/[id]`, `/books/[slug]`, `/law/[slug]`, and the entity loading state.
 
-Builds on, and does not replace: [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the fact grid), [`patterns-plate-posture.md`](./patterns-plate-posture.md) (the Framed plate), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (glyph and color).
+Builds on, and does not replace: [`patterns-record-anatomy.md`](./archive/patterns-record-anatomy.md) (the fact grid), [`patterns-plate-posture.md`](./patterns-plate-posture.md) (the Framed plate), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (glyph and color).
 
 ---
 

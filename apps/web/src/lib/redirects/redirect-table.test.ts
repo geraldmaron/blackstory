@@ -71,10 +71,21 @@ test('no redirect destination is itself the source of another rule', () => {
   }
 });
 
-test('every config rule is permanent, so no fold is re-litigated on the next request', () => {
+test('a rule onto /archive is temporary; every other config rule is permanent', () => {
+  // Phase 4b (docs/ui/archive-url-contract.md, 10.4): the Archive's redirects stay temporary
+  // until the owner has watched production search and traffic. Everything else is a settled fold.
   for (const rule of RULES) {
-    assert.equal(rule.permanent, true, `${rule.source} must be permanent`);
+    const ontoArchive = destinationPath(rule.destination) === '/archive';
+    assert.equal(
+      rule.permanent,
+      !ontoArchive,
+      `${rule.source} must be ${ontoArchive ? 'temporary' : 'permanent'}`,
+    );
   }
+  assert.deepEqual(
+    RULES.filter((rule) => !rule.permanent).map((rule) => rule.source),
+    ['/facts', '/facts/:path*', '/locate', '/library', '/rooms', '/inventions'],
+  );
 });
 
 test('specific rules precede the catch-all for their family', () => {
@@ -109,9 +120,12 @@ test('theme aliases are generated from the chapter slug table, not retyped', () 
 
 test('every folded path reaches its surface in exactly one hop', () => {
   const oneHop = [
-    ['/facts', '/records'],
-    ['/facts/anything', '/records'],
-    ['/facts/deeply/nested/path', '/records'],
+    ['/facts', '/archive'],
+    ['/facts/anything', '/archive'],
+    ['/facts/deeply/nested/path', '/archive'],
+    ['/inventions', '/archive'],
+    ['/library', '/archive'],
+    ['/rooms', '/archive'],
     ['/articles', '/stories'],
     ['/articles/buying-a-home', '/stories/buying-a-home'],
     ['/chapters', '/stories'],
@@ -128,7 +142,7 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/myths/anything', '/stories'],
     ['/legal', '/law'],
     ['/map', '/'],
-    ['/locate', '/explore'],
+    ['/locate', '/archive'],
   ] as const;
 
   for (const [from, to] of oneHop) {
@@ -143,21 +157,26 @@ test('/legal keeps its slug rather than dumping every statute on the index', () 
   assert.equal(rule?.destination, '/law/:path*');
 });
 
-test('/locate folds into the Atlas place finder, carrying the focus-instruction param', () => {
+test('/locate opens the map view with the place finder, carrying the focus-instruction param', () => {
   // Full destination with its query string, not just the bare path (see this file's doc
-  // comment): `?find=place` is what actually opens the place sheet on arrival, and a rule that
-  // dropped it on the way would look correct against `/explore` alone.
+  // comment): `?find=place` is what actually opens the place field on arrival, and a rule that
+  // dropped it on the way would look correct against `/archive` alone.
   const rule = RULES.find((entry) => entry.source === '/locate');
-  assert.equal(rule?.destination, '/explore?find=place');
-  assert.equal(rule?.permanent, true);
+  assert.equal(rule?.destination, '/archive?view=map&find=place');
+  assert.equal(rule?.permanent, false);
+  assert.equal(
+    RULES.find((entry) => entry.source === '/inventions')?.destination,
+    '/archive?kind=inventions',
+  );
 });
 
-test('/map lands on the Door journey; /explore stays the map-focus instrument', () => {
+test('/map lands on the front page; /explore has no config rule, least of all a permanent one', () => {
   const map = RULES.find((entry) => entry.source === '/map');
   const explore = RULES.find((entry) => entry.source === '/explore');
   assert.ok(map, '/map must have a config rule');
   assert.equal(map?.destination, '/');
   assert.equal(map?.permanent, true);
+  // Its temporary move to `/archive?view=map` is the proxy's (archive-routing.test.ts).
   assert.equal(explore, undefined, '/explore must not 308 (Chrome RSC cache hazard)');
 });
 
@@ -264,6 +283,12 @@ test('no rule redirects away from a route that still has a page', () => {
   }
 });
 
+const WEB_ARCHIVE_ADDRESS: Readonly<Record<string, string>> = {
+  '/records': '/archive',
+  '/explore': '/archive',
+  '/collections': '/archive',
+};
+
 test('every legacy alias in the semantic catalog is honored by the redirect table', () => {
   // The catalog is the shared statement of what an old address means; this table is the web
   // mechanism that honors it. Native honors the same catalog through deep-link normalization.
@@ -282,7 +307,10 @@ test('every legacy alias in the semantic catalog is honored by the redirect tabl
       );
       continue;
     }
-    assert.equal(final, alias.to, `${alias.from} should resolve to ${alias.to}`);
+    // The catalog is also the app's and still names the Archive's 4a addresses; on the web they
+    // are one hop further on, so the table lands on `/archive` directly.
+    const to = WEB_ARCHIVE_ADDRESS[alias.to] ?? alias.to;
+    assert.equal(final, to, `${alias.from} should resolve to ${to}`);
     assert.equal(hops, 1, `${alias.from} should take exactly one hop, took ${hops}`);
   }
 });

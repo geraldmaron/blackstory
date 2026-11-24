@@ -71,8 +71,12 @@ A direct write to `published.release_entities` / `published.search_index` leaves
 an in-place correction does not change. Rebuild the graph, then republish **locally**:
 
 ```bash
-cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx ../../packages/ops-data/scripts/publish-release-catalog-artifacts.ts
+cd apps/web && set -a && . ./.env.local && set +a && DATABASE_URL="$ADMIN_DATABASE_URL" node --conditions development --import tsx ../../packages/ops-data/scripts/publish-release-catalog-artifacts.ts
 ```
+
+The script needs the `blackstory_admin` login: the web role in `DATABASE_URL` is denied on
+`published.release_catalog_publish_watermark`. `docs/research/agent-local-env.md` says which
+login each script needs and how the owner refreshes them.
 
 **Then purge the Cloudflare zone** (`docs/security/cost-resource-controls.md`, "purge after an
 in-place correction"): public documents are edge-cached for an hour, so a corrected record keeps

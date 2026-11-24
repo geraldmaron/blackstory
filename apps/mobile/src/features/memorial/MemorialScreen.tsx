@@ -29,6 +29,7 @@ import {
   space,
   useThemeColors,
   MIN_TOUCH_TARGET,
+  radius,
 } from '@/ui';
 import { openExternalMaps } from '@/features/entity/maps-handoff';
 import { MEMORIAL_ACTIONS, MEMORIAL_BODY, MEMORIAL_INTRO, MEMORIAL_LIST } from './memorial-copy';
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
   searchField: {
     minHeight: MIN_TOUCH_TARGET,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     paddingHorizontal: space['3'],
     flexDirection: 'row',
     alignItems: 'center',

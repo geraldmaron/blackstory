@@ -24,6 +24,10 @@ export { AI_TRAINING_USER_AGENTS };
  * (`scripts/cloudflare-bot-rules.mts`).
  */
 export const CRAWL_DISALLOWED_QUERY_SHAPES: readonly string[] = [
+  '/archive?*&',
+  '/archive?q=',
+  // The 4a addresses redirect to `/archive` in phase 4b. Their rules stay so that switching the
+  // redirects off needs no change here.
   '/records?*&',
   '/records?q=',
   '/explore?',

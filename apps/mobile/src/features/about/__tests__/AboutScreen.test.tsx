@@ -34,22 +34,22 @@ describe('AboutScreen', () => {
   it('renders product thesis, pillars, mission, and close', async () => {
     const { getByText } = await render(<AboutScreen />);
     expect(getByText('History, pinned to place.')).toBeTruthy();
-    expect(getByText(/place-connected Black history research platform/)).toBeTruthy();
-    expect(getByText('Presence. Evidence. Dignity.')).toBeTruthy();
+    expect(getByText(/Black history, pinned to the places it happened/)).toBeTruthy();
+    expect(getByText('Place, evidence and dignity')).toBeTruthy();
     expect(getByText('Pinned to place')).toBeTruthy();
     expect(getByText('Receipts on every claim')).toBeTruthy();
-    expect(getByText('Rules, not tone')).toBeTruthy();
-    expect(getByText('History should not be erased')).toBeTruthy();
-    expect(getByText('It should not be hard to find')).toBeTruthy();
-    expect(getByText('Accessible because it is about you')).toBeTruthy();
-    expect(getByText('Released projections only, with receipts')).toBeTruthy();
+    expect(getByText('Protections that are enforced')).toBeTruthy();
+    expect(getByText('History shouldn’t be erased')).toBeTruthy();
+    expect(getByText('It shouldn’t be hard to find')).toBeTruthy();
+    expect(getByText('Accessible because it’s about you')).toBeTruthy();
+    expect(getByText('Only what’s been checked gets published')).toBeTruthy();
     expect(getByText('No account required')).toBeTruthy();
   });
 
   it('navigates Explore from the accent CTA', async () => {
     const { getAllByText } = await render(<AboutScreen />);
     fireEvent.press(getAllByText('Open the map')[0]!);
-    expect(mockPush).toHaveBeenCalledWith('/explore');
+    expect(mockPush).toHaveBeenCalledWith('/archive');
   });
 
   it('navigates Methodology and Data destinations', async () => {

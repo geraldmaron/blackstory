@@ -35,7 +35,7 @@ describe('BrowseCategoryList', () => {
       <BrowseCategoryList categories={BROWSE_CATEGORIES} onSelectCategory={onSelectCategory} />,
     );
 
-    fireEvent.press(getByLabelText('List Schools in Records'));
+    fireEvent.press(getByLabelText('List Schools in the Archive'));
 
     expect(onSelectCategory).toHaveBeenCalledWith('school');
     // The whole point of the bug: a category tap must not navigate away from the tab.
@@ -46,8 +46,8 @@ describe('BrowseCategoryList', () => {
     showCategoryOnMap('school');
 
     expect(router.push).toHaveBeenCalledWith({
-      pathname: '/explore',
-      params: { kind: 'school' },
+      pathname: '/archive',
+      params: { view: 'map', kind: 'school' },
     });
   });
 });

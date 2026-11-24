@@ -30,7 +30,7 @@ test('an empty explore state links to /explore, the Door browse deep link', () =
       showResults: false,
       showKey: false,
     }),
-    '/explore',
+    '/archive?view=map',
   );
 });
 
@@ -79,7 +79,7 @@ test('round-trips a full view state through build -> parse', () => {
   };
 
   const href = buildExploreHref(state);
-  assert.match(href, /^\/explore\?/);
+  assert.match(href, /^\/archive\?view=map&/);
   // Intentional deep links may still carry camera; live explore pan/zoom does not rewrite it.
   assert.match(href, /lat=38\.9072/);
   assert.match(href, /lng=-77\.0369/);
@@ -119,7 +119,7 @@ test('shareable explore URLs without an intentional camera omit lat/lng/zoom', (
     showKey: false,
     state: 'DC',
   });
-  assert.equal(qs, 'era=1970s&state=DC');
+  assert.equal(qs, 'view=map&era=1970s&state=DC');
   assert.doesNotMatch(qs, /lat=/);
   assert.doesNotMatch(qs, /lng=/);
   assert.doesNotMatch(qs, /zoom=/);
@@ -142,7 +142,7 @@ test('default filter values are omitted from the query string (minimal shareable
     showResults: false,
     showKey: false,
   });
-  assert.equal(qs, '');
+  assert.equal(qs, 'view=map');
 });
 
 test('layerMode=presence is emitted; off (the default) is omitted', () => {
@@ -163,7 +163,7 @@ test('layerMode=presence is emitted; off (the default) is omitted', () => {
       showResults: false,
       showKey: false,
     }),
-    'layerMode=presence',
+    'view=map&layerMode=presence',
   );
   assert.equal(
     buildExploreSearchParams({
@@ -182,7 +182,7 @@ test('layerMode=presence is emitted; off (the default) is omitted', () => {
       showResults: false,
       showKey: false,
     }),
-    '',
+    'view=map',
   );
 });
 
@@ -211,7 +211,7 @@ test('population modes round-trip decade params', () => {
     showKey: false,
   };
   const shareQs = buildExploreSearchParams(share);
-  assert.equal(shareQs, 'layerMode=blackShare&popDecade=2010');
+  assert.equal(shareQs, 'view=map&layerMode=blackShare&popDecade=2010');
   assert.deepEqual(
     parseExploreSearchParams(Object.fromEntries(new URLSearchParams(shareQs))),
     share,
@@ -237,7 +237,7 @@ test('population modes round-trip decade params', () => {
     showKey: false,
   };
   const changeQs = buildExploreSearchParams(change);
-  assert.equal(changeQs, 'layerMode=blackChange&popFrom=2000');
+  assert.equal(changeQs, 'view=map&layerMode=blackChange&popFrom=2000');
   assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams(changeQs))), {
     ...change,
     popTo: '2020',
@@ -305,7 +305,7 @@ test('absent panel params default map-first (all chrome collapsed)', () => {
       showResults: false,
       showKey: false,
     }),
-    '',
+    'view=map',
   );
 });
 
@@ -360,7 +360,7 @@ test('open panels are never serialized back out (chrome is not shareable state)'
     { showFilters: false, showResults: false, showKey: true },
     { showFilters: true, showResults: true, showKey: true },
   ]) {
-    assert.equal(buildExploreSearchParams({ ...base, ...chrome }), '');
+    assert.equal(buildExploreSearchParams({ ...base, ...chrome }), 'view=map');
   }
   // Meaningful state still serializes alongside open chrome.
   assert.equal(
@@ -371,7 +371,7 @@ test('open panels are never serialized back out (chrome is not shareable state)'
       showKey: true,
       state: 'DC',
     }),
-    'state=DC',
+    'view=map&state=DC',
   );
 });
 
@@ -495,7 +495,7 @@ test('parseExploreSearchParams ignores an invalid radius token', () => {
 
 /**
  * `find=place` has to survive the edge's query normalization for
- * `/locate`'s redirect (`/explore?find=place`) to actually open `PlaceFinder`'s place sheet
+ * `/locate`'s redirect (`/archive?view=map&find=place`) to actually open `PlaceFinder`'s place sheet
  * rather than 308ing again with the param stripped — see `query-normalization.test.ts`'s drift
  * tests, which fail if this key is read by the parser but missing from
  * `EXPLORE_URL_PARAM_KEYS`/the builder, or the reverse.
@@ -521,7 +521,7 @@ test('round-trips the find focus instruction, and never as a filter default', ()
     showKey: false,
     find: 'place',
   });
-  assert.equal(href, '/explore?find=place');
+  assert.equal(href, '/archive?view=map&find=place');
 
   // Omitted entirely (not `find=`) when absent, same as every other optional key here.
   const bare = parseExploreSearchParams({});
@@ -548,7 +548,7 @@ test('evidence floor round-trips on explore URLs (Records→Explore handoff)', (
     floor: 'B',
     state: 'OK',
   });
-  assert.equal(qs, 'state=OK&floor=B');
+  assert.equal(qs, 'view=map&state=OK&evidence=B');
   const parsed = parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
   assert.equal(parsed.floor, 'B');
   assert.equal(parsed.state, 'OK');

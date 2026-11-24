@@ -80,7 +80,7 @@ function assertDynamicAfterImports(source, label) {
 function main() {
   const errors = [];
 
-  // The home journey and filtered browse route share DoorHome.
+  // `/` is the front page (the retelling); `/explore` is the archive's map view.
   const explorePages = walkFiles(APP_DIR).filter((f) =>
     /(^|\/)explore\/page\.tsx$/.test(relativeAppPath(f)),
   );
@@ -127,8 +127,8 @@ function main() {
     if (!/await connection\(\)/.test(homeSource)) {
       errors.push(`${homeLabel}: must await connection() before reading the live catalog`);
     }
-    if (!/DoorHome/.test(homeSource)) {
-      errors.push(`${homeLabel}: must mount DoorHome, not the Atlas instrument`);
+    if (!/FrontPage/.test(homeSource)) {
+      errors.push(`${homeLabel}: must mount FrontPage, not the Atlas instrument`);
     }
     if (/AtlasHome|HomeFirstPaint|wantsAtlasInstrument/.test(homeSource)) {
       errors.push(`${homeLabel}: must not mount the Atlas instrument`);
@@ -139,8 +139,8 @@ function main() {
     try {
       const exploreSource = readFileSync(explorePages[0], 'utf8');
       assertDynamicAfterImports(exploreSource, relativeAppPath(explorePages[0]));
-      if (!/DoorHome/.test(exploreSource) || !/initialBrowse/.test(exploreSource)) {
-        errors.push(`${relativeAppPath(explorePages[0])}: must mount DoorHome with initialBrowse`);
+      if (!/MapView/.test(exploreSource)) {
+        errors.push(`${relativeAppPath(explorePages[0])}: must mount the archive's MapView`);
       }
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
@@ -185,7 +185,7 @@ function main() {
   }
 
   console.log(
-    'check-web-entity-visibility-guards: ok (Door journey at /, shared browse at /explore, /explore/api owned, segment config after imports)',
+    'check-web-entity-visibility-guards: ok (front page at /, map view at /explore, /explore/api owned, segment config after imports)',
   );
 }
 

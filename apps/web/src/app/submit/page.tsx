@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { TrustMast, TrustSheet } from '../../components/trust';
 import { FormLayout, NextSteps } from '../../components/forms/FormKit';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
@@ -25,11 +25,11 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function SubmitLeadPage() {
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
-        <TrustMast art={['tools']} tone="copper">
+        <TrustMast>
           <PageHeader
             display
             crumb={parentCrumb('/submit')}
@@ -46,7 +46,7 @@ export default function SubmitLeadPage() {
             <NextSteps
               steps={[
                 'I read it, after a screen that holds likely hate aside.',
-                'If it is worth pursuing, it becomes a private research candidate.',
+                'If it’s worth pursuing, it becomes a private research candidate.',
                 'It reaches the site only after the same source checks as every record.',
               ]}
             >
@@ -64,6 +64,6 @@ export default function SubmitLeadPage() {
           <SubmitLeadForm contact={SUPPORT_CONTACT} />
         </FormLayout>
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

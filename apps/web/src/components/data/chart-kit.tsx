@@ -286,8 +286,6 @@ export type LineSeries = {
   readonly tone: Tone;
   /** Draw the series dashed (a third neutral series, or a series after a definition change). */
   readonly dashed?: boolean;
-  /** Fill a ~10% wash under the line to the baseline. */
-  readonly area?: boolean;
 };
 
 function segments(points: readonly LinePoint[]): { x: number; y: number }[][] {
@@ -322,18 +320,6 @@ export function Lines({ series }: { readonly series: readonly LineSeries[] }) {
         segments(line.points).flatMap((run, index) => {
           const key = `${line.id}-${index}`;
           const shapes = [];
-          if (line.area && run.length > 1) {
-            const first = run[0]!;
-            const last = run.at(-1)!;
-            shapes.push(
-              <polygon
-                key={`${key}-area`}
-                className="ds-lines__area"
-                data-tone={line.tone}
-                points={`${first.x},100 ${svgPoints(run)} ${last.x},100`}
-              />,
-            );
-          }
           if (run.length > 1) {
             shapes.push(
               <polyline

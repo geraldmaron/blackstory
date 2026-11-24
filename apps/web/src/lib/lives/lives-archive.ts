@@ -202,7 +202,7 @@ export const LIVES_ARCHIVE_READINGS: Readonly<Record<LivesMilestoneKey, LivesArc
     connections: [
       {
         title: 'School desegregation records',
-        href: '/records?q=school%20desegregation',
+        href: '/archive?q=school%20desegregation',
         icon: 'records',
       },
       {

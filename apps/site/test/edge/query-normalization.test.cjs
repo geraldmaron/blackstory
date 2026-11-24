@@ -131,10 +131,10 @@ test('records-query parsing and printing', () => {
     page: 3,
   });
   assert.equal(records.parseRecordsQuery({ q: 'x'.repeat(500) }).q.length, 120);
-  assert.equal(records.recordsHref({}), '/records');
+  assert.equal(records.recordsHref({}), '/archive');
   assert.equal(
     records.recordsHref({ q: 'a b', kind: 'person', page: 2 }),
-    '/records?q=a+b&kind=person&page=2',
+    '/archive?q=a+b&kind=person&page=2',
   );
   assert.equal(
     records.isRecordsCombinationQuery(records.parseRecordsQuery({ kind: 'person' })),

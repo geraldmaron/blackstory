@@ -21,10 +21,7 @@ export default function ThemesDetailRoute() {
     return (
       <ScreenCanvas edges={['left', 'right', 'bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
-          <EmptyState
-            title="Theme not found"
-            description="That theme id is not valid in this release."
-          />
+          <EmptyState title="Theme not found" description="That theme isn’t in this release." />
         </ScrollView>
       </ScreenCanvas>
     );

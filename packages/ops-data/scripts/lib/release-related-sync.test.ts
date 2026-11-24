@@ -259,3 +259,34 @@ test('applyReleaseRelatedSync writes the related jsonb once per changed row', as
     { id: 'ent_b', type: 'invented', direction: 'outgoing' },
   ]);
 });
+
+test('planReleaseRelatedSync does not report drift when a pair is joined both ways and the stored entry carries the other direction', async () => {
+  const bothWays: DerivedRow[] = [
+    {
+      entity_id: 'ent_a',
+      other_id: 'ent_b',
+      relationship_type: 'related_to',
+      direction: 'incoming',
+    },
+    {
+      entity_id: 'ent_a',
+      other_id: 'ent_b',
+      relationship_type: 'related_to',
+      direction: 'outgoing',
+    },
+  ];
+  const stored = [{ id: 'ent_b', type: 'related_to', direction: 'outgoing' }];
+  const plan = await planReleaseRelatedSync(
+    fakeClient(bothWays, [{ entity_id: 'ent_a', related: stored }]),
+    'rel_1',
+  );
+  assert.equal(plan.changed.length, 0);
+
+  // A one-way edge still has a real direction, so a stored entry pointing the wrong way is drift.
+  const oneWay = await planReleaseRelatedSync(
+    fakeClient(bothWays.slice(0, 1), [{ entity_id: 'ent_a', related: stored }]),
+    'rel_1',
+  );
+  assert.equal(oneWay.changed.length, 1);
+  assert.equal(oneWay.changed[0]?.after[0]?.direction, 'incoming');
+});

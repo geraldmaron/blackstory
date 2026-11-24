@@ -20,8 +20,11 @@
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
   CAMERA_EASING_SLOW_OUT,
+  flightDurationFor,
+  flightPeakZoom,
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
+  screensBetween,
   type CameraEasing,
 } from './camera-presets';
 import { isMoveAllowed, type RecordLike as DignityRecord } from './camera-dignity';
@@ -67,6 +70,9 @@ export const CAMERA_MOVE_DURATIONS = {
   trace: 900,
   frameRecord: 900,
 } as const satisfies Record<CameraMove, number>;
+
+/** A selected record at least this many map widths away is flown to, not eased to. */
+const FRAME_RECORD_FLIGHT_SCREENS = 1;
 
 /** Pitch the tilt move toggles between. */
 const TILT_PITCH = 55;
@@ -138,6 +144,8 @@ export type CameraAnimationOptions = {
   bearing?: number;
   duration?: number;
   curve?: number;
+  /** `flyTo` only: the zoom at the top of the flight's arc. */
+  minZoom?: number;
   speed?: number;
   easing?: CameraEasing;
   padding?: ChromeInset;
@@ -458,7 +466,13 @@ export function createCamera(deps: CameraDeps): CameraApi {
     if (frame.kind === 'bounds' && frame.minZoom !== undefined && map.cameraForBounds) {
       // A place: fly to its frame in the unobscured map, never short of the next level.
       const inset = padding();
-      const fitted = map.cameraForBounds(frame.bounds, { padding: inset })?.zoom;
+      let fitted: number | undefined;
+      try {
+        const zoom = map.cameraForBounds(frame.bounds, { padding: inset })?.zoom;
+        if (Number.isFinite(zoom)) fitted = zoom;
+      } catch {
+        // MapLibre's globe throws when the paddings leave no canvas: fly to the floor instead.
+      }
       const [[west, south], [east, north]] = frame.bounds;
       map.flyTo({
         center: [(west + east) / 2, (south + north) / 2],
@@ -537,15 +551,32 @@ export function createCamera(deps: CameraDeps): CameraApi {
       reducedMotion: reducedMotion(),
     });
     if (!plan) return;
+    // By distance. A record on or beside the screen is one ease, as it always was. One a screen
+    // or more away is a flight: out as far as the trip needs (`flightPeakZoom`), then down, for
+    // as long as the ground it covers takes (`flightDurationFor`). The 0.9s ease across seven
+    // zoom levels and half a country was a cut with a blur on it.
+    const from = map.getZoom();
+    const here = map.getCenter();
+    const screens = screensBetween(
+      Array.isArray(here) ? { lng: here[0], lat: here[1] } : (here as { lng: number; lat: number }),
+      record.center,
+      from,
+      map.getContainer?.()?.clientWidth ?? 0,
+    );
     // Pitch and bearing are left out on purpose: the reader's tilt and turn survive a selection.
-    map.easeTo({
+    const move = {
       center: record.center,
       zoom: plan.zoom,
-      duration: plan.duration,
       easing: CAMERA_EASING_SLOW_OUT,
       padding: inset,
       essential: isEssential(options),
-    });
+    };
+    // Either way the move lasts as long as the zoom levels and ground it covers; a cut stays a cut.
+    const duration =
+      plan.duration > 0 ? flightDurationFor(plan.duration, from, plan.zoom, screens) : 0;
+    if (duration > 0 && screens >= FRAME_RECORD_FLIGHT_SCREENS) {
+      map.flyTo({ ...move, duration, minZoom: flightPeakZoom(from, plan.zoom, screens) });
+    } else map.easeTo({ ...move, duration });
     announce(`Record · ${record.place}`);
   }
 

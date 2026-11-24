@@ -8,9 +8,8 @@
  * register's native popovers of GET links, and every cover and state is an anchor.
  */
 import React from 'react';
-import { BandArt } from '../../components/atmosphere/BandArt';
 import Link from 'next/link';
-import { Block, Chip, DisplayNumeral, Sheet, buttonClassName } from '@repo/ui';
+import { Chip, DisplayNumeral, buttonClassName } from '@repo/ui';
 import { RecordsToolbar, type ToolbarMenu } from '../records/RecordsToolbar';
 import { Outcome } from '../records/RecordsIndex';
 import {
@@ -29,6 +28,8 @@ void React;
 
 export type BooksBrowseSectionsProps = {
   readonly view: BooksBrowseViewModel;
+  /** The page's header, first in the stage's main column. */
+  readonly head?: React.ReactNode;
 };
 
 type Params = Parameters<typeof buildBooksBrowseHref>[0];
@@ -129,7 +130,7 @@ function activeFilters(view: BooksBrowseViewModel): ActiveFilter[] {
   return active;
 }
 
-/** The closing note, set as a caption inside the last block so the page meets the footer on it. */
+/** The closing note, under the sheet on the night ground. */
 function BooksNote() {
   return (
     <p className="ds-books-note">
@@ -140,44 +141,41 @@ function BooksNote() {
 }
 
 /**
- * The sand lead over the cover wall: the state with the most challenged titles as a display
- * numeral, then the next four in mono. Every entry opens the states view; the numbers are the
- * same `stateCounts` the states view ranks.
+ * The busiest state as a display numeral, then the next four in mono, under the tile map on the
+ * rail. Every entry opens the states view; the numbers are the same `stateCounts` it ranks.
  */
 function StatesLead({ view }: { readonly view: BooksBrowseViewModel }) {
   const [top, ...rest] = view.stateCounts;
   if (!top) return null;
   const href = buildBooksBrowseHref({ ...currentParams(view), view: 'states' });
   return (
-    <Block tone="sand" className="ds-books-lead">
-      <div className="ds-wrap ds-books-lead__inner">
-        <a className="ds-books-lead__top" href={href}>
-          <DisplayNumeral size="title" className="ds-books-lead__numeral">
-            {top.count.toLocaleString('en-US')}
-          </DisplayNumeral>
-          <span className="ds-books-lead__label">
-            <span className="ds-books-lead__state">{top.name}</span>
-            <span className="ds-books-lead__unit">
-              {top.count === 1 ? 'title' : 'titles'} challenged, the most of any state
-            </span>
+    <div className="ds-books-lead">
+      <a className="ds-books-lead__top" href={href}>
+        <DisplayNumeral size="title" className="ds-books-lead__numeral">
+          {top.count.toLocaleString('en-US')}
+        </DisplayNumeral>
+        <span className="ds-books-lead__label">
+          <span className="ds-books-lead__state">{top.name}</span>
+          <span className="ds-books-lead__unit">
+            {top.count === 1 ? 'title' : 'titles'} challenged, the most of any state
           </span>
-        </a>
-        <ol className="ds-books-lead__rest" aria-label="Next states by challenged titles">
-          {rest.slice(0, 4).map((entry) => (
-            <li key={entry.code}>
-              <a className="ds-books-lead__row" href={href}>
-                <span>{entry.name}</span>
-                <span className="ds-books-lead__count">{titlesPhrase(entry.count)}</span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </Block>
+        </span>
+      </a>
+      <ol className="ds-books-lead__rest" aria-label="Next states by challenged titles">
+        {rest.slice(0, 4).map((entry) => (
+          <li key={entry.code}>
+            <a className="ds-books-lead__row" href={href}>
+              <span>{entry.name}</span>
+              <span className="ds-books-lead__count">{titlesPhrase(entry.count)}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
-/** A band holds about two screens of rows at 1440, then the ground changes. */
+/** A band holds about two screens of rows at 1440, then a rule and the next range. */
 const BAND_ROWS = 18;
 
 export type BookGroup = { readonly label: string; readonly items: readonly BooksBrowseItem[] };
@@ -277,56 +275,44 @@ function BookRow({ item }: { readonly item: BooksBrowseItem }) {
 }
 
 /**
- * The titles as bands that change ground every couple of screens, grouped by the field the order
- * sorts on. Each band names its range and counts its titles in a copper numeral; the titles are
- * ruled rows, a restrained cover at the row's end where real art exists.
+ * The titles on the one sheet, grouped by the field the order sorts on. Each band names its range
+ * and counts its titles in a copper numeral; the titles are ruled rows, a restrained cover at the
+ * row's end where real art exists.
  */
 function BookBands({ view }: { readonly view: BooksBrowseViewModel }) {
   const bands = bandBooks(view.items, view.sort);
   return (
-    <>
-      {bands.map((band, index) => {
+    <div className="ds-lens__sheet ds-books-sheet">
+      {bands.map((band) => {
         const total = band.reduce((sum, group) => sum + group.items.length, 0);
-        const last = index === bands.length - 1;
         return (
-          <Block
-            key={bandName(band)}
-            tone={index % 2 === 0 ? 'ink' : 'sand'}
-            className="ds-books-band"
-          >
-            <BandArt motifs={index % 2 === 0 ? ['ledger'] : ['grain']} />
-            <div className="ds-wrap ds-books-bandgrid">
-              <div className="ds-books-mark">
-                <DisplayNumeral decorative className="ds-books-mark__numeral">
-                  {total.toLocaleString('en-US')}
-                </DisplayNumeral>
-                <h2 className="ds-books-mark__name">{bandName(band)}</h2>
-                <p className="ds-books-mark__meta">{titlesPhrase(total)}</p>
-              </div>
-              <div className="ds-books-groups">
-                {band.map((group) => (
-                  <section key={group.label} aria-label={group.label}>
-                    {band.length > 1 ? (
-                      <h3 className="ds-books-group__label">{group.label}</h3>
-                    ) : null}
-                    <ul className="ds-books-list">
-                      {group.items.map((item) => (
-                        <BookRow key={item.id} item={item} />
-                      ))}
-                    </ul>
-                  </section>
-                ))}
-              </div>
-              {last ? <BooksNote /> : null}
+          <section key={bandName(band)} className="ds-books-band" aria-label={bandName(band)}>
+            <div className="ds-books-mark">
+              <h2 className="ds-books-mark__name">{bandName(band)}</h2>
+              <p className="ds-books-mark__meta">{titlesPhrase(total)}</p>
             </div>
-          </Block>
+            <div className="ds-books-groups">
+              {band.map((group) => (
+                <section key={group.label} aria-label={group.label}>
+                  {band.length > 1 ? (
+                    <h3 className="ds-books-group__label">{group.label}</h3>
+                  ) : null}
+                  <ul className="ds-books-list">
+                    {group.items.map((item) => (
+                      <BookRow key={item.id} item={item} />
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          </section>
         );
       })}
-    </>
+    </div>
   );
 }
 
-/** Steps for the tile grid: paper, copper, copper text, ink; none is an outline (books.css). */
+/** Steps for the tile grid, dim ember to paper; none is an outline (books.css). */
 const TILE_STEPS = 4;
 
 /** Square root, so the states behind one outlier still read apart from each other. */
@@ -347,71 +333,75 @@ export function tileLegend(max: number): { step: number; from: number; to: numbe
 }
 
 /**
- * The states by how many titles carry a cited challenge there. The tile grid is the picture: a
- * state code and a shade, decorative, since the ranked list beside it prints every number. The
- * list is the control, each row a link to the cover wall filtered to that state.
+ * The page's instrument: the states by how many titles carry a cited challenge there, as a tile
+ * grid. It is the picture, a state code and a shade, decorative, since the ranked list prints
+ * every number. In the titles view the busiest states stand under it and open the states view.
  */
-function StateView({ view }: { readonly view: BooksBrowseViewModel }) {
-  const params = currentParams(view);
+function PlaceRail({ view }: { readonly view: BooksBrowseViewModel }) {
   const counts = new Map(view.stateCounts.map((entry) => [entry.code, entry.count]));
   const max = Math.max(...view.stateCounts.map((entry) => entry.count));
   return (
-    <Block tone="sand" className="ds-books-band ds-books-band--states">
-      <div className="ds-wrap ds-books-states">
-        <div className="ds-books-map" aria-hidden="true">
-          <div className="ds-books-tiles">
-            {Object.entries(STATE_TILES).map(([code, [row, column]]) => {
-              const step = tileStep(counts.get(code) ?? 0, max);
-              return (
-                <span
-                  key={code}
-                  className="ds-books-tiles__tile"
-                  data-step={step}
-                  data-current={code === view.state ? 'true' : undefined}
-                  style={{ gridRow: row + 1, gridColumn: column + 1 }}
-                >
-                  {code}
-                </span>
-              );
-            })}
-          </div>
-          <ul className="ds-books-legend">
-            {tileLegend(max).map((range) => (
-              <li key={range.step}>
-                <span className="ds-books-tiles__tile" data-step={range.step} />
-                {range.from === range.to ? range.from : `${range.from} to ${range.to}`}{' '}
-                {range.to === 1 ? 'title' : 'titles'}
-              </li>
-            ))}
-          </ul>
+    <div className="ds-books-rail">
+      <div className="ds-books-map" data-ground="ink" data-ground-fixed="" aria-hidden="true">
+        <div className="ds-books-tiles">
+          {Object.entries(STATE_TILES).map(([code, [row, column]]) => {
+            const step = tileStep(counts.get(code) ?? 0, max);
+            return (
+              <span
+                key={code}
+                className="ds-books-tiles__tile"
+                data-step={step}
+                data-current={code === view.state ? 'true' : undefined}
+                style={{ gridRow: row + 1, gridColumn: column + 1 }}
+              >
+                {code}
+              </span>
+            );
+          })}
         </div>
-
-        <Sheet className="ds-books-ranks-sheet">
-          <ol className="ds-books-ranks" aria-label="States by challenged titles">
-            {view.stateCounts.map((entry) => (
-              <li key={entry.code}>
-                <a
-                  className="ds-books-ranks__row"
-                  href={buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' })}
-                  aria-current={entry.code === view.state ? 'true' : undefined}
-                >
-                  <span className="ds-books-ranks__name">{entry.name}</span>
-                  <span className="ds-books-ranks__bar" aria-hidden="true">
-                    <span style={{ width: `${(entry.count / max) * 100}%` }} />
-                  </span>
-                  <span className="ds-books-ranks__count">{titlesPhrase(entry.count)}</span>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </Sheet>
-        <BooksNote />
+        <ul className="ds-books-legend">
+          {tileLegend(max).map((range) => (
+            <li key={range.step}>
+              <span className="ds-books-tiles__tile" data-step={range.step} />
+              {range.from === range.to ? range.from : `${range.from} to ${range.to}`}{' '}
+              {range.to === 1 ? 'title' : 'titles'}
+            </li>
+          ))}
+        </ul>
       </div>
-    </Block>
+      {view.view === 'covers' ? <StatesLead view={view} /> : null}
+    </div>
   );
 }
 
-export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
+/** The ranked list is the control: each row a link to the titles filtered to that state. */
+function StateRanks({ view }: { readonly view: BooksBrowseViewModel }) {
+  const params = currentParams(view);
+  const max = Math.max(...view.stateCounts.map((entry) => entry.count));
+  return (
+    <div className="ds-lens__sheet ds-books-sheet">
+      <ol className="ds-books-ranks" aria-label="States by challenged titles">
+        {view.stateCounts.map((entry) => (
+          <li key={entry.code}>
+            <a
+              className="ds-books-ranks__row"
+              href={buildBooksBrowseHref({ ...params, state: entry.code, view: 'covers' })}
+              aria-current={entry.code === view.state ? 'true' : undefined}
+            >
+              <span className="ds-books-ranks__name">{entry.name}</span>
+              <span className="ds-books-ranks__bar" aria-hidden="true">
+                <span style={{ width: `${(entry.count / max) * 100}%` }} />
+              </span>
+              <span className="ds-books-ranks__count">{titlesPhrase(entry.count)}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+export function BooksBrowseSections({ view, head }: BooksBrowseSectionsProps) {
   const params = currentParams(view);
   const active = activeFilters(view);
   const facets = active.filter((filter) => filter.key !== 'q').length;
@@ -435,7 +425,7 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
           challenge with a state.
         </Outcome>
       ) : (
-        <StateView view={view} />
+        <StateRanks view={view} />
       );
   } else {
     body =
@@ -444,59 +434,63 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
           Nothing in the catalog matches {active.map((filter) => filter.label).join(', ')}.
         </Outcome>
       ) : (
-        <>
-          <StatesLead view={view} />
-          <BookBands view={view} />
-        </>
+        <BookBands view={view} />
       );
   }
 
+  // Without a state to shade (nothing matched, or no challenge names one) the stage is one column.
+  const railed = view.stateCounts.length > 0;
+
   return (
-    <>
-      <RecordsToolbar
-        filters={filterMenus(view)}
-        {...(view.view === 'covers' ? { sort: sortMenu(view) } : {})}
-        view={{
-          label: 'Show books as',
-          value: view.view,
-          options: [
-            { value: 'covers', label: 'Titles', href: viewHref('covers') },
-            { value: 'states', label: 'States', href: viewHref('states') },
-          ],
-        }}
-        activeCount={facets}
-        showLabel={`Show ${titlesPhrase(view.totalMatched)}`}
-        {...(facets > 0
-          ? {
-              clearAllHref: buildBooksBrowseHref({ ...params, state: 'all', author: 'all' }),
-            }
-          : {})}
-      />
+    <div className={railed ? 'ds-lens ds-lens--railed ds-books-stage' : 'ds-lens ds-books-stage'}>
+      <div className="ds-lens__main">
+        {head}
+        <RecordsToolbar
+          filters={filterMenus(view)}
+          {...(view.view === 'covers' ? { sort: sortMenu(view) } : {})}
+          view={{
+            label: 'Show books as',
+            value: view.view,
+            options: [
+              { value: 'covers', label: 'Titles', href: viewHref('covers') },
+              { value: 'states', label: 'States', href: viewHref('states') },
+            ],
+          }}
+          activeCount={facets}
+          showLabel={`Show ${titlesPhrase(view.totalMatched)}`}
+          {...(facets > 0
+            ? {
+                clearAllHref: buildBooksBrowseHref({ ...params, state: 'all', author: 'all' }),
+              }
+            : {})}
+        />
 
-      {active.length > 0 ? (
-        <div className="ds-records-active">
-          <ul className="ds-records-active__chips" aria-label="Active filters">
-            {active.map((filter) => (
-              <li key={filter.key}>
-                <Chip removable href={filter.href} label={filter.label}>
-                  {filter.label}
-                </Chip>
-              </li>
-            ))}
-          </ul>
-          {/* The empty state carries its own Clear filters; one control per job. */}
-          {active.length > 1 && !empty ? (
-            <a className={buttonClassName('quiet')} href={clearHref}>
-              Clear all
-            </a>
-          ) : null}
-        </div>
-      ) : null}
+        {active.length > 0 ? (
+          <div className="ds-records-active">
+            <ul className="ds-records-active__chips" aria-label="Active filters">
+              {active.map((filter) => (
+                <li key={filter.key}>
+                  <Chip removable href={filter.href} label={filter.label}>
+                    {filter.label}
+                  </Chip>
+                </li>
+              ))}
+            </ul>
+            {/* The empty state carries its own Clear filters; one control per job. */}
+            {active.length > 1 && !empty ? (
+              <a className={buttonClassName('quiet')} href={clearHref}>
+                Clear all
+              </a>
+            ) : null}
+          </div>
+        ) : null}
 
-      {body}
+        {railed ? <PlaceRail view={view} /> : null}
 
-      {/* With a band on the page the note rides its foot; an outcome keeps it here. */}
-      {empty ? <BooksNote /> : null}
-    </>
+        {body}
+
+        <BooksNote />
+      </div>
+    </div>
   );
 }

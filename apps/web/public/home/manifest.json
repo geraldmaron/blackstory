@@ -1,0 +1,12 @@
+[
+  {
+    "file": "paper.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. Square 1:1. Close-up of uncoated archival rag paper, warm off-white (#ece4d6 family), visible soft fibers and very slight mottling, flat even lighting, no folds, no edges, no stains larger than a speck, tileable. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content."
+  },
+  {
+    "file": "halftone.png",
+    "date": "2026-11-22",
+    "prompt": "Generate one abstract texture PNG. Square 1:1. A coarse newspaper halftone dot gradient, black dots on white, dots largest at bottom left and vanishing toward top right, crisp print look, no image content. Abstract only: no people, faces, places, buildings, maps, landscapes, text, letters, logos or symbols. Fill the entire canvas with the texture; no frame, border, mockup, or additional image content."
+  }
+]

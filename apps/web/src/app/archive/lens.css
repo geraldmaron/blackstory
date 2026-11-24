@@ -1,0 +1,44 @@
+/*
+ * A lens page (`/law`, `/books`): the Archive's head, then the lens's own catalog on paper. A
+ * lens may put its signature exhibit in a first column from 64rem (the law time rail, the books
+ * state tile map); narrower, the exhibit stands above the list, after the head, so a phone and a
+ * screen reader meet the title first.
+ */
+.ds-lens {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-8);
+  padding-bottom: var(--ds-space-16);
+}
+
+.ds-lens__main,
+.ds-lens__sheet {
+  min-width: 0;
+}
+
+/* An index is scanned, not read front to back: no reading-progress bar. */
+body:has(.ds-lens) .ds-reading-progress {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .ds-lens--railed {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 0 var(--ds-space-12);
+    align-items: start;
+  }
+
+  .ds-lens--railed > .ds-lens__main {
+    display: contents;
+  }
+
+  .ds-lens--railed > .ds-lens__main > * {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-lens {
+    padding-bottom: var(--ds-space-12);
+  }
+}

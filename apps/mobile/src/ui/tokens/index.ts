@@ -28,7 +28,7 @@ import {
   type TypeScaleRole,
 } from './generated/typography.generated';
 import { logoConstraints } from './generated/logo.generated';
-import { getShadowStyle, type ShadowLevel } from './elevation';
+import { getFloatShadowStyle } from './elevation';
 
 export {
   brandCore,
@@ -44,10 +44,9 @@ export {
   fontFamilies,
   typeScale,
   logoConstraints,
-  getShadowStyle,
+  getFloatShadowStyle,
 };
 export type {
-  ShadowLevel,
   ConfidenceLevel,
   StatusName,
   ThemeName,
@@ -66,6 +65,12 @@ export type {
  * Single source of truth — do not re-declare `MIN_TOUCH` / `MIN_ROW_HEIGHT` locally.
  */
 export const MIN_TOUCH_TARGET: number = Platform.select({ android: 48, default: 44 });
+
+/**
+ * How far chrome (a bar title, a view switch, a header button) follows the system text size.
+ * Reading text is never capped; a control that tripled would push the content off the screen.
+ */
+export const CHROME_MAX_FONT_SCALE = 1.6;
 
 /**
  * Shared stacking order for map-adjacent overlays. Keeps sheet/chrome/attribution
@@ -95,9 +100,9 @@ export function useThemeName(): ThemeName {
   return resolveThemeName(useColorScheme());
 }
 
-/** Shadow style for the active theme: `sheet`, `lift` or `float`; `none` for a flush surface. */
-export function useShadowStyle(level: ShadowLevel): ViewStyle {
-  return getShadowStyle(level, useThemeName());
+/** The shadow of a sheet floating over the map, the only shadow in the app. */
+export function useFloatShadowStyle(): ViewStyle {
+  return getFloatShadowStyle(useThemeName());
 }
 
 /** Resolves the full semantic color-role palette for the active color scheme. */

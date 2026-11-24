@@ -63,6 +63,10 @@ export type HydratedStoryFigure = {
   readonly caption: string;
   readonly observations: readonly ThemeImpactObservationView[];
   readonly sourceNumbers: readonly number[];
+  /** A Data registry figure to embed in place of the packet chart. */
+  readonly figureId?: string;
+  /** The build of that figure's data the story was written against (ISO). */
+  readonly figureAsOf?: string;
 };
 
 export type HydratedStoryStat = {
@@ -77,6 +81,8 @@ export type HydratedStoryStat = {
 
 export type HydratedStoryPrimaryDocument = {
   readonly type: 'primaryDocument';
+  /** The packet artifact's stored id: the exhibit's address on the page. */
+  readonly refId: string;
   readonly title: string;
   readonly summary: string;
   readonly quote?: string;
@@ -370,6 +376,8 @@ function hydrateBlock(
         caption: block.caption,
         observations,
         sourceNumbers: sourceNumbersFor(block, packet, numberByUrl),
+        ...(block.figureId ? { figureId: block.figureId } : {}),
+        ...(block.figureAsOf ? { figureAsOf: block.figureAsOf } : {}),
       };
     }
     case 'stat': {
@@ -405,6 +413,7 @@ function hydrateBlock(
       }
       return {
         type: 'primaryDocument',
+        refId: block.refId,
         title: artifact.title,
         summary: artifact.summary,
         ...(block.quote ? { quote: block.quote } : {}),

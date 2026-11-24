@@ -18,9 +18,8 @@ test('buildPublicSitemapEntries includes static core journeys', () => {
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
   });
   const urls = entries.map((entry) => entry.url);
-  // `/records` replaced `/history` here with SP-09: the record index is the crawlable list the
-  // decade view used to stand in for, and `/history` is now only a redirect into it.
-  assert.ok(urls.some((url) => url.endsWith('/records')));
+  // The Archive's list is the crawlable index; `/records` and `/history` redirect into it.
+  assert.ok(urls.some((url) => url.endsWith('/archive')));
   assert.ok(urls.some((url) => url.endsWith('/stories')));
   assert.ok(urls.some((url) => url.endsWith('/corrections')));
   assert.ok(urls.some((url) => url.endsWith('/law')));
@@ -33,10 +32,12 @@ test('the sitemap never advertises a URL that redirects', () => {
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
   });
   const urls = entries.map((entry) => entry.url);
-  // `/` is the map door. `/explore` remains a listed instrument URL.
-  assert.ok(urls.some((url) => url.endsWith('/explore')));
-  // `/history` 308s into `/records` for the same reason.
-  assert.ok(!urls.some((url) => url.endsWith('/history')));
+  // The map view is listed at its own address, the one sitemap URL with a query. The 4a
+  // addresses redirect to `/archive` in phase 4b, so none of them is listed.
+  assert.ok(urls.some((url) => url.endsWith('/archive?view=map')));
+  for (const retired of ['/explore', '/records', '/collections', '/history']) {
+    assert.ok(!urls.some((url) => url.endsWith(retired)), `${retired} redirects`);
+  }
   assert.ok(urls.some((url) => url === 'https://blackbook.example/'));
 });
 
@@ -48,6 +49,44 @@ test('the sitemap never lists the same URL twice', () => {
     entities: [{ id: 'ent_a' }, { id: 'ent_b' }],
   }).map((entry) => entry.url);
   assert.deepEqual([...new Set(urls)].sort(), [...urls].sort());
+});
+
+test('published stories are listed at their own address, once each', () => {
+  const entries = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
+    stories: [
+      { slug: 'the-count', publishedAt: '2026-08-01', updatedAt: '2026-09-02' },
+      { slug: 'george-washington', publishedAt: '2026-08-07' },
+      { slug: 'the-count', publishedAt: '2026-08-01' },
+      { slug: '  ' },
+      { slug: 'mosaic-credits', publishedAt: '2026-08-01' },
+    ],
+  });
+  const staticUrls = new Set(
+    buildPublicSitemapEntries({ siteUrl: 'https://blackbook.example' }).map((entry) => entry.url),
+  );
+  const storyEntries = entries.filter((entry) => !staticUrls.has(entry.url));
+  assert.deepEqual(
+    storyEntries.map((entry) => entry.url),
+    [
+      'https://blackbook.example/stories/the-count',
+      'https://blackbook.example/stories/george-washington',
+    ],
+  );
+  // The newest date the story carries is its lastmod; a story never edited falls back to its
+  // publication date rather than to the release stamp.
+  assert.equal(storyEntries[0]?.lastModified, '2026-09-02');
+  assert.equal(storyEntries[1]?.lastModified, '2026-08-07');
+  assert.match(serializeSitemapXml(storyEntries), /<lastmod>2026-09-02T00:00:00\.000Z<\/lastmod>/);
+});
+
+test('a story slug that is also a static route is listed once', () => {
+  const urls = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    stories: [{ slug: 'mosaic-credits', publishedAt: '2026-08-01' }],
+  }).map((entry) => entry.url);
+  assert.equal(urls.filter((url) => url.endsWith('/stories/mosaic-credits')).length, 1);
 });
 
 /**
@@ -82,7 +121,7 @@ test('every path the sitemap advertises is a page that exists', () => {
   const rendered = renderedStaticRoutes(join(import.meta.dirname, '../../app'));
   for (const destination of crawlableDestinations()) {
     assert.ok(
-      rendered.has(destination.path),
+      rendered.has(destination.path.split('?')[0]!),
       `${destination.path} is in the sitemap but has no page.tsx`,
     );
   }
@@ -215,4 +254,23 @@ test('an invention is advertised in its own family, never at a place address', (
     'the sitemap must not advertise the place address, which now permanently redirects',
   );
   assert.ok(urls.has('https://blackbook.example/place/fifteenth-street-presbyterian-church'));
+});
+
+test('a collection story is listed at its canonical collection address, not under /stories', () => {
+  const entries = buildPublicSitemapEntries({
+    siteUrl: 'https://example.test',
+    stories: [{ slug: 'abraham-lincoln', path: '/presidents/abraham-lincoln' }],
+  });
+  const urls = new Set(entries.map((entry) => entry.url));
+  assert.ok(urls.has('https://example.test/presidents/abraham-lincoln'));
+  assert.ok(!urls.has('https://example.test/stories/abraham-lincoln'));
+});
+
+test('figure pages are listed at their own address', () => {
+  const urls = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    figures: ['/data/D-01', '/data/D-09'],
+  }).map((entry) => entry.url);
+  assert.ok(new Set(urls).has('https://blackbook.example/data/D-01'));
+  assert.equal(urls.filter((url) => url.endsWith('/data/D-09')).length, 1);
 });

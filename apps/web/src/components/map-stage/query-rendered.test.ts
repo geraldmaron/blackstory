@@ -23,6 +23,10 @@ test("MapLibre's mid-setData index race reads as an empty frame; other errors st
     throw new Error("Out of bounds. Index requested n=0 can't be >= this._numberToString.length 0");
   });
   assert.deepEqual(queryRenderedLayers(racing, undefined, ['a']), []);
+  const racingVector = mapWith(['a'], () => {
+    throw new Error('feature index out of bounds');
+  });
+  assert.deepEqual(queryRenderedLayers(racingVector, undefined, ['a']), []);
   const broken = mapWith(['a'], () => {
     throw new Error('Style is not done loading');
   });

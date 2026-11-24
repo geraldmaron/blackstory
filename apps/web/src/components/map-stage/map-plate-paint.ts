@@ -18,6 +18,8 @@ export function buildArchiveBaseStyle(colorScheme: MapColorScheme): StyleSpecifi
   return {
     version: 8,
     name: 'BlackStory — Archive (US)',
+    // v12: flat (Mercator) on every surface. v11 drew a globe; the archive is one country, and a
+    // planet made its records a patch on one continent (design-direction-v12.md).
     sources: {},
     layers: [
       {

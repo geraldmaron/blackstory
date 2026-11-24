@@ -7,7 +7,7 @@
  * needed — the trap keeps Tab inside, and `inert` on everything else keeps the pointer, the
  * accessibility tree and the tab order agreeing with each other.
  *
- * Design law: docs/ui/design-direction-v9-atlas.md §7.
+ * Design law: docs/ui/archive/design-direction-v9-atlas.md §7.
  */
 
 import { useEffect, type RefObject } from 'react';

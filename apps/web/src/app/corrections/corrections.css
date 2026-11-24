@@ -46,7 +46,7 @@
   list-style: none;
 }
 
-.ds-receipt__steps > li:last-child .ds-room-ustep {
+.ds-receipt__steps > li:last-child .ds-doc-ustep {
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 

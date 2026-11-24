@@ -27,40 +27,20 @@
   border-radius: var(--ds-radius-sm);
 }
 
-/* The float plane (the `.ds-float` recipe): the stack is one sheet of glass, a loose button its own. */
+/* Solid, with the float shadow: the stack is one sheet over the map, a loose button its own. */
 .ds-map-controls__stack,
 .ds-map-controls__btn {
-  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  background: var(--ds-canvas);
   box-shadow:
     inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
     var(--ds-shadow-float);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
 }
 
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .ds-map-controls__stack,
-  .ds-map-controls__btn {
-    background: var(--ds-canvas);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .ds-map-controls__stack,
-  .ds-map-controls__btn {
-    background: var(--ds-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
-/* Inside the stack the buttons are bare: the stack's glass is the only plane. */
+/* Inside the stack the buttons are bare: the stack is the only plane. */
 .ds-map-controls__stack .ds-map-controls__btn {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
 }
 
 .ds-map-controls__stack .ds-map-controls__btn + .ds-map-controls__btn {
@@ -78,7 +58,7 @@
   /* Icons are 1.5px strokes in the plate's type color, the way the plate's own type reads. */
   color: var(--ds-map-label-hi);
   cursor: pointer;
-  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-map-controls__btn:hover {
@@ -98,7 +78,7 @@
 }
 
 .ds-map-controls__locate[data-state='locating'] svg {
-  animation: ds-map-controls-seek 1.1s var(--ds-ease-standard) infinite alternate;
+  animation: ds-map-controls-seek 1.1s var(--ds-ease-entrance) infinite alternate;
 }
 
 @keyframes ds-map-controls-seek {
@@ -111,7 +91,7 @@
   .ds-map-controls {
     right: var(--ds-space-3);
     bottom: calc(var(--ds-tabbar-h) + var(--ds-space-3));
-    transform: translateY(calc(-1 * var(--ds-xcol-detent-h, 176px)));
+    transform: translateY(calc(-1 * var(--ds-xcol-detent-h, 196px)));
   }
 }
 

@@ -8,7 +8,7 @@
  */
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Field, fieldControlProps } from '../../../components/room';
+import { Field, fieldControlProps } from '../../../components/forms/fields';
 import { RequiredMark, SubmitRow } from '../../../components/forms/FormKit';
 
 export function ReceiptLookupForm() {

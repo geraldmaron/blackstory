@@ -11,7 +11,8 @@ import {
   exploreHrefForState,
   searchHrefForStatus,
 } from './metadata-hrefs';
-import { ATLAS_INSTRUMENT_HREF } from '../nav/atlas-door';
+/** The map view with nothing narrowed: where an unusable value sends the reader. */
+const ATLAS_INSTRUMENT_HREF = '/archive?view=map';
 import { parseExploreSearchParams } from './url-state';
 
 function parseExploreHref(href: string) {
@@ -21,7 +22,7 @@ function parseExploreHref(href: string) {
 
 test('exploreHrefForState normalizes postal code and includes state (camera from state param)', () => {
   const href = exploreHrefForState(' tx ');
-  assert.equal(href, '/explore?state=TX');
+  assert.equal(href, '/archive?view=map&state=TX');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.state, 'TX');
@@ -47,7 +48,7 @@ test('exploreHrefForState returns the Explore instrument for empty or unknown po
 
 test('exploreHrefForEra filters explore to one era bucket', () => {
   const href = exploreHrefForEra('1860s');
-  assert.equal(href, '/explore?era=1860s');
+  assert.equal(href, '/archive?view=map&era=1860s');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.filters.era, '1860s');
@@ -61,7 +62,7 @@ test('exploreHrefForEra returns /explore when era bucket is empty', () => {
 
 test('exploreHrefForKind filters explore to the entity kind family', () => {
   const href = exploreHrefForKind('place');
-  assert.equal(href, '/explore?kind=places');
+  assert.equal(href, '/archive?view=map&kind=places');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.filters.kind, 'places');
@@ -73,9 +74,9 @@ test('exploreHrefForKind returns /explore when kind is empty', () => {
 });
 
 test('searchHrefForStatus emits /search links only for known non-all status tokens', () => {
-  assert.equal(searchHrefForStatus('active'), '/records?status=active');
-  assert.equal(searchHrefForStatus('in_force'), '/records?status=in_force');
-  assert.equal(searchHrefForStatus('historic'), '/records?status=historic');
+  assert.equal(searchHrefForStatus('active'), '/archive?status=active');
+  assert.equal(searchHrefForStatus('in_force'), '/archive?status=in_force');
+  assert.equal(searchHrefForStatus('historic'), '/archive?status=historic');
 });
 
 test('searchHrefForStatus returns undefined for all, empty, or unknown values', () => {
@@ -107,11 +108,11 @@ test('eraFactLink handles undated, single-bucket, and multi-bucket labels', () =
 
   assert.deepEqual(eraFactLink(['1860s']), {
     label: '1860s',
-    href: '/explore?era=1860s',
+    href: '/archive?view=map&era=1860s',
   });
 
   assert.deepEqual(eraFactLink(['1860s', '1890s', '1920s']), {
     label: '1860s-1920s',
-    href: '/explore?era=1860s',
+    href: '/archive?view=map&era=1860s',
   });
 });

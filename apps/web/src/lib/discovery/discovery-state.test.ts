@@ -35,9 +35,9 @@ describe('DiscoveryState map/list continuity', () => {
     assert.equal(href.includes('kind=place'), true);
     assert.equal(href.includes('era=1920s'), true);
     assert.equal(href.includes('state=OK'), true);
-    assert.equal(href.includes('theme=abolition'), true);
+    assert.equal(href.includes('topic=abolition'), true);
     assert.equal(href.includes('status=historic'), true);
-    assert.equal(href.includes('floor=B'), true);
+    assert.equal(href.includes('evidence=B'), true);
     assert.equal(href.includes('confidence='), false);
   });
 
@@ -47,11 +47,10 @@ describe('DiscoveryState map/list continuity', () => {
       state: 'OK',
       evidence: 'B',
     });
-    assert.equal(href, '/explore?state=OK&floor=B');
-    const qs = href.slice('/explore?'.length);
-    const params = Object.fromEntries(new URLSearchParams(qs).entries());
-    const normalized = normalizeQueryString('/explore', params);
-    assert.equal(normalized.includes('floor=B'), true, `stripped floor: ${normalized}`);
+    assert.equal(href, '/archive?view=map&state=OK&evidence=B');
+    const params = Object.fromEntries(new URLSearchParams(href.split('?')[1]).entries());
+    const normalized = normalizeQueryString('/archive', params);
+    assert.equal(normalized.includes('evidence=B'), true, `stripped evidence: ${normalized}`);
     assert.equal(normalized.includes('state=OK'), true);
   });
 
@@ -102,9 +101,9 @@ describe('DiscoveryState map/list continuity', () => {
       evidence: 'B',
       topic: 'abolition',
     };
-    const fromRecords = new URLSearchParams(buildAtlasHref(records).replace(/^\/explore\?/, ''));
+    const fromRecords = new URLSearchParams(buildAtlasHref(records).replace(/^\/archive\?/, ''));
     const fromDiscovery = new URLSearchParams(
-      mapHrefFromDiscovery(discoveryFromRecords(records)).replace(/^\/explore\?/, ''),
+      mapHrefFromDiscovery(discoveryFromRecords(records)).replace(/^\/archive\?/, ''),
     );
     assert.deepEqual(Object.fromEntries(fromRecords), Object.fromEntries(fromDiscovery));
   });
@@ -129,7 +128,7 @@ describe('DiscoveryState map/list continuity', () => {
       assert.equal(new URL(ret.mapHref, 'https://example.test').searchParams.has(key), false);
     }
     assert.equal(ret.mapHref.includes('selected=ent_dunbar_school_001'), true);
-    assert.equal(ret.mapHref.includes('floor=B'), true);
+    assert.equal(ret.mapHref.includes('evidence=B'), true);
     assert.equal(ret.mapHref.includes('state=OK'), true);
     assert.equal(ret.listHref.includes('kind=place'), true);
     assert.equal(ret.listHref.includes('evidence=B'), true);
@@ -175,6 +174,27 @@ describe('DiscoveryState map/list continuity', () => {
     assert.equal(ret.nextHref?.includes('gamma'), true);
     assert.equal(ret.positionLabel, '2 of 3 in this list');
   });
+});
+
+test('a shuffled list arrival returns to the same seed and the page that holds the record', () => {
+  const raw = { from: 'list', seed: '4ywe5m', kind: 'places', state: 'AL' };
+  const search = 'from=list&kind=places&seed=4ywe5m&state=AL';
+  assert.equal(normalizeQueryString('/place/some-place', new URLSearchParams(raw)), search);
+  assert.equal(
+    [...new URLSearchParams(recordArrivalQuery(raw))].sort().join(),
+    [...new URLSearchParams(search)].sort().join(),
+    'the seed survives the /entity to /place redirect',
+  );
+  const ret = placeDiscoveryReturn('ent_a', discoveryFromSearchParams(raw), {
+    index: 150,
+    total: 400,
+  });
+  assert.equal(ret.listHref, '/archive?kind=places&state=AL&seed=4ywe5m&page=2');
+  // A search has no shuffle, so a stray seed never reaches the list address.
+  assert.equal(
+    listHrefFromDiscovery(discoveryFromSearchParams({ from: 'list', q: 'church', seed: '4ywe5m' })),
+    '/archive?q=church',
+  );
 });
 
 describe('record arrival carried through redirects', () => {
@@ -304,7 +324,7 @@ test('record return restores the displayed chronology page and its prior index o
   );
   const params = new URL(result.listHref, 'https://example.test').searchParams;
   assert.equal(params.get('page'), '2');
-  assert.equal(params.get('layout'), 'chronology');
+  assert.equal(params.get('view'), 'timeline');
   assert.equal(params.get('sort'), 'name');
   assert.match(result.positionLabel ?? '', /125 of 300 in this chronology/);
 });

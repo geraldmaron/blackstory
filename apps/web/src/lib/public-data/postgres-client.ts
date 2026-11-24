@@ -8,6 +8,7 @@
  * silently substitute the 4-entity Dunbar seed (map layout is also `force-dynamic`).
  */
 import pg from 'pg';
+import { resolvePostgresPoolSettings } from '../postgres-pool-settings';
 
 let pool: pg.Pool | undefined;
 
@@ -85,13 +86,19 @@ export function getPostgresPool(
     throw new Error('DATABASE_URL or APP_DATABASE_URL is required for postgres public reads');
   }
   if (!pool) {
-    const maxRaw = environment.DATABASE_POOL_MAX?.trim();
-    const max = maxRaw ? Number(maxRaw) : 4;
     const conn = normalizePgConnectionString(connectionString, environment);
     pool = new pg.Pool({
       connectionString: conn.connectionString,
-      max: Number.isInteger(max) && max > 0 ? max : 4,
+      // The same bounds as the admin pool. Without them a connection the database or the pooler
+      // dropped never answers, and every page that reads the catalog (the map first) waits on it
+      // for minutes instead of failing and retrying.
+      ...resolvePostgresPoolSettings(environment),
       ...(conn.ssl ? { ssl: conn.ssl } : {}),
+    });
+    // An idle client erroring out (server restart, pooler eviction) emits on the pool. Without a
+    // listener node treats it as an unhandled 'error' event and takes the whole server down.
+    pool.on('error', (error) => {
+      console.error('postgres pool client error', error);
     });
   }
   return pool;

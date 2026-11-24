@@ -23,6 +23,8 @@ const EMPTY_RECORDS_QUERY = Object.freeze({
   sort: 'discovery',
   seed: '',
   layout: 'index',
+  selected: '',
+  place: '',
   page: 1,
 });
 const RECORDS_FILTER_KEYS = Object.freeze(['kind', 'era', 'state', 'topic', 'status', 'evidence']);
@@ -39,8 +41,15 @@ const RECORDS_PAGE_PARAM_ALLOWLIST = Object.freeze([
   'layout',
   // Read only as a spelling of `layout` (`?view=timeline`); the canonical URL never emits it.
   'view',
+  'selected',
+  'place',
   'page',
 ]);
+
+// Return context from the map (never filters): a record id, and `PLACE_KEY_PATTERN` from
+// @repo/domain/map/place-groups.
+const RECORD_ID = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,159}$/;
+const PLACE_KEY = /^(state|county|city)-[a-z0-9-]{1,80}$|^square-\d{1,4}-\d{1,4}$/;
 
 // Ports of lib/discovery/story-collection.ts and collection-period.ts (client-safe leaf codecs).
 const STORY_SLUG = /^[a-z0-9](?:[a-z0-9-]{0,94}[a-z0-9])?$/;
@@ -126,6 +135,8 @@ function parseRecordsQuery(raw) {
       ? one('sort').toLowerCase()
       : 'discovery',
     seed: SEED.test(one('seed').toLowerCase()) ? one('seed').toLowerCase() : '',
+    selected: RECORD_ID.test(one('selected')) ? one('selected') : '',
+    place: PLACE_KEY.test(one('place')) ? one('place') : '',
     page: Number.isFinite(rawPage) && rawPage > 1 ? Math.min(rawPage, MAX_PAGE) : 1,
   };
 }
@@ -147,18 +158,28 @@ function recordsQueryString(query) {
     params.set('seed', merged.seed);
   }
   if (merged.layout === 'chronology') params.set('layout', 'chronology');
+  if (merged.selected.length > 0) params.set('selected', merged.selected);
+  if (merged.place.length > 0) params.set('place', merged.place);
   if (merged.page > 1) params.set('page', String(merged.page));
   return params.toString();
 }
 
+/** The web app's list now answers on `/archive`, with the timeline as `view=timeline`. */
+function archiveQueryString(query) {
+  const rest = recordsQueryString({ ...query, layout: 'index' });
+  const view = query.layout === 'chronology' ? 'view=timeline' : '';
+  return view && rest ? `${view}&${rest}` : view || rest;
+}
+
 function recordsHref(query) {
-  const search = recordsQueryString(query);
-  return search.length > 0 ? `/records?${search}` : '/records';
+  const search = archiveQueryString(query);
+  return search.length > 0 ? `/archive?${search}` : '/archive';
 }
 
 /** True for a multi-constraint or free-text narrowing, which is a crawl trap (noindex upstream). */
 function isRecordsCombinationQuery(query) {
   if (query.q.length > 0) return true;
+  if (query.selected.length > 0 || query.place.length > 0) return true;
   if (
     query.collection.length > 0 ||
     query.layout === 'chronology' ||

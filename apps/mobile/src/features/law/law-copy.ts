@@ -18,13 +18,12 @@ export const LAW_CATALOG = {
   searchPlaceholder: 'Search laws or citations…',
   emptyTitle: 'No entries matched',
   emptyBody: 'Try a broader keyword or clear filters.',
-  seedNote:
-    'Catalog from the curated on-device legal snapshot. Live refresh ships when the mobile API exposes the listing.',
+  seedNote: 'This catalog is a snapshot stored on your device, so it can be behind the website.',
 } as const;
 
 export const LAW_ABOUT = {
   title: 'How to read this room',
-  lede: 'Entries cite official sources and archived captures. Status labels describe the current legal standing of the instrument, not a prediction of future outcomes.',
+  lede: 'Entries cite official sources and saved copies. A status label says where the law or ruling stands now. It doesn’t predict what happens next.',
 } as const;
 
 export const LAW_DETAIL = {
@@ -42,7 +41,7 @@ export const LAW_DETAIL = {
   archiveCta: 'Open archived capture',
   entityCta: 'Open linked record',
   missingTitle: 'Law entry not found',
-  missingBody: 'That catalog entry is not in this release. Return to Law and pick another entry.',
+  missingBody: 'That entry isn’t in this release. Go back to Law and pick another one.',
 } as const;
 
 export const LAW_KIND_LABELS: Readonly<Record<string, string>> = {

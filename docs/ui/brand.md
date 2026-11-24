@@ -4,6 +4,8 @@ explanation, `success` for a receipt, and `warning` only for something the reade
 The tone shows in the edge, the tint and the cue; the title and body stay in ink.
 # Brand: usage contract
 
+> **v13 (2026-11-23):** [`DESIGN.md`](./DESIGN.md) is the design system. This file still binds for the marks, the brand swatches, the type families, the dignity rules and the accessibility floor. Its rules on grounds, radius, depth, plates, texture and motion (the sections marked below) are superseded by `DESIGN.md` section 7 and remain only as a description of what is still in code until each phase lands.
+
 > **Binding source (2026-07-18):** root `brand/` — BlackStory full polished kit
 > (book-and-pin symbol + wordmark, light/dark transparent lockups and symbols,
 > app icons, 4-page guide, token files). Served copies use **role-based** paths
@@ -44,15 +46,15 @@ launch or partner-facing use beyond this repo.
 
 Recorded so nobody “fixes” the codebase back to a retired rule:
 
-1. **Radii.** Flat/zero-radius language is superseded by 8px / 14px / 28px
-   (`--ds-radius-sm` / `-md` / `-lg`), the same on web and mobile. The middle
-   step was 16px in the pack and moved to 14px with the Ink direction. The
-   old ban on gradients, glows, glass, shadow and grain was lifted by the
-   owner for the living-archive redesign (2026-11-15); see Shape and depth.
-   Bevels, 3D and ornamental motion stay out.
+1. **Radii.** 0 for exhibits, sheets and fields, 8px for controls
+   (`--ds-radius-sm`), full for chips (`DESIGN.md` section 7.4). The 14px and
+   28px steps (`--ds-radius-md` / `-lg`) are off every public surface since
+   phase 8; the tokens stay only for the admin stylesheets, which are outside
+   the v13 plan, and for the app's token generator. Gradients, glow, grain,
+   bevels, 3D and ornamental motion stay out.
 2. **Canvas.** White `#FFFFFF` canvas is superseded by the paper family. The
    Archive Paper swatch `#F4EFE5` is the brand color; the web theme canvas is
-   one value step lighter so a sunken well and a raised plate both have room
+   one value step lighter so a sunken well and a raised surface both have room
    (see Theme roles).
 3. **Display type.** Headlines use Schibsted Grotesk on its variable weight axis
    (800 display, 700 headline, 650 title); SemiBold-everywhere is retired because it
@@ -65,7 +67,7 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
    Inline links in operational notices use that theme-aware token, an underline, and a
    visible focus outline; browser-default blue does not provide dark-theme contrast.
 6. **Home layout.** The `/` surface follows
-   [design direction v10](./design-direction-v10.md) and its
+   [design direction v10](./archive/design-direction-v10.md) and its
    [reconciliation](./v10/design-doc-reconciliation.md); tokens and palette rules in this file
    govern the shared brand.
 
@@ -201,7 +203,7 @@ not what the role measures.
 | Body | `--ds-text-body`, `--ds-text-body-sm` | Geist 400 | UI and running text |
 | Editorial | `--ds-text-editorial` (17 to 19px), `--ds-text-editorial-lede` | Newsreader 400; italic optical size for pull statements | Ledes and prose |
 | Meta | `--ds-text-meta` (13px), `--ds-tracking-meta` | Geist Mono, caps | Dates, counts, citations |
-| Numeral | `--ds-text-numeral` (48 to 88px) | `--ds-weight-numeral` 800 | Dates, decades and counts as graphics |
+| Numeral | `--ds-text-numeral` (48 to 88px) | `--ds-weight-numeral` 800 | Years and decades as graphics. Never a count (`DESIGN.md` rule 4) |
 
 The older names (`--ds-text-display-title`, `-display-hero`, `-display-1`,
 `-display-numeral`) are aliases onto these roles, so untouched surfaces shrink
@@ -216,15 +218,16 @@ characters); the page grid caps at `--ds-grid-max` (72rem).
 ## Space, layout and motion
 
 - **Space** is a 4px rhythm, `--ds-space-1` to `--ds-space-16` inside
-  components, and the fluid `--ds-section-sm` / `-md` / `-lg` between sections.
-- **Breakpoints** are 40 / 48 / 64 / 80rem. CSS cannot read a custom property
+  components, and the fluid `--ds-section-md` / `-lg` between sections.
+- **Breakpoints** are 40 / 48 / 64 / 72 / 80rem. 72rem is the page grid's cap, used where a
+  side sheet needs the full grid beside it (the record page). CSS cannot read a custom property
   in a media query, so they live in `grid.breakpoints` in
   `packages/ui/src/tokens/spacing.ts`.
 - **Motion** explains a change of state and nothing else. Durations are
   `--ds-duration-fast` (160ms, hover and press), `-base` (280ms, panels) and
   `-slow` (480ms, surface changes). Things arrive on `--ds-ease-entrance` and
-  leave on `--ds-ease-exit`. The cinematic and chapter tokens belong to
-  sequenced surfaces such as the Door.
+  leave on `--ds-ease-exit`. Those five are the whole set; the sheet, cinematic
+  and chapter tokens went with the Door in phase 8.
 - **Stacking** uses the `--ds-z-*` ladder. A raw `z-index` is a bug waiting for
   the next overlay.
 
@@ -247,35 +250,37 @@ Every interactive element has all of these, in both themes:
 
 ## Shape and depth
 
-Radii 8/14/28px (sm/md/lg). The owner lifted the bans on gradients, glow,
-glass, backdrop blur, shadows and grain for the living-archive redesign
-(2026-11-15). Depth now comes from four planes, defined in
-[`patterns-living-archive.md`](./patterns-living-archive.md): the masthead
-**field** a plate stands in (plain since the 2026-11-15 critique pass: a glow,
-vignette or grain that carries no information is decoration), **grounds** (ink,
-paper, sand, copper bands), **sheets** (paper with a real layered shadow,
-`--ds-shadow-sheet` / `--ds-shadow-lift`) and **floats** (glass with a backdrop
-blur over the map, `.ds-float`). Shadows carry an offset and a soft blur; a
-zero-offset colored halo is still out, as are neon, bevels and 3D. The memorial
-and sensitive or violence-adjacent records stand on a quiet ground: no plate,
-no motion, and never lifted onto the home page.
+`DESIGN.md` sections 7.1 and 7.4 are the rule: radius 0 for exhibits, sheets and
+fields, 8px for controls, full for chips; no bands, no glow, no grain; a shadow
+(`--ds-shadow-float`) only where something floats over the map or the page (the
+record panel, a dialog, a menu, a phone sheet). The kit's `Sheet` is square and
+flat. The memorial and sensitive or violence-adjacent records stand on a quiet
+ground: no crop marks, no motion, and never lifted onto the front page.
+
+One thing from the older looks is still in the code after phase 8, with its
+reason in `DESIGN.md` section 13: the memorial's list keeps the rounded, banded
+sheet it was built with (P-01). Nothing blurs what is behind it; what floats is
+solid.
 
 ## Imagery and people
 
 Place first; evidence visible; people with context — a person is always
 identified (PERSON / ROLE / PLACE / YEAR), never anonymous decoration.
 Avoid generic “Black history” stock imagery, sepia filters dropped on any
-image to make it look old, and maps without source/precision context. No
-AI-generated image ships anywhere on the site (owner decision 2026-11-15;
-`/about` promises it publicly).
+image to make it look old, and maps without source/precision context.
 
-**Plates.** The one large image treatment is the plate: a record's own sourced
-`primary_image` shown large and toned ink and copper (`.ds-plate`, see
-[`patterns-living-archive.md`](./patterns-living-archive.md#plates)). Real
-sourced photographs only, never generated or stock; the credit line always
-visible beside it and never altered; never on the memorial or a sensitive or
-violence-adjacent record, which show the photograph plain or not at all; and
-the map and the plate always show the same place. No type is set on a plate.
+**Generated imagery (owner decision 2026-11-23, replacing 2026-11-15).** Nothing
+generated may depict a person, a place, a building, a document, a map or an
+event, anywhere on the site or in the app. Abstract textures made with an image
+generator may ship (the two named in `DESIGN.md` section 7.1), each recorded
+with its prompt in a manifest, and never over a photograph, a document or body
+text. Article covers stay hand-drawn scans, as `/about` and the FAQ say.
+
+**Photographs.** Every photograph is shown in its own color, never toned or
+aged, with its date basis stated and its credit beside it (`DESIGN.md` section
+7.3). Real sourced photographs only, never generated or stock; the credit is
+never altered; and the map beside a photograph always shows the same place.
+The duotone plate (`.ds-plate`) was deleted in phase 8.
 
 ## Map dignity
 

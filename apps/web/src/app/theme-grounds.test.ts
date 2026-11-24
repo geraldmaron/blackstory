@@ -46,7 +46,7 @@ test('the light and dark role blocks define exactly the same tokens', () => {
 /*
  * 4. An ink ground that stays black on the light table (the header and the ink blocks did). On the
  *    light table it takes the light roles on a paper step, by one selector in tokens.css; the two
- *    a plate that carries meaning as ink opts out with `data-ground-fixed` (TrustFrame `fixed`).
+ *    a plate that carries meaning as ink opts out with `data-ground-fixed` (a map exhibit).
  */
 test('on the light table an ink ground is paper, unless it is fixed', () => {
   const flip = ":root:not([data-theme='dark']) [data-ground='ink']:not([data-ground-fixed])";
@@ -61,10 +61,9 @@ test('on the light table an ink ground is paper, unless it is fixed', () => {
   assert.match(own, /--ds-numeral-soft-text: var\(--ds-accent\);/);
   // Archive Paper: the paper step contrast.test.ts measures ink, stone and copper text on.
   assert.match(tokens, /--ds-material-table: #f4efe5;/);
-  // The opt-out is TrustFrame's `fixed` prop; the errata tag and the Lives era tab that used it
-  // are ruled type now, not ink plates.
+  // The opt-out is the kit's map exhibit, which stays ink in both themes (DESIGN.md section 7.3).
   assert.match(
-    readFileSync(join(src, 'components/trust/TrustFrame.tsx'), 'utf8'),
+    readFileSync(join(src, '../../../packages/ui/src/components/Exhibit.tsx'), 'utf8'),
     /data-ground-fixed/,
   );
 });

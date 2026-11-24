@@ -15,12 +15,14 @@
  */
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { radius, Text, space, useThemeColors } from '@/ui';
+import { ExhibitFrame, Receipt, Text } from '@/ui';
 import { MapScreen, type MapCameraCommand, type MapFeatureCollection } from '@/features/map';
 import type { RecordAnatomyPlace } from './entity-anatomy-facts';
 
 export type RecordPlacePreviewProps = {
   readonly place?: RecordAnatomyPlace;
+  /** A harm-adjacent record: no crop marks. */
+  readonly quiet?: boolean;
   readonly onOpenInMaps?: () => void;
 };
 
@@ -31,9 +33,11 @@ const PREVIEW_HEIGHT = 168;
  */
 const LOCATOR_ZOOM = 11;
 
-export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewProps) {
-  const theme = useThemeColors();
-
+export function RecordPlacePreview({
+  place,
+  quiet = false,
+  onOpenInMaps,
+}: RecordPlacePreviewProps) {
   const source = useMemo<MapFeatureCollection | undefined>(() => {
     if (!place) return undefined;
     return {
@@ -64,27 +68,21 @@ export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewPr
 
   if (!place || !source || !camera) {
     return (
-      <View
-        style={[
-          styles.frame,
-          styles.empty,
-          { borderColor: theme.border, backgroundColor: theme.surface },
-        ]}
-        accessibilityRole="image"
+      <Text
+        variant="bodySmall"
+        colorRole="inkMuted"
         accessibilityLabel="Place not pinned on the archive map"
         testID="record-place-empty"
       >
-        <Text variant="code" colorRole="inkMuted">
-          Place not pinned
-        </Text>
-      </View>
+        Place not pinned
+      </Text>
     );
   }
 
   const label = `Map showing ${place.label} at public precision`;
-  const plate = (
+  const map = (
     <View
-      style={[styles.frame, { borderColor: theme.border }]}
+      style={styles.frame}
       accessibilityRole="image"
       accessibilityLabel={label}
       testID="record-place-preview"
@@ -99,33 +97,36 @@ export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewPr
     </View>
   );
 
-  if (onOpenInMaps) {
-    return (
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`Open ${place.label} in Maps at public precision`}
-        onPress={onOpenInMaps}
-        testID="record-place-preview-pressable"
-      >
-        {plate}
-      </Pressable>
-    );
-  }
-
-  return plate;
+  // The map is drawn no sharper than the stored precision, and the label says which that is.
+  // Only the map is the button: wrapping the whole exhibit would hide its label from VoiceOver.
+  return (
+    <ExhibitFrame
+      kind="map"
+      ground="ink"
+      basis={`${place.precision ?? 'city'} precision`}
+      variant={quiet ? 'quiet' : 'full'}
+      receipt={<Receipt source={place.label} />}
+      testID="record-place-exhibit"
+    >
+      {onOpenInMaps ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Open ${place.label} in Maps at public precision`}
+          onPress={onOpenInMaps}
+          testID="record-place-preview-pressable"
+        >
+          {map}
+        </Pressable>
+      ) : (
+        map
+      )}
+    </ExhibitFrame>
+  );
 }
 
 const styles = StyleSheet.create({
   frame: {
     height: PREVIEW_HEIGHT,
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    // The map paints to its own edges; without this the plate's corners square off over the radius.
     overflow: 'hidden',
-  },
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: space['3'],
   },
 });

@@ -33,38 +33,59 @@ test('the phone header shows the lockup artwork, sized down, never hidden', () =
   assert.doesNotMatch(commandBarCss, /ds-shell-wordmark__img[^{]*\{\s*display:\s*none/);
 });
 
-test('a record photograph leads the masthead as a plate beside the name, never under it', () => {
+test('the photograph leads as an exhibit and the map follows it; neither is a ground or a plate', () => {
   const page = read('./EntityRecordPage.tsx');
-  // Only a record that is not quiet gets a plate; a quiet one keeps its photograph plain in the rail.
-  assert.match(
-    page,
-    /!quiet && entity\.primaryImage && !isRenderedImage\(entity\.primaryImage\) \? \(\s*<RecordImage[\s\S]*?\n\s*plate\n/,
-  );
-  assert.match(page, /entity\.primaryImage && !plate \? \(\s*<RecordImage/);
-  assert.match(page, /const quiet = isQuietRecord\(entity\)/);
-  // The plate holds the right of the field and the head stops short of it: no type on the photo.
-  assert.match(recordCss, /\.ds-recpage__plate \{[^}]*position:\s*absolute/s);
-  assert.match(
-    recordCss,
-    /\.ds-recpage__mast\[data-plate\] \.ds-recpage__head \{[^}]*padding-right:/s,
-  );
+  const pattern = read('../../../components/patterns/RecordPage.tsx');
+  // Photograph, else the map: one lead, and a second map exhibit only when a photograph leads.
+  assert.match(page, /const lead = photograph \?\? mapExhibit;/);
+  assert.match(page, /photograph && mapExhibit \? \{ map: mapExhibit \}/);
+  assert.match(page, /<ExhibitFrame\s+id=\{`\$\{entity\.id\}-map`\}\s+kind="map"\s+ground="ink"/);
+  // A quiet record gets the quiet exhibit and a still map (DESIGN.md section 7.3, P-04).
+  assert.match(page, /variant=\{quiet \? 'quiet' : 'full'\}/);
+  assert.match(page, /still=\{quiet\}/);
+  // The retired looks are gone with their last caller.
+  for (const source of [page, pattern, recordCss]) {
+    assert.doesNotMatch(
+      source,
+      /RecordGround|plateMap|data-grounded|ds-recpage__(plate|wash|mast)/,
+    );
+    assert.doesNotMatch(source, /\bplate\b/);
+  }
+  assert.doesNotMatch(recordCss, /ds-recpage\[data-ground\]|counter\(beat|ds-plate/);
 });
 
-test('the sticky rail stops where the body ends, above the record file', () => {
+test('the side column stands beside the reading on a desktop and dissolves into one column below it', () => {
   const pattern = read('../../../components/patterns/RecordPage.tsx');
-  // The rail and the body share an inner box; the record file sits after it, outside.
+  // Facts, actions, then the exhibits, all inside the side column, before the body.
   assert.match(
     pattern,
-    /<div className="ds-recpage__main">[\s\S]*ds-recpage__rail[\s\S]*ds-recpage__body[\s\S]*<\/div>\s*<\/div>\s*<footer\s+className="ds-recpage__file"/,
+    /<div className="ds-recpage__side">[\s\S]*ds-recpage__facts[\s\S]*ds-recpage__actions[\s\S]*ds-recpage__lead[\s\S]*ds-recpage__map[\s\S]*<\/div>\s*<div className="ds-recpage__body">/,
   );
   const desktop = recordCss.slice(recordCss.indexOf('@media (min-width: 64rem)'));
-  assert.match(desktop, /\.ds-recpage__grid \{\s*grid-template-areas:\s*'main'\s*'file';/);
   assert.match(desktop, /\.ds-recpage__main \{[^}]*display: grid;[^}]*'body side';/s);
-  // The at-a-glance card stands beside the lede, above the sticky run, not inside the aside.
-  assert.match(desktop, /'lede side'\s*'note side'/);
-  assert.match(
-    pattern,
-    /<dl className="ds-recpage__facts"[^>]*data-ground="ink"[\s\S]*<aside className="ds-recpage__rail"/,
+  assert.match(desktop, /'head side'\s*'lede side'\s*'note side'/);
+  // Phone order (DESIGN.md section 9.1): exhibit, name, summary, facts, first beat, map, the rest.
+  const phone = recordCss.slice(
+    recordCss.indexOf('@media (max-width: 63.99rem)'),
+    recordCss.indexOf('@media (max-width: 47.9375rem)'),
   );
-  assert.doesNotMatch(desktop, /'file\s+file'/);
+  const order = (selector: string) =>
+    Number(new RegExp(`${selector} \\{[^}]*order: (\\d+)`, 's').exec(phone)?.[1]);
+  const sequence = [
+    order('\\.ds-recpage__lead'),
+    order('\\.ds-recpage__head'),
+    order('\\.ds-recpage__lede'),
+    order('\\.ds-recpage__facts'),
+    order('\\.ds-recpage__beat:first-child'),
+    order('\\.ds-recpage__extra'),
+    order('\\.ds-recpage__beat'),
+    order('\\.ds-recpage__file'),
+  ];
+  assert.deepEqual(
+    sequence,
+    [...sequence].sort((a, b) => a - b),
+  );
+  assert.ok(sequence.every(Number.isFinite), String(sequence));
+  // The facts are a ruled list on the page's paper, not a card on its own ground (DESIGN.md 7.4).
+  assert.doesNotMatch(pattern, /ds-recpage__facts"[^>]*data-ground/);
 });

@@ -1,8 +1,11 @@
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import {
   cameraPresetFor,
+  flightDurationFor,
+  flightPeakZoom,
   MAP_MIN_ZOOM,
   prefersReducedMotion,
+  screensBetween,
   type CameraPresetName,
 } from '../../lib/map-experience/camera-presets';
 import { lngLatTuple } from './viewport-geometry';
@@ -63,6 +66,50 @@ export type MapStageFlyOptions = {
  * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. Returns
  * `false` when `map` isn't constructed yet: callers latch the request and retry on `load`.
  */
+const ZERO_PADDING = { top: 0, bottom: 0, left: 0, right: 0 };
+
+/**
+ * `map.cameraForBounds`, safe to call from any camera state. Returns undefined when there is no
+ * usable fit, so every caller needs its own fallback frame.
+ *
+ * MapLibre fits bounds inside the padding it is given PLUS whatever padding the camera already
+ * holds (`cameraForBoxAndBearing`: `tr.padding + options.padding`). A center-and-zoom flight
+ * leaves its padding on the camera, so the next fit was padded twice: after the Door's Orbit the
+ * decade walk fitted the country into a 69px sliver and landed on Hudson Bay at zoom 1.8 with no
+ * record on screen. When the two paddings together exceed the canvas the globe helper throws
+ * outright (it reads `.center` off a fit that came back undefined), which is what a place click
+ * on the Door did. So the fit is computed with no padding on the camera, and a throw or a
+ * non-finite zoom (a map with no size yet, a background tab) is no fit. Nothing renders between
+ * the two writes: the held padding is back before this returns.
+ */
+export function fitBoundsCamera<Center>(
+  // Structural, so the stage's `AtlasCameraTarget` fits as well as the MapLibre map.
+  map: {
+    cameraForBounds(bounds: never, options: never): { center?: Center; zoom?: number } | undefined;
+  },
+  [west, south, east, north]: readonly [number, number, number, number],
+  padding: number | typeof ZERO_PADDING | undefined,
+): { center: Center | undefined; zoom: number } | undefined {
+  const transform = (map as { transform?: unknown }).transform as
+    { padding?: typeof ZERO_PADDING; setPadding?(p: typeof ZERO_PADDING): void } | undefined;
+  const held = transform?.padding ? { ...transform.padding } : null;
+  try {
+    if (held) transform!.setPadding?.(ZERO_PADDING);
+    const fit = map.cameraForBounds(
+      [west, south, east, north] as never,
+      (padding === undefined ? {} : { padding }) as never,
+    );
+    return typeof fit?.zoom === 'number' && Number.isFinite(fit.zoom)
+      ? { center: fit.center, zoom: fit.zoom }
+      : undefined;
+  } catch (error) {
+    console.error('[MapStage] cameraForBounds failed', error);
+    return undefined;
+  } finally {
+    if (held) transform!.setPadding?.(held);
+  }
+}
+
 export function runFlyPreset(
   map: MapLibreMap | null,
   name: CameraPresetName,
@@ -86,24 +133,17 @@ export function runFlyPreset(
   if ('center' in target) {
     center = [target.center[0], target.center[1]];
     zoom = target.zoom;
+    if (options?.zoomFloor === 'fit') map.setMinZoom(Math.min(MAP_MIN_ZOOM, zoom));
   } else {
     const [west, south, east, north] = target.bounds;
-    const camera = (() => {
-      try {
-        return map.cameraForBounds([west, south, east, north] as [number, number, number, number], {
-          // Honor caller padding (incl. asymmetric hero framing) when fitting bounds.
-          padding,
-        });
-      } catch (error) {
-        console.error('[MapStage] cameraForBounds failed', error);
-        return undefined;
-      }
-    })();
-    if (camera?.center && typeof camera.zoom === 'number') {
+    // Honor caller padding (incl. asymmetric hero framing) when fitting bounds.
+    const camera = fitBoundsCamera(map, target.bounds, padding);
+    if (camera?.center) {
       center = lngLatTuple(camera.center);
       zoom = camera.zoom;
       boundsFitted = true;
-      if (options?.zoomFloor === 'fit') map.setMinZoom(Math.min(MAP_MIN_ZOOM, zoom));
+      // MapLibre throws below its own floor of -2.
+      if (options?.zoomFloor === 'fit') map.setMinZoom(Math.max(-2, Math.min(MAP_MIN_ZOOM, zoom)));
     } else {
       center = [(west + east) / 2, (south + north) / 2];
       zoom = 3.4;
@@ -112,7 +152,7 @@ export function runFlyPreset(
 
   // Bounds fits already encode padding in center/zoom — re-applying padding on
   // ease/fly would double-shift (hero west coast pinned to the copy divider).
-  const motionPadding = boundsFitted ? { top: 0, bottom: 0, left: 0, right: 0 } : padding;
+  const motionPadding = boundsFitted ? ZERO_PADDING : padding;
 
   /** Only the attitude the caller actually authored — an absent one stays untouched. */
   const attitude = {
@@ -135,12 +175,16 @@ export function runFlyPreset(
       essential: true,
     });
   } else {
+    const from = map.getZoom();
+    const screens = screensBetween(map.getCenter(), center, from, map.getContainer().clientWidth);
     map.flyTo({
       center,
       zoom,
       padding: motionPadding,
       ...attitude,
-      duration: preset.duration,
+      duration: flightDurationFor(preset.duration, from, zoom, screens),
+      // The top of the arc, by distance (`flightPeakZoom`).
+      minZoom: flightPeakZoom(from, zoom, screens),
       curve: preset.curve,
       speed: preset.speed,
       easing: preset.easing,

@@ -16,7 +16,7 @@ test('The route error boundary every public route inherits shows a retry and a w
   const html = renderRouteBoundary(new Error('anything'));
   assert.match(html, /This page failed to load/);
   assert.match(html, /<button[^>]*type="button"[^>]*>Try again<\/button>/);
-  assert.match(html, /<a[^>]*href="\/"[^>]*>Back to the map<\/a>/);
+  assert.match(html, /<a[^>]*href="\/"[^>]*>Back to the front page<\/a>/);
 });
 
 test('The route error boundary never prints the raw message or stack in production', () => {

@@ -24,7 +24,6 @@
 import { parseRecordsQuery, type RecordsSort } from '../records/records-query';
 import { isPopulationDecade } from '@repo/domain/demographics/population-decades';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import { PLACE_KEY_PATTERN } from '@repo/domain/map/place-groups';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
 import {
   coercePopulationGeoForDecade,
@@ -39,7 +38,7 @@ import {
 import { EXPLORE_RADIUS_PRESETS, type ExploreRadiusPresetId } from './explore-place-radius';
 import type { EvidenceGrade } from './evidence-grade';
 import { normalizePeriod, type PeriodBound } from '../discovery/collection-period';
-import { parseCollectionToken, type CollectionToken } from '../discovery/story-collection';
+import type { CollectionToken } from '../discovery/story-collection';
 
 export type ExploreViewport = {
   readonly lat: number;
@@ -137,6 +136,12 @@ export type ExploreViewState = {
    * leaving the map for Records restores the chronology they left. Never narrows anything.
    */
   readonly layout?: 'chronology';
+  /**
+   * Return context from the list, never read by the map: the page and the shuffle seed the reader
+   * left, so the List link can hand them back while the filters are unchanged.
+   */
+  readonly page?: number;
+  readonly seed?: string;
 };
 
 export type RawExploreSearchParams = Readonly<
@@ -154,14 +159,17 @@ export type RawExploreSearchParams = Readonly<
  * reads a key this list lacks, and when the serializer writes one.
  */
 export const EXPLORE_URL_PARAM_KEYS = [
+  'view',
   'q',
   'sort',
   'era',
   'kind',
   'tone',
+  'topic',
   'theme',
   'status',
   'confidence',
+  'evidence',
   'floor',
   'lat',
   'lng',
@@ -189,6 +197,8 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'periodEnd',
   'includeUndated',
   'layout',
+  'seed',
+  'page',
 ] as const;
 
 export type ExploreUrlParamKey = (typeof EXPLORE_URL_PARAM_KEYS)[number];
@@ -229,9 +239,7 @@ function parseFiniteNumber(raw: string | undefined): number | undefined {
  * else falls back to the default and the edge 308s it away.
  */
 const FILTER_TOKEN = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,63}$/;
-const RECORD_ID = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,159}$/;
 const EDGE_ID = /^[^\s\p{Cc}]{1,256}$/u;
-const STATE_POSTAL = /^[A-Z]{2}$/;
 const DECADE = /^\d{3}0s$/;
 
 function cleanSelectParam(raw: string | undefined): string {
@@ -352,20 +360,36 @@ function parseNear(raw: string | undefined): string | undefined {
   return cleanLabelParam(raw, 80);
 }
 
-function parseEvidenceFloor(raw: string | undefined): EvidenceGrade | undefined {
-  const trimmed = raw?.trim().toUpperCase();
-  if (trimmed === 'A' || trimmed === 'B' || trimmed === 'C') return trimmed;
-  return undefined;
-}
-
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
-  const collection = parseRecordsQuery({ q: raw.q, sort: raw.sort });
+  // The shared filter model is parsed once, by the list's parser, so a value the list accepts
+  // the map accepts and the reverse. `theme` and `floor` are the map's 4a spellings of `topic` and
+  // `evidence`: still read, never written.
+  const collection = parseRecordsQuery({
+    q: raw.q,
+    sort: raw.sort,
+    kind: raw.kind,
+    era: raw.era,
+    state: raw.state,
+    topic: raw.topic ?? raw.theme,
+    status: raw.status,
+    evidence: raw.evidence ?? raw.floor,
+    selected: raw.selected,
+    place: raw.place,
+    collection: raw.collection,
+    periodStart: raw.periodStart,
+    periodEnd: raw.periodEnd,
+    includeUndated: raw.includeUndated,
+    layout: raw.layout,
+    seed: raw.seed,
+    page: raw.page,
+  });
+  const orAll = (value: string) => (value === '' ? 'all' : value);
   const filters: ExploreFilterState = {
-    era: cleanSelectParam(firstValue(raw.era)),
-    kind: cleanSelectParam(firstValue(raw.kind)),
+    era: orAll(collection.era),
+    kind: orAll(collection.kind),
     tone: cleanSelectParam(firstValue(raw.tone)),
-    theme: cleanSelectParam(firstValue(raw.theme)),
-    status: cleanSelectParam(firstValue(raw.status)),
+    theme: orAll(collection.topic),
+    status: orAll(collection.status),
     confidence: cleanSelectParam(firstValue(raw.confidence)),
   };
 
@@ -373,15 +397,14 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const lng = parseFiniteNumber(firstValue(raw.lng));
   const zoom = parseFiniteNumber(firstValue(raw.zoom));
 
-  const selectedRaw = matchOrUndefined(firstValue(raw.selected)?.trim(), RECORD_ID);
-  const stateCandidate = firstValue(raw.state)?.trim().toUpperCase();
-  const stateRaw = matchOrUndefined(stateCandidate, STATE_POSTAL);
-  const placeRaw = matchOrUndefined(firstValue(raw.place)?.trim(), PLACE_KEY_PATTERN);
+  const selectedRaw = collection.selected;
+  const stateRaw = collection.state;
+  const placeRaw = collection.place;
   const satRaw = firstValue(raw.sat);
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = matchOrUndefined(firstValue(raw.decade)?.trim(), DECADE);
   const edgeRaw = matchOrUndefined(firstValue(raw.edge)?.trim(), EDGE_ID);
-  const floor = parseEvidenceFloor(firstValue(raw.floor));
+  const floor = collection.evidence === '' ? undefined : (collection.evidence as EvidenceGrade);
   const layerMode = parseLayerMode(raw);
   const popGeoRaw = firstValue(raw.popGeo)?.trim();
   const popDecadeRaw = firstValue(raw.popDecade)?.trim();
@@ -390,13 +413,13 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const radiusRaw = firstValue(raw.radius)?.trim();
   const nearRaw = firstValue(raw.near)?.trim();
   const findRaw = cleanLabelParam(firstValue(raw.find), 120);
-  const collectionToken = parseCollectionToken(raw.collection);
-  const period = normalizePeriod({
-    start: raw.periodStart,
-    end: raw.periodEnd,
-    includeUndated: raw.includeUndated,
-  });
-  const chronologyLayout = firstValue(raw.layout)?.trim().toLowerCase() === 'chronology';
+  const collectionToken = collection.collection;
+  const period = {
+    start: collection.periodStart,
+    end: collection.periodEnd,
+    includeUndated: collection.includeUndated,
+  };
+  const chronologyLayout = collection.layout === 'chronology';
 
   const satOn = satRaw === '1' || satRaw === 'true';
 
@@ -444,7 +467,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
       ? { viewport: { lat, lng, zoom } }
       : {}),
     ...(selectedRaw ? { selected: selectedRaw } : {}),
-    ...(stateRaw && stateRaw !== 'ALL' ? { state: stateRaw } : {}),
+    ...(stateRaw ? { state: stateRaw } : {}),
     ...(placeRaw ? { place: placeRaw } : {}),
     layerMode,
     ...(popGeo ? { popGeo } : {}),
@@ -467,20 +490,23 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(period.end !== '' ? { periodEnd: period.end } : {}),
     ...(period.includeUndated ? { includeUndated: true } : {}),
     ...(chronologyLayout ? { layout: 'chronology' as const } : {}),
+    ...(collection.seed ? { seed: collection.seed } : {}),
+    ...(collection.page > 1 ? { page: collection.page } : {}),
   };
 }
 
-/** Builds a plain `?...` query string (no leading `/explore`) so callers can compose full hrefs
- * or push it via `history.replaceState` without a full navigation. */
+/** Builds the map view's query string (no leading `/archive?`), `view=map` first, so callers can
+ * compose full hrefs or push it via `history.replaceState` without a full navigation. */
 export function buildExploreSearchParams(state: ExploreViewState): string {
   const params = new URLSearchParams();
+  params.set('view', 'map');
   if (state.query) params.set('q', state.query);
   if (state.sort && state.sort !== 'discovery') params.set('sort', state.sort);
   if (state.filters.era !== DEFAULT_EXPLORE_FILTERS.era) params.set('era', state.filters.era);
   if (state.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind) params.set('kind', state.filters.kind);
   if (state.filters.tone !== DEFAULT_EXPLORE_FILTERS.tone) params.set('tone', state.filters.tone);
   if (state.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme)
-    params.set('theme', state.filters.theme);
+    params.set('topic', state.filters.theme);
   if (state.filters.status !== DEFAULT_EXPLORE_FILTERS.status)
     params.set('status', state.filters.status);
   if (state.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence) {
@@ -530,7 +556,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   // for the same reason. Inbound `panels=` and `hidePanels=` still parse; they never round-trip.
   if (state.radius && state.radius !== 'all') params.set('radius', state.radius);
   if (state.near) params.set('near', state.near);
-  if (state.floor) params.set('floor', state.floor);
+  if (state.floor) params.set('evidence', state.floor);
   if (state.find) params.set('find', state.find);
   if (state.collection) params.set('collection', state.collection);
   // Re-normalized so reversed bounds and a redundant `includeUndated` have one spelling.
@@ -543,13 +569,14 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (period.end !== '') params.set('periodEnd', period.end);
   if (period.includeUndated) params.set('includeUndated', '1');
   if (state.layout === 'chronology') params.set('layout', 'chronology');
+  if (state.seed) params.set('seed', state.seed);
+  if (state.page && state.page > 1) params.set('page', String(state.page));
   return params.toString();
 }
 
-/** Filter handoffs answer on `/explore`. `/` is the Door (reading); the live instrument is `/explore`. */
+/** The map view's address: `/archive?view=map` and the filter set. Never a camera. */
 export function buildExploreHref(state: ExploreViewState): string {
-  const qs = buildExploreSearchParams(state);
-  return qs ? `/explore?${qs}` : '/explore';
+  return `/archive?${buildExploreSearchParams(state)}`;
 }
 
 /**

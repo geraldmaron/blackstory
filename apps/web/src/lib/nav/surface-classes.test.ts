@@ -1,5 +1,5 @@
 /**
- * Surface class registry contracts (docs/ui/patterns-surface-classes.md §8).
+ * Surface class registry contracts (docs/ui/archive/patterns-surface-classes.md §8).
  *
  * The coverage assertion is the one that matters: it walks the App Router tree on disk and
  * fails when a route that actually renders has no class and is not declared an endpoint. That
@@ -37,20 +37,24 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the front door and /explore browse on the door class', () => {
+  it('puts the front page on the door class', () => {
     assert.equal(surfaceClassFor('/'), 'door');
     assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?state=DC'), 'door');
-    assert.equal(surfaceClassFor('/explore'), 'door');
-    assert.equal(surfaceClassFor('/explore?state=DC'), 'door');
   });
 
-  it('does not classify /story, which was deprecated in favor of the Explore story mode', () => {
-    // A classified path with no registry entry fails the coverage test, and a registry entry for
-    // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of
-    // `/explore`.
-    assert.ok(!CLASSIFIED_PATHS.includes('/story'));
+  it('reads the Archive as one reading page in every view, at its old addresses too', () => {
+    // The map view hands the plate to the reader itself; the class is the pathname only.
+    for (const path of ['/archive', '/archive?view=map', '/archive?view=timeline&kind=people']) {
+      assert.equal(surfaceClassFor(path), 'reading', path);
+    }
+    // The 4a addresses keep their pages for the one-line rollback, and stay out of every list.
+    for (const path of ['/explore', '/explore?state=DC', '/records']) {
+      assert.equal(surfaceClassFor(path), 'reading', path);
+      assert.ok(!CLASSIFIED_PATHS.includes(path.split('?')[0]!), path);
+    }
+    assert.equal(surfaceClassFor('/collections'), null);
   });
 
   it('separates a catalog index from its record pages', () => {
@@ -83,7 +87,6 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'door');
     assert.equal(surfaceClassFor('/about#sources'), 'reading');
     assert.equal(surfaceClassFor('/?junk=1'), 'door');
-    assert.equal(surfaceClassFor('/explore?era=1960s'), 'door');
   });
 
   it('falls back to utility so an unknown path still gets the 404 surface chrome', () => {

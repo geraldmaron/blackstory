@@ -5,86 +5,71 @@
  * from so nothing here reads as invented.
  */
 
+import { borders, motion } from '../../../../packages/ui/src/tokens/foundation';
+import { space } from '../../../../packages/ui/src/tokens/spacing';
+
 /**
- * Spacing scale, rem units, carried over verbatim from the shipped web
- * design system: packages/ui/src/tokens/spacing.ts `space` (4px base rhythm).
- * Converted to React Native dp at render time using 1rem = 16dp, RN's
- * standard density-independent-pixel base (RN has no native rem/em unit).
+ * Spacing, radius and motion are read from the web kit's token modules (docs/ui/DESIGN.md
+ * section 11), so the app cannot drift from the web by a hand-copied number. Edit the kit, then
+ * re-run the generator.
+ *
+ * Spacing is rem in the kit and is converted to React Native dp at render time using
+ * 1rem = 16dp (RN has no rem unit).
  */
-export const SPACE_REM: Record<string, number> = {
-  '0': 0,
-  '1': 0.25,
-  '2': 0.5,
-  '3': 0.75,
-  '4': 1,
-  '5': 1.25,
-  '6': 1.5,
-  '8': 2,
-  '10': 2.5,
-  '12': 3,
-  '16': 4,
-  '20': 5,
-  '24': 6,
-};
+export const SPACE_REM: Record<string, number> = Object.fromEntries(
+  Object.entries(space).map(([step, rem]) => [step, Number.parseFloat(rem)]),
+);
 export const REM_TO_DP = 16;
 
 /**
- * Radius scale, px, carried over verbatim from
- * packages/ui/src/tokens/foundation.ts `borders` + tokens.css `--ds-radius-full`.
+ * Radius scale in px: 0 for exhibits and sheets, 8 for controls, full for chips (DESIGN.md
+ * section 7.4). The kit still carries 14 and 28 until the web retires their last users; the app
+ * does not generate them, so a component cannot reach for one. `full` mirrors tokens.css
+ * `--ds-radius-full`.
  */
 export const RADIUS_PX = {
-  none: 0,
-  sm: 8,
-  md: 14,
-  lg: 28,
+  none: Number.parseFloat(borders.radiusNone),
+  sm: Number.parseFloat(borders.radiusSm),
   full: 999,
 } as const;
 
 /**
- * Motion tokens, carried over verbatim from
- * packages/ui/src/tokens/foundation.ts `motion`. `easingStandardCss` is kept
- * as the literal source string; the generator also emits its parsed numeric
- * control points (`easingStandardBezier`) for direct use with
- * react-native-reanimated's `Easing.bezier(x1, y1, x2, y2)`.
+ * Durations in ms and the standard easing. `EASING_STANDARD_CSS` stays the literal CSS string;
+ * the generator also emits its control points for react-native-reanimated's `Easing.bezier`.
  */
 export const MOTION_MS = {
-  durationInstant: 0,
-  durationFast: 160,
-  durationBase: 280,
-  durationSlow: 480,
+  durationInstant: Number.parseFloat(motion.durationInstant),
+  durationFast: Number.parseFloat(motion.durationFast),
+  durationBase: Number.parseFloat(motion.durationBase),
+  durationSlow: Number.parseFloat(motion.durationSlow),
 } as const;
-export const EASING_STANDARD_CSS = 'cubic-bezier(0.16, 1, 0.3, 1)';
+export const EASING_STANDARD_CSS = motion.easingStandard;
 
 /**
- * Type scale (role -> size/lineHeight/weight). No canonical type-scale token
- * exists anywhere in the repo today: apps/web's shell.css sets font-size via
- * ad hoc per-component `clamp()` values, not a shared scale export, so there
- * is nothing authoritative to mirror. This is a new, deterministic
- * construction for mobile — a standard modular ramp on a 16px base, paired
- * with the brand's actual type roles (display/uiBody/editorial/dataMono from
- * brand/tokens/typography.json). Flag for reconciliation if/when web adopts
- * a shared type-scale token; until then this is mobile's own, not "the same
- * values" borrowed from an existing source because none exists.
+ * Type scale. The seven roles are the web's (docs/ui/brand.md "Type", DESIGN.md section 7.2):
+ * display, headline, title, body, editorial, meta, numeral. The web sizes them with viewport
+ * clamps; a phone has one width, so each role takes a fixed size near the low end of its clamp
+ * that still survives the system's largest text size. Body has three smaller steps
+ * (bodyEmphasis, bodySmall, caption) because rows and captions need them; they are not new roles.
+ *
+ * Display is a name, a place or a year, never a count. Numeral is for years and decades only.
  */
 export const TYPE_SCALE = {
-  /** Web weight roles (tokens.css --ds-weight-display 800, --ds-weight-headline 700). */
-  display: { size: 34, lineHeight: 40, weight: '800', family: 'display' as const },
-  title: { size: 26, lineHeight: 32, weight: '700', family: 'display' as const },
-  subtitle: { size: 20, lineHeight: 27, weight: '600', family: 'uiBody' as const },
-  /** Ledger Line tab masthead — 16 Inter Medium (docs/ui/design-direction-v6-mobile.md). */
-  masthead: { size: 16, lineHeight: 22, weight: '500', family: 'uiBody' as const },
-  /** Ledger Line entity title — 17 Inter Medium. */
-  entityTitle: { size: 17, lineHeight: 22, weight: '500', family: 'uiBody' as const },
+  /** Web --ds-weight-display 800. Once per screen: a record's name, a story's title. */
+  display: { size: 36, lineHeight: 40, weight: '800', family: 'display' as const },
+  /** Web --ds-weight-headline 700. Screen and section titles. */
+  headline: { size: 26, lineHeight: 32, weight: '700', family: 'display' as const },
+  /** Web --ds-weight-title 650; the nearest loaded Schibsted cut is 600. Rows and sub-sections. */
+  title: { size: 20, lineHeight: 26, weight: '600', family: 'display' as const },
   body: { size: 16, lineHeight: 24, weight: '400', family: 'uiBody' as const },
   bodyEmphasis: { size: 16, lineHeight: 24, weight: '600', family: 'uiBody' as const },
-  /** Ledger Line row title — 13 Inter Medium. */
-  rowTitle: { size: 13, lineHeight: 18, weight: '500', family: 'uiBody' as const },
   bodySmall: { size: 14, lineHeight: 20, weight: '400', family: 'uiBody' as const },
   caption: { size: 12, lineHeight: 16, weight: '500', family: 'uiBody' as const },
-  /** Ledger Line mono section label — 11 IBM Plex Mono, uppercase tracked in UI. */
-  sectionLabel: { size: 11, lineHeight: 14, weight: '500', family: 'dataMono' as const },
   editorial: { size: 17, lineHeight: 27, weight: '400', family: 'editorial' as const },
-  code: { size: 13, lineHeight: 19, weight: '500', family: 'dataMono' as const },
+  /** Web --ds-text-meta 13px, Geist Mono; caps and tracking are applied where it is a label. */
+  meta: { size: 13, lineHeight: 18, weight: '500', family: 'dataMono' as const },
+  /** Web --ds-weight-numeral 800. A year or a decade as a graphic. */
+  numeral: { size: 48, lineHeight: 52, weight: '800', family: 'display' as const },
 } as const;
 
 /**

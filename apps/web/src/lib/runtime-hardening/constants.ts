@@ -131,6 +131,7 @@ export const ERRATA_PAGE_PARAM_ALLOWLIST = ['type'] as const;
 export const PLACE_PAGE_PARAM_ALLOWLIST = [
   'from',
   'sort',
+  'seed',
   'q',
   'kind',
   'era',

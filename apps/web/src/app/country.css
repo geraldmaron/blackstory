@@ -1,0 +1,89 @@
+/*
+ * Country (design-direction-v11.md §4.1): an index as a left sheet, the world beside it.
+ *
+ * The layout is CSS so the page does not move when the plate arrives: from 64rem, with scripting,
+ * the room is a sheet on the left and the right of the window is the persistent plate's. Until
+ * `IndexCountry` stamps `html[data-world-on]` the plate keeps its cover (shell.css), so the right
+ * side is plain ground, not a half-drawn map. Without scripting the query is false and the index
+ * is a document. With no plate (`html[data-world-off]`) it goes back to one.
+ */
+.ds-country__legend {
+  display: none;
+}
+
+@media (min-width: 64rem) and (scripting: enabled) {
+  html:not([data-world-off]) body:has(.ds-country) {
+    --ds-country-sheet-w: min(46rem, 56vw);
+  }
+
+  html:not([data-world-off]) .ds-country {
+    position: relative;
+    z-index: var(--ds-z-content);
+    width: var(--ds-country-sheet-w);
+    min-height: calc(100lvh - var(--ds-header-h));
+    background: var(--ds-canvas);
+    box-shadow: var(--ds-shadow-sheet);
+  }
+
+  html:not([data-world-off]) .ds-country > .ds-wrap {
+    width: auto;
+    margin-inline: var(--ds-space-6);
+  }
+
+  /* The page under the bar is full bleed, so the bar goes to the corners with it
+     (command-bar.css, "v11 corner chrome"). */
+  html:not([data-world-off]) body:has(.ds-country) .ds-bar__inner {
+    width: calc(100% - var(--ds-space-6) * 2);
+  }
+
+  html:not([data-world-off]) body:has(.ds-country) .ds-bar__tabs .ds-tabs__tab {
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-caption);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* The sticky toolbar bleeds its ground to the window's edges on a document. Here the window's
+     right is the world's, so the bleed stops at the sheet. */
+  html:not([data-world-off]) .ds-country .ds-records-toolbar {
+    clip-path: inset(0 calc(var(--ds-space-6) * -1) calc(var(--ds-border-width) * -1));
+  }
+
+  /* The title and its count share a narrower column than a document gives them. */
+  html:not([data-world-off]) .ds-country .ds-archive-head__title {
+    font-size: clamp(3rem, 1rem + 4.2vw, 4.75rem);
+  }
+
+  /* Each light opens its record (IndexCountry.tsx). The page's window-wide wrappers cover the
+     world's side with nothing, so they pass the pointer through and the sheet takes it back.
+     The plate answers no wheel or drag here, so the page still scrolls over it. */
+  html[data-world-on] .ds-shell-page-transition:has(.ds-country),
+  html[data-world-on] .ds-shell-page-transition__content:has(.ds-country) {
+    pointer-events: none;
+  }
+
+  html[data-world-on] .ds-shell-page-transition__content:has(.ds-country) > * {
+    pointer-events: auto;
+  }
+
+  /* What the lights are, on the world's side, in the chrome voice. */
+  html[data-world-on] .ds-country__legend {
+    position: fixed;
+    bottom: var(--ds-space-4);
+    left: calc(var(--ds-country-sheet-w) + var(--ds-space-4));
+    display: block;
+    max-width: min(26rem, 100vw - var(--ds-country-sheet-w) - 14rem);
+    margin: 0;
+    padding: var(--ds-space-2) var(--ds-space-3);
+    border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, var(--ds-fixed-ink) 80%, transparent);
+    color: var(--ds-fixed-paper);
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-caption);
+    line-height: 1.5;
+  }
+
+  html[data-world-on] .ds-country__legend a {
+    color: inherit;
+  }
+}

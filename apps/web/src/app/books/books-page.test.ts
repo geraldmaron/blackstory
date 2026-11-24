@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { BOOKS_INDEX_NOTE } from './books-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const indexSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+const indexSource = readFileSync(join(here, '(index)', 'page.tsx'), 'utf8');
 const detailSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'), 'utf8');
 const detailViewSource = readFileSync(join(here, '[slug]', 'BookRecordView.tsx'), 'utf8');
@@ -17,9 +17,10 @@ const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
 
 test('books index is the cover wall under a page header, with no edition chrome', () => {
   assert.match(indexSource, /BooksBrowseSections/);
-  assert.match(indexSource, /<PageHeader/);
+  assert.match(indexSource, /<ArchiveHead/);
   assert.match(indexSource, /title: 'Banned books'/);
-  assert.match(indexSource, /crumb: parentCrumb\('\/books'\)/);
+  // The books lens stands under the Archive's head, with its chip selected.
+  assert.match(indexSource, /lens="books"/);
   for (const gone of [
     'RoomStats',
     'OrientationInstrument',
@@ -60,10 +61,10 @@ test('books browse is the register toolbar over ruled bands, not kit rows or a s
   assert.doesNotMatch(browseSectionsSource, /ds-books-wall/);
   for (const gone of [
     'FindBar',
-    'RoomSection',
+    'PageSection',
     'HairlineIndex',
     'BooksRipRow',
-    'ds-room-idx',
+    'ds-doc-idx',
     'Typeahead',
   ]) {
     assert.doesNotMatch(browseSectionsSource, new RegExp(gone), `${gone} is back on /books`);

@@ -217,7 +217,7 @@ function ActiveFiltersStrip({
       accessibilityRole="summary"
       accessibilityLabel={`Active filters: ${chips.map((chip) => chip.label).join(', ')}`}
     >
-      <Text variant="code" colorRole="inkMuted" style={styles.activeStripKicker}>
+      <Text variant="meta" colorRole="inkMuted" style={styles.activeStripKicker}>
         On now
       </Text>
       <View style={styles.activeChipRow}>
@@ -374,7 +374,7 @@ function PlaceFindHandoff({ onOpenPlaceFind }: { readonly onOpenPlaceFind?: () =
       style={[styles.placeFind, { borderColor: theme.border }]}
       testID="explore-place-find-handoff"
     >
-      <Text variant="code" colorRole="inkMuted" style={styles.placeFindKicker}>
+      <Text variant="meta" colorRole="inkMuted" style={styles.placeFindKicker}>
         Place find
       </Text>
       <Text variant="bodySmall" colorRole="inkMuted">

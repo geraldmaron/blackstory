@@ -9,8 +9,8 @@
  * Row anatomy follows the Records register (two lines, 1px rules between rows). Line one: the
  * name, and its documented decade in mono at the right (the earliest, or under a brushed range the
  * first one inside it). Line two: the kind as a word and the place, and the grade tag (glyph and
- * word, the claims block's vocabulary) at the right. A record's own photograph leads the row as a
- * toned plate; a record without one gets no stand-in tile. Every row is the same height, which is what the windowing depends on.
+ * word, the claims block's vocabulary) at the right. A record's own photograph leads the row, in
+ * color; a record without one gets no stand-in tile. Every row is the same height, which is what the windowing depends on.
  */
 'use client';
 
@@ -30,7 +30,7 @@ void React;
 
 /** Fixed row height (explore-record-list.css). Windowing needs a known row box. */
 /** Tall enough for a two-line name over its place line; a cut-off name tells a reader nothing. */
-export const RESULTS_ROW_HEIGHT = 84;
+export const RESULTS_ROW_HEIGHT = 104;
 /** Rows rendered above and below the viewport so a fast scroll does not show blank space. */
 const OVERSCAN = 6;
 
@@ -133,10 +133,12 @@ export function ExploreRecordList({
   }
 
   const rows = features.slice(range.first, range.last);
-  const focusIndex = Math.max(
-    0,
-    features.findIndex((feature) => feature.properties.entityId === selectedId),
-  );
+  // One row is the list's tab stop: the selected one while it is rendered, otherwise the first
+  // rendered row. The list is windowed, so a selection scrolled out of the window is not in the
+  // DOM, and a tab stop on it left the whole list unreachable by keyboard.
+  const selectedIndex = features.findIndex((feature) => feature.properties.entityId === selectedId);
+  const focusIndex =
+    selectedIndex >= range.first && selectedIndex < range.last ? selectedIndex : range.first;
 
   return (
     <div className={cx('ds-xlist', className)} ref={scrollerRef} onScroll={onScroll}>
@@ -192,15 +194,9 @@ export function ExploreRecordList({
               }}
             >
               {photos[id]?.url ? (
-                <span className="ds-xlist__thumb ds-plate__tone" aria-hidden="true">
+                <span className="ds-xlist__thumb" aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element -- remote Commons thumbnail */}
-                  <img
-                    className="ds-plate__img"
-                    src={photos[id]!.url}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <img src={photos[id]!.url} alt="" loading="lazy" decoding="async" />
                 </span>
               ) : null}
               <span className="ds-xlist__line">

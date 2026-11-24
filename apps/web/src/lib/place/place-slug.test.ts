@@ -142,6 +142,15 @@ describe('place slug addresses', () => {
     );
   });
 
+  it('a token-named record links its entity page, never an empty address', () => {
+    for (const displayName of ['42Cb1758', '42Cb242', '42Dc682', '42Dc696']) {
+      assert.equal(
+        instrumentRecordHref({ id: 'ent_site', displayName, kind: 'site', summary: 'A site.' }),
+        '/entity/ent_site',
+      );
+    }
+  });
+
   it('map pins for people open the entity record, not the memorial room landing', () => {
     const base = listPublicEntities()[0]!;
     const person = {

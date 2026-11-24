@@ -2,7 +2,7 @@
  * Toast timing and stack rules, kept pure so the dismissal contract is testable without a DOM.
  *
  * A toast that carries an action stays longer than one that only reports: the reader has to read
- * it, decide, and reach it before it leaves. See docs/ui/design-direction-v9-atlas.md §7.
+ * it, decide, and reach it before it leaves. See docs/ui/archive/design-direction-v9-atlas.md §7.
  */
 
 /*

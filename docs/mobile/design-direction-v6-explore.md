@@ -1,7 +1,7 @@
 # Mobile design direction v6 — Explore (native)
 
 **Status:** binding for `@repo/mobile` Explore tab (2026-07-23).  
-**Parent:** [`docs/ui/design-direction-v6-explore.md`](../ui/design-direction-v6-explore.md), [`docs/ui/design-direction-v6-home.md`](../ui/design-direction-v6-home.md) (place-first posture).  
+**Parent:** [`docs/ui/archive/design-direction-v6-explore.md`](../ui/archive/design-direction-v6-explore.md), [`docs/ui/archive/design-direction-v6-home.md`](../ui/archive/design-direction-v6-home.md) (place-first posture).  
 **Code:** `apps/mobile/src/features/explore/`, `apps/mobile/src/features/map/`.
 
 ---

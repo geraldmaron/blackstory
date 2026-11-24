@@ -377,21 +377,11 @@
   padding: 0;
   border: 0;
   border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-canvas) 94%, transparent);
+  background: var(--ds-canvas);
   box-shadow:
     inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
     var(--ds-shadow-float);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink);
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .ds-command-palette {
-    background: var(--ds-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .ds-command-palette__panel {

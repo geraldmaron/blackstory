@@ -4,12 +4,12 @@
 export const MEMORIAL_INTRO = {
   kicker: 'Remembrance',
   title: 'Memorial',
-  lede: 'Names held in remembrance. Incomplete by design. The list below is the readable record; it does not claim to be a complete roll call.',
+  lede: 'Names, held in remembrance. The list below isn’t complete, and it doesn’t claim to be.',
 } as const;
 
 export const MEMORIAL_BODY = [
-  'This memorial is not a complete roll call, and it does not pretend to be. It holds names so they are harder to lose in the scroll of news cycles and map pins.',
-  'When a name links to a published place record, you can open it or view the location in Maps at the stored public precision.',
+  'This memorial isn’t a complete roll call and doesn’t pretend to be. It holds these names so they’re harder to lose under the next news cycle.',
+  'When a name links to a published place record, you can open it or see the location in Maps, no sharper than the record’s public precision.',
 ] as const;
 
 export const MEMORIAL_LIST = {
@@ -18,8 +18,9 @@ export const MEMORIAL_LIST = {
   searchPlaceholder: 'Search names…',
   emptyTitle: 'No names matched',
   emptyBody: 'Try a broader spelling or clear the search.',
-  note: 'This list is curated and incomplete. If a name belongs here and is missing, use Submit to send evidence for review.',
-  seedNote: 'On-device memorial roll. Entity and map links appear where milestones are published.',
+  note: 'This list is incomplete and always will be. If a name belongs here and it’s missing, use Submit to send the evidence.',
+  seedNote:
+    'This list is stored on your device. Record and map links appear where a record has been published.',
 } as const;
 
 export const MEMORIAL_ACTIONS = {

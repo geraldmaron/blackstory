@@ -7,12 +7,12 @@ import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { TrustMast } from '../../components/trust';
 import { loadRecordsIndex, recordsQueryCacheKey } from '../records/load-records-index';
 import { ABOUT_LEDE } from './about-copy';
 import { AboutSections, type AboutSectionsProps } from './AboutSections';
-import '../reading-room.css';
+import '../reading-page.css';
 import '../../components/trust/trust.css';
 import './about-page.css';
 
@@ -47,12 +47,11 @@ async function loadStates(): Promise<AboutSectionsProps['states']> {
 export default async function AboutPage() {
   const states = await loadStates();
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room ds-about-room"
+      className="ds-trust-doc ds-about-room"
       masthead={
         <TrustMast
-          tone="copper"
           numeral={
             states === undefined
               ? undefined
@@ -73,6 +72,6 @@ export default async function AboutPage() {
       }
     >
       <AboutSections {...(states === undefined ? {} : { states })} />
-    </Room>
+    </PageFrame>
   );
 }

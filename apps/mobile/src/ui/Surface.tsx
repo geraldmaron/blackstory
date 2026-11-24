@@ -16,7 +16,7 @@ export type SurfaceProps = ViewProps & {
 };
 
 export const Surface = forwardRef<View, SurfaceProps>(function Surface(
-  { tone = 'surface', radiusKey = 'md', paddingKey, bordered = false, style, ...rest },
+  { tone = 'surface', radiusKey = 'none', paddingKey, bordered = false, style, ...rest },
   ref,
 ) {
   const theme = useThemeColors();

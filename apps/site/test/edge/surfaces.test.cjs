@@ -9,7 +9,10 @@ const {
 test('surfaceClassFor', () => {
   const cases = [
     ['/', 'door'],
-    ['/explore', 'door'],
+    // The Archive is a reading page in every view since the web's phase 4b; the old map address
+    // redirects to it.
+    ['/explore', 'reading'],
+    ['/archive', 'reading'],
     ['/records', 'reading'],
     ['/methodology', 'reading'],
     ['/stories/some-chapter', 'reading'],

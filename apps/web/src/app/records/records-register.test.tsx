@@ -16,7 +16,7 @@ import {
   type RecordsQuery,
   type RecordsRow,
 } from '../../lib/records/build-records-index';
-import { RecordsIndexRoom } from './RecordsIndex';
+import { RecordsIndexPage } from './RecordsIndex';
 
 void React;
 
@@ -25,7 +25,7 @@ function facet(prefix: string, ids: readonly string[]): RecordsFacet[] {
     id,
     label: `${prefix} ${id}`,
     count: 100 - index,
-    href: `/records?${prefix.toLowerCase()}=${id}`,
+    href: `/archive?${prefix.toLowerCase()}=${id}`,
     nofollow: false,
   }));
 }
@@ -70,7 +70,7 @@ function render(query: Partial<RecordsQuery> = {}, overrides: Partial<RecordsInd
     notice: undefined,
     ...overrides,
   } as unknown as RecordsIndexModel;
-  return renderToStaticMarkup(<RecordsIndexRoom model={model} />);
+  return renderToStaticMarkup(<RecordsIndexPage model={model} />);
 }
 
 function menu(markup: string, key: string): string {
@@ -84,7 +84,7 @@ describe('Records register', () => {
     const markup = render();
     const state = menu(markup, 'state');
     assert.match(state, /popover="auto"/);
-    assert.equal([...state.matchAll(/href="\/records\?state=/g)].length, STATES.length);
+    assert.equal([...state.matchAll(/href="\/archive\?state=/g)].length, STATES.length);
     assert.match(state, /State KY<\/span><span class="ds-records-menu__count">89</);
     // States read by name, decades in time order, not by count.
     const labels = [...state.matchAll(/State ([A-Z]{2})</g)].map((match) => match[1]);
@@ -112,14 +112,14 @@ describe('Records register', () => {
     assert.doesNotMatch(plain, /Best match/);
     const searched = menu(render({ q: 'church' }), 'sort');
     assert.match(searched, /aria-current="true"[^>]*>[\s\S]*?Best match/);
-    assert.match(searched, /href="\/records\?q=church&amp;sort=era"/);
+    assert.match(searched, /href="\/archive\?q=church&amp;sort=era"/);
   });
 
   it('echoes the search as a removable chip and bolds the match in the row', () => {
     const markup = render(
       { q: 'church' },
       {
-        constraints: [{ key: 'q', label: '“church”', clearHref: '/records' }],
+        constraints: [{ key: 'q', label: '“church”', clearHref: '/archive' }],
       },
     );
     assert.match(markup, /aria-label="Remove “church”"/);
@@ -127,7 +127,10 @@ describe('Records register', () => {
     assert.match(markup, /oldest <b>church<\/b> of its kind/);
     // The row is one link; the kind is a glyph and a word; the grade is a meter and a word, with
     // the count of sources beside it.
-    assert.match(markup, /<a class="ds-record__link" href="\/place\/first-church--r1\?from=list">/);
+    assert.match(
+      markup,
+      /<a class="ds-record__link" href="\/place\/first-church--r1\?from=list" data-record-id="[^"]+">/,
+    );
     assert.match(markup, /class="ds-record__kind-word">Place</);
     assert.match(markup, /ds-grade-meter ds-grade-tag--high">.*?Well evidenced<\/span>/);
     assert.match(markup, /ds-record__sources-count">3<\/span> sources/);
@@ -140,13 +143,28 @@ describe('Records register', () => {
         rows: [],
         totalMatched: 0,
         constraints: [
-          { key: 'q', label: '“churhc”', clearHref: '/records?kind=people' },
-          { key: 'kind', label: 'People', clearHref: '/records?q=churhc' },
+          { key: 'q', label: '“churhc”', clearHref: '/archive?kind=people' },
+          { key: 'kind', label: 'People', clearHref: '/archive?q=churhc' },
         ],
       },
     );
     assert.match(markup, /Nothing in the archive matches “churhc” in People\./);
-    assert.match(markup, /href="\/records\?q=churhc">Search all records for “churhc”</);
+    assert.match(markup, /href="\/archive\?q=churhc">Search all records for “churhc”</);
+  });
+
+  it('a misspelled search offers the nearest spelling and never applies it', () => {
+    const markup = render(
+      { q: 'churhc' },
+      {
+        rows: [],
+        totalMatched: 0,
+        constraints: [{ key: 'q', label: '“churhc”', clearHref: '/archive' }],
+        didYouMean: { q: 'church', count: 12, href: '/archive?q=church' },
+      },
+    );
+    assert.match(markup, /Did you mean “church”\? It matches 12 records\./);
+    assert.match(markup, /href="\/archive\?q=church">Search for “church”</);
+    assert.match(markup, /Nothing in the archive matches “churhc”\./);
   });
 
   it('a search alone clears to the whole register without repeating the total', () => {
@@ -155,20 +173,20 @@ describe('Records register', () => {
       {
         rows: [],
         totalMatched: 0,
-        constraints: [{ key: 'q', label: '“zzzqqq”', clearHref: '/records' }],
+        constraints: [{ key: 'q', label: '“zzzqqq”', clearHref: '/archive' }],
       },
     );
-    assert.match(markup, /href="\/records">Clear search</);
+    assert.match(markup, /href="\/archive">Clear search</);
     assert.doesNotMatch(markup, /Show all/);
   });
 
   it('pages with real rel links and states the page once', () => {
     const markup = render(
       {},
-      { page: 3, pageCount: 44, previousHref: '/records?page=2', nextHref: '/records?page=4' },
+      { page: 3, pageCount: 44, previousHref: '/archive?page=2', nextHref: '/archive?page=4' },
     );
-    assert.match(markup, /href="\/records\?page=2" rel="prev"/);
-    assert.match(markup, /href="\/records\?page=4" rel="next"/);
+    assert.match(markup, /href="\/archive\?page=2" rel="prev"/);
+    assert.match(markup, /href="\/archive\?page=4" rel="next"/);
     assert.equal((markup.match(/ds-records-pager__at/g) ?? []).length, 1);
     assert.match(markup, /Page <span class="ds-records-pager__num">3<\/span> of/);
   });

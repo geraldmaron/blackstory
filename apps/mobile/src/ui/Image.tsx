@@ -8,13 +8,14 @@ import { useState } from 'react';
 import { Image as ExpoImage, type ImageSource } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 import { EntityMark, type EntityMarkProps } from './EntityMark';
-import { radius, useThemeColors } from './tokens';
+import { useThemeColors } from './tokens';
 
 export type ImageProps = {
   source: ImageSource | string | number | null | undefined;
   alt: string;
   aspectRatio?: number;
-  borderRadiusKey?: keyof typeof radius;
+  /** `contain` shows the picture whole (a document, a story image); `cover` fills the box. */
+  contentFit?: 'cover' | 'contain';
   /** Required so the fallback mark can be labeled meaningfully; also used while loading. */
   fallback: Omit<EntityMarkProps, 'entityName'> & { entityName?: string };
 };
@@ -23,7 +24,7 @@ export function Image({
   source,
   alt,
   aspectRatio = 4 / 3,
-  borderRadiusKey = 'sm',
+  contentFit = 'cover',
   fallback,
 }: ImageProps) {
   const theme = useThemeColors();
@@ -36,7 +37,6 @@ export function Image({
     {
       aspectRatio,
       backgroundColor: theme.surfaceRaised,
-      borderRadius: radius[borderRadiusKey],
       borderColor: theme.border,
       borderWidth: StyleSheet.hairlineWidth,
     },
@@ -70,9 +70,9 @@ export function Image({
         alt={alt}
         accessible
         accessibilityLabel={alt}
-        contentFit="cover"
+        contentFit={contentFit}
         transition={150}
-        style={[StyleSheet.absoluteFill, { borderRadius: radius[borderRadiusKey] }]}
+        style={StyleSheet.absoluteFill}
         onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
       />

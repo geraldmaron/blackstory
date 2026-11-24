@@ -24,34 +24,22 @@ export const fontFamilies = {
 /** Role -> size/lineHeight/weight/family-role scale (see supplementary-source.ts for provenance). */
 export const typeScale = {
   "display": {
-    "size": 34,
+    "size": 36,
     "lineHeight": 40,
     "weight": "800",
     "family": "display"
   },
-  "title": {
+  "headline": {
     "size": 26,
     "lineHeight": 32,
     "weight": "700",
     "family": "display"
   },
-  "subtitle": {
+  "title": {
     "size": 20,
-    "lineHeight": 27,
+    "lineHeight": 26,
     "weight": "600",
-    "family": "uiBody"
-  },
-  "masthead": {
-    "size": 16,
-    "lineHeight": 22,
-    "weight": "500",
-    "family": "uiBody"
-  },
-  "entityTitle": {
-    "size": 17,
-    "lineHeight": 22,
-    "weight": "500",
-    "family": "uiBody"
+    "family": "display"
   },
   "body": {
     "size": 16,
@@ -63,12 +51,6 @@ export const typeScale = {
     "size": 16,
     "lineHeight": 24,
     "weight": "600",
-    "family": "uiBody"
-  },
-  "rowTitle": {
-    "size": 13,
-    "lineHeight": 18,
-    "weight": "500",
     "family": "uiBody"
   },
   "bodySmall": {
@@ -83,23 +65,23 @@ export const typeScale = {
     "weight": "500",
     "family": "uiBody"
   },
-  "sectionLabel": {
-    "size": 11,
-    "lineHeight": 14,
-    "weight": "500",
-    "family": "dataMono"
-  },
   "editorial": {
     "size": 17,
     "lineHeight": 27,
     "weight": "400",
     "family": "editorial"
   },
-  "code": {
+  "meta": {
     "size": 13,
-    "lineHeight": 19,
+    "lineHeight": 18,
     "weight": "500",
     "family": "dataMono"
+  },
+  "numeral": {
+    "size": 48,
+    "lineHeight": 52,
+    "weight": "800",
+    "family": "display"
   }
 } as const;
 

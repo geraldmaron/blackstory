@@ -24,11 +24,11 @@ import {
   isErrataChangeType,
 } from '../../lib/trust/domain-trust';
 import { loadRecordsCatalog } from '../../lib/records/records-catalog';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { ErrataSections } from './ErrataSections';
 import { errataDate } from './errata-headline';
 import { resolveErrataRecordHrefs, type CatalogName } from './errata-records';
-import '../reading-room.css';
+import '../reading-page.css';
 import '../../components/trust/trust.css';
 import './errata.css';
 
@@ -82,13 +82,11 @@ export default async function ErrataPage({ searchParams }: ErrataPageProps) {
   );
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
-          art={['ledger']}
-          tone="copper"
           numeral={
             all.length === 0
               ? undefined
@@ -146,6 +144,6 @@ export default async function ErrataPage({ searchParams }: ErrataPageProps) {
           ]}
         />
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

@@ -7,7 +7,7 @@
  */
 const lists = require('./agent-lists.json');
 
-const EXPENSIVE_EXACT = new Set(['/explore', '/records', '/atlas/catalog', '/sitemap.xml']);
+const EXPENSIVE_EXACT = new Set(['/archive', '/explore', '/records', '/atlas/catalog', '/sitemap.xml']);
 const EXPENSIVE_PREFIXES = ['/explore/api', '/search/api', '/locate/api'];
 
 function matchesAny(userAgent, tokens) {

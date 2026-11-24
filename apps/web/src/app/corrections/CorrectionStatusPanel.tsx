@@ -28,9 +28,9 @@ export function CorrectionStatusPanel({ status }: { readonly status: PublicCorre
       ) : null}
 
       <p className="ds-trust-note">
-        Nothing you sent is public. If your correction is declined, you get the reason. Volume of
-        corrections never changes public confidence or publication, and coordinated activity is
-        reviewed separately and is not shown here. An accepted correction appears in{' '}
+        Nothing you sent is public. If your correction is declined, you get the reason. How many
+        corrections come in never changes a grade or what gets published, and coordinated activity
+        is reviewed separately and isn’t shown here. An accepted correction appears in{' '}
         <Link href="/errata">Errata</Link> with the record it changed.
       </p>
 

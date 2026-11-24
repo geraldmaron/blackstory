@@ -9,6 +9,12 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { EntityRecordPage } from '../../entity/[id]/EntityRecordPage';
 import { familyForKind } from '../../record-family';
+import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
+import {
+  buildRecordJsonLd,
+  recordCanonicalPath,
+  serializeJsonLd,
+} from '../../../lib/seo/record-json-ld';
 import { loadPlaceRecord } from '../place-record';
 import { publicPlaceSlug } from '../../../lib/place/public-place-path';
 import {
@@ -28,7 +34,16 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
   const { slug } = await params;
   const place = await loadPlaceRecord(slug);
   if (!place) return { title: 'Place not found' };
-  return { title: place.displayName, description: place.summary };
+  // The canonical is the record's own family address with no arrival query. A record page is
+  // reachable under many arrival variants (map and list returns, prev/next), and without a
+  // canonical each one reads to a crawler as a separate thin page.
+  return {
+    title: place.displayName,
+    description: place.summary,
+    alternates: {
+      canonical: absolutePublicUrl(recordCanonicalPath(familyForKind(place.kind), slug)),
+    },
+  };
 }
 
 export default async function PlacePage({ params, searchParams }: PlacePageProps) {
@@ -45,5 +60,25 @@ export default async function PlacePage({ params, searchParams }: PlacePageProps
   if (familyForKind(place.kind) !== 'place') {
     permanentRedirect(withQuery(`/invention/${slug}`, recordArrivalQuery(rawArrival)));
   }
-  return EntityRecordPage({ entity: place, arrival: discoveryFromSearchParams(rawArrival) });
+  const jsonLd = buildRecordJsonLd({
+    family: 'place',
+    slug,
+    displayName: place.displayName,
+    summary: place.summary,
+    jurisdictionLabel: place.jurisdictionLabel,
+  });
+  // No nonce: a JSON-LD block is data, never executed, so script-src does not govern it.
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+      {await EntityRecordPage({
+        entity: place,
+        arrival: discoveryFromSearchParams(rawArrival),
+        canonicalPath: recordCanonicalPath('place', slug),
+      })}
+    </>
+  );
 }

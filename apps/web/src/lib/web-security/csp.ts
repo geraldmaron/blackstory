@@ -41,7 +41,7 @@ export type CspBuildOptions = {
  * this constant against the live script content so drift fails a test instead of CSP silently.
  */
 export const THEME_BOOTSTRAP_SCRIPT_SHA256 =
-  "'sha256-51ZZphqguJf2bHn9CnelhCzdAtWW/oDmMD+ATk0tpAk='";
+  "'sha256-jbBWiw3K0kr4WDpEWxxau3cq3eVyxkH6zKyYaNg0cdQ='";
 
 /** MapLibre demo tiles (fallback) + OpenFreeMap streets/fonts for the archive basemap. */
 const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreemap.org'];

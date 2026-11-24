@@ -1,28 +1,93 @@
 /**
- * The Records timeline: each decade a full-bleed color band (paper and ink alternating, sand for
- * the page's busiest decades, `bandTones`). The decade is a display numeral that stays in view
- * (sticky) while the band's rows scroll past; the rows sit on the band's own ground, so a row on a
- * paper band reads ink on paper and a row on an ink band paper on ink. A run of empty decades is
- * named on a quiet line between bands.
+ * The Archive timeline: the decade figure, then each decade as a ruled section on paper. The
+ * decade is a year numeral that stays in view (sticky) while its rows scroll past. A run of empty
+ * decades is named on a quiet line between sections.
  *
- * Rows are the register's own (`.ds-record`, records-index.css). `--records-bar-h` is the sticky
+ * Rows are the list's own (`.ds-record`, records-index.css). `--records-bar-h` is the sticky
  * toolbar above, set on `.ds-records`.
  */
 
+/* —— the figure: one bar a decade on a true time scale ———————————————————————————— */
+.ds-decade-figure {
+  margin-top: var(--ds-space-6);
+}
+
+.ds-decade-figure__bars {
+  display: grid;
+  grid-template-columns: repeat(var(--decades), minmax(0, 1fr));
+  align-items: end;
+  gap: 1px;
+  height: 9rem;
+  margin: 0;
+  padding: 0 0 var(--ds-space-6);
+  list-style: none;
+  border-bottom: var(--ds-border-width) solid var(--ds-ink);
+}
+
+.ds-decade-figure__slot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+}
+
+/* Sand is a measured quantity, with an ink outline (DESIGN.md 7.1). The page's own decades are
+   copper, the current thing. */
+.ds-decade-figure__bar {
+  display: block;
+  width: 100%;
+  height: max(3px, calc(var(--share) * 100%));
+  border: var(--ds-border-width) solid var(--ds-ink);
+  background: var(--ds-material-sand);
+}
+
+.ds-decade-figure__bar[aria-current='true'] {
+  background: var(--ds-accent-graphic);
+}
+
+.ds-decade-figure__bar:hover {
+  background: var(--ds-ink);
+}
+
+.ds-decade-figure__bar:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-decade-figure__tick {
+  position: absolute;
+  top: calc(100% + var(--ds-space-1));
+  left: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-caption);
+  line-height: 1.2;
+}
+
+.ds-decade-figure__slot:last-child .ds-decade-figure__tick {
+  right: 0;
+  left: auto;
+}
+
+.ds-decade-figure__note {
+  max-width: var(--ds-width-read);
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: var(--ds-text-body-sm);
+}
+
+/* —— the rows, a ruled section a decade ————————————————————————————————————————— */
 .ds-records-timeline {
-  --timeline-mark-w: minmax(0, 5fr);
   --timeline-sticky-top: calc(var(--ds-island-clearance) + var(--records-bar-h, 0px));
-  /* Full bleed out of the wide container: the bands run edge to edge. */
-  margin-inline: calc(50% - 50vw);
   margin-top: var(--ds-space-6);
 }
 
 .ds-records-timeline__band {
   display: grid;
-  grid-template-columns: var(--timeline-mark-w) minmax(0, 7fr);
-  column-gap: var(--ds-space-12);
-  padding: var(--ds-space-12) max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2));
-  scroll-margin-top: var(--records-bar-h, 0px);
+  grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  column-gap: var(--ds-space-8);
+  padding-block: var(--ds-space-8);
+  scroll-margin-top: calc(var(--ds-island-clearance) + var(--records-bar-h, 0px));
 }
 
 .ds-records-timeline__mark {
@@ -42,9 +107,8 @@
   line-height: 1;
 }
 
-/* The decade at 160px on a wide screen, scaling down with the viewport. */
 .ds-records-timeline__year .ds-numeral {
-  font-size: clamp(4rem, 1rem + 9vw, 10rem);
+  font-size: clamp(2.75rem, 1rem + 4vw, 4.5rem);
 }
 
 /* A decade with three records or fewer gets a smaller mark and less air, so the sparse early
@@ -56,7 +120,7 @@
 .ds-records-timeline__band:not(:has(.ds-records-timeline__rows > :nth-child(4)))
   .ds-records-timeline__year
   .ds-numeral {
-  font-size: var(--ds-text-display-1);
+  font-size: var(--ds-text-headline);
 }
 
 .ds-records-timeline__total {
@@ -80,10 +144,10 @@
   border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
-/* Decades with no records between two bands: named on the table, between the blocks. */
+/* Decades with no records between two sections: named between them. */
 .ds-records-timeline__gap {
   margin: 0;
-  padding: var(--ds-space-4) max(var(--ds-gutter), calc((100vw - var(--ds-width-wide)) / 2));
+  padding-block: var(--ds-space-4);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-body);
@@ -104,8 +168,8 @@
     column-gap: var(--ds-space-4);
   }
 
-  .ds-records-timeline__year .ds-numeral {
-    font-size: clamp(3.5rem, 18vw, 5rem);
+  .ds-decade-figure__bars {
+    height: 6rem;
   }
 
   .ds-records-timeline__total {

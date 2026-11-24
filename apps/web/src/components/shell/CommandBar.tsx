@@ -17,17 +17,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { surfaceClassFor } from '../../lib/nav/surface-classes';
 import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark, Tabs, toggleDocumentTheme, type TabItem } from '@repo/ui';
 import { BAR_SEARCH_INPUT_ID, CommandBarSearch } from './CommandBarSearch';
 import { PhoneTabBar } from './PhoneTabBar';
 import { DestinationIcon } from '../patterns/DestinationIcon';
-import { SHELL_TABS, currentTabFor, pathIsMapSurface } from './shell-tabs';
-import {
-  exitMapBrowse,
-  MAP_BROWSE_ENTERED_EVENT,
-  MAP_BROWSE_EXITED_EVENT,
-} from '../../lib/nav/map-browse';
+import { SHELL_TABS, currentTabFor } from './shell-tabs';
 import './command-bar.css';
 
 /** Tab label with its destination glyph beside the word, matching the phone tab bar. */
@@ -41,11 +37,6 @@ function tabLabel(tab: (typeof SHELL_TABS)[number]) {
 }
 
 void React;
-
-/** Browse is a posture of Map: the Door's morph (dataset flag) or a cold `/explore` load. */
-function pathIsBrowsing(pathname: string, doorBrowse: boolean): boolean {
-  return doorBrowse || pathname === '/explore' || pathname.startsWith('/explore/');
-}
 
 export type AtlasMode = 'atlas' | 'story';
 
@@ -126,21 +117,8 @@ export function CommandBar({
   className,
 }: CommandBarProps) {
   const pathname = usePathname() || '/';
-  const [doorBrowse, setDoorBrowse] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const openerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    setDoorBrowse(document.documentElement.dataset.doorBrowse === '1');
-    const onEntered = () => setDoorBrowse(true);
-    const onExited = () => setDoorBrowse(false);
-    window.addEventListener(MAP_BROWSE_ENTERED_EVENT, onEntered);
-    window.addEventListener(MAP_BROWSE_EXITED_EVENT, onExited);
-    return () => {
-      window.removeEventListener(MAP_BROWSE_ENTERED_EVENT, onEntered);
-      window.removeEventListener(MAP_BROWSE_EXITED_EVENT, onExited);
-    };
-  }, []);
 
   const closeSearch = useCallback(() => {
     setSearchOpen(false);
@@ -175,39 +153,25 @@ export function CommandBar({
     };
   }, [searchOpen, closeSearch]);
 
-  const browsing = pathIsBrowsing(pathname, doorBrowse);
   const current = currentTabFor(pathname);
-  const tabs: TabItem[] = SHELL_TABS.map((tab) => {
-    // On the map, Map is the page you are on: marked current and inert. It never navigates (a
-    // link would drop the map's filters from the URL) and never doubles as a way out. The lockup
-    // is the way home.
-    if (tab.id === '/explore' && pathIsMapSurface(pathname) && browsing) {
-      return { label: tabLabel(tab), current: true };
-    }
-    return { label: tabLabel(tab), href: tab.href, current: current === tab.id };
-  });
+  const tabs: TabItem[] = SHELL_TABS.map((tab) => ({
+    label: tabLabel(tab),
+    href: tab.href,
+    current: current === tab.id,
+  }));
 
   return (
     <>
       <header
         className={cx('ds-bar', className)}
         data-ground="ink"
+        // On the front page the bar stands on the map's ink ground in either theme.
+        {...(surfaceClassFor(pathname) === 'door' ? { 'data-ground-fixed': '' } : {})}
         data-browse-chrome="true"
         data-search-open={searchOpen ? 'true' : undefined}
       >
         <div className="ds-bar__inner">
-          <Link
-            className="ds-bar__brand ds-shell-wordmark"
-            href="/"
-            aria-label="BlackStory, home"
-            onClick={(event) => {
-              // Browsing the map on the Door, pushState left Next on `/`, so the link alone would
-              // do nothing: home is the journey, so leave browse back into it.
-              if (!doorBrowse) return;
-              event.preventDefault();
-              exitMapBrowse();
-            }}
-          >
+          <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory, home">
             <ShellWordmark lockup={BRAND_ASSETS.lockup} />
           </Link>
 
@@ -302,7 +266,7 @@ export function CommandBar({
         </div>
       </header>
       {/* A sibling of the header, not a child, so the header's own stacking never traps it. */}
-      <PhoneTabBar pathname={pathname} browsing={browsing} />
+      <PhoneTabBar pathname={pathname} />
     </>
   );
 }

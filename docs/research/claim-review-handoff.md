@@ -1,5 +1,39 @@
 # Claim review: where it stands and what the next session does first
 
+**Status, 2026-11-18.** Thirteen of the 17 records below are published (seven Sigma Gamma Rho
+founders, three Zeta Phi Beta founders, and the Massachusetts 1855, New York 1821 and Oklahoma
+grandfather-clause laws). The rest of this note is the 2026-11-08 record and is kept for its
+reasoning; its "do this first" steps and "do not publish" hold are superseded by the order below.
+
+## The order that works
+
+Each step invalidates the ones after it, so do them in this order and do not edit a record's
+claims or evidence once its text is approved.
+
+1. Settle the claims: every sentence of `summary`, `historicalContext` and `impactStatement` must
+   be carried by a claim, and every claim must cite a page that can be captured.
+2. `capture-backfill --landscape-ids <ids> --preservation-decisions <file> --commit`. Each new URL
+   needs an owner-approved preservation decision.
+3. `session-claim-review-prepare.ts`, then `session-claim-review-codex.ts`. Reword or drop what
+   Sol rejects and repeat until the dry run of `session-claim-review-apply.ts` refuses nothing.
+4. Write the claim ledger (`DRY_RUN=0 CLAIM_REVIEW_APPLY=1`, owner login).
+5. `session-public-text-review.ts --step=prepare`, `--step=review`, then `--step=apply` dry run.
+   The text hash covers the claim list, so any later claim or evidence edit voids the approval,
+   and a clause with no claim ref is refused even when Sol marks it supported.
+6. Write the text ledger (`DRY_RUN=0 PUBLIC_TEXT_REVIEW_APPLY=1`, owner login, with the real
+   `--drafter-actor` and `--drafter-family`).
+7. `publish-release-entities-incremental.ts --ids=<ids>` dry run, then apply, then republish the
+   catalog artifacts.
+
+Which login each step needs is in [agent-local-env.md](agent-local-env.md).
+
+The text reviewer returns `request_changes` whenever a record's own sources disagree, even when
+the text states the disagreement. In practice a record passes only once the conflicting source is
+no longer cited or the disputed point is cut. Whether a disclosed disagreement should be
+publishable is an open owner decision.
+
+---
+
 Written 2026-11-08. This is the plan for the next session. The first job is to write the approvals
 and rejections for the 17 near-ready records to the review ledger.
 

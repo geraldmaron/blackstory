@@ -1,23 +1,26 @@
 /*
- * The story frame: /stories/[slug] (chapters and entries), and the body StoryBody renders
- * wherever it appears (/lives, the admin preview).
+ * The story page (docs/ui/DESIGN.md section 9.3): /stories/[slug] and /presidents/[slug], and the
+ * body StoryBody renders wherever it appears (/lives, the admin preview).
  *
- * Tracks: prose on the 680px reading measure; every artifact on the 964px wide track; on wide
- * screens a 156px section spine to the left, so spine, gap and wide track fill the 1152px page
- * container and line up with the header.
+ * One paper ground. Prose sits on the reading measure (--ds-content-max); every exhibit breaks
+ * it onto the wide track. From 64rem a chapter rail stands beside the column; below that a bar
+ * names the section under the shell's progress line. No sheet, shadow, band or rounded corner.
  */
 
-/* The spine and the Contents bar carry the reader's place; the global hairline would be a second
-   gauge for the same thing. */
-:root:has(.ds-story) .ds-reading-progress {
-  display: none;
+/* From 64rem the rail carries the reader's place, so the shell's progress line would be a second
+   gauge. Below it the line is the gauge and the bar under it names the section. */
+@media (min-width: 64rem) {
+  :root:has(.ds-story__frame) .ds-reading-progress {
+    display: none;
+  }
 }
 
 .ds-story {
   --story-prose: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
+  --story-anchor: calc(var(--ds-island-clearance) + var(--ds-space-18));
 }
 
-.ds-story .ds-room__doc {
+.ds-story .ds-doc__column {
   padding-block: var(--ds-space-12) var(--ds-space-18);
 }
 
@@ -33,26 +36,16 @@
   margin-inline: auto;
 }
 
-.ds-story-mast {
-  grid-row: 1;
-}
-
-.ds-story-bar {
-  grid-row: 2;
-}
-
 .ds-story__main {
-  grid-row: 3;
   margin-top: var(--ds-space-8);
 }
 
-/* The body's tracks: prose on the reading measure, artifacts on the wide track (the sheet's
-   whole inner width). */
+/* The body's tracks: prose on the reading measure, exhibits on the wide track. */
 .ds-story-body {
   display: grid;
   grid-template-columns:
     [wide-start] minmax(0, 1fr)
-    [body-start] minmax(0, var(--ds-width-read))
+    [body-start] minmax(0, var(--ds-content-max))
     [body-end] minmax(0, 1fr)
     [wide-end];
 }
@@ -60,14 +53,15 @@
 .ds-story-body > * {
   grid-column: body;
   min-width: 0;
+  margin: 0;
 }
 
 .ds-story-body > .ds-story-wide {
   grid-column: wide;
 }
 
-/* —— Masthead: on the ink table, the title large, the opening year as a numeral, a copper band
-      of facts, then (chapters) the hero image whole on the wide track ——————————————————— */
+/* —— Masthead: the title, the opening year as a numeral, a ruled strip of facts, then
+      (chapters) the cover as an exhibit ———————————————————————————————————————— */
 .ds-story-mast {
   display: grid;
   grid-template-columns: [wide-start] minmax(0, 1fr) [aside-start] auto [wide-end];
@@ -86,10 +80,6 @@
   margin-bottom: -0.04em;
 }
 
-.ds-story-mast__text .ds-story-mast__numeral {
-  margin: var(--ds-space-2) 0 var(--ds-space-3);
-}
-
 .ds-story-mast__band,
 .ds-story-mast > .ds-story-mast__hero {
   grid-column: wide;
@@ -99,7 +89,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--ds-space-1) 0;
   margin: 0 0 var(--ds-space-4);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
@@ -111,20 +100,19 @@
   content: '·';
   display: inline-block; /* keeps a link's underline off the separator */
   padding-inline: var(--ds-space-2);
-  color: var(--ds-ink-muted);
 }
 
-/* A 44px hit area; the negative margin keeps the facts line at its visual height. */
-.ds-story-mast__series {
+/* A 44px hit area; the negative margin keeps the line at its visual height. */
+.ds-story-mast__series,
+.ds-story-mast__band a {
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
   margin-block: calc((2.75rem - 1lh) / -2);
   color: var(--ds-ink);
   text-decoration: underline;
-  text-decoration-color: var(--ds-accent-graphic);
   text-decoration-thickness: 2px;
-  text-underline-offset: 0.25em;
+  text-underline-offset: 0.2em;
 }
 
 .ds-story-mast__title.ds-story-mast__title {
@@ -132,8 +120,9 @@
   color: var(--ds-ink);
 }
 
-.ds-story-mast__dek {
-  max-width: var(--ds-width-read);
+.ds-story-mast__dek,
+.ds-story-mast__rest {
+  max-width: var(--ds-content-max);
   margin: 0;
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
@@ -143,17 +132,13 @@
 }
 
 .ds-story-mast__rest {
-  max-width: var(--ds-width-read);
-  margin: var(--ds-space-3) 0 0;
+  margin-top: var(--ds-space-3);
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
   font-size: var(--story-prose);
   line-height: 1.55;
-  text-wrap: pretty;
 }
 
-/* The facts strip: the record page's facts idiom for a story. Mono-caps labels over display
-   values, set as ruled type between two ink rules, with no box around any of it. */
+/* The facts strip: mono-caps labels over values, between two ink rules, with no box. */
 .ds-story-mast__band {
   display: flex;
   flex-wrap: wrap;
@@ -162,7 +147,6 @@
   margin: var(--ds-space-10) 0 0;
   padding-block: var(--ds-space-4);
   border-block: var(--ds-border-width-strong) solid var(--ds-ink);
-  animation: ds-sheet-in var(--ds-duration-sheet) var(--ds-ease-entrance) both;
 }
 
 .ds-story-mast__band > div {
@@ -190,22 +174,12 @@
 .ds-story-mast__band dd {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0 var(--ds-space-2);
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-body);
   font-weight: 650;
-}
-
-.ds-story-mast__band a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  margin-block: calc((2.75rem - 1lh) / -2);
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.2em;
 }
 
 .ds-story-mast__years {
@@ -218,18 +192,22 @@
   padding-left: var(--ds-space-2);
 }
 
+/* Cite and the corrections link close the strip, at its right edge on a wide page. */
 .ds-story-mast__band > .ds-story-mast__report {
-  align-self: center;
   margin-left: auto;
   padding-right: 0;
   border-left: 0;
+}
+
+.ds-story-mast__report dd {
+  gap: 0 var(--ds-space-6);
 }
 
 .ds-story-mast__hero {
   margin-top: var(--ds-space-10);
 }
 
-/* An entry's masthead: the portrait large beside the title block. */
+/* An entry's masthead: the portrait beside the title block, whole and in its own color. */
 .ds-story--entry .ds-story-mast[data-media='photo'] {
   grid-template-columns: [wide-start] minmax(0, 1fr) [aside-start] 17rem [wide-end];
   column-gap: var(--ds-space-12);
@@ -239,37 +217,10 @@
   grid-column: aside-start / wide-end;
   grid-row: 1;
   align-self: end;
-  margin: 0;
+  --story-cap: 26rem;
 }
 
-.ds-story-mast__portrait .ds-plate__tone {
-  aspect-ratio: 4 / 5;
-}
-
-/* StoryImage's frame is the plate's image: the plate's tone filter lands on it, its photo fills it. */
-.ds-story-mast__portrait .ds-story-img,
-.ds-story-next__plate .ds-story-img {
-  position: absolute;
-  inset: 0;
-  min-height: 0;
-  background: transparent;
-}
-
-.ds-story-mast__portrait .ds-story-img > img {
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 18%;
-}
-
-/* The credit sits under the plate in mono caps, the meta role; never on the photograph. */
-.ds-story-mast__portrait .ds-plate__credit {
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-meta);
-  letter-spacing: var(--ds-tracking-meta);
-  text-transform: uppercase;
-}
-
-/* —— Section spine (wide screens) and Contents bar (everything narrower) ————————————— */
+/* —— Chapter rail (64rem and wider) and the section bar (everything narrower) ——————————— */
 .ds-story-spine {
   display: none;
 }
@@ -277,9 +228,10 @@
 .ds-story-spine__label {
   margin: 0 0 var(--ds-space-3);
   color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-caption);
-  font-weight: 500;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-meta);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-story-sections {
@@ -303,21 +255,17 @@
   text-decoration: none;
 }
 
-.ds-story-sections__link:hover {
+.ds-story-sections__link:hover,
+.ds-story-sections__item[data-state='read'] .ds-story-sections__link {
   color: var(--ds-ink);
 }
 
 .ds-story-sections__link:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: 2px;
-  border-radius: var(--ds-radius-sm);
 }
 
-.ds-story-sections__item[data-state='read'] .ds-story-sections__link {
-  color: var(--ds-ink);
-}
-
-/* The current section: weight and a copper mark on the rule, never color alone. */
+/* The current section: weight and a mark on the rule, never color alone. */
 .ds-story-sections__link[aria-current='location'] {
   color: var(--ds-ink);
   font-weight: 600;
@@ -330,7 +278,6 @@
   bottom: 4px;
   left: -1.5px;
   width: 2px;
-  border-radius: 1px;
   background: var(--ds-accent-graphic);
 }
 
@@ -354,9 +301,9 @@
   gap: var(--ds-space-3);
   width: 100%;
   max-width: var(--ds-width-record);
-  min-height: 3.5rem;
-  margin: var(--ds-space-12) auto 0;
-  border-block: var(--ds-border-width) solid var(--ds-rule);
+  min-height: 3rem;
+  margin: var(--ds-space-10) auto 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   background: var(--ds-canvas);
 }
 
@@ -392,7 +339,7 @@
   flex: none;
   min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border-control);
+  border: var(--ds-border-width) solid transparent;
   border-radius: var(--ds-radius-sm);
   background: transparent;
   color: var(--ds-ink);
@@ -402,8 +349,8 @@
   cursor: pointer;
 }
 
-.ds-story-sheet__close {
-  border-color: transparent;
+.ds-story-bar__open {
+  border-color: var(--ds-border-control);
 }
 
 .ds-story-bar__open:hover {
@@ -416,6 +363,7 @@
   outline-offset: var(--ds-focus-offset);
 }
 
+/* The contents list over the page: the one thing here that floats, so the one shadow. */
 .ds-story-sheet {
   inset: auto 0 0 0;
   width: min(100%, 36rem);
@@ -424,9 +372,8 @@
   padding: var(--ds-space-2) var(--ds-space-4)
     calc(var(--ds-space-6) + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
   border-bottom: 0;
-  border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
   color: var(--ds-ink);
 }
 
@@ -449,21 +396,21 @@
 }
 
 .ds-story-sheet .ds-story-sections__link {
-  min-height: 2.75rem;
-  align-content: center;
   padding-block: var(--ds-space-2);
   font-size: var(--ds-text-body-sm);
 }
 
-@media (min-width: 80rem) {
+@media (min-width: 64rem) {
   .ds-story__frame {
     grid-template-columns: 9.75rem minmax(0, var(--ds-width-record));
     column-gap: var(--ds-space-8);
+    justify-content: center;
   }
 
   .ds-story-mast,
   .ds-story__main {
     grid-column: 2;
+    grid-row: 1;
   }
 
   .ds-story-bar {
@@ -471,12 +418,13 @@
   }
 
   .ds-story__main {
+    grid-row: 2;
     margin-top: var(--ds-space-12);
   }
 
   .ds-story-spine {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 2;
     align-self: start;
     position: sticky;
     top: calc(var(--ds-island-clearance) + var(--ds-space-8));
@@ -489,16 +437,15 @@
 }
 
 /* —— Body ————————————————————————————————————————————————————————————————————— */
-.ds-story-body > * {
-  margin: 0;
-}
-
 .ds-story-body > * + * {
   margin-top: var(--ds-space-6);
 }
 
+/* An exhibit always gets air. */
 .ds-story-body > .ds-story-wide,
 .ds-story-body > .ds-story-wide + *,
+.ds-story-body > .ds-story-figures,
+.ds-story-body > .ds-story-figures + *,
 .ds-story-body > .ds-story-quote,
 .ds-story-body > .ds-story-quote + *,
 .ds-story-body > .ds-story-divider,
@@ -508,8 +455,6 @@
 
 .ds-story-p,
 .ds-story-list {
-  /* A reading measure: the column is wider than a comfortable line of serif. */
-  max-width: 68ch;
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
   font-size: var(--story-prose);
@@ -526,14 +471,12 @@
   text-underline-offset: 0.18em;
 }
 
-/* Section h2s are the shared SectionHeading (ds-section-heading, 24/28); the body only sets
-   their spacing, 48px above and 16px below, because its own flow margins win over the primitive. */
 .ds-story-h2,
 .ds-story-h3 {
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   text-wrap: balance;
-  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-18));
+  scroll-margin-top: var(--story-anchor);
 }
 
 .ds-story-h3 {
@@ -542,10 +485,7 @@
   line-height: 1.25;
 }
 
-.ds-story-body > .ds-story-h2:not(:first-child) {
-  margin-top: var(--ds-space-12);
-}
-
+.ds-story-body > .ds-story-h2:not(:first-child),
 .ds-story-body > .ds-story-h3:not(:first-child) {
   margin-top: var(--ds-space-12);
 }
@@ -557,9 +497,8 @@
   letter-spacing: var(--ds-tracking-display);
 }
 
-/* A dated section opens on its year as a copper numeral across the wide track, then the heading
-   under a 4px rule with clear air on both sides: the rule never cuts the digits, and the heading
-   starts where the numeral starts with its text indented to the body track. */
+/* A dated section opens on its year as a numeral across the wide track, then a 2px ink rule and
+   the heading, its text indented to the reading measure. */
 .ds-story-body > .ds-story-year {
   grid-column: wide;
   margin-top: var(--ds-space-18);
@@ -571,14 +510,11 @@
 }
 
 .ds-story-body > .ds-story-h2.ds-story-h2--dated {
-  position: relative;
-  z-index: 1; /* local: the heading crops the year numeral above it */
   grid-column: wide;
   margin-top: 0;
   padding-top: var(--ds-space-6);
-  padding-inline: max(0px, (100% - var(--ds-width-read)) / 2);
-  border-top: 4px solid var(--ds-ink);
-  background: var(--ds-canvas);
+  padding-inline: max(0px, (100% - var(--ds-content-max)) / 2);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-story-body > .ds-story-h2 + *,
@@ -586,7 +522,7 @@
   margin-top: var(--ds-space-4);
 }
 
-/* Cited call-outs: a ledger in the body face, one fact per ruled row. */
+/* Cited call-outs: one fact per ruled row, in the body face. */
 .ds-story-list {
   padding: 0;
   list-style: none;
@@ -620,16 +556,14 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A pull line: large Newsreader italic on the wide track, hung from a copper bar. */
+/* A pull line: Newsreader italic on the wide track, hung from an ink rule. */
 .ds-story-body > .ds-story-quote {
   grid-column: wide;
 }
 
 .ds-story-quote {
-  position: relative;
-  margin-inline: 0;
   padding: var(--ds-space-2) 0 var(--ds-space-2) var(--ds-space-8);
-  border-left: 8px solid var(--ds-accent-graphic);
+  border-left: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
 .ds-story-quote p {
@@ -660,17 +594,13 @@
   background: var(--ds-border-strong);
 }
 
-/* Captions: the caption in ink, its credit after it in muted ink, one sans style. */
+/* A caption: the story's own line about an exhibit, above its receipt. */
 .ds-story-caption {
-  margin-top: var(--ds-space-3);
+  margin: 0 0 var(--ds-space-1);
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-caption);
   line-height: 1.5;
-}
-
-.ds-story-caption__credit {
-  color: var(--ds-ink-muted);
 }
 
 /* Inline citation numbers: copper like every link in prose, with a hit area wider than the
@@ -709,82 +639,45 @@
   text-decoration: underline;
 }
 
-/* —— Artifacts on the wide track ————————————————————————————————————————————————— */
+/* —— Exhibits ————————————————————————————————————————————————————————————————— */
+.ds-story .ds-exhibit {
+  scroll-margin-top: var(--story-anchor);
+}
 
-/* Figure callouts: the chapter's own numbers, set as numbers. */
-/* A copper block: the numbers in ink, large. */
+/* The chapter's own numbers: a ruled list at body size. A count is never display type. */
 .ds-story-figures {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-  gap: var(--ds-space-8);
-  padding: var(--ds-space-8);
-  border-radius: var(--ds-radius-md);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-story-figures__item {
+  display: grid;
+  gap: var(--ds-space-1);
   margin: 0;
-  padding-top: var(--ds-space-4);
-  border-top: 4px solid var(--ds-ink);
+  padding-block: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-story-figures__number {
-  display: block;
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-1);
-  font-weight: 600;
-  font-variant-numeric: lining-nums proportional-nums;
-  line-height: 1;
-  letter-spacing: var(--ds-tracking-display);
+  font-size: var(--ds-text-body);
+  font-weight: 650;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .ds-story-figures__label {
-  margin-top: var(--ds-space-3);
-  color: var(--ds-ink);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   line-height: 1.45;
 }
 
-/* On the story page the copper figures and sand documents are not boxes inside the sheet: each
-   runs as a full-bleed band, so a long story changes ground every few screens instead of running
-   one sheet top to bottom (patterns-living-archive, Depth planes). The band's color is painted
-   past its content box with a spread shadow and clipped to the sheet's own edges (the left
-   stripes stay visible), so the band reads as part of the paper at every width and never runs
-   under the contents rail or into the page margin. Owner decision 2026-11-16. */
-.ds-story .ds-story-body > :is(.ds-story-figures, .ds-story-doc)[data-ground] {
-  margin-block: var(--ds-space-16);
-  padding-inline: 0;
-  padding-block: var(--ds-space-12);
-  border-radius: 0;
-  box-shadow: 0 0 0 100vmax var(--ds-canvas);
-  clip-path: inset(
-    0 calc(var(--ds-sheet-pad) * -1 - var(--ds-border-width)) 0 calc(var(--ds-sheet-pad) * -1)
-  );
-}
-
-/* Two documents in a row share one band. */
-.ds-story .ds-story-body > .ds-story-doc[data-ground] + .ds-story-doc[data-ground] {
-  margin-top: calc(var(--ds-space-16) * -1);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-/* A primary document: a sand block, date and title beside its words. */
-.ds-story-doc {
+/* A primary document's words, inside the crop marks. */
+.ds-story-doc > .ds-exhibit__object {
   display: grid;
-  grid-template-columns: 13rem minmax(0, 1fr);
-  gap: var(--ds-space-8);
-  margin: 0;
-  padding: var(--ds-space-8);
-  border-radius: var(--ds-radius-md);
-}
-
-.ds-story-doc__date {
-  margin: 0 0 var(--ds-space-2);
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  font-variant-numeric: tabular-nums;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-6);
 }
 
 .ds-story-doc__title {
@@ -798,24 +691,13 @@
 }
 
 .ds-story-doc__quote {
-  margin: 0 0 var(--ds-space-4);
+  max-width: var(--ds-content-max);
+  margin: 0;
   color: var(--ds-ink);
   font-family: var(--ds-font-editorial);
   font-size: var(--ds-text-editorial-lede);
   line-height: 1.45;
   text-wrap: pretty;
-}
-
-.ds-story-doc__summary {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-body-sm);
-  line-height: 1.55;
-}
-
-.ds-story-doc__text > :only-child {
-  color: var(--ds-ink);
-  font-size: var(--ds-text-body);
 }
 
 .ds-story-timeline {
@@ -835,8 +717,7 @@
 }
 
 /* An archival image keeps its whole frame. The figure is as wide as the image may be shown:
-   never past the track it sits on, the height cap, or the file's own pixels. The frame and the
-   caption take that width, so nothing waits on the file and nothing leaves the sheet. */
+   never past the track it sits on, the height cap, or the file's own pixels. */
 .ds-story-figure {
   --story-cap: min(75vh, 44rem);
   width: min(100%, var(--story-cap) * var(--story-ratio), var(--story-natural));
@@ -845,7 +726,7 @@
 
 /* No stored size: hold the reading measure and letterbox a tall scan inside the height cap. */
 .ds-story-figure:not([style]) {
-  width: min(100%, var(--ds-width-read));
+  width: min(100%, var(--ds-content-max));
 }
 
 .ds-story-figure:not([style]) img {
@@ -853,27 +734,15 @@
   object-fit: contain;
 }
 
-.ds-story-figure__frame {
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-}
-
-/* —— End of the piece ——————————————————————————————————————————————————————————— */
-/* The end block is a copper band across the sheet's foot, from the page bands to the right edge
-   (the sheet's own padding, given back). */
+/* —— End of the piece: sources, where to read next, linked records ——————————————————— */
 .ds-story-body > .ds-story-end {
   display: grid;
   gap: var(--ds-space-12);
-  margin: var(--ds-space-18) calc(var(--ds-sheet-pad) * -1) calc(var(--ds-sheet-pad) * -1);
-  padding: var(--ds-space-12) var(--ds-sheet-pad) var(--ds-space-12);
-  border-radius: 0 0 var(--ds-radius-md) 0;
+  margin-top: var(--ds-space-18);
+  padding-top: var(--ds-space-8);
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
 }
 
-.ds-story-end .ds-section-heading {
-  font-size: var(--ds-text-display-3);
-}
-
-/* The end block's h2s are SectionHeadings too; inside the block the gap above is the block's. */
 .ds-section-heading.ds-story-end__heading {
   margin-top: 0;
 }
@@ -885,7 +754,8 @@
   gap: var(--ds-space-4);
 }
 
-.ds-story-end__count {
+.ds-story-end__count,
+.ds-story-chapters__years {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-caption);
@@ -893,20 +763,20 @@
   white-space: nowrap;
 }
 
-/* Next and previous: a ruled two-row index on the copper band. The whole row is the link; the
-   portrait is a small toned plate at its right edge, so every row shares one text edge. */
+/* Next and previous: a ruled index. The whole row is the link; a portrait, when it may be shown,
+   is small at the right edge so every row shares one text edge. */
 .ds-story-next__row {
   display: grid;
-  border-bottom: var(--ds-border-width) solid var(--ds-ink);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-story-next__item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 4.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
   column-gap: var(--ds-space-6);
   align-items: start;
-  padding-block: var(--ds-space-6);
-  border-top: var(--ds-border-width) solid var(--ds-ink);
+  padding-block: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink);
   text-decoration: none;
 }
@@ -918,51 +788,25 @@
   outline-offset: var(--ds-focus-offset);
 }
 
-.ds-story-next__plate {
-  grid-column: 2;
-  grid-row: 1;
+.ds-story-next__thumb {
+  width: 4.5rem;
 }
 
-.ds-story-next__plate .ds-plate__tone {
-  aspect-ratio: 4 / 5;
-}
-
-.ds-story-chapters__media .ds-story-img {
-  height: 100%;
-  min-height: 0;
-}
-
-.ds-story-next__plate img,
-.ds-story-chapters__media img {
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-/* Chapter images are archive scans; crop inside the paper border, as the /stories covers do. */
-.ds-story-chapters__media img {
-  object-position: 50% 6%;
-  transform: scale(1.06);
-}
-
-.ds-story-next__plate .ds-story-img__failed,
+.ds-story-next__thumb .ds-story-img__failed,
 .ds-story-chapters__media .ds-story-img__failed {
   display: none;
 }
 
 .ds-story-next__text {
   display: grid;
-  grid-column: 1;
-  grid-row: 1;
   align-content: start;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-1);
 }
 
 .ds-story-next__meta {
-  color: var(--ds-ink);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-meta);
-  font-weight: 600;
   letter-spacing: var(--ds-tracking-meta);
   text-transform: uppercase;
 }
@@ -973,12 +817,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-.ds-story-next__title {
+.ds-story-next__title,
+.ds-story-chapters__title {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
+  font-size: var(--ds-text-title);
   font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: var(--ds-tracking-display);
+  line-height: 1.15;
+  letter-spacing: var(--ds-tracking-title);
 }
 
 .ds-story-next__item:hover .ds-story-next__title,
@@ -1011,31 +856,17 @@
 
 .ds-story-chapters__card {
   display: grid;
+  align-content: start;
   gap: var(--ds-space-1);
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink);
   text-decoration: none;
 }
 
 .ds-story-chapters__media {
-  aspect-ratio: 3 / 2;
-  margin-bottom: var(--ds-space-3);
-  overflow: hidden;
-  background: var(--ds-material-ink);
-}
-
-.ds-story-chapters__title {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: var(--ds-tracking-display);
-}
-
-.ds-story-chapters__years {
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-caption);
-  font-variant-numeric: tabular-nums;
+  width: min(100%, 12rem);
+  margin-bottom: var(--ds-space-2);
 }
 
 .ds-story-records__note {
@@ -1096,12 +927,11 @@
   text-underline-offset: 0.2em;
 }
 
-/* —— Sources ————————————————————————————————————————————————————————————————————— */
 .ds-story-body > .ds-story-sources-block {
   margin-top: var(--ds-space-18);
   padding-top: var(--ds-space-8);
-  border-top: 4px solid var(--ds-ink);
-  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-18));
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+  scroll-margin-top: var(--story-anchor);
 }
 
 .ds-story-sources {
@@ -1112,30 +942,23 @@
 
 .ds-story-sources__item {
   display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr);
-  padding: var(--ds-space-2) var(--ds-space-2) var(--ds-space-2) 0;
-  border-radius: var(--ds-radius-sm);
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  padding-block: var(--ds-space-2);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body-sm);
   line-height: 1.5;
-  scroll-margin-top: calc(var(--ds-island-clearance) + var(--ds-space-18));
+  scroll-margin-top: var(--story-anchor);
 }
 
 .ds-story-sources__item:target {
   background: var(--ds-surface-sunken);
 }
 
-/* Each source's number large and copper, as on a record page. */
+/* A source's number is a reference mark, set in mono at the text's own size. */
 .ds-story-sources__num {
-  padding-right: var(--ds-space-4);
-  color: var(--ds-accent);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-display-3);
-  font-weight: 600;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
   font-variant-numeric: lining-nums tabular-nums;
-  line-height: 0.9;
-  letter-spacing: var(--ds-tracking-display);
-  text-align: right;
 }
 
 .ds-story-sources__body {
@@ -1162,7 +985,7 @@
 
 /* —— Phone ——————————————————————————————————————————————————————————————————————— */
 @media (max-width: 47.9375rem) {
-  .ds-story .ds-room__doc {
+  .ds-story .ds-doc__column {
     padding-top: var(--ds-space-6);
   }
 
@@ -1175,10 +998,9 @@
     width: auto;
     margin-inline: calc(var(--ds-gutter) * -1);
     padding-inline: var(--ds-gutter);
-    border-top: 0;
   }
 
-  /* One column: the numeral (or the portrait) first, then the title, the band, the hero. */
+  /* One column: the numeral (or the portrait) first, then the title, the strip, the cover. */
   .ds-story-mast,
   .ds-story--entry .ds-story-mast[data-media='photo'] {
     grid-template-columns: [wide-start aside-start] minmax(0, 1fr) [wide-end];
@@ -1194,31 +1016,28 @@
     margin: 0 0 var(--ds-space-2);
   }
 
-  /* An entry's year steps up to the full numeral scale (72px at phone width). */
-  .ds-story-mast__text .ds-story-mast__numeral {
-    font-size: var(--ds-text-display-numeral);
-  }
-
-  /* The portrait leads the masthead at 4:3, its credit under it. */
   .ds-story-mast__portrait {
     grid-row: auto;
     order: -1;
-    width: auto;
     margin: 0 0 var(--ds-space-4);
-  }
-
-  .ds-story-mast__portrait .ds-plate__tone {
-    aspect-ratio: 4 / 3;
+    --story-cap: 20rem;
   }
 
   /* The byline parts stack, so no separator dot is left hanging at a line end. */
   .ds-story-mast__byline dd {
-    display: flex;
     flex-direction: column;
+    align-items: start;
   }
 
   .ds-story-mast__byline dd > :not(:last-child)::after {
     content: none;
+  }
+
+  /* The link may wrap here, so it gives up the one-line hit-area trick. */
+  .ds-story-mast__byline a {
+    min-height: 0;
+    margin-block: 0;
+    padding-block: var(--ds-space-2);
   }
 
   .ds-story-mast__band > div {
@@ -1228,61 +1047,25 @@
   }
 
   .ds-story-mast__band > .ds-story-mast__report {
+    flex-basis: 100%;
     margin-left: 0;
   }
 
-  /* The sheet runs full-bleed (the kit drops its side edges); the copper end band follows it. */
-  .ds-story__main {
-    width: auto;
-    margin-inline: calc(var(--ds-gutter) * -1);
-  }
-
-  .ds-story-body > .ds-story-end {
-    border-radius: 0;
+  /* Cite opens from the strip's left edge on a phone, where it sits. */
+  .ds-story-mast__report .ds-cite__panel {
+    inset-inline: 0 auto;
   }
 
   .ds-story-body > .ds-story-year {
     margin-top: var(--ds-space-12);
   }
 
-  /* The sheet pads 16 right and its bands + pad on the left; the image stays inside both. */
-  .ds-story__main .ds-story-figure__frame > img {
-    max-width: calc(100vw - var(--ds-sheet-pad) * 2 - var(--ds-band-w) * 3);
-  }
-
   .ds-story-quote {
     padding-left: var(--ds-space-4);
-    border-left-width: 6px;
   }
 
-  .ds-story-figures {
-    padding: var(--ds-space-6) var(--ds-space-4);
-  }
-
-  .ds-story-doc {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--ds-space-4);
-    padding: var(--ds-space-6) var(--ds-space-4);
-  }
-
-  .ds-story-figures {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--ds-space-6) var(--ds-space-4);
-  }
-
-  .ds-story-figures__number {
-    font-size: var(--ds-text-display-2);
-  }
-
-  .ds-story-next__item {
-    column-gap: var(--ds-space-4);
-    padding-block: var(--ds-space-4);
-  }
-}
-
-@media (max-width: 40rem) {
-  .ds-story-figures {
-    grid-template-columns: minmax(0, 1fr);
+  .ds-story-doc > .ds-exhibit__object {
+    padding: var(--ds-space-4);
   }
 }
 
@@ -1291,7 +1074,7 @@
   color: var(--ds-accent);
   text-decoration: underline;
   text-underline-offset: 0.18em;
-  transition: color var(--ds-duration-fast) var(--ds-ease-standard);
+  transition: color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-reading__extlink:hover {
@@ -1314,8 +1097,7 @@
 /* Scrolls sideways inside the figure only; the page never gains a horizontal scrollbar. */
 .ds-reading-table__scroll {
   overflow-x: auto;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-reading-table table {
@@ -1346,6 +1128,10 @@
   border-bottom-color: var(--ds-border-strong);
 }
 
+.ds-reading-table .ds-story-caption {
+  margin-top: var(--ds-space-3);
+}
+
 @media (max-width: 40rem) {
   .ds-reading-table th:first-child,
   .ds-reading-table td:first-child {
@@ -1360,7 +1146,6 @@
   aspect-ratio: 16 / 9;
   width: 100%;
   border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
   background: var(--ds-surface-sunken);
   overflow: hidden;
 }
@@ -1418,7 +1203,7 @@
   border: 0;
   border-radius: var(--ds-radius-sm);
   cursor: pointer;
-  transition: background var(--ds-duration-fast) var(--ds-ease-standard);
+  transition: background var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-reading-video__play:hover {
@@ -1436,46 +1221,22 @@
   text-underline-offset: 0.18em;
 }
 
-/* —— Loading: the masthead, the copper band and the sheet, held still ———————————————— */
-.ds-story-wait {
-  display: grid;
-  gap: var(--ds-space-4);
-  max-width: var(--ds-width-record);
-  margin-inline: auto;
-}
+/* —— Print: the column, its exhibits with their receipts, and the sources ————————————— */
+@media print {
+  .ds-story-spine,
+  .ds-story-bar {
+    display: none;
+  }
 
-.ds-story-wait__line {
-  display: block;
-  height: 1.25rem;
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface-sunken);
-}
+  .ds-story__frame {
+    display: block;
+  }
 
-.ds-story-wait__line--title {
-  width: 60%;
-  height: 6rem;
-  margin-bottom: var(--ds-space-4);
-}
-
-.ds-story-wait__line--short {
-  width: 55%;
-}
-
-.ds-story-wait__band {
-  display: block;
-  height: 6rem;
-  margin-block: var(--ds-space-6);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-material-copper);
-}
-
-.ds-story-wait__sheet {
-  display: grid;
-  gap: var(--ds-space-4);
-}
-
-/* The mast's drawn streetscape: decorative, under the dek. */
-.ds-story-mast__art {
-  margin-top: var(--ds-space-8);
-  max-width: 44rem;
+  /* A source prints its address, so the page stands without the link. */
+  .ds-story-sources__body a::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-micro);
+    overflow-wrap: anywhere;
+  }
 }

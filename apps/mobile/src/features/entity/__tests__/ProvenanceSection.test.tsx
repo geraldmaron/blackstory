@@ -10,9 +10,7 @@ import { fullEntityFixture } from '../testFixtures';
 describe('ProvenanceSection', () => {
   it('states maturity and coverage as fields, not as a sentence', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
-    const { getByTestId, queryByText } = await render(
-      <ProvenanceSection entity={entity} index="09" />,
-    );
+    const { getByTestId, queryByText } = await render(<ProvenanceSection entity={entity} />);
 
     expect(getByTestId('entity-provenance-maturity')).toBeTruthy();
     expect(getByTestId('entity-provenance-coverage')).toBeTruthy();
@@ -24,7 +22,7 @@ describe('ProvenanceSection', () => {
 
   it('draws the shared meter for research coverage', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
-    const { getByTestId } = await render(<ProvenanceSection entity={entity} index="09" />);
+    const { getByTestId } = await render(<ProvenanceSection entity={entity} />);
     expect(
       getByTestId('entity-provenance-coverage-meter', { includeHiddenElements: true }),
     ).toBeTruthy();
@@ -32,7 +30,7 @@ describe('ProvenanceSection', () => {
 
   it('keeps the revision dates as labeled rows', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
-    const { getByTestId } = await render(<ProvenanceSection entity={entity} index="09" />);
+    const { getByTestId } = await render(<ProvenanceSection entity={entity} />);
     expect(getByTestId('entity-provenance-updated')).toBeTruthy();
     expect(getByTestId('entity-provenance-generated')).toBeTruthy();
   });

@@ -7,6 +7,14 @@ export { Button, buttonClassName, type ButtonProps, type ButtonVariant } from '.
 export { Chip, type ChipProps } from './Chip.js';
 export { Citation, type CitationProps, type CitationLinkStatus } from './Citation.js';
 export {
+  Cite,
+  citationHtml,
+  citationText,
+  type CitationPart,
+  type CiteFormat,
+  type CiteProps,
+} from './Cite.js';
+export {
   CommandPalette,
   filterCommandPaletteItems,
   groupCommandPaletteItems,
@@ -32,6 +40,14 @@ export { Dialog, type DialogProps } from './Dialog.js';
 export { InlineEdit, type InlineEditProps, type InlineEditStatus } from './InlineEdit.js';
 export { DisplayNumeral, type DisplayNumeralProps } from './DisplayNumeral.js';
 export { EmptyState, type EmptyStateProps } from './EmptyState.js';
+export {
+  ExhibitFrame,
+  Receipt,
+  type ExhibitFrameProps,
+  type ExhibitKind,
+  type ExhibitVariant,
+  type ReceiptProps,
+} from './Exhibit.js';
 export { FacetRail, type FacetRailProps, type FacetGroup, type FacetOption } from './FacetRail.js';
 export { FilterBar, type FilterBarProps, type FilterField } from './FilterBar.js';
 export { FilterButton, type FilterButtonProps } from './FilterButton.js';

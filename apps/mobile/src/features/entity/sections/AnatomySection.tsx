@@ -10,16 +10,13 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Notice, RecordMeter, Text, space } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
-import {
-  buildEntityAnatomyInputs,
-  buildEntityAnatomyPlace,
-  type RecordAnatomyPlace,
-} from '../entity-anatomy-facts';
+import { buildEntityAnatomyInputs, buildEntityAnatomyPlace } from '../entity-anatomy-facts';
 import { openExternalMaps } from '../maps-handoff';
 import type { Entity } from '../types';
 import { EditionFactIcon, type EditionFactIconProps } from '../edition-fact-icon';
 import { RecordBeatRow, recordBeatLabelColumnWidth, recordBeatRowStyle } from '../RecordBeatRow';
 import { RecordPlacePreview } from '../record-place-preview';
+import { isQuietRecord } from '../entity-view-model';
 
 export type AnatomySectionProps = {
   readonly entity: Entity;
@@ -63,85 +60,46 @@ function factsFor(entity: Entity): readonly AnatomyFact[] {
   ];
 }
 
-export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
-  const [mapsError, setMapsError] = useState<string | undefined>(undefined);
+/** Hands the record's public anchor to the device's maps app, and says so when it cannot. */
+function useOpenInMaps(entity: Entity) {
+  const [error, setError] = useState<string | undefined>(undefined);
   const place = buildEntityAnatomyPlace(entity);
-  const inputs = buildEntityAnatomyInputs(entity);
-  const facts = factsFor(entity);
-  const hasPublicAnchor = place !== undefined;
 
-  async function handleOpenInMaps(fromPlace?: RecordAnatomyPlace) {
-    const anchor = fromPlace ?? place;
-    if (!anchor) {
-      setMapsError('No public coordinates are available for this record yet.');
+  async function open() {
+    if (!place) {
+      setError('No public coordinates are available for this record yet.');
       return;
     }
-    setMapsError(undefined);
+    setError(undefined);
     const result = await openExternalMaps({
-      lat: anchor.lat,
-      lng: anchor.lng,
+      lat: place.lat,
+      lng: place.lng,
       ...(entity.displayName ? { label: entity.displayName } : {}),
     });
     if (result !== 'opened') {
-      setMapsError(
-        'Could not open Maps. Try again, or use View on national map inside BlackStory.',
-      );
+      setError('Could not open Maps. Try again, or use View on national map inside BlackStory.');
     }
   }
 
+  return { place, open, error };
+}
+
+/**
+ * The record's map exhibit with its precision in words and the two ways onward. It leads the
+ * record when there is no photograph and follows the claims when there is one.
+ */
+export function RecordMapSection({ entity, onBackToMap }: AnatomySectionProps) {
+  const { place, open, error } = useOpenInMaps(entity);
+
   return (
-    <EntityEditionPanel
-      index="01"
-      kicker="Anatomy"
-      title="Record at a glance"
-      testID="entity-anatomy-section"
-    >
+    <View style={styles.map} testID="entity-map-section">
       <RecordPlacePreview
         place={place}
-        {...(hasPublicAnchor
-          ? {
-              onOpenInMaps: () => {
-                void handleOpenInMaps();
-              },
-            }
-          : {})}
+        quiet={isQuietRecord(entity)}
+        {...(place ? { onOpenInMaps: () => void open() } : {})}
       />
 
-      <View style={styles.factsList} accessibilityLabel="Record anatomy">
-        {facts.map((fact) => (
-          <RecordBeatRow
-            key={fact.key}
-            label={fact.label}
-            leading={<EditionFactIcon {...fact.icon} />}
-            value={fact.value}
-            testID={`entity-anatomy-fact-${fact.key}`}
-            labelTestID={`entity-anatomy-fact-label-${fact.key}`}
-            {...(fact.key === 'evidence'
-              ? {
-                  trailing: (
-                    <RecordMeter
-                      tier={inputs.evidenceTier}
-                      showLetter={false}
-                      decorative
-                      testID="entity-anatomy-evidence-meter"
-                    />
-                  ),
-                }
-              : {})}
-            {...(fact.key === 'where' && hasPublicAnchor
-              ? {
-                  onPress: () => {
-                    void handleOpenInMaps();
-                  },
-                  accessibilityLabel: `Where: ${fact.value}. Open in Maps at public precision.`,
-                }
-              : {})}
-          />
-        ))}
-      </View>
-
-      {/* A sentence, so it is set in the body face. Mono is for data and citations; three lines
-          of monospaced prose read as a console log sitting under the record. */}
+      {/* A sentence, so it is set in the body face. Mono is for data and citations. */}
       {place?.precisionCaption ? (
         <Text variant="bodySmall" colorRole="inkMuted">
           {place.precisionCaption}
@@ -149,15 +107,13 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
       ) : null}
 
       <View style={styles.actions}>
-        {hasPublicAnchor ? (
+        {place ? (
           <Button
             label="Open in maps"
-            variant="accent"
+            variant="secondary"
             density="compact"
             accessibilityLabel={`Open ${entity.locationLabel || entity.displayName} in Maps at public precision`}
-            onPress={() => {
-              void handleOpenInMaps();
-            }}
+            onPress={() => void open()}
           />
         ) : null}
         {onBackToMap ? (
@@ -171,16 +127,60 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
         ) : null}
       </View>
 
-      {mapsError ? <Notice tone="info" title="Maps unavailable" description={mapsError} /> : null}
+      {error ? <Notice tone="info" title="Maps unavailable" description={error} /> : null}
+    </View>
+  );
+}
+
+/** The record at a glance: kind, where, era and evidence as a ruled list. */
+export function AnatomySection({ entity }: Pick<AnatomySectionProps, 'entity'>) {
+  const { place, open, error } = useOpenInMaps(entity);
+  const inputs = buildEntityAnatomyInputs(entity);
+  const facts = factsFor(entity);
+
+  return (
+    <EntityEditionPanel kicker="Facts" title="Record at a glance" testID="entity-anatomy-section">
+      <View style={styles.factsList} accessibilityLabel="Record at a glance">
+        {facts.map((fact) => (
+          <RecordBeatRow
+            key={fact.key}
+            label={fact.label}
+            leading={<EditionFactIcon {...fact.icon} />}
+            value={fact.value}
+            testID={`entity-anatomy-fact-${fact.key}`}
+            labelTestID={`entity-anatomy-fact-label-${fact.key}`}
+            {...(fact.key === 'evidence'
+              ? {
+                  trailing: (
+                    <RecordMeter
+                      tier={inputs.evidenceTier}
+                      decorative
+                      testID="entity-anatomy-evidence-meter"
+                    />
+                  ),
+                }
+              : {})}
+            {...(fact.key === 'where' && place
+              ? {
+                  onPress: () => void open(),
+                  accessibilityLabel: `Where: ${fact.value}. Open in Maps at public precision.`,
+                }
+              : {})}
+          />
+        ))}
+      </View>
+      {error ? <Notice tone="info" title="Maps unavailable" description={error} /> : null}
     </EntityEditionPanel>
   );
 }
 
-/** The row layout is `RecordBeatRow`'s now; these stay as the anatomy beat's contract names. */
 export const anatomyFactRowStyle = recordBeatRowStyle;
 export const anatomyFactLabelColumnWidth = recordBeatLabelColumnWidth;
 
 const styles = StyleSheet.create({
+  map: {
+    gap: space['3'],
+  },
   factsList: {
     flexDirection: 'column',
     gap: space['2'],

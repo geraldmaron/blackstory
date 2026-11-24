@@ -6,7 +6,7 @@
  * the one thing on the screen a person has to keep was set at body size inside it.
  */
 import React from 'react';
-import { UtilityStep } from '../../components/room';
+import { NumberedStep } from '../../components/forms/fields';
 import { formatRecordDate } from '../../components/patterns/format-record-date';
 import type { PublicCorrectionPhase } from './public-status';
 import './corrections.css';
@@ -46,7 +46,7 @@ export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: Rec
 
       <ol className="ds-receipt__steps" aria-label="Where this correction stands">
         <li>
-          <UtilityStep
+          <NumberedStep
             index={1}
             title="Received"
             done
@@ -54,7 +54,7 @@ export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: Rec
           />
         </li>
         <li>
-          <UtilityStep
+          <NumberedStep
             index={2}
             title="In review"
             done={inReview}
@@ -64,7 +64,7 @@ export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: Rec
           />
         </li>
         <li>
-          <UtilityStep
+          <NumberedStep
             index={3}
             title="Outcome"
             done={closed}

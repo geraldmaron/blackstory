@@ -21,10 +21,10 @@ export type SheetDetent = 'peek' | 'half' | 'full';
 /** The phone header above the sheet, and the tab bar under it (tab-bar.css). */
 const PHONE_HEADER = 48;
 const PHONE_TAB_BAR = 56;
-/** Grab strip (44, a full touch target) + header (48) + one register row (84, see
+/** Grab strip (44, a full touch target) + header (48) + one list row (104, see
  * RESULTS_ROW_HEIGHT): the count and the top record. explore-column.css and map-controls.css
- * carry the same 176px. */
-export const SHEET_PEEK_HEIGHT = 176;
+ * carry the same 196px. */
+export const SHEET_PEEK_HEIGHT = 196;
 
 /** The sheet's own height at a detent, tab bar excluded. Pure, so layout and camera agree. */
 export function sheetHeightFor(detent: SheetDetent, viewportHeight: number): number {
@@ -174,7 +174,18 @@ export function ExploreColumn({
         ) : null}
         <div className="ds-xcol__head">{header}</div>
       </div>
-      {search ? <div className="ds-xcol__search">{search}</div> : null}
+      {search ? (
+        <div
+          className="ds-xcol__search"
+          // On a phone the place field shows at peek. Using it needs room for its suggestions
+          // and the keyboard, so focus raises the sheet.
+          onFocusCapture={() => {
+            if (sheet && detent === 'peek') onDetentChange('full');
+          }}
+        >
+          {search}
+        </div>
+      ) : null}
       {echoes}
       <div className="ds-xcol__body">{children}</div>
     </aside>

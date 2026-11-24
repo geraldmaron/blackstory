@@ -19,8 +19,8 @@ const pinRoute = readFileSync(
   fileURLToPath(new URL('../../app/door/pin/[pinId]/route.ts', import.meta.url)),
   'utf8',
 );
-const doorHome = readFileSync(
-  fileURLToPath(new URL('../../app/door-home.tsx', import.meta.url)),
+const mapView = readFileSync(
+  fileURLToPath(new URL('../../app/archive/map-view.tsx', import.meta.url)),
   'utf8',
 );
 const homePage = readFileSync(
@@ -53,13 +53,13 @@ test('door redirect table fits Next data cache; full pin plate does not ride uns
   assert.match(catalogSource, /return redirectTable;/);
 });
 
-test('door home and pin route share the cached pin plate loader', () => {
-  assert.match(doorHome, /loadDoorPinPlate/);
-  assert.doesNotMatch(doorHome, /toDoorLinkPins/);
+test('the map view and the pin route share the cached pin plate loader', () => {
+  assert.match(mapView, /loadDoorPinPlate/);
+  assert.doesNotMatch(mapView, /toDoorLinkPins/);
   // The shell resolves filtered opaque pins against the same cached plate ordering.
   // The sixth argument is the resolved story collection descriptor.
   assert.match(
-    doorHome,
+    mapView,
     /buildAtlasShell\(\s*params,\s*entities,\s*dataSource,\s*features,\s*collectionCatalog,\s*collection\s*,?\s*\)/,
   );
   assert.doesNotMatch(catalogSource, /return \{ data: listPublicEntities\(\)/);

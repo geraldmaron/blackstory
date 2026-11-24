@@ -2,7 +2,7 @@
 
 **Status:** binding for entity and place pages (2026-09).  
 **Code:** `apps/web/src/lib/geography/{public-address,visit-handoff,external-maps-url}.ts`, `RecordVisitBlock.tsx`.  
-**Related:** [`patterns-record-anatomy.md`](./patterns-record-anatomy.md), [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md), constitution `publicPrecisionRules`.
+**Related:** [`patterns-record-anatomy.md`](./archive/patterns-record-anatomy.md), [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md), constitution `publicPrecisionRules`.
 
 ---
 

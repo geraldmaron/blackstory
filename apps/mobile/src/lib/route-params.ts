@@ -420,7 +420,13 @@ export function filterStateToRouteParams(filters: FilterState): Record<string, s
 // ---------------------------------------------------------------------------
 
 /** Static stack roots plus tab roots from the v6 mobile shell IA. */
-const ALLOWED_STATIC_ROUTES = [...MOBILE_TAB_ROOTS, MOBILE_LEGACY_SEARCH_ROUTE, '/data'] as const;
+const ALLOWED_STATIC_ROUTES = [
+  ...MOBILE_TAB_ROOTS,
+  MOBILE_LEGACY_SEARCH_ROUTE,
+  // Tabs until the Archive merged them; still valid in a stored `returnTo` or last route.
+  '/explore',
+  '/records',
+] as const;
 
 export type SafeInternalPath = (typeof ALLOWED_STATIC_ROUTES)[number] | `/entity/${string}`;
 
@@ -481,7 +487,7 @@ export type RestoredRoute = {
 };
 
 /** The route the app restores to whenever a persisted last-route can't be trusted. */
-export const SAFE_DEFAULT_ROUTE: RestoredRoute = { pathname: '/explore' };
+export const SAFE_DEFAULT_ROUTE: RestoredRoute = { pathname: '/archive' };
 
 /**
  * Validates a persisted "last route" blob (as it would come back from disk/storage after a cold

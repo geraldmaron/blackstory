@@ -46,7 +46,7 @@ export function ErrorState({ title, description, retry, compact = false }: Error
           style={[styles.glyph, { borderColor: status.error.border }]}
         />
       )}
-      <Text variant="subtitle" style={styles.title}>
+      <Text variant="title" style={styles.title}>
         {title}
       </Text>
       {description ? (

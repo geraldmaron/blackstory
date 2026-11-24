@@ -18,19 +18,14 @@ export type SectionHeaderProps = {
   headingScale?: TextRole;
 };
 
-export function SectionHeader({
-  title,
-  meta,
-  action,
-  headingScale = 'sectionLabel',
-}: SectionHeaderProps) {
-  const isSectionLabel = headingScale === 'sectionLabel';
+export function SectionHeader({ title, meta, action, headingScale = 'meta' }: SectionHeaderProps) {
+  const isSectionLabel = headingScale === 'meta';
 
   return (
     <View style={styles.row} accessibilityRole="header">
       <View style={styles.textColumn}>
         {meta ? (
-          <Text variant="sectionLabel" colorRole="inkMuted" style={styles.meta}>
+          <Text variant="meta" colorRole="inkMuted" style={styles.meta}>
             {meta}
           </Text>
         ) : null}

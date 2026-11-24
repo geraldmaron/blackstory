@@ -1,14 +1,16 @@
 # Plate posture
 
-**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) sections 2 and 3, and demonstrated in the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`setPlate`, `frameMoment`, `pickMoment`, `lockGestures`).
+**Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./archive/design-direction-v9-surfaces.md) sections 2 and 3, and demonstrated in the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`setPlate`, `frameMoment`, `pickMoment`, `lockGestures`).
 
-Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (single mount, WebGL lifecycle, `../decisions-carryover.md`, "Persistent map canvas", ADR-017), [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) (the Live posture in full), [`brand.md`](./brand.md) (map dignity, precision honesty).
+> **v11 (2026-11-20):** [`design-direction-v11.md`](./archive/design-direction-v11.md) is binding and changes this pattern on home, Explore and place records. This document still describes every surface v11 has not reached; its rewrite is owed (v11 section 21).
+
+Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (single mount, WebGL lifecycle, `../decisions-carryover.md`, "Persistent map canvas", ADR-017), [`patterns-atlas-instrument.md`](./archive/patterns-atlas-instrument.md) (the Live posture in full), [`brand.md`](./brand.md) (map dignity, precision honesty).
 
 ---
 
 ## 1. The rule
 
-One MapLibre plate mounts once in the root layout and never unmounts. It has exactly four declarative postures, and the posture is selected by the page's surface class (see [`patterns-surface-classes.md`](./patterns-surface-classes.md)), never by a component asking for one.
+One MapLibre plate mounts once in the root layout and never unmounts. It has exactly four declarative postures, and the posture is selected by the page's surface class (see [`patterns-surface-classes.md`](./archive/patterns-surface-classes.md)), never by a component asking for one.
 
 | Posture | Where | Geometry | Gestures | Camera |
 |---|---|---|---|---|

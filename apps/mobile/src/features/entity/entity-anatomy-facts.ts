@@ -3,10 +3,8 @@
  * AnatomySection and unit tests. Mirrors web `entity-anatomy-facts.ts` without
  * React or `@repo/domain` imports.
  */
-import {
-  evidenceLabel as buildEvidenceLabel,
-  recordConfidenceTier,
-} from '@repo/public-contracts/evidence';
+import { recordConfidenceTier } from '@repo/public-contracts/evidence';
+import { evidenceLabel as buildEvidenceLabel } from '@/lib/evidence-words';
 
 import { humanizeToken } from './format';
 import type { Entity, LocationPrecision } from './types';

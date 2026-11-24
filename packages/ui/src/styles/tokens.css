@@ -74,24 +74,9 @@
    * cue reads as a rendering bug. It is not an elevation ramp, and it must never be applied to a
    * card that is flush with the page.
    */
-  --ds-contact-hairline: 0 1px 0 rgb(10 10 10 / 5%);
   --ds-contact-overlap: 0 2px 10px rgb(10 10 10 / 8%);
   --ds-contact-plate: 0 6px 28px rgb(10 10 10 / 10%);
 
-  /*
-   * Era temperature: the second visual axis (plan.md decision 2). The archive's canvas drifts
-   * warmer the deeper into the nineteenth century a surface sits, and cools toward the present.
-   * It encodes era data, so it is information, not decoration, and it never leaves the
-   * paper-and-ink range: the tint is Page Sand on light and Charcoal-warm on dark, and the mix
-   * percentage is capped at the --ds-era-warmth values set on [data-era-band] below.
-   */
-  --ds-era-tint: #d8a178;
-  --ds-era-warmth: 0;
-
-  --ds-viz-1: #0a0a0a;
-  --ds-viz-2: #b86b2a;
-  --ds-viz-3: #6d675f;
-  --ds-viz-4: #d8a178;
   --ds-viz-grid: #d7d0c4;
 
   /*
@@ -107,6 +92,19 @@
   --ds-map-label: #6d675f;
   --ds-map-label-hi: #2e2a24;
   --ds-map-halo: #fbf8f2;
+}
+
+/*
+ * The ink ground (DESIGN.md section 7.1): brand values that never follow the theme. A surface on
+ * ink uses these, so it stays ink in light and dark. Moved here from base.css so every token is
+ * declared in one file. The map colors below are the same swatches under their map names.
+ */
+:root {
+  --ds-fixed-ink: #0a0a0a;
+  --ds-fixed-charcoal: #161616;
+  --ds-fixed-paper: #f4efe5;
+  --ds-fixed-stone: #bdb5a9;
+  --ds-fixed-accent: #d07a32;
 }
 
 [data-theme='dark'] [data-ground='paper']:not([data-ground-fixed]),
@@ -172,18 +170,11 @@
 
   /* Contact on dark is the absence of bounce light, not a cast shadow: near-black at a tight
      radius. Same law as light — overlap only, never a ramp. */
-  --ds-contact-hairline: 0 1px 0 rgb(0 0 0 / 30%);
   --ds-contact-overlap: 0 2px 10px rgb(0 0 0 / 38%);
   --ds-contact-plate: 0 6px 28px rgb(0 0 0 / 46%);
 
   /* Warmth on dark runs toward the Charcoal end of the same paper-and-ink range. */
-  --ds-era-tint: #6d5a43;
-  --ds-era-warmth: 0;
 
-  --ds-viz-1: #f4efe5;
-  --ds-viz-2: #d07a32;
-  --ds-viz-3: #bdb5a9;
-  --ds-viz-4: #d8a178;
   --ds-viz-grid: #34302c;
 
   /*
@@ -470,10 +461,8 @@
    */
   --ds-space-24: 6rem;
   --ds-space-32: 8rem;
-  --ds-space-48: 12rem;
-  --ds-section-sm: clamp(var(--ds-space-10), 6vw, var(--ds-space-24));
+  --ds-space-48: 12rem; /* used by apps/site as $48 */
   --ds-section-md: clamp(var(--ds-space-12), 9vw, var(--ds-space-32));
-  --ds-section-lg: clamp(var(--ds-space-16), 13vw, var(--ds-space-48));
 
   /*
    * The type scale. Until now this file declared four families and zero steps, so every surface
@@ -500,6 +489,9 @@
    * untouched surfaces shrink with the system instead of keeping 111px headings.
    */
   --ds-text-display: clamp(3rem, 1rem + 7vw, 6.5rem);
+  /* The one viewport-scale line on the site: the front page's opening word (DESIGN.md 9.7).
+     About half the window's width, and held under its height so the lines below it stay in view. */
+  --ds-text-hero: clamp(4rem, min(15vw, 28svh), 16rem);
   --ds-text-headline: clamp(2rem, 1.2rem + 3vw, 3.5rem);
   --ds-text-meta: 0.8125rem;
   --ds-text-numeral: clamp(3rem, 1.5rem + 4.5vw, 5.5rem);
@@ -528,14 +520,10 @@
   --ds-map-ring: 14px;
   --ds-map-keyline: 2px;
 
-  --ds-text-display-numeral: var(--ds-text-numeral);
-  --ds-text-display-title: var(--ds-text-display);
   --ds-tracking-numeral: -0.04em;
   /* Tall enough that the line box holds the digits and a count's comma: a rule or a line set
      under a numeral meets the glyphs' edge, never cuts them. */
   --ds-leading-numeral: 0.92;
-  --ds-text-display-hero: var(--ds-text-display);
-  --ds-text-display-1: var(--ds-text-headline);
   --ds-text-display-2: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
   --ds-text-display-3: clamp(1.5rem, 1.22rem + 1.2vw, 2.125rem);
   --ds-text-title: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
@@ -550,54 +538,15 @@
   /* Tracking tightens as size grows; mono and caption open up so data stays scannable. */
   --ds-tracking-display: -0.03em;
   --ds-tracking-title: -0.016em;
-  --ds-tracking-body: 0;
-  --ds-tracking-caption: 0.01em;
   --ds-tracking-mono: 0.04em;
 
-  --ds-leading-display: 1.04;
   --ds-leading-title: 1.18;
   --ds-leading-body: 1.55;
   --ds-leading-editorial: 1.68;
 
-  /*
-   * The Atlas gutters. Every floating instrument positions from these two and nothing else.
-   *
-   * They exist because five selectors used to compute their own top from
-   * `calc(56px + var(--ds-space-4))` = 72px, while the command bar is 64px tall at an 8px offset
-   * and so ends at 72px too: the intended 16px of air was zero and the instruments sat flush
-   * against the bar. `--ds-atlas-bottom` is the matching floor — the time panel renders 139px
-   * tall, plus its 16px offset and a 12px gap — so a panel's max-height is
-   * `100dvh - top - bottom` rather than a hand-computed subtraction per file.
-   */
-  --ds-atlas-top: 88px;
-  --ds-atlas-bottom: 168px;
-  /*
-   * The right column's own floor. The camera console lives under the results rail, not under the
-   * time panel, and it is taller than the time panel's band: 218px of console plus its 16px
-   * offset and a 12px gap. Without this the rail ran to the shared floor and the console's top
-   * corner sat inside it.
-   *
-   * This is the first-paint default only. The console is not a fixed 218px — the dignity gate's
-   * refusal note adds 68px whenever the selected record is violence-adjacent, and the console is
-   * not always mounted at all. A hand-kept number was wrong in both directions (it still said
-   * 174px after the WCAG 2.5.5 touch-target bump grew the console, and the rail's bottom rows
-   * sat under the console), so `syncCameraConsoleClearance` in CameraConsole.tsx measures the
-   * console and overrides this on the root — the same clearance pattern the command bar uses for
-   * `--ds-island-clearance`.
-   */
-  --ds-atlas-bottom-right: 246px;
-  /* Narrow instrument sheets sit above the dock; visible map above them stays hittable. */
-  /* The dock sits 8px + 28px (attribution) off the bottom and is 54px tall (44px chips + 4px
-     padding + hairlines); sheets and the on-map controls stack 8px above it. The old 66px
-     predated the attribution offset, so every compact sheet slid 16px under the dock. */
-  --ds-atlas-dock-clearance: calc(var(--ds-space-2) * 2 + 28px + 54px);
-  --ds-atlas-sheet-peek: min(42dvh, 22.5rem);
-
   /* Fixed instrument-panel widths (map-experience lens-panel/results-rail/pin-photo-card).
      Named to match the design mock's --rail-w/--results-w; the photo card has no mock
      counterpart so it gets its own token rather than borrowing an unrelated one. */
-  --ds-rail-w: 300px;
-  --ds-results-w: 344px;
   --ds-pin-photo-card-w: 168px;
 
   --ds-radius-sm: 8px;
@@ -613,43 +562,17 @@
   --ds-focus-width: 3px;
   --ds-focus-offset: 2px;
 
-  --ds-icon-sm: 1rem;
   --ds-icon-md: 1.25rem;
-  --ds-icon-lg: 1.5rem;
 
   --ds-duration-fast: 160ms;
   --ds-duration-base: 280ms;
   --ds-duration-slow: 480ms;
-  /* A sheet sliding onto the table. */
-  --ds-duration-sheet: 240ms;
-  --ds-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /*
-   * Easing, which the system had none of. `--ds-easing` above is one curve used for everything,
-   * so a thing arriving and a thing leaving moved identically and nothing felt directional.
-   *
-   * --ds-ease-cinematic is the door journey's curve, lifted verbatim out of the literal in
-   * app/door-home.css so surfaces other than `/` can move the same way. It is long-tailed on the
-   * way in, which is what makes a chapter feel like it settles rather than stops.
-   */
+  /* Things arrive on entrance and leave on exit (docs/ui/brand.md). `--ds-ease-standard` is the
+     admin stylesheets' symmetric curve and goes when they move to the kit. */
   --ds-ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
   --ds-ease-exit: cubic-bezier(0.55, 0, 1, 0.45);
-  --ds-ease-cinematic: cubic-bezier(0.33, 0, 0.2, 1);
   --ds-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Chapter pacing, also from the door journey: how long one beat of a sequenced surface holds
-     before the next is allowed to begin. */
-  --ds-duration-cinematic: 900ms;
-  --ds-duration-chapter: 1200ms;
-  --ds-stagger-beat: 90ms;
-
-  /*
-   * Living-archive motion: each move played once. A line drawing draws itself in (a mask wipe), a
-   * ground slides in (`<Block wipe>`). Content is visible before either runs, and both collapse to
-   * instant under reduced motion (below). No count-up: a number is printed at its value.
-   */
-  --ds-duration-draw: 1600ms;
-  --ds-ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
 
   --ds-grid-max: 72rem;
   --ds-content-max: 38rem;
@@ -669,18 +592,10 @@
    */
 
   /* Band A — local/component stacking (route content, page decoration, panel internals). */
-  --ds-z-decoration: 0; /* shell.css .ds-page-field: decorative motif behind page content */
   --ds-z-map-plate: 0; /* persistent MapLibre plate baseline (map-surfaces.css, entity-page) */
   --ds-z-content: 1; /* route/page content sitting one level above a local plate or decoration */
-  --ds-z-map-scrim: 1; /* Cinematic Map Backdrop legibility scrim over the plate */
-  --ds-z-map-plate-engaged: 1; /* map plate raised to scrim tier while Cinematic is Engaged */
-  --ds-z-restore-dock: 2; /* explore stage's collapsed-panel restore chips */
   --ds-z-memorial-jump: 2; /* memorial edition's sticky jump rail */
-  --ds-z-cinematic-content: 2; /* Cinematic Map Backdrop route-owned content wrapper */
   --ds-z-instrument-panel: 3; /* explore stage's fixed notice/instruments/results panels */
-  --ds-z-cinematic-rail: 3; /* Cinematic Map Backdrop Explore/Close rail controls */
-  --ds-z-spotlight: 4; /* explore stage's native-dialog spotlight */
-  --ds-z-cinematic-rail-engaged: 5; /* cinematic rail pinned above the header while Engaged */
   --ds-z-annotation: 5; /* map-experience annotation overlay */
   --ds-z-decade-dock: 6; /* explore edition's persistent decade scrub dock */
   --ds-z-atlas-modal: 6; /* Atlas spotlight dialog */
@@ -688,14 +603,11 @@
   /* Band B — route-level fixed chrome. */
   --ds-z-atlas-instruments: 20; /* camera console, time panel, lens panel, results rail, Atlas
                                     dock — mode==='atlas' only, mutually exclusive with Story Mode */
-  --ds-z-story-mode: 20; /* full-screen story surface — mode==='story' only */
-  --ds-z-atlas-pill: 21; /* camera readout, deliberately above the instrument band */
   --ds-z-typeahead: 22; /* shell search dropdown; mounted independent of atlas/story mode, must
                             outrank both (e.g. open while Story Mode is running) */
   --ds-z-atlas-search: 30; /* top status notice, deliberately above the readout pill */
 
   /* Band C — shell/portal overlay chrome. */
-  --ds-z-record-sheet: 40;
   --ds-z-pin-photo-card: 45; /* map-experience pin-photo-card.css: above the record sheet so a
                                  hovered pin's photo card is never trapped under it */
   --ds-z-command-bar: 50;
@@ -709,17 +621,9 @@
 }
 
 /*
- * Depth planes (living archive, owner direction 2026-11-15; the owner lifted the old bans on
- * gradients, glow, glass, shadow and grain for this redesign). Four planes, deepest first:
- *
- *   field   the masthead ground (.ds-field), plain: a real sourced photograph leading a page
- *           stands in it as a toned plate (.ds-plate). No lamplight, vignette or grain.
- *   ground  the section band: ink, paper, sand or copper (`data-ground`, `<Block wipe>`)
- *   sheet   reading paper with a real layered shadow; a linked sheet lifts on hover (.ds-sheet)
- *   float   header, map chrome, dialogs: glass with a backdrop blur over the map (.ds-float)
- *
- * Rule: never more than about two screens on one plane before the ground changes.
- * The memorial is exempt from plates and motion; so is a violence-adjacent record.
+ * Depth (docs/ui/DESIGN.md section 7.4): none on the page. A shadow exists only where something
+ * floats over the map or the page (the record panel, a dialog, a menu, a toast), and what floats
+ * is solid: no blur, no see-through ground.
  */
 :root {
   --ds-shadow-sheet:
@@ -732,11 +636,8 @@
     0 1px 2px rgb(10 10 10 / 8%), 0 12px 32px -8px rgb(10 10 10 / 16%),
     0 40px 80px -30px rgb(10 10 10 / 22%);
   --ds-float-edge: rgb(10 10 10 / 10%);
-  --ds-float-alpha: 76%;
   /* A plate tones a real photograph in two inks: the shadows in ink, the lights in warm paper
      (light theme) or copper (dark theme). Never applied to a generated image; there are none. */
-  --ds-plate-lo: #1b130d;
-  --ds-plate-hi: #ecd8bf;
 }
 
 [data-theme='dark'] {
@@ -749,71 +650,6 @@
     0 1px 2px rgb(0 0 0 / 50%), 0 14px 36px -8px rgb(0 0 0 / 50%),
     0 44px 90px -30px rgb(0 0 0 / 70%);
   --ds-float-edge: rgb(244 239 229 / 10%);
-  --ds-float-alpha: 70%;
-  --ds-plate-lo: #0a0a0a;
-  --ds-plate-hi: #d8a178;
-}
-
-/*
- * Era temperature bands.
- *
- * Set `data-era-band` on any element that knows which era it is showing, and the canvas under it
- * drifts. The bands are the archive's own periodisation, and the warmth runs one direction only:
- * the further back, the warmer the paper, because that is what old paper does. The ceiling is 5%,
- * which is a step a reader notices moving between two records and cannot name on one.
- *
- * This is an encoding of data, not a mood. A surface with no era does not get a tint, and a
- * surface must never pick a band to look a certain way.
- */
-
-/* Outside a band the era tokens are the plain surfaces, so a component may reference them
-   unconditionally without checking whether it happens to sit inside an era. Declared before the
-   band rules: `:root` and `[data-era-band]` have equal specificity, so if a band ever lands on
-   <html> the later rule is the one that must win, and that has to be the band. */
-:root {
-  --ds-canvas-era: var(--ds-canvas);
-  --ds-surface-era: var(--ds-surface);
-}
-
-[data-era-band] {
-  /*
-   * Declared on the banded element, not on :root. A custom property is substituted at
-   * computed-value time on the element that declares it, so a --ds-canvas-era defined up on
-   * :root would bake in :root's warmth of 0 and inherit down already resolved. The band has to
-   * own the derivation.
-   */
-  --ds-canvas-era: color-mix(
-    in srgb,
-    var(--ds-era-tint) calc(var(--ds-era-warmth) * 1%),
-    var(--ds-canvas)
-  );
-  --ds-surface-era: color-mix(
-    in srgb,
-    var(--ds-era-tint) calc(var(--ds-era-warmth) * 1%),
-    var(--ds-surface)
-  );
-
-  background-color: var(--ds-canvas-era);
-}
-
-[data-era-band='pre-1865'] {
-  --ds-era-warmth: 5;
-}
-
-[data-era-band='1865-1899'] {
-  --ds-era-warmth: 4;
-}
-
-[data-era-band='1900-1945'] {
-  --ds-era-warmth: 3;
-}
-
-[data-era-band='1946-1975'] {
-  --ds-era-warmth: 2;
-}
-
-[data-era-band='1976-present'] {
-  --ds-era-warmth: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -821,10 +657,5 @@
     --ds-duration-fast: 0.01ms;
     --ds-duration-base: 0.01ms;
     --ds-duration-slow: 0.01ms;
-    --ds-duration-sheet: 0.01ms;
-    --ds-duration-cinematic: 0.01ms;
-    --ds-duration-chapter: 0.01ms;
-    --ds-stagger-beat: 0ms;
-    --ds-duration-draw: 0.01ms;
   }
 }

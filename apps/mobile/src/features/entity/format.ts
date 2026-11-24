@@ -1,4 +1,4 @@
-import { evidenceLabel } from '@repo/public-contracts/evidence';
+import { evidenceLabel } from '@/lib/evidence-words';
 /** Presentation helpers for dates, citations and qualitative evidence labels. */
 import type { ConfidenceLevel, DatePrecision } from './types';
 
@@ -85,7 +85,7 @@ export function formatFetchedAt(epochMs: number): string {
 /** Reader wording for record-maturity tokens; mirrors web's `recordMaturityLabel`
  * (apps/web/src/lib/evidence/confidence-language.ts) so no pipeline state prints raw. */
 const RECORD_MATURITY_COPY: Readonly<Record<string, string>> = {
-  projection_stub: 'Listed, not yet researched',
+  projection_stub: 'Listed, not researched yet',
   partial_enrichment: 'Partly researched',
   full_enrichment: 'Fully researched',
 };

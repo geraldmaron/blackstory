@@ -1,11 +1,4 @@
-/**
- * Utility page wiring, on both sides of the room-kit migration.
- *
- * Rooms move onto `components/room` one at a time, so this file has to describe two states at
- * once. A single table asserting the v6 shell would fail the moment a room converted, which reads
- * as a regression rather than as progress; a single table asserting the kit would stop guarding
- * the rooms that have not moved yet. Move a route between the two lists when you convert it.
- */
+/** Utility page wiring: each of these pages renders through the shared page kit. */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -14,19 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const appDir = dirname(fileURLToPath(import.meta.url));
 
-/**
- * Still on the v6 utility shell. Each one is a room-kit conversion still owed.
- *
- * `/locate` left this list in SP-14: it did not convert to the room kit, it folded into the
- * Atlas Lens's Where group (wide) and a dedicated place sheet (narrow) instead, per
- * `docs/ui/design-direction-v9-surfaces.md`'s `/locate` row. The standalone page and
- * `LocateExperience` are deleted; `/locate` now 308s to `/explore?find=place`
- * (`next-config-redirects.mjs`), and `/locate/api` is unchanged.
- */
-const UTILITY_PAGES: ReadonlyArray<{ readonly route: string; readonly file: string }> = [];
-
-/** Converted to the shared room kit. */
-const ROOM_KIT_PAGES = [
+const PAGE_KIT_PAGES = [
   { route: 'submit', file: 'submit/page.tsx' },
   { route: 'corrections', file: 'corrections/page.tsx' },
   { route: 'support', file: 'support/page.tsx' },
@@ -36,19 +17,19 @@ const ROOM_KIT_PAGES = [
   { route: 'correction-status', file: 'corrections/status/[receiptCode]/page.tsx' },
 ] as const;
 
-for (const page of ROOM_KIT_PAGES) {
-  test(`${page.route} renders through the room kit`, () => {
+for (const page of PAGE_KIT_PAGES) {
+  test(`${page.route} renders through the page kit`, () => {
     const source = readFileSync(join(appDir, page.file), 'utf8');
     // Depth-agnostic: these rooms sit anywhere from the app root (`not-found.tsx`) to four
     // levels down (`corrections/status/[receiptCode]`), so pinning the `../` count would fail
     // a correct conversion for the wrong reason.
-    assert.match(source, /from '(?:\.\.\/)+components\/room(?:'|\/(?:Room)')/);
-    assert.match(source, /<Room/);
+    assert.match(source, /from '(?:\.\.\/)+components\/page(?:'|\/(?:PageFrame)')/);
+    assert.match(source, /<PageFrame/);
     assert.match(source, /<PageHeader/);
     // Trust pages and forms open on a color mast with a paper sheet risen over it, so they take
     // the wide container and the sheet sets the reading measure; the error pages stay read.
     const width = page.route === 'not-found' || page.route === 'error' ? 'read' : 'wide';
-    assert.match(source, new RegExp(`<Room\\s+width="${width}"`));
+    assert.match(source, new RegExp(`<PageFrame\\s+width="${width}"`));
     if (width === 'wide') {
       assert.match(source, /<TrustMast/);
       assert.match(source, /<TrustSheet>/);
@@ -61,46 +42,16 @@ for (const page of ROOM_KIT_PAGES) {
   });
 }
 
-for (const page of UTILITY_PAGES) {
-  test(`${page.route} uses UtilityEditionShell with main landmark`, () => {
-    const source = readFileSync(join(appDir, page.file), 'utf8');
-    assert.match(source, /UtilityEditionShell/);
-    assert.match(source, /UtilityEditionIntro/);
-    assert.doesNotMatch(source, /mosaicSeed/);
-    assert.doesNotMatch(source, /EditionAtmosphereMosaic/);
-    assert.match(source, /editionKey="/);
-    assert.doesNotMatch(source, /ds-page__eyebrow/);
-    assert.doesNotMatch(source, /ds-entity-mast/);
-  });
-}
-
-test('not-found keeps archive recovery CTA', () => {
-  const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8');
-  assert.match(source, /Find in the archive/);
-  // `/history` became a permanent redirect to `/records`; the recovery CTA on the 404 must land
-  // on the real index rather than teaching a lost reader to take an extra hop (SP-15).
-  assert.match(source, /href="\/records"/);
-});
-
-test('not-found offers the four exits the design law names, and no gallery', () => {
-  // Comments stripped: the file's own header explains which exit was removed and why, so a raw
-  // match on `design-system` would fail on the sentence recording that it is gone.
+test('not-found is one sentence and the way back, with no gallery exit', () => {
   const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^[ \t]*\/\/.*$/gm, '');
-  // Recovery goes to the stand the reader left. Atlas is the old board.
-  assert.match(source, /href="\/"/);
-  assert.match(source, /loadWalkBackPlace/);
-  assert.doesNotMatch(source, /The place/);
-  assert.match(source, /href="\/stories"/);
-  assert.match(source, /⌘K/);
-  assert.doesNotMatch(source, /Open the Atlas|ATLAS_INSTRUMENT/);
-  // The `/design-system` exit sent a reader who mistyped a chapter slug to a component gallery.
-  // Its removal is the criterion, so an assertion that it stays removed is the guard.
+  assert.match(source, /<Button href="\/">Back to the front page<\/Button>/);
+  // The second way on is the archive's own search, which a redirect never stands in for.
+  assert.match(source, /href="\/archive"/);
+  // The `/design-system` exit sent a reader who mistyped a story slug to a component gallery.
   assert.doesNotMatch(source, /design-system/);
-  // `/explore` folded into the map in SP-07. A 404 that still names it teaches a route that
-  // 308s, which is the exact failure this page exists to end.
-  assert.doesNotMatch(source, /Explore/);
+  assert.doesNotMatch(source, /ds-utility-exits|BandArt|DisplayNumeral/);
 });
 
 test('not-found seeds the bar search with the path it was reached by', () => {

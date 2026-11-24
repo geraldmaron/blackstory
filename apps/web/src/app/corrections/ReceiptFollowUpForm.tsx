@@ -7,7 +7,7 @@
  * Neither ever exposes moderation-sensitive detail.
  */
 import React, { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
-import { Field, fieldControlProps, fieldErrorId } from '../../components/room';
+import { Field, fieldControlProps, fieldErrorId } from '../../components/forms/fields';
 import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
 import { useFieldErrors, type FieldErrors } from '../../components/forms/use-field-errors';
 import {
@@ -123,7 +123,7 @@ export function ReceiptFollowUpForm({
       if (kind === 'appeal' && (response.status === 403 || response.status === 404)) {
         setState({
           status: 'failed',
-          title: 'This receipt cannot take an appeal right now.',
+          title: 'This receipt can’t take an appeal right now.',
           detail: 'An appeal is open only once a correction is closed, and only once per receipt.',
         });
         return;
@@ -140,7 +140,7 @@ export function ReceiptFollowUpForm({
     } catch {
       setState({
         status: 'failed',
-        title: 'It was not sent.',
+        title: 'It wasn’t sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }
@@ -239,12 +239,12 @@ export function ReceiptFollowUpForm({
           required
         />
         <label htmlFor={ids.privacy}>
-          I have read how this is handled.
+          I’ve read how this is handled.
           <RequiredMark />
           <small>{CORRECTION_PRIVACY_NOTICE.body}</small>
         </label>
         {error('privacyConsent') ? (
-          <p className="ds-room-field__error" id={fieldErrorId(ids.privacy)} role="alert">
+          <p className="ds-doc-field__error" id={fieldErrorId(ids.privacy)} role="alert">
             {error('privacyConsent')}
           </p>
         ) : null}

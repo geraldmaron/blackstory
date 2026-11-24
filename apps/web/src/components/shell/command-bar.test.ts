@@ -12,30 +12,32 @@ import { SHELL_TABS, currentTabFor } from './shell-tabs';
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (file: string) => readFileSync(join(here, file), 'utf8');
 
-test('the tabs are Map, Records, Stories and Collections, in that order, from the registry', () => {
+test('the tabs are Archive, Stories, Data and Memorial, in that order, from the registry', () => {
   assert.deepEqual(
     SHELL_TABS.map((tab) => tab.label),
-    ['Map', 'Records', 'Stories', 'Collections'],
+    ['Archive', 'Stories', 'Data', 'Memorial'],
   );
   assert.deepEqual(
     SHELL_TABS.map((tab) => tab.href),
-    ['/explore', '/records', '/stories', '/collections'],
+    ['/archive', '/stories', '/data', '/memorial'],
   );
   assert.match(read('shell-tabs.ts'), /primaryNavDestinations\(\)/);
 });
 
-test('a record page belongs to Records; a collection belongs to Collections', () => {
-  assert.equal(currentTabFor('/'), '/explore');
-  assert.equal(currentTabFor('/explore'), '/explore');
-  assert.equal(currentTabFor('/records'), '/records');
-  assert.equal(currentTabFor('/entity/abc'), '/records');
-  assert.equal(currentTabFor('/place/abc'), '/records');
-  assert.equal(currentTabFor('/invention/abc'), '/records');
+test('a record and a lens belong to the Archive; a president is a story; Lives is Data', () => {
+  assert.equal(currentTabFor('/'), null);
+  assert.equal(currentTabFor('/archive'), '/archive');
+  assert.equal(currentTabFor('/entity/abc'), '/archive');
+  assert.equal(currentTabFor('/place/abc'), '/archive');
+  assert.equal(currentTabFor('/invention/abc'), '/archive');
+  assert.equal(currentTabFor('/law'), '/archive');
+  assert.equal(currentTabFor('/law/fair-housing-act-1968'), '/archive');
+  assert.equal(currentTabFor('/books/beloved'), '/archive');
   assert.equal(currentTabFor('/stories/the-count'), '/stories');
-  assert.equal(currentTabFor('/law'), '/collections');
-  assert.equal(currentTabFor('/law/fair-housing-act-1968'), '/collections');
-  assert.equal(currentTabFor('/presidents/abraham-lincoln'), '/collections');
-  assert.equal(currentTabFor('/collections'), '/collections');
+  assert.equal(currentTabFor('/presidents/abraham-lincoln'), '/stories');
+  assert.equal(currentTabFor('/data/D-09'), '/data');
+  assert.equal(currentTabFor('/lives/explorer'), '/data');
+  assert.equal(currentTabFor('/memorial'), '/memorial');
   assert.equal(currentTabFor('/methodology'), null);
 });
 
@@ -45,7 +47,7 @@ test('the header and the tab bar read the same tab set', () => {
     assert.match(source, /SHELL_TABS/);
     assert.match(source, /currentTabFor/);
     // A literal axis href is a second registry waiting to drift from the first.
-    assert.doesNotMatch(source, /href="\/(?:explore|records|stories|collections)"/);
+    assert.doesNotMatch(source, /href="\/(?:archive|explore|records|stories|data|memorial)"/);
   }
 });
 

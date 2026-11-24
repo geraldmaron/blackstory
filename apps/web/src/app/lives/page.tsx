@@ -5,7 +5,7 @@ import { LIVES_NATIONAL, LIVES_REGIONS } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { PageHeader } from '@repo/ui';
 import Link from 'next/link';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { TrustMast, TrustSheet } from '../../components/trust';
 import { livesDecadeNumeral } from '../../components/lives/lives-mast';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../lib/lives/lives-source';
@@ -20,7 +20,7 @@ import {
   renumberLivesNarrativeReferences,
 } from '../../lib/lives/lives-narratives';
 import '../../components/story/story.css';
-import '../reading-room.css';
+import '../reading-page.css';
 import './lives.css';
 
 void React;
@@ -50,14 +50,12 @@ export default async function LivesIndexPage({
   const narratives = renumberLivesNarrativeReferences(mapping.byEraId);
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
-          tone="sand"
           numeral={livesDecadeNumeral(bundle)}
-          art={['tools', 'grain']}
           tools={
             // The page reads the nation; each region's own tables live in the appendix. Without
             // this row the only way there was a link at the foot of a very long page.
@@ -66,7 +64,7 @@ export default async function LivesIndexPage({
               {LIVES_REGIONS.map((region) => (
                 <Link
                   key={region.slug}
-                  className="ds-room-chip"
+                  className="ds-doc-chip"
                   href={`${LIVES_EXPLORER_PATH}?area=${region.slug}`}
                   title={region.summary}
                 >
@@ -94,6 +92,6 @@ export default async function LivesIndexPage({
         />
         <LivesMilestoneExperience bundle={bundle} milestone={milestone} narratives={narratives} />
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

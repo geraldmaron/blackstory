@@ -20,6 +20,7 @@ import {
   space,
   useScreenScrollInsets,
 } from '@/ui';
+import { ARCHIVE_LIST_HREF } from '@/shell/mobile-nav';
 import { FeaturedStoryCard } from './FeaturedStoryCard';
 import { StoryCompactRow } from './StoryCompactRow';
 import { listedOnStories, pickFeaturedStory, storyHref } from './story-index';
@@ -154,7 +155,7 @@ export function StoriesHomeScreen() {
               summary="The whole archive as a list, searchable by era, kind and place"
               leading={<NavIcon name="records" size={20} />}
               showChevron
-              onPress={() => router.push('/records' as never)}
+              onPress={() => router.push(ARCHIVE_LIST_HREF)}
               showDivider={false}
             />
           </View>

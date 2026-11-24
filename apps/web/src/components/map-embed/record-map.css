@@ -2,8 +2,8 @@
  * The one embedded map (RecordMap.tsx): the /explore plate holding one record
  * (docs/ui/patterns-place-map.md, "Embeds"). A framed canvas on the plate's own ground, the
  * record's place as a token on the plate, then the place in words and the hand-off to the full
- * map. The frame is a plate with an `--ds-float-edge` keyline; the place token on it is glass on
- * the float plane (the `.ds-float` recipe, copied below); the attribution is the shared chip.
+ * map. The frame is a plate with an `--ds-float-edge` keyline; the place token on it is a solid
+ * chip with the float shadow; the attribution is the shared chip.
  */
 
 .ds-record-map {
@@ -20,7 +20,7 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: var(--ds-radius-md);
+  border-radius: 0;
   box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-float-edge);
   /* The plate's own land, so the frame reads as the map before the first tile paints. */
   background: var(--ds-map-land);
@@ -33,7 +33,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity var(--ds-duration-base) var(--ds-easing);
+  transition: opacity var(--ds-duration-base) var(--ds-ease-entrance);
 }
 
 .ds-record-map__frame[data-status='ready'] .ds-record-map__canvas {
@@ -59,7 +59,7 @@
   padding: var(--ds-space-4);
   text-align: center;
   pointer-events: none;
-  transition: opacity var(--ds-duration-base) var(--ds-easing);
+  transition: opacity var(--ds-duration-base) var(--ds-ease-entrance);
 }
 
 .ds-record-map__ground-name {
@@ -84,7 +84,7 @@
   opacity: 0;
   visibility: hidden;
   transition:
-    opacity var(--ds-duration-base) var(--ds-easing),
+    opacity var(--ds-duration-base) var(--ds-ease-entrance),
     visibility 0s linear var(--ds-duration-base);
 }
 
@@ -109,10 +109,10 @@
   }
 }
 
-/* A phone does not hold an empty 16:10 box open while the tiles load: the frame is a short plate
-   carrying the place in words until the canvas paints, then opens to the map. Without scripting
-   it stays that plate, which is the whole answer there. */
-@media (max-width: 47.9375rem) {
+/* Without scripting a phone gets a short plate carrying the place in words, which is the whole
+   answer there. With scripting the frame holds its 16:10 from the start, so nothing under it (or,
+   where the map leads a record, the record's name) moves when the canvas paints. */
+@media (max-width: 47.9375rem) and (scripting: none) {
   .ds-record-map__frame[data-ground]:not([data-status='ready']) {
     aspect-ratio: auto;
     min-height: 5.5rem;
@@ -132,8 +132,8 @@
 }
 
 /* The record's place as the plate prints a place: a register entry, a copper numeral and the name
-   in mono capitals (the same `--ds-map-count-*` and `--ds-map-name-*` tokens), on glass of the
-   table's own ground (the explore column's float recipe, data-ground="ink"). Visually 28px tall;
+   in mono capitals (the same `--ds-map-count-*` and `--ds-map-name-*` tokens), on a solid chip of
+   the table's own ground (data-ground="ink"). Visually 28px tall;
    the 44px hit area is the pseudo-element. */
 .ds-record-map__token {
   position: absolute;
@@ -146,29 +146,13 @@
   max-width: calc(100% - var(--ds-space-3) * 2 - 44px);
   min-height: 28px;
   padding: var(--ds-space-1) var(--ds-space-3);
-  border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-canvas) var(--ds-float-alpha), transparent);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
   box-shadow:
     inset 0 0 0 var(--ds-border-width) var(--ds-float-edge),
     var(--ds-shadow-float);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
   color: var(--ds-ink);
   text-decoration: none;
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .ds-record-map__token {
-    background: var(--ds-canvas);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .ds-record-map__token {
-    background: var(--ds-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .ds-record-map__token::after {
@@ -185,7 +169,7 @@
   font-variant-numeric: tabular-nums;
   font-weight: var(--ds-weight-numeral);
   line-height: 1;
-  transition: color var(--ds-duration-fast) var(--ds-easing);
+  transition: color var(--ds-duration-fast) var(--ds-ease-entrance);
 }
 
 .ds-record-map__name {
@@ -215,6 +199,12 @@
 .ds-record-map__token:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: var(--ds-focus-offset);
+}
+
+/* Inside an exhibit the frame is the object: square, its edge the exhibit's crop marks. */
+.ds-exhibit .ds-record-map__frame[data-ground] {
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* The record's name beside its pin wraps inside the half of the frame the pin leaves. */
@@ -260,6 +250,11 @@
 }
 
 /* The attribution is the shared chip (shell.css, `:is(.ds-map-stage, .ds-record-map)`). */
+
+/* A still frame (a harm-adjacent record) arrives as a cut, like reduced motion. */
+.ds-record-map__frame[data-still] :is(.ds-record-map__canvas, .ds-record-map__ground) {
+  transition: none;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .ds-record-map__canvas,

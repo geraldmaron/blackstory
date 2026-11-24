@@ -27,10 +27,10 @@ describe('SiteFooter', () => {
     assert.match(html, /class="ds-shell-footer__column-title">Collections</);
     assert.match(html, /class="ds-shell-footer__column-title">How it decides</);
     assert.match(html, /class="ds-shell-footer__column-title">Add to it</);
-    assert.match(html, /href="\/explore"/);
+    assert.match(html, /href="\/archive"/);
+    assert.match(html, /href="\/archive\?view=map"/);
     assert.match(html, /href="\/stories"/);
-    assert.match(html, /href="\/records"/);
-    assert.match(html, /href="\/collections"/);
+    assert.doesNotMatch(html, /href="\/(?:explore|records|collections)"/);
     assert.match(html, /href="\/presidents"/);
     assert.match(html, new RegExp(`© \\d{4} ${PRODUCT_NAME}<`));
     assert.match(html, /aria-label="Policies"/);

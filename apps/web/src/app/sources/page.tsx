@@ -7,11 +7,11 @@ import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../components/room';
+import { parentCrumb, PageFrame } from '../../components/page';
 import { TrustMast, TrustSheet } from '../../components/trust';
 import { loadSourceLibrary } from './load-source-library';
 import { SourcesSections, sourcesDek } from './SourcesSections';
-import '../reading-room.css';
+import '../reading-page.css';
 import '../../components/trust/trust.css';
 import './sources.css';
 
@@ -29,13 +29,11 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default async function SourcesPage() {
   const library = await loadSourceLibrary();
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
-          art={['mapline']}
-          tone="sand"
           numeral={
             library === undefined
               ? undefined
@@ -59,6 +57,6 @@ export default async function SourcesPage() {
       <TrustSheet>
         <SourcesSections library={library} />
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

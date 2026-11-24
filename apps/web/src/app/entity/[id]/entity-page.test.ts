@@ -78,10 +78,7 @@ test('every record family renders the one record page, not a copy', () => {
   assert.match(pageSource, /EntityRecordPage\(\{ entity, arrival:/);
   for (const route of ['../../invention/[slug]/page.tsx', '../../place/[slug]/page.tsx']) {
     const source = readFileSync(join(here, route), 'utf8');
-    assert.match(
-      source,
-      /EntityRecordPage\(\{ entity: \w+, arrival:|EntityRecordPage\(\{ entity, arrival:/,
-    );
+    assert.match(source, /EntityRecordPage\(\{\s*entity(: \w+)?,\s*arrival:/);
     assert.match(source, /familyForKind/);
   }
 });

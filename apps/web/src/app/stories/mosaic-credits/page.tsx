@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Notice, PageHeader, Pagination } from '@repo/ui';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
-import { ATMOSPHERE_TILE_CREDITS } from '../../../components/atmosphere';
+import { ATMOSPHERE_TILE_CREDITS } from './tile-credits';
 import { getPublicSearchIndex } from '../../../lib/public-data/source';
-import { parentCrumb, Prose, Room } from '../../../components/room';
+import { parentCrumb, Prose, PageFrame } from '../../../components/page';
 import { TrustMast, TrustSheet } from '../../../components/trust';
 import {
   MOSAIC_CREDITS_PAGE_SIZE,
@@ -40,12 +40,11 @@ export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
   const records = new Map(read.data.map((record) => [record.id, record]));
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
         <TrustMast
-          tone="sand"
           numeral={{ value: String(ATMOSPHERE_TILE_CREDITS.length), label: 'tiles in the mosaic' }}
         >
           <PageHeader
@@ -78,11 +77,11 @@ export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
               <li className="ds-mosaic-credit" key={tile.index}>
                 <span className="ds-mosaic-credit__index">{row.index}</span>
                 {/* Local derivatives are the actual decorative assets, not the current record image. */}
-                <span className="ds-plate ds-plate--upper ds-mosaic-credit__plate">
-                  <span className="ds-plate__tone">
+                <span className="ds-mosaic-credit__thumb">
+                  <span className="ds-thumb ds-thumb--upper">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      className="ds-plate__img"
+                      className="ds-thumb__img"
                       src={row.tilePath}
                       width={96}
                       height={96}
@@ -111,6 +110,6 @@ export default async function MosaicCreditsPage({ searchParams }: Props = {}) {
           hrefForPage={mosaicCreditsHref}
         />
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

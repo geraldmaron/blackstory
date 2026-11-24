@@ -6,9 +6,8 @@
  * hatched and labeled "Not published"; so is a skipped year inside an annual run. Series are named
  * at the right edge, level with their latest value.
  */
-import React, { type ReactNode } from 'react';
+import React from 'react';
 import type { DataPageGroupedBarSeries } from '@repo/domain/statistics/data-page-series';
-import { DataChartFrame } from './DataChartFrame';
 import {
   Band,
   Dot,
@@ -20,16 +19,15 @@ import {
   valueScale,
   type AxisTick,
 } from './chart-kit';
-import { chapterHrefForTheme, formatDataPageValue } from './chart-utils';
-import { axisValue, seriesSubtitle, seriesTone } from './series-format';
+import { formatDataPageValue } from './chart-utils';
+import { axisValue, seriesTone } from './series-format';
 
 void React;
 
 export type TrendLineChartProps = {
   readonly series: DataPageGroupedBarSeries;
-  readonly reading?: ReactNode;
-  readonly span?: 'wide' | 'half';
-  readonly id?: string;
+  /** `md` is the shorter plot. */
+  readonly size?: 'md' | 'lg';
 };
 
 /** Year positions when every period is a plain year, else evenly spaced indexes. */
@@ -66,7 +64,7 @@ export function skippedYears(
   return out;
 }
 
-export function TrendLineChart({ series, reading, span, id }: TrendLineChartProps) {
+export function TrendLineChart({ series, size = 'lg' }: TrendLineChartProps) {
   if (series.points.length === 0 || series.series.length === 0) return null;
 
   const periods = series.points.map((point) => point.period);
@@ -80,7 +78,6 @@ export function TrendLineChart({ series, reading, span, id }: TrendLineChartProp
     axisValue(value, series.unit),
   );
   const y = (value: number) => (value / top) * 100;
-  const chapterHref = chapterHrefForTheme(series.themeId);
 
   // Hit bands reach halfway to each neighbor.
   const edges = x.map((value, index) => {
@@ -122,150 +119,110 @@ export function TrendLineChart({ series, reading, span, id }: TrendLineChartProp
   const last = series.points.at(-1)!;
 
   return (
-    <DataChartFrame
-      title={seriesSubtitle(series)}
-      {...(reading !== undefined ? { reading } : {})}
-      {...(span !== undefined ? { span } : {})}
-      {...(id !== undefined ? { id } : {})}
-      {...(chapterHref ? { chapterHref } : {})}
-      caption={series.caption}
-      sources={series.sources}
-      textAlternative={
-        <table className="ds-data-chart__table">
-          <caption>{series.title}</caption>
-          <thead>
-            <tr>
-              <th scope="col">Period</th>
-              {series.series.map((def) => (
-                <th scope="col" key={def.id}>
-                  {def.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {series.points.map((point) => (
-              <tr key={point.period}>
-                <th scope="row">{point.period}</th>
-                {series.series.map((def) => {
-                  const value = point.values[def.id];
-                  return (
-                    <td key={def.id}>
-                      {value === undefined ? 'N/A' : formatDataPageValue(value, series.unit)}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      }
+    <Plot
+      label={series.title}
+      unit={series.yAxisLabel}
+      size={size}
+      yWidth="3rem"
+      endWidth={series.series.length > 1 ? 'min(9rem, 28cqi)' : '3.5rem'}
+      yTicks={ticks}
+      xTicks={xTicks}
     >
-      <Plot
-        label={series.title}
-        unit={series.yAxisLabel}
-        size={span === 'half' ? 'md' : 'lg'}
-        yWidth="3rem"
-        endWidth={series.series.length > 1 ? 'min(9rem, 28cqi)' : '3.5rem'}
-        yTicks={ticks}
-        xTicks={xTicks}
-      >
-        {gaps.map((gap) => (
-          <Band
-            key={`${gap.from}-${gap.to}`}
-            from={gap.from}
-            to={gap.to}
-            kind="gap"
-            label="Not published"
-          />
-        ))}
-        <Lines
-          series={series.series.map((def) => ({
-            id: def.id,
-            tone: seriesTone(series, def.id),
-            points: series.points.flatMap((point, index) => {
-              const value = point.values[def.id];
-              const here = value === undefined ? null : { x: x[index]!, y: y(value) };
-              const skipped =
-                years && index > 0 && skippedYears(years).some((gap) => gap.before === index);
-              return skipped ? [null, here] : [here];
-            }),
-          }))}
+      {gaps.map((gap) => (
+        <Band
+          key={`${gap.from}-${gap.to}`}
+          from={gap.from}
+          to={gap.to}
+          kind="gap"
+          label="Not published"
         />
-        {series.points.map((point, index) => {
-          const present = series.series.filter((def) => point.values[def.id] !== undefined);
-          const highest = Math.max(0, ...present.map((def) => point.values[def.id]!));
-          return (
-            <Mark
-              key={point.period}
-              x={edges[index]!.center}
-              width={edges[index]!.width}
-              first={index === 0}
-              crosshair
-              tipY={y(highest)}
-              ariaLabel={`${point.period}: ${
-                present.length === 0
-                  ? 'not published'
-                  : present
-                      .map(
-                        (def) =>
-                          `${def.label} ${formatDataPageValue(point.values[def.id]!, series.unit)}`,
-                      )
-                      .join(', ')
-              }`}
-              tip={
-                <Tip
-                  title={point.period}
-                  rows={series.series.map((def) => {
-                    const value = point.values[def.id];
-                    return {
-                      value:
-                        value === undefined
-                          ? 'Not published'
-                          : formatDataPageValue(value, series.unit),
-                      label: def.label,
-                      tone: seriesTone(series, def.id),
-                    };
-                  })}
-                />
-              }
-            >
-              {(index === 0 || x[index]! - x[index - 1]! >= 2.5) &&
-              (index === x.length - 1 || x[index + 1]! - x[index]! >= 2.5)
-                ? present.map((def) => (
-                    <Dot
-                      key={def.id}
-                      x={
-                        ((x[index]! - (edges[index]!.center - edges[index]!.width / 2)) /
-                          edges[index]!.width) *
-                        100
-                      }
-                      y={y(point.values[def.id]!)}
-                      tone={seriesTone(series, def.id)}
-                      size="sm"
-                    />
-                  ))
-                : null}
-            </Mark>
-          );
-        })}
-        <EndLabels
-          items={series.series.flatMap((def) => {
-            const value = last.values[def.id];
-            return value === undefined
-              ? []
-              : [
-                  {
-                    id: def.id,
-                    y: y(value),
-                    name: series.series.length > 1 ? def.label : '',
-                    value: formatDataPageValue(value, series.unit),
+      ))}
+      <Lines
+        series={series.series.map((def) => ({
+          id: def.id,
+          tone: seriesTone(series, def.id),
+          points: series.points.flatMap((point, index) => {
+            const value = point.values[def.id];
+            const here = value === undefined ? null : { x: x[index]!, y: y(value) };
+            const skipped =
+              years && index > 0 && skippedYears(years).some((gap) => gap.before === index);
+            return skipped ? [null, here] : [here];
+          }),
+        }))}
+      />
+      {series.points.map((point, index) => {
+        const present = series.series.filter((def) => point.values[def.id] !== undefined);
+        const highest = Math.max(0, ...present.map((def) => point.values[def.id]!));
+        return (
+          <Mark
+            key={point.period}
+            x={edges[index]!.center}
+            width={edges[index]!.width}
+            first={index === 0}
+            crosshair
+            tipY={y(highest)}
+            ariaLabel={`${point.period}: ${
+              present.length === 0
+                ? 'not published'
+                : present
+                    .map(
+                      (def) =>
+                        `${def.label} ${formatDataPageValue(point.values[def.id]!, series.unit)}`,
+                    )
+                    .join(', ')
+            }`}
+            tip={
+              <Tip
+                title={point.period}
+                rows={series.series.map((def) => {
+                  const value = point.values[def.id];
+                  return {
+                    value:
+                      value === undefined
+                        ? 'Not published'
+                        : formatDataPageValue(value, series.unit),
+                    label: def.label,
                     tone: seriesTone(series, def.id),
-                  },
-                ];
-          })}
-        />
-      </Plot>
-    </DataChartFrame>
+                  };
+                })}
+              />
+            }
+          >
+            {(index === 0 || x[index]! - x[index - 1]! >= 2.5) &&
+            (index === x.length - 1 || x[index + 1]! - x[index]! >= 2.5)
+              ? present.map((def) => (
+                  <Dot
+                    key={def.id}
+                    x={
+                      ((x[index]! - (edges[index]!.center - edges[index]!.width / 2)) /
+                        edges[index]!.width) *
+                      100
+                    }
+                    y={y(point.values[def.id]!)}
+                    tone={seriesTone(series, def.id)}
+                    size="sm"
+                  />
+                ))
+              : null}
+          </Mark>
+        );
+      })}
+      <EndLabels
+        items={series.series.flatMap((def) => {
+          const value = last.values[def.id];
+          return value === undefined
+            ? []
+            : [
+                {
+                  id: def.id,
+                  y: y(value),
+                  name: series.series.length > 1 ? def.label : '',
+                  value: formatDataPageValue(value, series.unit),
+                  tone: seriesTone(series, def.id),
+                },
+              ];
+        })}
+      />
+    </Plot>
   );
 }

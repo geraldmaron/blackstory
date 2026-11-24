@@ -27,7 +27,11 @@ import { visitContactClaimsForMap } from '../geography/public-visit-contact';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { resolveEntityEraBuckets } from './entity-era-facts';
 import { countClaimSources } from './evidence-grade';
-import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
+import {
+  geoPrecisionTierForPublicPrecision,
+  mapPrecisionFor,
+  resolveDisplayRadiusMeters,
+} from './geo-precision';
 import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
 import { staysOffPublicMap, atlasWalkHref } from '../place/public-place-path';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
@@ -294,7 +298,12 @@ function enrichFeature(
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
       oneLineStory: sanitizePublicProseText(entity.summary),
-      precision: feature.properties.precision,
+      // A law is drawn at its jurisdiction, never as a site dot (geo-precision.ts).
+      precision: mapPrecisionFor({
+        kind: String(entity.kind),
+        locationPrecision: feature.properties.precision,
+        jurisdictionLabel: entity.jurisdictionLabel,
+      }),
       geoPrecisionTier: tier,
       ...(radius.ok ? { radiusMeters: radius.radiusMeters } : {}),
       eraBuckets,

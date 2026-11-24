@@ -29,7 +29,7 @@ import {
 } from './discovery-state';
 import { normalizeQueryString } from '../runtime-hardening/query-normalization';
 import { recordsQueryFromExplore } from './explore-collection';
-import { mapListContinuityLabel } from './continuity-label';
+import { membershipSentence } from './continuity-label';
 
 const bag = (href: string) =>
   Object.fromEntries(new URL(href, 'https://example.test').searchParams);
@@ -124,8 +124,12 @@ for (const sort of ['discovery', 'era', 'name', 'evidence']) {
       assert.equal(lens.collectionState.filters.kind, 'school');
       assert.equal(lens.collectionState.filters.era, '1920s');
       assert.equal(
-        mapListContinuityLabel(lens.collectionMatched, lens.filtered.length),
-        '2 records match. 1 appear on the map.',
+        membershipSentence({
+          view: 'map',
+          matched: lens.collectionMatched,
+          mapped: lens.filtered.length,
+        }),
+        '1 of 2 records has a point on the map. The other 1 has no public point and is in the list only.',
       );
       assert.deepEqual(
         buildRecordsIndex(entities, recordsQueryFromExplore(lens.collectionState)).rows.map(

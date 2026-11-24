@@ -1,4 +1,4 @@
-import { act, render } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { Text } from '../Text';
 import { themeColors, typeScale } from '../tokens';
 import { resetTestWindowSize, setTestWindowSize } from '../layout/testing';
@@ -19,7 +19,7 @@ describe('Text', () => {
   });
 
   it('exposes a "header" accessibilityRole for heading variants (display/title/subtitle)', async () => {
-    const { getByRole } = await render(<Text variant="title">A Title</Text>);
+    const { getByRole } = await render(<Text variant="headline">A Title</Text>);
     expect(getByRole('header')).toBeTruthy();
   });
 
@@ -41,55 +41,23 @@ describe('Text', () => {
   });
 });
 
-describe('Text — Dynamic Type keeps the line box around the letters', () => {
+describe('Text: Dynamic Type', () => {
   afterEach(resetTestWindowSize);
 
-  it('scales lineHeight by the same multiplier the OS applies to fontSize', async () => {
+  it('writes lineHeight unscaled, because React Native scales it with the font', async () => {
+    // Scaling it here as well squared the multiplier: about 7.9x at the largest size.
     setTestWindowSize({ width: 402, height: 874, fontScale: 3.1 });
-    const { getByText } = await render(<Text variant="body">Body copy</Text>);
-
-    // React Native grows `fontSize` on its own and leaves a numeric `lineHeight` alone, so a
-    // 16pt body at the largest accessibility size renders ~50pt tall inside a 24pt line box and
-    // is cropped to the tops of its own letters. The ratio is what has to survive.
-    expect(styleOf(getByText('Body copy')).lineHeight).toBeCloseTo(
-      typeScale.body.lineHeight * 3.1,
-      5,
-    );
-  });
-
-  it('leaves the ratio alone at the default text size', async () => {
-    setTestWindowSize({ width: 402, height: 874, fontScale: 1 });
     const { getByText } = await render(<Text variant="body">Body copy</Text>);
     expect(styleOf(getByText('Body copy')).lineHeight).toBe(typeScale.body.lineHeight);
   });
 
-  it('honors maxFontSizeMultiplier, so a capped size gets a capped line box', async () => {
-    setTestWindowSize({ width: 402, height: 874, fontScale: 3.1 });
+  it('never turns font scaling off, and passes a cap through', async () => {
     const { getByText } = await render(
       <Text variant="body" maxFontSizeMultiplier={1.4}>
         Capped copy
       </Text>,
     );
-    // Without this the line box would keep growing past text that had stopped, opening a gap
-    // the caller capped the size specifically to avoid.
-    expect(styleOf(getByText('Capped copy')).lineHeight).toBeCloseTo(
-      typeScale.body.lineHeight * 1.4,
-      5,
-    );
-  });
-
-  it('follows a text-size change made while the screen is already mounted', async () => {
-    setTestWindowSize({ width: 402, height: 874, fontScale: 1 });
-    const { getByText } = await render(<Text variant="body">Body copy</Text>);
-    expect(styleOf(getByText('Body copy')).lineHeight).toBe(typeScale.body.lineHeight);
-
-    await act(async () => setTestWindowSize({ width: 402, height: 874, fontScale: 2 }));
-
-    // A one-shot PixelRatio read would leave every mounted screen with the old line boxes
-    // until it remounted.
-    expect(styleOf(getByText('Body copy')).lineHeight).toBeCloseTo(
-      typeScale.body.lineHeight * 2,
-      5,
-    );
+    expect(getByText('Capped copy').props.allowFontScaling).toBe(true);
+    expect(getByText('Capped copy').props.maxFontSizeMultiplier).toBe(1.4);
   });
 });

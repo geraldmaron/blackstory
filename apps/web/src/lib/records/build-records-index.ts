@@ -66,8 +66,11 @@ import {
   chronologyOrder,
   type ChronologyPage,
 } from '../discovery/collection-chronology';
+import { exploreHrefFromRecordsQuery } from '../discovery/explore-collection';
+import { nearestQuery } from './nearest-query';
 import {
   decadeLabel,
+  documentedDecades,
   periodIsActive,
   periodIsInvalid,
   periodLabel,
@@ -94,6 +97,10 @@ function recordsArrivalQuery(query: RecordsQuery): string {
   params.set('from', 'list');
   if (query.q.length > 0) params.set('q', query.q);
   if (query.sort !== 'discovery') params.set('sort', query.sort);
+  // The shuffle rides along so Return and previous/next follow the order the reader saw.
+  if (query.seed.length > 0 && query.sort === 'discovery' && query.q.length === 0) {
+    params.set('seed', query.seed);
+  }
   if (query.kind.length > 0) params.set('kind', query.kind);
   if (query.era.length > 0) params.set('era', query.era);
   if (query.state.length > 0) params.set('state', query.state);
@@ -218,6 +225,10 @@ export type RecordsIndex = {
   readonly atlasHref: string;
   /** Matched records the current map plate draws; Explore's count must equal it. */
   readonly mappableMatched: number;
+  /** Matched records with no documented decade: the timeline's Undated band. */
+  readonly undatedMatched: number;
+  /** Records every other filter keeps that a decade range leaves out for having no decade. */
+  readonly undatedExcluded: number;
   /** The resolved named collection (`none` when the whole archive is the collection). */
   readonly collection: CollectionDescriptor;
   /** Set when the collection or period cannot be shown; never a silently widened list. */
@@ -231,6 +242,11 @@ export type RecordsIndex = {
   readonly decadeJumps: readonly RecordsDecadeJump[];
   /** Present for `layout=chronology`: the page's rows grouped by documented decade. */
   readonly chronology: ChronologyPage<RecordsRow> | undefined;
+  /**
+   * A search that matched nothing, respelled with the nearest words the records hold, when that
+   * spelling does match under the same filters (`nearest-query.ts`). An offer, never applied.
+   */
+  readonly didYouMean?: { readonly q: string; readonly count: number; readonly href: string };
 };
 
 function humanize(value: string): string {
@@ -430,7 +446,8 @@ function toFacts(
       )
     : `/entity/${entry.id}`;
   const href =
-    drawnHrefs === undefined ? guessed : (drawnHrefs.get(entry.id) ?? `/entity/${entry.id}`);
+    // `||`: a plate cached before `instrumentRecordHref` stopped returning '' still holds blanks.
+    drawnHrefs === undefined ? guessed : drawnHrefs.get(entry.id) || `/entity/${entry.id}`;
 
   return {
     row: {
@@ -536,6 +553,26 @@ function labelFor(key: RecordsFilterKey, value: string, stateNames: Map<string, 
   }
 }
 
+/** The nearest spelling that does match, for a search that matched nothing. */
+function respelled(
+  facts: readonly RecordFacts[],
+  matched: number,
+  query: RecordsQuery,
+  members: ReadonlySet<string> | undefined,
+): RecordsIndex['didYouMean'] {
+  if (matched > 0 || query.q.length === 0) return undefined;
+  const q = nearestQuery(
+    query.q,
+    facts.map((record) => record.haystack),
+  );
+  if (q === null) return undefined;
+  const respelledQuery = { ...query, q, page: 1 };
+  const count = facts.filter((record) =>
+    matchesExcept(record, respelledQuery, 'none', members),
+  ).length;
+  return count > 0 ? { q, count, href: recordsHref(respelledQuery) } : undefined;
+}
+
 /**
  * Builds everything `/records` renders for one request.
  *
@@ -600,6 +637,7 @@ export function buildRecordsIndex(
   const matched = facts
     .filter((record) => matchesExcept(record, query, 'none', members))
     .sort(recordsComparator(query));
+  const didYouMean = respelled(facts, matched.length, query, members);
   const mappableMatched = matched.filter((record) =>
     drawableIds === undefined ? record.mappable : drawableIds.has(record.row.id),
   ).length;
@@ -782,6 +820,7 @@ export function buildRecordsIndex(
   return {
     query: { ...query, page },
     rows,
+    ...(didYouMean === undefined ? {} : { didYouMean }),
     totalMatched: matched.length,
     totalAll: facts.length,
     page,
@@ -792,16 +831,27 @@ export function buildRecordsIndex(
       singular: 'record',
       plural: 'records',
     }),
-    // The shuffle seed is per visit, never part of what the page is.
-    canonicalPath: recordsHref({ ...query, page, seed: '' }),
+    // The shuffle seed is per visit and a map selection is one reader's way back; neither is
+    // part of what the page is.
+    canonicalPath: recordsHref({ ...query, page, seed: '', selected: '', place: '' }),
     indexable: recordsQueryIndexable(query),
     previousHref: page > 1 ? recordsHref({ ...query, page: page - 1 }) : undefined,
     nextHref: page < pageCount ? recordsHref({ ...query, page: page + 1 }) : undefined,
     facets,
     constraints,
-    clearAllHref: '/records',
+    clearAllHref: recordsHref({}),
     atlasHref: buildAtlasHref(query),
     mappableMatched,
+    undatedMatched: matched.filter((record) => documentedDecades(record.eraBuckets).length === 0)
+      .length,
+    undatedExcluded:
+      periodIsActive(period) && !period.includeUndated && !periodIsInvalid(period)
+        ? facts.filter(
+            (record) =>
+              documentedDecades(record.eraBuckets).length === 0 &&
+              matchesExcept(record, query, 'period', members),
+          ).length
+        : 0,
     collection,
     notice,
     indexHref: recordsHref({
@@ -898,23 +948,7 @@ export function findRecordsNeighbors(
  * `evidence` becomes `floor` (and-up grade predicate; not exact-match `confidence`).
  */
 export function buildAtlasHref(query: RecordsQuery): string {
-  const params = new URLSearchParams();
-  if (query.q) params.set('q', query.q);
-  if (query.sort !== 'discovery') params.set('sort', query.sort);
-  if (query.kind.length > 0) params.set('kind', query.kind);
-  if (query.era.length > 0) params.set('era', query.era);
-  if (query.state.length > 0) params.set('state', query.state);
-  if (query.topic.length > 0) params.set('theme', query.topic);
-  if (query.status.length > 0) params.set('status', query.status);
-  if (query.evidence.length > 0) params.set('floor', query.evidence);
-  if (query.collection.length > 0) params.set('collection', query.collection);
-  if (query.periodStart.length > 0) params.set('periodStart', query.periodStart);
-  if (query.periodEnd.length > 0) params.set('periodEnd', query.periodEnd);
-  if (query.includeUndated) params.set('includeUndated', '1');
-  // Return context only: Explore ignores it for matching and hands it back with the reader.
-  if (query.layout === 'chronology') params.set('layout', 'chronology');
-  const search = params.toString();
-  return search.length > 0 ? `/explore?${search}` : '/explore';
+  return exploreHrefFromRecordsQuery(query);
 }
 
 /** Exported for the drift test: the postal codes this index can actually filter on. */

@@ -1,7 +1,7 @@
 /**
  * The Framed posture's two decisions, as pure functions.
  *
- * Design law: `docs/ui/design-direction-v9-surfaces.md` §3.
+ * Design law: `docs/ui/archive/design-direction-v9-surfaces.md` §3.
  *
  * `plate-posture.ts` answers what posture a SURFACE rests in. This module answers the question one
  * level down, the one that changes on every scroll frame: given that resting posture and whatever

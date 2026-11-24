@@ -3,7 +3,7 @@
  * warehouse feeds. Honest modeling status without claiming completeness.
  */
 import { StyleSheet, View } from 'react-native';
-import { Text, space, useThemeColors } from '@/ui';
+import { Text, space, useThemeColors, radius } from '@/ui';
 
 export type CoveragePulseItem = {
   readonly id: string;
@@ -49,7 +49,7 @@ export function CoveragePulse({ items }: CoveragePulseProps) {
             <Text variant="caption" colorRole="ink" style={styles.label} numberOfLines={1}>
               {item.label}
             </Text>
-            <Text variant="sectionLabel" colorRole="inkMuted" style={styles.status}>
+            <Text variant="meta" colorRole="inkMuted" style={styles.status}>
               {STATUS_LABEL[item.status]}
             </Text>
           </View>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space['1'],
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: space['1'],
+    borderRadius: radius.full,
     paddingHorizontal: space['2'],
     paddingVertical: space['2'],
     minHeight: 36,
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   dot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: radius.full,
   },
   label: {
     maxWidth: 96,

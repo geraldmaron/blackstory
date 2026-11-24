@@ -18,12 +18,12 @@ export function CorrectionsSections(props: CorrectionFormProps) {
           steps={[
             'A person reads it against the published sources, usually within ten working days.',
             'If it holds up, the record changes and the change is listed in Errata, with the earlier wording still readable.',
-            'If it is declined, you get the reason, and one appeal.',
+            'If it’s declined, you get the reason, and one appeal.',
           ]}
         >
           <p>
-            Save your receipt code. It is the only way to look up the outcome, and coordinated
-            volume never changes a grade or what publishes.
+            Save your receipt code. It’s the only way to look up the outcome. A flood of matching
+            reports never changes a grade or what gets published.
           </p>
           <p>
             Already have a code? <Link href="/corrections/status">Check a receipt</Link>.

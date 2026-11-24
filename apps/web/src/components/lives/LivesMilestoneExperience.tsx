@@ -29,7 +29,7 @@ import { livesTurnFor } from '../../lib/lives/lives-turns';
 import { describeLivesCell, livesBarScaleNote, livesBarShare } from '../../lib/lives/lives-format';
 import { DisclosureCaret } from './DisclosureCaret';
 import { LIVES_ARCHIVE_READINGS } from '../../lib/lives/lives-archive';
-import { ArchiveFigure } from '../room';
+import { ArchiveFigure } from '../page';
 import { LivesEraScrubber, type ScrubberEra } from './LivesEraScrubber';
 import { LivesRuleCard } from './LivesRuleCard';
 

@@ -2,28 +2,6 @@
  * Base document styles, visible focus rings, and reduced-motion safeguards for BlackStory UI.
  */
 
-/*
- * Theme-invariant ink-surface constants (brand pack v3). tokens.css's
- * --ds-ink/--ds-canvas/etc. pairs intentionally flip with [data-theme] so
- * ordinary page chrome matches the reader's light/dark preference. Ink bands
- * (`.ds-band`) stay brand-fixed regardless of that preference. The map plate,
- * header, footer, and hero chrome follow [data-theme] with ordinary
- * --ds-ink/--ds-canvas pairs. These six custom properties give remaining
- * fixed surfaces something to reference that is never re-pointed by
- * [data-theme='dark'], so consuming CSS never needs an ad-hoc hex literal.
- * Values are copied 1:1 from the landed v3 palette (tokens.css dark theme /
- * brand-palette.ts) — nothing new is introduced, only a theme-stable name
- * for values that already exist.
- */
-:root {
-  --ds-fixed-ink: #0a0a0a;
-  --ds-fixed-charcoal: #161616;
-  --ds-fixed-paper: #f4efe5;
-  --ds-fixed-stone: #bdb5a9;
-  --ds-fixed-rule: #34302c;
-  --ds-fixed-accent: #d07a32;
-}
-
 *,
 *:before,
 *:after {
@@ -52,7 +30,7 @@ body {
      role — index rows, table cells, buttons, form fields, empty states, anything a component had
      not named — rendered as longform serif. That is why the app read as dated regardless of the
      modern stack in tokens.css: the modern faces were loaded and almost nothing used them.
-     The serif is now what it was always described as, a register you opt into: `.ds-room-prose`,
+     The serif is now what it was always described as, a register you opt into: `.ds-doc-prose`,
      the lede and the editorial titles ask for it by name. */
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-body);

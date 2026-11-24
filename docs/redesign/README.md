@@ -1,6 +1,6 @@
 # GROUND: a ground-up reconception of the BlackStory experience
 
-**Status:** proposal + working prototype. No production behavior is changed by this directory.
+**Status:** history (2026-11-23). Superseded by [`docs/ui/DESIGN.md`](../ui/DESIGN.md); kept as the record of the GROUND proposal. Originally: proposal + working prototype. No production behavior is changed by this directory.
 **Date:** 2026-10-31 · **Branch:** `redesign/ux-audit-2026-10`
 **Prototype:** [`prototype/index.html`](prototype/index.html) — see [how to open it](#how-to-open-the-prototype)
 
@@ -229,7 +229,7 @@ the navigation.
 
 BlackStory already has binding design law. This proposal is an **amendment to it**, not a
 greenfield invention. The relevant rules are in `docs/ui/PROTECTED-EXPERIENCES.md` (P-01…P-06),
-`docs/ui/brand.md`, `docs/ui/story.md` and `docs/ui/design-direction-v10.md`.
+`docs/ui/brand.md`, `docs/ui/story.md` and `docs/ui/archive/design-direction-v10.md`.
 
 ### Where GROUND implements existing law in code
 

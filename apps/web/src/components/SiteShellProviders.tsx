@@ -21,11 +21,12 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { syncThemeColorMeta } from '@repo/ui';
-import { MapMomentStage } from './room/MapMoment';
+import { MapMomentStage } from './map-stage/MapMoment';
 import { MapStageProvider } from './map-stage/MapStage';
 import { OfflineNotice } from './OfflineNotice';
 import { SiteShellFooter } from './SiteShellFooter';
 import { SiteShellHeader } from './SiteShellHeader';
+import { WorldControls } from './shell/WorldControls';
 
 export type SiteShellProvidersProps = {
   readonly children: ReactNode;
@@ -39,6 +40,8 @@ export function SiteShellProviders({ children }: SiteShellProvidersProps) {
       <MapStageProvider>
         <div className="ds-shell">
           <SiteShellHeader />
+          {/* Straight after the bar: the switches that stop motion come before the content that moves. */}
+          <WorldControls />
           <OfflineNotice />
           <div className="ds-shell-body">{children}</div>
           <SiteShellFooter />

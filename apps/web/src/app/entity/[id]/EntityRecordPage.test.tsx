@@ -16,7 +16,8 @@ import {
 } from '../../../data/public-seed';
 import { placeDiscoveryReturn } from '../../../lib/discovery/discovery-state';
 import { precisionInWords } from '../../../lib/map-experience/geo-precision';
-import { EntityRecordView, typedConnections } from './EntityRecordPage';
+import { EvidenceList } from '../../../components/evidence/EvidenceList';
+import { EntityRecordView, mapPrecisionFor, typedConnections } from './EntityRecordPage';
 
 void React;
 
@@ -191,4 +192,113 @@ test('registry topics become pills linking to the records list; a quiet record s
     sensitivity: { kind: 'violence' } as never,
   });
   assert.doesNotMatch(quiet, /aria-label="Topics"/);
+});
+
+/* Phase 3b (docs/ui/DESIGN.md sections 7.3 and 9.1). */
+
+test('a law is drawn at its jurisdiction, never as an exact site', () => {
+  const law = (jurisdictionLabel: string, locationPrecision: string) =>
+    mapPrecisionFor({
+      kind: 'law',
+      jurisdictionLabel,
+      locationPrecision,
+    } as unknown as PublicEntityView);
+  // A state's law stored at its capitol building is the state.
+  assert.equal(law('Jackson, Mississippi', 'institution'), 'state');
+  assert.equal(law('Oregon', 'institution'), 'state');
+  // A federal law stored at the Capitol is no sharper than Washington.
+  assert.equal(law('Washington, District of Columbia', 'institution'), 'city');
+  assert.equal(law('Washington, District of Columbia', 'city'), 'city');
+  // Every other kind keeps its stored precision.
+  const church = seed('ent_15th_st_church_001');
+  assert.equal(mapPrecisionFor(church), church.locationPrecision);
+});
+
+test('each claim is a numbered statement with its own receipt at a persistent address', () => {
+  const church = seed('ent_15th_st_church_001');
+  const html = render(church, { point: POINT });
+  const shown = church.claims.filter((claim) => html.includes(`id="${claim.id}"`));
+  assert.ok(shown.length > 0, 'claims are addressed by their stored ids');
+  assert.doesNotMatch(html, /id="source-\d+"/);
+  assert.equal(html.match(/class="ds-receipt ds-evidence__receipt"/g)?.length, shown.length);
+  // The grade is a glyph and words, never a letter.
+  assert.match(
+    html,
+    /ds-receipt__grade"><a href="\/methodology#evidence-grades"[^>]*><span class="ds-grade-tag/,
+  );
+  // The map is an exhibit on ink with its own address; without a photograph it leads.
+  assert.match(html, new RegExp(`<figure id="${church.id}-(photograph|map)"`));
+  assert.match(html, /data-kind="map"[^>]*>.*?data-ground="ink" data-ground-fixed=""/s);
+});
+
+test('the page offers one Cite control for its canonical URL and none on a claim', () => {
+  const church = seed('ent_15th_st_church_001');
+  const html = render(church, { point: POINT, canonicalPath: '/place/fifteenth-street-church' });
+  assert.equal(html.match(/<details class="ds-cite/g)?.length, 1);
+  assert.match(html, /\/place\/fifteenth-street-church/);
+  for (const style of ['MLA', 'APA', 'Chicago']) assert.ok(html.includes(`Copy ${style}`));
+});
+
+test('a quiet record gets quiet exhibits and a still map', () => {
+  const church = seed('ent_15th_st_church_001');
+  const html = render(
+    { ...church, sensitivity: { level: 'sensitive' } as never, primaryImage: undefined } as never,
+    { point: POINT },
+  );
+  assert.match(html, /class="ds-exhibit ds-exhibit--quiet" data-kind="map"/);
+  assert.match(html, /data-still=""/);
+  assert.doesNotMatch(html, /Use two fingers/);
+});
+
+test('a disputed value prints both values, each with the source it came from', () => {
+  const html = renderToStaticMarkup(
+    <EvidenceList
+      items={[
+        {
+          id: 'claim_x_01',
+          statement: 'Founded: 1841',
+          source: { title: 'Church history', href: 'https://example.org/a' },
+          level: 'medium',
+          dispute: {
+            hasDispute: true,
+            primaryValue: '1841',
+            alternates: [
+              {
+                value: '1843',
+                credible: true,
+                kind: 'contradicting',
+                source: 'County deed book',
+                sourceHref: 'https://example.org/b',
+              },
+              { value: '1850', credible: false, kind: 'alternative' },
+            ],
+          },
+        },
+      ]}
+    />,
+  );
+  assert.match(
+    html,
+    /1841<\/span><div class="ds-receipt[^"]*"><span class="ds-receipt__source"><a href="https:\/\/example.org\/a"/,
+  );
+  assert.match(
+    html,
+    /1843<\/span><div class="ds-receipt[^"]*"><span class="ds-receipt__source"><a href="https:\/\/example.org\/b"[^>]*>County deed book/,
+  );
+  // A value with no source on file says so; it never borrows the first value's receipt.
+  assert.match(
+    html,
+    /1850 \(not independently credible\)<\/span><div class="ds-receipt[^"]*"><span class="ds-receipt__source">Source not on file/,
+  );
+});
+
+test('a record titled a massacre is quiet even when its topics do not say so', () => {
+  const church = seed('ent_15th_st_church_001');
+  const titled = {
+    ...church,
+    displayName: 'Wilmington massacre and coup of 1898',
+    topicIds: ['great-migration'],
+    topicTags: ['great-migration'],
+  } as PublicEntityView;
+  assert.match(render(titled, { point: POINT }), /<main[^>]*data-quiet=""/);
 });

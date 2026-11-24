@@ -104,17 +104,17 @@ Serve from `apps/web/public/brand/` (masters in root `brand/`).
 ## UI Design Patterns
 
 **Index:** [`docs/ui/README.md`](docs/ui/README.md) — living pattern catalog and adoption checklists.  
-**Component registry:** [`docs/ui/patterns-registry.md`](docs/ui/patterns-registry.md) — reusable modules under `apps/web/src/components/patterns/`.
+**Components:** the kit's index (`packages/ui/src/components/index.ts`), drawn at `/design-system` (staff), which is generated from it; the page kit is `apps/web/src/components/page`.
 
 ### Binding docs (read before UI edits)
 
 | Doc | Scope |
 |---|---|
 | [`docs/ui/PROTECTED-EXPERIENCES.md`](docs/ui/PROTECTED-EXPERIENCES.md) | Memorial + evidence/precision/dignity/public/brand laws |
-| [`docs/ui/design-direction-v10.md`](docs/ui/design-direction-v10.md) | Product thesis, visual models, surface law, authority order |
+| [`docs/ui/DESIGN.md`](docs/ui/DESIGN.md) | The one design system: grounds, type, exhibit frame, components, anchor pages, gates, phases. Earlier directions are history in `docs/ui/archive/` |
 | [`docs/ui/brand.md`](docs/ui/brand.md) | Palette, type, mark, copper discipline |
 | [`docs/ui/v10/`](docs/ui/v10/) | Inventory, DiscoveryState, Place anatomy, research, cost, reconciliation |
-| [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` tab bar, More menu, shell chrome (until v10 mobile packet) |
+| [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` ledger rows, browse and utility shells (superseded in part by `DESIGN.md` phase 9; the doc's header says which parts) |
 | [`docs/ui/patterns-*.md`](docs/ui/) | Reusable site patterns (map encoding, record anatomy, …) |
 | [`docs/ui/story.md`](docs/ui/story.md) | Voice, microcopy, narrative arc |
 
@@ -133,7 +133,7 @@ Kit implementation: `@repo/ui` (`packages/ui`). Where a pattern doc and the kit 
 7. **Map dignity:** no alarm hues for violence-adjacent records; confidence never color-alone; points never sharper than stored precision.
 8. **File naming:** lowercase-kebab for new docs, CSS, and components.
 
-When adding a reusable control, prefer `apps/web/src/components/patterns/` + a pattern doc + a row in `patterns-registry.md`. Surface-specific layout stays in route folders (`app/`, `components/home/`, etc.) but must cite its binding direction doc.
+When adding a reusable control, prefer the kit (`packages/ui`) with a fixture in `apps/web/src/app/design-system/Gallery.tsx`, or `apps/web/src/components/patterns/` with a pattern doc. Surface-specific layout stays in route folders (`app/`, `components/home/`, etc.) but must cite its binding direction doc.
 
 ## Session completion and branching
 

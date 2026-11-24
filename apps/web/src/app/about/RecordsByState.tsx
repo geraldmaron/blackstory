@@ -147,7 +147,7 @@ export function RecordsByState({
           {totalRecords > located
             ? `${n(totalRecords - located)} are not tied to one state and are not drawn. `
             : ''}
-          <Link href="/records">Browse them by state</Link>.
+          <Link href="/archive">Browse them by state</Link>.
         </p>
       </div>
     </figure>

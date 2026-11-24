@@ -10,17 +10,9 @@
  * search contract entirely (`packages/public-contracts/src/v1/search.ts`).
  */
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { evidenceMeterLabel, type ConfidenceTier } from '@repo/public-contracts/evidence';
-import {
-  Button,
-  LedgerRow,
-  NavIcon,
-  navIconForEntityKind,
-  RecordMeter,
-  space,
-  useThemeColors,
-} from '@/ui';
+import { type ConfidenceTier } from '@repo/public-contracts/evidence';
+import { evidenceMeterLabel } from '@/lib/evidence-words';
+import { Button, LedgerRow, NavIcon, navIconForEntityKind, EvidenceGrade, space } from '@/ui';
 import { recordEraLabel, recordKindLabel, recordStatusLabel } from '../record-facts/record-facts';
 import type { SearchResultV1 } from './search-contracts';
 
@@ -88,7 +80,6 @@ export function SearchResultCard({
   onShowOnMap,
   position,
 }: SearchResultCardProps) {
-  const theme = useThemeColors();
   const body = summary?.trim() || explanation;
   const kindLabel = recordKindLabel(kind);
   const eraLabel = recordEraLabel({ eraBuckets: eraBuckets ?? [] });
@@ -115,23 +106,16 @@ export function SearchResultCard({
         summary={body}
         leading={<NavIcon name={navIconForEntityKind(kind)} size={18} />}
         onPress={onPress ? () => onPress(id) : undefined}
-        trailing={
-          confidenceTier !== undefined ? (
-            <View style={styles.trailing}>
-              {/* The letter beside the bars is the non-color cue: color is never the only one. */}
-              <RecordMeter tier={confidenceTier} decorative testID="search-result-evidence-meter" />
-              {onPress ? (
-                <Ionicons
-                  name="chevron-forward"
-                  size={18}
-                  color={theme.inkMuted}
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                />
-              ) : null}
-            </View>
-          ) : undefined
-        }
+        {...(confidenceTier !== undefined
+          ? {
+              // The grade as its glyph and its words, on a line of its own so neither is cut.
+              secondaryAction: (
+                <View testID="search-result-evidence-meter">
+                  <EvidenceGrade tier={confidenceTier} />
+                </View>
+              ),
+            }
+          : {})}
         showChevron={Boolean(onPress)}
         accessibilityLabel={`${displayName}. ${accessibilitySlug}. ${body}${evidenceSentence}${positionSentence}`}
         showDivider
@@ -152,11 +136,6 @@ export function SearchResultCard({
 }
 
 const styles = StyleSheet.create({
-  trailing: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: space['2'],
-  },
   secondary: {
     alignItems: 'flex-start',
     paddingLeft: 28 + space['2'] + space['3'],

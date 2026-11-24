@@ -11,7 +11,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { MAP_MIN_ZOOM } from '../../lib/map-experience/camera-presets';
-import { runFlyPreset } from './camera';
+import { fitBoundsCamera, runFlyPreset } from './camera';
 
 type Call = Record<string, unknown>;
 
@@ -31,6 +31,9 @@ function fakeMap(fitZoom = 3.35) {
         calls.push({ kind: 'setMinZoom', options: { value } });
       },
       cameraForBounds: () => ({ center: { lng: -96.5, lat: 38.6 }, zoom: fitZoom }),
+      getZoom: () => fitZoom,
+      getCenter: () => ({ lng: -96.5, lat: 38.6 }),
+      getContainer: () => ({ clientWidth: 1000 }),
     },
   };
 }
@@ -101,4 +104,68 @@ test('a fit may sink the zoom floor to what the frame needs, and only that far',
     plain.calls.some((call) => call.kind === 'setMinZoom'),
     false,
   );
+});
+
+test('a bounds fit is computed with no padding held on the camera, and the held padding is put back', () => {
+  // The defect: a center-and-zoom flight leaves its padding on the camera, MapLibre adds the
+  // fit's own padding to it, and the country is fitted into what is left of the screen twice over.
+  const held = { top: 84, bottom: 32, left: 585, right: 152 };
+  let onCamera = { ...held };
+  const seenAtFit: (typeof held)[] = [];
+  const { calls, map } = fakeMap();
+  const withPadding = {
+    ...map,
+    transform: {
+      get padding() {
+        return onCamera;
+      },
+      setPadding: (next: typeof held) => {
+        onCamera = { ...next };
+      },
+    },
+    cameraForBounds: () => {
+      seenAtFit.push({ ...onCamera });
+      return { center: { lng: -96.5, lat: 38.6 }, zoom: 3.35 };
+    },
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  runFlyPreset(withPadding as any, 'national', { bounds: CONUS }, { mode: 'ease', padding: held });
+  assert.deepEqual(seenAtFit, [{ top: 0, bottom: 0, left: 0, right: 0 }]);
+  assert.deepEqual(onCamera, held);
+  // The fit lands with no padding on the camera: its padding is already in the center and zoom.
+  assert.deepEqual(calls.at(-1)?.options.padding, { top: 0, bottom: 0, left: 0, right: 0 });
+});
+
+test('a fit MapLibre cannot make is no fit, and the held padding is put back', () => {
+  const held = { top: 10, bottom: 20, left: 30, right: 40 };
+  let onCamera = { ...held };
+  const transform = {
+    get padding() {
+      return onCamera;
+    },
+    setPadding: (next: typeof held) => {
+      onCamera = { ...next };
+    },
+  };
+  // MapLibre 5.24's globe helper throws when the paddings leave no canvas.
+  const throws = {
+    transform,
+    cameraForBounds: () => {
+      throw new TypeError("Cannot read properties of undefined (reading 'center')");
+    },
+  };
+  const error = console.error;
+  console.error = () => {};
+  try {
+    assert.equal(fitBoundsCamera(throws, CONUS, 48), undefined);
+  } finally {
+    console.error = error;
+  }
+  assert.deepEqual(onCamera, held);
+  // A map with no size yet fits to a non-finite zoom.
+  assert.equal(fitBoundsCamera({ cameraForBounds: () => ({ zoom: NaN }) }, CONUS, 48), undefined);
+  assert.deepEqual(fitBoundsCamera({ cameraForBounds: () => ({ zoom: 4 }) }, CONUS, undefined), {
+    center: undefined,
+    zoom: 4,
+  });
 });

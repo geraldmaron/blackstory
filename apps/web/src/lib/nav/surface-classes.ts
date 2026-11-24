@@ -1,7 +1,7 @@
 /**
  * The surface class registry: which of the four rendered classes a public route belongs to.
  *
- * Design law: `docs/ui/patterns-surface-classes.md` and `design-direction-v9-surfaces.md` §2.
+ * Design law: `docs/ui/archive/patterns-surface-classes.md` and `design-direction-v9-surfaces.md` §2.
  * Every public rendered route belongs to exactly one class, and the class is the single switch
  * that shell layout, plate posture, keyboard scope and the footer decision all read. Before this
  * module those decisions were made by roughly 25 `:has()` selectors keyed on marker classes a
@@ -17,17 +17,14 @@
  * Endpoints (redirects, JSON, feeds, crawler files) have no class. They render no chrome, so
  * `surfaceClassFor` returns `null` and nothing is emitted.
  *
- * `/` is the door journey. `/explore` is the same door already in browse posture (deep link /
- * share). A place is `/place/{slug}`.
+ * `/` is the front page. A place is `/place/{slug}`.
  */
 /**
  * The five rendered surface classes. Endpoints are represented by `null`.
  *
- * `door` is `/` and `/explore`: reading-room chrome (bar, scroll, footer decision) over the shared
- * map plate. On `/` the plate rests ambient under scroll chapters; browse (morph or cold
- * `/explore`) flips Live gestures via `setDoorBrowseLive` without a second shell. `instrument`
- * remains in the type union for plate-posture and legacy CSS, but no public route emits it —
- * Explore is a Door posture, not a peer cockpit.
+ * `door` is the front page (`/`): the map plate under the scroll scenes,
+ * painted and never steered by hand. `instrument` remains in the type union for plate-posture
+ * and legacy CSS, but no public route emits it.
  */
 export type SurfaceClass = 'door' | 'instrument' | 'reading' | 'record' | 'utility';
 
@@ -36,16 +33,17 @@ export type SurfaceClass = 'door' | 'instrument' | 'reading' | 'record' | 'utili
  * (`/stories/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
-  // Front door + browse deep link: one map product, two URLs. Story is a mode of browse, not a path.
+  // The front page: the retelling over the map plate, then the contents on paper.
   ['/', 'door'],
-  ['/explore', 'door'],
 
-  // Reading room — one scrolling, measure-limited column on paper.
-  // `/collections` is the hub the collections hang off: it renders rows, not records, but it is
-  // the same measure-limited column on paper, so it is a Reading room and not a fifth class.
-  ['/collections', 'reading'],
-  ['/presidents', 'reading'],
+  // Reading: one scrolling column on paper. The Archive is one too in every view; its map view
+  // hands the plate to the reader itself (`app/archive/ArchiveMap.tsx`).
+  ['/archive', 'reading'],
+  // The Archive's 4a addresses. Their pages stay so that switching the phase 4b redirects off
+  // brings them back (`lib/redirects/archive-redirects.mjs`); see `UNLISTED_PATHS`.
+  ['/explore', 'reading'],
   ['/records', 'reading'],
+  ['/presidents', 'reading'],
   ['/stories', 'reading'],
   ['/books', 'reading'],
   ['/law', 'reading'],
@@ -86,6 +84,7 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // URLs that return 404.
   ['/stories/', 'reading'],
   ['/presidents/', 'reading'],
+  ['/data/', 'reading'],
   ['/lives/', 'reading'],
   ['/place/', 'record'],
   ['/invention/', 'record'],
@@ -101,6 +100,7 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
  */
 export const ENDPOINT_ROUTES: readonly string[] = [
   '/facts',
+  '/collections',
   '/search',
   '/map',
   '/history',
@@ -168,5 +168,10 @@ export function surfaceClassFor(pathname: string, _search?: string): SurfaceClas
   return 'utility';
 }
 
-/** Every path with an explicit class, for the coverage test and the registry sweep. */
-export const CLASSIFIED_PATHS: readonly string[] = [...SURFACE_CLASS_BY_PATH.keys()];
+/** Classified so they render with chrome, but in no menu, footer, palette or sitemap. */
+const UNLISTED_PATHS = new Set(['/explore', '/records']);
+
+/** Every listed path with an explicit class, for the coverage test and the registry sweep. */
+export const CLASSIFIED_PATHS: readonly string[] = [...SURFACE_CLASS_BY_PATH.keys()].filter(
+  (path) => !UNLISTED_PATHS.has(path),
+);

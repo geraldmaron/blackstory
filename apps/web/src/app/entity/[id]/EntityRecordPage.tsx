@@ -8,13 +8,15 @@
  * What the page states is bounded by what the record carries:
  *  - connections are the record's own typed relationships, each with its relation in words;
  *    proximity and collection membership never become a link here (P-02);
- *  - the map frames the stored precision, and "Open in maps" appears only for a visitable site
- *    at site precision (P-03); no line claims an object still stands;
+ *  - the map exhibit frames the stored precision, a law is drawn at its jurisdiction and never as
+ *    a site, and "Open in maps" appears only for a visitable site at site precision (P-03); no
+ *    line claims an object still stands;
+ *  - a quiet record's exhibits are the quiet variant and its map is a still frame (P-04);
  *  - grade, kind, era and status each appear once; release ids and pipeline tokens never print.
  */
 import React from 'react';
 import Link from 'next/link';
-import { Timeline } from '@repo/ui';
+import { ExhibitFrame, Receipt, Timeline } from '@repo/ui';
 import { containsInternalId, stripInternalIds } from '@repo/public-contracts/narrative-text';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleHalfStroke, faLandmark, faLocationDot } from '@fortawesome/free-solid-svg-icons';
@@ -37,7 +39,6 @@ import {
 } from '../../../components/entity/EntitySensitivityNote';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { RecordImage } from '../../../components/entity/RecordImage';
-import { isRenderedImage } from '../../../components/entity/rendered-image';
 import {
   RECORD_GAP_COPY,
   SINGLE_SOURCE_COPY,
@@ -45,8 +46,10 @@ import {
   type RecordGapKind,
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
+import { RecordFigures } from '../../../components/data/figures/RecordFigures';
 import { RecordMap } from '../../../components/map-embed/RecordMap';
 import {
+  loadRecordCounty,
   loadRecordPlace,
   mapHrefInPlace,
   type RecordPlace,
@@ -63,12 +66,15 @@ import { buildExploreMapSource } from '../../../lib/map-experience/build-explore
 import { ERA_NOT_DOCUMENTED_LABEL } from '../../../lib/map-experience/entity-era-facts';
 import { findUsStateFromJurisdictionLabel } from '@repo/domain/map/geography';
 import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
-import { precisionInWords } from '../../../lib/map-experience/geo-precision';
+import { mapPrecisionFor, precisionInWords } from '../../../lib/map-experience/geo-precision';
+
+export { mapPrecisionFor };
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { kindIconFor } from '../../../lib/map-experience/kind-icons';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
 import { shouldShowVisitBlock } from '../../../lib/geography/visit-handoff';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
+import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
 import {
   discoveryHasNarrowing,
   EMPTY_DISCOVERY_STATE,
@@ -102,9 +108,9 @@ void React;
 type StoryCitation = ReturnType<typeof storiesCiting>[number];
 
 /**
- * The rail map is a 300px thumbnail: at the site zoom (14) a swamp or a field is an empty tile, so
- * it stops at 12, where the nearest town and water show. The mark stays a site dot, so precision is
- * not overstated; "Open on the map" still frames the record at its full precision zoom.
+ * The map exhibit is a side-column frame: at the site zoom (14) a swamp or a field is an empty
+ * tile, so it stops at 12, where the nearest town and water show. The mark stays a site dot, so
+ * precision is not overstated; "Open on the map" still frames the record at its full precision.
  */
 const RAIL_MAP_MAX_ZOOM = 12;
 type Point = { readonly lat: number; readonly lng: number };
@@ -212,6 +218,10 @@ export type EntityRecordViewProps = {
   readonly returns?: PlaceDiscoveryReturn;
   readonly citing?: readonly StoryCitation[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
+  /** The page's own address without arrival query, for the citation. Defaults to `/entity/{id}`. */
+  readonly canonicalPath?: string;
+  /** Figures whose data covers the record's county or state (`RecordFigures`), the last beat. */
+  readonly figures?: React.ReactNode;
 };
 
 export function EntityRecordView({
@@ -222,6 +232,8 @@ export function EntityRecordView({
   returns,
   citing = [],
   crossReferences = [],
+  canonicalPath,
+  figures,
 }: EntityRecordViewProps) {
   const tone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
   const anatomy = buildEntityAnatomyInputs(entity, tone);
@@ -230,21 +242,9 @@ export function EntityRecordView({
   const status = metaStatus(entity);
   /* A sensitivity flag's note already carries the sensitive-content disclaimer; never print it twice. */
   const trauma = entity.sensitivity ? undefined : traumaContentDisclaimerFor(entity);
-  /* Violence-adjacent and sensitive records stand on a quiet ground: no plate. */
+  /* Violence-adjacent and sensitive records get quiet exhibits and a still map. */
   const quiet = isQuietRecord(entity);
-  /* The record's own photograph leads the masthead as a plate; a quiet record keeps it plain in
-     the rail. Never a stand-in image. */
-  const plate =
-    !quiet && entity.primaryImage && !isRenderedImage(entity.primaryImage) ? (
-      <RecordImage
-        entityId={entity.id}
-        entityName={entity.displayName}
-        image={entity.primaryImage}
-        plate
-        width={704}
-        {...(String(entity.kind) === 'person' ? { className: 'ds-plate--upper' } : {})}
-      />
-    ) : undefined;
+  const mapPrecision = mapPrecisionFor(entity);
 
   /* The place glyph belongs to the place; a place-kind record's kind word takes a landmark. */
   const kindIcon = kindIconFor(entity.kind, tone);
@@ -273,7 +273,9 @@ export function EntityRecordView({
   const evidence: EvidenceItem[] = cards.map((card, index) => {
     const claim = shownClaims[index]!;
     return {
-      id: `source-${index + 1}`,
+      /* The claim's stored id is its address: it names the record and does not move when the
+         list is reordered. */
+      id: claim.id,
       statement: statementFor(card.predicate, card.object),
       source: {
         ...(publisherOf(claim) ? { publisher: publisherOf(claim) } : {}),
@@ -304,7 +306,7 @@ export function EntityRecordView({
     {
       label: 'Where' as const,
       value: whereValue,
-      detail: point ? precisionInWords(entity.locationPrecision) : 'No public map location',
+      detail: point ? precisionInWords(mapPrecision) : 'No public map location',
     },
     {
       label: 'When' as const,
@@ -353,12 +355,13 @@ export function EntityRecordView({
     },
   ];
 
-  /* The rail: the map at its stored precision, and the photograph plain when it is not a plate. */
+  /* The exhibits: the photograph leads; without one the map does (no record carries a source
+     document image yet, which would stand between them). */
   const visitInput = {
     displayName: entity.displayName,
     locationLabel: entity.locationLabel,
     jurisdictionLabel: entity.jurisdictionLabel,
-    locationPrecision: entity.locationPrecision,
+    locationPrecision: mapPrecision,
     kind: entity.kind,
     ...(entity.visit !== undefined ? { visit: entity.visit } : {}),
     ...(point ? point : {}),
@@ -368,34 +371,41 @@ export function EntityRecordView({
       ? buildExternalMapsSearchUrl({ ...point, query: anatomy.whereLabel })
       : undefined;
   const statePostalCode = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)?.postalCode;
-  const recordMap = point ? (
-    <RecordMap
-      lat={point.lat}
-      lng={point.lng}
-      label={String(entity.kind) === 'person' ? (place ?? whereValue) : entity.displayName}
-      precision={entity.locationPrecision}
-      {...(statePostalCode ? { statePostalCode } : {})}
-      maxZoom={RAIL_MAP_MAX_ZOOM}
-      {...(recordPlace ? { place: recordPlace } : {})}
-      caption={false}
+  const photograph = entity.primaryImage ? (
+    <RecordImage
+      entityId={entity.id}
+      entityName={entity.displayName}
+      image={entity.primaryImage}
+      quiet={quiet}
+      width={400}
     />
-  ) : null;
-  /* With a plate, the map moves into the masthead and the photograph becomes its ground. */
-  const plateMap = plate ? recordMap : null;
-  const media =
-    (entity.primaryImage && !plate) || (point && !plateMap) ? (
-      <>
-        {entity.primaryImage && !plate ? (
-          <RecordImage
-            entityId={entity.id}
-            entityName={entity.displayName}
-            image={entity.primaryImage}
-            width={300}
-          />
-        ) : null}
-        {plateMap ? null : recordMap}
-      </>
-    ) : undefined;
+  ) : undefined;
+  const mapExhibit = point ? (
+    <ExhibitFrame
+      id={`${entity.id}-map`}
+      kind="map"
+      ground="ink"
+      basis={precisionInWords(mapPrecision)}
+      variant={quiet ? 'quiet' : 'full'}
+      receipt={<Receipt source={whereValue} detail="Place as the record states it" />}
+    >
+      <RecordMap
+        lat={point.lat}
+        lng={point.lng}
+        label={String(entity.kind) === 'person' ? (place ?? whereValue) : entity.displayName}
+        precision={mapPrecision}
+        {...(statePostalCode ? { statePostalCode } : {})}
+        maxZoom={RAIL_MAP_MAX_ZOOM}
+        /* A law drawn at its jurisdiction is not counted in the town it was passed in. */
+        {...(recordPlace && mapPrecision === entity.locationPrecision
+          ? { place: recordPlace }
+          : {})}
+        caption={false}
+        still={quiet}
+      />
+    </ExhibitFrame>
+  ) : undefined;
+  const lead = photograph ?? mapExhibit;
 
   /* The way back: the list or map the reader came from, or the register. */
   const fromList = arrival.view === 'list' && returns !== undefined;
@@ -530,8 +540,6 @@ export function EntityRecordView({
       crumb={crumb}
       title={entity.displayName}
       quiet={quiet}
-      {...(plate ? { plate } : {})}
-      {...(plateMap ? { plateMap } : {})}
       meta={meta}
       {...(topicTags.length > 0 ? { tags: topicTags } : {})}
       ledeText={entity.summary}
@@ -552,7 +560,8 @@ export function EntityRecordView({
         ) : undefined
       }
       facts={facts}
-      media={media}
+      {...(lead ? { lead } : {})}
+      {...(photograph && mapExhibit ? { map: mapExhibit } : {})}
       actions={{
         ...(point && returns
           ? {
@@ -565,6 +574,13 @@ export function EntityRecordView({
           : {}),
         ...(externalMapsHref ? { externalMapsHref } : {}),
         correctionHref: `/corrections?target=${encodeURIComponent(entity.id)}`,
+        cite: {
+          title: entity.displayName,
+          url: absolutePublicUrl(canonicalPath ?? `/entity/${entity.id}`),
+          ...(entity.revision.recordUpdatedAt
+            ? { published: entity.revision.recordUpdatedAt }
+            : {}),
+        },
       }}
       {...(evidence.length > 0 ? { sourcesAnchor: 'sources' } : {})}
       file={file}
@@ -588,6 +604,13 @@ export function EntityRecordView({
           }
         : {})}
     >
+      {/* The claims lead the reading, beside the exhibits (DESIGN.md section 9.1). */}
+      {evidence.length > 0 ? (
+        <RecordBeat id="sources" title="What the sources say">
+          <EvidenceList items={evidence} />
+        </RecordBeat>
+      ) : null}
+
       {history.length > 0 ? (
         <RecordBeat id="history" title="History">
           <RecordProse>{history.map((text, index) => prose(text, `h-${index}`))}</RecordProse>
@@ -597,12 +620,6 @@ export function EntityRecordView({
       {impact.length > 0 ? (
         <RecordBeat id="impact" title="What it changed">
           <RecordProse>{impact.map((text, index) => prose(text, `i-${index}`))}</RecordProse>
-        </RecordBeat>
-      ) : null}
-
-      {evidence.length > 0 ? (
-        <RecordBeat id="sources" title="What the sources say">
-          <EvidenceList items={evidence} />
         </RecordBeat>
       ) : null}
 
@@ -623,6 +640,8 @@ export function EntityRecordView({
           <RecordConnections connections={writtenAbout} />
         </RecordBeat>
       ) : null}
+
+      {figures}
     </RecordPage>
   );
 }
@@ -632,20 +651,37 @@ export function EntityRecordView({
 export async function EntityRecordPage({
   entity,
   arrival = EMPTY_DISCOVERY_STATE,
+  canonicalPath,
 }: {
   readonly entity: PublicEntityView;
   readonly arrival?: DiscoveryState;
+  readonly canonicalPath?: string;
 }) {
   const feature = buildExploreMapSource([entity]).featureCollection.features[0];
   const point = feature
     ? { lng: feature.geometry.coordinates[0], lat: feature.geometry.coordinates[1] }
     : undefined;
-  const [returns, crossReferences, cites, place] = await Promise.all([
+  const isLaw = String(entity.kind) === 'law';
+  const jurisdiction = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel);
+  // A law labeled Washington, D.C. is a federal law, as `mapPrecisionFor` already reads it.
+  const state = isLaw && jurisdiction?.postalCode === 'DC' ? undefined : jurisdiction?.name;
+  const [returns, crossReferences, cites, place, county] = await Promise.all([
     recordDiscoveryReturn(entity.id, arrival, feature !== undefined),
     resolveEntityCrossReferences(entity.id),
     resolveCitesEdgeIndex(),
     feature ? loadRecordPlace(entity.id) : undefined,
+    feature ? loadRecordCounty(entity.id) : undefined,
   ]);
+  const figures = await RecordFigures({
+    record: {
+      id: entity.id,
+      ...(state ? { state } : {}),
+      ...(county ? { county } : {}),
+      // A law with no state of its own is a federal law: its jurisdiction is the country.
+      nationwide: isLaw && state === undefined,
+      quiet: isQuietRecord(entity),
+    },
+  });
   return (
     <EntityRecordView
       entity={entity}
@@ -655,6 +691,8 @@ export async function EntityRecordPage({
       returns={returns}
       citing={storiesCiting(cites, entity.id)}
       crossReferences={crossReferences}
+      {...(canonicalPath ? { canonicalPath } : {})}
+      figures={figures}
     />
   );
 }

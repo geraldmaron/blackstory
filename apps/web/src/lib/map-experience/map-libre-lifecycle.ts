@@ -3,6 +3,7 @@
  * Firefox desktop; mobile WebKit). Covers zero-size containers, viewport/orientation
  * changes, tab visibility restores, and WebGL context loss.
  */
+import { readAsDocuments } from './world-prefs';
 
 export function containerHasLayout(container: HTMLElement): boolean {
   const rect = container.getBoundingClientRect();
@@ -30,6 +31,8 @@ export function waitForContainerLayout(container: HTMLElement): Promise<void> {
 /** Fail fast before MapLibre construction when WebGL is unavailable or blocked. */
 export function isWebGlAvailable(): boolean {
   if (typeof document === 'undefined') return false;
+  // v11 "Read as documents": the reader's choice is the same path as a browser without WebGL.
+  if (readAsDocuments()) return false;
   try {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');

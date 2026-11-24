@@ -1,7 +1,7 @@
 /**
  * Where a trust page points onward: ruled rows of a name and one line. A row that points at a
  * catalog destination carries that destination's glyph beside its name, so onward links read the
- * same here as in the footer and Rooms. The whole row is the link.
+ * same here as in the footer and Pages. The whole row is the link.
  */
 import React from 'react';
 import Link from 'next/link';

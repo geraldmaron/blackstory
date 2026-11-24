@@ -4,7 +4,7 @@
  *
  * Geometry. The stage is one screen of wall plus the stretch the visitor scrolls through while
  * the list rises over it (STEP_CLOSER_SHARE in MemorialWallAtmosphere.tsx; the room body's
- * negative margin in reading-room.css matches the extra 40svh). The wall itself is sticky, so it
+ * negative margin in reading-page.css matches the extra 40svh). The wall itself is sticky, so it
  * holds still while the list arrives and then leaves with it.
  */
 
@@ -128,7 +128,7 @@
 .ds-memorial-wall__inscription-text {
   max-width: 35rem;
   margin: 0;
-  /* The same full-bleed escape as the list zone (reading-room.css), so the inscription and the list
+  /* The same full-bleed escape as the list zone (reading-page.css), so the inscription and the list
      heading that follows it share one left edge. */
   margin-inline-start: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
   font-family: var(--ds-font-editorial);

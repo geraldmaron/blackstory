@@ -6,6 +6,7 @@
  * or scraper sending `?kind=<random>` or `?zz=<random>` then gets a cheap 308 to a URL the CDN
  * has already cached, instead of forcing a fresh render per unique query (repo-4wb0e).
  */
+import { PLACE_KEY_PATTERN } from '@repo/domain/map/place-groups';
 import { isValidTopicId } from '@repo/domain/taxonomy/topics';
 import { normalizePeriod, periodIsActive, type PeriodBound } from '../discovery/collection-period';
 import { parseCollectionToken, type CollectionToken } from '../discovery/story-collection';
@@ -35,6 +36,13 @@ export type RecordsQuery = {
    */
   readonly seed: string;
   readonly layout: RecordsLayout;
+  /**
+   * Return context from the map, never a filter: the record and the place the reader had selected
+   * there. The list ignores both for matching and hands them back on its Map link, the way Explore
+   * carries `layout` for the list. A URL holding either is a reader's view, never an indexed page.
+   */
+  readonly selected: string;
+  readonly place: string;
   readonly page: number;
 };
 
@@ -53,6 +61,8 @@ export const EMPTY_RECORDS_QUERY: RecordsQuery = Object.freeze({
   sort: 'discovery',
   seed: '',
   layout: 'index',
+  selected: '',
+  place: '',
   page: 1,
 });
 
@@ -89,6 +99,8 @@ export const RECORDS_PAGE_PARAM_ALLOWLIST: readonly string[] = Object.freeze([
   'layout',
   // Read only as a spelling of `layout` (`?view=timeline`); the canonical URL never emits it.
   'view',
+  'selected',
+  'place',
   'page',
 ]);
 
@@ -102,6 +114,8 @@ const TIMELINE_SPELLINGS = new Set(['chronology', 'timeline']);
 /** Far above any real page count (the catalog is a few thousand rows); bounds `?page=<huge>`. */
 const MAX_PAGE = 1000;
 const SEED = /^[a-z0-9]{1,8}$/;
+/** A record id as the catalog writes one. Shared with the Explore parser (`url-state.ts`). */
+const RECORD_ID = /^[A-Za-z0-9][A-Za-z0-9_.:|~-]{0,159}$/;
 
 function slugOrEmpty(value: string): string {
   return FACET_SLUG.test(value) ? value : '';
@@ -151,6 +165,8 @@ export function parseRecordsQuery(
       : 'discovery',
     seed: SEED.test(one('seed').toLowerCase()) ? one('seed').toLowerCase() : '',
     evidence: EVIDENCE_GRADES.has(evidence) ? evidence : '',
+    selected: RECORD_ID.test(one('selected')) ? one('selected') : '',
+    place: PLACE_KEY_PATTERN.test(one('place')) ? one('place') : '',
     page: Number.isFinite(rawPage) && rawPage > 1 ? Math.min(rawPage, MAX_PAGE) : 1,
   };
 }
@@ -182,17 +198,39 @@ export function recordsQueryString(query: Partial<RecordsQuery>): string {
     params.set('seed', merged.seed);
   }
   if (merged.layout === 'chronology') params.set('layout', 'chronology');
+  if (merged.selected.length > 0) params.set('selected', merged.selected);
+  if (merged.place.length > 0) params.set('place', merged.place);
   // `page=1` is never emitted: `/records` and `/records?page=1` would otherwise be two URLs for
   // one page, and each would claim to be canonical.
   if (merged.page > 1) params.set('page', String(merged.page));
   return params.toString();
 }
 
+/** The one route the list, the timeline and the map answer on (archive-url-contract.md, 10). */
+export const ARCHIVE_PATH = '/archive';
+
 /**
- * Builds a `/records` href. Params are emitted in a fixed order so a given narrowing has exactly
- * one URL, which is what makes the self-referential canonical honest.
+ * The `/archive` spelling of a list or timeline narrowing: `recordsQueryString` with the timeline
+ * as `view=timeline`, first, instead of `layout=chronology`. The list is the default view and is
+ * never written.
+ */
+export function archiveQueryString(query: Partial<RecordsQuery>): string {
+  const rest = recordsQueryString({ ...query, layout: 'index' });
+  const view = query.layout === 'chronology' ? 'view=timeline' : '';
+  return view && rest ? `${view}&${rest}` : view || rest;
+}
+
+/**
+ * Builds the list's href on `/archive`. Params are emitted in a fixed order so a given narrowing
+ * has exactly one URL, which is what makes the self-referential canonical honest.
  */
 export function recordsHref(query: Partial<RecordsQuery>): string {
+  const search = archiveQueryString(query);
+  return search.length > 0 ? `${ARCHIVE_PATH}?${search}` : ARCHIVE_PATH;
+}
+
+/** The same narrowing at its 4a address. Only the rollback canonical and the edge print it. */
+export function legacyRecordsHref(query: Partial<RecordsQuery>): string {
   const search = recordsQueryString(query);
   return search.length > 0 ? `/records?${search}` : '/records';
 }
@@ -205,6 +243,8 @@ export function recordsHref(query: Partial<RecordsQuery>): string {
  */
 export function isRecordsCombinationQuery(query: RecordsQuery): boolean {
   if (query.q.length > 0) return true;
+  // A map selection riding along is one reader's way back, not a page.
+  if (query.selected.length > 0 || query.place.length > 0) return true;
   // A story collection, a decade range and the chronology layout are reader-built views, and a
   // malformed one is an error page. None is a set a crawler should enumerate.
   if (

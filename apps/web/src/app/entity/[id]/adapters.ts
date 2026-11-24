@@ -10,7 +10,7 @@ import {
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import type { PublicClaimView, PublicEntityView } from '../../../data/public-seed';
 import { humanizeToken } from '../../../components/entity/format';
-import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
+import { resolveMapTone } from '../../../lib/map-experience/kind-encoding';
 
 /**
  * The sensitive-content disclaimer when the record's own accepted prose documents harm, else
@@ -95,13 +95,18 @@ export function toEvidenceClaimInputs(
 
 /**
  * A sensitive or violence-adjacent record: a sensitivity flag, a trauma content note, or a
- * massacre or plantation tone. It stands on a quiet ground (no plate, no lamplight, no motion) on
+ * massacre or plantation tone (by topic or by name). Its exhibits are quiet and its map still on
  * its own page and is never lifted onto the home page.
  */
 export function isQuietRecord(entity: PublicEntityView): boolean {
   if (entity.sensitivity) return true;
   if (traumaContentDisclaimerFor(entity) !== undefined) return true;
-  const tone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
+  // Topics first, then the name: a record titled a massacre whose topics do not say so (the
+  // Wilmington massacre of 1898) is still one.
+  const tone = resolveMapTone({
+    topicTags: entity.topicIds ?? entity.topicTags,
+    displayName: entity.displayName,
+  });
   return tone === 'massacre' || tone === 'plantation';
 }
 
@@ -114,10 +119,30 @@ export function publisherOf(claim: PublicClaimView): string {
     .replace(/\/$/, '');
 }
 
-/** A short claim whose object is a bare name reads as nothing; prefix the predicate in words. */
+/** A claim that is a sentence quoted from a source, not a fact stated about the record. */
+export function isSourceExcerpt(predicate: string): boolean {
+  return predicate.trim().toLowerCase().replace(/[_-]/g, ' ') === 'source states';
+}
+
+/** "Dr. Martin Luther King Jr." and "Washington, D.C." end on a period without being sentences. */
+const ENDS_ON_ABBREVIATION =
+  /(?:\b(?:Jr|Sr|Dr|Mr|Mrs|Ms|Rev|St|Ave|Blvd|Rd|Inc|Co|Corp|Ltd|No|etc)|\b\p{Lu})\.$/u;
+
+/** Does the text end the way a whole sentence does? */
+export function endsAsSentence(text: string): boolean {
+  const trimmed = text.trim();
+  return /[.!?]["')\]”]?$/u.test(trimmed) && !ENDS_ON_ABBREVIATION.test(trimmed);
+}
+
+/**
+ * A claim in words. A source excerpt is the source's own sentence and stands as written. Any
+ * other claim is a fact about the record, and its object alone ("Dr. Martin Luther King Jr.",
+ * "on the National Register of Historic Places ...") says nothing without its predicate, however
+ * long it is; only an object that is itself a whole sentence goes without one.
+ */
 export function statementFor(predicate: string, object: string): string {
   const text = object.trim();
-  const isSentence = /[.!?]["')\]]?$/.test(text) || text.split(/\s+/).length > 8;
-  if (isSentence || predicate.trim().length === 0) return text;
-  return `${humanizeToken(predicate)}: ${text}`;
+  const label = predicate.trim();
+  if (label.length === 0 || isSourceExcerpt(label) || endsAsSentence(text)) return text;
+  return `${humanizeToken(label)}: ${text}`;
 }

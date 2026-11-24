@@ -74,7 +74,10 @@ test('the toolbar carries State, Author, Sort and Covers | States, all as links'
 
 test('the states view: a decorative tile grid and a ranked list that filters the wall', () => {
   const html = render({ view: 'states' });
-  assert.match(html, /<div class="ds-books-map" aria-hidden="true"><div class="ds-books-tiles">/);
+  assert.match(
+    html,
+    /<div class="ds-books-map" data-ground="ink" data-ground-fixed="" aria-hidden="true"><div class="ds-books-tiles">/,
+  );
   assert.match(html, /<ul class="ds-books-legend">/);
   assert.match(html, /<ol class="ds-books-ranks" aria-label="States by challenged titles">/);
   assert.match(html, /href="\/books\?state=FL"/);
@@ -96,7 +99,7 @@ test('the tile legend reads its ranges off the step formula, with no gaps or ove
   assert.deepEqual(tileLegend(1), [{ step: 4, from: 1, to: 1 }]);
 });
 
-test('the titles view leads with the busiest state on sand, every entry opening the states view', () => {
+test('the titles view leads with the busiest state on the rail, every entry opening the states view', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {});
   const html = render({});
   const [top] = view.stateCounts;

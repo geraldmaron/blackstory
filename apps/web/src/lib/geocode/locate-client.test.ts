@@ -121,30 +121,10 @@ test('sends the provided request-integrity headers on the outgoing request', asy
   }) as typeof fetch;
   try {
     await fetchLocateByAddress('123 Main St', { 'x-csrf-token': 'token-123' });
-    assert.deepEqual(capturedHeaders, { 'x-csrf-token': 'token-123' });
-  } finally {
-    globalThis.fetch = original;
-  }
-});
-
-test('forCamera appends camera=1 on the address locate request URL', async () => {
-  const original = globalThis.fetch;
-  let capturedUrl = '';
-  globalThis.fetch = (async (url: string) => {
-    capturedUrl = url;
-    return {
-      status: 200,
-      json: async () => ({
-        ok: false,
-        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/history' },
-      }),
-    } as Response;
-  }) as typeof fetch;
-  try {
-    await fetchLocateByAddress('Washington, DC', {}, { forCamera: true });
-    assert.match(capturedUrl, /\/locate\/api\?/);
-    assert.match(capturedUrl, /camera=1/);
-    assert.match(capturedUrl, /address=Washington/);
+    assert.deepEqual(capturedHeaders, {
+      'x-csrf-token': 'token-123',
+      'content-type': 'application/json',
+    });
   } finally {
     globalThis.fetch = original;
   }
@@ -169,6 +149,27 @@ test('forCamera appends camera=1 on coordinate locate request URL', async () => 
     assert.match(capturedUrl, /camera=1/);
     assert.match(capturedUrl, /lat=26\.7/);
     assert.match(capturedUrl, /lng=-80/);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test('sends a typed place in the request body, never in the address of the request', async () => {
+  const original = globalThis.fetch;
+  const calls: { url: string; init: RequestInit | undefined }[] = [];
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    calls.push({ url: String(input), init });
+    return { status: 200, json: async () => ({ ok: false, fallback: {} }) } as Response;
+  }) as typeof fetch;
+  try {
+    await fetchLocateByAddress('Tuskegee, Alabama', {}, { forCamera: true });
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]!.url, '/locate/api');
+    assert.equal(calls[0]!.init?.method, 'POST');
+    assert.deepEqual(JSON.parse(String(calls[0]!.init?.body)), {
+      address: 'Tuskegee, Alabama',
+      camera: true,
+    });
   } finally {
     globalThis.fetch = original;
   }

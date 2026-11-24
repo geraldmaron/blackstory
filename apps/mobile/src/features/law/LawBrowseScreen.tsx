@@ -28,6 +28,7 @@ import {
   space,
   useThemeColors,
   MIN_TOUCH_TARGET,
+  radius,
 } from '@/ui';
 import { LAW_ABOUT, LAW_CATALOG, LAW_DISCLAIMER, LAW_INTRO } from './law-copy';
 import {
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
   searchField: {
     minHeight: MIN_TOUCH_TARGET,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     paddingHorizontal: space['3'],
     flexDirection: 'row',
     alignItems: 'center',
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
     minHeight: MIN_TOUCH_TARGET,
     paddingHorizontal: space['3'],
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },

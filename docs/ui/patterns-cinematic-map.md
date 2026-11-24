@@ -1,6 +1,6 @@
 # Cinematic Map Backdrop
 
-**Status: Binding — reusable, cross-surface.** Supersedes the home-only "map behind hero" treatment in [`design-direction-v6-home.md`](./design-direction-v6-home.md) by generalizing it into one pattern every map-bearing surface shares. Builds on (does not replace) [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, `../decisions-carryover.md`, "Persistent map canvas", ADR-017) and [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin color/shape). Governed by [`brand.md`](./brand.md) (flat matte, copper discipline, dignity) and [`story.md`](./story.md) (voice).
+**Status: Binding — reusable, cross-surface.** Supersedes the home-only "map behind hero" treatment in [`design-direction-v6-home.md`](./archive/design-direction-v6-home.md) by generalizing it into one pattern every map-bearing surface shares. Builds on (does not replace) [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, `../decisions-carryover.md`, "Persistent map canvas", ADR-017) and [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin color/shape). Governed by [`brand.md`](./brand.md) (flat matte, copper discipline, dignity) and [`story.md`](./story.md) (voice).
 
 Token contract: `--ds-easing: cubic-bezier(0.16, 1, 0.3, 1)`, `--ds-duration-fast 160ms` / `--ds-duration-base 280ms` / `--ds-duration-slow 480ms` (`packages/ui/src/styles/tokens.css`, `packages/ui/src/tokens/foundation.ts`, mobile `apps/mobile/src/ui/tokens/generated/motion.generated.ts`). Camera timings from `apps/web/src/lib/map-experience/camera-presets.ts` and mobile `apps/mobile/src/features/map/mapCamera.ts`.
 
@@ -184,5 +184,5 @@ Per [`story.md`](./story.md): evidence-before-assertion, sentence case, no em da
 2. Choose the surface's home camera preset and, if a landing/narrative surface, its Invite beats (`MapIntroBeat` list).
 3. Wire selection through feature-state; confirm deselect leaves neighbors unchanged.
 4. Verify reduced motion, keyboard, 44px targets, light + dark.
-5. Add the surface to the adopters table in [`patterns-registry.md`](./patterns-registry.md) and cite this doc in the surface's `design-direction-v6-*.md`.
+5. Add the surface to the adopters table in [`patterns-registry.md`](./archive/patterns-registry.md) and cite this doc in the surface's `design-direction-v6-*.md`.
 6. Mobile: verify on a Release build via `pnpm mobile:ios:verify` (not Metro).

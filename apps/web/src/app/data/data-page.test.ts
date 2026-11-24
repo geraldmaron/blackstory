@@ -59,15 +59,9 @@ test('legacy \\?s=lives on /data rewrites to the hash deep link', () => {
   assert.match(pageSource, /buildLivesHref/);
 });
 
-test('data sections keep census and indicator chart wiring', () => {
-  assert.match(sectionsSource, /PopulationDecadeSpine/);
-  assert.match(sectionsSource, /PopulationByDecadeChart/);
-  assert.match(sectionsSource, /BlackPopulationShareChart/);
-  assert.match(sectionsSource, /GapMagnitudeSight/);
-  assert.match(sectionsSource, /RacePairComparisonChart/);
-  assert.match(sectionsSource, /GroupedBarIndicatorChart/);
-  assert.match(sectionsSource, /StatePopulationShiftChart/);
-  assert.match(sectionsSource, /TrendLineChart/);
+test('data sections place registry figures, each with its own view', () => {
+  assert.match(sectionsSource, /<Figure\s+id=\{id\}\s+views=\{views\}/);
+  assert.match(pageSource, /views=\{parseFigureViews\(raw\.view\)\}/);
   assert.match(sectionsSource, /href="\/lives"/);
   assert.match(sectionsSource, /id="counted"/);
   assert.match(sectionsSource, /id="lives"/);
@@ -80,7 +74,7 @@ test('data page keeps a deep-linkable anchor for every section, under a plain he
     assert.match(sectionsSource, new RegExp(`id="${section.id}"`));
   }
   assert.match(sectionsSource, /<SectionHeading/);
-  assert.doesNotMatch(sectionsSource, /DataPageNav|RoomStats|ds-room-section__plate/);
+  assert.doesNotMatch(sectionsSource, /DataPageNav|RoomStats|ds-doc-section__plate/);
 });
 
 test('reading rules and section heads carry no icon plates or kickers', () => {
@@ -148,60 +142,26 @@ test('the indicator fixture captions the figures print verbatim keep the same vo
 });
 
 test('figure findings compare the values instead of restating them', async () => {
-  const { createElement, Fragment } = await import('react');
-  const { renderToStaticMarkup } = await import('react-dom/server');
-  const { deltaTrendReading, gapTrendReading, shareRiseReading } = await import('./DataSections');
-  const text = (node: unknown) =>
-    renderToStaticMarkup(createElement(Fragment, null, node as never)).replace(/<!-- -->/g, '');
+  const { deltaTrendReading } = await import('../../components/data/figures/census');
+  const { gapTrendReading, seriesData } = await import('../../components/data/figures/indicators');
 
-  const delta = (label: string, value: string) => ({ id: label, label, value });
+  const delta = (label: string, change: number) => ({ label, change });
   assert.equal(
-    text(
-      deltaTrendReading([
-        delta('Black population, 1990 to 2000', '+4,975,063'),
-        delta('Black population, 2000 to 2010', '+4,429,694'),
-        delta('Black population, 2010 to 2020', '+1,942,094'),
-      ]),
-    ),
+    deltaTrendReading([
+      delta('Black population, 1990 to 2000', 4_975_063),
+      delta('Black population, 2000 to 2010', 4_429_694),
+      delta('Black population, 2010 to 2020', 1_942_094),
+    ]),
     'Growth slowed each decade since 1990',
   );
-  // Mixed movement has no single finding; the caller falls back to the latest value.
+  // Mixed movement has no single finding; the figure falls back to the latest value.
   assert.equal(
-    deltaTrendReading([delta('A, 1990 to 2000', '+5'), delta('B', '+9'), delta('C', '+2')]),
-    null,
+    deltaTrendReading([delta('A, 1990 to 2000', 5), delta('B', 9), delta('C', 2)]),
+    undefined,
   );
 
-  const row = (decade: string, black: number) => ({
-    decade,
-    blackPopulation: black,
-    totalPopulation: 100,
-    blackShareOfTotalPct: black,
-  });
-  assert.equal(
-    text(
-      shareRiseReading([
-        row('1910', 11),
-        row('1930', 9),
-        row('1950', 10),
-        row('1970', 11),
-      ] as never),
-    ),
-    'The share has risen at every census since 1930',
-  );
-  assert.equal(
-    text(
-      shareRiseReading([
-        row('1930', 9),
-        row('1950', 10),
-        row('1970', 9.5),
-        row('1990', 12),
-      ] as never),
-    ),
-    'The share rose at 2 of the 3 censuses since 1930',
-  );
-
-  const trend = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthTrend;
-  if (trend && trend.points.length > 1) {
-    assert.match(text(gapTrendReading(trend)), /^The gap has (widened|narrowed) in dollars since /);
+  const trend = seriesData(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthTrend);
+  if (trend && trend.rows.length > 1) {
+    assert.match(gapTrendReading(trend) ?? '', /^The gap has (widened|narrowed) in dollars since /);
   }
 });

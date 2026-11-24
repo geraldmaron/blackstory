@@ -5,15 +5,21 @@ import { LIVES_NATIONAL, livesAreaBySlug } from '@repo/domain/statistics/lives';
 import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { PageHeader } from '@repo/ui';
-import { parentCrumb, Room } from '../../../components/room';
+import { parentCrumb, PageFrame } from '../../../components/page';
 import { TrustMast, TrustSheet } from '../../../components/trust';
 import { livesDecadeNumeral } from '../../../components/lives/lives-mast';
 import { emptyLivesAreaBundle, loadLivesAreaView } from '../../../lib/lives/lives-source';
-import { parseLivesAreaSlug, type RawLivesSearchParams } from '../../../lib/lives/lives-url-state';
+import {
+  parseLivesAreaSlug,
+  parseLivesSearchParams,
+  type RawLivesSearchParams,
+} from '../../../lib/lives/lives-url-state';
+import { parseFigureViews } from '../../../components/data/figures/figure-spec';
+import { absolutePublicUrl } from '../../../lib/seo/metadata-builders';
 import { LivesSourceNotice } from '../../../components/lives/LivesSourceNotice';
 import { LivesTimeline } from '../../../components/lives/LivesTimeline';
 import { LivesTimelineStatic } from '../../../components/lives/LivesTimelineStatic';
-import '../../reading-room.css';
+import '../../reading-page.css';
 import '../lives.css';
 
 void React;
@@ -37,13 +43,17 @@ export default async function LivesExplorerPage({
   const area = livesAreaBySlug(areaSlug) ?? LIVES_NATIONAL;
   const loaded = await loadLivesAreaView(area.slug);
   const bundle = loaded?.bundle ?? emptyLivesAreaBundle(area);
+  const frame = {
+    origin: absolutePublicUrl('/').replace(/\/$/, ''),
+    accessed: new Date().toISOString(),
+  };
 
   return (
-    <Room
+    <PageFrame
       width="wide"
-      className="ds-trust-room"
+      className="ds-trust-doc"
       masthead={
-        <TrustMast tone="copper" art={['ledger', 'grain']} numeral={livesDecadeNumeral(bundle)}>
+        <TrustMast numeral={livesDecadeNumeral(bundle)}>
           <PageHeader
             display
             crumb={parentCrumb('/lives/explorer')}
@@ -61,10 +71,19 @@ export default async function LivesExplorerPage({
           retryHref={`/lives/explorer?area=${encodeURIComponent(area.slug)}`}
         />
 
-        <Suspense fallback={<LivesTimelineStatic bundle={bundle} areaSlug={area.slug} />}>
-          <LivesTimeline bundle={bundle} areaSlug={area.slug} />
+        <Suspense
+          fallback={
+            <LivesTimelineStatic
+              bundle={bundle}
+              areaSlug={area.slug}
+              state={parseLivesSearchParams(raw)}
+              frame={{ ...frame, views: parseFigureViews(raw.view) }}
+            />
+          }
+        >
+          <LivesTimeline bundle={bundle} areaSlug={area.slug} frame={frame} />
         </Suspense>
       </TrustSheet>
-    </Room>
+    </PageFrame>
   );
 }

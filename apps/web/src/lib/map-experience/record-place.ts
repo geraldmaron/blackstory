@@ -17,7 +17,8 @@ import type { ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { CountyGeometryCollection } from './county-hatch';
 import { placeGroupsFor } from './place-map';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';
-import { buildExploreHref, defaultExploreOverlayState } from './url-state';
+import { buildExploreHref, defaultExploreOverlayState, exploreRecordHref } from './url-state';
+import { parseFirstPaintPinId } from './first-paint-pins';
 
 export type RecordPlace = {
   readonly key: string;
@@ -28,7 +29,7 @@ export type RecordPlace = {
   readonly href: string;
 };
 
-/** `/explore?place=<key>&selected=<id>`: the place entered, the record found inside it. */
+/** The map view at `place=<key>&selected=<id>`: the place entered, the record found inside it. */
 export function recordPlaceHref(placeKey: string, entityId: string): string {
   return buildExploreHref({
     filters: DEFAULT_EXPLORE_FILTERS,
@@ -38,9 +39,18 @@ export function recordPlaceHref(placeKey: string, entityId: string): string {
   });
 }
 
-/** A map hand-off (`/explore?selected=…`, filters and all) with the record's place entered. */
+/** The map view with a place entered: every record in it listed, none selected. */
+export function placeMapHref(placeKey: string): string {
+  return buildExploreHref({
+    filters: DEFAULT_EXPLORE_FILTERS,
+    ...defaultExploreOverlayState(),
+    place: placeKey,
+  });
+}
+
+/** A map hand-off (the map view at `selected=…`, filters and all) with the record's place entered. */
 export function mapHrefInPlace(mapHref: string, placeKey: string): string {
-  const [path = '/explore', query = ''] = mapHref.split('?');
+  const [path = '/archive', query = ''] = mapHref.split('?');
   const params = new URLSearchParams(query);
   params.set('place', placeKey);
   return `${path}?${params}`;
@@ -87,3 +97,46 @@ export const loadRecordPlace = cache(async (entityId: string): Promise<RecordPla
     return undefined;
   }
 });
+
+/**
+ * The county a record's point falls in, by name with its suffix ("Cook County"), for matching a
+ * county series to a record (`figure-coverage.ts`). Nothing when the record has no point, sits at
+ * state precision, or the county outlines cannot be read. Never throws.
+ */
+export const loadRecordCounty = cache(async (entityId: string): Promise<string | undefined> => {
+  try {
+    const plate = await loadDoorPinPlate();
+    let collection = collections.get(plate);
+    if (!collection) {
+      collection = { type: 'FeatureCollection', features: plate.features };
+      collections.set(plate, collection);
+    }
+    const groups = placeGroupsFor(collection, await loadCounties());
+    const county = groups.pathById.get(entityId)?.county;
+    // A county place is named with its state's postal code ("Cook County, IL").
+    return county ? groups.places.get(county)?.name.replace(/, [A-Z]{2}$/, '') : undefined;
+  } catch {
+    return undefined;
+  }
+});
+
+/**
+ * "See all on the map" for a stack of lights (`OverlapChooser`): the map with the record's place
+ * entered, or the record itself where the catalog cannot place it. Takes a record id or an opaque
+ * first-paint pin id (`pin-N`, the front page's lights). Nothing for an id the plate does not hold.
+ */
+export async function loadRecordPlaceMapHref(id: string): Promise<string | undefined> {
+  try {
+    const plate = await loadDoorPinPlate();
+    const index = parseFirstPaintPinId(id);
+    const entityId =
+      index === null
+        ? plate.features.find((feature) => feature.properties.entityId === id)?.properties.entityId
+        : plate.features[index]?.properties.entityId;
+    if (!entityId) return undefined;
+    const place = await loadRecordPlace(entityId);
+    return place ? placeMapHref(place.key) : exploreRecordHref(entityId);
+  } catch {
+    return undefined;
+  }
+}

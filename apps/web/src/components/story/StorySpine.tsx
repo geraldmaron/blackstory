@@ -12,7 +12,8 @@
  * Both are in the document; story.css shows one per viewport with display:none, so assistive
  * technology never meets both. Both read the same headings, so they cannot disagree on a target.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useFocusTrap } from '../../lib/keyboard/use-focus-trap';
 import type { ChapterHeading } from '../../lib/stories/heading-anchors';
 import { splitSectionHeading } from './story-text';
 
@@ -118,6 +119,27 @@ export function StorySpine({ headings, sourcesHref }: StorySpineProps) {
     ...(sourcesHref ? [sourcesHref.replace(/^#/, '')] : []),
   ]);
   const current = useCurrentSection(ids);
+  const sheetRef = useRef<HTMLDivElement | null>(null);
+  const openerRef = useRef<HTMLButtonElement | null>(null);
+  const [open, setOpen] = useState(false);
+  // The sheet covers the page, so it is modal while open: Tab stays in it and the page is inert.
+  useFocusTrap(sheetRef, open, { overlayRef: sheetRef });
+  useEffect(() => {
+    if (!open) return;
+    const sheet = sheetRef.current;
+    sheet?.focus();
+    // Widening past the bar's breakpoint hides the sheet without closing it; close it, or the
+    // page stays inert behind nothing.
+    const closeIfHidden = () => {
+      if (sheet && sheet.getClientRects().length === 0) sheet.hidePopover();
+    };
+    window.addEventListener('resize', closeIfHidden);
+    return () => {
+      window.removeEventListener('resize', closeIfHidden);
+      // Runs after the trap's cleanup has made the button focusable again.
+      openerRef.current?.focus();
+    };
+  }, [open]);
   if (headings.length === 0) return null;
   const here =
     current === headings.length
@@ -155,7 +177,12 @@ export function StorySpine({ headings, sourcesHref }: StorySpineProps) {
             </span>
           )}
         </p>
-        <button className="ds-story-bar__open" type="button" popoverTarget={SHEET_ID}>
+        <button
+          className="ds-story-bar__open"
+          type="button"
+          popoverTarget={SHEET_ID}
+          ref={openerRef}
+        >
           Contents
         </button>
         <div
@@ -164,7 +191,11 @@ export function StorySpine({ headings, sourcesHref }: StorySpineProps) {
           id={SHEET_ID}
           popover="auto"
           role="dialog"
+          aria-modal={open || undefined}
           aria-labelledby={`${SHEET_ID}-title`}
+          tabIndex={-1}
+          ref={sheetRef}
+          onToggle={(event) => setOpen(event.newState === 'open')}
         >
           <div className="ds-story-sheet__head">
             <p className="ds-story-sheet__title" id={`${SHEET_ID}-title`}>
