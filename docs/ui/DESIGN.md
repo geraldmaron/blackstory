@@ -172,8 +172,12 @@ The four families and seven roles in `brand.md` stay. Changes:
   `-display-numeral`) are removed with their last users.
 - Compact scale: display tops out at 88px, headline at 44px. The page earns size from the
   exhibit, which is large, and keeps type tight around it. One exception (owner, 2026-11-23): the
-  front page's opening word is sized from the window, about half its width (`--ds-text-hero`), once on the
-  site.
+  front page's last scene sets the official wordmark from the window, about half its width
+  (`--ds-text-hero`), once on the site. The first screen carries the same wordmark smaller, about a
+  third of the window and at most 30rem, as the page's h1, in the slot where the changing word
+  later stands (same top, same left edge); its sentence is display-3 italic and its counting year
+  headline size, so the lit map carries the screen. "History" is that scene's heading for a screen
+  reader and the rail.
 
 ### 7.3 The exhibit frame
 
@@ -432,7 +436,7 @@ chapter rail naming all six and "Skip to the archive" on screen throughout.
 
 | Scene | Word | Shows | Ground action |
 | ----- | ---- | ----- | ------------- |
-| 1 | History | The word and one sentence. No document by default (see the verdict) | Map dark |
+| 1 | History (read, not shown) | The wordmark as the page's h1, one sentence, the year counting as the lights come on. No document by default (see the verdict) | Map lit |
 | 2 | *His* story | One sourced record of a man | Camera lands on his place |
 | 3 | *Her* story | One sourced record of a woman | Traverse, land |
 | 4 | *Your* story | A field: "Type a town." It answers with the nearest records and the distance, or says plainly that nothing near there is researched yet | Traverse to the town |

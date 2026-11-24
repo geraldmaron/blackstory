@@ -53,6 +53,12 @@ function SceneWord({ prefix, heading }: { readonly prefix: string; readonly head
   );
 }
 
+/** The official artwork. The wordmark is never retyped beside a symbol. */
+function Lockup() {
+  // eslint-disable-next-line @next/next/no-img-element -- brand artwork
+  return <img src={BRAND_ASSETS.lockup.dark} alt="BlackStory" width={800} height={450} />;
+}
+
 export async function Retelling({
   returning = false,
 }: {
@@ -176,8 +182,6 @@ export async function Retelling({
         <WorldControls inline />
       </nav>
 
-      <h1 className="ds-retelling__title">BlackStory</h1>
-
       {RETELLING_SCENES.map((scene, i) => {
         const record = shown[i];
         const leg = legs[i];
@@ -198,18 +202,17 @@ export async function Retelling({
             ) : null}
             <div className="ds-scene__pin">
               <div className="ds-scene__words">
+                {scene.id === 'history' ? (
+                  // The page's title is the brand, on the first screen, in the slot where the
+                  // changing word will stand. "History" stays the section's heading for a
+                  // screen reader and the rail.
+                  <h1 className="ds-scene__heading ds-scene__heading--mark">
+                    <Lockup />
+                  </h1>
+                ) : null}
                 {scene.kind === 'country' ? (
                   <h2 className="ds-scene__heading ds-scene__heading--mark" id={`${scene.id}-h`}>
-                    {/* The official artwork. The wordmark is never retyped beside a symbol. */}
-                    {/* eslint-disable-next-line @next/next/no-img-element -- brand artwork */}
-                    <img src={BRAND_ASSETS.lockup.dark} alt="BlackStory" width={800} height={450} />
-                  </h2>
-                ) : scene.id === 'history' ? (
-                  // The first screen: the word at the width of the window, already split by
-                  // its accent, so the page's idea is on screen before any scroll. It reads
-                  // "History" to a screen reader.
-                  <h2 className="ds-scene__heading ds-scene__heading--hero" id={`${scene.id}-h`}>
-                    <em>His</em>tory
+                    <Lockup />
                   </h2>
                 ) : (
                   <h2 className="ds-scene__heading" id={`${scene.id}-h`}>
@@ -256,15 +259,19 @@ export async function Retelling({
                       {precisionInWords(record.precision)}.
                     </span>
                   </p>
-                  <RecordImage
-                    entityId={record.pinId ?? record.entityId}
-                    entityName={record.name}
-                    image={record.plate!}
-                    width={720}
-                    className="ds-scene__exhibit"
-                  />
-                  <div className="ds-scene__slip" data-ground="paper" data-ground-fixed="">
-                    <EvidenceList items={[{ ...record.claim, id: `${scene.id}-claim` }]} />
+                  {/* The photograph and its claim as one mounted plate: the label overlaps the
+                      print the way a museum label sits on its object. */}
+                  <div className="ds-scene__plate">
+                    <RecordImage
+                      entityId={record.pinId ?? record.entityId}
+                      entityName={record.name}
+                      image={record.plate!}
+                      width={720}
+                      className="ds-scene__exhibit"
+                    />
+                    <div className="ds-scene__slip" data-ground="paper" data-ground-fixed="">
+                      <EvidenceList items={[{ ...record.claim, id: `${scene.id}-claim` }]} />
+                    </div>
                   </div>
                 </>
               ) : null}
