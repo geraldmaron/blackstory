@@ -6,11 +6,16 @@
   --chooser-w: min(20rem, 100vw - 1rem);
   --chooser-h: min(18rem, 60svh);
   position: fixed;
-  top: clamp(0.5rem, var(--at-y) + 0.75rem, 100svh - var(--chooser-h) - 0.5rem);
+  /* Clear of the phone's tab bar, which would otherwise cover the last rows. */
+  top: clamp(
+    0.5rem,
+    var(--at-y) + 0.75rem,
+    100svh - var(--chooser-h) - var(--ds-tabbar-h, 0px) - 0.5rem
+  );
   left: clamp(0.5rem, var(--at-x) + 0.75rem, 100vw - var(--chooser-w) - 0.5rem);
   z-index: var(--ds-z-pin-photo-card);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: var(--chooser-w);
   max-height: var(--chooser-h);
   padding: var(--ds-space-2) 0;
@@ -58,4 +63,20 @@
 .ds-overlap-chooser__list a:focus-visible {
   outline: 2px solid var(--ds-focus-ring);
   outline-offset: -2px;
+}
+
+/* A long stack hands off to the map, which lists every record in the place. */
+.ds-overlap-chooser__all {
+  margin-top: var(--ds-space-1);
+  padding: var(--ds-space-2) var(--ds-space-3) 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  color: var(--ds-accent);
+  font: var(--ds-text-meta) / 1.4 var(--ds-font-mono);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-overlap-chooser__all:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 2px;
 }

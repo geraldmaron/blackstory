@@ -17,7 +17,8 @@ import type { ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { CountyGeometryCollection } from './county-hatch';
 import { placeGroupsFor } from './place-map';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';
-import { buildExploreHref, defaultExploreOverlayState } from './url-state';
+import { buildExploreHref, defaultExploreOverlayState, exploreRecordHref } from './url-state';
+import { parseFirstPaintPinId } from './first-paint-pins';
 
 export type RecordPlace = {
   readonly key: string;
@@ -35,6 +36,15 @@ export function recordPlaceHref(placeKey: string, entityId: string): string {
     ...defaultExploreOverlayState(),
     place: placeKey,
     selected: entityId,
+  });
+}
+
+/** The map view with a place entered: every record in it listed, none selected. */
+export function placeMapHref(placeKey: string): string {
+  return buildExploreHref({
+    filters: DEFAULT_EXPLORE_FILTERS,
+    ...defaultExploreOverlayState(),
+    place: placeKey,
   });
 }
 
@@ -109,3 +119,24 @@ export const loadRecordCounty = cache(async (entityId: string): Promise<string |
     return undefined;
   }
 });
+
+/**
+ * "See all on the map" for a stack of lights (`OverlapChooser`): the map with the record's place
+ * entered, or the record itself where the catalog cannot place it. Takes a record id or an opaque
+ * first-paint pin id (`pin-N`, the front page's lights). Nothing for an id the plate does not hold.
+ */
+export async function loadRecordPlaceMapHref(id: string): Promise<string | undefined> {
+  try {
+    const plate = await loadDoorPinPlate();
+    const index = parseFirstPaintPinId(id);
+    const entityId =
+      index === null
+        ? plate.features.find((feature) => feature.properties.entityId === id)?.properties.entityId
+        : plate.features[index]?.properties.entityId;
+    if (!entityId) return undefined;
+    const place = await loadRecordPlace(entityId);
+    return place ? placeMapHref(place.key) : exploreRecordHref(entityId);
+  } catch {
+    return undefined;
+  }
+}

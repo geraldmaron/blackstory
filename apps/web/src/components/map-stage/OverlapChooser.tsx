@@ -14,6 +14,13 @@ import './overlap-chooser.css';
 
 void React;
 
+/**
+ * The box shows about five rows before it scrolls; past that, the map lists them better. The map
+ * lists the whole place (a city holds more than the records on its center), so the link names the
+ * place, not this count.
+ */
+const SEE_ALL_FROM = 6;
+
 type Open = { readonly x: number; readonly y: number; readonly ids: readonly string[] };
 
 export function OverlapChooser({
@@ -89,6 +96,14 @@ export function OverlapChooser({
           </li>
         ))}
       </ul>
+      {rows.length >= SEE_ALL_FROM ? (
+        <a
+          className="ds-overlap-chooser__all"
+          href={`/door/pin/${encodeURIComponent(rows[0]!.id)}/map`}
+        >
+          See this place on the map
+        </a>
+      ) : null}
     </div>,
     document.body,
   );
