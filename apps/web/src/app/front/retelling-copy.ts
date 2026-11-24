@@ -1,7 +1,8 @@
 /**
  * The retelling's sentences, one per scene (docs/ui/DESIGN.md section 9.7).
  *
- * Each says only what its word means. None is a claim about history, so none needs a source.
+ * Each says only what its word means; the first also says how the page works. None is a claim
+ * about history, so none needs a source.
  * PROVISIONAL: first drafts, with two alternatives each in docs/ui/v13/retelling-copy.md, waiting
  * on the owner and a prose review (docs/ui/story.md, docs/content/neo-voice.md).
  */
@@ -10,7 +11,7 @@ import type { RetellingSceneId } from './retelling-scenes';
 export const RETELLING_COPY_PROVISIONAL = true;
 
 export const RETELLING_SENTENCES: Readonly<Partial<Record<RetellingSceneId, string>>> = {
-  history: 'History is the record of what happened.',
+  history: 'History is the story that got told, so keep going and watch the word change.',
   'his-story': 'His story is one man’s part of it.',
   'her-story': 'Her story is one woman’s part of it.',
   'your-story': 'Your story is the part nearest you.',

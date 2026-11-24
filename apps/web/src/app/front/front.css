@@ -278,14 +278,81 @@
   min-height: 70svh;
 }
 
-/* Scene 1 stands on the dark map: the ink ground, nearly whole, thinning toward scene 2. */
+/* Scene 1 is the first screen: the map at full brightness, with ink only at the left where the
+   sentence and the year are read, thinning to nothing by the middle of the window. */
 .ds-scene[data-kind='word'] {
   background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--ds-fixed-ink) 88%, transparent) 0,
-    color-mix(in srgb, var(--ds-fixed-ink) 88%, transparent) 60%,
-    transparent 100%
+    to right,
+    color-mix(in srgb, var(--ds-fixed-ink) 62%, transparent) 0,
+    transparent 58%
   );
+}
+
+.ds-scene[data-scene='history'] .ds-scene__pin {
+  grid-template-rows: 1fr auto;
+  min-height: calc(100svh - var(--front-bar));
+  padding-top: calc(var(--front-rail) + var(--ds-space-6));
+  /* Clear of the phone's tab bar, so the year and its sentence are on the first screen. */
+  padding-bottom: calc(var(--ds-tabbar-h, 0px) + var(--ds-space-10));
+}
+
+.ds-scene[data-scene='history'] .ds-scene__words {
+  align-self: center;
+  gap: var(--ds-space-4);
+}
+
+/* The opening word, at the width of the window. "His" is the accent; "tory" is the display face
+   at its heaviest. One line at every width. */
+.ds-scene__heading--hero {
+  font-size: var(--ds-text-hero);
+  font-weight: var(--ds-weight-display);
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.ds-scene__heading--hero em {
+  letter-spacing: -0.02em;
+}
+
+.ds-scene[data-scene='history'] .ds-scene__sentence {
+  max-width: 38ch;
+  font: italic var(--ds-text-headline) / 1.25 var(--ds-font-editorial);
+}
+
+/* The line crosses the lights, so each of its lines stands on its own strip of ink. */
+.ds-scene[data-scene='history'] .ds-scene__sentence > span,
+.ds-scene__year-caption {
+  padding: 0 var(--ds-space-2);
+  background: color-mix(in srgb, var(--ds-fixed-ink) 82%, transparent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.ds-scene__year-caption {
+  justify-self: start;
+}
+
+/* The year the lights have reached, and what that means. The numeral is a year, which is what
+   display type is for; the count is in the sentence under it. */
+.ds-scene__year {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+}
+
+.ds-scene__year-numeral {
+  font: var(--ds-weight-numeral) var(--ds-text-numeral) / 0.9 var(--ds-font-display);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: var(--ds-tracking-numeral);
+  color: var(--front-accent);
+}
+
+.ds-scene__year-caption {
+  max-width: 44ch;
+  font: var(--ds-text-meta) / 1.4 var(--ds-font-mono);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
 }
 
 .ds-scene[data-kind='word'] .ds-scene__words,
@@ -540,7 +607,8 @@
   }
 
   /* The persistent word is this heading's visible form. It stays in the accessibility tree. */
-  .ds-retelling:not([data-still]) .ds-scene__heading:not(.ds-scene__heading--mark) {
+  .ds-retelling:not([data-still])
+    .ds-scene__heading:not(.ds-scene__heading--mark):not(.ds-scene__heading--hero) {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -565,6 +633,39 @@
   .ds-retelling:not([data-still]) .ds-scene[data-kind='country'] .ds-scene__pin {
     align-content: start;
     min-height: 0;
+  }
+
+  /* Scene 1 pinned: its own giant heading is the word on screen, so the persistent word waits
+     until the scroll leaves this scene. The heading and the year span the window. */
+  .ds-retelling:not([data-still]) .ds-retelling__stage {
+    transition: opacity var(--ds-duration-base) var(--ds-ease-entrance);
+  }
+
+  .ds-retelling:not([data-still])[data-scene='history'] .ds-retelling__stage {
+    opacity: 0;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__pin {
+    grid-template-rows: 1fr auto;
+    align-content: stretch;
+    /* The first scene starts under the header, so its pin is the window less the header: the
+       year at its foot is on the first screen before any scroll. */
+    top: var(--front-bar);
+    height: calc(100svh - var(--front-bar));
+    padding-top: calc(var(--front-rail) + var(--ds-space-6));
+    padding-bottom: var(--ds-space-10);
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__pin > * {
+    grid-column: 1 / -1;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__words {
+    align-self: center;
+  }
+
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__year {
+    align-self: end;
   }
 
   /* The artwork lands where the typed word stood: the panel's own padding is taken back out. */

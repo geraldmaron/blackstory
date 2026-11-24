@@ -13,7 +13,7 @@ reads as an epigram. A unit test holds the mechanical ones (`retelling-picks.tes
 
 | Scene | Word          | Wired (first draft)                            | Alternative A                                      | Alternative B                                |
 | ----- | ------------- | ---------------------------------------------- | -------------------------------------------------- | -------------------------------------------- |
-| 1     | History       | History is the record of what happened.        | History is what happened, and what was kept of it. | History is the past, as it was written down. |
+| 1     | History       | History is the story that got told, so keep going and watch the word change. (Changed 2026-11-23 with the first screen's rebuild; was: History is the record of what happened.)        | History is what happened, and what was kept of it. | History is the past, as it was written down. |
 | 2     | _His_ story   | His story is one man’s part of it.             | His story is what one man did, and where.          | His story belongs to one man.                |
 | 3     | _Her_ story   | Her story is one woman’s part of it.           | Her story is what one woman did, and where.        | Her story belongs to one woman.              |
 | 4     | _Your_ story  | Your story is the part nearest you.            | Your story starts where you live.                  | Your story is the part with your town in it. |

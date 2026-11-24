@@ -30,6 +30,7 @@ import { ORBIT_MAX_ZOOM } from '../map/explore-style';
 import { framePadding } from './frame-padding';
 import { easeTourCamera, type TourCamera } from './camera-path';
 import {
+  lapseSteps,
   retellingCameraAt,
   retellingPhase,
   type RetellingLayout,
@@ -67,6 +68,9 @@ const COUNTRY_SPAN_DEG = US_CONUS_BOUNDS[2] - US_CONUS_BOUNDS[0];
 const NO_PADDING = { top: 0, right: 0, bottom: 0, left: 0 };
 /** A town is framed with its surroundings, never at street level. */
 const TOWN_ZOOM = 8;
+/** The first screen's time-lapse, start to finish, and the beat before it starts. */
+const LAPSE_MS = 4200;
+const LAPSE_LEAD_MS = 500;
 
 /** The country, edge to edge, never so far out that the style drops its state lines. */
 function countryZoom(width: number, height: number): number {
@@ -126,9 +130,67 @@ export function RetellingFilm({
   // Every record is its own light here, never grouped into a place. Grouping also has the map
   // regroup the whole catalog on the main thread the first time the camera dives (about 440ms
   // at 4x CPU, measured), which is the one long task this page would otherwise have.
+  //
+  // The first screen counts the lights on by decade when the reader arrives at the top with
+  // motion allowed (`lapseSteps`). Then the map starts dark so no light shows before its decade.
+  const lapseRef = useRef<'idle' | 'armed' | 'done'>('idle');
   useEffect(() => {
-    stage.patchData(nationalFieldPatch(pins, { densityLevels, clusteringEnabled: false }));
-  }, [densityLevels, pins, stage]);
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches || holdStill();
+    const arrivingAtTop = window.scrollY < window.innerHeight * 0.25 && !window.location.hash;
+    const arm = lapseRef.current === 'idle' && !still && arrivingAtTop && !(returning && seen());
+    if (arm) lapseRef.current = 'armed';
+    const shown = arm ? { ...pins, features: [] } : pins;
+    stage.patchData(nationalFieldPatch(shown, { densityLevels, clusteringEnabled: false }));
+  }, [densityLevels, pins, returning, stage]);
+
+  // The time-lapse itself: about four seconds, one step a decade, each record lit in the decade
+  // it is first documented in. Leaving the first screen ends it with every light on.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (plate !== 'live' || lapseRef.current !== 'armed' || !root) return undefined;
+    const yearEl = root.querySelector<HTMLElement>('[data-year]');
+    const captionEl = root.querySelector<HTMLElement>('[data-year-caption]');
+    const settledYear = yearEl?.textContent ?? '';
+    const settledCaption = captionEl?.textContent ?? '';
+    const steps = lapseSteps(pins.features.map((pin) => pin.properties.earliestDecade));
+    const total = pins.features.length.toLocaleString('en-US');
+    const full = nationalFieldPatch(pins, { densityLevels, clusteringEnabled: false });
+    let step = 0;
+    let timer: number | null = null;
+
+    const finish = () => {
+      if (lapseRef.current === 'done') return;
+      lapseRef.current = 'done';
+      if (timer !== null) window.clearTimeout(timer);
+      window.removeEventListener('scroll', onScroll);
+      stage.patchData(full);
+      if (yearEl) yearEl.textContent = settledYear;
+      if (captionEl) captionEl.textContent = settledCaption;
+    };
+    const onScroll = () => {
+      if (window.scrollY > window.innerHeight * 0.5) finish();
+    };
+    const advance = () => {
+      const current = steps[step];
+      if (!current) {
+        finish();
+        return;
+      }
+      const lit = current.order.map((index) => pins.features[index]!);
+      stage.patchData(
+        nationalFieldPatch({ ...pins, features: lit }, { densityLevels, clusteringEnabled: false }),
+      );
+      if (yearEl) yearEl.textContent = String(current.decade);
+      if (captionEl) {
+        captionEl.textContent = `${lit.length.toLocaleString('en-US')} of ${total} records first documented by the ${current.decade}s`;
+      }
+      step += 1;
+      timer = window.setTimeout(advance, LAPSE_MS / steps.length);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    timer = window.setTimeout(advance, LAPSE_LEAD_MS);
+    return finish;
+  }, [densityLevels, pins, plate, stage]);
   useEffect(() => stage.subscribe('viewport', () => setPlate('live')), [stage]);
   useEffect(() => stage.subscribe('error', () => setPlate('unavailable')), [stage]);
   // A light here is one record: no place counts over them.
@@ -267,8 +329,12 @@ export function RetellingFilm({
         // Keep the current name in sight on a narrow rail without moving the page.
         const link = railEls[current];
         const list = link?.closest('ol');
-        if (link && list)
-          list.scrollLeft = link.offsetLeft - (list.clientWidth - link.offsetWidth) / 2;
+        // Centered where there is room; where the list is narrower than the word (a phone), the
+        // word starts at the list's edge, never cut at its first letters.
+        if (link && list) {
+          const centered = link.offsetLeft - (list.clientWidth - link.offsetWidth) / 2;
+          list.scrollLeft = Math.min(link.offsetLeft, centered);
+        }
         if (current === lastScene) markSeen();
       }
       const traveling = phase.from !== phase.to;

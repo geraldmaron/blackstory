@@ -141,3 +141,25 @@ export function retellingCameraAt(
     ? tourDive(peak, from, 1 - phase.t * 2)
     : tourDive(peak, to, (phase.t - 0.5) * 2);
 }
+
+/**
+ * The time-lapse as steps: for each decade that has a record, the indexes of every record first
+ * documented in it or earlier, oldest first. Records with no decade are not lit by any step; they
+ * come on when the lapse ends and every light does. Pure, so the order is tested.
+ */
+export function lapseSteps(
+  decades: readonly (number | undefined)[],
+): { readonly decade: number; readonly order: readonly number[] }[] {
+  const dated = decades
+    .map((decade, index) => ({ decade, index }))
+    .filter((pin): pin is { decade: number; index: number } => typeof pin.decade === 'number')
+    .sort((a, b) => a.decade - b.decade || a.index - b.index);
+  const steps: { decade: number; order: number[] }[] = [];
+  dated.forEach((pin, position) => {
+    const last = steps[steps.length - 1];
+    const order = dated.slice(0, position + 1).map((entry) => entry.index);
+    if (last && last.decade === pin.decade) last.order = order;
+    else steps.push({ decade: pin.decade, order });
+  });
+  return steps;
+}

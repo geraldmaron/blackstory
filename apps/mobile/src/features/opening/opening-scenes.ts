@@ -36,7 +36,7 @@ export const OPENING_SCENES: readonly OpeningScene[] = [
     heading: 'History',
     prefix: '',
     kind: 'word',
-    sentence: 'History is the record of what happened.',
+    sentence: 'History is the story that got told, so keep going and watch the word change.',
   },
   {
     id: 'his-story',

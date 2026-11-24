@@ -139,3 +139,20 @@ describe('the camera for a phase', () => {
     assert.equal(still, country);
   });
 });
+
+it('the time-lapse lights each record in its first decade, oldest first, and never an undated one', async () => {
+  const { lapseSteps } = await import('./retelling-scenes');
+  const steps = lapseSteps([1920, undefined, 1860, 1920, 1530]);
+  assert.deepEqual(
+    steps.map((step) => step.decade),
+    [1530, 1860, 1920],
+  );
+  assert.deepEqual(steps[0]?.order, [4]);
+  assert.deepEqual(steps[1]?.order, [4, 2]);
+  assert.deepEqual(steps[2]?.order, [4, 2, 0, 3]);
+  assert.equal(
+    steps.some((step) => step.order.includes(1)),
+    false,
+  );
+  assert.deepEqual(lapseSteps([undefined]), []);
+});

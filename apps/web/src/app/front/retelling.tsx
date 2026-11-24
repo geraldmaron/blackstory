@@ -105,6 +105,15 @@ export async function Retelling({
   );
   const total = model.totalAll.toLocaleString('en-US');
 
+  // Scene 1's year: the span of decades the map's records are first documented in. The film
+  // counts through it as the lights come on; without script this is what the page says.
+  const decades = pins.features
+    .map((pin) => pin.properties.earliestDecade)
+    .filter((decade): decade is number => typeof decade === 'number');
+  const firstDecade = decades.length > 0 ? Math.min(...decades) : null;
+  const lastDecade = decades.length > 0 ? Math.max(...decades) : null;
+  const mapped = pins.features.length.toLocaleString('en-US');
+
   return (
     <RetellingFilm
       pins={pins}
@@ -195,6 +204,13 @@ export async function Retelling({
                     {/* eslint-disable-next-line @next/next/no-img-element -- brand artwork */}
                     <img src={BRAND_ASSETS.lockup.dark} alt="BlackStory" width={800} height={450} />
                   </h2>
+                ) : scene.id === 'history' ? (
+                  // The first screen: the word at the width of the window, already split by
+                  // its accent, so the page's idea is on screen before any scroll. It reads
+                  // "History" to a screen reader.
+                  <h2 className="ds-scene__heading ds-scene__heading--hero" id={`${scene.id}-h`}>
+                    <em>His</em>tory
+                  </h2>
                 ) : (
                   <h2 className="ds-scene__heading" id={`${scene.id}-h`}>
                     <SceneWord prefix={scene.prefix} heading={scene.heading} />
@@ -212,9 +228,23 @@ export async function Retelling({
                     </p>
                   </>
                 ) : (
-                  <p className="ds-scene__sentence">{RETELLING_SENTENCES[scene.id]}</p>
+                  <p className="ds-scene__sentence">
+                    {/* The span is the line's own ink ground where it crosses the lights. */}
+                    <span>{RETELLING_SENTENCES[scene.id]}</span>
+                  </p>
                 )}
               </div>
+              {scene.id === 'history' && firstDecade !== null && lastDecade !== null ? (
+                <p className="ds-scene__year">
+                  <span className="ds-scene__year-numeral" data-year="" aria-hidden="true">
+                    {lastDecade}
+                  </span>
+                  <span className="ds-scene__year-caption" data-year-caption="">
+                    {mapped} records on the map, first documented from the {firstDecade}s to the{' '}
+                    {lastDecade}s.
+                  </span>
+                </p>
+              ) : null}
               {record ? (
                 <>
                   <p className="ds-scene__record">

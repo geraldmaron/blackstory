@@ -21,7 +21,7 @@ describe('OpeningScreen', () => {
       <OpeningScreen onDone={onDone} onOpenRecord={noop} onOpenRoute={noop} />,
     );
     expect(getByLabelText('Scene 1 of 6: History')).toBeTruthy();
-    expect(getByText('History is the record of what happened.')).toBeTruthy();
+    expect(getByText('History is the story that got told, so keep going and watch the word change.')).toBeTruthy();
     await fireEvent.press(getByLabelText('Skip to the archive'));
     expect(onDone).toHaveBeenCalledTimes(1);
   });

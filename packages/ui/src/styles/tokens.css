@@ -489,6 +489,9 @@
    * untouched surfaces shrink with the system instead of keeping 111px headings.
    */
   --ds-text-display: clamp(3rem, 1rem + 7vw, 6.5rem);
+  /* The one viewport-scale line on the site: the front page's opening word (DESIGN.md 9.7).
+     Sized to the window's width, and held under its height so the line below it stays in view. */
+  --ds-text-hero: clamp(4.5rem, min(22.5vw, 44svh), 26rem);
   --ds-text-headline: clamp(2rem, 1.2rem + 3vw, 3.5rem);
   --ds-text-meta: 0.8125rem;
   --ds-text-numeral: clamp(3rem, 1.5rem + 4.5vw, 5.5rem);
