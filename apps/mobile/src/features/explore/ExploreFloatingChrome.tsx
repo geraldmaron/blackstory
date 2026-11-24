@@ -3,10 +3,18 @@
  * chip + ghost icon affordances). Map dominates first glance — no opaque Surface slab.
  * Copper accent on the count chip and active filters (~10–15% copper budget).
  */
-import type { Ref } from 'react';
+import { useEffect, useRef, useState, type Ref } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
-import { CHROME_MAX_FONT_SCALE, Text, space, radius, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui';
+import {
+  CHROME_MAX_FONT_SCALE,
+  Text,
+  space,
+  radius,
+  MIN_TOUCH_TARGET,
+  useAnnounceOnChange,
+  Z_LAYER,
+} from '@/ui';
 import { hasActiveFilters, type FilterState } from '@/lib/route-params';
 import { exploreContentInset, useExploreChromeColors, MAP_GHOST_PRESSED } from './explore-chrome';
 import { formatExploreCountLabel } from './explore-count-label';
@@ -103,6 +111,9 @@ function GhostIconButton({
   );
 }
 
+/** Long enough for the filtered list to re-count, short enough to feel like the answer. */
+const FILTER_SETTLE_MS = 500;
+
 export function ExploreFloatingChrome({
   inViewCount,
   releaseCount,
@@ -129,6 +140,26 @@ export function ExploreFloatingChrome({
     showDemoHint,
   });
   const showSparseCoach = shouldShowSparseViewportCoach({ inViewCount, releaseCount });
+
+  // Speak the count once a filter change has settled. The count also moves on every pan, and
+  // that must stay silent, so the announcement is keyed to the filters, not to the number.
+  const filterKey = JSON.stringify(filters);
+  const countSpoken = useRef(countLabel.accessibilityLabel);
+  useEffect(() => {
+    countSpoken.current = countLabel.accessibilityLabel;
+  }, [countLabel.accessibilityLabel]);
+  const mountedKey = useRef(filterKey);
+  const [settledCount, setSettledCount] = useState<{ key: string; label: string } | null>(null);
+  useEffect(() => {
+    if (filterKey === mountedKey.current) return;
+    mountedKey.current = '';
+    const timer = setTimeout(
+      () => setSettledCount({ key: filterKey, label: countSpoken.current }),
+      FILTER_SETTLE_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [filterKey]);
+  useAnnounceOnChange(settledCount?.key === filterKey ? settledCount.label : null);
 
   return (
     <View

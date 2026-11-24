@@ -62,7 +62,13 @@ export function Button({
   // "disabled" instead of "pressed". Tones are token-only and visible in both themes.
   const palette = {
     primary: { bg: theme.ink, pressedBg: theme.inkMuted, fg: theme.inverseInk, border: theme.ink },
-    secondary: { bg: theme.surface, pressedBg: theme.border, fg: theme.ink, border: theme.border },
+    // `borderControl`: the edge is what marks this as a control, so it must clear 3:1.
+    secondary: {
+      bg: theme.surface,
+      pressedBg: theme.border,
+      fg: theme.ink,
+      border: theme.borderControl,
+    },
     ghost: { bg: 'transparent', pressedBg: theme.border, fg: theme.accent, border: 'transparent' },
     accent: {
       bg: theme.ink,

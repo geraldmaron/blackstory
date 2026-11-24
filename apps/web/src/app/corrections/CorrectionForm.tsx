@@ -144,7 +144,7 @@ export function CorrectionForm({
     } catch {
       setState({
         status: 'failed',
-        title: 'The correction wasn’t sent.',
+        title: 'We couldn’t confirm the correction was sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }

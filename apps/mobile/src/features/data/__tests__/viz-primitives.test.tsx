@@ -51,6 +51,27 @@ describe('SparklineStrip', () => {
     expect(getByText('2010')).toBeTruthy();
     expect(getByText('Black householder')).toBeTruthy();
   });
+
+  it('keeps a missing value missing and gives each period both values in words', async () => {
+    const base = DATA_INDICATOR_FIXTURE_BUNDLE.cookHomeownership;
+    const { getByLabelText, getByText } = await render(
+      <SparklineStrip
+        series={{
+          ...base,
+          points: [
+            { period: '1990', values: { black: 37.1, white: 63.8 } },
+            { period: '2000', values: { white: 66.7 } },
+          ],
+        }}
+      />,
+    );
+    expect(getByLabelText('1990: Black householder 37.1%, White householder 63.8%')).toBeTruthy();
+    expect(
+      getByLabelText('2000: Black householder not available, White householder 66.7%'),
+    ).toBeTruthy();
+    // Not "0%": the period was not measured.
+    expect(getByText('n/a')).toBeTruthy();
+  });
 });
 
 describe('CoveragePulse', () => {

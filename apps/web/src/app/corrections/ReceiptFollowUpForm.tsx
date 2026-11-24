@@ -25,6 +25,8 @@ void React;
 
 export type FollowUpKind = 'appeal' | 'abuse';
 
+const FOLLOW_UP_FIELDS = new Set(['statement', 'sourceUrl', 'contact', 'privacyConsent']);
+
 const COPY = {
   appeal: {
     endpoint: '/corrections/appeal/api',
@@ -120,7 +122,15 @@ export function ReceiptFollowUpForm({
         setState({ status: 'success' });
         return;
       }
-      if (kind === 'appeal' && (response.status === 403 || response.status === 404)) {
+      if (response.status === 429) {
+        setState({
+          status: 'failed',
+          title: 'Too many messages from this connection just now.',
+          detail: 'Wait a few minutes, then send it again. Nothing you typed has been lost.',
+        });
+        return;
+      }
+      if (kind === 'appeal' && [403, 404, 409].includes(response.status)) {
         setState({
           status: 'failed',
           title: 'This receipt can’t take an appeal right now.',
@@ -129,18 +139,32 @@ export function ReceiptFollowUpForm({
         return;
       }
       if (response.status === 400 && body && typeof body === 'object' && 'issues' in body) {
+        // The server names the link field `sourceUrls`; an issue on a field this form does not
+        // draw (the receipt code, the whole payload) has to surface as a form-level message.
+        const issues = (
+          (body as { issues?: readonly { field: string; message: string }[] }).issues ?? []
+        ).map((issue) => (issue.field === 'sourceUrls' ? { ...issue, field: 'sourceUrl' } : issue));
+        const elsewhere = issues.filter((issue) => !FOLLOW_UP_FIELDS.has(issue.field));
         fields.showIssues(
           formRef.current,
-          (body as { issues?: readonly { field: string; message: string }[] }).issues ?? [],
+          issues.filter((issue) => FOLLOW_UP_FIELDS.has(issue.field)),
         );
-        setState({ status: 'idle' });
+        setState(
+          elsewhere.length === 0
+            ? { status: 'idle' }
+            : {
+                status: 'failed',
+                title: 'It wasn’t accepted.',
+                detail: elsewhere.map((issue) => issue.message).join(' '),
+              },
+        );
         return;
       }
       throw new Error(`follow-up intake answered ${response.status}`);
     } catch {
       setState({
         status: 'failed',
-        title: 'It wasn’t sent.',
+        title: 'We couldn’t confirm it was sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }

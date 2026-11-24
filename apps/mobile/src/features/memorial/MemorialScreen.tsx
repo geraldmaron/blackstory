@@ -111,7 +111,7 @@ export function MemorialScreen() {
           <View
             style={[
               styles.searchField,
-              { borderColor: theme.border, backgroundColor: theme.surface },
+              { borderColor: theme.borderControl, backgroundColor: theme.surface },
             ]}
           >
             <Ionicons

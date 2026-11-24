@@ -135,7 +135,7 @@ export function CommandBar({
     // The header's own brand link, tabs and tools sit behind the sheet too; leaving them focusable
     // let Tab walk out of a dialog that declares aria-modal.
     const behind = document.querySelectorAll(
-      '.ds-shell-body, .ds-shell-footer, .ds-tabbar, .ds-bar__brand, .ds-bar__tabs, .ds-bar__tools',
+      '.ds-skip-link, .ds-shell-offline, .ds-world-controls, .ds-shell-body, .ds-shell-footer, .ds-tabbar, .ds-bar__brand, .ds-bar__tabs, .ds-bar__tools',
     );
     behind.forEach((element) => element.setAttribute('inert', ''));
     document.documentElement.dataset.searchSheet = 'open';

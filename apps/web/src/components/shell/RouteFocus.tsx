@@ -26,9 +26,18 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
-/** `<main>` is not focusable by default; it needs a programmatic-only tab stop. */
+/**
+ * `<main>` is not focusable by default; it needs a programmatic-only tab stop.
+ *
+ * The layout's own `.ds-shell-body` wrapper is preferred over the page's `<main>`: on a route
+ * with a `loading.tsx` the `<main>` present when the pathname flips is the skeleton's, which
+ * React then replaces, and focus fell to `<body>` (seen on /stories and /presidents).
+ */
 function focusMain() {
-  const main = document.querySelector<HTMLElement>('main#main') ?? document.querySelector('main');
+  const main =
+    document.querySelector<HTMLElement>('.ds-shell-body') ??
+    document.querySelector<HTMLElement>('main#main') ??
+    document.querySelector('main');
   if (!main) return;
   if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
   main.focus({ preventScroll: true });

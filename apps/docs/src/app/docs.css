@@ -309,6 +309,9 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
   background: var(--ds-raised);
   max-height: 20rem;
   overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .search-slot {
@@ -326,7 +329,7 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
   border-bottom: 1px solid var(--ds-hairline);
 }
 
-.search-results a:last-child {
+.search-results li:last-child a {
   border-bottom: 0;
 }
 
@@ -666,6 +669,15 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
   font-size: 0.95rem;
 }
 
+.prose .table-scroll {
+  margin: 0 0 1rem;
+  overflow-x: auto;
+}
+
+.prose .table-scroll table {
+  margin: 0;
+}
+
 .prose th,
 .prose td {
   padding: 0.55rem 0.65rem;
@@ -712,11 +724,17 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
     z-index: 40;
     width: min(var(--ds-sidebar-width), 88vw);
     transform: translateX(-105%);
-    transition: transform 160ms ease;
+    /* Hidden once the slide-out ends, so closed links leave the tab order. */
+    visibility: hidden;
+    transition:
+      transform 160ms ease,
+      visibility 0s linear 160ms;
   }
 
   .shell.nav-open .sidebar {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform 160ms ease;
   }
 
   .backdrop {
@@ -727,11 +745,13 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
     border: 0;
     background: color-mix(in srgb, var(--ds-ink) 45%, transparent);
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
   }
 
   .shell.nav-open .backdrop {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
   }
 

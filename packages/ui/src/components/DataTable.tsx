@@ -45,6 +45,8 @@ export type DataTableProps<Row> = {
   readonly rows: readonly Row[];
   readonly columns: readonly DataTableColumn<Row>[];
   readonly rowKey: (row: Row) => string;
+  /** Human name for a row, read out with its selection checkbox. Falls back to the row key. */
+  readonly rowLabel?: (row: Row) => string;
   /** Enables the selection column and the keyboard selection verbs. */
   readonly selectedIds?: ReadonlySet<string>;
   readonly onSelectionChange?: (next: ReadonlySet<string>) => void;
@@ -96,6 +98,7 @@ export function DataTable<Row>({
   rows,
   columns,
   rowKey,
+  rowLabel,
   selectedIds,
   onSelectionChange,
   rowHref,
@@ -107,6 +110,8 @@ export function DataTable<Row>({
   className,
 }: DataTableProps<Row>) {
   const selectable = Boolean(selectedIds && onSelectionChange);
+  // A read-only table has nothing for a focused row to do, so its rows are not tab stops.
+  const interactive = selectable || Boolean(rowHref) || Boolean(onRowActivate);
   const [cursor, setCursor] = useState(0);
   // Anchor for shift+x range selection, mirroring how file lists behave.
   const anchorRef = useRef<number | null>(null);
@@ -368,8 +373,7 @@ export function DataTable<Row>({
                 key={id}
                 data-row-index={index}
                 // Roving tabindex: one stop for the whole table, then j/k inside it.
-                tabIndex={index === cursor ? 0 : -1}
-                aria-selected={selectable ? isSelected : undefined}
+                tabIndex={interactive ? (index === cursor ? 0 : -1) : undefined}
                 className={cx(
                   'ds-datatable__row',
                   isSelected && 'ds-datatable__row--selected',
@@ -383,7 +387,7 @@ export function DataTable<Row>({
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      aria-label={`Select ${id}`}
+                      aria-label={`Select ${rowLabel?.(row) ?? id}`}
                       onChange={() => {
                         anchorRef.current = index;
                         toggle(id);

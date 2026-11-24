@@ -302,7 +302,9 @@ export default async function QueuePage({
             )}
           </Panel>
           {page.rows.length > 0 ? (
-            <p className="queue__hint">j / k to move, Enter to open</p>
+            <p className="queue__hint">
+              With focus in the table: j / k to move between rows, Enter to open
+            </p>
           ) : null}
 
           <Pagination

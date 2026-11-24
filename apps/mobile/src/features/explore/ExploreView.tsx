@@ -35,6 +35,7 @@ import {
   duration,
   space,
   useAccessibilityFocus,
+  useBackDismiss,
   useThemeColors,
   MIN_TOUCH_TARGET,
   radius,
@@ -122,6 +123,11 @@ export type ExploreViewProps = {
   readonly onFiltersChange?: (filters: FilterState) => void;
   /** Optional — notify the route when selection should sync to `selected`. */
   readonly onSelectionChange?: (entityId: string | null) => void;
+  /**
+   * False while another screen covers this one. The view stays mounted under a pushed record,
+   * and must not take the back button from it.
+   */
+  readonly focused?: boolean;
 };
 
 export function ExploreView({
@@ -140,6 +146,7 @@ export function ExploreView({
   onOpenSearch,
   onFiltersChange,
   onSelectionChange,
+  focused = true,
 }: ExploreViewProps) {
   const osReduceMotion = useReduceMotion();
   const reduceMotion = reduceMotionProp ?? osReduceMotion;
@@ -423,6 +430,22 @@ export function ExploreView({
     setSnapIndex(state.selectedId ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
   }, [state.selectedId]);
 
+  const handleClosePreview = useCallback(() => {
+    dispatch({ type: 'entityDeselected' });
+    focusMapSummary();
+  }, [focusMapSummary]);
+
+  const handleHideInstruments = useCallback(() => {
+    setInstrumentsOpen(false);
+    focusInstrumentsToggle();
+  }, [focusInstrumentsToggle]);
+
+  // Android back closes the in-place overlay before it leaves the screen. The most recently
+  // opened one answers first (BackHandler calls the newest subscription first).
+  useBackDismiss(focused && mapLive && mapImmersive, handleExitImmersiveMap);
+  useBackDismiss(focused && Boolean(selectedFeature), handleClosePreview);
+  useBackDismiss(focused && mapLive && !mapImmersive && instrumentsOpen, handleHideInstruments);
+
   // Built once and placed by whichever posture is active. The wide layout mounts BOTH at the
   // same time — that is the whole point of it — so neither may assume it is the only one.
   const recordsList = (
@@ -446,10 +469,7 @@ export function ExploreView({
       feature={selectedFeature}
       onOpenEntity={onOpenEntity}
       {...(onOpenStory ? { onOpenStory } : {})}
-      onClose={() => {
-        dispatch({ type: 'entityDeselected' });
-        focusMapSummary();
-      }}
+      onClose={handleClosePreview}
       onBrowsePrevious={handleBrowsePrevious}
       onBrowseNext={handleBrowseNext}
       browsePosition={
@@ -468,6 +488,7 @@ export function ExploreView({
           testID="explore-map-area"
           pointerEvents="box-none"
           onLayout={handleMapAreaLayout}
+          {...(mapLive && mapImmersive ? { onAccessibilityEscape: handleExitImmersiveMap } : {})}
         >
           <MapScreen
             source={filteredMapSource}
@@ -547,6 +568,7 @@ export function ExploreView({
                 { top: instrumentsTop, bottom: attributionBottom },
               ]}
               pointerEvents="box-none"
+              onAccessibilityEscape={handleHideInstruments}
               entering={reduceMotion ? undefined : FadeInDown.duration(duration.durationFast)}
               exiting={reduceMotion ? undefined : FadeOutUp.duration(duration.durationFast)}
             >
@@ -554,10 +576,7 @@ export function ExploreView({
                 filters={state.filters}
                 features={allFeatures}
                 onFiltersChange={handleFiltersChange}
-                onHide={() => {
-                  setInstrumentsOpen(false);
-                  focusInstrumentsToggle();
-                }}
+                onHide={handleHideInstruments}
                 onOpenPlaceFind={onOpenSearch}
               />
             </Animated.View>

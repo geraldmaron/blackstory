@@ -91,7 +91,7 @@ export function LawBrowseScreen() {
           <View
             style={[
               styles.searchField,
-              { borderColor: theme.border, backgroundColor: theme.surface },
+              { borderColor: theme.borderControl, backgroundColor: theme.surface },
             ]}
           >
             <Ionicons
@@ -146,7 +146,7 @@ export function LawBrowseScreen() {
                   style={[
                     styles.chip,
                     {
-                      borderColor: selected ? theme.accentGraphic : theme.border,
+                      borderColor: selected ? theme.accentGraphic : theme.borderControl,
                       backgroundColor: theme.surface,
                     },
                   ]}

@@ -74,3 +74,6 @@ export { ApiStatusBanner, type ApiStatusBannerProps } from './ApiStatusBanner';
 export { DevMenuHeaderButton } from './DevMenuHeaderButton';
 export { useAccessibilityFocus } from './useAccessibilityFocus';
 export { useAnnounceOnMount } from './useAnnounceOnMount';
+export { useAnnounceOnChange } from './useAnnounceOnChange';
+export { useBackDismiss } from './useBackDismiss';
+export { linesForFontScale, LARGE_TYPE_THRESHOLD } from './large-type';

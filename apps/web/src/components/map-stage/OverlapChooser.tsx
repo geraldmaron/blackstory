@@ -75,6 +75,17 @@ export function OverlapChooser({
         .sort((a, b) => a.displayName.localeCompare(b.displayName))
     : [];
 
+  // Closing unmounts the focused link; hand focus back to where it was instead of to <body>.
+  useEffect(() => {
+    if (!open) return;
+    const opener = document.activeElement;
+    return () => {
+      if (document.activeElement === document.body && opener instanceof HTMLElement) {
+        opener.focus({ preventScroll: true });
+      }
+    };
+  }, [open]);
+
   useEffect(() => {
     if (rows.length > 0) boxRef.current?.querySelector('a')?.focus({ preventScroll: true });
   }, [open, rows.length]);

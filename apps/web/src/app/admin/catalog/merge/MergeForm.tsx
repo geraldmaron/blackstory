@@ -9,7 +9,7 @@
  * un-merge.
  */
 import { FormInput, FormButton } from '../../../../admin/design-system/fields';
-import { useActionState, useState } from 'react';
+import { useActionState, useId, useState } from 'react';
 import Link from 'next/link';
 import { mergeEntities } from './actions';
 import { MERGE_INITIAL } from './merge-state';
@@ -34,6 +34,10 @@ export function MergeForm({
   const [state, formAction, pending] = useActionState(mergeEntities, MERGE_INITIAL);
   const [survivorId, setSurvivorId] = useState(defaultSurvivorId);
   const [reason, setReason] = useState('');
+  const hintId = useId();
+  const needsReason = !reason.trim();
+  const survivorName =
+    candidates.find((candidate) => candidate.id === survivorId)?.displayName ?? 'this record';
 
   if (state.status === 'ok') {
     return (
@@ -103,9 +107,19 @@ export function MergeForm({
       ) : null}
 
       <div className="entity-edit__actions">
-        <FormButton type="submit" className="ds-button" disabled={pending || !reason.trim()}>
-          {pending ? 'Merging…' : `Merge ${candidates.length - 1} into this record`}
+        <FormButton
+          type="submit"
+          className="ds-button"
+          disabled={pending || needsReason}
+          {...(needsReason ? { 'aria-describedby': hintId } : {})}
+        >
+          {pending ? 'Merging…' : `Merge ${candidates.length - 1} into ${survivorName}`}
         </FormButton>
+        {needsReason ? (
+          <span className="entity-edit__hint" id={hintId}>
+            Enter a reason to enable the merge.
+          </span>
+        ) : null}
         <Link href="/admin/catalog" className="entity-merge__cancel">
           Cancel
         </Link>

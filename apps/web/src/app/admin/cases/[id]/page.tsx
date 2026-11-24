@@ -298,6 +298,8 @@ export default function CaseDetailPage() {
                   className="acq__button acq__button--primary"
                   title={actionHelp(action)}
                   disabled={busy || !reason.trim()}
+                  // The visible "Write a decision reason…" line is why these are disabled.
+                  {...(!reason.trim() ? { 'aria-describedby': reasonHintId } : {})}
                   onClick={() => void runTransition(action)}
                 >
                   {actionLabel(action)}

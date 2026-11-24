@@ -8,7 +8,7 @@ import { Text } from './Text';
 import { radius, space, useThemeColors } from './tokens';
 
 export type EntityMarkShape = 'book' | 'pin' | 'arch';
-export type EntityMarkReason = 'absent' | 'pending-rights-review' | 'redacted';
+export type EntityMarkReason = 'absent' | 'pending-rights-review' | 'redacted' | 'load-failed';
 
 export type EntityMarkProps = {
   entityName: string;
@@ -23,6 +23,7 @@ const REASON_CAPTION: Record<EntityMarkReason, string> = {
   absent: 'No image available',
   'pending-rights-review': 'Image pending rights review',
   redacted: 'Image withheld',
+  'load-failed': 'Image could not be loaded',
 };
 
 export function EntityMark({

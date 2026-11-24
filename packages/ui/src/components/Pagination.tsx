@@ -68,14 +68,16 @@ export function Pagination({
       {pageCount > 1 ? (
         <ul className="ds-pagination__pages">
           <li>
-            <a
-              className="ds-pagination__step"
-              href={hrefForPage(Math.max(1, page - 1))}
-              aria-disabled={page === 1}
-              rel="prev"
-            >
-              ← Prev
-            </a>
+            {page <= 1 ? (
+              // Not a link at the bound: an <a href aria-disabled> still navigates on Enter.
+              <span className="ds-pagination__step" aria-disabled="true">
+                ← Prev
+              </span>
+            ) : (
+              <a className="ds-pagination__step" href={hrefForPage(page - 1)} rel="prev">
+                ← Prev
+              </a>
+            )}
           </li>
           {pageWindow(page, pageCount).map((entry, index) =>
             entry === 'gap' ? (
@@ -99,14 +101,15 @@ export function Pagination({
             ),
           )}
           <li>
-            <a
-              className="ds-pagination__step"
-              href={hrefForPage(Math.min(pageCount, page + 1))}
-              aria-disabled={page === pageCount}
-              rel="next"
-            >
-              Next →
-            </a>
+            {page >= pageCount ? (
+              <span className="ds-pagination__step" aria-disabled="true">
+                Next →
+              </span>
+            ) : (
+              <a className="ds-pagination__step" href={hrefForPage(page + 1)} rel="next">
+                Next →
+              </a>
+            )}
           </li>
         </ul>
       ) : null}

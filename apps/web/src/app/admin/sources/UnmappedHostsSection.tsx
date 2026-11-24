@@ -43,6 +43,10 @@ export function UnmappedHostsSection({ rows }: { readonly rows: readonly Unmappe
                     {row.sampleHref ? (
                       <a href={row.sampleHref} rel="noopener noreferrer" target="_blank">
                         Sample
+                        <span className="ds-visually-hidden">
+                          {' '}
+                          citation from {row.host} (opens in a new tab)
+                        </span>
                       </a>
                     ) : (
                       '—'

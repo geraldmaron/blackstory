@@ -2,7 +2,8 @@
  * Themed image primitive wrapping expo-image. `alt` is required so every call
  * site provides an accessible description. When `source` is absent or the
  * network image fails, this fills the frame with `EntityMark` (geometric,
- * non-figurative) — never a broken-image glyph or generated portrait.
+ * non-figurative) — never a broken-image glyph or generated portrait. A failed
+ * load is captioned as a failed load; `fallback.reason` only describes an absent source.
  */
 import { useState } from 'react';
 import { Image as ExpoImage, type ImageSource } from 'expo-image';
@@ -49,7 +50,8 @@ export function Image({
           entityName={fallback.entityName ?? alt}
           shape={fallback.shape}
           kindLabel={fallback.kindLabel}
-          reason={fallback.reason ?? 'absent'}
+          // A failed download is not a rights decision; never let the caller's reason speak for it.
+          reason={hasSource && failed ? 'load-failed' : (fallback.reason ?? 'absent')}
           fill
         />
       </View>

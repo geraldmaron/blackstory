@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { evidenceLabel, evidenceMeterLabel } from '@/lib/evidence-words';
 
 import {
+  linesForFontScale,
   NavIcon,
   navIconForEntityKind,
   RecordMeter,
@@ -30,7 +31,6 @@ import {
   MIN_TOUCH_TARGET,
 } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
-import { linesForFontScale } from './large-type';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 import type { FilterState } from '@/lib/route-params';
 import { exploreStoryMeta } from './explore-story-meta';
@@ -84,7 +84,7 @@ const RecordRow = memo(function RecordRow({
   const theme = useThemeColors();
   const story = exploreStoryMeta(feature);
   // One line at ordinary text sizes; more once the OS text size makes one line unreadable.
-  // See `large-type.ts` — at 3.1x a title in this rail had room for about four characters, so
+  // See `ui/large-type.ts` — at 3.1x a title in this rail had room for about four characters, so
   // every row rendered as four characters and an ellipsis.
   const { fontScale } = useWindowDimensions();
   const titleLines = linesForFontScale(1, fontScale);

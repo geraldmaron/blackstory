@@ -4,8 +4,8 @@
  * sheet. Drives assistive-tech focus on selection change.
  *
  * Evidence is the shared meter plus the shared label, not a "High confidence" chip beside a
- * "3 claims" chip. The card is `accessible` with one composed label, so the meter is decorative
- * here and the sentence rides in `factsSummary`.
+ * "3 claims" chip. The header block is `accessible` with one composed label, so the meter is
+ * decorative here and the sentence rides in `factsSummary`.
  *
  * "Cited in" mirrors web's `RecordSheet` group of the same name, including its rule: it renders
  * only when a story actually cites this record. Most of the catalog has no long-form written
@@ -13,10 +13,18 @@
  * the ordinary state of a record no story has reached.
  */
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Button,
+  linesForFontScale,
   NavIcon,
   navIconForEntityKind,
   RecordMeter,
@@ -123,6 +131,7 @@ export function EntityPreviewSheet({
   style,
 }: EntityPreviewSheetProps) {
   const theme = useThemeColors();
+  const { fontScale } = useWindowDimensions();
   const { ref: sheetRef, focus } = useAccessibilityFocus();
   const featureId = feature?.entityId;
 
@@ -200,20 +209,11 @@ export function EntityPreviewSheet({
     <View
       style={[styles.root, style]}
       testID="entity-preview-sheet"
-      accessibilityViewIsModal
       importantForAccessibility="yes"
+      onAccessibilityEscape={onClose}
     >
       <ExploreChromeFrame accentEdge style={styles.frame}>
-        <View
-          ref={sheetRef}
-          accessible
-          accessibilityRole="summary"
-          accessibilityLabel={`Pinned place: ${feature.label}. ${kindLabel}. ${factsSummary}${
-            dek ? `. ${dek}` : ''
-          }`}
-          accessibilityHint="Swipe through controls to open the full place or close this preview."
-          style={styles.card}
-        >
+        <View style={styles.card}>
           <View style={styles.headerRow}>
             <View
               style={[
@@ -223,7 +223,18 @@ export function EntityPreviewSheet({
             >
               <NavIcon name={navIconForEntityKind(feature.kind)} size={20} selected />
             </View>
-            <View style={styles.headerText}>
+            {/* The summary sits on this non-interactive block, not on the card: on iOS an
+                accessible parent is one element and the controls inside it are unreachable. */}
+            <View
+              ref={sheetRef}
+              accessible
+              accessibilityRole="summary"
+              accessibilityLabel={`Pinned place: ${feature.label}. ${kindLabel}. ${factsSummary}${
+                dek ? `. ${dek}` : ''
+              }`}
+              accessibilityHint="Swipe through controls to open the full place or close this preview."
+              style={styles.headerText}
+            >
               <Text variant="meta" colorRole="accent" numberOfLines={1} style={styles.kicker}>
                 Pinned here
               </Text>
@@ -261,17 +272,31 @@ export function EntityPreviewSheet({
             onPress={() => onOpenEntity(feature.entityId)}
             style={({ pressed }) => [styles.titlePress, { opacity: pressed ? 0.85 : 1 }]}
           >
-            <Text variant="title" isHeading numberOfLines={2} style={styles.title}>
+            <Text
+              variant="title"
+              isHeading
+              numberOfLines={linesForFontScale(2, fontScale, 4)}
+              style={styles.title}
+            >
               {feature.label}
             </Text>
           </Pressable>
 
           {dek ? (
-            <Text variant="editorial" colorRole="ink" numberOfLines={3} style={styles.dek}>
+            <Text
+              variant="editorial"
+              colorRole="ink"
+              numberOfLines={linesForFontScale(3, fontScale, 5)}
+              style={styles.dek}
+            >
               {dek}
             </Text>
           ) : (
-            <Text variant="caption" colorRole="inkMuted" numberOfLines={2}>
+            <Text
+              variant="caption"
+              colorRole="inkMuted"
+              numberOfLines={linesForFontScale(2, fontScale, 4)}
+            >
               {meta
                 ? `${meta}. Open for claims, timeline, and connected pins.`
                 : 'Open for claims, timeline, and connected pins.'}

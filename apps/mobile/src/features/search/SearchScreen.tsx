@@ -12,6 +12,7 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,10 +30,12 @@ import { Notice } from '@/ui/Notice';
 import { ScreenCanvas } from '@/ui/ScreenCanvas';
 import { Text } from '@/ui/Text';
 import {
+  linesForFontScale,
   MIN_TOUCH_TARGET,
   radius,
   space,
   typeScale,
+  useAnnounceOnChange,
   useScreenScrollInsets,
   useThemeColors,
 } from '@/ui';
@@ -196,6 +199,18 @@ export function SearchScreen({
   const showBrowse = state.kind === 'browse';
   const draftLength = draft.trim().length;
 
+  // Speak the settled outcome only. `results` and `empty` are what the controller lands on after
+  // its debounce; typing and loading pass null, so nothing is spoken per keystroke. The error
+  // states announce themselves through `ErrorState`.
+  const shownCount = cardData.length;
+  useAnnounceOnChange(
+    state.kind === 'results'
+      ? `${shownCount} ${shownCount === 1 ? 'record' : 'records'} shown${state.hasMore ? ', more available' : ''}`
+      : showEmpty
+        ? 'No matching records'
+        : null,
+  );
+
   return (
     <ScreenCanvas edges={['left', 'right']}>
       <ScrollView
@@ -217,7 +232,7 @@ export function SearchScreen({
         <View
           style={[
             styles.searchField,
-            { borderColor: theme.border, backgroundColor: theme.surface },
+            { borderColor: theme.borderControl, backgroundColor: theme.surface },
           ]}
         >
           <View style={styles.searchRow}>
@@ -420,6 +435,7 @@ function KindFilterChip({
   readonly onPress: () => void;
   readonly theme: ReturnType<typeof useThemeColors>;
 }) {
+  const { fontScale } = useWindowDimensions();
   return (
     <Pressable
       accessibilityRole="button"
@@ -429,7 +445,7 @@ function KindFilterChip({
       style={({ pressed }) => [
         styles.chip,
         {
-          borderColor: selected ? theme.accent : theme.border,
+          borderColor: selected ? theme.accent : theme.borderControl,
           backgroundColor: selected
             ? theme.surfaceRaised
             : pressed
@@ -442,7 +458,7 @@ function KindFilterChip({
       <Text
         variant="caption"
         style={{ color: selected ? theme.accent : theme.ink }}
-        numberOfLines={1}
+        numberOfLines={linesForFontScale(1, fontScale)}
       >
         {label}
       </Text>
@@ -555,6 +571,7 @@ function SearchListFooter({
   loadMoreError: string | undefined;
   onLoadMore: () => void;
 }) {
+  useAnnounceOnChange(loadingMore ? null : loadMoreError);
   if (loadingMore) {
     return (
       <View style={styles.centered}>

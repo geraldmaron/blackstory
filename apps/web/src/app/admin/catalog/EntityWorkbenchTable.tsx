@@ -9,7 +9,7 @@
 
 import { FormInput, FormButton } from '../../../admin/design-system/fields';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DataTable, SelectionBar, type DataTableColumn } from '@repo/ui';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
@@ -30,6 +30,8 @@ const ACTION_LABEL: Record<CatalogDecisionAction, string> = {
  * be acted on at all.
  */
 const CONFIRM_THRESHOLD = 250;
+
+const REASON_REQUIRED = 'A reason is required — every bulk decision is audited.';
 
 type Props = {
   readonly rows: readonly EntityRow[];
@@ -82,6 +84,9 @@ export function EntityWorkbenchTable({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const reasonRef = useRef<HTMLInputElement>(null);
+  const errorId = useId();
+  const reasonMissing = error === REASON_REQUIRED && !reason.trim();
 
   const clearSelection = useCallback(() => {
     setSelectedIds(new Set());
@@ -112,7 +117,8 @@ export function EntityWorkbenchTable({
     const entityIds = [...selectedIds];
     if (entityIds.length === 0) return;
     if (!reason.trim()) {
-      setError('A reason is required — every bulk decision is audited.');
+      setError(REASON_REQUIRED);
+      reasonRef.current?.focus();
       return;
     }
     if (
@@ -172,6 +178,11 @@ export function EntityWorkbenchTable({
           {row.aliases.length > 0 ? (
             <p className="story-review__row-meta">also {row.aliases.slice(0, 2).join(', ')}</p>
           ) : null}
+          {/* The Living column is dropped at compact widths while bulk actions stay; shown here
+              only then, so the status is never out of sight when acting on a row. */}
+          <p className="story-review__row-meta ds-datatable__compact-only">
+            Living status: {formatLivingStatusLabel(row.livingStatus)}
+          </p>
         </div>
       ),
     },
@@ -226,7 +237,7 @@ export function EntityWorkbenchTable({
   return (
     <>
       {error ? (
-        <p className="story-review__alert" role="alert">
+        <p className="story-review__alert" role="alert" id={errorId}>
           {error}
         </p>
       ) : null}
@@ -242,6 +253,7 @@ export function EntityWorkbenchTable({
         rows={rows}
         columns={columns}
         rowKey={(row) => row.id}
+        rowLabel={(row) => row.displayName}
         selectedIds={selectedIds}
         onSelectionChange={(next) => {
           setSelectedIds(next);
@@ -267,10 +279,12 @@ export function EntityWorkbenchTable({
         <label className="story-review__field">
           <span className="ds-visually-hidden">Reason (required, audited)</span>
           <FormInput
+            ref={reasonRef}
             type="text"
             value={reason}
             onChange={(event) => setReason(event.target.value)}
             placeholder="Reason (required, audited)"
+            {...(reasonMissing ? { 'aria-invalid': true, 'aria-describedby': errorId } : {})}
           />
         </label>
         {canMerge && selectedIds.size >= 2 && selectedIds.size <= MAX_MERGE_SELECTION ? (

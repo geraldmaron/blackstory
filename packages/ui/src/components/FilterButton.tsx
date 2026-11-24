@@ -26,7 +26,7 @@ export function FilterButton({
     <button
       type={type}
       className={cx('ds-button', 'ds-button--secondary', 'ds-filter-button', className)}
-      aria-haspopup="true"
+      aria-haspopup="dialog"
       {...rest}
     >
       <span>{children}</span>

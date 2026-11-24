@@ -114,7 +114,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
     } catch {
       setState({
         status: 'failed',
-        title: 'The lead wasn’t sent.',
+        title: 'We couldn’t confirm the lead was sent.',
         detail: `Nothing you typed has been lost. Try again in a moment, or email it to ${contact}.`,
       });
     }

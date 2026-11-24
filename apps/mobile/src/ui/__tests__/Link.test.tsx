@@ -1,8 +1,21 @@
 import { fireEvent, render } from '@testing-library/react-native';
-import { Linking, StyleSheet } from 'react-native';
-import { EXTERNAL_LINK_HINT, externalLinkHint, Link } from '../Link';
+import { AccessibilityInfo, Linking, StyleSheet } from 'react-native';
+import { EXTERNAL_LINK_HINT, externalLinkHint, Link, LINK_OPEN_FAILED } from '../Link';
 
 describe('Link', () => {
+  it('says so, in text and to the screen reader, when the URL cannot be opened', async () => {
+    const open = jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('no handler'));
+    const announce = jest
+      .spyOn(AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
+    const { getByRole, findByText } = await render(<Link href="https://blackstory.app">site</Link>);
+    fireEvent.press(getByRole('link'));
+    expect(await findByText(LINK_OPEN_FAILED)).toBeTruthy();
+    expect(announce).toHaveBeenCalledWith(LINK_OPEN_FAILED);
+    open.mockRestore();
+    announce.mockRestore();
+  });
+
   it('exposes accessibilityRole="link" and the visible text as the default label', async () => {
     const { getByRole } = await render(<Link href="https://blackstory.app">blackstory.app</Link>);
     const link = getByRole('link');

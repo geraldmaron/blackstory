@@ -198,7 +198,10 @@ function NoMatch({ model }: { readonly model: RecordsIndexModel }) {
   }
   if (constraints.length === 0) {
     return (
-      <Outcome title="The release is empty" action={{ href: '/', label: 'Go to the front page' }}>
+      <Outcome
+        title="The archive didn’t load"
+        action={{ href: '/archive', label: 'Load the archive again' }}
+      >
         The archive failed to load its records. That’s a fault in the site, not an absence of
         history.
       </Outcome>

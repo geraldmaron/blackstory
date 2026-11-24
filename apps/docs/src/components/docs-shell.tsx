@@ -6,7 +6,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { DocsSearch } from '@/components/docs-search';
 import { ThemeToggle } from '@/components/theme-toggle';
 import type { SearchHit } from '@/lib/content';
@@ -38,6 +38,18 @@ function pathMatches(pathname: string, url: string): boolean {
 export function DocsShell({ sections, searchIndex, children }: Props) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+
+  useEffect(() => {
+    if (navOpen) {
+      sidebarRef.current?.querySelector('a')?.focus();
+    } else if (wasOpen.current) {
+      menuRef.current?.focus();
+    }
+    wasOpen.current = navOpen;
+  }, [navOpen]);
 
   useEffect(() => {
     setNavOpen(false);
@@ -67,7 +79,7 @@ export function DocsShell({ sections, searchIndex, children }: Props) {
         aria-label="Close navigation"
         onClick={() => setNavOpen(false)}
       />
-      <aside id="docs-sidebar" className="sidebar" aria-label="Documentation">
+      <aside id="docs-sidebar" ref={sidebarRef} className="sidebar" aria-label="Documentation">
         <Link href="/" className="sidebar-brand" aria-label={PRODUCT_NAME}>
           <Image
             src={withBasePath('/brand/lockup-light.png')}
@@ -126,6 +138,7 @@ export function DocsShell({ sections, searchIndex, children }: Props) {
           <button
             type="button"
             className="menu-toggle"
+            ref={menuRef}
             aria-expanded={navOpen}
             aria-controls="docs-sidebar"
             onClick={() => setNavOpen((value) => !value)}

@@ -43,14 +43,9 @@ export function SelectionBar({
     Boolean(onSelectAllMatches) && !allMatchesSelected && matchCount > selectedCount;
 
   return (
-    <div
-      className={cx('ds-selection-bar', className)}
-      role="region"
-      aria-label="Bulk actions"
-      // Announce selection size changes without stealing focus from the table.
-      aria-live="polite"
-    >
-      <p className="ds-selection-bar__count">
+    <div className={cx('ds-selection-bar', className)} role="region" aria-label="Bulk actions">
+      {/* Only the count is live: on the whole region, typing a reason would be announced too. */}
+      <p className="ds-selection-bar__count" aria-live="polite">
         <strong>{selectedCount.toLocaleString()}</strong>{' '}
         {selectedCount === 1 ? 'entity' : 'entities'} selected
         {allMatchesSelected ? ' — every match in this filter' : ''}

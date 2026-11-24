@@ -602,6 +602,11 @@ button.ds-mark {
   visibility: visible;
 }
 
+[data-tips-off] .ds-mark .ds-tip {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .ds-tip__title {
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-micro);

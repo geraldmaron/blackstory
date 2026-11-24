@@ -240,7 +240,7 @@ export function TypeaheadCombobox({
         : showSearching
           ? SEARCHING_NOTE
           : suggestions.length === 0
-            ? 'No matching suggestions'
+            ? NO_MATCH_NOTE
             : `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'} available`;
 
   return (
@@ -302,7 +302,7 @@ export function TypeaheadCombobox({
         </p>
       ) : null}
       {showUnavailable && open ? (
-        <p className="ds-typeahead__note" role="status">
+        <p className="ds-typeahead__note" aria-hidden="true">
           {UNAVAILABLE_NOTE}
         </p>
       ) : null}

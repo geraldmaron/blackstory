@@ -7,7 +7,14 @@
  */
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { EXTERNAL_LINK_HINT, MIN_TOUCH_TARGET, Text, useThemeColors, space } from '@/ui';
+import {
+  EXTERNAL_LINK_HINT,
+  MIN_TOUCH_TARGET,
+  Text,
+  useAnnounceOnChange,
+  useThemeColors,
+  space,
+} from '@/ui';
 import { OFFLINE_CITATION_COPY, UNSAFE_LINK_COPY } from './copy';
 import { formatSourceName } from './format';
 import { isSafeExternalUrl, openExternalLink } from './linking';
@@ -21,6 +28,7 @@ export type CitationLinkProps = {
 export function CitationLink({ citation, isOnline }: CitationLinkProps) {
   const theme = useThemeColors();
   const [notice, setNotice] = useState<string | undefined>(undefined);
+  useAnnounceOnChange(notice);
   const hasSafeHref = Boolean(citation.href) && isSafeExternalUrl(citation.href);
   const sourceName = formatSourceName(citation.source);
   // "Wikipedia" over "Wikipedia" is not attribution, it is a repeat. The second line earns its
@@ -30,6 +38,8 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
 
   const handlePress = async () => {
     if (!citation.href) return;
+    // Cleared first so a second failure in a row is announced again.
+    setNotice(undefined);
     const result = await openExternalLink(citation.href, { isOnline });
     if (result === 'offline') setNotice(OFFLINE_CITATION_COPY.description);
     else if (result === 'blocked-unsafe-url') setNotice(UNSAFE_LINK_COPY.description);

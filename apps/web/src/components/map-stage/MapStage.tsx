@@ -1299,9 +1299,15 @@ export function MapStageProvider({
    */
   const syncRotateGestures = useCallback(
     (map: MapLibreMap, posture: PlatePosture, pointerFine: boolean) => {
-      // The plate is aria-hidden, so its canvas is a Tab stop only where the reader steers it
-      // (live); a backdrop or framed map would be a focus stop that announces nothing.
+      // The canvas is a Tab stop only where the reader steers it (live), and the plate drops its
+      // aria-hidden in that posture: a focus stop inside a hidden subtree announces nothing.
       map.getCanvas().tabIndex = posture === 'live' ? 0 : -1;
+      map
+        .getCanvas()
+        .setAttribute(
+          'aria-label',
+          'Map. Arrow keys move it, plus and minus zoom. The records list holds the same records.',
+        );
       const container = containerRef.current;
       const current = rotateGesturesRef.current;
       const allowed = container !== null && rotateGestureAllowed(posture, { pointerFine });
@@ -2099,10 +2105,16 @@ export function MapStageProvider({
           class onto whatever container it's given, and maplibre-gl.css hard-codes
           `position: relative` on that class, which would silently clobber the plate's
           `position: fixed` (same element, same specificity, later cascade wins) and put the
-          canvas back in normal document flow. `aria-hidden` on the plate: the synchronized
-          result list is this map's accessible-parity surface, so the canvas itself carries no
-          separate a11y tree. */}
-      <div className="ds-map-stage" data-plate-posture={posture} ref={plateRef} aria-hidden="true">
+          canvas back in normal document flow. `aria-hidden` on the plate wherever it is a
+          backdrop: the synchronized result list is the map's accessible-parity surface. In the
+          live posture the canvas is focusable and the place-count list is its text, so the
+          plate is exposed there. */}
+      <div
+        className="ds-map-stage"
+        data-plate-posture={posture}
+        ref={plateRef}
+        aria-hidden={posture === 'live' ? undefined : true}
+      >
         <div ref={containerRef} className="ds-map-stage__canvas" />
       </div>
       <Suspense fallback={null}>

@@ -1,7 +1,9 @@
 /**
  * "Jump to decade" for the pager. A GET form whose select names a page, so without JavaScript
- * it still lands on the right page; with it, choosing a decade goes straight to that decade's
- * first row (the page plus its anchor).
+ * it still lands on the right page; with it, Go lands on that decade's first row (the page plus
+ * its anchor). It moves on Go, never on change: a closed select fires `change` on every arrow
+ * key in Windows and Linux browsers, which sent a keyboard reader to the first decade they
+ * passed (WCAG 3.2.2).
  */
 'use client';
 
@@ -24,21 +26,24 @@ export type DecadeJumpProps = {
 export function DecadeJump({ jumps, preserved }: DecadeJumpProps) {
   const router = useRouter();
   return (
-    <form className="ds-records-jump" action="/archive" method="get">
+    <form
+      className="ds-records-jump"
+      action="/archive"
+      method="get"
+      onSubmit={(event) => {
+        const select = event.currentTarget.elements.namedItem('page') as HTMLSelectElement;
+        const jump = jumps[select.selectedIndex - 1];
+        if (jump === undefined) return;
+        event.preventDefault();
+        router.push(jump.href);
+      }}
+    >
       {preserved.map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
       <label className="ds-records-jump__field">
         <span className="ds-visually-hidden">Jump to decade</span>
-        <select
-          className="ds-records-jump__select"
-          name="page"
-          defaultValue=""
-          onChange={(event) => {
-            const jump = jumps[event.currentTarget.selectedIndex - 1];
-            if (jump !== undefined) router.push(jump.href);
-          }}
-        >
+        <select className="ds-records-jump__select" name="page" defaultValue="">
           <option value="" disabled>
             Jump to decade
           </option>
@@ -58,11 +63,9 @@ export function DecadeJump({ jumps, preserved }: DecadeJumpProps) {
           />
         </svg>
       </label>
-      <noscript>
-        <button className={buttonClassName('secondary')} type="submit">
-          Go
-        </button>
-      </noscript>
+      <button className={buttonClassName('secondary')} type="submit">
+        Go
+      </button>
     </form>
   );
 }

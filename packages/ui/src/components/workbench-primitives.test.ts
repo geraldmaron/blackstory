@@ -9,8 +9,11 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
+import { DataTable } from './DataTable.tsx';
 import { DetailField, DetailPanel } from './DetailPanel.tsx';
 import { InlineEdit } from './InlineEdit.tsx';
+import { Pagination } from './Pagination.tsx';
+import { SelectionBar } from './SelectionBar.tsx';
 import { Toolbar, ToolbarField } from './Toolbar.tsx';
 
 test('Toolbar without an action is a labeled toolbar, not an unnamed div', () => {
@@ -123,4 +126,47 @@ test('InlineEdit emits hidden fields and reports pending on the button', () => {
   assert.match(html, /name="field" value="displayName"/);
   assert.match(html, /Saving…/);
   assert.match(html, /disabled=""/);
+});
+
+test('Pagination renders Prev and Next as non-links at the bounds', () => {
+  const props = { pageCount: 3, pageSize: 10, total: 30, hrefForPage: (n: number) => `/p/${n}` };
+  const first = renderToStaticMarkup(createElement(Pagination, { ...props, page: 1 }));
+  assert.match(first, /<span class="ds-pagination__step" aria-disabled="true">← Prev<\/span>/);
+  assert.match(first, /<a class="ds-pagination__step" href="\/p\/2" rel="next">/);
+  const last = renderToStaticMarkup(createElement(Pagination, { ...props, page: 3 }));
+  assert.match(last, /<span class="ds-pagination__step" aria-disabled="true">Next →<\/span>/);
+  assert.match(last, /<a class="ds-pagination__step" href="\/p\/2" rel="prev">/);
+});
+
+test('DataTable names a row checkbox with rowLabel and only makes actionable rows tab stops', () => {
+  type Row = { id: string; name: string };
+  const base = {
+    caption: 'Rows',
+    rows: [{ id: 'ent_1', name: 'Bethel AME' }] as readonly Row[],
+    columns: [{ id: 'name', header: 'Name', cell: (row: Row) => row.name }],
+    rowKey: (row: Row) => row.id,
+  };
+  const selectable = renderToStaticMarkup(
+    createElement(DataTable<Row>, {
+      ...base,
+      rowLabel: (row) => row.name,
+      selectedIds: new Set(['ent_1']),
+      onSelectionChange: () => {},
+    }),
+  );
+  assert.match(selectable, /aria-label="Select Bethel AME"/);
+  assert.match(selectable, /<tr[^>]*tabindex="0"/);
+  // A native table row has no selected state; the checkbox carries it.
+  assert.doesNotMatch(selectable, /aria-selected/);
+
+  const readOnly = renderToStaticMarkup(createElement(DataTable<Row>, base));
+  assert.doesNotMatch(readOnly, /tabindex/);
+});
+
+test('SelectionBar announces the count only, not the controls beside it', () => {
+  const html = renderToStaticMarkup(
+    createElement(SelectionBar, { selectedCount: 2, matchCount: 40, onClear: () => {} }),
+  );
+  assert.match(html, /<p class="ds-selection-bar__count" aria-live="polite">/);
+  assert.doesNotMatch(html, /role="region"[^>]*aria-live/);
 });

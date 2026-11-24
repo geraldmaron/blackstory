@@ -67,7 +67,7 @@ describe('a failed lookup is not an empty one', () => {
     const start = code.indexOf('const statusMessage');
     const status = code.slice(start, code.indexOf(';', code.indexOf('available`', start)));
     assert.ok(
-      status.indexOf('showUnavailable') < status.indexOf('No matching suggestions'),
+      status.indexOf('showUnavailable') < status.indexOf('NO_MATCH_NOTE'),
       'unavailability must be checked before the empty-result message',
     );
   });
@@ -80,7 +80,7 @@ describe('a failed lookup is not an empty one', () => {
     const status = code.slice(start, code.indexOf(';', code.indexOf('available`', start)));
     assert.ok(
       status.indexOf('showSearching') >= 0 &&
-        status.indexOf('showSearching') < status.indexOf('No matching suggestions'),
+        status.indexOf('showSearching') < status.indexOf('NO_MATCH_NOTE'),
       'a pending lookup must not be announced as no matches',
     );
     // The live region announces it; the visible note must not announce it a second time.
@@ -103,6 +103,7 @@ describe('a failed lookup is not an empty one', () => {
     // itself as one available suggestion.
     const list = code.slice(code.indexOf('{showList ?'));
     assert.doesNotMatch(list, /ds-typeahead__note/);
-    assert.match(code, /className="ds-typeahead__note" role="status"/);
+    // Every visible note is a copy of what the one live region already said.
+    assert.doesNotMatch(code, /className="ds-typeahead__note" role="status"/);
   });
 });

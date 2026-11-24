@@ -221,7 +221,7 @@ export function ExploreRestoreChip({
         styles.restoreChip,
         {
           backgroundColor: selected ? theme.surfaceRaised : theme.surface,
-          borderColor: selected ? theme.accent : theme.border,
+          borderColor: selected ? theme.accent : theme.borderControl,
           opacity: pressed ? 0.85 : 1,
         },
       ]}

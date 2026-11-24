@@ -23,10 +23,10 @@ describe('SiteFooter', () => {
     assert.match(html, /AI helps with the research and drafting here/);
     assert.match(html, /href="\/methodology#how-a-record-gets-in"/);
     assert.match(html, /aria-label="Footer"/);
-    assert.match(html, /class="ds-shell-footer__column-title">Find</);
-    assert.match(html, /class="ds-shell-footer__column-title">Collections</);
-    assert.match(html, /class="ds-shell-footer__column-title">How it decides</);
-    assert.match(html, /class="ds-shell-footer__column-title">Add to it</);
+    assert.match(html, /class="ds-shell-footer__column-title"[^>]*>Find</);
+    assert.match(html, /class="ds-shell-footer__column-title"[^>]*>Collections</);
+    assert.match(html, /class="ds-shell-footer__column-title"[^>]*>How it decides</);
+    assert.match(html, /class="ds-shell-footer__column-title"[^>]*>Add to it</);
     assert.match(html, /href="\/archive"/);
     assert.match(html, /href="\/archive\?view=map"/);
     assert.match(html, /href="\/stories"/);

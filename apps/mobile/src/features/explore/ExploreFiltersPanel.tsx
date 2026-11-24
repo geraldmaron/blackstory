@@ -167,14 +167,15 @@ function FilterChip({
       accessibilityRole={accessibilityRole}
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ selected }}
+      // A radio reports `checked`; `selected` is for tabs and list items and reads as nothing here.
+      accessibilityState={accessibilityRole === 'radio' ? { checked: selected } : { selected }}
       onPress={onPress}
       hitSlop={4}
       style={({ pressed }) => [
         styles.chip,
         {
           backgroundColor: selected ? (useCopper ? theme.surfaceRaised : theme.ink) : theme.surface,
-          borderColor: selected ? (useCopper ? theme.accent : theme.ink) : theme.border,
+          borderColor: selected ? (useCopper ? theme.accent : theme.ink) : theme.borderControl,
           opacity: pressed ? 0.85 : 1,
         },
       ]}

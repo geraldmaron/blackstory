@@ -73,6 +73,7 @@ export default function ArchiveTabScreen() {
       </View>
       {onInk ? (
         <ExploreView
+          focused={focused}
           edges={['left', 'right']}
           source={mapSource.source}
           loadState={mapSource.loadState}

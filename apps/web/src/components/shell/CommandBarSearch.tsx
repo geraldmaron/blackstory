@@ -174,6 +174,7 @@ export function CommandBarSearch({ placeholder, query }: CommandBarSearchProps) 
       action="/archive"
       method="get"
       role="search"
+      aria-label="Site"
       className="ds-bar__search-form"
       data-ground="paper"
     >
