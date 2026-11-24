@@ -15,6 +15,7 @@ import {
   actionHelp,
   filterChipLabel,
   legalActionsForState,
+  mergeConfirmation,
   missingDecisionReasonMessage,
   stateLabel,
 } from './research-case-types';
@@ -91,4 +92,14 @@ test('parseResearchCaseRecord coerces sparse stored records', () => {
   assert.ok(parsed);
   assert.equal(parsed?.record.checklist.items.length, 0);
   assert.equal(parsed?.record.history.length, 0);
+});
+
+test('mergeConfirmation names one case by title and a bulk merge by count', () => {
+  const one = mergeConfirmation([{ title: 'Greenwood lead' }]);
+  assert.equal(one.name, 'Greenwood lead');
+  assert.equal(one.count, 1);
+  const many = mergeConfirmation([{ title: 'A' }, { title: 'B' }]);
+  assert.equal(many.name, undefined);
+  assert.equal(many.count, 2);
+  assert.match(many.consequence, /can’t be reopened/);
 });

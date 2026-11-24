@@ -4,6 +4,10 @@
 'use client';
 
 import {
+  ConfirmAction,
+  type ConfirmActionRequest,
+} from '../../../../admin/design-system/ConfirmAction';
+import {
   FormTextarea,
   FormSelect,
   FormInput,
@@ -21,6 +25,7 @@ import {
   EXCLUSION_REASON_CODES,
   actionHelp,
   legalActionsForState,
+  mergeConfirmation,
   missingDecisionReasonMessage,
   stateLabel,
   type AdminCaseDetail,
@@ -42,6 +47,7 @@ export default function CaseDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState<ConfirmActionRequest | null>(null);
   const reasonRef = useRef<HTMLTextAreaElement>(null);
   const reasonHintId = useId();
 
@@ -73,7 +79,11 @@ export default function CaseDetailPage() {
     if (user) void load();
   }, [user, load]);
 
-  async function runTransition(action: AdminCaseTransitionAction) {
+  async function runTransition(
+    action: AdminCaseTransitionAction,
+    trigger: HTMLElement,
+    confirmed = false,
+  ) {
     if (!caseId) return;
     if (!reason.trim()) {
       setError(missingDecisionReasonMessage(action));
@@ -82,6 +92,14 @@ export default function CaseDetailPage() {
     }
     if (action === 'merge' && !mergeTarget.trim()) {
       setError('Enter the research case id to merge into before Merge.');
+      return;
+    }
+    if (action === 'merge' && !confirmed) {
+      setConfirming({
+        ...mergeConfirmation([detail ?? { title: caseId }]),
+        trigger,
+        onConfirm: () => void runTransition(action, trigger, true),
+      });
       return;
     }
     setBusy(true);
@@ -300,7 +318,7 @@ export default function CaseDetailPage() {
                   disabled={busy || !reason.trim()}
                   // The visible "Write a decision reason…" line is why these are disabled.
                   {...(!reason.trim() ? { 'aria-describedby': reasonHintId } : {})}
-                  onClick={() => void runTransition(action)}
+                  onClick={(event) => void runTransition(action, event.currentTarget)}
                 >
                   {actionLabel(action)}
                 </FormButton>
@@ -318,6 +336,7 @@ export default function CaseDetailPage() {
           </section>
         </>
       )}
+      <ConfirmAction request={confirming} onDismiss={() => setConfirming(null)} />
     </main>
   );
 }

@@ -2,18 +2,19 @@
  * Edition shell chrome — tab bar and stack header option hooks.
  */
 import type { ReactNode } from 'react';
-import { StyleSheet, type TextStyle, type ViewStyle } from 'react-native';
-import { renderHook } from '@testing-library/react-native';
+import { Platform, StyleSheet, type TextStyle, type ViewStyle } from 'react-native';
+import { render, renderHook } from '@testing-library/react-native';
 import { BottomTabBarHeightContext } from 'expo-router/build/react-navigation/bottom-tabs';
 
 import {
   EDITION_TAB_BAR_BODY,
+  EditionTabLabel,
   editionTabIcon,
   useEditionStackScreenOptions,
   useEditionTabBarInset,
   useEditionTabBarOptions,
 } from './edition-chrome';
-import { themeColors } from '@/ui/tokens';
+import { CHROME_MAX_FONT_SCALE, themeColors } from '@/ui/tokens';
 
 jest.mock('@/ui/tokens', () => {
   const actual = jest.requireActual('@/ui/tokens');
@@ -39,6 +40,27 @@ describe('useEditionTabBarOptions', () => {
     expect(tabBarStyle.backgroundColor).toBe(light.surface);
     expect(tabBarStyle.borderTopColor).toBe(light.border);
     expect(result.current.headerShown).toBe(false);
+  });
+
+  // iOS: the navigator turns label scaling off and sets the Large Content Viewer title itself.
+  it('caps the label at the chrome scale on Android and leaves the iOS label to the navigator', async () => {
+    const ios = await renderHook(() => useEditionTabBarOptions());
+    expect(ios.result.current.tabBarLabel).toBeUndefined();
+
+    const os = jest.replaceProperty(Platform, 'OS', 'android');
+    const android = await renderHook(() => useEditionTabBarOptions());
+    os.restore();
+    expect(android.result.current.tabBarLabel).toBe(EditionTabLabel);
+
+    const { getByText } = await render(
+      <EditionTabLabel color="#123456" position="below-icon">
+        Archive
+      </EditionTabLabel>,
+    );
+    const label = getByText('Archive');
+    expect(label.props.maxFontSizeMultiplier).toBe(CHROME_MAX_FONT_SCALE);
+    expect(label.props.numberOfLines).toBe(1);
+    expect((StyleSheet.flatten(label.props.style) as TextStyle).color).toBe('#123456');
   });
 });
 

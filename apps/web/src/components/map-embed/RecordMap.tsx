@@ -42,6 +42,8 @@ import {
   pointerHitBox,
 } from '../../lib/map-experience/entity-pointer-hit';
 import type { RecordPlace } from '../../lib/map-experience/record-place';
+import { ZoomStack } from '../map-experience/MapControls';
+import { useReducedMotion } from '../../lib/motion/use-reduced-motion';
 import { bindRecordName } from '../map-stage/place-labels';
 import { queryRenderedLayers } from '../map-stage/query-rendered';
 import { fetchCountyPolygons, fetchStatePolygons } from '../map-stage/geo-source-loaders';
@@ -309,6 +311,8 @@ export function RecordMap({
     statePostalCode ?? /^state-([a-z]{2})$/.exec(place?.key ?? '')?.[1]?.toUpperCase();
   const slotRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
+  const reducedMotion = useReducedMotion();
   const [status, setStatus] = useState<Status>('idle');
   /** The slot has come near the viewport: build the map. */
   const [wanted, setWanted] = useState(false);
@@ -393,6 +397,7 @@ export function RecordMap({
           trackResize: false,
         });
         const active = map;
+        mapRef.current = active;
         if (!still) active.touchZoomRotate.disableRotation();
         active.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
         // Start the credit as the "i" button; the text opens on tap.
@@ -460,6 +465,7 @@ export function RecordMap({
       resizeLifecycle?.disconnect();
       contextRecovery?.disconnect();
       guard?.detach();
+      mapRef.current = null;
       map?.remove();
     };
   }, [wanted, lat, lng, precision, statePostal, maxZoom, label, still, recordHref]);
@@ -503,11 +509,30 @@ export function RecordMap({
             </span>
           </a>
         ) : null}
+        {/* Cooperative gestures need two fingers or a held key to zoom; these need one press. */}
+        {!still && status === 'ready' ? (
+          <div className="ds-record-map__zoom">
+            <ZoomStack
+              onZoom={(delta) => {
+                // The reader's own step, as a pinch is: the embed still never moves itself (P-04).
+                const step = { duration: reducedMotion ? 0 : 250 };
+                if (delta > 0) mapRef.current?.zoomIn(step);
+                else mapRef.current?.zoomOut(step);
+              }}
+            />
+          </div>
+        ) : null}
       </div>
-      {caption ? (
+      {/* The hand-off shows wherever it has somewhere to go: the full map is where a reader can
+          move the view with one pointer. */}
+      {caption || exploreHref ? (
         <figcaption className="ds-record-map__caption">
-          <span className="ds-record-map__place">{named}</span>
-          <span className="ds-record-map__precision">{precisionWords}</span>
+          {caption ? (
+            <>
+              <span className="ds-record-map__place">{named}</span>
+              <span className="ds-record-map__precision">{precisionWords}</span>
+            </>
+          ) : null}
           {exploreHref ? (
             <a className="ds-record-map__open" href={exploreHref}>
               Open on the map

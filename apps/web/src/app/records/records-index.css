@@ -327,6 +327,16 @@ body:has(.ds-records) .ds-reading-progress {
   font-variant-numeric: tabular-nums;
 }
 
+/* A decade bar in the timeline's figure can be 3px tall, so its link takes the whole height of
+   its own column (the slot is the positioned box): at least 24px tall, and as wide as the gap to
+   its neighbors allows without overlapping them. The bar is drawn as before. It sits here, not
+   in records-chronology.css with the bar's other rules, beside the jump that is its equivalent. */
+.ds-decade-figure__bar::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+}
+
 .ds-records-jump {
   display: flex;
   gap: var(--ds-space-2);

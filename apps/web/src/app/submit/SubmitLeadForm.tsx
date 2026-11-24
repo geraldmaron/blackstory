@@ -9,17 +9,20 @@
  * Checked as the reader goes (`lead-form.ts`); the server still decides. On success the form is
  * replaced by the receipt; on failure everything typed stays in place.
  */
-import React, { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Button, buttonClassName } from '@repo/ui';
 import { Field, fieldControlProps } from '../../components/forms/fields';
 import { FormFailure, RequiredMark, RequiredNote, SubmitRow } from '../../components/forms/FormKit';
 import { useFieldErrors } from '../../components/forms/use-field-errors';
-import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+import { postJsonWithRequestIntegrity } from '../../lib/request-integrity/client';
 import { leadIssueField, validateLeadForm } from './lead-form';
+import { MAX_FIELD_LENGTH, MAX_SHORT_FIELD_LENGTH, MIN_WHY_IT_MATTERS_LENGTH } from './lead-intake';
 
 void React;
 
 const LEAD_FIELDS = new Set(['url', 'description', 'whyItMatters', 'location', 'era', 'contact']);
+const LONG_LIMIT = `Up to ${MAX_FIELD_LENGTH.toLocaleString('en-US')} characters.`;
+const SHORT_LIMIT = `Up to ${MAX_SHORT_FIELD_LENGTH} characters.`;
 
 type SubmitState =
   | { readonly status: 'idle' }
@@ -29,8 +32,10 @@ type SubmitState =
 
 export function SubmitLeadForm({ contact }: { readonly contact: string }) {
   const [state, setState] = useState<SubmitState>({ status: 'idle' });
-  const fields = useFieldErrors(validateLeadForm);
+  const validate = useMemo(() => (data: FormData) => validateLeadForm(data, contact), [contact]);
+  const fields = useFieldErrors(validate);
   const formRef = useRef<HTMLFormElement | null>(null);
+  const sendingAnother = useRef(false);
   const doneRef = useRef<HTMLDivElement | null>(null);
   const failureRef = useRef<HTMLDivElement | null>(null);
   const id = useId();
@@ -47,6 +52,11 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
   useEffect(() => {
     if (state.status === 'success') doneRef.current?.focus();
     if (state.status === 'failed') failureRef.current?.focus();
+    // "Send another lead" unmounts the button that had focus; the new form's first field takes it.
+    if (state.status === 'idle' && sendingAnother.current) {
+      sendingAnother.current = false;
+      (formRef.current?.elements.namedItem('url') as HTMLElement | null)?.focus();
+    }
   }, [state.status]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -67,13 +77,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
 
     setState({ status: 'submitting' });
     try {
-      const integrityHeaders = await getRequestIntegrityHeaders();
-      const response = await fetch('/submit/api', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', ...integrityHeaders },
-        body: JSON.stringify(payload),
-      });
+      const response = await postJsonWithRequestIntegrity('/submit/api', payload);
       const body: unknown = await response.json().catch(() => undefined);
 
       if (response.status === 202) {
@@ -122,6 +126,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
 
   function another() {
     fields.reset();
+    sendingAnother.current = true;
     setState({ status: 'idle' });
   }
 
@@ -169,6 +174,9 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
 
       <fieldset className="ds-form-group">
         <legend>The lead</legend>
+        <p className="ds-form-group__hint">
+          The whole lead can run to about 5,800 characters. Each answer gives its own limit.
+        </p>
         <Field
           label={
             <>
@@ -177,7 +185,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
             </>
           }
           htmlFor={ids.url}
-          hint="Where this lives online, such as an article, an archived post or a group page."
+          hint={`Where this lives online, such as an article, an archived post or a group page. If there is no link, write to ${contact} instead.`}
           {...errorProps('url')}
         >
           <input
@@ -185,7 +193,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
             name="url"
             type="url"
             inputMode="url"
-            autoComplete="url"
+            autoComplete="off"
             required
             placeholder="https://"
           />
@@ -194,7 +202,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
         <Field
           label="What you know"
           htmlFor={ids.description}
-          hint="Plain language is fine. Say where it comes from."
+          hint={`Plain language is fine. Say where it comes from. ${LONG_LIMIT}`}
           {...errorProps('description')}
         >
           <textarea
@@ -216,7 +224,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
             </>
           }
           htmlFor={ids.why}
-          hint="What would it help document?"
+          hint={`What would it help document? ${LONG_LIMIT}`}
           {...errorProps('whyItMatters')}
         >
           <textarea
@@ -224,14 +232,14 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
             name="whyItMatters"
             rows={3}
             required
-            minLength={10}
+            minLength={MIN_WHY_IT_MATTERS_LENGTH}
           />
         </Field>
 
         <Field
           label="Where"
           htmlFor={ids.location}
-          hint="A town, county or state, if you know it."
+          hint={`A town, county or state, if you know it. ${SHORT_LIMIT}`}
           {...errorProps('location')}
         >
           <input
@@ -244,7 +252,7 @@ export function SubmitLeadForm({ contact }: { readonly contact: string }) {
         <Field
           label="When"
           htmlFor={ids.era}
-          hint="A year or a decade is enough."
+          hint={`A year or a decade is enough. ${SHORT_LIMIT}`}
           {...errorProps('era')}
         >
           <input

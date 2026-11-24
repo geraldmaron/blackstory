@@ -14,6 +14,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@repo/ui';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import { AtlasExperience } from './AtlasExperience';
+import { CommandBar } from '../../components/shell/CommandBar';
 import { recordsHref } from '../../lib/records/records-query';
 import { recordsQueryFromExplore } from '../../lib/discovery/explore-collection';
 import { cachedAtlasCatalog, fetchAtlasCatalog } from './atlas-catalog-fetch';
@@ -82,6 +83,8 @@ export function AtlasLoader({
     // The column, in its error state: the map stays visible beside it.
     return (
       <div className="ds-atlas" data-atlas-catalog="error">
+        {/* Embedded, the site header is already on the page; alone, this branch needs its own. */}
+        {embedded ? null : <CommandBar />}
         <aside className="ds-xcol" aria-label="Records on the map">
           <div className="ds-xcol__head">
             <h2 className="ds-xcol__count">Records did not load</h2>

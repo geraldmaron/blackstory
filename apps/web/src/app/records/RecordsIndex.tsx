@@ -383,6 +383,19 @@ export function RecordsIndexPage({ model, photos = {}, world }: RecordsIndexProp
   const preserved = [
     ...new URLSearchParams(archiveQueryString({ ...query, page: 1 })).entries(),
   ] as const;
+  // Offered on a single page too, where it lands on that decade's anchor: the figure's bars are
+  // too narrow to be the only way to a decade (WCAG 2.5.8).
+  const decadeJump =
+    decadeJumps.length > 1 ? (
+      <DecadeJump
+        jumps={decadeJumps.map((jump) => ({
+          label: jump.label,
+          page: jump.page,
+          href: jump.href,
+        }))}
+        preserved={preserved}
+      />
+    ) : null;
 
   return (
     <PageFrame width="wide" className={world ? 'ds-records ds-country' : 'ds-records'}>
@@ -460,17 +473,10 @@ export function RecordsIndexPage({ model, photos = {}, world }: RecordsIndexProp
               <ArrowGlyph direction="next" />
             </a>
           )}
-          {decadeJumps.length > 1 ? (
-            <DecadeJump
-              jumps={decadeJumps.map((jump) => ({
-                label: jump.label,
-                page: jump.page,
-                href: jump.href,
-              }))}
-              preserved={preserved}
-            />
-          ) : null}
+          {decadeJump}
         </nav>
+      ) : decadeJump ? (
+        <div className="ds-records-pager">{decadeJump}</div>
       ) : null}
       {world}
     </PageFrame>

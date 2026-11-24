@@ -30,7 +30,7 @@ import {
   getServerPaletteSeed,
   subscribeToPaletteSeed,
 } from '../../lib/shell/palette-seed';
-import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+import { fetchWithRequestIntegrity } from '../../lib/request-integrity/client';
 import { TypeaheadCombobox, type TypeaheadSuggestion } from '../typeahead/TypeaheadCombobox';
 import { instrumentRecordHref } from '../../lib/place/place-slug';
 
@@ -114,14 +114,9 @@ export function CommandBarSearch({ placeholder, query }: CommandBarSearchProps) 
 
   const suggestRemote = useCallback(
     async (query: string, signal: AbortSignal): Promise<readonly TypeaheadSuggestion[]> => {
-      const integrityHeaders = await getRequestIntegrityHeaders();
-      const response = await fetch(
+      const response = await fetchWithRequestIntegrity(
         `/search/api?q=${encodeURIComponent(query)}&pageSize=${SUGGESTION_PAGE_SIZE}&facets=0`,
-        {
-          credentials: 'same-origin',
-          headers: { accept: 'application/json', ...integrityHeaders },
-          signal,
-        },
+        { headers: { accept: 'application/json' }, signal },
       );
       if (!response.ok) {
         // Thrown, not swallowed. Returning `[]` here is what made a 429 read as an empty archive:

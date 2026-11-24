@@ -1,10 +1,11 @@
 'use client';
 
 /**
- * The map's own controls: zoom, locate, and north. Every maps app puts these on the map itself,
+ * The map's own controls: move, zoom, locate, and north. Every maps app puts these on the map itself,
  * so that is where readers look for them.
  *
- * One vertical stack, 44px targets (WCAG 2.5.5). Grouping nearby records is not a control: it is
+ * The four move buttons are the single-pointer way to pan (WCAG 2.5.7): dragging is never the
+ * only one. One vertical stack, 44px targets (WCAG 2.5.5). Grouping nearby records is not a control: it is
  * always on. The compass only appears once the plate is rotated, and pressing it straightens it.
  * The stack never changes shape while the column changes state, so nothing under a reader's
  * pointer moves: locate is always here, and it is the page's one locate control.
@@ -15,7 +16,70 @@ import './map-controls.css';
 
 void React;
 
+export type PanDirection = 'north' | 'west' | 'south' | 'east';
+
+/** Unit screen offsets for `map.panBy`: up the screen is north while the map is not turned. */
+export const PAN_OFFSETS: Readonly<Record<PanDirection, readonly [number, number]>> = {
+  north: [0, -1],
+  west: [-1, 0],
+  south: [0, 1],
+  east: [1, 0],
+};
+
+/** What a move button says while the map is turned: its arrow follows the screen, not the compass. */
+const SCREEN_WORD: Readonly<Record<PanDirection, string>> = {
+  north: 'up',
+  west: 'left',
+  south: 'down',
+  east: 'right',
+};
+
+const PAN_ARROW: Readonly<Record<PanDirection, string>> = {
+  north: 'M5 12l5-5 5 5',
+  west: 'M12 5l-5 5 5 5',
+  south: 'M5 8l5 5 5-5',
+  east: 'M8 5l5 5-5 5',
+};
+
+/**
+ * The zoom pair, one sheet. The record embed (`RecordMap`) carries the same pair, so the two maps
+ * cannot grow different buttons.
+ */
+export function ZoomStack({ onZoom }: { readonly onZoom: (delta: 1 | -1) => void }) {
+  return (
+    <div className="ds-map-controls__stack">
+      <button
+        type="button"
+        className="ds-map-controls__btn"
+        onClick={() => onZoom(1)}
+        aria-label="Zoom in"
+      >
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M10 4v12M4 10h12"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className="ds-map-controls__btn"
+        onClick={() => onZoom(-1)}
+        aria-label="Zoom out"
+      >
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 10h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export type MapControlsProps = {
+  /** Move the view one step; the caller drives the camera, as it does for zoom. */
+  readonly onPan: (direction: PanDirection) => void;
   /** Zoom by a whole step; the caller drives the camera. */
   readonly onZoom: (delta: 1 | -1) => void;
   readonly onLocate: () => void;
@@ -24,6 +88,8 @@ export type MapControlsProps = {
   readonly located: boolean;
   readonly bearing: number;
   readonly onResetBearing: () => void;
+  /** True while the catalog loads: the controls are drawn but cannot be used. */
+  readonly inert?: boolean;
   readonly className?: string;
 };
 
@@ -31,12 +97,14 @@ export type MapControlsProps = {
 export const COMPASS_THRESHOLD_DEGREES = 1;
 
 export function MapControls({
+  onPan,
   onZoom,
   onLocate,
   locating,
   located,
   bearing,
   onResetBearing,
+  inert = false,
   className,
 }: MapControlsProps) {
   const rotated =
@@ -49,34 +117,31 @@ export function MapControls({
       data-ground="ink"
       role="group"
       aria-label="Map controls"
+      inert={inert}
     >
-      <div className="ds-map-controls__stack">
-        <button
-          type="button"
-          className="ds-map-controls__btn"
-          onClick={() => onZoom(1)}
-          aria-label="Zoom in"
-        >
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path
-              d="M10 4v12M4 10h12"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-        <button
-          type="button"
-          className="ds-map-controls__btn"
-          onClick={() => onZoom(-1)}
-          aria-label="Zoom out"
-        >
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M4 10h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </button>
+      <div className="ds-map-controls__pad">
+        {(Object.keys(PAN_OFFSETS) as PanDirection[]).map((direction) => (
+          <button
+            key={direction}
+            type="button"
+            className="ds-map-controls__btn"
+            data-pan={direction}
+            onClick={() => onPan(direction)}
+            aria-label={`Move the map ${rotated ? SCREEN_WORD[direction] : direction}`}
+          >
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d={PAN_ARROW[direction]}
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        ))}
       </div>
+      <ZoomStack onZoom={onZoom} />
       <button
         type="button"
         className="ds-map-controls__btn ds-map-controls__locate"

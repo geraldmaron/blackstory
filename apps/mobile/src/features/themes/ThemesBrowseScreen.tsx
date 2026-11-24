@@ -3,17 +3,8 @@
  * Stack route: canvas insets sides/bottom only (native header owns top).
  */
 import { useMemo, useState } from 'react';
-import {
-  Keyboard,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import {
   Button,
   EmptyState,
@@ -27,9 +18,7 @@ import {
   Text,
   screenScrollInsets,
   space,
-  useThemeColors,
-  MIN_TOUCH_TARGET,
-  radius,
+  SearchField,
 } from '@/ui';
 import { THEMES_CATALOG, THEMES_INTRO, THEMES_METHOD } from './themes-copy';
 import {
@@ -78,7 +67,6 @@ function ThemeRows({
 }
 
 export function ThemesBrowseScreen() {
-  const theme = useThemeColors();
   const [draft, setDraft] = useState('');
   const allRows = useMemo(() => listCatalogRows(), []);
   const filtered = useMemo(() => filterCatalogRows(allRows, draft), [allRows, draft]);
@@ -131,46 +119,13 @@ export function ThemesBrowseScreen() {
           <LedgerSectionLabel ruleAbove meta={countLabel}>
             Find a theme
           </LedgerSectionLabel>
-          <View
-            style={[
-              styles.searchField,
-              { borderColor: theme.borderControl, backgroundColor: theme.surface },
-            ]}
-          >
-            <Ionicons
-              name="search-outline"
-              size={18}
-              color={theme.inkMuted}
-              accessibilityElementsHidden
-            />
-            <TextInput
-              value={draft}
-              onChangeText={setDraft}
-              returnKeyType="search"
-              onSubmitEditing={() => Keyboard.dismiss()}
-              placeholder={THEMES_CATALOG.searchPlaceholder}
-              placeholderTextColor={theme.inkMuted}
-              accessibilityLabel="Search themes"
-              accessibilityRole="search"
-              maxLength={120}
-              autoCorrect={false}
-              autoCapitalize="none"
-              spellCheck={false}
-              clearButtonMode="while-editing"
-              style={[styles.input, { color: theme.ink }]}
-            />
-            {draft.length > 0 && Platform.OS !== 'ios' ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Clear search"
-                onPress={() => setDraft('')}
-                hitSlop={8}
-                style={styles.clear}
-              >
-                <Ionicons name="close-circle" size={18} color={theme.inkMuted} />
-              </Pressable>
-            ) : null}
-          </View>
+          <SearchField
+            value={draft}
+            onChangeText={setDraft}
+            placeholder={THEMES_CATALOG.searchPlaceholder}
+            accessibilityLabel="Search themes"
+            maxLength={120}
+          />
         </View>
 
         <View style={styles.section}>
@@ -206,25 +161,5 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: space['2'],
-  },
-  searchField: {
-    minHeight: MIN_TOUCH_TARGET,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.sm,
-    paddingHorizontal: space['3'],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space['2'],
-  },
-  input: {
-    flex: 1,
-    fontSize: 13,
-    paddingVertical: space['2'],
-  },
-  clear: {
-    minHeight: MIN_TOUCH_TARGET,
-    minWidth: MIN_TOUCH_TARGET,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

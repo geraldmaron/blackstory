@@ -420,6 +420,7 @@ export function OpeningScreen({
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         onMomentumScrollEnd={handleSettle}
         testID="opening-pager"
       >
@@ -429,6 +430,9 @@ export function OpeningScreen({
             style={[{ width }, index === lastIndex ? { backgroundColor: theme.canvas } : undefined]}
             contentContainerStyle={styles.page}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            // The town field sits low on its page; without this the keyboard covers it on iOS.
+            automaticallyAdjustKeyboardInsets
             // Only the page on screen is read; the others are a swipe away, not in the way.
             accessibilityElementsHidden={index !== page}
             importantForAccessibility={index === page ? 'auto' : 'no-hide-descendants'}

@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { AppRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import {
   EMPTY_RECORDS_QUERY,
@@ -70,7 +71,12 @@ function render(query: Partial<RecordsQuery> = {}, overrides: Partial<RecordsInd
     notice: undefined,
     ...overrides,
   } as unknown as RecordsIndexModel;
-  return renderToStaticMarkup(<RecordsIndexPage model={model} />);
+  // The decade jump reads the router; a static render has none mounted.
+  return renderToStaticMarkup(
+    <AppRouterContext.Provider value={{} as never}>
+      <RecordsIndexPage model={model} />
+    </AppRouterContext.Provider>,
+  );
 }
 
 function menu(markup: string, key: string): string {
@@ -189,5 +195,24 @@ describe('Records register', () => {
     assert.match(markup, /href="\/archive\?page=4" rel="next"/);
     assert.equal((markup.match(/ds-records-pager__at/g) ?? []).length, 1);
     assert.match(markup, /Page <span class="ds-records-pager__num">3<\/span> of/);
+  });
+
+  it('offers the decade jump on a single page too, with no pager around it', () => {
+    const decadeJumps = [
+      { decade: 1770, label: '1770s', page: 1, href: '/archive?sort=earliest#decade-1770' },
+      { decade: 1950, label: '1950s', page: 1, href: '/archive?sort=earliest#decade-1950' },
+    ];
+    const markup = render({}, { pageCount: 1, decadeJumps });
+    assert.match(markup, /<form class="ds-records-jump"/);
+    assert.match(markup, /<option value="1">1950s<\/option>/);
+    assert.doesNotMatch(markup, /aria-label="Pages"/);
+    assert.doesNotMatch(markup, /ds-records-pager__at/);
+
+    const paged = render({}, { page: 1, pageCount: 3, nextHref: '/archive?page=2', decadeJumps });
+    assert.equal((paged.match(/ds-records-jump"/g) ?? []).length, 1);
+    assert.match(paged, /aria-label="Pages"/);
+
+    const oneDecade = render({}, { pageCount: 1, decadeJumps: decadeJumps.slice(0, 1) });
+    assert.doesNotMatch(oneDecade, /ds-records-jump/);
   });
 });

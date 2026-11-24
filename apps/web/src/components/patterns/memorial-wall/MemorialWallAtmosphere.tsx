@@ -22,7 +22,9 @@
  * name every few seconds would be noise. The inscription is real text, and the alphabetical list
  * below (MemorialSections) is the complete, keyboard-reachable path to every name. Under
  * `prefers-reduced-motion` the wall is drawn once as a composed still, with a share of names fully
- * legible, and nothing drifts or cycles.
+ * legible, and nothing drifts or cycles. The shell's "Hold still" switch (WorldControls) stops the
+ * wall too: pressed on this page it freezes the wall where it is and releasing it carries on from
+ * there; already on when the page opens, the wall opens as the same composed still.
  *
  * Performance. One canvas, text drawn with `fillText` grouped by font, capped near 30 fps, and
  * paused while the tab is hidden or the wall is off screen. No per-name DOM, no layout reads per
@@ -32,6 +34,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from '../../../lib/motion/use-reduced-motion';
+import { holdStill } from '../../../lib/map-experience/world-prefs';
 import {
   MEMORIAL_HANDWRITING_FONT_VARS,
   MEMORIAL_NAMES,
@@ -88,6 +91,8 @@ export type MemorialWallAtmosphereProps = {
   readonly entityLinksByName?: Readonly<Record<string, string>>;
   /** The live `prefers-reduced-motion` read: a composed still wall, nothing drifts or cycles. */
   readonly held?: boolean;
+  /** "Hold still" pressed on this page: the wall stops on its current frame and resumes from it. */
+  readonly paused?: boolean;
 };
 
 function hashString(raw: string): number {
@@ -158,8 +163,11 @@ export function MemorialWallAtmosphere({
   messageLines,
   entityLinksByName,
   held: heldProp,
+  paused = false,
 }: MemorialWallAtmosphereProps) {
   const held = Boolean(heldProp);
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
   const wallRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const presenceRef = useRef<HTMLDivElement | null>(null);
@@ -197,7 +205,7 @@ export function MemorialWallAtmosphere({
 
   // The inscription arrives one sentence at a time and then stays.
   useEffect(() => {
-    if (held) {
+    if (held || paused) {
       setLinesShown(lineCount);
       return;
     }
@@ -205,7 +213,7 @@ export function MemorialWallAtmosphere({
       window.setTimeout(() => setLinesShown((n) => Math.max(n, i + 1)), ms),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [held, lineCount]);
+  }, [held, paused, lineCount]);
 
   // One name at a time: in, held, out, then the next. A pressed name stays until released.
   useEffect(() => {
@@ -220,6 +228,8 @@ export function MemorialWallAtmosphere({
       setPresence((p) => ({ ...p, visible: true }));
       return;
     }
+    // Paused: the name in front stays as it is, shown or not, until the wall moves again.
+    if (paused) return;
     let timer = 0;
     const show = () => {
       setPresence((p) => ({ ...p, visible: true }));
@@ -234,7 +244,7 @@ export function MemorialWallAtmosphere({
     };
     timer = window.setTimeout(show, 2600);
     return () => window.clearTimeout(timer);
-  }, [held, presence.pinned]);
+  }, [held, paused, presence.pinned]);
 
   useEffect(() => {
     if (!presence.pinned) return;
@@ -287,6 +297,8 @@ export function MemorialWallAtmosphere({
     let travelled = 0;
     let seconds = 0;
     let buildAt = 0;
+    // Set by a paused draw: names still arriving are shown, and do not arrive again on resume.
+    let revealed = false;
     let families: string[] = [];
     let presenceClear = { cx: 0, cy: 0, rx: 0, ry: 0 };
     let inscriptionClear = { cx: 0, cy: 0, hw: 0, hh: 0 };
@@ -452,7 +464,8 @@ export function MemorialWallAtmosphere({
 
     const draw = (now: number) => {
       const span = builtHeight + WRAP_MARGIN * 2;
-      const density = held ? 1 : computeMemorialRevealState(now - buildAt).namesDensity;
+      if (pausedRef.current) revealed = true;
+      const density = held || revealed ? 1 : computeMemorialRevealState(now - buildAt).namesDensity;
       const pinned = pinnedRef.current;
       const radius = Math.max(110, Math.min(200, width * 0.14));
       const att = held ? 0 : pointer.att;
@@ -537,7 +550,8 @@ export function MemorialWallAtmosphere({
     let raf = 0;
     let last = 0;
     let onScreen = true;
-    const running = () => !held && onScreen && !document.hidden && items.length > 0 && !disposed;
+    const running = () =>
+      !held && !pausedRef.current && onScreen && !document.hidden && items.length > 0 && !disposed;
 
     const frame = (now: number) => {
       raf = 0;
@@ -569,8 +583,10 @@ export function MemorialWallAtmosphere({
         raf = window.requestAnimationFrame(frame);
       }
     };
+    // Draws the stopped wall again (theme, pressed name, pause), or sets it moving once released.
     const redrawStill = () => {
-      if (held && items.length > 0) draw(performance.now());
+      if (!held && !pausedRef.current) start();
+      else if (items.length > 0) draw(performance.now());
     };
 
     const rebuildIfNeeded = () => {
@@ -649,7 +665,7 @@ export function MemorialWallAtmosphere({
         pointer.lastMove = performance.now();
       }
       // The still wall has no loop to update the cursor from.
-      if (held) {
+      if (held || pausedRef.current) {
         canvas.style.cursor = hitTestMemorialWall(targets, p.x, p.y) >= 0 ? 'pointer' : '';
       }
     };
@@ -697,12 +713,12 @@ export function MemorialWallAtmosphere({
     };
   }, [held, names, seedKey, pin, release]);
 
-  // A still wall redraws when the pressed name changes, so it lights on the wall too.
+  // A still wall redraws when the pressed name changes, so it lights on the wall too. The same
+  // event stops the loop on its current frame when the wall is paused and restarts it on release.
   useEffect(() => {
-    if (!held) return;
     const canvas = canvasRef.current;
     canvas?.dispatchEvent(new Event('memorial-redraw'));
-  }, [held, presence.pinned]);
+  }, [held, paused, presence.pinned]);
 
   return (
     <div className="ds-memorial-stage" data-held={held ? 'true' : undefined}>
@@ -757,12 +773,40 @@ export function MemorialWallAtmosphere({
 }
 
 /**
- * Mounts the wall still whenever the OS asks for reduced motion. There is no on-page control: the
- * reader's only switch is the system preference, read live.
+ * Mounts the wall still whenever the OS asks for reduced motion, read live, and follows the
+ * shell's "Hold still" switch (WorldControls), the reader's on-page way to stop the wall. The wall
+ * draws no control of its own.
+ *
+ * A choice already saved when the page opens gets the composed still, as reduced motion does: there
+ * is no frame yet to stop on. Pressed here, the switch pauses the moving wall where it is.
  */
 export function MemorialWallSection(
-  props: Omit<MemorialWallAtmosphereProps, 'held'>,
+  props: Omit<MemorialWallAtmosphereProps, 'held' | 'paused'>,
 ): React.ReactElement {
   const reducedMotion = useReducedMotion();
-  return <MemorialWallAtmosphere {...props} held={reducedMotion} />;
+  const [hold, setHold] = useState<'off' | 'still' | 'paused'>('off');
+  useEffect(() => {
+    if (holdStill()) setHold('still');
+    // The switch stores the choice; this page follows it without a reload (as retelling-film does).
+    const onClick = (event: MouseEvent) => {
+      if ((event.target as HTMLElement).closest('.ds-world-controls__button')) {
+        window.setTimeout(() => setHold(memorialHoldAfterSwitch), 0);
+      }
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
+  return (
+    <MemorialWallAtmosphere
+      {...props}
+      held={reducedMotion || hold === 'still'}
+      paused={hold === 'paused'}
+    />
+  );
+}
+
+/** Switched on over a moving wall pauses it; a wall that opened still stays the composed still. */
+function memorialHoldAfterSwitch(was: 'off' | 'still' | 'paused'): 'off' | 'still' | 'paused' {
+  if (!holdStill()) return 'off';
+  return was === 'off' ? 'paused' : was;
 }

@@ -68,6 +68,8 @@ export {
   type UtilityScreenShellProps,
   type UtilityScreenShellScrollProps,
 } from './UtilityScreenShell';
+export { Chip, type ChipProps } from './Chip';
+export { SearchField, type SearchFieldProps } from './SearchField';
 export { CorrectionTextField, type CorrectionTextFieldProps } from './CorrectionTextField';
 export { NavIcon, navIconForEntityKind, type NavIconProps, type NavIconName } from './NavIcon';
 export { ApiStatusBanner, type ApiStatusBannerProps } from './ApiStatusBanner';

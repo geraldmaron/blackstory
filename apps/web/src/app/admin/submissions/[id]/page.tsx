@@ -13,6 +13,7 @@ import {
   SUBMISSION_DECISION_PERMISSION,
   submissionDecisionOptions,
   submissionHasReceipt,
+  submissionOutcomeEmailsSubmitter,
 } from '../../../../admin/lib/postgres-submissions';
 import { SubmissionDecisionForm } from './SubmissionDecisionForm';
 
@@ -109,6 +110,8 @@ export default async function SubmissionDetailPage({
             <SubmissionDecisionForm
               key={decisions.join(',')}
               intakeItemId={submission.id}
+              title={submission.title}
+              emailsSubmitter={submissionOutcomeEmailsSubmitter(submission)}
               decisions={decisions}
               needsPublicReason={decisions.includes('reject') && submissionHasReceipt(submission)}
             />

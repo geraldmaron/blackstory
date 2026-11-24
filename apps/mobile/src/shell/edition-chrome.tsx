@@ -4,7 +4,7 @@
  * hooks instead of Expo defaults with an ad-hoc tint.
  */
 import { useContext, type ReactNode } from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Text, type ColorValue } from 'react-native';
 import {
   BottomTabBarHeightContext,
   type BottomTabNavigationOptions,
@@ -15,10 +15,53 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { NavIcon, type NavIconName } from '@/ui/NavIcon';
 import { resolveFontFamily } from '@/ui/fonts';
-import { typeScale, useThemeColors } from '@/ui/tokens';
+import { CHROME_MAX_FONT_SCALE, typeScale, useThemeColors } from '@/ui/tokens';
 
 const TAB_LABEL_SIZE = typeScale.caption.size;
 const STACK_TITLE_SIZE = typeScale.bodyEmphasis.size;
+
+/**
+ * Tab label capped at the chrome scale, like every other piece of chrome: the bar has a fixed
+ * height. Android only. On iOS the navigator already turns label scaling off and gives each tab
+ * item the Large Content Viewer title instead, which is what a system tab bar does.
+ */
+export function EditionTabLabel({
+  color,
+  position,
+  children,
+}: {
+  readonly color: ColorValue;
+  readonly position: 'below-icon' | 'beside-icon';
+  readonly children: string;
+}) {
+  return (
+    <Text
+      numberOfLines={1}
+      maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
+      style={[
+        styles.tabLabel,
+        // The navigator's own beside-icon margins, which a custom label does not inherit.
+        position === 'beside-icon' ? styles.tabLabelBeside : null,
+        { color },
+      ]}
+    >
+      {children}
+    </Text>
+  );
+}
+
+const styles = StyleSheet.create({
+  tabLabel: {
+    fontFamily: resolveFontFamily('uiBody', '500'),
+    fontSize: TAB_LABEL_SIZE,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  tabLabelBeside: {
+    marginStart: 5,
+    marginEnd: 12,
+  },
+});
 
 /** Bottom tab bar options — matte Surface plate, copper active, Inter labels. */
 export function useEditionTabBarOptions(): BottomTabNavigationOptions {
@@ -36,11 +79,8 @@ export function useEditionTabBarOptions(): BottomTabNavigationOptions {
       ...(Platform.OS === 'android' ? { elevation: 0 } : {}),
       shadowOpacity: 0,
     },
-    tabBarLabelStyle: {
-      fontFamily: resolveFontFamily('uiBody', '500'),
-      fontSize: TAB_LABEL_SIZE,
-      fontWeight: '500',
-    },
+    tabBarLabelStyle: styles.tabLabel,
+    ...(Platform.OS === 'android' ? { tabBarLabel: EditionTabLabel } : {}),
   };
 }
 

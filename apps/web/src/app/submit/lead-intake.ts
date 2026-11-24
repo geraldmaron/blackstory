@@ -14,9 +14,29 @@
  */
 import type { SubmissionInput } from '@repo/security';
 
-const MIN_WHY_IT_MATTERS_LENGTH = 10;
-const MAX_FIELD_LENGTH = 4_000;
-const MAX_CONTACT_LENGTH = 320;
+/* Exported so the form states and checks the same limits the server enforces. */
+export const MIN_WHY_IT_MATTERS_LENGTH = 10;
+export const MAX_FIELD_LENGTH = 4_000;
+export const MAX_SHORT_FIELD_LENGTH = 200;
+export const MAX_CONTACT_LENGTH = 320;
+/**
+ * The quarantine's `maxStatementCharacters`, which bounds the whole composed lead. Restated
+ * because the browser cannot import @repo/security (node:crypto); a test holds the two equal.
+ */
+export const MAX_LEAD_STATEMENT_LENGTH = 6_000;
+
+/** "Keep “Where” to 200 characters or fewer." `what` names the field as the reader sees it. */
+export function tooLongMessage(what: string, max: number): string {
+  return `Keep ${what} to ${max.toLocaleString('en-US')} characters or fewer.`;
+}
+
+export const LEAD_FIELD_LIMITS = [
+  ['description', '“What you know”', MAX_FIELD_LENGTH],
+  ['whyItMatters', '“Why it matters”', MAX_FIELD_LENGTH],
+  ['location', '“Where”', MAX_SHORT_FIELD_LENGTH],
+  ['era', '“When”', MAX_SHORT_FIELD_LENGTH],
+  ['contact', 'the email address', MAX_CONTACT_LENGTH],
+] as const;
 
 export type LeadSubmissionInput = {
   readonly url?: string | undefined;
@@ -54,15 +74,26 @@ function composeStatement(input: LeadSubmissionInput): string {
   return lines.join('\n\n');
 }
 
-function fieldTooLong(
-  value: string | undefined,
-  field: string,
-  max: number,
-): LeadSubmissionFieldIssue | undefined {
-  if (value !== undefined && value.length > max) {
-    return { field, message: `${field} must be ${max} characters or fewer.` };
-  }
-  return undefined;
+/**
+ * The length the quarantine measures: the composed statement (labels, place, period and
+ * attestation line included) after its text normalization. No single field's length answers it.
+ */
+export function leadStatementLength(input: LeadSubmissionInput): number {
+  // Mirrors `normalizeText` in packages/security/src/submissions/quarantine.ts; a test compares them.
+  return composeStatement(input)
+    .normalize('NFKC')
+    .replace(/\r\n?/gu, '\n')
+    .replace(/[ \t]+/gu, ' ')
+    .trim().length;
+}
+
+/** How many characters the whole lead runs past what the quarantine accepts, or 0. */
+export function leadOverLength(input: LeadSubmissionInput): number {
+  return Math.max(0, leadStatementLength(input) - MAX_LEAD_STATEMENT_LENGTH);
+}
+
+export function leadTooLongMessage(over: number): string {
+  return `All the fields together can hold ${MAX_LEAD_STATEMENT_LENGTH.toLocaleString('en-US')} characters, and this is ${over.toLocaleString('en-US')} over. Shorten “What you know” or “Why it matters”.`;
 }
 
 /**
@@ -89,18 +120,20 @@ export function validateLeadSubmission(input: LeadSubmissionInput): LeadSubmissi
     });
   }
 
-  for (const [value, field, max] of [
-    [input.description, 'description', MAX_FIELD_LENGTH],
-    [input.whyItMatters, 'whyItMatters', MAX_FIELD_LENGTH],
-    [input.location, 'location', 200],
-    [input.era, 'era', 200],
-    [input.contact, 'contact', MAX_CONTACT_LENGTH],
-  ] as const) {
-    const issue = fieldTooLong(value, field, max);
-    if (issue) issues.push(issue);
+  for (const [field, what, max] of LEAD_FIELD_LIMITS) {
+    const value = input[field];
+    if (value !== undefined && value.length > max) {
+      issues.push({ field, message: tooLongMessage(what, max) });
+    }
   }
 
   if (issues.length > 0) return { valid: false, issues };
+
+  // The quarantine would refuse this anyway; said here so it names the fields a reader can see.
+  const over = leadOverLength(input);
+  if (over > 0) {
+    return { valid: false, issues: [{ field: 'whyItMatters', message: leadTooLongMessage(over) }] };
+  }
 
   const payload: SubmissionInput = {
     kind: 'contribution',

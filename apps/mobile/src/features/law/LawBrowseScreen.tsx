@@ -3,17 +3,8 @@
  * Stack route: canvas insets sides/bottom only (native header owns top).
  */
 import { useMemo, useState } from 'react';
-import {
-  Keyboard,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import {
   EmptyState,
   LedgerRow,
@@ -26,9 +17,8 @@ import {
   Text,
   screenScrollInsets,
   space,
-  useThemeColors,
-  MIN_TOUCH_TARGET,
-  radius,
+  Chip,
+  SearchField,
 } from '@/ui';
 import { LAW_ABOUT, LAW_CATALOG, LAW_DISCLAIMER, LAW_INTRO } from './law-copy';
 import {
@@ -40,7 +30,6 @@ import {
 } from './catalog';
 
 export function LawBrowseScreen() {
-  const theme = useThemeColors();
   const [draft, setDraft] = useState('');
   const [kind, setKind] = useState('all');
   const allRows = useMemo(() => listCatalogRows(), []);
@@ -88,79 +77,29 @@ export function LawBrowseScreen() {
           <Text variant="caption" colorRole="inkMuted">
             {LAW_CATALOG.lede}
           </Text>
-          <View
-            style={[
-              styles.searchField,
-              { borderColor: theme.borderControl, backgroundColor: theme.surface },
-            ]}
-          >
-            <Ionicons
-              name="search-outline"
-              size={18}
-              color={theme.inkMuted}
-              accessibilityElementsHidden
-            />
-            <TextInput
-              value={draft}
-              onChangeText={setDraft}
-              returnKeyType="search"
-              onSubmitEditing={() => Keyboard.dismiss()}
-              placeholder={LAW_CATALOG.searchPlaceholder}
-              placeholderTextColor={theme.inkMuted}
-              accessibilityLabel="Search law catalog"
-              accessibilityRole="search"
-              maxLength={120}
-              autoCorrect={false}
-              autoCapitalize="none"
-              spellCheck={false}
-              clearButtonMode="while-editing"
-              style={[styles.input, { color: theme.ink }]}
-            />
-            {draft.length > 0 && Platform.OS !== 'ios' ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Clear search"
-                onPress={() => setDraft('')}
-                hitSlop={8}
-                style={styles.clear}
-              >
-                <Ionicons name="close-circle" size={18} color={theme.inkMuted} />
-              </Pressable>
-            ) : null}
-          </View>
+          <SearchField
+            value={draft}
+            onChangeText={setDraft}
+            placeholder={LAW_CATALOG.searchPlaceholder}
+            accessibilityLabel="Search law catalog"
+            maxLength={120}
+          />
 
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.chips}
           >
-            {kindFilters.map((filter) => {
-              const selected = filter.value === kind;
-              return (
-                <Pressable
-                  key={filter.value}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  accessibilityLabel={`Filter by ${filter.label}`}
-                  onPress={() => setKind(filter.value)}
-                  style={[
-                    styles.chip,
-                    {
-                      borderColor: selected ? theme.accentGraphic : theme.borderControl,
-                      backgroundColor: theme.surface,
-                    },
-                  ]}
-                >
-                  <Text
-                    variant="caption"
-                    colorRole={selected ? 'accent' : 'inkMuted'}
-                    numberOfLines={1}
-                  >
-                    {filter.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            {kindFilters.map((filter) => (
+              <Chip
+                key={filter.value}
+                label={filter.label}
+                accessibilityLabel={`Filter by ${filter.label}`}
+                selected={filter.value === kind}
+                onPress={() => setKind(filter.value)}
+                numberOfLines={1}
+              />
+            ))}
           </ScrollView>
 
           {rows.length === 0 ? (
@@ -207,36 +146,8 @@ const styles = StyleSheet.create({
   section: {
     gap: space['2'],
   },
-  searchField: {
-    minHeight: MIN_TOUCH_TARGET,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.sm,
-    paddingHorizontal: space['3'],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space['2'],
-  },
-  input: {
-    flex: 1,
-    fontSize: 13,
-    paddingVertical: space['2'],
-  },
-  clear: {
-    minHeight: MIN_TOUCH_TARGET,
-    minWidth: MIN_TOUCH_TARGET,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   chips: {
     gap: space['2'],
     paddingVertical: space['1'],
-  },
-  chip: {
-    minHeight: MIN_TOUCH_TARGET,
-    paddingHorizontal: space['3'],
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

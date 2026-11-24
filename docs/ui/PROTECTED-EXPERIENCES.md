@@ -25,7 +25,7 @@ These constraints are non-negotiable for BlackStory v10 and later. Implementatio
 | Handwritten names wall | Must remain the opening atmosphere |
 | `MemorialWallAtmosphere` | Must remain the background layer |
 | Quiet opening composition | Bare kicker/title; no stacked lede/prose cluttering the wall |
-| Opening controls | None. The "Read every name" scroll cue and the "Hold the wall still" toggle were removed on 2026-10-16 by owner decision; the wall freezes only for `prefers-reduced-motion`, and the accessible list is reached by scrolling |
+| Opening controls | None inside the wall. The "Read every name" scroll cue and the wall's own "Hold the wall still" toggle were removed on 2026-10-16 by owner decision, and the accessible list is reached by scrolling. Amended 2026-11-24 by owner decision: the site shell's existing "Hold still" switch shows on `/memorial` and freezes the wall on its current frame (WCAG 2.2.2), sitting under the header on a phone and bottom right elsewhere. `prefers-reduced-motion` keeps precedence. The wall is unchanged for a reader who never presses it |
 | Accessible names list | Must remain below the fold as the non-canvas path |
 | Dignity framing | Names stay names; national memorial, not a join from a place record |
 | No gamification | No scores, streaks, unlocks |

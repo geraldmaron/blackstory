@@ -3,17 +3,8 @@
  * Dignity first; incomplete by design. No sensational framing.
  */
 import { useMemo, useState } from 'react';
-import {
-  Keyboard,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import {
   Button,
   EmptyState,
@@ -28,8 +19,7 @@ import {
   screenScrollInsets,
   space,
   useThemeColors,
-  MIN_TOUCH_TARGET,
-  radius,
+  SearchField,
 } from '@/ui';
 import { openExternalMaps } from '@/features/entity/maps-handoff';
 import { MEMORIAL_ACTIONS, MEMORIAL_BODY, MEMORIAL_INTRO, MEMORIAL_LIST } from './memorial-copy';
@@ -108,46 +98,14 @@ export function MemorialScreen() {
           <Text variant="caption" colorRole="inkMuted">
             {MEMORIAL_LIST.lede}
           </Text>
-          <View
-            style={[
-              styles.searchField,
-              { borderColor: theme.borderControl, backgroundColor: theme.surface },
-            ]}
-          >
-            <Ionicons
-              name="search-outline"
-              size={18}
-              color={theme.inkMuted}
-              accessibilityElementsHidden
-            />
-            <TextInput
-              value={draft}
-              onChangeText={setDraft}
-              returnKeyType="search"
-              onSubmitEditing={() => Keyboard.dismiss()}
-              placeholder={MEMORIAL_LIST.searchPlaceholder}
-              placeholderTextColor={theme.inkMuted}
-              accessibilityLabel="Search memorial names"
-              accessibilityRole="search"
-              maxLength={120}
-              autoCorrect={false}
-              autoCapitalize="words"
-              spellCheck={false}
-              clearButtonMode="while-editing"
-              style={[styles.input, { color: theme.ink }]}
-            />
-            {draft.length > 0 && Platform.OS !== 'ios' ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Clear search"
-                onPress={() => setDraft('')}
-                hitSlop={8}
-                style={styles.clear}
-              >
-                <Ionicons name="close-circle" size={18} color={theme.inkMuted} />
-              </Pressable>
-            ) : null}
-          </View>
+          <SearchField
+            value={draft}
+            onChangeText={setDraft}
+            placeholder={MEMORIAL_LIST.searchPlaceholder}
+            accessibilityLabel="Search memorial names"
+            maxLength={120}
+            autoCapitalize="words"
+          />
 
           {names.length === 0 ? (
             <EmptyState
@@ -244,26 +202,6 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: space['2'],
-  },
-  searchField: {
-    minHeight: MIN_TOUCH_TARGET,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.sm,
-    paddingHorizontal: space['3'],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space['2'],
-  },
-  input: {
-    flex: 1,
-    fontSize: 13,
-    paddingVertical: space['2'],
-  },
-  clear: {
-    minHeight: MIN_TOUCH_TARGET,
-    minWidth: MIN_TOUCH_TARGET,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   nameBlock: {
     gap: space['1'],

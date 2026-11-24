@@ -4,6 +4,10 @@
  * The three decision verbs for one quarantined submission: promote, reject, mark spam.
  * One shared reason, one shared server action — see actions.ts's decideSubmission.
  */
+import {
+  ConfirmAction,
+  type ConfirmActionRequest,
+} from '../../../../admin/design-system/ConfirmAction';
 import { FormTextarea, FormButton } from '../../../../admin/design-system/fields';
 import { useActionState, useEffect, useId, useRef, useState } from 'react';
 import type { SubmissionDecision } from '../../../../admin/lib/postgres-submissions';
@@ -17,12 +21,31 @@ const DECISION_LABEL = {
   resolve: 'Close as resolved',
 } as const;
 
+/**
+ * The decisions staff cannot take back: none of them leaves a status with a further decision
+ * (`submissionDecisionOptions`), and reject and resolve can email the submitter. Promote is left
+ * at one click: the research case it opens can still be excluded.
+ */
+const CONFIRMED: Partial<
+  Record<SubmissionDecision, Pick<ConfirmActionRequest, 'verb' | 'tail'> & { closed: string }>
+> = {
+  reject: { verb: 'Reject', closed: 'a rejected submission' },
+  spam: { verb: 'Mark', tail: 'as spam', closed: 'a submission marked as spam' },
+  resolve: { verb: 'Close', tail: 'as resolved', closed: 'a correction closed as resolved' },
+};
+
 export function SubmissionDecisionForm({
   intakeItemId,
+  title,
+  emailsSubmitter = false,
   decisions,
   needsPublicReason = false,
 }: {
   readonly intakeItemId: string;
+  /** The submission's own title: the confirmation names what is being closed. */
+  readonly title: string;
+  /** Rejecting or resolving this one emails its submitter. Marking spam never does. */
+  readonly emailsSubmitter?: boolean;
   readonly decisions: readonly SubmissionDecision[];
   /** A correction with a receipt: declining it needs a reason its submitter will read. */
   readonly needsPublicReason?: boolean;
@@ -35,6 +58,7 @@ export function SubmissionDecisionForm({
   const [publicReason, setPublicReason] = useState('');
   // Which verb was pressed, so only that button reads "Working…" while the action runs.
   const [pressed, setPressed] = useState<SubmissionDecision | null>(null);
+  const [confirming, setConfirming] = useState<ConfirmActionRequest | null>(null);
   const hintId = useId();
   const doneRef = useRef<HTMLDivElement>(null);
   const canSubmit = reason.trim().length > 0 && !pending;
@@ -72,6 +96,25 @@ export function SubmissionDecisionForm({
         </div>
       </div>
     );
+  }
+
+  function askFirst(decision: SubmissionDecision, button: HTMLButtonElement) {
+    const copy = CONFIRMED[decision];
+    if (!copy) return false;
+    const emailed = emailsSubmitter && decision !== 'spam';
+    setConfirming({
+      verb: copy.verb,
+      ...(copy.tail ? { tail: copy.tail } : {}),
+      noun: 'submission',
+      name: title,
+      consequence: `You can’t reopen ${copy.closed}, and the submitter ${
+        emailed ? 'will be emailed the outcome' : 'will not be emailed'
+      }.`,
+      trigger: button,
+      // The same submit the button would have made: same form, same submitter, same action.
+      onConfirm: () => button.form?.requestSubmit(button),
+    });
+    return true;
   }
 
   return (
@@ -116,7 +159,10 @@ export function SubmissionDecisionForm({
             className={index === 0 ? 'ds-button' : 'ds-button ds-button--secondary'}
             disabled={blocked(decision)}
             {...(hint && !pending && blocked(decision) ? { 'aria-describedby': hintId } : {})}
-            onClick={() => setPressed(decision)}
+            onClick={(event) => {
+              setPressed(decision);
+              if (askFirst(decision, event.currentTarget)) event.preventDefault();
+            }}
           >
             {pending && pressed === decision ? 'Working…' : DECISION_LABEL[decision]}
           </FormButton>
@@ -127,6 +173,7 @@ export function SubmissionDecisionForm({
           </span>
         ) : null}
       </div>
+      <ConfirmAction request={confirming} onDismiss={() => setConfirming(null)} />
     </form>
   );
 }

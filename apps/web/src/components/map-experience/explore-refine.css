@@ -63,6 +63,54 @@
   line-height: 1.5;
 }
 
+/* The key under an active shading layer (LayerLegend.tsx): one row a class, its swatch beside its
+   range. The swatch keeps a hairline and its own colors in forced-colors mode, and every row says
+   its range in words, so the key never depends on a fill alone. */
+.ds-xlegend {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-xlegend__rows {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+
+.ds-xlegend__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-xlegend__swatch {
+  flex: none;
+  box-sizing: border-box;
+  width: var(--ds-space-6);
+  height: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-control);
+  forced-color-adjust: none;
+}
+
+.ds-xlegend__cue {
+  flex: none;
+  width: 1em;
+  font-family: var(--ds-font-mono);
+  text-align: center;
+}
+
+@media (forced-colors: active) {
+  .ds-xlegend__swatch {
+    border-color: CanvasText;
+  }
+}
+
 /* The drawing key (MapKey): what the marks on the map mean. On a wide screen the strip carries
    it, so it shows here only where the strip's leading cell has no room for it. */
 .ds-xrefine__key {

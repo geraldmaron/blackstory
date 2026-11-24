@@ -1,5 +1,5 @@
 /*
- * On-map controls, bottom-right: the zoom pair and locate, 44px each, stacked; the compass joins
+ * On-map controls, bottom-right: the move pad, the zoom pair and locate, 44px each, stacked; the compass joins
  * them only while the map is turned. Wide screens park the stack above the decade histogram; a
  * phone parks it above the bottom sheet's resting height.
  *
@@ -16,8 +16,16 @@
   flex-direction: column;
   align-items: flex-end;
   gap: var(--ds-space-2);
-  pointer-events: auto;
+  /* The root is wider than its buttons now that it holds the move pad: it paints nothing and
+     takes no clicks itself, so the map shows and answers between the keys. */
+  background: none;
+  pointer-events: none;
   transition: transform var(--ds-duration-base) var(--ds-ease-entrance);
+}
+
+.ds-map-controls__btn,
+.ds-map-controls__stack {
+  pointer-events: auto;
 }
 
 .ds-map-controls__stack {
@@ -25,6 +33,34 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--ds-radius-sm);
+}
+
+/* The move pad, laid out as the arrow keys are: north over west, south, east. Each button is a
+   solid square with the plate's edge, so the pad reads as one piece without a shadow per key. */
+.ds-map-controls__pad {
+  display: grid;
+  grid-template: repeat(2, 44px) / repeat(3, 44px);
+}
+
+.ds-map-controls__pad .ds-map-controls__btn {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-float-edge);
+}
+
+.ds-map-controls__pad [data-pan='north'] {
+  grid-area: 1 / 2;
+}
+
+.ds-map-controls__pad [data-pan='west'] {
+  grid-area: 2 / 1;
+}
+
+.ds-map-controls__pad [data-pan='south'] {
+  grid-area: 2 / 2;
+}
+
+.ds-map-controls__pad [data-pan='east'] {
+  grid-area: 2 / 3;
 }
 
 /* Solid, with the float shadow: the stack is one sheet over the map, a loose button its own. */

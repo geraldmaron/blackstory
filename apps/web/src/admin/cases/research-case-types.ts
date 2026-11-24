@@ -147,6 +147,30 @@ export function actionHelp(action: AdminCaseTransitionAction): string {
   }
 }
 
+/**
+ * Merge is the one case transition with no way back: the domain workflow gives `merged` no legal
+ * next state, while an excluded case can return to relevance review. Only Merge is confirmed.
+ */
+export function mergeConfirmation(cases: readonly { readonly title: string }[]): {
+  verb: string;
+  noun: string;
+  name?: string;
+  count: number;
+  consequence: string;
+} {
+  const [only] = cases;
+  return {
+    verb: 'Merge',
+    noun: 'case',
+    count: cases.length,
+    ...(cases.length === 1 && only ? { name: only.title } : {}),
+    consequence:
+      cases.length === 1
+        ? 'A merged case can’t be reopened or split back out, and no one is emailed.'
+        : 'Merged cases can’t be reopened or split back out, and no one is emailed.',
+  };
+}
+
 export function missingDecisionReasonMessage(action: AdminCaseTransitionAction): string {
   return `Add a decision reason before “${actionLabelSafe(action)}”. Every move is audited and does not publish by itself.`;
 }
