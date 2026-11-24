@@ -174,8 +174,9 @@ The four families and seven roles in `brand.md` stay. Changes:
   exhibit, which is large, and keeps type tight around it. One exception (owner, 2026-11-23): the
   front page's last scene sets the official wordmark from the window, about half its width
   (`--ds-text-hero`), once on the site. The first screen carries the same wordmark smaller, about a
-  third of the window and at most 30rem, as the page's h1, in the slot where the changing word
-  later stands (same top, same left edge); its sentence is display-3 italic and its counting year
+  third of the window and at most 30rem, as the page's h1, on the changing word's left edge and
+  centered in the space over the year (owner, 2026-11-23: top-aligned it read too high on large
+  windows); its sentence is display-3 italic and its counting year
   headline size, so the lit map carries the screen. "History" is that scene's heading for a screen
   reader and the rail.
 

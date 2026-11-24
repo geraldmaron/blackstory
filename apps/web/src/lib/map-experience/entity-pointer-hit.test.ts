@@ -135,3 +135,32 @@ test('overlapping pins remain individually reachable without duplicate halo hits
     { kind: 'entity', entityId: 'school' },
   );
 });
+
+test('the disc under the pointer wins over its neighbors in the padded box', () => {
+  assert.deepEqual(
+    resolveEntityPointerHit([
+      { properties: { entityId: 'near' }, offsetPx: 14 },
+      { properties: { entityId: 'under' }, offsetPx: 2 },
+      { properties: { entityId: 'edge' }, offsetPx: 8 },
+    ]),
+    { kind: 'entity', entityId: 'under' },
+  );
+  // Stacked discs, the same distance away, still ask, and only about themselves.
+  assert.deepEqual(
+    resolveEntityPointerHit([
+      { properties: { entityId: 'a' }, offsetPx: 3 },
+      { properties: { entityId: 'b' }, offsetPx: 4 },
+      { properties: { entityId: 'neighbor' }, offsetPx: 8 },
+      { properties: { entityId: 'far' }, offsetPx: 15 },
+    ]),
+    { kind: 'overlap', entityIds: ['a', 'b'] },
+  );
+  // A near miss with no disc under the pointer keeps the padded answer.
+  assert.deepEqual(
+    resolveEntityPointerHit([
+      { properties: { entityId: 'a' }, offsetPx: 12 },
+      { properties: { entityId: 'b' }, offsetPx: 15 },
+    ]),
+    { kind: 'overlap', entityIds: ['a', 'b'] },
+  );
+});

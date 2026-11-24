@@ -1,0 +1,61 @@
+/**
+ * OverlapChooser: a short list of links beside the pointer, kept inside the window. It takes the
+ * hover card's layer and ground (pin-photo-card.css).
+ */
+.ds-overlap-chooser {
+  --chooser-w: min(20rem, 100vw - 1rem);
+  --chooser-h: min(18rem, 60svh);
+  position: fixed;
+  top: clamp(0.5rem, var(--at-y) + 0.75rem, 100svh - var(--chooser-h) - 0.5rem);
+  left: clamp(0.5rem, var(--at-x) + 0.75rem, 100vw - var(--chooser-w) - 0.5rem);
+  z-index: var(--ds-z-pin-photo-card);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: var(--chooser-w);
+  max-height: var(--chooser-h);
+  padding: var(--ds-space-2) 0;
+  pointer-events: auto;
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  box-shadow: var(--ds-shadow-float);
+  color: var(--ds-ink);
+}
+
+.ds-overlap-chooser__count {
+  margin: 0;
+  padding: 0 var(--ds-space-3) var(--ds-space-1);
+  color: var(--ds-ink-muted);
+  font: var(--ds-text-meta) / 1.4 var(--ds-font-mono);
+  letter-spacing: var(--ds-tracking-meta);
+  text-transform: uppercase;
+}
+
+.ds-overlap-chooser__list {
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+}
+
+.ds-overlap-chooser__list a {
+  display: block;
+  /* A full-width row is the touch target. */
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  color: inherit;
+  font-size: var(--ds-text-body-sm);
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.ds-overlap-chooser__list a:hover,
+.ds-overlap-chooser__list a:focus-visible {
+  background: color-mix(in srgb, var(--ds-accent) 14%, transparent);
+  text-decoration: underline;
+}
+
+.ds-overlap-chooser__list a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: -2px;
+}

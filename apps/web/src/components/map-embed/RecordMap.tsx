@@ -37,6 +37,10 @@ import {
 } from '../../lib/map-experience/county-hatch';
 import { renderedAnchorFor } from '../../lib/map-experience/record-marks';
 import { abbreviate } from '../../lib/map-experience/place-map';
+import {
+  ENTITY_POINTER_HIT_LAYER_IDS,
+  pointerHitBox,
+} from '../../lib/map-experience/entity-pointer-hit';
 import type { RecordPlace } from '../../lib/map-experience/record-place';
 import { bindRecordName } from '../map-stage/place-labels';
 import { queryRenderedLayers } from '../map-stage/query-rendered';
@@ -107,6 +111,8 @@ export type RecordMapProps = {
   readonly caption?: boolean;
   /** `/explore?selected=…` (`exploreRecordHref`), or the record inside its place (`RecordPlace.href`). */
   readonly exploreHref?: string;
+  /** Where the record's own mark leads, on a page that is not the record (a story's inset). */
+  readonly recordHref?: string;
   /** The place the record belongs to, with its record count (`loadRecordPlace`). */
   readonly place?: Pick<RecordPlace, 'key' | 'name' | 'count' | 'href'>;
   /** A harm-adjacent record: the frame is a still picture. No fade in, no zoom, no pan (P-04). */
@@ -293,6 +299,7 @@ export function RecordMap({
   maxZoom = MAP_MAX_ZOOM,
   caption = true,
   exploreHref,
+  recordHref,
   place,
   still = false,
   className,
@@ -423,6 +430,17 @@ export function RecordMap({
           }),
         );
         active.on('error', (event) => console.error('[RecordMap]', event.error));
+        if (recordHref) {
+          const onMark = (point: { x: number; y: number }) =>
+            queryRenderedLayers(active, pointerHitBox(point), ENTITY_POINTER_HIT_LAYER_IDS).length >
+            0;
+          active.on('click', (event) => {
+            if (onMark(event.point)) window.location.assign(recordHref);
+          });
+          active.on('mousemove', (event) => {
+            active.getCanvas().style.cursor = onMark(event.point) ? 'pointer' : '';
+          });
+        }
         themeObserver = new MutationObserver(() => {
           active.setStyle(styleFor(readDocumentColorScheme(), marks));
         });
@@ -444,7 +462,7 @@ export function RecordMap({
       guard?.detach();
       map?.remove();
     };
-  }, [wanted, lat, lng, precision, statePostal, maxZoom, label, still]);
+  }, [wanted, lat, lng, precision, statePostal, maxZoom, label, still, recordHref]);
 
   const named = label.trim();
   const precisionWords = precisionInWords(precision);

@@ -19,6 +19,7 @@ import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { nationalFieldPatch } from '../../lib/map-experience/national-field';
 import { useOptionalMapStage } from './MapStage';
+import { OverlapChooser } from './OverlapChooser';
 
 void React;
 
@@ -150,9 +151,15 @@ export function IndexCountry({ lights, listed }: IndexCountryProps) {
   );
 
   const legend = countryLegend(lights.length, listed);
-  return legend ? (
-    <p className="ds-country__legend">
-      {legend} Unlit places are not yet researched. <a href="/methodology">How coverage works</a>
-    </p>
-  ) : null;
+  return (
+    <>
+      {legend ? (
+        <p className="ds-country__legend">
+          {legend} Unlit places are not yet researched.{' '}
+          <a href="/methodology">How coverage works</a>
+        </p>
+      ) : null}
+      {wide && available ? <OverlapChooser stage={stage} records={lights} /> : null}
+    </>
+  );
 }

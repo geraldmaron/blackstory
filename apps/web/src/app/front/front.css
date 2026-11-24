@@ -38,6 +38,27 @@
   background: transparent;
 }
 
+/* Once the map is the ground, each light opens its record (retelling-film.tsx), so the
+   window-sized layers over it pass the pointer through and only what they hold takes it back.
+   The wheel and a finger still scroll the page: the plate answers no wheel and no touch here
+   (gesture-lock.ts, `ambient`). */
+.ds-shell-page-transition:has(.ds-retelling[data-plate='live']),
+.ds-shell-page-transition__content:has(.ds-retelling[data-plate='live']),
+.ds-front:has(.ds-retelling[data-plate='live']),
+.ds-retelling[data-plate='live'],
+.ds-retelling[data-plate='live'] :is(.ds-retelling__stage, .ds-scene, .ds-scene__pin),
+.ds-retelling[data-plate='live'] :is(.ds-scene__words, .ds-scene__year, .ds-scene__ways) {
+  pointer-events: none;
+}
+
+.ds-front:has(.ds-retelling[data-plate='live']) > :not(.ds-retelling),
+.ds-retelling[data-plate='live'] > :not(.ds-scene, .ds-retelling__stage, .ds-retelling__landing),
+.ds-retelling[data-plate='live'] .ds-scene__pin > :not(.ds-scene__words, .ds-scene__year),
+.ds-retelling[data-plate='live'] .ds-scene__words > :not(.ds-scene__ways),
+.ds-retelling[data-plate='live'] :is(.ds-scene__year, .ds-scene__ways) > * {
+  pointer-events: auto;
+}
+
 /* Measured only: the part of the window a scene leaves to the map. */
 .ds-retelling__landing {
   position: fixed;
@@ -666,9 +687,9 @@
     min-height: 0;
   }
 
-  /* Scene 1 pinned: the brand stands where the changing word will stand (same top, same left
-     edge), so the persistent word waits until the scroll leaves this scene and then takes the
-     brand's place. The sentence sits under the mark and the year spans the foot. */
+  /* Scene 1 pinned: the brand shares the changing word's left edge, and the persistent word waits
+     until the scroll leaves this scene. The sentence sits under the mark and the year spans the
+     foot. */
   .ds-retelling:not([data-still]) .ds-retelling__stage {
     transition: opacity var(--ds-duration-base) var(--ds-ease-entrance);
   }
@@ -693,17 +714,26 @@
     grid-column: 1 / -1;
   }
 
+  /* Centered in the space over the year, as the stacked layout does: pinned to the word's top it
+     hugged the rail and left the middle of a tall window empty. The word fades in after this
+     scene, so it does not need the mark's slot. */
   .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__words {
-    align-self: start;
+    align-self: safe center;
   }
 
   .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__year {
     align-self: end;
   }
 
-  /* The artwork lands where the typed word stood: the panel's own padding is taken back out. */
+  /* The artwork keeps the typed word's left edge: the panel's own padding is taken back out. */
   .ds-retelling:not([data-still]) .ds-scene[data-kind='country'] .ds-scene__pin {
+    /* Centered, a little above the middle (the foot pad matches the header and rail): pinned to
+       the word's top it left the lower two thirds of a large window empty. The typed word fades
+       out before the mark lands, so the two need not share a top. */
+    grid-template-rows: auto;
+    align-content: safe center;
     padding-top: calc(var(--front-top) - var(--ds-space-6));
+    padding-bottom: var(--front-top);
     padding-left: calc(var(--front-edge) - var(--ds-space-6));
   }
 

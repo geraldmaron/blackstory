@@ -44,7 +44,8 @@ export type EntityPointerHit =
 export type RenderedPointerFeature = {
   readonly layerId?: string;
   readonly properties?: { readonly [key: string]: unknown } | null;
-  readonly coordinates?: readonly number[];
+  /** Screen distance from the pointer to a point feature's center. */
+  readonly offsetPx?: number;
 };
 
 export function pointerHitBox(
@@ -91,13 +92,46 @@ function hasPointCount(properties: RenderedPointerFeature['properties']): boolea
   return typeof count === 'number' || (typeof count === 'string' && count.length > 0);
 }
 
+/** Inside a drawn disc: the area ring's radius (7px) plus its keyline. */
+export const ENTITY_UNDER_POINTER_PX = 9;
+/** Two discs whose centers are this close to the same distance are stacked, not one over another. */
+const STACKED_PX = 3;
+
 /**
- * Prefer a named record disc when the pad covers both a disc and a place token.
- * Token hits carry the place key and extent for the drill-in.
+ * The records whose discs are under the pointer: one when one clearly is, several when they are
+ * stacked (many records share a city's center). At national zoom the padded box nearly always
+ * holds several discs, so without this a click squarely on one disc asked "which one?" about
+ * every neighbor in the box.
+ */
+function discsUnderPointer(features: readonly RenderedPointerFeature[]): readonly string[] {
+  const under = features
+    .flatMap((feature) => {
+      const entityId = entityIdFromProperties(feature.properties);
+      const offset = feature.offsetPx;
+      if (!entityId || hasPointCount(feature.properties) || offset === undefined) return [];
+      return offset <= ENTITY_UNDER_POINTER_PX ? [{ entityId, offset }] : [];
+    })
+    .sort((a, b) => a.offset - b.offset);
+  const nearest = under[0];
+  if (!nearest) return [];
+  return [
+    ...new Set(
+      under.filter((disc) => disc.offset - nearest.offset < STACKED_PX).map((d) => d.entityId),
+    ),
+  ];
+}
+
+/**
+ * The disc under the pointer wins, and stacked discs under it ask among themselves. Otherwise prefer a named record disc when the pad covers both
+ * a disc and a place token, and ask when it covers several. Token hits carry the place key and
+ * extent for the drill-in.
  */
 export function resolveEntityPointerHit(
   features: readonly RenderedPointerFeature[],
 ): EntityPointerHit | undefined {
+  const under = discsUnderPointer(features);
+  if (under.length > 1) return { kind: 'overlap', entityIds: under };
+  if (under[0]) return { kind: 'entity', entityId: under[0] };
   const entityIds = [
     ...new Set(
       features.flatMap((feature) => {

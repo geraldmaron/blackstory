@@ -1581,6 +1581,15 @@ export function MapStageProvider({
        * National discs are a few pixels; query a padded box so a near-miss still opens
        * the record sheet instead of selecting the state fill underneath.
        */
+      function pointerOffsetPx(
+        map: MapLibreMap,
+        coordinates: readonly number[],
+        point: { x: number; y: number },
+      ): number {
+        const at = map.project([coordinates[0]!, coordinates[1]!]);
+        return Math.hypot(at.x - point.x, at.y - point.y);
+      }
+
       function pointerHitAt(point: { x: number; y: number }) {
         if (!ENTITY_POINTER_HIT_LAYER_IDS.some((id) => activeMap.getLayer(id))) return undefined;
         const features = queryRenderedLayers<MapLibreNamespace.MapGeoJSONFeature>(
@@ -1593,7 +1602,7 @@ export function MapStageProvider({
             layerId: feature.layer.id,
             properties: feature.properties ?? null,
             ...(feature.geometry.type === 'Point'
-              ? { coordinates: feature.geometry.coordinates }
+              ? { offsetPx: pointerOffsetPx(activeMap, feature.geometry.coordinates, point) }
               : {}),
           })),
         );

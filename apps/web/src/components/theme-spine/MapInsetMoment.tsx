@@ -44,6 +44,7 @@ export async function MapInsetMoment({
       label={label}
       precision={precision}
       exploreHref={place ? place.href : exploreRecordHref(entityId)}
+      recordHref={`/entity/${encodeURIComponent(entityId)}`}
       {...(place ? { place } : {})}
       still={still}
       caption={caption}

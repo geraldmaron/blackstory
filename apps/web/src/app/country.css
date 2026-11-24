@@ -54,6 +54,18 @@
     font-size: clamp(3rem, 1rem + 4.2vw, 4.75rem);
   }
 
+  /* Each light opens its record (IndexCountry.tsx). The page's window-wide wrappers cover the
+     world's side with nothing, so they pass the pointer through and the sheet takes it back.
+     The plate answers no wheel or drag here, so the page still scrolls over it. */
+  html[data-world-on] .ds-shell-page-transition:has(.ds-country),
+  html[data-world-on] .ds-shell-page-transition__content:has(.ds-country) {
+    pointer-events: none;
+  }
+
+  html[data-world-on] .ds-shell-page-transition__content:has(.ds-country) > * {
+    pointer-events: auto;
+  }
+
   /* What the lights are, on the world's side, in the chrome voice. */
   html[data-world-on] .ds-country__legend {
     position: fixed;

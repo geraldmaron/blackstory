@@ -26,6 +26,7 @@ import { nationalFieldPatch } from '../../lib/map-experience/national-field';
 import { holdStill } from '../../lib/map-experience/world-prefs';
 import { useMapStage } from '../../components/map-stage/MapStage';
 import { groundFrameFor } from '../../components/map-stage/ground-frame';
+import { OverlapChooser } from '../../components/map-stage/OverlapChooser';
 import { ORBIT_MAX_ZOOM } from '../map/explore-style';
 import { framePadding } from './frame-padding';
 import { easeTourCamera, type TourCamera } from './camera-path';
@@ -199,7 +200,7 @@ export function RetellingFilm({
     return () => stage.setPlaceTokens(true);
   }, [stage]);
 
-  // A pin opens its record.
+  // A pin opens its record; stacked pins ask which (OverlapChooser).
   useEffect(() => {
     const hrefs = new Map(
       pins.features.map((pin) => [pin.properties.entityId, pin.properties.href] as const),
@@ -450,6 +451,7 @@ export function RetellingFilm({
       {/* Measured only: the part of the window a scene leaves to the map (front.css). */}
       <div className="ds-retelling__landing" ref={landingRef} aria-hidden="true" />
       <TownContext.Provider value={setTown}>{children}</TownContext.Provider>
+      <OverlapChooser stage={stage} records={pins.features} />
       {plate === 'unavailable' ? (
         <p className="ds-retelling__note" role="status">
           The map could not start in this browser. Everything on this page still works.
