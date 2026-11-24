@@ -261,9 +261,9 @@ test('a collection story is listed at its canonical collection address, not unde
     siteUrl: 'https://example.test',
     stories: [{ slug: 'abraham-lincoln', path: '/presidents/abraham-lincoln' }],
   });
-  const urls = entries.map((entry) => entry.url);
-  assert.ok(urls.includes('https://example.test/presidents/abraham-lincoln'));
-  assert.ok(!urls.includes('https://example.test/stories/abraham-lincoln'));
+  const urls = new Set(entries.map((entry) => entry.url));
+  assert.ok(urls.has('https://example.test/presidents/abraham-lincoln'));
+  assert.ok(!urls.has('https://example.test/stories/abraham-lincoln'));
 });
 
 test('figure pages are listed at their own address', () => {
@@ -271,6 +271,6 @@ test('figure pages are listed at their own address', () => {
     siteUrl: 'https://blackbook.example',
     figures: ['/data/D-01', '/data/D-09'],
   }).map((entry) => entry.url);
-  assert.ok(urls.includes('https://blackbook.example/data/D-01'));
+  assert.ok(new Set(urls).has('https://blackbook.example/data/D-01'));
   assert.equal(urls.filter((url) => url.endsWith('/data/D-09')).length, 1);
 });
