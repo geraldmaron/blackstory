@@ -301,12 +301,13 @@
   gap: var(--ds-space-4);
 }
 
-/* The opening word, at the width of the window. "His" is the accent; "tory" is the display face
-   at its heaviest. One line at every width. */
+/* The opening word, about half the window wide. "His" is the accent; "tory" is the display face
+   at its heaviest. One line at every width. The line box holds the y's tail, so the sentence
+   under it never sits on the word. */
 .ds-scene__heading--hero {
   font-size: var(--ds-text-hero);
   font-weight: var(--ds-weight-display);
-  line-height: 0.86;
+  line-height: 1;
   letter-spacing: -0.045em;
   white-space: nowrap;
 }
@@ -1014,4 +1015,18 @@
   height: auto;
   max-height: 12rem;
   object-fit: cover;
+}
+
+/* A short window (a laptop with the dock and toolbars showing): the first scene gives up padding
+   and sentence size before it gives up the year, which has to be on the first screen. */
+@media (max-height: 600px) {
+  .ds-retelling .ds-scene[data-scene='history'] .ds-scene__pin,
+  .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__pin {
+    padding-top: calc(var(--front-rail) + var(--ds-space-2));
+    padding-bottom: calc(var(--ds-tabbar-h, 0px) + var(--ds-space-4));
+  }
+
+  .ds-scene[data-scene='history'] .ds-scene__sentence {
+    font-size: min(var(--ds-text-headline), 7svh);
+  }
 }

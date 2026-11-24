@@ -172,7 +172,7 @@ The four families and seven roles in `brand.md` stay. Changes:
   `-display-numeral`) are removed with their last users.
 - Compact scale: display tops out at 88px, headline at 44px. The page earns size from the
   exhibit, which is large, and keeps type tight around it. One exception (owner, 2026-11-23): the
-  front page's opening word is set at the width of the window (`--ds-text-hero`), once on the
+  front page's opening word is sized from the window, about half its width (`--ds-text-hero`), once on the
   site.
 
 ### 7.3 The exhibit frame
