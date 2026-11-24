@@ -101,7 +101,7 @@ function doorRecordHref(
   // A same-name record's address carries its id after `--`, which never rides the first
   // document (`stripShopTokensFromJson`); the opaque pin redirect resolves it on the server.
   if (publicHref.length > 0) {
-    return isShopToken(publicHref) ? `/door/pin/${encodeURIComponent(pinId)}` : publicHref;
+    return publicHref.includes('--') ? `/door/pin/${encodeURIComponent(pinId)}` : publicHref;
   }
 
   if (href.startsWith('/entity/')) {
