@@ -19,16 +19,14 @@ const shipped: TimelineEvent = {
 
 describe('TimelineSection', () => {
   it('keeps the dated sentence and drops the Basis tail of claim ids', async () => {
-    const { getByText, queryByText } = await render(
-      <TimelineSection timeline={[shipped]} index="06" />,
-    );
+    const { getByText, queryByText } = await render(<TimelineSection timeline={[shipped]} />);
     expect(getByText('In effect from 1840.')).toBeTruthy();
     expect(queryByText(/Basis:/)).toBeNull();
     expect(queryByText(/claim_0/)).toBeNull();
   });
 
   it('renders nothing at all when there is no dated span', async () => {
-    const { toJSON } = await render(<TimelineSection timeline={[]} index="06" />);
+    const { toJSON } = await render(<TimelineSection timeline={[]} />);
     expect(toJSON()).toBeNull();
   });
 });

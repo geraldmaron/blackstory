@@ -1,4 +1,4 @@
-import { evidenceLabel } from '@repo/public-contracts/evidence';
+import { evidenceLabel } from '@/lib/evidence-words';
 /** Presentation helpers for dates, citations and qualitative evidence labels. */
 import type { ConfidenceLevel, DatePrecision } from './types';
 

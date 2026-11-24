@@ -56,13 +56,13 @@ export const ABOUT_PUBLISH = {
 
 export const ABOUT_DESTINATIONS = [
   {
-    href: '/explore',
+    href: '/archive',
     label: 'Map',
     detail: 'Everything published, across the country. Explore adds filters and browsing by place.',
     icon: 'explore' as const,
   },
   {
-    href: '/records',
+    href: '/archive?view=list',
     label: 'Records',
     detail: 'The archive as a list. Browse by era, kind and place, or search by name or keyword.',
     icon: 'records' as const,

@@ -81,7 +81,7 @@ describe('FiltersSheet — live facet apply (no Apply gate)', () => {
     await fireEvent.press(getByLabelText('Places'));
     expect(mockNavigate).toHaveBeenCalledWith(
       expect.objectContaining({
-        pathname: '/explore',
+        pathname: '/archive',
         params: expect.objectContaining({ kind: 'places' }),
       }),
     );
@@ -89,7 +89,7 @@ describe('FiltersSheet — live facet apply (no Apply gate)', () => {
     await fireEvent.press(getByLabelText('1950s'));
     expect(mockNavigate).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        pathname: '/explore',
+        pathname: '/archive',
         params: expect.objectContaining({ kind: 'places', era: '1950s' }),
       }),
     );
@@ -108,7 +108,7 @@ describe('FiltersSheet — live facet apply (no Apply gate)', () => {
     expect(getByLabelText('All kinds').props.accessibilityState?.selected).toBe(true);
     expect(mockNavigate).toHaveBeenCalledWith(
       expect.objectContaining({
-        pathname: '/explore',
+        pathname: '/archive',
         params: expect.objectContaining({
           kind: '',
           era: '',
@@ -125,7 +125,7 @@ describe('FiltersSheet — live facet apply (no Apply gate)', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith(
       expect.objectContaining({
-        pathname: '/explore',
+        pathname: '/archive',
         params: expect.objectContaining({ kind: 'places' }),
       }),
     );

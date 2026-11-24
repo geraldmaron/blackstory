@@ -135,7 +135,7 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     const summary = getByLabelText(/Pinned place: Bethel AME Church\./);
     // One evidence fact, in the language the site prints — not "High confidence" beside
     // "4 claims", neither of which named a grade.
-    expect(summary.props.accessibilityLabel).toMatch(/Evidence: Grade A · 4 sources/);
+    expect(summary.props.accessibilityLabel).toMatch(/Evidence: Well evidenced · 4 sources/);
     expect(summary.props.accessibilityLabel).not.toMatch(/claims/);
     expect(
       getByTestId('entity-preview-evidence-meter', { includeHiddenElements: true }),

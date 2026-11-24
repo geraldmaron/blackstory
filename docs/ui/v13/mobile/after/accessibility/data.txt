@@ -1,0 +1,60 @@
+Application    application  BlackStory (Dev)
+StaticText     text         NUMBERS
+Heading        heading      Data behind the archive
+StaticText     text         The national census picture, plus published figures on wealth, housing, credit and justice. Every chart names its source.
+StaticText     text         HOW TO READ THESE NUMBERS
+StaticText     text         The census decades give the national picture. The indicators are published series the archive reads next to its own records.
+GenericElement              Figures use verified Phase 1 fixtures, Charts below use verified Phase 1 fixtures until live warehouse rows replace them.
+StaticText     text         Population
+StaticText     text         DEFERRED
+StaticText     text         Wealth
+StaticText     text         FIXTURE
+StaticText     text         Housing
+StaticText     text         FIXTURE
+StaticText     text         Justice
+StaticText     text         FIXTURE
+StaticText     text         Themes
+StaticText     text         CATALOG
+StaticText     text         NATIONAL FIRST
+StaticText     text         The census sections show the whole country. Each indicator chart goes deeper on one published series.
+StaticText     text         SOURCES VISIBLE
+StaticText     text         Every figure links to its source. A chart built on sample data says so.
+StaticText     text         GAPS ARE NOT SILENCE
+StaticText     text         Where coverage is thin, the data is incomplete. It doesn’t mean nothing happened. And two numbers side by side don’t show that one caused the other.
+StaticText     text         JUXTAPOSITION
+StaticText     text         Indicators sit beside archive evidence. Gaps mean the feed is incomplete, not that nothing happened. Comparison is not causation.
+Button         button       Juxtaposition rules
+StaticText     text         BLACK POPULATION OVER TIME
+StaticText     text         Black Americans counted by the Census each decade, 1790 to 2020.
+StaticText     text         MODEL
+StaticText     text         National decade series and Black population share charts ship on web when the warehouse snapshot is wired. Mobile shows the frame until that feed lands.
+Heading        heading      Census timeline not on this release yet
+StaticText     text         Open the Archive map for place layers, or read Methodology for juxtaposition rules.
+Button         button       Open the Archive map
+StaticText     text         WEALTH GAP AT A GLANCE
+StaticText     text         Median family net worth from the Federal Reserve triennial survey. The figures sit side by side and don’t point to a single cause.
+Heading        heading      Median family net worth, Black vs White
+Button         button       Plain, View of Median family net worth, Black vs White
+Button         button       Numbers, View of Median family net worth, Black vs White
+StaticText     text         Figure, United States · 2022.
+StaticText     text         Black families
+StaticText     text         $44,900
+StaticText     text         White non-Hispanic families
+StaticText     text         $285,000
+Link           link         Source: Board of Governors of the Federal Reserve System, Survey of Consumer Finances
+StaticText     text         National median family net worth from the Survey of Consumer Finances. Wealth is measured at a point in time, not income, and reflects decades of policy and market context.
+StaticText     text         HOUSING, CREDIT, AND COST BURDEN
+StaticText     text         Cook County homeownership, mortgage denial rates and housing cost burden from HUD’s CHAS data.
+Heading        heading      Homeownership by householder race, Cook County
+Button         button       Plain, View of Homeownership by householder race, Cook County
+Button         button       Numbers, View of Homeownership by householder race, Cook County
+StaticText     text         Figure, Cook County, Illinois · 1990 · 2010.
+StaticText     text         Black householder
+StaticText     text         White householder
+StaticText     text         1990
+StaticText     text         2000
+StaticText     text         2010
+StaticText     text         37.1%
+StaticText     text         42%
+StaticText     text         41.2%
+Link           link         Source: IPUMS NHGIS / U.S. Census decennial county tables

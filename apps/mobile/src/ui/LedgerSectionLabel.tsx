@@ -25,11 +25,11 @@ export function LedgerSectionLabel({ children, meta, ruleAbove = false }: Ledger
     >
       {ruleAbove ? <Divider /> : null}
       <View style={styles.row}>
-        <Text variant="sectionLabel" colorRole="inkMuted" style={styles.label}>
+        <Text variant="meta" colorRole="inkMuted" style={styles.label}>
           {children}
         </Text>
         {meta ? (
-          <Text variant="sectionLabel" colorRole="inkSubtle" style={styles.label}>
+          <Text variant="meta" colorRole="inkSubtle" style={styles.label}>
             {meta}
           </Text>
         ) : null}

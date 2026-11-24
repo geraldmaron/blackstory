@@ -1,0 +1,4 @@
+Application    application  BlackStory (Dev)
+StaticText     text         Scene 2 of 6: His story
+Button         button       Skip to the archive
+Heading        heading      His story

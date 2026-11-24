@@ -147,7 +147,7 @@ export function ContentPageScreen({
                     dense
                   />
                 ) : (
-                  <ScreenHeader kicker="Document" title={page.title} dek={page.dek} compact dense />
+                  <ScreenHeader title={page.title} dek={page.dek} dense={false} />
                 )}
                 <ContentRenderer
                   page={page}
@@ -180,7 +180,6 @@ const styles = StyleSheet.create({
     marginBottom: space['5'],
   },
   skeletonBar: {
-    borderRadius: space['1'],
     borderWidth: StyleSheet.hairlineWidth,
   },
 });

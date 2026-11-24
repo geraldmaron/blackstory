@@ -29,15 +29,13 @@ function tracked(value: string): string {
 
 export type ProvenanceSectionProps = {
   readonly entity: Entity;
-  readonly index: string;
 };
 
-export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
+export function ProvenanceSection({ entity }: ProvenanceSectionProps) {
   const coverage = coverageLevel(entity.researchCoverage);
 
   return (
     <EntityEditionPanel
-      index={index}
       kicker="Provenance"
       title="How complete this record is"
       testID="entity-provenance-section"
@@ -71,7 +69,7 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
           <RecordBeatRow
             label="Release"
             valueNode={
-              <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+              <Text variant="meta" colorRole="inkMuted" style={styles.dataValue}>
                 {entity.revision.releaseId}
               </Text>
             }
@@ -81,7 +79,7 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
         <RecordBeatRow
           label="Updated"
           valueNode={
-            <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+            <Text variant="meta" colorRole="inkMuted" style={styles.dataValue}>
               {tracked(entity.revision.recordUpdatedAt)}
             </Text>
           }
@@ -90,7 +88,7 @@ export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
         <RecordBeatRow
           label="Generated"
           valueNode={
-            <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+            <Text variant="meta" colorRole="inkMuted" style={styles.dataValue}>
               {tracked(entity.revision.generatedAt)}
             </Text>
           }

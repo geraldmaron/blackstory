@@ -1,13 +1,11 @@
 /**
- * The four primary tabs: Explore, Stories, Records, More.
+ * The four primary tabs: Archive, Stories, Data, More (docs/ui/DESIGN.md section 11).
  *
- * Names come straight from `MOBILE_PRIMARY_TABS`, which derives them from the shared destination
- * catalog. This file used to translate one of them by hand — `name={tab.id === 'stories' ?
- * 'learn' : tab.id}` — which is how the tab bar could say "Stories" while pushing `/learn`.
+ * Names come straight from `MOBILE_PRIMARY_TABS`.
  *
- * `search` and `history` are registered but hidden: both are legacy roots that still arrive as
- * deep links and as restored navigation state, and both normalize to Records while keeping the
- * reader's query.
+ * `explore`, `records`, `search` and `history` are registered but hidden: each was a tab or a
+ * tab root once and still arrives as a deep link and as restored navigation state. Each
+ * redirects into the Archive and keeps the reader's query.
  */
 import { Tabs } from 'expo-router';
 
@@ -20,16 +18,20 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={tabBarOptions}>
       <Tabs.Screen name="index" options={{ href: null }} />
-      {MOBILE_PRIMARY_TABS.map((tab) => (
+      {MOBILE_PRIMARY_TABS.map((tab, index) => (
         <Tabs.Screen
           key={tab.id}
           name={tab.id}
           options={{
             title: tab.label,
             tabBarIcon: editionTabIcon(tab.icon),
+            // The default label counts the hidden redirect routes too ("2 of 9").
+            tabBarAccessibilityLabel: `${tab.label}, tab, ${index + 1} of ${MOBILE_PRIMARY_TABS.length}`,
           }}
         />
       ))}
+      <Tabs.Screen name="explore" options={{ href: null }} />
+      <Tabs.Screen name="records" options={{ href: null }} />
       <Tabs.Screen name="search" options={{ href: null }} />
       <Tabs.Screen name="history" options={{ href: null }} />
     </Tabs>

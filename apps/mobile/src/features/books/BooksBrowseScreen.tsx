@@ -27,6 +27,7 @@ import {
   space,
   useThemeColors,
   MIN_TOUCH_TARGET,
+  radius,
 } from '@/ui';
 import { BOOKS_ABOUT, BOOKS_CATALOG, BOOKS_INTRO } from './books-copy';
 import { catalogPulse, filterCatalogRows, listCatalogRows, loadBooksCatalog } from './catalog';
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   searchField: {
     minHeight: MIN_TOUCH_TARGET,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     paddingHorizontal: space['3'],
     flexDirection: 'row',
     alignItems: 'center',

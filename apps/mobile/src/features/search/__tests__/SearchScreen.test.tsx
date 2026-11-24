@@ -163,8 +163,8 @@ describe('SearchScreen — result rendering', () => {
     fireEvent.press(getByLabelText('Show Harriet Tubman on map'));
 
     expect(router.push).toHaveBeenCalledWith({
-      pathname: '/explore',
-      params: { selected: 'ent_1', kind: 'person' },
+      pathname: '/archive',
+      params: { view: 'map', selected: 'ent_1', kind: 'person' },
     });
   });
 });

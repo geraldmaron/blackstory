@@ -25,7 +25,7 @@ describe('CitedInSection', () => {
   it('lists each citing story with the relation stated in words', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
     const { getByTestId, getByText } = await render(
-      <CitedInSection citingStories={entity.citingStories ?? []} index="09" />,
+      <CitedInSection citingStories={entity.citingStories ?? []} />,
     );
     expect(getByTestId('entity-cited-in-section')).toBeTruthy();
     expect(getByText('Blockbusting')).toBeTruthy();
@@ -35,7 +35,7 @@ describe('CitedInSection', () => {
   });
 
   it('renders nothing at all when no story cites the record', async () => {
-    const { queryByTestId } = await render(<CitedInSection citingStories={[]} index="09" />);
+    const { queryByTestId } = await render(<CitedInSection citingStories={[]} />);
     expect(queryByTestId('entity-cited-in-section')).toBeNull();
   });
 
@@ -43,11 +43,7 @@ describe('CitedInSection', () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
     const onOpenStory = jest.fn();
     const { getByLabelText } = await render(
-      <CitedInSection
-        citingStories={entity.citingStories ?? []}
-        index="09"
-        onOpenStory={onOpenStory}
-      />,
+      <CitedInSection citingStories={entity.citingStories ?? []} onOpenStory={onOpenStory} />,
     );
     fireEvent.press(getByLabelText(/Blockbusting, mapped in this record/i));
     expect(onOpenStory).toHaveBeenCalledWith('blockbusting');

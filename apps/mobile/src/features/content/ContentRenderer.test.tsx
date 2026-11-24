@@ -3,7 +3,6 @@
  * `numberOfLines`, RTL text rendering, cached/offline + stale-version affordances, missing-citation
  * warning, and that an unsafe source href degrades to plain text instead of an openable link.
  */
-import { Dimensions } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 import { normalizeTypedContentPage } from './content-blocks';
 import { ContentRenderer } from './ContentRenderer';
@@ -80,19 +79,15 @@ describe('ContentRenderer', () => {
     expect(getByText('Showing cached copy (offline)')).toBeTruthy();
   });
 
-  it('shows an "up to date" notice when served fresh from the network', async () => {
-    const { getByText } = await renderPage(BASE_PAGE, {
-      cached: { fetchedAt: Date.now(), degraded: false },
-    });
-    expect(getByText('Up to date')).toBeTruthy();
-  });
-
-  it('hides the fresh "up to date" notice in longform presentation', async () => {
-    const { queryByText } = await renderPage(BASE_PAGE, {
-      presentation: 'longform',
-      cached: { fetchedAt: Date.now(), degraded: false },
-    });
-    expect(queryByText('Up to date')).toBeNull();
+  it('says nothing about the cache when the copy on screen is fresh', async () => {
+    for (const presentation of ['document', 'longform'] as const) {
+      const { queryByText } = await renderPage(BASE_PAGE, {
+        presentation,
+        cached: { fetchedAt: Date.now(), degraded: false },
+      });
+      expect(queryByText('Up to date')).toBeNull();
+      expect(queryByText(/Last updated/)).toBeNull();
+    }
   });
 
   it('still shows offline cache notice in longform presentation', async () => {
@@ -110,13 +105,8 @@ describe('ContentRenderer', () => {
     // rather than a one-off 18/30 override that drifts from the type scale.
     const flattened = Object.assign({}, ...[paragraph.props.style].flat());
     expect(flattened.fontSize).toBe(17);
-    // `lineHeight` is scaled for Dynamic Type by the Text primitive, and jest-expo seeds a
-    // fontScale of 2 — so what this asserts is the RATIO the type scale defines, which is the
-    // part that has to hold at every text size. A raw 27 here would only be asserting that
-    // line height had been left behind when the font grew, which is the bug it was written
-    // before (see `Text.tsx`).
-    const fontScale = Dimensions.get('window').fontScale;
-    expect(flattened.lineHeight).toBe(27 * fontScale);
+    // Written unscaled: React Native scales lineHeight with the font (see `Text.tsx`).
+    expect(flattened.lineHeight).toBe(27);
     expect(flattened.fontFamily).toBe('Newsreader-Regular');
   });
 

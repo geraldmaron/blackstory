@@ -21,6 +21,7 @@ import {
 import { ScreenCanvas } from '@/ui';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 import { DEMO_MAP_SOURCE } from '@/features/map/demoMapSource';
+import { ARCHIVE_LIST_HREF } from '@/shell/mobile-nav';
 import { toExploreFeatures } from '@/features/explore/explore-feature';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
 import { ExploreFiltersPanel, filterStateFromPanel } from '@/features/explore/ExploreFiltersPanel';
@@ -36,7 +37,7 @@ export default function FiltersSheet() {
 
   // Never trust `returnTo` directly — only a value that survives the safe-route allowlist is
   // used; anything else (an external URL, an unenumerated path) silently falls back to Explore.
-  const safeReturnTo = parseReturnTo(rawParams.returnTo) ?? '/explore';
+  const safeReturnTo = parseReturnTo(rawParams.returnTo) ?? '/archive';
 
   useEditionStackBack({
     fallbackHref: safeReturnTo,
@@ -74,7 +75,7 @@ export default function FiltersSheet() {
         onFiltersChange={syncLive}
         onClear={clear}
         onDone={done}
-        onOpenPlaceFind={() => router.push('/records')}
+        onOpenPlaceFind={() => router.push(ARCHIVE_LIST_HREF)}
         description="Narrow the map and list by kind family and decade. Changes apply right away."
       />
     </ScreenCanvas>

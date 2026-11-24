@@ -4,7 +4,7 @@
  */
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Text, space, useConfidenceColors, useThemeColors } from '@/ui';
+import { Text, space, useConfidenceColors, useThemeColors, radius } from '@/ui';
 import {
   CONFIDENCE_TIER_GLYPH,
   CLUSTER_RADIUS_BY_COUNT,
@@ -85,7 +85,7 @@ function LegendRow({ label, children }: { readonly label: string; readonly child
 function SectionTitle({ children }: { readonly children: string }) {
   const theme = useThemeColors();
   return (
-    <Text variant="code" style={[styles.sectionTitle, { color: theme.accent }]}>
+    <Text variant="meta" style={[styles.sectionTitle, { color: theme.accent }]}>
       {children}
     </Text>
   );
@@ -166,7 +166,7 @@ export function MapColorKey({ testID = 'map-color-key', embedded = false }: MapC
       {CONFIDENCE_TIER_ROWS.map(([tier, label]) => (
         <LegendRow key={tier} label={label}>
           <Text
-            variant="code"
+            variant="meta"
             style={{ color: tier === 'unrated' ? theme.inkMuted : confidence[tier].fg, width: 20 }}
           >
             {CONFIDENCE_TIER_GLYPH[tier]}
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   toneSwatch: {
     width: 16,
     height: 16,
-    borderRadius: 8,
+    borderRadius: radius.full,
   },
   sizeDisc: {
     borderWidth: StyleSheet.hairlineWidth,

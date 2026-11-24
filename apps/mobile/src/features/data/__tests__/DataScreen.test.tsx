@@ -18,6 +18,7 @@ jest.mock('react-native-safe-area-context', () => {
     SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
       React.createElement(View, { style }, children as never),
     SafeAreaProvider: ({ children }: { children?: unknown }) => children,
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
   };
 });
 
@@ -32,10 +33,26 @@ describe('DataScreen', () => {
     expect(getByText(/The national census picture, plus published figures/)).toBeTruthy();
   });
 
-  it('shows honest Census degraded empty state with model frame', async () => {
-    const { getByText } = await render(<DataScreen />);
+  it('says the Census timeline is missing in words, with no stand-in chart', async () => {
+    const { getByText, queryByText } = await render(<DataScreen />);
     expect(getByText('Census timeline not on this release yet')).toBeTruthy();
-    expect(getByText('Decade axis')).toBeTruthy();
+    expect(queryByText('Decade axis')).toBeNull();
+  });
+
+  it('opens every figure in Plain, with Numbers one tap away and its sources as the receipt', async () => {
+    const { getAllByTestId, queryAllByTestId, getAllByLabelText } = await render(<DataScreen />);
+    const plain = getAllByLabelText(/^Plain, View of /);
+    expect(plain.length).toBeGreaterThan(0);
+    for (const segment of plain) {
+      expect(segment.props.accessibilityState).toEqual({ selected: true });
+    }
+    expect(queryAllByTestId('data-figure-numbers')).toHaveLength(0);
+    expect(getAllByTestId('exhibit-receipt').length).toBe(plain.length);
+
+    await fireEvent.press(getAllByLabelText(/^Numbers, View of /)[0]!);
+    expect(getAllByTestId('data-figure-numbers')).toHaveLength(1);
+    // The table speaks each value with its label.
+    expect(getAllByLabelText(/Black families: \$44,900/).length).toBeGreaterThan(0);
   });
 
   it('renders coverage pulse and juxtaposition callout', async () => {
@@ -60,14 +77,14 @@ describe('DataScreen', () => {
 
   it('navigates Explore from the Census empty action', async () => {
     const { getByText } = await render(<DataScreen />);
-    fireEvent.press(getByText('Open Explore'));
-    expect(mockPush).toHaveBeenCalledWith('/explore');
+    fireEvent.press(getByText('Open the Archive map'));
+    expect(mockPush).toHaveBeenCalledWith('/archive');
   });
 
   it('navigates Explore and Methodology from next-step actions', async () => {
     const { getByText } = await render(<DataScreen />);
     fireEvent.press(getByText('Explore the map'));
-    expect(mockPush).toHaveBeenCalledWith('/explore');
+    expect(mockPush).toHaveBeenCalledWith('/archive');
     fireEvent.press(getByText('Read methodology'));
     expect(mockPush).toHaveBeenCalledWith('/methodology');
   });

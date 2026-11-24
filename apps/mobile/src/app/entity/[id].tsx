@@ -32,7 +32,7 @@ import {
   type EntityDataDeps,
 } from '@/features/entity';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
-import { Button, ScreenCanvas } from '@/ui';
+import { Button, CHROME_MAX_FONT_SCALE, ScreenCanvas } from '@/ui';
 
 function compactHeaderTitle(title: string): string {
   const trimmed = title.trim();
@@ -46,8 +46,8 @@ export default function EntityDetailRoute() {
   const entityId = parseEntityId(id);
 
   useEditionStackBack({
-    fallbackHref: '/explore',
-    accessibilityHint: 'Returns to Explore when there is no previous screen',
+    fallbackHref: '/archive',
+    accessibilityHint: 'Returns to the Archive when there is no previous screen',
   });
 
   const [deps, setDeps] = useState<EntityDataDeps | undefined>(undefined);
@@ -83,6 +83,7 @@ export default function EntityDetailRoute() {
             label="Share"
             variant="ghost"
             density="compact"
+            maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
             loading={shareBusy}
             accessibilityLabel={`Share ${readyEntity.displayName}`}
             onPress={() => {
@@ -106,7 +107,7 @@ export default function EntityDetailRoute() {
 
   if (!entityId) {
     // Unknown/malformed/unsafe id — safe-default fallback, never a raw render of the input.
-    return <Redirect href="/explore" />;
+    return <Redirect href="/archive" />;
   }
 
   return (
@@ -114,9 +115,9 @@ export default function EntityDetailRoute() {
       <EntityDetailScreen
         state={deps ? state : { kind: 'loading' }}
         onRetry={retry}
-        onBackToExplore={() => router.replace('/explore')}
+        onBackToExplore={() => router.replace('/archive')}
         onBackToMap={(selectedId) =>
-          router.replace({ pathname: '/explore', params: { selected: selectedId } })
+          router.replace({ pathname: '/archive', params: { selected: selectedId } })
         }
         onOpenEntity={(neighborId) => router.push(`/entity/${neighborId}`)}
         onOpenStory={(slug) => router.push(`/stories/${slug}`)}

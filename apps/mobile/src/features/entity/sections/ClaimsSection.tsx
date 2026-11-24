@@ -18,20 +18,18 @@ export const CLAIMS_PREVIEW_COUNT = 2;
 export type ClaimsSectionProps = {
   readonly claims: readonly Claim[];
   readonly isOnline: boolean;
-  readonly index: string;
 };
 
-export function ClaimsSection({ claims, isOnline, index }: ClaimsSectionProps) {
+export function ClaimsSection({ claims, isOnline }: ClaimsSectionProps) {
   const claimCards = claims.map((claim, claimIndex) => (
     <View key={claim.id}>
-      <ClaimCard claim={claim} isOnline={isOnline} />
+      <ClaimCard claim={claim} isOnline={isOnline} number={claimIndex + 1} />
       {claimIndex < claims.length - 1 ? <Divider /> : null}
     </View>
   ));
 
   return (
     <EntityEditionPanel
-      index={index}
       kicker="Claims"
       title={SECTION_HEADINGS.claims}
       testID="entity-claims-section"

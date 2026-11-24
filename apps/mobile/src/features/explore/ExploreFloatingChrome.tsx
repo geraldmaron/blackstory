@@ -6,7 +6,7 @@
 import type { Ref } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
-import { Text, space, radius, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui';
+import { CHROME_MAX_FONT_SCALE, Text, space, radius, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui';
 import { hasActiveFilters, type FilterState } from '@/lib/route-params';
 import { exploreContentInset, useExploreChromeColors, MAP_GHOST_PRESSED } from './explore-chrome';
 import { formatExploreCountLabel } from './explore-count-label';
@@ -94,7 +94,7 @@ function GhostIconButton({
           importantForAccessibility="no-hide-descendants"
           testID={`${testID ?? 'ghost'}-badge`}
         >
-          <Text variant="code" style={[styles.filterBadgeText, { color: chrome.mapInk }]}>
+          <Text variant="meta" style={[styles.filterBadgeText, { color: chrome.mapInk }]}>
             {badgeCount > 9 ? '9+' : String(badgeCount)}
           </Text>
         </View>
@@ -142,7 +142,8 @@ export function ExploreFloatingChrome({
           style={[
             styles.countChip,
             {
-              backgroundColor: 'transparent',
+              // Solid, like every map control: a map label must not show through the count.
+              backgroundColor: chrome.mapGhostBg,
               borderColor: chrome.mapAccent,
             },
           ]}
@@ -165,7 +166,11 @@ export function ExploreFloatingChrome({
               "4,154..." one size up) — dropping the very number the chip exists
               to show (explore-count-label.ts). Wrapping trades a taller chip for
               keeping both counts at every Dynamic Type size. */}
-          <Text variant="caption" style={[styles.countInline, { color: chrome.mapAccent }]}>
+          <Text
+            variant="caption"
+            maxFontSizeMultiplier={CHROME_MAX_FONT_SCALE}
+            style={[styles.countInline, { color: chrome.mapAccent }]}
+          >
             {countLabel.railInline}
           </Text>
         </View>
@@ -307,7 +312,7 @@ const styles = StyleSheet.create({
     right: 2,
     minWidth: 14,
     height: 14,
-    borderRadius: 7,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 3,

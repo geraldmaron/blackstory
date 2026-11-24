@@ -1,0 +1,32 @@
+Application    application  BlackStory (Dev)
+Button         button       Map, Archive view
+Button         button       List, Archive view
+Heading        heading      Archive
+StaticText     text         Every documented person, place, event and institution. Browse by kind, or search by name.
+TextField      search text field Search | Search names, places, events...
+StaticText     text         SCALE
+StaticText     text         ACTIVE RELEASE · 4,096 RECORDS PINNED ON THE MAP
+StaticText     text         BY CATEGORY
+Button         button       List People in the Archive
+Button         button       List Places in the Archive
+Button         button       List Schools in the Archive
+Button         button       List Organizations in the Archive
+Slider         slider       List Institutions in the Archive
+Button         button       List Events in the Archive
+Button         button       List Laws in the Archive
+Button         button       List Cases in the Archive
+Link           link         List Publications in the Archive
+Button         button       List Artifacts in the Archive
+Button         button       List Movements in the Archive
+Button         button       List Inventions in the Archive
+Button         button       List Other in the Archive
+StaticText     text         RECENT SEARCHES
+Button         button       Search again for school
+Button         button       Remove school from recent searches
+Button         button       Search again for church
+Button         button       Remove church from recent searches
+Button         button       Clear all
+Button         button       Archive, tab, 1 of 4
+Button         button       Stories, tab, 2 of 4
+Button         button       Data, tab, 3 of 4
+Button         button       More, tab, 4 of 4

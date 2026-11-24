@@ -25,7 +25,7 @@ export function RelatedEntityList({ entityIds }: { readonly entityIds: readonly 
   return (
     <View accessible={false}>
       <Text
-        variant="sectionLabel"
+        variant="meta"
         colorRole="inkMuted"
         isHeading
         accessibilityRole="header"
@@ -66,7 +66,7 @@ export function RelatedFactBadges({ factIds }: { readonly factIds: readonly stri
   return (
     <View accessible={false}>
       <Text
-        variant="sectionLabel"
+        variant="meta"
         colorRole="inkMuted"
         isHeading
         accessibilityRole="header"

@@ -64,18 +64,18 @@ export function LedgerRow({
   const content = (
     <View style={styles.row}>
       {indexLabel ? (
-        <Text variant="code" colorRole="inkSubtle" style={styles.index}>
+        <Text variant="meta" colorRole="inkSubtle" style={styles.index}>
           {indexLabel}
         </Text>
       ) : null}
       {leading ? <View style={styles.leading}>{leading}</View> : null}
       <View style={styles.textColumn}>
         {slug ? (
-          <Text variant="code" colorRole="inkMuted" numberOfLines={1}>
+          <Text variant="meta" colorRole="inkMuted" numberOfLines={1}>
             {slug}
           </Text>
         ) : null}
-        <Text variant="rowTitle" numberOfLines={2}>
+        <Text variant="bodyEmphasis" numberOfLines={2}>
           {title}
         </Text>
         {summary ? (

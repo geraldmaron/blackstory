@@ -12,7 +12,6 @@ import type { Entity } from '../types';
 
 export type StatusSectionProps = {
   readonly entity: Entity;
-  readonly index: string;
 };
 
 function formatEventWindowLabel(
@@ -24,17 +23,12 @@ function formatEventWindowLabel(
   return `${startAt} to ${endAt}`;
 }
 
-export function StatusSection({ entity, index }: StatusSectionProps) {
+export function StatusSection({ entity }: StatusSectionProps) {
   const statusHeading =
     entity.kind === 'event' ? SECTION_HEADINGS.statusEvent : SECTION_HEADINGS.statusRecord;
 
   return (
-    <EntityEditionPanel
-      index={index}
-      kicker="Status"
-      title={statusHeading}
-      testID="entity-status-section"
-    >
+    <EntityEditionPanel kicker="Status" title={statusHeading} testID="entity-status-section">
       {entity.kind === 'event' ? (
         <View style={{ gap: space['2'] }}>
           {entity.eventWindow ? (
@@ -58,7 +52,7 @@ export function StatusSection({ entity, index }: StatusSectionProps) {
         </View>
       ) : (entity.statusHistory?.length ?? 0) > 0 ? (
         <View style={{ gap: space['2'] }}>
-          <Text variant="rowTitle">Current status: {humanizeToken(entity.status ?? '')}</Text>
+          <Text variant="bodyEmphasis">Current status: {humanizeToken(entity.status ?? '')}</Text>
           {(entity.statusHistory ?? []).map((record, recordIndex) => (
             <Text
               key={`${entity.id}_status_${recordIndex}`}

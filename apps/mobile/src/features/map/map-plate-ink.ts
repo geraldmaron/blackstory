@@ -26,10 +26,11 @@ export function withAlpha(hex: string, alpha: number): string {
 export const MAP_INK = brandCore.archivePaper;
 export const MAP_INK_MUTED = withAlpha(brandCore.archivePaper, 0.68);
 /** Resting fill for any ghost control on the plate. */
-export const MAP_GHOST_BG = withAlpha(brandCore.archivePaper, 0.08);
+/** Map controls are solid: nothing shows through a control (DESIGN.md section 7.4, no glass). */
+export const MAP_GHOST_BG = themeColors.dark.surface;
 /** Hairline edge that keeps a ghost control legible over both land and water. */
 export const MAP_GHOST_BORDER = withAlpha(brandCore.archivePaper, 0.22);
 export const MAP_ACCENT = themeColors.dark.accentGraphic;
-export const MAP_GHOST_ACTIVE = withAlpha(MAP_ACCENT, 0.28);
+export const MAP_GHOST_ACTIVE = brandCore.mahogany;
 /** Pressed feedback fill for ghost controls on the dark plate. */
-export const MAP_GHOST_PRESSED = withAlpha(brandCore.archivePaper, 0.14);
+export const MAP_GHOST_PRESSED = themeColors.dark.surfaceRaised;

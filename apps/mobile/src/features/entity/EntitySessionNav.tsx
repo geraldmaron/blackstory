@@ -34,7 +34,7 @@ export function EntitySessionNav({
       accessibilityLabel="Record navigation"
       testID={testID}
     >
-      <Text variant="code" colorRole="inkMuted" style={styles.kicker}>
+      <Text variant="meta" colorRole="inkMuted" style={styles.kicker}>
         Browse records
       </Text>
       <View style={styles.row}>

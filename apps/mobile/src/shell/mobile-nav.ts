@@ -15,7 +15,6 @@
 import {
   allSemanticDestinations,
   canonicalPathForLegacy,
-  primaryAxes,
   semanticDestinationById,
   semanticDestinationsInFamily,
   type DestinationFamily,
@@ -24,7 +23,7 @@ import {
 
 import type { NavIconName } from '@/ui/NavIcon';
 
-export type MobileTabId = 'explore' | 'stories' | 'records' | 'more';
+export type MobileTabId = 'archive' | 'stories' | 'data' | 'more';
 
 export type MobileTabDefinition = {
   readonly id: MobileTabId;
@@ -34,25 +33,36 @@ export type MobileTabDefinition = {
   readonly icon: NavIconName;
 };
 
+/** The Archive tab's two views (docs/ui/DESIGN.md section 9.2). The map is the default. */
+export type ArchiveView = 'map' | 'list';
+export const ARCHIVE_ROUTE = '/archive' as const;
+/** The Archive as a list: where search lives, and where every legacy find-in-time link lands. */
+export const ARCHIVE_LIST_HREF = { pathname: ARCHIVE_ROUTE, params: { view: 'list' } } as const;
+
+function catalogTab(id: 'stories' | 'data'): MobileTabDefinition {
+  const destination = semanticDestinationById(id);
+  /* istanbul ignore next -- the catalog is exhaustive; this is a load-bearing assert. */
+  if (!destination) throw new Error(`MOBILE_PRIMARY_TABS: no destination for "${id}"`);
+  return {
+    id,
+    label: destination.label,
+    route: destination.path as `/${string}`,
+    icon: destination.icon as NavIconName,
+  };
+}
+
 /**
- * The bottom tab bar: the three product axes a phone navigates between, plus More.
+ * The bottom tab bar: Archive, Stories, Data, More (docs/ui/DESIGN.md section 11).
  *
- * Collections is the web's fourth tab; on a phone that job, plus the trust pages and forms, is the
- * platform's own `More`.
- * Search is not a tab: it is a capability of Records, reachable from Explore and from the bar.
+ * Archive is the map with its list and filters, what were the Explore and Records tabs, behind
+ * one Map and List switch. It is defined here because the shared catalog still lists the web's
+ * `/explore` and `/records` as separate axes until the web merges them (DESIGN.md phase 4b).
+ * Search is not a tab: it is the Archive's list view.
  */
 export const MOBILE_PRIMARY_TABS: readonly MobileTabDefinition[] = [
-  ...(['explore', 'stories', 'records'] as const).map((id) => {
-    const destination = primaryAxes().find((axis) => axis.id === id);
-    /* istanbul ignore next -- the catalog is exhaustive; this is a load-bearing assert. */
-    if (!destination) throw new Error(`MOBILE_PRIMARY_TABS: no destination for "${id}"`);
-    return {
-      id,
-      label: destination.label,
-      route: destination.path as `/${string}`,
-      icon: destination.icon as NavIconName,
-    };
-  }),
+  { id: 'archive', label: 'Archive', route: ARCHIVE_ROUTE, icon: 'explore' },
+  catalogTab('stories'),
+  catalogTab('data'),
   { id: 'more', label: 'More', route: '/more', icon: 'more' },
 ] as const;
 
@@ -95,7 +105,6 @@ const MORE_PRESENTATION: Readonly<Record<string, MoreRowPresentation>> = Object.
     icon: 'institution',
   },
   law: { line: 'Statutes and rulings, in plain language', route: '/law', icon: 'law' },
-  data: { line: 'National series with their sources attached', route: '/data' },
   lives: { line: 'One question about daily life, decade by decade' },
   books: { line: 'Documented challenges, with the reports cited', route: '/books' },
   memorial: { line: 'Names, held quietly', route: '/memorial' },
@@ -146,6 +155,8 @@ const section = (
   meta,
   rows: semanticDestinationsInFamily(family)
     .filter((destination) => destination.isPublic)
+    // A tab duplicated inside More is a second, worse route to somewhere the bar already goes.
+    .filter((destination) => !MOBILE_PRIMARY_TABS.some((tab) => tab.id === destination.id))
     .map(moreRow),
 });
 
@@ -168,25 +179,25 @@ export const MOBILE_TAB_ROOTS: readonly `/${string}`[] = MOBILE_PRIMARY_TABS.map
   (tab) => tab.route,
 );
 
-/** The archive tab: where search lives, and where every legacy find-in-time link lands. */
-export const MOBILE_RECORDS_ROUTE = '/records' as const;
-
 /**
- * Legacy native routes that still have to resolve, and the canonical route each becomes.
+ * Native routes that still have to resolve, and the tab root each becomes.
  *
- * Derived from the catalog so the phone and the site cannot disagree about what an old address
- * meant, then narrowed to the paths a native build actually registers: the app never had a
- * `/facts` or `/legal` URL of its own, but it did ship `/learn`, `/history` and `/search`.
+ * `/explore` and `/records` were tabs until the Archive merged them; `/learn`, `/history` and
+ * `/search` are older still. Each keeps a route file that redirects with the reader's query, so
+ * an old deep link, a saved link and restored navigation state all land (`(tabs)/explore.tsx`,
+ * `(tabs)/records.tsx`, `(tabs)/search.tsx`, `(tabs)/history.tsx`, `learn/[...legacy].tsx`).
  */
 const NATIVE_LEGACY_ROUTES: Readonly<Record<string, `/${string}`>> = Object.freeze({
+  '/explore': ARCHIVE_ROUTE,
+  '/records': ARCHIVE_ROUTE,
   '/learn': '/stories',
-  '/history': MOBILE_RECORDS_ROUTE,
-  '/search': MOBILE_RECORDS_ROUTE,
+  '/history': ARCHIVE_ROUTE,
+  '/search': ARCHIVE_ROUTE,
   '/topics': '/stories',
   '/myths': '/stories',
   '/chapters': '/stories',
   '/articles': '/stories',
-  '/facts': MOBILE_RECORDS_ROUTE,
+  '/facts': ARCHIVE_ROUTE,
   '/library': '/more',
 });
 
@@ -210,14 +221,14 @@ export function nativeLegacyRoutes(): readonly (readonly [string, string])[] {
 
 /**
  * Where a canonical WEB path lands on the phone, when the two platforms name the same job
- * differently.
- *
- * There is exactly one such pair, and it is deliberate: the web hub is `/collections`, and the
- * phone's version of that job is the platform's own `More`. Anything not listed here uses the same
- * path on both.
+ * differently: the web hub `/collections` is the phone's `More`, and the web's map and list are
+ * the phone's one Archive. Anything not listed here uses the same path on both.
  */
 export const WEB_TO_NATIVE_ROUTE: Readonly<Record<string, `/${string}`>> = Object.freeze({
   '/collections': '/more',
+  // Until the web's own Archive lands (DESIGN.md phase 4b) its map and list are two addresses.
+  '/explore': ARCHIVE_ROUTE,
+  '/records': ARCHIVE_ROUTE,
 });
 
 /** The native route for a canonical web path. */

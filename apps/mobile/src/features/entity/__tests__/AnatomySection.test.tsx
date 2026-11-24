@@ -1,9 +1,10 @@
 /**
- * Record anatomy section: v6 edition panel, fact grid, place preview, maps hand-off.
+ * The record at a glance (facts) and the record's map exhibit with its maps hand-off.
  */
 import { fireEvent, render } from '@testing-library/react-native';
 import {
   AnatomySection,
+  RecordMapSection,
   anatomyFactLabelColumnWidth,
   anatomyFactRowStyle,
 } from '../sections/AnatomySection';
@@ -24,12 +25,14 @@ describe('AnatomySection', () => {
     }
   });
 
-  it('renders four labeled facts inside the anatomy edition panel', async () => {
+  it('renders four labeled facts, with no section counter', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
-    const { getByTestId, getByText } = await render(<AnatomySection entity={entity} />);
+    const { getByTestId, getByText, queryByText } = await render(
+      <AnatomySection entity={entity} />,
+    );
     expect(getByTestId('entity-anatomy-section')).toBeTruthy();
     expect(getByText('Record at a glance')).toBeTruthy();
-    expect(getByText(/01\s*·\s*Anatomy/i)).toBeTruthy();
+    expect(queryByText(/^\d\d\s*·/)).toBeNull();
     expect(getByText('Kind')).toBeTruthy();
     expect(getByText('Where')).toBeTruthy();
     expect(getByText('Era')).toBeTruthy();
@@ -37,15 +40,16 @@ describe('AnatomySection', () => {
     expect(getByText('Place')).toBeTruthy();
     expect(getByText('Reconstruction')).toBeTruthy();
     // One citation source across both claims: uncorroborated, so grade B, not A.
-    expect(getByText(/Grade B · 2 sources/)).toBeTruthy();
+    expect(getByText(/Partly evidenced · 2 sources/)).toBeTruthy();
   });
 
   it('shows Place not pinned when geo is absent', async () => {
     const entity = normalizeEntity(minimalEntityFixture('place'))!;
-    const { getByTestId, getByText } = await render(<AnatomySection entity={entity} />);
-    expect(getByTestId('record-place-empty')).toBeTruthy();
-    expect(getByText('Place not pinned')).toBeTruthy();
-    expect(getByText('Undated')).toBeTruthy();
+    const map = await render(<RecordMapSection entity={entity} />);
+    expect(map.getByTestId('record-place-empty')).toBeTruthy();
+    expect(map.getByText('Place not pinned')).toBeTruthy();
+    const facts = await render(<AnatomySection entity={entity} />);
+    expect(facts.getByText('Undated')).toBeTruthy();
   });
 
   it('renders long where values without line clamp', async () => {
@@ -65,7 +69,7 @@ describe('AnatomySection', () => {
     const onBackToMap = jest.fn();
     const entity = normalizeEntity(fullEntityFixture('place'))!;
     const { getAllByLabelText, getByLabelText } = await render(
-      <AnatomySection entity={entity} onBackToMap={onBackToMap} />,
+      <RecordMapSection entity={entity} onBackToMap={onBackToMap} />,
     );
     expect(getAllByLabelText(/Open Historic Dunbar neighborhood in Maps/).length).toBeGreaterThan(
       0,
@@ -73,16 +77,22 @@ describe('AnatomySection', () => {
     fireEvent.press(getByLabelText(/View Full Fixture Record \(place\) on the national map/));
     expect(onBackToMap).toHaveBeenCalledTimes(1);
   });
+
+  it('frames the map as an exhibit on ink, labeled with its stored precision', async () => {
+    const entity = normalizeEntity(fullEntityFixture('place'))!;
+    const { getByTestId } = await render(<RecordMapSection entity={entity} />);
+    expect(getByTestId('exhibit-label').props.children).toMatch(/^Map · \w+ precision$/);
+  });
 });
 
 describe('AnatomySection evidence', () => {
-  it('draws the shared meter beside the grade, and prints the letter once', async () => {
+  it('draws the shared meter beside the grade in words', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
     const { getByTestId, getByText } = await render(<AnatomySection entity={entity} />);
     expect(
       getByTestId('entity-anatomy-evidence-meter', { includeHiddenElements: true }),
     ).toBeTruthy();
     // The row's own value carries the grade; the meter beside it must not repeat the letter.
-    expect(getByText(/^Grade [ABC] · \d+ sources?$|^Not graded$/)).toBeTruthy();
+    expect(getByText(/^(Well|Partly|Thinly) evidenced · \d+ sources?$|^Not graded$/)).toBeTruthy();
   });
 });
