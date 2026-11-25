@@ -194,6 +194,7 @@ import {
   EXPLORE_MAP_ACCESSIBILITY_LABEL,
   ExploreView,
   exploreMapAccessibilityHint,
+  previewAnswersBack,
 } from '../ExploreView';
 // eslint-disable-next-line import/first
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map';
@@ -833,5 +834,19 @@ describe('ExploreView — screen reader map equivalent and focus return', () => 
     expect(queryByTestId('explore-instruments-panel')).toBeNull();
     expect(sendEvent.mock.calls.map(testIdOf)).toEqual(['explore-chip-instruments']);
     sendEvent.mockRestore();
+  });
+});
+
+describe('ExploreView — Android back with a record selected', () => {
+  it('closes the preview in browse, and leaves it to the map exit while the map is expanded', () => {
+    expect(previewAnswersBack({ focused: true, hasSelection: true, immersive: false })).toBe(true);
+    // Expanded: back restores the chrome first, and the record stays selected.
+    expect(previewAnswersBack({ focused: true, hasSelection: true, immersive: true })).toBe(false);
+    expect(previewAnswersBack({ focused: true, hasSelection: false, immersive: false })).toBe(
+      false,
+    );
+    expect(previewAnswersBack({ focused: false, hasSelection: true, immersive: false })).toBe(
+      false,
+    );
   });
 });

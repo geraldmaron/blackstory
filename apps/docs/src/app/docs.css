@@ -367,6 +367,12 @@ html[data-theme='dark'] .hero-lockup.brand-dark {
   padding: 2rem 1.5rem 4rem;
 }
 
+/* The main area takes focus after the skip link or a drawer navigation so reading starts there.
+   It is not a control, so it shows no ring. */
+.content:focus {
+  outline: none;
+}
+
 .hero {
   position: relative;
   padding: 2.5rem 0 2rem;

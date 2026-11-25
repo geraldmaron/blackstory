@@ -40,18 +40,24 @@ export function DocsShell({ sections, searchIndex, children }: Props) {
   const [navOpen, setNavOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLButtonElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
   const wasOpen = useRef(false);
+  const closedByNavigation = useRef(false);
 
   useEffect(() => {
     if (navOpen) {
       sidebarRef.current?.querySelector('a')?.focus();
     } else if (wasOpen.current) {
-      menuRef.current?.focus();
+      // Dismissed, focus goes back to the button that opened the drawer. Closed because the
+      // reader followed a link, it goes to the page they asked for, not back to Menu.
+      (closedByNavigation.current ? mainRef : menuRef).current?.focus();
     }
+    closedByNavigation.current = false;
     wasOpen.current = navOpen;
   }, [navOpen]);
 
   useEffect(() => {
+    closedByNavigation.current = wasOpen.current;
     setNavOpen(false);
   }, [pathname]);
 
@@ -159,7 +165,7 @@ export function DocsShell({ sections, searchIndex, children }: Props) {
             </a>
           </div>
         </header>
-        <main id="main" className="content">
+        <main id="main" ref={mainRef} tabIndex={-1} className="content">
           {children}
         </main>
       </div>
