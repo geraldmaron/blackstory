@@ -11,6 +11,9 @@ import type { RetellingSceneId } from './retelling-scenes';
 export const RETELLING_COPY_PROVISIONAL = true;
 
 export const RETELLING_SENTENCES: Readonly<Partial<Record<RetellingSceneId, string>>> = {
+  // The web's first screen is the brand panel and does not show this one. The app's opening
+  // still does, and reads its words from here (apps/mobile/src/features/opening).
+  history: 'History is the story that got told, so keep going and watch the word change.',
   'his-story': 'His story is one man’s part of it.',
   'her-story': 'Her story is one woman’s part of it.',
   'your-story': 'Your story is the part nearest you.',
