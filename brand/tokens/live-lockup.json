@@ -1,0 +1,14 @@
+{
+  "family": "Outfit",
+  "weight": 400,
+  "tracking": -0.03,
+  "sideBearing": 0.082,
+  "baseline": 0.87,
+  "symbol": {
+    "size": 2.7826,
+    "left": -2.1921,
+    "top": -1.7241,
+    "inkLeft": -1.2763
+  },
+  "wordWidth": 4.427
+}

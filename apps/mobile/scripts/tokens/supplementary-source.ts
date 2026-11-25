@@ -74,10 +74,10 @@ export const TYPE_SCALE = {
 
 /**
  * Logo/clear-space constraints, transcribed from
- * brand/guide/pages/03-usage-rules.png ("Usage Rules", BlackStory Brand
+ * brand/source/generated-2026-07-18/guide/pages/03-usage-rules.png ("Usage Rules", BlackStory Brand
  * Guide v1.0) — read visually, not measured from source vector files (the
  * guide is a flattened PNG export, not editable art). Re-verify against the
- * PDF (`brand/guide/pdf/BlackStory-Brand-Guide.pdf`) if these ever need
+ * PDF (`brand/source/generated-2026-07-18/guide/pdf/BlackStory-Brand-Guide.pdf`) if these ever need
  * higher-precision figures than the guide page states.
  */
 export const LOGO_CONSTRAINTS = {

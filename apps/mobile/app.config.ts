@@ -299,7 +299,8 @@ const config: ExpoConfig = {
     // stack" (OS floors): Android 8.0 (API 26)+.
     package: bundleIdentifier,
     adaptiveIcon: {
-      backgroundColor: '#E6F4FE',
+      // Archive Paper, the ground the launcher icon is drawn on (brand/scripts/build-kit.mjs).
+      backgroundColor: '#F4EFE5',
       foregroundImage: './assets/images/android-icon-foreground.png',
       backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',

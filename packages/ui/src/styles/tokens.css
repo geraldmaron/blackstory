@@ -424,13 +424,13 @@
    * <body>; this :root chain is the no-JS and out-of-app fallback. Weight and tracking live in
    * the type-scale tokens, not here.
    *
-   * Schibsted Grotesk carries an editorial spine that Sora's geometric construction did not,
-   * and Geist reads sharper than Inter at UI sizes without Inter's ubiquity. Geist ships no
+   * Outfit is the wordmark's own face (brand/README.md), so the logo and every headline are one
+   * typeface (owner, 2026-11-24; it replaced Schibsted Grotesk), and Geist reads sharper than Inter at UI sizes without Inter's ubiquity. Geist ships no
    * italic, which is why the fallback chain ends in system faces that do: an italic in a sans
    * context is synthesised either way, and real italics belong to the editorial register.
    * Newsreader is drawn for longform reading on screen and carries an optical-size axis.
    */
-  --ds-font-display: 'Schibsted Grotesk', var(--ds-font-sans, system-ui, sans-serif);
+  --ds-font-display: 'Outfit', var(--ds-font-sans, system-ui, sans-serif);
   --ds-font-editorial:
     'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --ds-font-sans: 'Geist', 'Segoe UI', system-ui, sans-serif;
@@ -477,13 +477,13 @@
    * when every headline sat at weight 600; weight is an axis now, so each role owns a size AND a
    * weight. Seven roles, and a surface picks which role a thing is, never what it measures:
    *
-   *   display    Schibsted 800, once per surface (the home opening, a page title)
-   *   headline   Schibsted 700, a section or chapter title
-   *   title      Schibsted 650, a card, a row, a sub-section
+   *   display    Outfit 800, once per surface (the home opening, a page title)
+   *   headline   Outfit 700, a section or chapter title
+   *   title      Outfit 650, a card, a row, a sub-section
    *   body       Geist 400, 16-17px
    *   editorial  Newsreader 400, ledes and prose, 17-20px
    *   meta       Geist Mono caps, dates, counts, citations
-   *   numeral    Schibsted 800 figures
+   *   numeral    Outfit 800 figures
    *
    * The older display-title / display-hero / display-1 names stay as aliases onto these roles so
    * untouched surfaces shrink with the system instead of keeping 111px headings.
