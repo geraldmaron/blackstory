@@ -981,11 +981,14 @@ export function liveSourceClaims(row: LivePublishedRow): readonly ReleaseSourceC
     });
 }
 
-/** Identity of a claim as a reader meets it: what it says, about what. */
+/** Identity of a claim as a reader meets it: what it says, about what. A closing period is not a different claim. */
 function claimIdentity(claim: ReleaseSourceClaim): string {
   // Use ASCII Unit Separator for this in-memory identity key. Literal NUL bytes cause text
   // tooling to classify the module as binary.
-  return `${claim.predicate.trim().toLowerCase()}\u001f${claim.object.trim().toLowerCase()}`;
+  return `${claim.predicate.trim().toLowerCase()}\u001f${claim.object
+    .trim()
+    .replace(/[\s.;:,]+$/u, '')
+    .toLowerCase()}`;
 }
 
 export type ClaimCarryResult = {

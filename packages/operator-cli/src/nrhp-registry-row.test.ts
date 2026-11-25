@@ -55,3 +55,17 @@ test('rows render as labeled lines with dates spelled out and restricted address
   assert.match(guarded, /Listed Date: 25975 \(February 11, 1971\)/u);
   assert.equal(renderNrhpRegistryRows(header, rows, '3'), undefined);
 });
+
+test('only the NPS asset path gets the larger nomination PDF limit', async () => {
+  const { isNpgalleryNomination } = await import('./nrhp-registry-row.ts');
+  assert.equal(
+    isNpgalleryNomination('https://npgallery.nps.gov/NRHP/GetAsset/NRHP/76002187_text'),
+    true,
+  );
+  assert.equal(
+    isNpgalleryNomination('https://npgallery.nps.gov.evil.example/NRHP/GetAsset/x'),
+    false,
+  );
+  assert.equal(isNpgalleryNomination('https://npgallery.nps.gov/other/x'), false);
+  assert.equal(isNpgalleryNomination('http://npgallery.nps.gov/NRHP/GetAsset/x'), false);
+});

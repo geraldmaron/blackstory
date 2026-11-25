@@ -2511,3 +2511,19 @@ test('a correction retires Wikipedia-cited live claims only when the rebuild add
   const wikiOnly = { ...gov, citationHref: 'https://en.wikipedia.org/wiki/Y' };
   assert.equal(carryLiveClaims([wikiOnly], live, { dropWikipedia: true }).dropped.length, 0);
 });
+
+test('a live claim and a rebuilt claim differing only by a closing period are one fact', () => {
+  const live = liveRow([
+    { ...LIVE_CLAIM, object: 'Dedicated in 1925, the square honors a soldier.' },
+  ]);
+  const rebuilt = [
+    {
+      ...LIVE_CLAIM,
+      object: 'Dedicated in 1925, the square honors a soldier',
+      citationSource: 'nps.gov',
+    },
+  ];
+  const carry = carryLiveClaims(rebuilt, live);
+  assert.equal(carry.carried, 0);
+  assert.equal(carry.claims.length, 1);
+});

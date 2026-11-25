@@ -211,3 +211,22 @@ export async function fetchNrhpRegistryRow(url: string) {
     publicationAllowed: false,
   } as const;
 }
+
+/** Scanned nomination PDFs run 20 to 30 MB, far over the default 2 MB cap; only NPS's own asset path gets more. */
+export const NOMINATION_PDF_LIMITS = {
+  maxResponseBytes: 64 * 1024 * 1024,
+  maxDurationMs: 90_000,
+} as const;
+
+export function isNpgalleryNomination(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.protocol === 'https:' &&
+      parsed.hostname === 'npgallery.nps.gov' &&
+      parsed.pathname.startsWith('/NRHP/GetAsset/')
+    );
+  } catch {
+    return false;
+  }
+}

@@ -178,6 +178,30 @@ those two have no review, and the capture rule never captures Wikipedia, so they
 one. Every live record with a Wikipedia-cited claim will stop at the same place: 3,145 published
 claims cite a wiki or crowd host. The owner has to decide whether a correction may retire them.
 
+## Second NRHP batch, same day
+
+Five large-nomination records (Jackson Ward, Collier Heights, Colored Musicians Club, Farish
+Street, Dorrance Brooks Square). One published (Dorrance Brooks Square, 7 claims); four held.
+George Washington Carver Library also published earlier through the new rule that a correction may
+retire Wikipedia-cited live claims when it adds reviewed claims from another source, with the
+dropped claims listed in the audit event.
+
+What the batch found:
+
+- **Capture text is cut at 100,000 characters** (`pdf-parser.ts`, safe-fetch). A drafter reads a
+  relevance-selected excerpt of the whole nomination, so a quote can come from past the cut and the
+  reviewer, who sees only the capture, says the text does not state it. Collier Heights and Jackson
+  Ward held for this. The fix is a design choice (a larger cap per nomination, or capturing the same
+  excerpt the drafter read), not a patch.
+- **Scanned nominations of 20 to 30 MB exceeded the 2 MB fetch cap.** NPS asset URLs now get a
+  64 MB, 90-second limit (`NOMINATION_PDF_LIMITS`); other hosts keep the default. One PDF (Farish
+  Street) still fails to capture.
+- **A live claim and a rebuilt claim differing by a closing period counted as two facts**, so the
+  live one was carried forward unreviewed and the publisher held a record that had cleared review.
+  Identity now ignores trailing punctuation.
+- The Colored Musicians Club ledger refused a verdict because one quotation did not occur verbatim
+  in its capture (curly quotes or the cut above).
+
 ## What is still to build, in order
 
 1. **Burn down NRHP enrichment** with the correction path, in small batches, and re-pin the

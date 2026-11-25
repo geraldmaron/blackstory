@@ -190,7 +190,12 @@ import {
   type EnrichedCandidate,
   type AdjudicatedRelationship,
 } from '@repo/research-harness';
-import { fetchNrhpRegistryRow, parseNrhpRegistryRowUrl } from './nrhp-registry-row.js';
+import {
+  NOMINATION_PDF_LIMITS,
+  fetchNrhpRegistryRow,
+  isNpgalleryNomination,
+  parseNrhpRegistryRowUrl,
+} from './nrhp-registry-row.js';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
 import { describeRoutedSearch } from '@repo/domain';
 import { runSearchQueries, type ResolvedSearchProvider } from './search-routing.js';
@@ -1236,7 +1241,11 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           fetchUrl: (url) =>
             parseNrhpRegistryRowUrl(url)
               ? fetchNrhpRegistryRow(url)
-              : runQuickAddFetch(url, fetchDependencies),
+              : runQuickAddFetch(
+                  url,
+                  fetchDependencies,
+                  isNpgalleryNomination(url) ? { limits: NOMINATION_PDF_LIMITS } : {},
+                ),
           storage: captureStorageFromEnv(process.env, decisions),
           parserVersion: 'capture-backfill-v1',
           newId: (prefix, seed) =>
