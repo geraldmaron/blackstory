@@ -131,3 +131,26 @@ test('env config: present, aliased key, and absent', () => {
   assert.equal(supabaseStorageConfigFromEnv({ SUPABASE_URL: 'https://r.supabase.co' }), null);
   assert.equal(supabaseStorageConfigFromEnv({}), null);
 });
+
+test('a dropped upload response is retried once and the stored object answers as a duplicate', async () => {
+  let calls = 0;
+  const storage = createSupabaseStorage({
+    url: 'https://ref.supabase.co',
+    secretKey: 'k',
+    bucket: 'raw-sources',
+    transport: (async () => {
+      calls += 1;
+      if (calls === 1) throw new TypeError('fetch failed');
+      return new Response('{}', { status: 409 });
+    }) as typeof fetch,
+  });
+  const object = await storage.store({
+    url: 'https://example.org/doc',
+    sha256: SHA,
+    contentType: 'text/plain',
+    byteLength: 10,
+    text: 'x',
+  });
+  assert.equal(calls, 2);
+  assert.equal(object.deduplicated, true);
+});

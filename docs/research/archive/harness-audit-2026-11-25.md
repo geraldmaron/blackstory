@@ -212,6 +212,14 @@ approved against the current text. Two records still hold: Jackson Ward and Colo
 Club fail in the storage upload of the extracted text (`fetch failed`, other side closed; not size
 related, cause not found), and Farish Street's PDF exceeds the 64 MB fetch limit.
 
+The upload failure was a large first upload whose response the connection dropped while the object
+landed; the retry then found the object stored. The storage client now retries once (the path is
+the content hash, so a retry is safe). Jackson Ward and Colored Musicians Club then cleared claim
+and text review and are held by the publisher alone: each live record carries an older claim from
+the same nomination (one an OCR-garbled quote, one the 1917 claim Sol rejected as conflating the
+union and the club). Replacing live claims that cite a document the correction just re-reviewed
+needs an owner decision.
+
 ## What is still to build, in order
 
 1. **Burn down NRHP enrichment** with the correction path, in small batches, and re-pin the
