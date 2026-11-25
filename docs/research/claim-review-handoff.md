@@ -16,14 +16,19 @@ claims or evidence once its text is approved.
    needs an owner-approved preservation decision.
 3. `session-claim-review-prepare.ts`, then `session-claim-review-codex.ts`. Reword or drop what
    Sol rejects and repeat until the dry run of `session-claim-review-apply.ts` refuses nothing.
-4. Write the claim ledger (`DRY_RUN=0 CLAIM_REVIEW_APPLY=1`, owner login).
+4. Write the claim ledger (`DRY_RUN=0 CLAIM_REVIEW_APPLY=1`, admin login).
 5. `session-public-text-review.ts --step=prepare`, `--step=review`, then `--step=apply` dry run.
    The text hash covers the claim list, so any later claim or evidence edit voids the approval,
    and a clause with no claim ref is refused even when Sol marks it supported.
-6. Write the text ledger (`DRY_RUN=0 PUBLIC_TEXT_REVIEW_APPLY=1`, owner login, with the real
+6. Write the text ledger (`DRY_RUN=0 PUBLIC_TEXT_REVIEW_APPLY=1`, admin login, with the real
    `--drafter-actor` and `--drafter-family`).
 7. `publish-release-entities-incremental.ts --ids=<ids>` dry run, then apply, then republish the
    catalog artifacts.
+
+Steps 2 to 7 run as one command, `packages/ops-data/scripts/research-batch.ts` (dry run by default,
+`--apply` to write). It stops the batch on a blocked claim, a missing verdict or a refusal, holds a
+record with a rejected claim, and checks the `research-campaigns` kill switch before anything.
+Step 1 stays with whoever researched the record.
 
 Which login each step needs is in [agent-local-env.md](agent-local-env.md).
 

@@ -206,7 +206,6 @@ async function apply(): Promise<void> {
   await withDb(async (client) => {
     await client.query(write ? 'BEGIN' : 'BEGIN READ ONLY');
     try {
-      if (write) await client.query('SET LOCAL ROLE service_role');
       const { packets, rows } = await buildPackets(client, ids, {});
       const stored = new Map(readJsonl<PublicTextPacket>(packetsPath).map((p) => [p.entityId, p]));
       const profiles = (

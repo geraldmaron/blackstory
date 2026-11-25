@@ -617,8 +617,8 @@ export async function recordDecision(
 }
 
 /**
- * Write one entity's approved claims as a reviewed chain. Caller owns the transaction and must
- * have run `SET LOCAL ROLE service_role`. Order matters: the gate drops a review once any
+ * Write one entity's approved claims as a reviewed chain. Caller owns the transaction on a login
+ * holding `claim_reviewer` (the admin login), with no role switch. Order matters: the gate drops a review once any
  * assignment or lineage member postdates it, so evidence rows are written before approval.
  */
 export async function writeEntityApprovals(
@@ -819,7 +819,7 @@ const groupByEntity = <T extends { prepared: PreparedClaim }>(items: readonly T[
  * Validate verdicts against claims rebuilt inside the caller's transaction, and when `write` is
  * set record every approval and rejection there too. The caller COMMITs only if this returns:
  * it throws, so the caller rolls back, unless the gate SQL accepts every approved claim version
- * and hides every linked rejected one. `write` requires `SET LOCAL ROLE service_role`.
+ * and hides every linked rejected one. `write` requires a login holding `claim_reviewer`.
  */
 export async function runClaimReview(
   db: Pick<PoolClient, 'query'>,

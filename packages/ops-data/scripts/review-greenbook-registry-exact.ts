@@ -41,7 +41,6 @@ async function main(): Promise<void> {
   const client = await connectWithDeadline<pg.PoolClient>(pool);
   try {
     await client.query(WRITE ? 'BEGIN' : 'BEGIN READ ONLY');
-    if (WRITE) await client.query('SET LOCAL ROLE service_role');
     const staged = `SELECT l.id FROM research.landscape_candidates l
               WHERE l.lane = 'greenbook' AND l.status = 'pending' AND l.payload ? 'listingReview'`;
     const unreviewed = `${staged} AND NOT EXISTS (
