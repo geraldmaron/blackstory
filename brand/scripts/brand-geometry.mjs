@@ -69,20 +69,27 @@ const PAGES = [
   },
 ];
 
-/** The clear strip between one page and the page showing behind it. */
+/** The clear strip between one page and the page showing behind it, along the right edge and the foot. */
 const PAGE_GAP = [39, 33, 35];
+/**
+ * The same strip along the top edges, measured straight up. It is narrower there than at the
+ * side, and narrower for each page back: the tops fan closer together than the sides.
+ */
+const TOP_GAP = [36, 28, 25];
 
 /** The pin on the cover: a round head with a round hole, tapering to a point. */
 const PIN = { cx: 891.5, cy: 1205, head: 108.5, hole: 45, tipY: 1422 };
 
 const n = (value) => +value.toFixed(2);
 
-/** A page's outline, grown outward by `grow`, as the points and radii a path needs. */
-function pageOutline(page, grow = 0) {
+/**
+ * A page's outline as the points and radii a path needs, grown outward by `grow` at the right
+ * edge, the corner and the foot, and with its top edge raised by `lift`.
+ */
+function pageOutline(page, grow = 0, lift = 0) {
   const { slope } = page.top;
   const norm = Math.hypot(slope, 1);
-  // The top edge, moved up along its own normal.
-  const lineY = (x) => page.top.y + slope * (x - page.top.x) - grow * norm;
+  const lineY = (x) => page.top.y + slope * (x - page.top.x) - lift;
   const right = page.right + grow;
   const corner = page.corner + grow;
   const cornerX = page.right - page.corner;
@@ -128,15 +135,20 @@ function lowerCrossing(a, b) {
  */
 function bandPath(index) {
   const outer = pageOutline(PAGES[index]);
-  const inner = pageOutline(PAGES[index - 1], PAGE_GAP[index - 1]);
-  // The band's top-left end: where its top edge first shows, or, if the two edges cross to the
-  // right of that, where they cross.
-  const cross = (inner.lineY(0) - outer.lineY(0)) / (outer.slope - inner.slope);
-  const crossesAfter =
-    Number.isFinite(cross) && cross > PAGES[index].start && cross < outer.tangent.x;
-  const tipX = crossesAfter ? cross : PAGES[index].start;
+  const inner = pageOutline(PAGES[index - 1], PAGE_GAP[index - 1], TOP_GAP[index - 1]);
+  // The band's top-left end, where its top edge first shows. The band has to have some
+  // thickness there and at the corner, or its outline would cross itself and fill the strip
+  // that is meant to stay clear.
+  const tipX = PAGES[index].start;
   const tip = { x: tipX, y: outer.lineY(tipX) };
-  const tipInner = { x: tipX, y: Math.max(outer.lineY(tipX), inner.lineY(tipX)) };
+  const tipInner = { x: tipX, y: inner.lineY(tipX) };
+  for (const x of [tipX, inner.tangent.x]) {
+    if (inner.lineY(x) - outer.lineY(x) <= 0) {
+      throw new Error(
+        `The ${PAGES[index].name} page does not clear the page in front of it at x ${x}`,
+      );
+    }
+  }
   // Its heel, bottom: where the two feet cross.
   const heel = lowerCrossing(
     { x: outer.footX, y: FOOT_Y, r: outer.foot },

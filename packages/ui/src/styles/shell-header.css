@@ -45,8 +45,10 @@ html {
   width: auto;
   max-width: none;
   height: var(--ds-lockup-size);
-  margin-block: calc(var(--ds-lockup-size) * -0.3022) calc(var(--ds-lockup-size) * -0.3222);
-  margin-inline: calc(var(--ds-lockup-size) * -0.2533) calc(var(--ds-lockup-size) * -0.1932);
+  /* The artwork's own empty margins, as shares of its height (brand/tokens/live-lockup.json,
+     `lockup.trim`). */
+  margin-block: calc(var(--ds-lockup-size) * -0.3017) calc(var(--ds-lockup-size) * -0.3221);
+  margin-inline: calc(var(--ds-lockup-size) * -0.255) calc(var(--ds-lockup-size) * -0.1684);
 }
 
 /* The nearest ground picks the artwork (tokens.css `--ds-lockup-on-*`), so a lockup on an ink

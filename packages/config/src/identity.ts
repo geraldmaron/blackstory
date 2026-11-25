@@ -40,6 +40,8 @@ export const BRAND_ASSETS = {
   /** The same marks as vectors (brand/vector), for anything shown larger than the PNGs. */
   vector: {
     lockup: { light: '/brand/lockup-light.svg', dark: '/brand/lockup-dark.svg' },
+    /** The lockup cropped to its ink, with no margin of its own. */
+    lockupTight: { light: '/brand/lockup-tight-light.svg', dark: '/brand/lockup-tight-dark.svg' },
     symbol: { light: '/brand/symbol-light.svg', dark: '/brand/symbol-dark.svg' },
   },
   // Opaque 1200×630 composites (no alpha). `v=` busts scraper caches when the

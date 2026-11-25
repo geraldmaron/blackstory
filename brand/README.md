@@ -29,8 +29,11 @@ node brand/scripts/build-kit.mjs --check
 ```
 
 Builds in memory and fails if any file differs from its definition. Run it after touching
-anything under `brand/` or an app's brand folder. The output is deterministic, so a file that
-was edited by hand shows up here.
+anything under `brand/` or an app's brand folder. SVG, JSON and CSS are compared byte for byte.
+A PNG is compared as decoded pixels with a small allowance, because the image encoder and
+rasterizer are native libraries whose bytes can differ between machines while the picture does
+not; a moved edge or a changed color still fails. The check also confirms that
+`qa/checksums.json` lists every kit file.
 
 To change the mark, change `brand-geometry.mjs` and rebuild. Do not edit an exported file.
 
@@ -48,7 +51,8 @@ converted to outlines. In the lockup the em is 223.3 units, the letters start at
 on the baseline at y 562.
 
 **One typeface.** Outfit is also the site's display face: every headline is set in it
-(`--ds-font-display`), so the logo and the headlines are the same letters. Body text, long-form
+(`--ds-font-display` on the web, `@expo-google-fonts/outfit` in the mobile app), so the logo and
+the headlines are the same letters. Body text, long-form
 reading and data keep their own faces (`docs/ui/brand.md`).
 
 **Lockup.** The symbol and the wordmark on a 1672 by 941 canvas. The symbol's 2048 square is
@@ -74,8 +78,11 @@ paper cover and paper letters.
 
 **`vector/`** (SVG, the masters to hand to a printer or a vendor)
 
-- `BlackStory-lockup-{dark,light}.svg`: symbol and wordmark. The wordmark is outlines, so no
-  font is needed to open it.
+- `BlackStory-lockup-{dark,light}.svg`: symbol and wordmark on the full canvas. The wordmark is
+  outlines, so no font is needed to open it.
+- `BlackStory-lockup-{dark,light}-tight.svg`: the same, cropped exactly to its ink. Use this
+  when a layout sets its own space around the mark, so nothing has to know where the letters
+  end.
 - `BlackStory-symbol-{dark,light}.svg`: the symbol alone.
 - `BlackStory-wordmark-{dark,light}.svg`: the wordmark alone, cropped to its ink.
 
@@ -92,9 +99,9 @@ paper cover and paper letters.
 
 | App | Files |
 | --- | ----- |
-| `apps/web/public/brand`, `apps/docs/public/brand` | `lockup-*.png` (1600 by 900), `lockup-*.svg`, `symbol-*.png` (512), `symbol-*.svg`, `favicon-*-{16,32,48}.png` (rounded tile), `apple-touch-icon-*-180.png`, `open-graph-*-1200x630.png` |
+| `apps/web/public/brand`, `apps/docs/public/brand` | `lockup-*.png` (1600 by 900), `lockup-*.svg`, `lockup-tight-*.svg` (cropped to the ink, no margin), `symbol-*.png` (512), `symbol-*.svg`, `favicon-*-{16,32,48}.png` (rounded tile), `apple-touch-icon-*-180.png`, `open-graph-*-1200x630.png` |
 | `apps/web/public/brand` only | `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `icon-maskable-dark-512.png`, `email-lockup.png` |
-| `apps/web/src/app/front` | `brand-wordmark.ttf`, the font for the one place the web sets the wordmark as live text |
+| `apps/web/src/app/front` | `live-lockup.css`, the numbers for the one place the web sets the wordmark as live text |
 | `apps/mobile/assets/brand` | the lockup and the 1024 symbol |
 | `apps/mobile/assets/images` | `icon.png`, `favicon.png`, and Android's `android-icon-{foreground,background,monochrome}.png` |
 
@@ -108,7 +115,8 @@ link previews refetch it.
 Use the artwork wherever it will do. Where the letters have to be real text (the front page's
 last scene, where "Black History" closes into "BlackStory"), set them in the display face at the
 weight and tracking in `tokens/live-lockup.json` and stand the symbol beside them using the same
-file. Its values are in ems of the text: how far the "B"'s ink sits inside its box, where the
+file. The build writes those numbers as CSS custom properties for the web
+(`apps/web/src/app/front/live-lockup.css`), so the page holds no copy of its own. Its values are in ems of the text: how far the "B"'s ink sits inside its box, where the
 baseline falls in a line of height 1, and the symbol's square relative to the ink's left edge
 and the baseline. Set that way, the text and the symbol are the lockup, to the pixel. Typing the
 name in any other face, weight or spacing beside the symbol is still misuse
@@ -128,8 +136,10 @@ font and no way to rebuild a file, and its letters matched no typeface, which su
 
 This kit was rebuilt from measurements of that artwork on 2026-11-24:
 
-- The symbol's lines and arcs were fitted to the 2048 export. The rebuilt symbol covers 96
-  percent of the same pixels.
+- The symbol's lines and arcs were fitted to the 2048 export. The rebuilt symbol covers 97
+  percent of the same pixels. The clear strip between pages is narrower along the tops than
+  along the sides, as it was in the artwork; the geometry refuses to build if a page would
+  cross the page in front of it.
 - The wordmark is new lettering in a real font. 33 open faces were fitted to the artwork's
   letters (same capital height, width, left edge and baseline) and scored by how much of the
   artwork's shape each covered. Outfit Regular was the closest with the artwork's one-storey

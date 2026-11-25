@@ -10,5 +10,24 @@
     "top": -1.7241,
     "inkLeft": -1.2763
   },
-  "wordWidth": 4.427
+  "wordWidth": 4.427,
+  "lockup": {
+    "canvas": {
+      "width": 1672,
+      "height": 941
+    },
+    "ink": {
+      "left": 239.9916,
+      "top": 283.9409,
+      "right": 1513.5491,
+      "bottom": 637.8646
+    },
+    "aspect": 3.5984,
+    "trim": {
+      "top": 0.3017,
+      "bottom": 0.3221,
+      "left": 0.255,
+      "right": 0.1684
+    }
+  }
 }
