@@ -25,7 +25,6 @@ import {
   canonicalUpsertParamsFromLandscape,
   carryLiveClaims,
   catalogDecisionFromRow,
-  claimCountRegressed,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
   liveLocationFromRow,
@@ -363,6 +362,13 @@ type PreparedPublish = {
    * when the landscape row has no location.
    */
   readonly locationInherited?: boolean;
+  /** Wikipedia-cited live claims this correction retired, listed in the audit event. */
+  readonly droppedClaims?: readonly {
+    readonly id?: string;
+    readonly predicate: string;
+    readonly object: string;
+    readonly citationHref?: string;
+  }[];
 };
 
 function reviewedCitationCaptures(
@@ -501,6 +507,8 @@ function preparePublish(input: {
   readonly publicTextReviews: readonly PublicTextReview[];
   readonly canonicalStatus?: ReturnType<typeof parseCanonicalStatusSnapshot>;
   readonly allowRepublish?: boolean;
+  /** A correction may retire Wikipedia-cited live claims when the rebuild adds other sources. */
+  readonly allowCorrect?: boolean;
   /**
    * The active-release row for an already published entity.
    */
@@ -538,7 +546,9 @@ function preparePublish(input: {
     }
     // Combine candidate claims with separately cited published claims, then reassess the
     // combined set. Rebuilding from the landscape row alone would discard accumulated evidence.
-    const carry = carryLiveClaims(gate.entry.claims ?? [], input.livePublished);
+    const carry = carryLiveClaims(gate.entry.claims ?? [], input.livePublished, {
+      dropWikipedia: input.allowCorrect === true,
+    });
     const combined = assessPublicationClaims(
       { ...gate.entry, claims: carry.claims },
       input.reviewedClaims,
@@ -547,7 +557,7 @@ function preparePublish(input: {
       return { id: input.entityId, reason: 'claim_assessment_required', detail: combined.detail };
     }
     const entry: ReleaseSourceEntity = { ...gate.entry, claims: combined.claims };
-    if (claimCountRegressed(carry.claims, input.livePublished)) {
+    if (carry.claims.length < carry.liveCount) {
       return {
         id: input.entityId,
         reason: 'claim_count_regression',
@@ -584,6 +594,7 @@ function preparePublish(input: {
       landscapeRow: input.row,
       lintReport: built.lintReport,
       ...(gate.locationOverride !== undefined ? { locationInherited: true } : {}),
+      ...(carry.dropped.length > 0 ? { droppedClaims: carry.dropped } : {}),
     };
   }
 
@@ -768,6 +779,7 @@ async function main(): Promise<void> {
         reviewedClaims,
         publicTextReviews,
         allowRepublish,
+        allowCorrect,
         ...(livePublished !== undefined ? { livePublished } : {}),
         ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
         ...(visitOverride !== undefined ? { visitOverride } : {}),
@@ -1059,11 +1071,28 @@ async function main(): Promise<void> {
            VALUES (gen_random_uuid()::text, 'publication.entities_corrected', 'publication',
              jsonb_build_object('id', 'incremental-publisher', 'type', 'service'),
              jsonb_build_object('type', 'release', 'id', $1::text, 'path', 'publication.releases/' || $1::text,
-               'entityIds', $2::jsonb),
+               'entityIds', $2::jsonb, 'droppedClaims', $3::jsonb),
              'Live entities corrected in place on a signed release after claim and text review',
              gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
              'correct:' || $1::text || ':' || extract(epoch from now())::text, now())`,
-          [releaseId, JSON.stringify([...correctedIds].sort())],
+          [
+            releaseId,
+            JSON.stringify([...correctedIds].sort()),
+            JSON.stringify(
+              Object.fromEntries(
+                prepared
+                  .filter((row) => row.droppedClaims && correctedIds.has(row.id))
+                  .map((row) => [
+                    row.id,
+                    row.droppedClaims!.map((c) => ({
+                      predicate: c.predicate,
+                      object: c.object,
+                      citationHref: c.citationHref ?? null,
+                    })),
+                  ]),
+              ),
+            ),
+          ],
         );
       }
       await client.query('COMMIT');

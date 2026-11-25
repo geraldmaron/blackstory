@@ -2475,3 +2475,39 @@ test('an uncalibrated numeric interval neither blocks nor authorizes independent
   assert.ok(result.eligible);
   assert.equal(result.reviewBasis, 'independent_review');
 });
+
+test('a correction retires Wikipedia-cited live claims only when the rebuild adds another source', () => {
+  const own = {
+    ...LIVE_CLAIM,
+    id: 'o',
+    object: 'Stated by the city',
+    citationHref: 'https://www.austintexas.gov/x',
+    citationSource: 'austintexas.gov',
+    confidenceLevel: 'high' as const,
+  };
+  const wiki = { ...LIVE_CLAIM, id: 'w', object: 'From the encyclopedia' };
+  const live = liveRow([own, wiki]);
+  const gov = {
+    predicate: 'listing',
+    object: 'Listed in 2005',
+    confidenceLevel: 'high' as const,
+    citationSource: 'nps.gov',
+    citationLabel: 'NPS',
+    citationHref: 'https://www.nps.gov/x',
+  };
+
+  const kept = carryLiveClaims([gov], live);
+  assert.equal(kept.dropped.length, 0);
+  assert.equal(kept.claims.length, 3);
+
+  const dropped = carryLiveClaims([gov], live, { dropWikipedia: true });
+  assert.deepEqual(
+    dropped.dropped.map((c) => c.object),
+    ['From the encyclopedia'],
+  );
+  assert.equal(dropped.claims.length, 2);
+  assert.equal(dropped.liveCount, 1);
+
+  const wikiOnly = { ...gov, citationHref: 'https://en.wikipedia.org/wiki/Y' };
+  assert.equal(carryLiveClaims([wikiOnly], live, { dropWikipedia: true }).dropped.length, 0);
+});

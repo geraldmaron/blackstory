@@ -26,6 +26,7 @@ import {
 } from '@repo/domain';
 import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts';
 import { isRestatedListing } from './greenbook-registry.ts';
+import { isWikipediaHost } from './tier1-sources.ts';
 import {
   assessPublicationClaims,
   confidenceLevelForSource,
@@ -993,6 +994,8 @@ export type ClaimCarryResult = {
   readonly carried: number;
   readonly rebuilt: number;
   readonly liveCount: number;
+  /** Live claims a correction dropped because they cite Wikipedia, kept for the audit event. */
+  readonly dropped: readonly ReleaseSourceClaim[];
 };
 
 /**
@@ -1016,15 +1019,23 @@ export type ClaimCarryResult = {
 export function carryLiveClaims(
   rebuilt: readonly ReleaseSourceClaim[],
   live: LivePublishedRow | undefined,
+  options: { readonly dropWikipedia?: boolean } = {},
 ): ClaimCarryResult {
   const liveClaims = live === undefined ? [] : liveSourceClaims(live);
   if (liveClaims.length === 0) {
-    return { claims: rebuilt, carried: 0, rebuilt: rebuilt.length, liveCount: 0 };
+    return { claims: rebuilt, carried: 0, rebuilt: rebuilt.length, liveCount: 0, dropped: [] };
   }
 
+  // A correction may retire Wikipedia-cited live claims, but only when the rebuild brings at
+  // least one claim from another source, so a record never ends up with less evidence than a
+  // reviewer approved. Wikipedia is never captured, so those claims can never be reviewed.
+  const cites = (claim: ReleaseSourceClaim) => isWikipediaHost(claim.citationHref);
+  const drop = options.dropWikipedia === true && rebuilt.some((claim) => !cites(claim));
+  const dropped = drop ? liveClaims.filter(cites) : [];
   const seen = new Set(rebuilt.map(claimIdentity));
   const carried: ReleaseSourceClaim[] = [];
   for (const claim of liveClaims) {
+    if (drop && cites(claim)) continue;
     const identity = claimIdentity(claim);
     if (seen.has(identity)) continue;
     seen.add(identity);
@@ -1035,7 +1046,8 @@ export function carryLiveClaims(
     claims: [...rebuilt, ...carried],
     carried: carried.length,
     rebuilt: rebuilt.length,
-    liveCount: liveClaims.length,
+    liveCount: liveClaims.length - dropped.length,
+    dropped,
   };
 }
 
