@@ -2096,11 +2096,11 @@ const LIVE_CLAIM = {
   id: 'claim_gap_tulsa_race_massacre_01',
   predicate: 'occurred',
   object: 'Tulsa Race Massacre',
-  claimRole: 'evidence',
+  claimRole: 'evidence' as const,
   citationHref: 'https://en.wikipedia.org/wiki/Tulsa_race_massacre',
   citationLabel: 'Wikipedia',
   citationSource: 'wikipedia_api',
-  confidenceLevel: 'low',
+  confidenceLevel: 'low' as const,
 };
 
 function liveRow(claims: readonly unknown[]) {

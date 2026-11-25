@@ -52,6 +52,7 @@ import {
   runPublishRegressionGates,
 } from './lib/publish-regression-gates.ts';
 import { assertNoProjectionDivergence } from './lib/projection-divergence.ts';
+import { changedRowIds } from './lib/preflight-drift.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-related-sync.ts';
 import {
@@ -297,6 +298,11 @@ FROM published.release_entities e
 JOIN published.active_release a ON a.release_id = e.release_id
 WHERE e.entity_id = ANY($1::text[])
 `;
+
+/** Re-reads inside the transaction. Locking the rows makes another writer of these records wait
+ * for this run's commit instead of landing between the check and the upsert. */
+const LIVE_PUBLISHED_BY_IDS_LOCKED_SQL = `${LIVE_PUBLISHED_BY_IDS_SQL}FOR UPDATE OF e`;
+const CATALOG_DECISIONS_BY_IDS_LOCKED_SQL = `${CATALOG_DECISIONS_BY_IDS_SQL}FOR SHARE`;
 
 function readArg(prefix: string): string | undefined {
   const hit = process.argv.find((entry) => entry.startsWith(prefix));
@@ -894,6 +900,20 @@ async function main(): Promise<void> {
         'SELECT signed_manifest FROM publication.releases WHERE id=$1 FOR UPDATE',
         [releaseId],
       );
+      // Preflight read these rows before the lock. A correction committed since then would be
+      // overwritten by this run's older copy, so stop and let the operator rerun on fresh reads.
+      const preparedIds = prepared.map((row) => row.entityRow.entity_id);
+      const lockedLive = await client.query<{ readonly entity_id: string }>(
+        LIVE_PUBLISHED_BY_IDS_LOCKED_SQL,
+        [preparedIds],
+      );
+      const liveDrift = changedRowIds(preparedIds, liveRes.rows, lockedLive.rows);
+      if (liveDrift.length > 0) {
+        throw new Error(
+          `Live records changed after preflight (${liveDrift.slice(0, 3).join(', ')}); ` +
+            'retry incremental publication',
+        );
+      }
       // A write that changes an entity already in the release is refused on a signed release.
       // Appending new entities leaves every signed entry untouched, so it is allowed. Missing or
       // malformed release state reaches the guard unchanged and fails closed.
@@ -1025,6 +1045,36 @@ async function main(): Promise<void> {
              gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
              'append:' || $1::text || ':' || extract(epoch from now())::text, now())`,
           [releaseId, JSON.stringify([...appendedIds].sort())],
+        );
+      }
+      // A retraction recorded while this run worked must still withdraw the record, so the
+      // decisions are read again as the last step. Existing decision rows are share-locked until
+      // commit, so only a new decision row inserted in the moment before COMMIT can slip by.
+      const preparedIdSet = new Set(prepared.map((row) => row.entityRow.entity_id));
+      const preparedDecisionIds = [
+        ...new Set(
+          sliced
+            .filter((item) => preparedIdSet.has(item.entityId))
+            .flatMap((item) =>
+              [item.entityId, item.row?.source_item_id].filter(
+                (id): id is string => typeof id === 'string' && id.length > 0,
+              ),
+            ),
+        ),
+      ];
+      const lockedDecisions = await client.query<{ readonly entity_id: string }>(
+        CATALOG_DECISIONS_BY_IDS_LOCKED_SQL,
+        [preparedDecisionIds],
+      );
+      const decisionDrift = changedRowIds(
+        preparedDecisionIds,
+        catalogDecisionRes.rows,
+        lockedDecisions.rows,
+      );
+      if (decisionDrift.length > 0) {
+        throw new Error(
+          `Catalog decisions changed after preflight (${decisionDrift.slice(0, 3).join(', ')}); ` +
+            'retry incremental publication',
         );
       }
       await client.query('COMMIT');
