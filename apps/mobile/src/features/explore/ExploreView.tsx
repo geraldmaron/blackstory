@@ -80,6 +80,19 @@ export const EXPLORE_MAP_ACCESSIBILITY_LABEL = 'Map of pinned places';
  * Where a screen reader user can read what the map shows. Pins are native map layers that no
  * screen reader can step through, so the map names its text equivalent for each posture.
  */
+/**
+ * Whether Android back closes the record preview. Not while the map is expanded: there back
+ * restores the chrome first and the record stays selected, as the on-screen exit does. Otherwise
+ * back would deselect the record and leave the reader in the expanded map with no chrome.
+ */
+export function previewAnswersBack(state: {
+  readonly focused: boolean;
+  readonly hasSelection: boolean;
+  readonly immersive: boolean;
+}): boolean {
+  return state.focused && state.hasSelection && !state.immersive;
+}
+
 export function exploreMapAccessibilityHint(posture: 'sheet' | 'pane' | 'immersive'): string {
   if (posture === 'pane') return 'The same places are listed in the records pane beside the map.';
   if (posture === 'immersive') {
@@ -443,7 +456,14 @@ export function ExploreView({
   // Android back closes the in-place overlay before it leaves the screen. The most recently
   // opened one answers first (BackHandler calls the newest subscription first).
   useBackDismiss(focused && mapLive && mapImmersive, handleExitImmersiveMap);
-  useBackDismiss(focused && Boolean(selectedFeature), handleClosePreview);
+  useBackDismiss(
+    previewAnswersBack({
+      focused,
+      hasSelection: Boolean(selectedFeature),
+      immersive: mapLive && mapImmersive,
+    }),
+    handleClosePreview,
+  );
   useBackDismiss(focused && mapLive && !mapImmersive && instrumentsOpen, handleHideInstruments);
 
   // Built once and placed by whichever posture is active. The wide layout mounts BOTH at the
