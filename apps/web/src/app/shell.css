@@ -422,7 +422,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-family: var(--ds-font-display);
   font-weight: 500;
   font-size: clamp(1.75rem, 1.5rem + 1.4vw, 2.5rem);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   line-height: 1.12;
 }
 
@@ -431,7 +431,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-family: var(--ds-font-editorial);
   font-style: italic;
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: var(--ds-accent);
 }
 
@@ -449,7 +449,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-family: var(--ds-font-display);
   font-weight: 500;
   font-size: clamp(1.25rem, 1.15rem + 0.6vw, 1.625rem);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.012em;
   line-height: 1.2;
 }
 
@@ -570,7 +570,7 @@ html:has(.ds-map-stage[data-plate-posture='live']) {
   font-family: var(--ds-font-display);
   font-weight: 500;
   font-size: var(--ds-text-body);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   line-height: 1.3;
 }
 

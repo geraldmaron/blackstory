@@ -179,7 +179,7 @@
   font-weight: 600;
   font-size: var(--ds-text-display-3);
   line-height: 1.18;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.012em;
   color: var(--ds-ink);
 }
 
@@ -479,7 +479,7 @@ a.ds-doc-chip {
   font-family: var(--ds-font-display);
   font-weight: 600;
   font-size: var(--ds-text-title);
-  letter-spacing: -0.022em;
+  letter-spacing: -0.011em;
 }
 
 .ds-doc-offramp p {

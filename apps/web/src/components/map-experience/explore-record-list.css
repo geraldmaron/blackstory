@@ -154,7 +154,7 @@
   color: var(--ds-accent);
   font-size: var(--ds-text-body-sm);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .ds-xlist__row--selected .ds-xlist__decade {

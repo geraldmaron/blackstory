@@ -309,7 +309,7 @@ export function bindPlaceLabels(map: MapLibreMap): PlaceLabelsHandle {
           ...((phone || named.has(key)) && label
             ? {
                 name: {
-                  dx: count.length * size * 0.31 + 8,
+                  dx: (count.length * size * COUNT_DIGIT_EM) / 2 + 8,
                   width: label.length * nameSize * (0.6 + NAME_TRACKING_EM),
                   height: nameSize,
                 },

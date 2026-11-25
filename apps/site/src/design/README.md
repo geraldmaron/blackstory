@@ -31,7 +31,7 @@ means deleting its line.
 | a minimum target    | `minHeight="$touch"` (44 px)                                                                                                                        | `minHeight={44}`               |
 | radius              | `$sm` (8), `$md` (14), `$lg` (28), `$full`                                                                                                          | `borderRadius={14}`            |
 | type size           | `fontSize="$caption"`, `$bodySm`, `$body`, `$subtitle`, `$title`, `$display3` ...                                                                   | `fontSize={13}`                |
-| type family         | `fontFamily="$body"` (Geist), `$heading` (Schibsted Grotesk), `$editorial` (Newsreader), `$mono` (Geist Mono)                                       | a font string                  |
+| type family         | `fontFamily="$body"` (Geist), `$heading` (Outfit), `$editorial` (Newsreader), `$mono` (Geist Mono)                                       | a font string                  |
 | breakpoint          | media props `$gtMd`, `$maxMd` (grid: 640, 768, 1024, 1280)                                                                                          | `@media` literals              |
 | a hairline          | `borderWidth={1}` (and `2` for strong)                                                                                                              | `borderWidth={3}`              |
 

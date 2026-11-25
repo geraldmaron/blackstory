@@ -764,14 +764,14 @@ span.ds-tabs__tab {
 .ds-page-title,
 .ds-page-header--display .ds-page-header__title {
   margin: 0;
-  /* Schibsted's ascenders rise above a 0.9 line box; this keeps them off a block's top edge. */
+  /* The display face's ascenders rise above a 0.9 line box; this keeps them off a block's top edge. */
   padding-top: 0.04em;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-display);
-  /* The display role: Schibsted at 800, the record page's name weight (patterns-living-archive). */
+  /* The display role: Outfit at 800, the record page's name weight (patterns-living-archive). */
   font-weight: var(--ds-weight-display);
   line-height: 0.92;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.018em;
   text-wrap: balance;
   font-kerning: normal;
 }

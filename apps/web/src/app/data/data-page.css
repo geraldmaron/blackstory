@@ -138,7 +138,7 @@
   font-size: var(--ds-text-headline);
   font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 

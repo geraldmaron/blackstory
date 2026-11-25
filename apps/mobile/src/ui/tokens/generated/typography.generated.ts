@@ -15,7 +15,7 @@
 
 /** Brand type-family names, from brand/tokens/typography.json. */
 export const fontFamilies = {
-  "display": "Schibsted Grotesk",
+  "display": "Outfit",
   "uiBody": "Geist",
   "editorial": "Newsreader",
   "dataMono": "Geist Mono"

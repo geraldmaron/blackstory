@@ -165,7 +165,7 @@ body:has(.ds-records) .ds-reading-progress {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 

@@ -59,8 +59,8 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
    (see Theme roles).
 3. **Display type.** Headlines use Outfit, the wordmark's own face, on its variable weight
    axis (800 display, 700 headline, 650 title), so the logo and the headlines are one typeface
-   (owner, 2026-11-24; it replaced Schibsted Grotesk on the web. The mobile app still names
-   Schibsted Grotesk in `brand/tokens/typography.json` until its fonts are swapped). UI Geist;
+   (owner, 2026-11-24; it replaced Schibsted Grotesk on the web, in the mobile app and in
+   `apps/site`). UI Geist;
    editorial Newsreader; data Geist Mono (see `apps/web/src/app/layout.tsx`).
 4. **Lockup rendering.** Use the kit's artwork (`BRAND_ASSETS`). The wordmark is Outfit
    Regular, kerned, tracked -0.03em. Where the letters must be live text, set them in the

@@ -15,7 +15,7 @@ import {
   type TokenInput,
 } from './token-layout';
 
-const DIGIT_EM = 0.62;
+const DIGIT_EM = 0.59;
 
 function token(key: string, x: number, y: number, count: number): TokenInput {
   const size = MAP_TYPE.count[placeTier(count)];

@@ -59,7 +59,7 @@ export const TYPE_SCALE = {
   display: { size: 36, lineHeight: 40, weight: '800', family: 'display' as const },
   /** Web --ds-weight-headline 700. Screen and section titles. */
   headline: { size: 26, lineHeight: 32, weight: '700', family: 'display' as const },
-  /** Web --ds-weight-title 650; the nearest loaded Schibsted cut is 600. Rows and sub-sections. */
+  /** Web --ds-weight-title 650; the nearest loaded Outfit cut is 600. Rows and sub-sections. */
   title: { size: 20, lineHeight: 26, weight: '600', family: 'display' as const },
   body: { size: 16, lineHeight: 24, weight: '400', family: 'uiBody' as const },
   bodyEmphasis: { size: 16, lineHeight: 24, weight: '600', family: 'uiBody' as const },

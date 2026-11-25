@@ -520,7 +520,7 @@
   --ds-map-ring: 14px;
   --ds-map-keyline: 2px;
 
-  --ds-tracking-numeral: -0.04em;
+  --ds-tracking-numeral: -0.02em;
   /* Tall enough that the line box holds the digits and a count's comma: a rule or a line set
      under a numeral meets the glyphs' edge, never cuts them. */
   --ds-leading-numeral: 0.92;
@@ -536,8 +536,9 @@
   --ds-text-editorial: clamp(1.0625rem, 1rem + 0.15vw, 1.1875rem);
 
   /* Tracking tightens as size grows; mono and caption open up so data stays scannable. */
-  --ds-tracking-display: -0.03em;
-  --ds-tracking-title: -0.016em;
+  /* Outfit sits closer than Schibsted Grotesk did, so its tracking is half what that face took. */
+  --ds-tracking-display: -0.015em;
+  --ds-tracking-title: -0.008em;
   --ds-tracking-mono: 0.04em;
 
   --ds-leading-title: 1.18;
