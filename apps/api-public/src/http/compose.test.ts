@@ -47,3 +47,13 @@ test('createProductionHandlerDeps does not silently select a data source when PU
   });
   assert.equal(await deps.dataAccess.getReleasePointer(), undefined);
 });
+
+test('RATE_LIMIT_DISABLED turns limits off locally but never in a production deployment', () => {
+  const request = { method: 'GET', path: '/v1/search?q=test', subject: 'anonymous' } as const;
+  const local = createProductionHandlerDeps({ environment: { RATE_LIMIT_DISABLED: '1' } });
+  assert.equal(local.rateLimitGuard.evaluate(request), null);
+  const production = createProductionHandlerDeps({
+    environment: { RATE_LIMIT_DISABLED: '1', VERCEL_ENV: 'production' },
+  });
+  assert.notEqual(production.rateLimitGuard.evaluate(request), null);
+});

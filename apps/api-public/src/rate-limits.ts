@@ -131,8 +131,8 @@ export function createPublicRateLimitGuard(options: PublicRateLimitGuardOptions 
  * tracked. Safe for local dev/simulator sessions where the in-memory quota
  * would otherwise be exhausted by repeated test launches.
  *
- * Enable with `RATE_LIMIT_DISABLED=1` in the server environment. Never set
- * this in production — the env var is validated absent by the prod deploy check.
+ * Enable with `RATE_LIMIT_DISABLED=1` in the server environment. `compose.ts` ignores the flag
+ * when `VERCEL_ENV=production`.
  */
 export function createNoopRateLimitGuard(): ReturnType<typeof createPublicRateLimitGuard> {
   return {

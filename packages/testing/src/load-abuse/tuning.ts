@@ -48,7 +48,7 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
       currentValue: `${DEFAULT_DAILY_BUDGETS.geocoder.dailyCap} req/day`,
       recommendedValue: '4000 req/day if Maps billing alert fires before 80% soft threshold',
       rationale:
-        'Hard stop at 100% prevents runaway external geocoder cost; align alert at 50% with infra/gcp cost runbook.',
+        'Hard stop at 100% prevents runaway external geocoder cost; align alert at 50% with the budget alerts in resource-controls.ts.',
       priority: 'P0',
     },
     {

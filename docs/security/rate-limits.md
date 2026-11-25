@@ -17,22 +17,29 @@ the next request answered `429` with `retry-after: 10`, service resumed 12 s lat
 was untouched throughout. The threshold is deliberately generous because carrier-grade NAT puts
 many phones behind one address; it stops scripts, not people. Vercel WAF rate limiting is NOT
 used on the web project: Vercel sees Cloudflare's addresses as the client, so a per-IP rule
-there would throttle every visitor together. `api.blackstory.app` is not behind Cloudflare, so
-a Vercel WAF rule (Log first, then Deny) is the right control there; it is not yet configured
-(`repo-ogo3j.7`).
-**Depends on:** [ ingress / Cloud Armor](./ingress-armor.md), [API protocol](../../apps/api-public/src/http/README.md)
+there would throttle every visitor together.
+
+## API rate limit (Vercel firewall, log mode since 2026-11-25)
+
+`api.blackstory.app` is not behind Cloudflare, so its limit is a Vercel firewall rule on project
+`blackstory-api`: "API per-IP burst limit (2026-11-25, log mode)", host `api.blackstory.app`,
+path prefix `/v1/`, fixed window, **60 requests per 10 s per IP**. It only logs for now. After a
+week of firewall logs shows no real app traffic over the limit, change its rate-limit action to
+deny (`repo-ogo3j.7`).
+**Depends on:** [ingress boundary](./ingress-armor.md), [API protocol](../../apps/api-public/src/http/README.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-02](./threat-model.md#t-02-cost-exhaustion-via-search-and-geocoding), [T-05](./threat-model.md#t-05-coordinated-correction-brigading)
 
 ## Objective
 
-Layer application quotas beneath Cloud Armor so expensive endpoints are throttled per subject,
+Layer application quotas beneath the edge limits so expensive endpoints are throttled per subject,
 device/session risk, and endpoint class — without exposing exact thresholds to callers.
 
 ## Control layers
 
 | Layer | Scope | Implementation |
 |-------|-------|----------------|
-| Cloud Armor | Per-IP edge throttles, WAF, emergency deny | [`infra/gcp/armor/`](../../infra/gcp/armor/) |
+| Cloudflare rate-limit rule | Per-IP burst limit on the web property's expensive endpoints | Cloudflare zone `blackstory.app` (see above) |
+| Vercel firewall | Per-IP limit on `api.blackstory.app`, which Cloudflare does not front | Vercel project `api-public` firewall |
 | Client header | Platform/version format signal, not authorization | `packages/security/src/client-attestation.ts` |
 | Subject quotas | anonymous < authenticated < admin < service | `@repo/security` policy matrix |
 | Endpoint buckets | search, geocode, nearby, entity, source, … | Token bucket + rolling/daily windows |
@@ -106,6 +113,6 @@ pnpm --filter @repo/api-public test
 
 ## Related
 
-- [Ingress / Cloud Armor](./ingress-armor.md)
+- [Ingress boundary](./ingress-armor.md)
 - [Abuse cases AC-01, AC-02, AC-05](./abuse-cases.md)
 - [Service surfaces](./service-surfaces.md)

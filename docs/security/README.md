@@ -9,7 +9,7 @@ Threat model, abuse-case corpus, environment isolation design, and security test
 | [`threat-corpus.json`](./threat-corpus.json) | Machine-readable corpus (source for tests) |
 | [`threat-corpus.schema.json`](./threat-corpus.schema.json) | JSON Schema for the corpus |
 | [`environment-isolation.md`](./environment-isolation.md) | /D-013 single-project production isolation and deferred migration |
-| [`ingress-armor.md`](./ingress-armor.md) |  Cloud Armor + LB-only ingress design |
+| [`ingress-armor.md`](./ingress-armor.md) | Current ingress boundary (Vercel, Cloudflare, Supabase) |
 | [`rate-limits.md`](./rate-limits.md) |  application quota matrix and guard stubs |
 | [`query-guardrails.md`](./query-guardrails.md) |  search query validation, cursors, cache keys |
 | [`submission-quarantine.md`](./submission-quarantine.md) |  correction validation, quarantine, campaign detection, and moderation boundary |
