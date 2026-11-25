@@ -56,7 +56,7 @@ report. After that batch a run does not come back with questions; it holds the i
 | Operation | Path | Alone, it may |
 | --- | --- | --- |
 | New record (pending candidate or new lead) | evidence, then `research-batch.ts`, which runs the ordered steps in [claim-review handoff](../../../docs/research/claim-review-handoff.md#the-order-that-works) | publish, when every step reports complete and nothing is refused |
-| Enrich or re-cite a live record (image, context, a better source than Wikipedia) | `stage-landscape-evidence.ts`; the changed assertion is reviewed again, never just its URL | stage and review. The publisher refuses changes to a live entry of a signed release, so shipping it is an in-place correction (`CLAUDE.md`) |
+| Enrich or re-cite a live record (image, context, a better source than Wikipedia) | `session-enrich-*` then `apply-enrichment-to-landscape.ts`, or `stage-landscape-evidence.ts`; then `research-batch.ts --correct`. The changed assertion is reviewed again, never just its URL | publish in place, when every claim the record carries passes review; otherwise hold |
 | Correction to a published fact | name the old claim, the evidence and the replacement; management work or in-place correction | prepare the exact change and hold for the owner |
 | Connection hunt | [entity-relate](../blackstory-entity-relate/SKILL.md), then `propose-edge` with the record that states the relation | propose. Withdrawing an edge no record supports is a successful result |
 | Identity and duplicates | `merge-duplicate-hubs.ts` dry run plus disambiguating evidence | propose |
@@ -76,8 +76,11 @@ the reason recorded. It does not fall through to another path.
   claim. Find the underlying work or drop the clause.
 - One fit source supports a narrow attributed fact at minimal coverage. Superlatives, firsts,
   causes and anything about wrongdoing need independent lineage and a recorded counter-search.
-- Sources disagree: state the disagreement or publish the less precise value both support. If
-  review still refuses, hold the record. Never drop a conflicting citation to get a pass.
+- Sources disagree: state the disagreement in the text and attribute each value, keeping both
+  citations; the reviewer passes a stated dispute. Never drop a conflicting citation to get a
+  pass.
+- A source the pipeline does not recognize gets no capture, so its claims stay blocked. Record
+  the host as needing a decision; do not swap in a weaker source to get through.
 - A quote that is not verbatim in the captured text is refused; reword the claim to what the
   source says. Never loosen the check.
 - Missing image, date or address stays missing. A record is not improved by a guess.

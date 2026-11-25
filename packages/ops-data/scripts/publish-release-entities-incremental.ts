@@ -1,7 +1,8 @@
 /**
  * Publishes selected landscape candidates through reviewed-claim, privacy, withdrawal and
  * content gates. --ids, --lane or --from-landscape-pending scope input; --republish permits
- * corrections to existing records. Default dry-run; writes require DRY_RUN=0 and
+ * corrections to existing records; add --correct with --ids to change live records in place on a
+ * signed release (audited as publication.entities_corrected). Default dry-run; writes require DRY_RUN=0 and
  * INCREMENTAL_PUBLISH_APPLY=1. Post-write taxonomy, relationships and divergence checks cover
  * the active release.
  */
@@ -52,7 +53,6 @@ import {
   runPublishRegressionGates,
 } from './lib/publish-regression-gates.ts';
 import { assertNoProjectionDivergence } from './lib/projection-divergence.ts';
-import { changedRowIds } from './lib/preflight-drift.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-related-sync.ts';
 import {
@@ -298,11 +298,6 @@ FROM published.release_entities e
 JOIN published.active_release a ON a.release_id = e.release_id
 WHERE e.entity_id = ANY($1::text[])
 `;
-
-/** Re-reads inside the transaction. Locking the rows makes another writer of these records wait
- * for this run's commit instead of landing between the check and the upsert. */
-const LIVE_PUBLISHED_BY_IDS_LOCKED_SQL = `${LIVE_PUBLISHED_BY_IDS_SQL}FOR UPDATE OF e`;
-const CATALOG_DECISIONS_BY_IDS_LOCKED_SQL = `${CATALOG_DECISIONS_BY_IDS_SQL}FOR SHARE`;
 
 function readArg(prefix: string): string | undefined {
   const hit = process.argv.find((entry) => entry.startsWith(prefix));
@@ -610,6 +605,18 @@ async function main(): Promise<void> {
   const explicitIds = readIdsArg();
   const laneArg = readArg('--lane=');
   const allowRepublish = hasFlag('--republish');
+  // --correct lets named live records change in place on a signed release. They pass the same
+  // claim and text review as a new record, and the change is recorded as an audit event.
+  const allowCorrect = hasFlag('--correct');
+  if (
+    allowCorrect &&
+    (!allowRepublish || explicitIds.length === 0 || fromLandscapePending || laneArg)
+  ) {
+    console.error(
+      '--correct needs --republish and --ids=..., and cannot be combined with a lane or pending sweep',
+    );
+    process.exit(2);
+  }
   if (!fromLandscapePending && explicitIds.length === 0 && !laneArg) {
     console.error('Pass --from-landscape-pending and/or --ids=id1,id2 and/or --lane=<lane>');
     process.exit(2);
@@ -809,9 +816,6 @@ async function main(): Promise<void> {
     const report = {
       generatedAt,
       dryRun: DRY_RUN || !APPLY,
-      // False until the transaction commits: a run that fails or rolls back leaves this false, so
-      // publishedIds then lists what was attempted, not what went live.
-      committed: false,
       releaseId,
       mode: fromLandscapePending ? 'from-landscape-pending' : 'explicit-ids',
       pendingBefore,
@@ -847,9 +851,7 @@ async function main(): Promise<void> {
     };
 
     mkdirSync(dirname(REPORT_PATH), { recursive: true });
-    const writeReport = (committed: boolean) =>
-      writeFileSync(REPORT_PATH, `${JSON.stringify({ ...report, committed }, null, 2)}\n`);
-    writeReport(false);
+    writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`);
 
     console.log('=== Incremental publish (published.release_entities) ===');
     console.log(`Active release: ${releaseId}`);
@@ -900,189 +902,175 @@ async function main(): Promise<void> {
     }
 
     await client.query('BEGIN');
-    const release = await client.query<{ readonly signed_manifest: unknown }>(
-      'SELECT signed_manifest FROM publication.releases WHERE id=$1 FOR UPDATE',
-      [releaseId],
-    );
-    // Preflight read these rows before the lock. A correction committed since then would be
-    // overwritten by this run's older copy, so stop and let the operator rerun on fresh reads.
-    const preparedIds = prepared.map((row) => row.entityRow.entity_id);
-    const lockedLive = await client.query<{ readonly entity_id: string }>(
-      LIVE_PUBLISHED_BY_IDS_LOCKED_SQL,
-      [preparedIds],
-    );
-    const liveDrift = changedRowIds(preparedIds, liveRes.rows, lockedLive.rows);
-    if (liveDrift.length > 0) {
-      throw new Error(
-        `Live records changed after preflight (${liveDrift.slice(0, 3).join(', ')}); ` +
-          'retry incremental publication',
+    try {
+      const release = await client.query<{ readonly signed_manifest: unknown }>(
+        'SELECT signed_manifest FROM publication.releases WHERE id=$1 FOR UPDATE',
+        [releaseId],
       );
-    }
-    // A write that changes an entity already in the release is refused on a signed release.
-    // Appending new entities leaves every signed entry untouched, so it is allowed. Missing or
-    // malformed release state reaches the guard unchanged and fails closed.
-    const signedManifest = release.rows[0]?.signed_manifest;
-    const appendedIds = new Set(
-      prepared
-        .filter((row) => row.landscapeRow?.exact_in_release === false)
-        .map((row) => row.entityRow.entity_id),
-    );
-    assertArchiveHydrationTargetIsUnsigned(
-      signedManifest,
-      prepared.filter((row) => !appendedIds.has(row.entityRow.entity_id)).length,
-    );
-    const signedRelease = prepared.length > 0 && releaseIsSigned(signedManifest);
-    const assertNoExistingEntityChanged = (
-      step: string,
-      changed: readonly { entityId: string }[],
-    ) => {
-      const existing = changed.filter((row) => !appendedIds.has(row.entityId));
-      if (signedRelease && existing.length > 0) {
-        throw new Error(
-          `${step} would change ${existing.length} existing entities of a signed release ` +
-            `(${existing
-              .slice(0, 3)
-              .map((row) => row.entityId)
-              .join(', ')}); resolve that drift first`,
+      // A write that changes an entity already in the release is refused on a signed release.
+      // Appending new entities leaves every signed entry untouched, so it is allowed. Missing or
+      // malformed release state reaches the guard unchanged and fails closed.
+      const signedManifest = release.rows[0]?.signed_manifest;
+      const appendedIds = new Set(
+        prepared
+          .filter((row) => row.landscapeRow?.exact_in_release === false)
+          .map((row) => row.entityRow.entity_id),
+      );
+      const correctedIds = new Set(
+        allowCorrect
+          ? prepared
+              .map((row) => row.entityRow.entity_id)
+              .filter((entityId) => !appendedIds.has(entityId))
+          : [],
+      );
+      assertArchiveHydrationTargetIsUnsigned(
+        signedManifest,
+        prepared.filter(
+          (row) =>
+            !appendedIds.has(row.entityRow.entity_id) && !correctedIds.has(row.entityRow.entity_id),
+        ).length,
+      );
+      const signedRelease = prepared.length > 0 && releaseIsSigned(signedManifest);
+      const assertNoExistingEntityChanged = (
+        step: string,
+        changed: readonly { entityId: string }[],
+      ) => {
+        const existing = changed.filter(
+          (row) => !appendedIds.has(row.entityId) && !correctedIds.has(row.entityId),
         );
-      }
-    };
+        if (signedRelease && existing.length > 0) {
+          throw new Error(
+            `${step} would change ${existing.length} existing entities of a signed release ` +
+              `(${existing
+                .slice(0, 3)
+                .map((row) => row.entityId)
+                .join(', ')}); resolve that drift first`,
+          );
+        }
+      };
 
-    if (prepared.length > 0) {
-      const transactionReviewedClaims = await loadReviewedClaimAssessments(
-        client,
-        prepared.map((row) => row.entityRow.entity_id),
-      );
-      const transactionArchives = await loadPublicCitationArchives(
-        client,
-        reviewedCitationCaptures(transactionReviewedClaims),
-        new Date().toISOString(),
-        { lock: true },
-      );
-      const transactionPrepared = hydratePreparedArchives(
-        unhydratedPrepared,
-        transactionArchives,
-      ).map((entry) => entry.row);
-      const hydrationChanged = transactionPrepared.some(
-        (row, index) =>
-          JSON.stringify(row.entityRow.projection) !==
-          JSON.stringify(prepared[index]?.entityRow.projection),
-      );
-      if (hydrationChanged) {
-        throw new Error(
-          'Archive eligibility changed after preflight; retry incremental publication',
+      if (prepared.length > 0) {
+        const transactionReviewedClaims = await loadReviewedClaimAssessments(
+          client,
+          prepared.map((row) => row.entityRow.entity_id),
         );
+        const transactionArchives = await loadPublicCitationArchives(
+          client,
+          reviewedCitationCaptures(transactionReviewedClaims),
+          new Date().toISOString(),
+          { lock: true },
+        );
+        const transactionPrepared = hydratePreparedArchives(
+          unhydratedPrepared,
+          transactionArchives,
+        ).map((entry) => entry.row);
+        const hydrationChanged = transactionPrepared.some(
+          (row, index) =>
+            JSON.stringify(row.entityRow.projection) !==
+            JSON.stringify(prepared[index]?.entityRow.projection),
+        );
+        if (hydrationChanged) {
+          throw new Error(
+            'Archive eligibility changed after preflight; retry incremental publication',
+          );
+        }
+        prepared = transactionPrepared;
       }
-      prepared = transactionPrepared;
-    }
-    for (const row of prepared) {
-      await upsertEntity(client, row.entityRow);
-      await upsertSearchIndex(client, row.searchRow);
-      if (row.fromLandscape && row.landscapeRow) {
-        await markLandscapeAccepted(client, row.id, row.entityRow.entity_id, row.landscapeRow);
+      for (const row of prepared) {
+        await upsertEntity(client, row.entityRow);
+        await upsertSearchIndex(client, row.searchRow);
+        if (row.fromLandscape && row.landscapeRow) {
+          await markLandscapeAccepted(client, row.id, row.entityRow.entity_id, row.landscapeRow);
+        }
       }
-    }
 
-    // Keep reconciliation under the same release-row lock as the entity upserts. A signer
-    // cannot freeze the release between these derived writes.
-    if (prepared.length > 0) {
-      const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
-      assertNoExistingEntityChanged('Taxonomy re-sync', taxonomyPlan.changed);
-      if (taxonomyPlan.changed.length > 0) {
-        await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
+      // Keep reconciliation under the same release-row lock as the entity upserts. A signer
+      // cannot freeze the release between these derived writes.
+      if (prepared.length > 0) {
+        const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
+        assertNoExistingEntityChanged('Taxonomy re-sync', taxonomyPlan.changed);
+        if (taxonomyPlan.changed.length > 0) {
+          await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
+          console.log(
+            `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
+          );
+        }
+
+        // Resync relationships after the entity upserts so both endpoints can be found in the
+        // transaction. Do this before rebuilding the graph, which reads projection.related;
+        // source rows do not carry canonical edges.
+        const relatedPlan = await planReleaseRelatedSync(client, releaseId);
+        assertNoExistingEntityChanged('Related re-sync', relatedPlan.changed);
+        if (relatedPlan.changed.length > 0) {
+          await applyReleaseRelatedSync(client, releaseId, relatedPlan);
+          console.log(
+            `Re-synced related[] from canonical edges for ${relatedPlan.changed.length} entities` +
+              `${relatedPlan.repaired > 0 ? ` (${relatedPlan.repaired} had no connections at all)` : ''}.`,
+          );
+        }
+
+        const enforceCoverage = process.env.ENFORCE_DECADE_COVERAGE !== '0';
         console.log(
-          `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
+          enforceCoverage
+            ? `  graph: decade coverage floor ${minDecadeCoverage ?? 90}%` +
+                `${minDecadeCoverage === undefined ? ' (default)' : ' (acknowledged via --min-decade-coverage)'}`
+            : '  graph: decade coverage NOT ENFORCED (ENFORCE_DECADE_COVERAGE=0)',
+        );
+        const graphRebuild = await rebuildReleaseGraphForRelease(client, {
+          releaseId,
+          generatedAt,
+          dryRun: false,
+          manageTransaction: false,
+          enforceCoverage,
+          ...(minDecadeCoverage !== undefined ? { minDecadeCoveragePct: minDecadeCoverage } : {}),
+        });
+        for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
+          console.log(`  graph: ${line}`);
+        }
+
+        // The same client can read its uncommitted writes, so divergence validation remains
+        // inside the transaction and any failure rolls the complete incremental update back.
+        await assertNoProjectionDivergence(
+          client,
+          prepared.map((row) => row.entityRow.entity_id),
+          { releaseId },
         );
       }
-
-      // Resync relationships after the entity upserts so both endpoints can be found in the
-      // transaction. Do this before rebuilding the graph, which reads projection.related;
-      // source rows do not carry canonical edges.
-      const relatedPlan = await planReleaseRelatedSync(client, releaseId);
-      assertNoExistingEntityChanged('Related re-sync', relatedPlan.changed);
-      if (relatedPlan.changed.length > 0) {
-        await applyReleaseRelatedSync(client, releaseId, relatedPlan);
-        console.log(
-          `Re-synced related[] from canonical edges for ${relatedPlan.changed.length} entities` +
-            `${relatedPlan.repaired > 0 ? ` (${relatedPlan.repaired} had no connections at all)` : ''}.`,
+      if (signedRelease && appendedIds.size > 0) {
+        // The manifest cannot list what was appended, so the append is recorded where the
+        // activation of this release was.
+        await client.query(
+          `INSERT INTO audit.events (id, action, category, actor, subject, reason, request_id,
+             correlation_id, release_id, idempotency_key, occurred_at)
+           VALUES (gen_random_uuid()::text, 'publication.entities_appended', 'publication',
+             jsonb_build_object('id', 'incremental-publisher', 'type', 'service'),
+             jsonb_build_object('type', 'release', 'id', $1::text, 'path', 'publication.releases/' || $1::text,
+               'entityIds', $2::jsonb),
+             'New entities appended to a signed release; no listed entry changed',
+             gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
+             'append:' || $1::text || ':' || extract(epoch from now())::text, now())`,
+          [releaseId, JSON.stringify([...appendedIds].sort())],
         );
       }
-
-      const enforceCoverage = process.env.ENFORCE_DECADE_COVERAGE !== '0';
-      console.log(
-        enforceCoverage
-          ? `  graph: decade coverage floor ${minDecadeCoverage ?? 90}%` +
-              `${minDecadeCoverage === undefined ? ' (default)' : ' (acknowledged via --min-decade-coverage)'}`
-          : '  graph: decade coverage NOT ENFORCED (ENFORCE_DECADE_COVERAGE=0)',
-      );
-      const graphRebuild = await rebuildReleaseGraphForRelease(client, {
-        releaseId,
-        generatedAt,
-        dryRun: false,
-        manageTransaction: false,
-        enforceCoverage,
-        ...(minDecadeCoverage !== undefined ? { minDecadeCoveragePct: minDecadeCoverage } : {}),
-      });
-      for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
-        console.log(`  graph: ${line}`);
+      if (signedRelease && correctedIds.size > 0) {
+        await client.query(
+          `INSERT INTO audit.events (id, action, category, actor, subject, reason, request_id,
+             correlation_id, release_id, idempotency_key, occurred_at)
+           VALUES (gen_random_uuid()::text, 'publication.entities_corrected', 'publication',
+             jsonb_build_object('id', 'incremental-publisher', 'type', 'service'),
+             jsonb_build_object('type', 'release', 'id', $1::text, 'path', 'publication.releases/' || $1::text,
+               'entityIds', $2::jsonb),
+             'Live entities corrected in place on a signed release after claim and text review',
+             gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
+             'correct:' || $1::text || ':' || extract(epoch from now())::text, now())`,
+          [releaseId, JSON.stringify([...correctedIds].sort())],
+        );
       }
-
-      // The same client can read its uncommitted writes, so divergence validation remains
-      // inside the transaction and any failure rolls the complete incremental update back.
-      await assertNoProjectionDivergence(
-        client,
-        prepared.map((row) => row.entityRow.entity_id),
-        { releaseId },
-      );
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
     }
-    if (signedRelease && appendedIds.size > 0) {
-      // The manifest cannot list what was appended, so the append is recorded where the
-      // activation of this release was.
-      await client.query(
-        `INSERT INTO audit.events (id, action, category, actor, subject, reason, request_id,
-           correlation_id, release_id, idempotency_key, occurred_at)
-         VALUES (gen_random_uuid()::text, 'publication.entities_appended', 'publication',
-           jsonb_build_object('id', 'incremental-publisher', 'type', 'service'),
-           jsonb_build_object('type', 'release', 'id', $1::text, 'path', 'publication.releases/' || $1::text,
-             'entityIds', $2::jsonb),
-           'New entities appended to a signed release; no listed entry changed',
-           gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
-           'append:' || $1::text || ':' || extract(epoch from now())::text, now())`,
-        [releaseId, JSON.stringify([...appendedIds].sort())],
-      );
-    }
-    // A retraction recorded while this run worked must still withdraw the record, so the
-    // decisions are read again as the last step. Existing decision rows are share-locked until
-    // commit, so only a new decision row inserted in the moment before COMMIT can slip by.
-    const preparedIdSet = new Set(prepared.map((row) => row.entityRow.entity_id));
-    const preparedDecisionIds = [
-      ...new Set(
-        sliced
-          .filter((item) => preparedIdSet.has(item.entityId))
-          .flatMap((item) =>
-            [item.entityId, item.row?.source_item_id].filter(
-              (id): id is string => typeof id === 'string' && id.length > 0,
-            ),
-          ),
-      ),
-    ];
-    const lockedDecisions = await client.query<{ readonly entity_id: string }>(
-      CATALOG_DECISIONS_BY_IDS_LOCKED_SQL,
-      [preparedDecisionIds],
-    );
-    const decisionDrift = changedRowIds(
-      preparedDecisionIds,
-      catalogDecisionRes.rows,
-      lockedDecisions.rows,
-    );
-    if (decisionDrift.length > 0) {
-      throw new Error(
-        `Catalog decisions changed after preflight (${decisionDrift.slice(0, 3).join(', ')}); ` +
-          'retry incremental publication',
-      );
-    }
-    await client.query('COMMIT');
-    writeReport(true);
 
     const pendingAfter = Number(
       (await client.query<{ n: string }>(PENDING_COUNT_SQL)).rows[0]?.n ?? 0,

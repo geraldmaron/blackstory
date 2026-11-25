@@ -94,22 +94,51 @@ The repository describes three pipelines and production uses one of them.
 | Four schedules | Rejected for now | One manual pilot task, `blackstory-research-prep`, that writes no database rows |
 | Auto-sealing guidance from run results | Rejected | Runs record collection, query, coverage and outcome; a person or reviewed finding promotes it |
 
+## Built and run the same day
+
+- **Ledger on the admin login.** `claim_reviewer` marker role, live in production; no ledger write
+  needs the owner password.
+- **`research-batch.ts`.** One command for capture, claim review, ledger, text review, publish
+  and catalog republish, reading results instead of exit codes. Its `--apply` path published one
+  new record end to end (Oklahoma Senate Bill One, 1907): 11 claims approved, text approved,
+  appended, catalog workflow dispatched, page checked on the Postgres-backed site.
+- **Standing capture rule** (owner): a private one-year text copy for any publisher the pipeline
+  recognizes; Wikipedia and unrecognized hosts get none and their claims stay blocked.
+- **Stated disputes pass text review** (owner): the text must state the disagreement and
+  attribute each value; a silent pick still fails.
+- **Live records through the publisher** (owner): `--republish --correct --ids` changes a live
+  record in place after the same review, audited as `publication.entities_corrected`. The gate
+  ran on two live NRHP records and held both; the publish step of this mode has not yet written.
+- **Run log.** One JSON line per run when `RESEARCH_RUN_LOG` is set, with the attempted
+  denominator, approvals, rejections, holds and undecided sources.
+- **`evidence.source_review_outcomes`.** Per publisher host, model reviews approved and rejected.
+
+## What the first runs found
+
+1. **The NRHP lane's own claims fail review.** Its templated `listing` and `significant for`
+   claims cite the NPGallery asset page, whose captured text states neither. Every one of the
+   2,550 NRHP records will be held on re-review until those claims cite a capture that states
+   the listing (the state office's announcement did, for the record tried). This is the largest
+   blocker to burning down the enrichment backlog.
+2. **Reputable local news is often unrecognized.** A public radio station's report was the only
+   evidence for one record and the source register returned `review`, not `accept`, so the
+   record holds for an owner decision. Expect this often for recent listings.
+3. **Source guidance cannot be seeded from fetch summaries.** Five of eight collections refused
+   automated fetches. Three were drafted with every support quote verified verbatim against the
+   live page, and the second-vendor review still returned `revise` on all three because the
+   search methods and access statements went beyond the quotes. Nothing was sealed; drafts and
+   the review are in the vault under `Agent Memory/blackstory-source-library/`.
+
 ## What is still to build, in order
 
-1. **Write authority for unattended runs.** Designed and challenged the same day. A login
-   narrowed by table grants was rejected: the publisher upserts with `ON CONFLICT DO UPDATE`,
-   taxonomy sync updates published rows and the graph rebuild deletes them, so "insert-only"
-   cannot run it, and a separate credential isolates nothing while the admin URL sits in a file
-   the same account reads. What survives: a capability role the existing admin login can assume
-   for the ledger transaction, accepted by `research.submit_artifact` and
-   `research.approve_artifact`, so routine ledger writes stop using the owner password; and
-   confinement at the session, where the scheduled task may run one runner command and has no
-   database connector. Both function gates must be tested under the real role, approval and
-   rejection, before any unattended write.
-2. **A gated path for changes to live records**, with the same review as new ones.
-3. **Let a stated disagreement pass review**, or route it to a hold that keeps both citations.
-4. **One runner for the ordered steps** that asserts complete results at each step.
-5. **Run records with denominators**, then the library view built on them.
-6. **Edge cleanup.** Re-research or withdraw the 601 generic edges; fix direction in dedup.
-7. **Turn the pilot into a schedule** after one interrupted-and-resumed run proves recovery, and
-   replace the "no research schedule" line in `docs/architecture.md` when that happens.
+1. **Re-source the NRHP lane's listing claims** so live NRHP records can pass review.
+2. **Run `--correct` through its publish step** on the first live record that clears review.
+3. **Decide the unrecognized-publisher queue**: who registers a host the register returns as
+   `review`, and how often.
+4. **Seed source guidance by hand-opened pages**, one collection at a time, with statements
+   limited to what was quoted.
+5. **Edge cleanup.** Re-research or withdraw the 601 generic edges; fix direction in dedup.
+6. **Schedule.** The prep task is manual. Turn on a nightly run only after one unattended run
+   finishes without a permission stall, and replace the "no research schedule" line in
+   `docs/architecture.md` when that happens.
+7. **Per-record stops in the runner** once batches are large; today one refusal stops the batch.

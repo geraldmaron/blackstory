@@ -32,10 +32,9 @@ Step 1 stays with whoever researched the record.
 
 Which login each step needs is in [agent-local-env.md](agent-local-env.md).
 
-The text reviewer returns `request_changes` whenever a record's own sources disagree, even when
-the text states the disagreement. In practice a record passes only once the conflicting source is
-no longer cited or the disputed point is cut. Whether a disclosed disagreement should be
-publishable is an open owner decision.
+When a record's sources disagree, the text must state the disagreement and attribute each value;
+the reviewer then passes it with both sources cited (owner decision, 2026-11-25). A text that picks
+one value silently still fails. Never drop a conflicting citation to get a pass.
 
 ---
 
