@@ -218,7 +218,9 @@ the content hash, so a retry is safe). Jackson Ward and Colored Musicians Club t
 and text review and are held by the publisher alone: each live record carries an older claim from
 the same nomination (one an OCR-garbled quote, one the 1917 claim Sol rejected as conflating the
 union and the club). Replacing live claims that cite a document the correction just re-reviewed
-needs an owner decision.
+needs an owner decision. The owner approved it the same day: a correction now replaces live claims
+that cite a document it re-cites, and lists each replaced claim in the `publication.entities_corrected`
+event. Jackson Ward (8 claims) and Colored Musicians Club (6) published through it.
 
 ## What is still to build, in order
 

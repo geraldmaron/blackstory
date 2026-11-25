@@ -2527,3 +2527,48 @@ test('a live claim and a rebuilt claim differing only by a closing period are on
   assert.equal(carry.carried, 0);
   assert.equal(carry.claims.length, 1);
 });
+
+test('a correction replaces live claims that cite a document it re-cites, and says which', () => {
+  const doc = 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/1_text';
+  const garbled = {
+    ...LIVE_CLAIM,
+    id: 'g',
+    object: 'M i t c h e l l was a leader',
+    citationHref: doc,
+    citationSource: 'npgallery.nps.gov',
+    confidenceLevel: 'high' as const,
+  };
+  const elsewhere = {
+    ...LIVE_CLAIM,
+    id: 'e',
+    object: 'From the state office',
+    citationHref: 'https://shpo.example.gov/x',
+    citationSource: 'shpo.example.gov',
+    confidenceLevel: 'high' as const,
+  };
+  const rebuilt = [
+    {
+      predicate: 'source states',
+      object: 'Mitchell led the Republican organization',
+      confidenceLevel: 'high' as const,
+      citationSource: 'npgallery.nps.gov',
+      citationLabel: 'NPS',
+      citationHref: doc,
+    },
+  ];
+  const live = liveRow([garbled, elsewhere]);
+
+  const kept = carryLiveClaims(rebuilt, live);
+  assert.equal(kept.dropped.length, 0);
+  assert.equal(kept.claims.length, 3);
+
+  const replaced = carryLiveClaims(rebuilt, live, { dropWikipedia: true });
+  assert.deepEqual(
+    replaced.dropped.map((c) => c.object),
+    ['M i t c h e l l was a leader'],
+  );
+  assert.deepEqual(
+    replaced.claims.map((c) => c.object),
+    ['Mitchell led the Republican organization', 'From the state office'],
+  );
+});

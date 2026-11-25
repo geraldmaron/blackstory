@@ -1029,18 +1029,30 @@ export function carryLiveClaims(
     return { claims: rebuilt, carried: 0, rebuilt: rebuilt.length, liveCount: 0, dropped: [] };
   }
 
-  // A correction may retire Wikipedia-cited live claims, but only when the rebuild brings at
-  // least one claim from another source, so a record never ends up with less evidence than a
-  // reviewer approved. Wikipedia is never captured, so those claims can never be reviewed.
+  // A correction may retire two kinds of live claim, listed in the audit event. (1) Wikipedia-cited
+  // claims, when the rebuild brings a claim from another source: Wikipedia is never captured, so
+  // they can never be reviewed. (2) Claims citing a document the rebuild cites again: the
+  // correction just re-reviewed that document, and its reviewed claims replace the older ones
+  // (an OCR-garbled quote cannot be reviewed against a clean capture). A record never ends up
+  // with fewer reviewed claims than the correction approved.
   const cites = (claim: ReleaseSourceClaim) => isWikipediaHost(claim.citationHref);
-  const drop = options.dropWikipedia === true && rebuilt.some((claim) => !cites(claim));
-  const dropped = drop ? liveClaims.filter(cites) : [];
+  const dropWiki = options.dropWikipedia === true && rebuilt.some((claim) => !cites(claim));
+  const rebuiltHrefs = new Set(rebuilt.map((claim) => claim.citationHref).filter(Boolean));
+  const retired = (claim: ReleaseSourceClaim) =>
+    (dropWiki && cites(claim)) ||
+    (options.dropWikipedia === true &&
+      !!claim.citationHref &&
+      rebuiltHrefs.has(claim.citationHref));
   const seen = new Set(rebuilt.map(claimIdentity));
+  const dropped: ReleaseSourceClaim[] = [];
   const carried: ReleaseSourceClaim[] = [];
   for (const claim of liveClaims) {
-    if (drop && cites(claim)) continue;
     const identity = claimIdentity(claim);
     if (seen.has(identity)) continue;
+    if (retired(claim)) {
+      dropped.push(claim);
+      continue;
+    }
     seen.add(identity);
     carried.push(claim);
   }
