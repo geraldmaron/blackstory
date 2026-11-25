@@ -12,6 +12,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import {
+  nrhpRegistryRowUrl,
+  parseSharedStrings,
+  parseSheetRows,
+  type SheetRow,
+} from '../../operator-cli/src/nrhp-registry-row.ts';
 import { uninvertFiledName } from './lib/uninvert-leading-article.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -34,62 +40,6 @@ const RUN_LANE = 'nrhp';
 
 const BROWSER_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
-
-const XML_ENTITIES: Record<string, string> = {
-  '&amp;': '&',
-  '&lt;': '<',
-  '&gt;': '>',
-  '&quot;': '"',
-  '&apos;': "'",
-};
-
-export function unescapeXml(text: string): string {
-  return text
-    .replace(/&(?:amp|lt|gt|quot|apos);/gu, (m) => XML_ENTITIES[m] ?? m)
-    .replace(/&#x([0-9a-f]+);/giu, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)))
-    .replace(/&#(\d+);/gu, (_, dec: string) => String.fromCodePoint(Number(dec)));
-}
-
-/** Pure — parses xl/sharedStrings.xml into the ordered string table. */
-export function parseSharedStrings(xml: string): string[] {
-  const strings: string[] = [];
-  const siPattern = /<si>([\s\S]*?)<\/si>/gu;
-  let si: RegExpExecArray | null;
-  while ((si = siPattern.exec(xml)) !== null) {
-    const parts: string[] = [];
-    const tPattern = /<t[^>]*>([\s\S]*?)<\/t>/gu;
-    let t: RegExpExecArray | null;
-    while ((t = tPattern.exec(si[1]!)) !== null) parts.push(unescapeXml(t[1]!));
-    strings.push(parts.join(''));
-  }
-  return strings;
-}
-
-type SheetRow = Readonly<Record<string, string>>;
-
-/** Pure — parses sheet XML into rows keyed by column letter (blank-safe). */
-export function parseSheetRows(xml: string, sharedStrings: readonly string[]): SheetRow[] {
-  const rows: SheetRow[] = [];
-  const rowPattern = /<row[^>]*>([\s\S]*?)<\/row>/gu;
-  const cellPattern = /<c\s+([^>]*?)\/?>(?:(?:<v>([\s\S]*?)<\/v>)?(?:<\/c>)?)?/gu;
-  let rowMatch: RegExpExecArray | null;
-  while ((rowMatch = rowPattern.exec(xml)) !== null) {
-    const cells: Record<string, string> = {};
-    let cellMatch: RegExpExecArray | null;
-    cellPattern.lastIndex = 0;
-    while ((cellMatch = cellPattern.exec(rowMatch[1]!)) !== null) {
-      const attrs = cellMatch[1]!;
-      const ref = /r="([A-Z]+)\d+"/u.exec(attrs)?.[1];
-      if (!ref) continue;
-      const isShared = /t="s"/u.test(attrs);
-      const raw = cellMatch[2];
-      if (raw === undefined) continue;
-      cells[ref] = isShared ? (sharedStrings[Number(raw)] ?? '') : unescapeXml(raw);
-    }
-    rows.push(cells);
-  }
-  return rows;
-}
 
 const RELISTING_PAREN =
   /\s*\(+\s*(?:boundary\s+(?:increase|decrease|expansion)|additional\s+documentation|amendment)[^()]*\)+/giu;
@@ -326,6 +276,8 @@ async function main(): Promise<void> {
       listedDateSerial: row[COL.listedDate]?.trim() || null,
       restrictedAddress: (row[COL.restricted] ?? '').trim() === '1',
       canonicalUrl: externalLink ?? `https://npgallery.nps.gov/AssetDetail/NRIS/${refnum}`,
+      // The row these listing facts were read from; the listing claims cite and are reviewed against it.
+      registrySourceUrl: nrhpRegistryRowUrl(refnum, xlsxUrl),
       externalLink,
       lat: null,
       lng: null,

@@ -129,10 +129,27 @@ The repository describes three pipelines and production uses one of them.
    search methods and access statements went beyond the quotes. Nothing was sealed; drafts and
    the review are in the vault under `Agent Memory/blackstory-source-library/`.
 
+## NRHP lane fix, same day
+
+The lane's listing facts come from the NPS listed-properties spreadsheet, so its `listing` and
+`significant for` claims now cite that property's row
+(`national-register-listed_<date>.xlsx?refnum=<reference>`), and the capture step stores the row
+as labeled text (`packages/operator-cli/src/nrhp-registry-row.ts`). All 2,581 lane rows carry
+`payload.registrySourceUrl`; the scraper sets it for new rows. Enrichment staging now writes every
+quoted passage as a single-fact claim, and NRHP records publish those alongside the two registry
+claims, so each sentence of the summary has a claim to rest on. A fact rejected against one source
+no longer counts as a rejected fact once the record cites a different source for it.
+
+Proved on a live record (Building at 220 Sunset Avenue, NW): 8 claims and the text approved, the
+record corrected in place, `publication.entities_corrected` written, page checked on the
+Postgres-backed site. The dataset URL is dated, so the citation link will break when NPS replaces
+the file; the captured row text is kept for a year.
+
 ## What is still to build, in order
 
-1. **Re-source the NRHP lane's listing claims** so live NRHP records can pass review.
-2. **Run `--correct` through its publish step** on the first live record that clears review.
+1. **Burn down NRHP enrichment** with the correction path, in small batches, and re-pin the
+   dataset URL when NPS publishes a new file.
+2. **Purge the Cloudflare zone after corrections**; no token for it exists on this machine.
 3. **Decide the unrecognized-publisher queue**: who registers a host the register returns as
    `review`, and how often.
 4. **Seed source guidance by hand-opened pages**, one collection at a time, with statements

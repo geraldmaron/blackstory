@@ -190,6 +190,7 @@ import {
   type EnrichedCandidate,
   type AdjudicatedRelationship,
 } from '@repo/research-harness';
+import { fetchNrhpRegistryRow, parseNrhpRegistryRowUrl } from './nrhp-registry-row.js';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
 import { describeRoutedSearch } from '@repo/domain';
 import { runSearchQueries, type ResolvedSearchProvider } from './search-routing.js';
@@ -1231,7 +1232,11 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
         const waybackCredentials = wayback ? waybackCredentialsFromEnv(process.env) : undefined;
         const captureDeps: CaptureDeps = {
-          fetchUrl: (url) => runQuickAddFetch(url, fetchDependencies),
+          // A registry row URL names one row of a spreadsheet; safe-fetch has no parser for it.
+          fetchUrl: (url) =>
+            parseNrhpRegistryRowUrl(url)
+              ? fetchNrhpRegistryRow(url)
+              : runQuickAddFetch(url, fetchDependencies),
           storage: captureStorageFromEnv(process.env, decisions),
           parserVersion: 'capture-backfill-v1',
           newId: (prefix, seed) =>

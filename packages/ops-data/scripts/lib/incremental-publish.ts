@@ -708,6 +708,13 @@ export function buildReleaseSourceFromLandscape(
         ? 'address'
         : 'city';
 
+  // The register's own spreadsheet row states the listing facts; the asset page does not.
+  const registrySourceUrl = readTrimmedString(row.payload.registrySourceUrl);
+  const registryUrl = registrySourceUrl.length > 0 ? registrySourceUrl : canonicalUrl;
+  const registryLabel =
+    registrySourceUrl.length > 0
+      ? 'National Register of Historic Places listed properties'
+      : hostname;
   // Separate the NRHP listing fact from its significance claim. A candidate without a registry
   // URL gets no record_index claim and must rely on its actual cited evidence.
   const claims: ReleaseSourceClaim[] =
@@ -725,10 +732,10 @@ export function buildReleaseSourceFromLandscape(
                     ? (row.payload.listedDateSerial as string | null)
                     : undefined,
               }),
-              confidenceLevel: confidenceLevelForSource(canonicalUrl),
-              citationSource: hostname,
-              citationHref: canonicalUrl,
-              citationLabel: hostname,
+              confidenceLevel: confidenceLevelForSource(registryUrl),
+              citationSource: registryLabel,
+              citationHref: registryUrl,
+              citationLabel: registryLabel,
               claimRole: 'record_index',
             },
             {
@@ -739,12 +746,15 @@ export function buildReleaseSourceFromLandscape(
                     ? row.payload.areaOfSignificance
                     : undefined,
               }),
-              confidenceLevel: confidenceLevelForSource(canonicalUrl),
-              citationSource: hostname,
-              citationHref: canonicalUrl,
-              citationLabel: hostname,
+              confidenceLevel: confidenceLevelForSource(registryUrl),
+              citationSource: registryLabel,
+              citationHref: registryUrl,
+              citationLabel: registryLabel,
               claimRole: 'record_index',
             },
+            // The registry states the listing; what happened there is carried by the facts the
+            // enrichment quoted from its evidence.
+            ...(summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? []),
           ]
         : (summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? [
             {

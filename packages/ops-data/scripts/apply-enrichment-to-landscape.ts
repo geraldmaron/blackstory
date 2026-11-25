@@ -109,6 +109,31 @@ function buildEvidenceCitations(
   }));
 }
 
+/**
+ * Every quoted passage the draft rests on, beyond the one kept per document above, as a
+ * single-fact claim. Review checks each sentence of the public text against a claim, so a
+ * summary resting on six passages of one document needs all six, not the longest.
+ */
+function buildSummaryClaims(
+  draft: NonNullable<EnrichedRow['notes']['draft']>,
+  docsById: ReadonlyMap<string, EvidenceDocRow>,
+  kept: readonly EvidenceCitation[],
+): { object: string; citationHref: string }[] {
+  const seen = new Set(kept.map((citation) => citation.quote));
+  const claims: { object: string; citationHref: string }[] = [];
+  for (const entry of [
+    ...citationEntries(draft.summaryCitations),
+    ...citationEntries(draft.historicalContextCitations),
+  ]) {
+    const doc = docsById.get(entry.evidenceId);
+    const quote = entry.quote.trim();
+    if (doc === undefined || quote.length === 0 || seen.has(quote)) continue;
+    seen.add(quote);
+    claims.push({ object: quote, citationHref: doc.source_url });
+  }
+  return claims;
+}
+
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
@@ -156,6 +181,7 @@ async function main(): Promise<void> {
     eraBuckets: number;
     keywords: number;
     evidenceCitations: EvidenceCitation[];
+    summaryClaims: { object: string; citationHref: string }[];
   }[] = [];
   const skipped: { entityId: string; reason: string }[] = [];
 
@@ -183,6 +209,7 @@ async function main(): Promise<void> {
       eraBuckets: Array.isArray(draft.eraBuckets) ? draft.eraBuckets.length : 0,
       keywords: Array.isArray(draft.keywords) ? draft.keywords.length : 0,
       evidenceCitations: buildEvidenceCitations(draft, docsById),
+      summaryClaims: buildSummaryClaims(draft, docsById, buildEvidenceCitations(draft, docsById)),
     });
   }
 
@@ -258,6 +285,7 @@ async function main(): Promise<void> {
             keywords: Array.isArray(draft.keywords) ? draft.keywords : undefined,
             evidenceCitations:
               plan.evidenceCitations.length > 0 ? plan.evidenceCitations : undefined,
+            summaryClaims: plan.summaryClaims.length > 0 ? plan.summaryClaims : undefined,
           }),
         ],
       );

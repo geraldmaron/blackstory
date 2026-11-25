@@ -111,6 +111,9 @@ export async function collectCitedUrls(
        CROSS JOIN LATERAL (
          SELECT lc.canonical_url AS url
          UNION ALL
+         -- The registry row an NRHP record's listing claims are reviewed against.
+         SELECT lc.payload->>'registrySourceUrl'
+         UNION ALL
          SELECT citation->>'sourceUrl' FROM jsonb_array_elements(
            CASE WHEN jsonb_typeof(lc.payload->'evidenceCitations') = 'array'
              THEN lc.payload->'evidenceCitations' ELSE '[]'::jsonb END) citation

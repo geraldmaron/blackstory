@@ -76,8 +76,8 @@ async function buildPackets(
   rejectedFile: Record<string, { object: string }[]>,
 ): Promise<{ packets: PublicTextPacket[]; rows: Map<string, unknown>; blocked: unknown[] }> {
   const { prepared, blocked } = await loadReviewClaims(client, ids);
-  const rejectedInLedger = await client.query<{ uri: string; object: string }>(
-    `SELECT a.storage_uri AS uri, f->>'object' AS object
+  const rejectedInLedger = await client.query<{ uri: string; object: string; href: string | null }>(
+    `SELECT a.storage_uri AS uri, f->>'object' AS object, f->>'citationHref' AS href
      FROM research.artifacts a
      JOIN research.review_decisions r ON r.artifact_id = a.id AND r.decision = 'reject'
      CROSS JOIN LATERAL jsonb_array_elements(r.findings) f
@@ -94,7 +94,17 @@ async function buildPackets(
     const sources = new Map(claims.map((claim) => [claim.claim.citationHref, claim.capture.text]));
     const rejected = new Set([
       ...(rejectedFile[id] ?? []).map((fact) => fact.object),
-      ...rejectedInLedger.rows.filter((r) => r.uri === `landscape://${id}`).map((r) => r.object),
+      ...rejectedInLedger.rows
+        .filter((r) => r.uri === `landscape://${id}`)
+        // A fact rejected against one source is not a rejected fact once the record cites a
+        // different source for it; that claim stands or falls on its own review.
+        .filter(
+          (r) =>
+            !claims.some(
+              (claim) => claim.claim.object === r.object && claim.claim.citationHref !== r.href,
+            ),
+        )
+        .map((r) => r.object),
     ]);
     packets.push({
       entityId: id,
