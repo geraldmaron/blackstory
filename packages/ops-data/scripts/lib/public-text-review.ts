@@ -160,6 +160,29 @@ export const PUBLIC_TEXT_OUTPUT_SCHEMA = {
   },
 } as const;
 
+/**
+ * Rejected facts that still stand against a record. A fact rejected against one source stops
+ * counting once the record cites a different source for it; that claim stands or falls on its
+ * own review. A fact rejected against the source the record still cites keeps counting.
+ */
+export function standingRejectedFacts(
+  rejections: readonly { readonly object: string; readonly href: string | null }[],
+  claims: readonly { readonly object: string; readonly citationHref: string | null | undefined }[],
+): string[] {
+  return [
+    ...new Set(
+      rejections
+        .filter(
+          (rejection) =>
+            !claims.some(
+              (claim) => claim.object === rejection.object && claim.citationHref !== rejection.href,
+            ),
+        )
+        .map((rejection) => rejection.object),
+    ),
+  ];
+}
+
 export function buildPublicTextPrompt(packet: PublicTextPacket): string {
   const fence = packet.textHash.slice(0, 16);
   return [

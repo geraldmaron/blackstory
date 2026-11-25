@@ -29,6 +29,7 @@ import {
   buildPublicTextPrompt,
   providerOf,
   publicTextHash,
+  standingRejectedFacts,
   validatePublicTextVerdict,
   type PublicTextPacket,
   type PublicTextVerdict,
@@ -94,17 +95,10 @@ async function buildPackets(
     const sources = new Map(claims.map((claim) => [claim.claim.citationHref, claim.capture.text]));
     const rejected = new Set([
       ...(rejectedFile[id] ?? []).map((fact) => fact.object),
-      ...rejectedInLedger.rows
-        .filter((r) => r.uri === `landscape://${id}`)
-        // A fact rejected against one source is not a rejected fact once the record cites a
-        // different source for it; that claim stands or falls on its own review.
-        .filter(
-          (r) =>
-            !claims.some(
-              (claim) => claim.claim.object === r.object && claim.claim.citationHref !== r.href,
-            ),
-        )
-        .map((r) => r.object),
+      ...standingRejectedFacts(
+        rejectedInLedger.rows.filter((r) => r.uri === `landscape://${id}`),
+        claims.map((claim) => claim.claim),
+      ),
     ]);
     packets.push({
       entityId: id,

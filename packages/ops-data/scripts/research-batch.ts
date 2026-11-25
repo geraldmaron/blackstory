@@ -18,9 +18,8 @@
  * Captures use the standing rule below plus any decisions passed in; a source with neither stays
  * uncaptured and blocks its claims. RESEARCH_RUN_LOG=<file> appends one JSON line per run.
  *
- * A record with a rejected claim is held (its rejection is still recorded); the rest continue.
- * shortcut: any refusal, missing verdict or blocked claim stops every record in the batch, not
- * just its own; split per record once batches are large enough for that to cost real work.
+ * A blocked claim, a missing verdict, a ledger refusal or a rejected claim holds that record
+ * alone, and so does a record the publisher's own gates skip.
  */
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -83,28 +82,41 @@ export function firstJson(stdout: string): Record<string, unknown> {
   throw new Error('step printed no JSON report');
 }
 
-/** Entities whose every packet was approved; anything refused or unreviewed stops the batch. */
+/** The ids the publisher's dry run lists as eligible, limited to the ones that were asked for. */
+export function eligibleIds(dryRunOutput: string, asked: readonly string[]): string[] {
+  const listed = new Set(
+    [...dryRunOutput.matchAll(/^ {2}(\S+) \(basis=[^)]*\)$/gmu)].map((match) => match[1]),
+  );
+  return asked.filter((id) => listed.has(id));
+}
+
+/**
+ * Which records clear claim review, and why each of the others is held. A record is held, alone,
+ * when one of its claims is blocked, unreviewed, refused by the ledger or rejected; the rest of
+ * the batch goes on.
+ */
 export function passingEntities(
-  packetEntityIds: readonly string[],
-  verdictCount: number,
-  report: {
-    approved?: { entityId: string }[];
-    rejected?: { entityId: string }[];
-    refused?: unknown[];
-  },
-): string[] {
-  if (verdictCount !== packetEntityIds.length) {
-    throw new Error(
-      `${verdictCount} verdicts for ${packetEntityIds.length} packets; re-run the review`,
-    );
+  packets: readonly { packetId: string; entityId: string }[],
+  verdictPacketIds: readonly string[],
+  report: { rejected?: { entityId: string }[]; refused?: { packetId: string }[] },
+  blockedEntityIds: readonly string[] = [],
+): { passing: string[]; held: Record<string, string> } {
+  const entityOf = new Map(packets.map((packet) => [packet.packetId, packet.entityId]));
+  const reviewed = new Set(verdictPacketIds);
+  const held: Record<string, string> = {};
+  const hold = (entityId: string | undefined, reason: string): void => {
+    if (entityId !== undefined && held[entityId] === undefined) held[entityId] = reason;
+  };
+  for (const entityId of blockedEntityIds) hold(entityId, 'a claim has no reviewable capture');
+  for (const packet of packets) {
+    if (!reviewed.has(packet.packetId)) hold(packet.entityId, 'a claim got no verdict');
   }
-  if ((report.refused ?? []).length > 0) {
-    throw new Error(
-      `ledger refused ${(report.refused ?? []).length} verdicts: ${JSON.stringify(report.refused)}`,
-    );
+  for (const refusal of report.refused ?? []) {
+    hold(entityOf.get(refusal.packetId), 'the ledger refused a verdict');
   }
-  const rejected = new Set((report.rejected ?? []).map((row) => row.entityId));
-  return [...new Set(packetEntityIds)].filter((id) => !rejected.has(id));
+  for (const rejection of report.rejected ?? []) hold(rejection.entityId, 'a claim was rejected');
+  const all = [...new Set([...packets.map((packet) => packet.entityId), ...blockedEntityIds])];
+  return { passing: all.filter((id) => held[id] === undefined), held };
 }
 
 function flag(name: string, fallback?: string): string {
@@ -241,23 +253,26 @@ async function main(): Promise<void> {
     `--out=${packets}`,
   ]);
   const blocked = JSON.parse(readFileSync(join(workDir, 'packets.blocked.json'), 'utf8')) as {
-    missingEntityIds: unknown[];
-    blocked: unknown[];
+    missingEntityIds: string[];
+    blocked: { entityId: string }[];
   };
-  if (blocked.blocked.length > 0 || blocked.missingEntityIds.length > 0) {
-    throw new Error(
-      `${blocked.blocked.length} claims have no reviewable capture and ${blocked.missingEntityIds.length} ids are missing; see packets.blocked.json`,
-    );
-  }
-  const packetEntityIds = jsonl(packets).map((packet) => String(packet.entityId));
-  if (packetEntityIds.length === 0) throw new Error('no claims to review');
+  const blockedEntityIds = [
+    ...new Set([...blocked.missingEntityIds, ...blocked.blocked.map((claim) => claim.entityId)]),
+  ];
+  const packetList = jsonl(packets).map((packet) => ({
+    packetId: String(packet.packetId),
+    entityId: String(packet.entityId),
+  }));
+  if (packetList.length === 0) throw new Error('no claims to review; see packets.blocked.json');
 
   step('claim review (Sol)', `${S}/session-claim-review-codex.ts`, [
     `--packets-file=${packets}`,
     `--out=${verdicts}`,
     `--work-dir=${join(workDir, 'codex')}`,
   ]);
-  const verdictCount = existsSync(verdicts) ? jsonl(verdicts).length : 0;
+  const verdictPacketIds = existsSync(verdicts)
+    ? jsonl(verdicts).map((verdict) => String(verdict.packetId))
+    : [];
   const reviewerEnv = {
     CLAIM_REVIEW_REVIEWER_ACTOR_ID: REVIEWER.actorId,
     CLAIM_REVIEW_REVIEWER_MODEL_FAMILY: REVIEWER.family,
@@ -269,14 +284,20 @@ async function main(): Promise<void> {
       DRY_RUN: '1',
     }),
   );
-  const passing = passingEntities(packetEntityIds, verdictCount, dry);
-  const held = [...new Set(packetEntityIds)].filter((id) => !passing.includes(id));
+  const { passing, held: heldWhy } = passingEntities(
+    packetList,
+    verdictPacketIds,
+    dry as { rejected?: { entityId: string }[]; refused?: { packetId: string }[] },
+    blockedEntityIds,
+  );
+  const held = Object.keys(heldWhy);
+  for (const [id, why] of Object.entries(heldWhy)) console.log(`Held ${id}: ${why}`);
   Object.assign(log, {
-    packets: packetEntityIds.length,
+    packets: packetList.length,
     claimsApproved: ((dry.approved as unknown[]) ?? []).length,
     claimsRejected: ((dry.rejected as unknown[]) ?? []).length,
     clearedClaimReview: passing,
-    heldAtClaimReview: held,
+    heldAtClaimReview: heldWhy,
   });
   if (!apply) {
     console.log(
@@ -294,43 +315,44 @@ async function main(): Promise<void> {
     CLAIM_REVIEW_APPLY: '1',
   });
   if (passing.length === 0)
-    throw new Error(`every record has a rejected claim; held: ${held.join(', ')}`);
+    throw new Error(`no record cleared claim review; held: ${held.join(', ')}`);
 
   const idsFile = join(workDir, 'text-ids.txt');
   writeFileSync(idsFile, `${passing.join('\n')}\n`);
   const text = `${S}/session-public-text-review.ts`;
   step('text packets', text, ['--step=prepare', `--ids-file=${idsFile}`, `--work-dir=${workDir}`]);
   step('text review (Sol)', text, ['--step=review', `--work-dir=${workDir}`]);
-  const textVerdicts = jsonl(join(workDir, 'text-verdicts.jsonl')).length;
-  if (textVerdicts !== passing.length)
-    throw new Error(`${textVerdicts} text verdicts for ${passing.length} records`);
   const applyText = ['--step=apply', `--work-dir=${workDir}`, ...drafter];
   const textDry = firstJson(step('text ledger dry run', text, applyText, { DRY_RUN: '1' })) as {
     approved?: string[];
     refused?: unknown[];
   };
+  // A record with no text verdict, a refused one or requested changes is simply not in `approved`.
   if ((textDry.refused ?? []).length > 0)
-    throw new Error(`text ledger refused: ${JSON.stringify(textDry.refused)}`);
+    console.log(`Text ledger refused: ${JSON.stringify(textDry.refused)}`);
   step('text ledger write', text, applyText, { DRY_RUN: '0', PUBLIC_TEXT_REVIEW_APPLY: '1' });
   const approved = textDry.approved ?? [];
   log.clearedTextReview = approved;
   if (approved.length === 0) throw new Error('no record passed text review; nothing to publish');
 
   const publisher = `${S}/publish-release-entities-incremental.ts`;
-  const publishArgs = [
-    `--ids=${approved.join(',')}`,
-    ...(correct ? ['--republish', '--correct'] : []),
-  ];
-  const eligible = /^Eligible: (\d+)$/mu.exec(
-    step('publisher dry run', publisher, publishArgs, { DRY_RUN: '1' }),
+  const correction = correct ? ['--republish', '--correct'] : [];
+  // The publisher has gates of its own (carried live claims, depth, privacy). What it skips is
+  // held with the rest; what it finds eligible ships.
+  const dryPublish = step(
+    'publisher dry run',
+    publisher,
+    [`--ids=${approved.join(',')}`, ...correction],
+    { DRY_RUN: '1' },
   );
-  if (Number(eligible?.[1]) !== approved.length) {
-    throw new Error(
-      `publisher finds ${eligible?.[1] ?? 'no'} of ${approved.length} eligible; nothing published`,
-    );
-  }
+  const eligible = eligibleIds(dryPublish, approved);
+  const skipped = approved.filter((id) => !eligible.includes(id));
+  if (skipped.length > 0) console.log(`Held by the publisher: ${skipped.join(', ')}`);
+  log.heldAtPublisher = skipped;
+  if (eligible.length === 0) throw new Error('the publisher finds no record eligible');
+  const publishArgs = [`--ids=${eligible.join(',')}`, ...correction];
   step('publish', publisher, publishArgs, { DRY_RUN: '0', INCREMENTAL_PUBLISH_APPLY: '1' });
-  log.published = approved;
+  log.published = eligible;
 
   // Local uploads over about 5 MB are cut off on this machine, so the workflow republishes.
   console.log('\n== catalog republish ==');
@@ -348,7 +370,7 @@ async function main(): Promise<void> {
     { cwd: REPO_ROOT, stdio: 'inherit' },
   );
   console.log(
-    `\nPublished ${approved.length}: ${approved.join(', ')}. Held: ${[...held, ...passing.filter((id) => !approved.includes(id))].join(', ') || 'none'}.`,
+    `\nPublished ${eligible.length}: ${eligible.join(', ')}. Held: ${[...held, ...passing.filter((id) => !eligible.includes(id))].join(', ') || 'none'}.`,
   );
   if (correct) {
     console.log(

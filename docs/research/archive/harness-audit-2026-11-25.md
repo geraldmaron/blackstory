@@ -165,6 +165,19 @@ and review picked a document's longest stored text, which after a recapture is t
 Entities are now decoded (angle brackets excepted) and review prefers the extraction the capture
 origin currently records.
 
+## Follow-up to the first batch
+
+The runner now holds one record at a time: a blocked claim, a missing verdict, a ledger refusal,
+a rejected claim or a publisher skip holds that record and the rest go on. Eastside Historic
+District published after its summary dropped the bridge sentence the reviewer doubted.
+
+George Washington Carver Library cleared claim and text review and is still held, by the
+publisher. Its live record carries two claims cited to Wikipedia, one of them about George
+Washington Carver the man. A correction carries live claims forward so none disappears silently,
+those two have no review, and the capture rule never captures Wikipedia, so they can never get
+one. Every live record with a Wikipedia-cited claim will stop at the same place: 3,145 published
+claims cite a wiki or crowd host. The owner has to decide whether a correction may retire them.
+
 ## What is still to build, in order
 
 1. **Burn down NRHP enrichment** with the correction path, in small batches, and re-pin the

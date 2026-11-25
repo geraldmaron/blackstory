@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { firstJson, passingEntities, standingDecisions } from './research-batch.ts';
+import { eligibleIds, firstJson, passingEntities, standingDecisions } from './research-batch.ts';
 
 test('firstJson reads the report and ignores the prose a step prints after it', () => {
   const out =
@@ -9,12 +9,33 @@ test('firstJson reads the report and ignores the prose a step prints after it', 
   assert.throws(() => firstJson('no report here'), /no JSON report/u);
 });
 
-test('a batch stops on missing verdicts or refusals and holds records with a rejected claim', () => {
-  const packets = ['a', 'a', 'b'];
-  assert.throws(() => passingEntities(packets, 2, {}), /2 verdicts for 3 packets/u);
-  assert.throws(() => passingEntities(packets, 3, { refused: [{ packetId: 'p' }] }), /refused 1/u);
-  assert.deepEqual(passingEntities(packets, 3, { rejected: [{ entityId: 'b' }] }), ['a']);
-  assert.deepEqual(passingEntities(packets, 3, {}), ['a', 'b']);
+test('a record is held alone for a blocked, unreviewed, refused or rejected claim', () => {
+  const packets = [
+    { packetId: 'p1', entityId: 'a' },
+    { packetId: 'p2', entityId: 'a' },
+    { packetId: 'p3', entityId: 'b' },
+    { packetId: 'p4', entityId: 'c' },
+    { packetId: 'p5', entityId: 'd' },
+  ];
+  const result = passingEntities(
+    packets,
+    ['p1', 'p2', 'p3', 'p4'],
+    { rejected: [{ entityId: 'b' }], refused: [{ packetId: 'p4' }] },
+    ['e'],
+  );
+  assert.deepEqual(result.passing, ['a']);
+  assert.deepEqual(result.held, {
+    e: 'a claim has no reviewable capture',
+    d: 'a claim got no verdict',
+    c: 'the ledger refused a verdict',
+    b: 'a claim was rejected',
+  });
+  assert.deepEqual(passingEntities(packets, ['p1', 'p2', 'p3', 'p4', 'p5'], {}).passing, [
+    'a',
+    'b',
+    'c',
+    'd',
+  ]);
 });
 
 test('the standing capture rule covers recognized publishers only and never allows archiving', () => {
@@ -34,4 +55,11 @@ test('the standing capture rule covers recognized publishers only and never allo
   );
   assert.equal(decisions[0]!.allowArchive, false);
   assert.equal(decisions[0]!.expiresAt, '2027-11-25T00:00:00.000Z');
+});
+
+test('only the asked-for ids the publisher lists as eligible are published', () => {
+  const out =
+    'Eligible: 1\nSkipped: 1\n\nEligible IDs:\n  rec-a (basis=independent_review)\n  rec-x (basis=independent_review)\n\nSkip counts:\n  claim_assessment_required: 1\n';
+  assert.deepEqual(eligibleIds(out, ['rec-a', 'rec-b']), ['rec-a']);
+  assert.deepEqual(eligibleIds('Eligible: 0', ['rec-a']), []);
 });
