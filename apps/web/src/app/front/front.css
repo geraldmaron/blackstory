@@ -174,7 +174,7 @@
 .ds-scene__heading {
   margin: 0;
   font: 600 var(--front-word) / 1 var(--ds-font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 /* The accent rule (section 7.2): the word the line turns on, in Newsreader italic, in copper. */
@@ -414,7 +414,7 @@
 
 /* "Black History" closes into "BlackStory", and the typed word is then the wordmark itself: the
    site's display face is the wordmark's (Outfit), set here at the wordmark's weight and tracking
-   (brand/tokens/live-lockup.json). The "Hi" with its space and the small "s" are tracks that
+   (live-lockup.css, generated from the kit). The "Hi" with its space and the small "s" are tracks that
    shut, and the capital is one that opens, so no letter's width is written down. The symbol
    stands beside the word exactly where the lockup has it; its place is in ems of the type, from
    the same file. Closed, with the symbol, is the resting state: without script, held still or
@@ -424,15 +424,16 @@
   display: inline-block;
   /* The heading's line is taller than the word (above), which is the symbol's room. */
   line-height: 1;
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  /* Half of what the symbol adds at the left, so the lockup, not the word alone, is centered. */
-  translate: 0.597em 0;
+  /* The kit's numbers, generated into live-lockup.css. */
+  font-weight: var(--lockup-weight);
+  letter-spacing: var(--lockup-tracking);
+  translate: var(--lockup-shift) 0;
 }
 
 .ds-scene__closing-word > span {
   display: inline-grid;
   grid-template-columns: 0fr;
+  opacity: 0;
 }
 
 .ds-scene__closing-word > span > span {
@@ -443,86 +444,116 @@
 
 .ds-scene__closing-word > [data-part='cap'] {
   grid-template-columns: 1fr;
+  opacity: 1;
 }
 
-/* The symbol's 2048 square: 2.7826em wide, its left edge 2.1921em left of the "B"'s ink (which
-   sits 0.082em inside the text's box) and its top 1.7241em above the baseline (0.87em down a
-   line of height 1). */
+/* The symbol's 2048 square, sized and placed in ems of the type so that it stands beside the
+   word exactly where the lockup has it. */
 .ds-scene__closing-mark {
   position: absolute;
-  top: -0.8541em;
-  left: -2.1101em;
-  width: 2.7826em;
+  top: var(--lockup-symbol-top);
+  left: var(--lockup-symbol-left);
+  width: var(--lockup-symbol-size);
   max-width: none;
   height: auto;
 }
 
-@media (scripting: enabled) {
-  .ds-retelling:not([data-still]) .ds-scene__closing,
-  .ds-retelling:not([data-still]) .ds-scene__closing-word > span {
+/* These states exist only once the film has started (it sets `data-plate`) and only where motion
+   is wanted. If the script never arrives, or motion is reduced, the scene rests closed with its
+   symbol and its line showing. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  /* One movement, not three steps: the word starts to close after a short hold, the symbol
+     starts to arrive from the left while the word is still closing, and the line under them
+     comes up as the two settle. */
+  .ds-retelling[data-plate]:not([data-still]) .ds-scene__closing,
+  .ds-retelling[data-plate]:not([data-still]) .ds-scene__closing-word > span {
     transition:
-      grid-template-columns calc(var(--ds-duration-slow) * 2) var(--ds-ease-standard)
-        var(--ds-duration-slow),
-      translate calc(var(--ds-duration-slow) * 2) var(--ds-ease-standard) var(--ds-duration-slow);
+      grid-template-columns calc(var(--ds-duration-slow) * 2.3) var(--ds-ease-standard)
+        calc(var(--ds-duration-slow) * 0.75),
+      translate calc(var(--ds-duration-slow) * 2.3) var(--ds-ease-standard)
+        calc(var(--ds-duration-slow) * 0.75);
   }
 
-  .ds-retelling:not([data-still]) .ds-scene__closing-mark {
-    transition: opacity var(--ds-duration-slow) var(--ds-ease-standard)
-      calc(var(--ds-duration-slow) * 3);
+  /* The letters that leave fade before their tracks finish shutting, and the capital comes up
+     as its track opens, so no letter is seen sliced at a track's edge. */
+  .ds-retelling[data-plate]:not([data-still])
+    .ds-scene__closing-word
+    > :is([data-part='hi'], [data-part='s']) {
+    transition:
+      grid-template-columns calc(var(--ds-duration-slow) * 2.3) var(--ds-ease-standard)
+        calc(var(--ds-duration-slow) * 0.75),
+      opacity var(--ds-duration-slow) var(--ds-ease-standard) calc(var(--ds-duration-slow) * 0.75);
   }
 
-  .ds-retelling:not([data-still]) .ds-scene[data-kind='country'] .ds-scene__tagline {
-    transition: opacity var(--ds-duration-slow) var(--ds-ease-entrance)
-      calc(var(--ds-duration-slow) * 4);
+  .ds-retelling[data-plate]:not([data-still]) .ds-scene__closing-word > [data-part='cap'] {
+    transition:
+      grid-template-columns calc(var(--ds-duration-slow) * 2.3) var(--ds-ease-standard)
+        calc(var(--ds-duration-slow) * 0.75),
+      opacity calc(var(--ds-duration-slow) * 1.4) var(--ds-ease-standard)
+        calc(var(--ds-duration-slow) * 1.5);
+  }
+
+  .ds-retelling[data-plate]:not([data-still]) .ds-scene__closing-mark {
+    transition:
+      opacity calc(var(--ds-duration-slow) * 2) var(--ds-ease-standard)
+        calc(var(--ds-duration-slow) * 1.25),
+      translate calc(var(--ds-duration-slow) * 2.3) var(--ds-ease-entrance)
+        calc(var(--ds-duration-slow) * 1.1);
+  }
+
+  .ds-retelling[data-plate]:not([data-still]) .ds-scene[data-kind='country'] .ds-scene__tagline {
+    transition: opacity calc(var(--ds-duration-slow) * 1.5) var(--ds-ease-standard)
+      calc(var(--ds-duration-slow) * 2.75);
   }
 
   /* Until the scene is the current one it reads "Black History" and the rest waits. */
-  .ds-retelling:not([data-still]):not([data-scene='black-story'])
+  .ds-retelling[data-plate]:not([data-still]):not([data-scene='black-story'])
     :is(.ds-scene__closing, .ds-scene__closing-mark, .ds-scene__closing-word > span),
-  .ds-retelling:not([data-still]):not([data-scene='black-story'])
+  .ds-retelling[data-plate]:not([data-still]):not([data-scene='black-story'])
     .ds-scene[data-kind='country']
     .ds-scene__tagline {
     transition-delay: 0s;
   }
 
-  .ds-retelling:not([data-still]):not([data-scene='black-story']) .ds-scene__closing {
+  .ds-retelling[data-plate]:not([data-still]):not([data-scene='black-story']) .ds-scene__closing {
     translate: 0 0;
   }
 
-  .ds-retelling:not([data-still]):not([data-scene='black-story'])
+  .ds-retelling[data-plate]:not([data-still]):not([data-scene='black-story'])
+    .ds-scene__closing-mark {
+    translate: -0.35em 0;
+  }
+
+  .ds-retelling[data-plate]:not([data-still]):not([data-scene='black-story'])
     .ds-scene__closing-word
     > :is([data-part='hi'], [data-part='s']) {
     grid-template-columns: 1fr;
+    opacity: 1;
   }
 
-  .ds-retelling:not([data-still]):not([data-scene='black-story'])
+  .ds-retelling[data-plate]:not([data-still]):not([data-scene='black-story'])
     .ds-scene__closing-word
     > [data-part='cap'] {
     grid-template-columns: 0fr;
+    opacity: 0;
   }
 
-  .ds-retelling:not([data-still]):not([data-scene='black-story'])
+  .ds-retelling[data-plate]:not([data-still]):not([data-scene='black-story'])
     :is(.ds-scene__closing-mark, .ds-scene[data-kind='country'] .ds-scene__tagline) {
     opacity: 0;
   }
 }
 
-/* The official lockup, cropped to its artwork: the file carries wide transparent margins. It is
-   on the first screen only. It introduces; it does not shout: about a third of the window and at
-   most 30rem, so the map carries the screen. */
+/* The official lockup, already cropped to its ink (the kit's tight export). It is on the first
+   screen only. It introduces; it does not shout: about a third of the window and at most 30rem,
+   so the map carries the screen. */
 .ds-scene__heading--mark {
-  position: relative;
   width: min(100%, clamp(16rem, 34vw, 30rem));
-  aspect-ratio: 3.42;
-  overflow: hidden;
 }
 
 .ds-scene__heading--mark img {
-  position: absolute;
-  top: -74.4%;
-  left: -18.33%;
-  width: 133.33%;
-  max-width: none;
+  display: block;
+  width: 100%;
   height: auto;
 }
 
@@ -649,7 +680,7 @@
     justify-items: end;
     margin: 0;
     font: 600 var(--front-word) / 1 var(--ds-font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     white-space: nowrap;
   }
 
@@ -799,13 +830,18 @@
   }
 
   .ds-retelling:not([data-still]) .ds-scene[data-scene='history'] .ds-scene__pin > * {
-    transition: opacity var(--ds-duration-base) var(--ds-ease-entrance);
+    transition:
+      opacity var(--ds-duration-base) var(--ds-ease-entrance),
+      visibility var(--ds-duration-base);
   }
 
+  /* Faded, the panel is also out of reach of the keyboard and the pointer, so nothing unseen
+     can be focused or pressed. While focus is inside it, it stays. */
   .ds-retelling:not([data-still])[data-to='his-story']
     .ds-scene[data-scene='history']
-    .ds-scene__pin
+    .ds-scene__pin:not(:focus-within)
     > * {
+    visibility: hidden;
     opacity: 0;
   }
 
@@ -838,31 +874,37 @@
 
   /* Pinned, the scene becomes current while it is still below the window, so the close also
      waits for it to land. */
-  .ds-retelling:not([data-still])[data-to='black-story']
+  .ds-retelling[data-plate]:not([data-still])[data-to='black-story']
     :is(.ds-scene__closing, .ds-scene__closing-mark, .ds-scene__closing-word > span),
-  .ds-retelling:not([data-still])[data-to='black-story']
+  .ds-retelling[data-plate]:not([data-still])[data-to='black-story']
     .ds-scene[data-kind='country']
     .ds-scene__tagline {
     transition-delay: 0s;
   }
 
-  .ds-retelling:not([data-still])[data-to='black-story'] .ds-scene__closing {
+  .ds-retelling[data-plate]:not([data-still])[data-to='black-story'] .ds-scene__closing {
     translate: 0 0;
   }
 
-  .ds-retelling:not([data-still])[data-to='black-story']
+  .ds-retelling[data-plate]:not([data-still])[data-to='black-story'] .ds-scene__closing-mark {
+    translate: -0.35em 0;
+  }
+
+  .ds-retelling[data-plate]:not([data-still])[data-to='black-story']
     .ds-scene__closing-word
     > :is([data-part='hi'], [data-part='s']) {
     grid-template-columns: 1fr;
+    opacity: 1;
   }
 
-  .ds-retelling:not([data-still])[data-to='black-story']
+  .ds-retelling[data-plate]:not([data-still])[data-to='black-story']
     .ds-scene__closing-word
     > [data-part='cap'] {
     grid-template-columns: 0fr;
+    opacity: 0;
   }
 
-  .ds-retelling:not([data-still])[data-to='black-story']
+  .ds-retelling[data-plate]:not([data-still])[data-to='black-story']
     :is(.ds-scene__closing-mark, .ds-scene[data-kind='country'] .ds-scene__tagline) {
     opacity: 0;
   }
@@ -1141,7 +1183,7 @@
   padding-top: var(--ds-space-4);
   border-top: 2px solid var(--ds-ink);
   font: 600 var(--ds-text-headline) / 1.05 var(--ds-font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .ds-front-contents__search {

@@ -181,8 +181,8 @@ the display face is Outfit, the wordmark's own, in place of Schibsted Grotesk. C
   the first screen. The last scene is centered: it arrives reading "Black History", set in
   the display face at the wordmark's weight and tracking, which closes into "BlackStory" once
   the scene lands. The typed word is then the wordmark itself, and the symbol comes in beside it
-  where the lockup has it, placed from `brand/tokens/live-lockup.json`; "It happened here."
-  follows under it (owner's direction, 2026-11-24). Held still, under reduced motion or without
+  where the lockup has it, placed from the kit's numbers (`front/live-lockup.css`, generated);
+  the close, the symbol and "It happened here." overlap as one movement (owner's direction, 2026-11-24). Held still, under reduced motion or without
   script the lockup is there from the start.
 
 ### 7.3 The exhibit frame

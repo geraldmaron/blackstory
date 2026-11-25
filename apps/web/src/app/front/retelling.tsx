@@ -41,6 +41,7 @@ import { RETELLING_PICKS, pickedRecord } from './retelling-picks';
 import { RETELLING_SCENES, isRecordScene, type RetellingSceneId } from './retelling-scenes';
 import { TownField } from './town-field';
 import './front.css';
+import './live-lockup.css';
 
 void React;
 
@@ -60,10 +61,15 @@ function SceneWord({ prefix, heading }: { readonly prefix: string; readonly head
   );
 }
 
-/** The official artwork. The wordmark is never retyped beside a symbol. */
+/**
+ * The official artwork, cropped to its ink by the kit (brand/scripts/build-kit.mjs), so nothing
+ * here has to know where the letters end. 1274 by 354 is that crop's own shape.
+ */
 function Lockup() {
-  // eslint-disable-next-line @next/next/no-img-element -- brand artwork
-  return <img src={BRAND_ASSETS.vector.lockup.dark} alt="BlackStory" width={800} height={450} />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- brand artwork
+    <img src={BRAND_ASSETS.vector.lockupTight.dark} alt="BlackStory" width={1274} height={354} />
+  );
 }
 
 export async function Retelling({
