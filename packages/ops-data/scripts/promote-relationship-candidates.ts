@@ -204,6 +204,15 @@ async function main(): Promise<void> {
     }
     if (inserts.length > 5) console.log(`  ...and ${inserts.length - 5} more inserts`);
 
+    // These candidates are scored on co-participation, shared decades and proximity and carry no
+    // relationship evidence, so promoting them publishes an edge no record states. Dry run still
+    // reports what would be inserted; an edge reaches canonical through propose-edge with evidence.
+    if (!DRY_RUN && APPLY) {
+      throw new Error(
+        'promote-relationship-candidates no longer writes: heuristic candidates have no relationship ' +
+          'evidence. Research the pair (blackstory-entity-relate) and use propose-edge.',
+      );
+    }
     if (DRY_RUN || !APPLY) {
       console.log(
         '\nDry run only — no writes made. Set DRY_RUN=0 and PROMOTE_RELATIONSHIP_CANDIDATES_APPLY=1 to apply.',
