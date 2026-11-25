@@ -8,7 +8,7 @@ Agent skills live under `.agents/skills/`:
 - **Verbs** below have no skill of their own; `research-framework` routes here.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
-  `ringer-review`, `surface-triage`, `intake-review`, `experience-review`) are not verbs. Their decision order lives in the
+  `ringer-review`, `surface-triage`, `intake-review`, `experience-review`, `brand-content`) are not verbs. Their decision order lives in the
   skill file. They call verbs from this document when a command is needed.
 
 See `AGENTS.md` for the one-line index of every verb with its exact command.
@@ -760,6 +760,7 @@ a sourced address, evidence attachment, or campaign is actually ready.
 | `.agents/skills/blackstory-ringer-review`     | Adversarial factual and interpretive review                                |
 | `.agents/skills/blackstory-surface-triage`    | Projection/search/artifact disagreement                                    |
 | `.agents/skills/blackstory-experience-review` | Task-based web/native usability and evidence presentation                  |
+| `.agents/skills/blackstory-brand-content`     | Site, marketing and social copy from published records; drafts only        |
 
 ## Account-owned management work
 

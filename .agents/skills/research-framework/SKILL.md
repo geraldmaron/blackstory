@@ -43,6 +43,65 @@ claims do not certify every summary or context sentence. Use
 [experience review](../blackstory-experience-review/SKILL.md) when interface presentation
 may lose qualifiers, hide evidence or impede a web/native reader task.
 
+## Runs
+
+A run is one operation over a bounded set of records. Every run type below already has
+commands; this section fixes which path it takes, what it may do alone, and when it stops.
+
+**Intake.** Restate the request as operation, scope, budget and stop condition. Ask at most
+five questions, in one batch, and only where the answer changes scope, authority or
+sensitivity. Everything else takes the defaults below and is listed as an assumption in the
+report. After that batch a run does not come back with questions; it holds the item instead.
+
+| Operation | Path | Alone, it may |
+| --- | --- | --- |
+| New record (pending candidate or new lead) | evidence, then `research-batch.ts`, which runs the ordered steps in [claim-review handoff](../../../docs/research/claim-review-handoff.md#the-order-that-works) | publish, when every step reports complete and nothing is refused |
+| Enrich or re-cite a live record (image, context, a better source than Wikipedia) | `stage-landscape-evidence.ts`; the changed assertion is reviewed again, never just its URL | stage and review. The publisher refuses changes to a live entry of a signed release, so shipping it is an in-place correction (`CLAUDE.md`) |
+| Correction to a published fact | name the old claim, the evidence and the replacement; management work or in-place correction | prepare the exact change and hold for the owner |
+| Connection hunt | [entity-relate](../blackstory-entity-relate/SKILL.md), then `propose-edge` with the record that states the relation | propose. Withdrawing an edge no record supports is a successful result |
+| Identity and duplicates | `merge-duplicate-hubs.ts` dry run plus disambiguating evidence | propose |
+| Drift check | `capture-backfill` dry run, `source-register.ts verify` | report |
+| Source library upkeep | unmapped hosts, profiles, guidance per [source registry](../../../docs/research/source-registry.md#keeping-it-accurate) | propose; a sealed guidance version needs a reviewed finding, not one failed search |
+| Record prose | [neo-voice](../blackstory-neo-voice/SKILL.md), prose review, ringer review | ship with its record |
+| Chapter | the `neo` agent | draft only |
+| Site, marketing and social copy | [brand-content](../blackstory-brand-content/SKILL.md) | draft only |
+
+An operation or entity kind not in this table, or outside what its path supports, stops with
+the reason recorded. It does not fall through to another path.
+
+**Defaults.** Apply these without asking:
+
+- Living or unknown-status person, a residence, a minor, a named victim's family: hold.
+- A claim whose only support is Wikipedia, Wikidata, a search blurb or model memory: not a
+  claim. Find the underlying work or drop the clause.
+- One fit source supports a narrow attributed fact at minimal coverage. Superlatives, firsts,
+  causes and anything about wrongdoing need independent lineage and a recorded counter-search.
+- Sources disagree: state the disagreement or publish the less precise value both support. If
+  review still refuses, hold the record. Never drop a conflicting citation to get a pass.
+- A quote that is not verbatim in the captured text is refused; reword the claim to what the
+  source says. Never loosen the check.
+- Missing image, date or address stays missing. A record is not improved by a guess.
+- When two defaults conflict, take the one that publishes less.
+
+**Who does what.** Search, reading and extraction go to the cheapest model that passes the
+verbatim check; drafting follows the voice skills. The reviewer is a different vendor's model
+through the executable steps (`session-claim-review-codex.ts`,
+`session-public-text-review.ts --step=review`), never a prompt retyped by hand. A step that
+logs missing verdicts or prints refusals has not passed, whatever its exit code: compare
+verdict count to packet count and read the report before the next step.
+
+**Unattended runs.** A scheduled session works one operation with a record budget, uses only
+the credentials already provided to it, never reads a secret, and treats a permission denial
+as a hold. It reruns safely: captures dedupe, reviews key on packet hash, and the publisher
+dry run says what is eligible. It publishes only where the table allows and the session has
+the authority; otherwise it leaves a prepared batch.
+
+**Report.** Each run ends with: operation, records attempted, published, held (with reason),
+questions asked, reviewer approvals and rejections, and for every evidence need the
+collection searched, the query, its coverage and whether it answered. A collection that keeps
+answering or keeps failing a kind of need is a library finding to review, with those rows as
+its evidence. Counts of published records do not measure quality; sample accepted output.
+
 ## End-to-end owner requests
 
 Default to session execution. Use the current harness's available search, browser and document

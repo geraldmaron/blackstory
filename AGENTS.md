@@ -38,7 +38,7 @@ Operator-cli verbs have no skill of their own; `research-framework` routes to
 
 **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
-  `ringer-review`, `surface-triage`, `intake-review`, `experience-review`) carry decision order, source ladders, and Do/Never. They
+  `ringer-review`, `surface-triage`, `intake-review`, `experience-review`, `brand-content`) carry decision order, source ladders, and Do/Never. They
   have no operator-cli verb of their own.
 
 The `locate` verb Census-geocodes a sourced address (no LLM). Finding the place, confirming
