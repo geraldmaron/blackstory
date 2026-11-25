@@ -265,7 +265,9 @@ function outputs() {
 
   // Mobile launcher icons.
   const mobile = 'apps/mobile/assets/images';
+  // icon.png is the app's icon everywhere; iOS also takes icon-dark.png for a dark home screen.
   apps.push([`${mobile}/icon.png`, tile('light', 1024, APP)]);
+  apps.push([`${mobile}/icon-dark.png`, tile('dark', 1024, APP)]);
   apps.push([`${mobile}/favicon.png`, tile('light', 48, TAB)]);
   // Android adaptive: the foreground keeps inside the middle two thirds the launcher shows.
   apps.push([

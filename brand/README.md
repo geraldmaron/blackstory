@@ -103,7 +103,7 @@ paper cover and paper letters.
 | `apps/web/public/brand` only | `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `icon-maskable-dark-512.png`, `email-lockup.png` |
 | `apps/web/src/app/front` | `live-lockup.css`, the numbers for the one place the web sets the wordmark as live text |
 | `apps/mobile/assets/brand` | the lockup and the 1024 symbol |
-| `apps/mobile/assets/images` | `icon.png`, `favicon.png`, and Android's `android-icon-{foreground,background,monochrome}.png` |
+| `apps/mobile/assets/images` | `icon.png`, `icon-dark.png` (iOS, dark home screen), `favicon.png`, and Android's `android-icon-{foreground,background,monochrome}.png` |
 
 Web code reaches these through `BRAND_ASSETS` in `packages/config`, never by file name.
 

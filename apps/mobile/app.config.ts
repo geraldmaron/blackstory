@@ -237,7 +237,12 @@ const config: ExpoConfig = {
     // against SDK 56; the app now runs SDK 57 and nothing asserts this value.
     deploymentTarget: '16.4',
     bundleIdentifier,
-    icon: './assets/expo.icon',
+    // The kit's launcher icons (brand/scripts/build-kit.mjs): the symbol on Archive Paper, and on
+    // Black Ink when the home screen is dark.
+    icon: {
+      light: './assets/images/icon.png',
+      dark: './assets/images/icon-dark.png',
+    },
     //
     // App Store export-compliance declaration. The app uses only exempt
     // encryption (standard HTTPS/TLS via the OS), so declare no use of
