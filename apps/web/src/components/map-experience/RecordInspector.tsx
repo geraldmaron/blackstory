@@ -19,7 +19,7 @@ import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icon
 import { evidenceCountPhrase } from '../../lib/map-experience/evidence-grade';
 import { precisionInWords } from '../../lib/map-experience/geo-precision';
 import { placeDetail } from '../../lib/map-experience/place-label';
-import { kindLabelForMark } from '../entity/record-mark';
+import { entityPrimaryImageAlt, kindLabelForMark } from '../entity/record-mark';
 import { GradeTag } from '../evidence/EvidenceList';
 import { confidenceLevelFor } from './ExploreRecordList';
 import './record-inspector.css';
@@ -88,7 +88,11 @@ export function RecordInspector({ record, position, onStep, className }: RecordI
       {record.photoUrl ? (
         <figure className="ds-inspector__photo">
           {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
-          <img src={record.photoUrl} alt={record.photoAlt ?? ''} decoding="async" />
+          <img
+            src={record.photoUrl}
+            alt={entityPrimaryImageAlt(record.photoAlt, record.name)}
+            decoding="async"
+          />
           <figcaption>
             {record.photoCredit ? <span>{record.photoCredit}</span> : null}
             <span>The photograph’s date is not on record.</span>

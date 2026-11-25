@@ -3,9 +3,11 @@
 /**
  * The reader's "Hold still" switch over the world (design-direction-v11.md §4.1): it stops camera
  * motion. The "Read as documents" switch was removed; documents mode still applies where WebGL is
- * missing (map-libre-lifecycle.ts).
+ * missing (map-libre-lifecycle.ts). On the memorial it stops the wall of names
+ * (MemorialWallAtmosphere), and the region is named for that.
  */
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   HOLD_STILL_KEY,
   READ_AS_DOCUMENTS_KEY,
@@ -25,6 +27,7 @@ void React;
 export function WorldControls({ inline = false }: { readonly inline?: boolean } = {}) {
   const [still, setStill] = useState(false);
   const [documents, setDocuments] = useState(false);
+  const onMemorial = usePathname() === '/memorial';
   useEffect(() => {
     setStill(holdStill());
     setDocuments(readAsDocuments());
@@ -36,7 +39,7 @@ export function WorldControls({ inline = false }: { readonly inline?: boolean } 
   return (
     <section
       className={inline ? 'ds-world-controls ds-world-controls--inline' : 'ds-world-controls'}
-      aria-label="Map display"
+      aria-label={onMemorial ? 'Memorial wall motion' : 'Map display'}
       data-documents={documents ? '' : undefined}
     >
       {documents ? null : (

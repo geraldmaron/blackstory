@@ -205,7 +205,7 @@ const C = {
   copperText: '#8E4F2A',
 };
 const SANS = "Geist, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
-const HEAD = "'Schibsted Grotesk', Geist, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
+const HEAD = "'Outfit', Geist, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
 const MONO = "'Geist Mono', ui-monospace, Menlo, Consolas, monospace";
 
 function renderHtml(e: Email): string {

@@ -59,7 +59,7 @@ import { ExploreRecordList } from '../../components/map-experience/ExploreRecord
 import { RecordInspector } from '../../components/map-experience/RecordInspector';
 import { DecadeBrush } from '../../components/map-experience/DecadeBrush';
 import { PlaceControl, type PlaceResolved } from '../../components/map-experience/PlaceControl';
-import { MapControls } from '../../components/map-experience/MapControls';
+import { MapControls, PAN_OFFSETS } from '../../components/map-experience/MapControls';
 import {
   distanceLabel,
   nearbyFrame,
@@ -87,7 +87,10 @@ import { usePanelVisibility } from './hooks/use-panel-visibility';
 import { useSavedCollection } from './hooks/use-saved-collection';
 import { useLensFilters } from './hooks/use-lens-filters';
 import { useMapSync } from './hooks/use-map-sync';
-import { usePopulationChoropleth } from './hooks/use-population-choropleth';
+import {
+  populationChoroplethRequest,
+  usePopulationChoropleth,
+} from './hooks/use-population-choropleth';
 import { useAtlasCamera } from './hooks/use-atlas-camera';
 import { useReducedMotion } from '../../lib/motion/use-reduced-motion';
 import { CAMERA_EASING_SLOW_OUT } from '../../lib/map-experience/camera-presets';
@@ -113,6 +116,10 @@ void React;
 
 /** A zoom button step: short, ease-out, a cut under reduced motion. */
 const ZOOM_STEP_MS = 250;
+/** One press of a pan button, the distance MapLibre's own arrow keys move. */
+const PAN_STEP_PX = 100;
+/** How long the catalog may load before the column offers the list view instead. */
+const SLOW_LOAD_MS = 12_000;
 /** Entering or leaving a place: one quick flight, a cut under reduced motion. */
 const PLACE_FLIGHT_MS = 700;
 
@@ -160,6 +167,13 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
   const view = useMemo(() => hydrateExploreViewModel(initial), [initial]);
   const toasts = useToasts();
   const ready = Boolean(view.collectionFacts);
+  /* No deadline on the fetch itself: a slow link that is still making progress is not cut off. */
+  const [slowLoad, setSlowLoad] = useState(false);
+  useEffect(() => {
+    if (ready) return;
+    const timer = window.setTimeout(() => setSlowLoad(true), SLOW_LOAD_MS);
+    return () => window.clearTimeout(timer);
+  }, [ready]);
 
   const {
     mode,
@@ -1084,9 +1098,9 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
        else. `handleKeyStroke` walks up from the keystroke's target looking for it. */
     <div
       className={embedded ? 'ds-atlas ds-atlas--embedded' : 'ds-atlas'}
-      inert={!ready}
       aria-busy={!ready}
-      data-key-scope="instrument"
+      // No scope until the catalog is here: the bare keys act on records that have not arrived.
+      data-key-scope={ready ? 'instrument' : undefined}
       data-chrome={chromeHidden ? 'hidden' : 'shown'}
       data-mode={mode}
       data-detent={phone ? shownDetent : undefined}
@@ -1194,11 +1208,22 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
           }
         >
           {!ready ? (
-            <div className="ds-xcol__loading" aria-hidden="true">
-              {Array.from({ length: 8 }, (_, index) => (
-                <span key={index} />
-              ))}
-            </div>
+            <>
+              {/* Mounted empty, so the sentence is announced once, when it arrives. */}
+              <div role="status">
+                {slowLoad ? (
+                  <p className="ds-xcol__note">
+                    The records are still loading. You can <a href={listHref}>open the list view</a>{' '}
+                    while you wait.
+                  </p>
+                ) : null}
+              </div>
+              <div className="ds-xcol__loading" aria-hidden="true">
+                {Array.from({ length: 8 }, (_, index) => (
+                  <span key={index} />
+                ))}
+              </div>
+            </>
           ) : inspector ? (
             <RecordInspector
               record={inspector}
@@ -1227,6 +1252,8 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
                     layerMode={layerMode}
                     onLayerModeChange={setLayerMode}
                     areaFillPermitted={areaFillPermitted}
+                    densityLevels={view.densityLevels}
+                    population={populationChoroplethRequest(layerMode, view.viewState)}
                     layers={layers}
                     onLayerToggle={(layer) =>
                       setLayers((current) => ({ ...current, [layer]: !current[layer] }))
@@ -1241,13 +1268,27 @@ export function AtlasExperience({ initial, embedded = false }: AtlasExperiencePr
       )}
 
       {!phone && !chromeHidden && mode === 'atlas' ? (
-        <div className="ds-xdock" data-ground="ink">
+        <div className="ds-xdock" data-ground="ink" inert={!ready}>
           {brush}
         </div>
       ) : null}
 
       {mode === 'atlas' && !chromeHidden && stage.mapAvailable ? (
         <MapControls
+          inert={!ready}
+          onPan={(direction) => {
+            const map = stage.getMap();
+            if (!map) return;
+            const [x, y] = PAN_OFFSETS[direction];
+            // `panBy` written out (the stage's camera type carries `easeTo`, not `panBy`): hold
+            // the center and offset it the other way, which is what MapLibre's `panBy` does.
+            map.easeTo({
+              center: map.getCenter(),
+              offset: [-x * PAN_STEP_PX, -y * PAN_STEP_PX],
+              duration: reducedMotion ? 0 : ZOOM_STEP_MS,
+              easing: CAMERA_EASING_SLOW_OUT,
+            } as never);
+          }}
           onZoom={(delta) => {
             const map = stage.getMap();
             if (!map) return;

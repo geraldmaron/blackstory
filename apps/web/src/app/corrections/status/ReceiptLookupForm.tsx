@@ -25,7 +25,7 @@ export function ReceiptLookupForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const code = String(new FormData(event.currentTarget).get('receiptCode') ?? '')
-      .trim()
+      .replace(/[\s.]+/g, '')
       .toUpperCase();
     if (!code) {
       setError('Enter the receipt code you were given when you sent the correction.');
@@ -46,7 +46,7 @@ export function ReceiptLookupForm() {
           </>
         }
         htmlFor={receiptCodeId}
-        hint="It looks like BB-COR followed by sixteen letters and numbers."
+        hint="It looks like BB-COR followed by sixteen characters, the digits 0 to 9 and the letters A to F."
         {...(error ? { error } : {})}
       >
         <input

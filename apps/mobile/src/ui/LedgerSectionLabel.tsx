@@ -20,6 +20,8 @@ export function LedgerSectionLabel({ children, meta, ruleAbove = false }: Ledger
   return (
     <View
       style={styles.wrap}
+      // `accessible` is what makes iOS honor the role and label; without it the rotor is empty.
+      accessible
       accessibilityRole="header"
       accessibilityLabel={meta ? `${children}, ${meta}` : children}
     >

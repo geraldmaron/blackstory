@@ -11,12 +11,17 @@
  * Chrome. A caller-supplied `onPress` decides the destination, so no hint is derived for it; pass
  * `accessibilityHint` to state one, or to override the derived one.
  */
+import { useState } from 'react';
 import { Linking, Pressable, StyleSheet, type PressableProps } from 'react-native';
 import { Text, type TextProps } from './Text';
+import { useAnnounceOnChange } from './useAnnounceOnChange';
 import { MIN_TOUCH_TARGET, radius, useThemeColors } from './tokens';
 
 /** Spoken hint for any control that hands the reader off to the system browser. */
 export const EXTERNAL_LINK_HINT = 'Opens in your browser';
+
+/** Shown and announced when the system refuses the URL. Same words as `CitationLink`. */
+export const LINK_OPEN_FAILED = 'This link could not be opened.';
 
 /** The browser hint for a web `href`; undefined for anything that is not http(s). */
 export function externalLinkHint(href: string): string | undefined {
@@ -43,39 +48,50 @@ export function Link({
 }: LinkProps) {
   const theme = useThemeColors();
   const hint = accessibilityHint ?? (onPress ? undefined : externalLinkHint(href));
+  const [failed, setFailed] = useState(false);
+  useAnnounceOnChange(failed ? LINK_OPEN_FAILED : null);
 
   const handlePress = () => {
     if (onPress) {
       onPress();
       return;
     }
+    // Cleared first so a second failure in a row is announced again.
+    setFailed(false);
     Linking.openURL(href).catch(() => {
-      // Swallow: an unreachable/unsupported URL should not crash the app.
-      // A future MOB-018 observability pass may log this (without the URL,
-      // per the program's privacy posture) if it proves to matter.
+      // An unreachable/unsupported URL must not crash the app, and must not fail silently
+      // either. Nothing is logged (the URL stays out of logs, per the privacy posture).
+      setFailed(true);
     });
   };
 
   return (
-    <Pressable
-      accessibilityRole="link"
-      accessibilityLabel={accessibilityLabel ?? children}
-      {...(hint ? { accessibilityHint: hint } : {})}
-      hitSlop={{ left: 8, right: 8 }}
-      onPress={handlePress}
-      android_ripple={{ color: theme.border }}
-      // Tint on press. The box itself is at least 44pt tall, so the visible target clears the
-      // floor without leaning on an invisible vertical hitSlop; the text stays centered in it.
-      style={({ pressed }) => [
-        styles.pressable,
-        pressed ? { backgroundColor: theme.border } : null,
-      ]}
-      {...rest}
-    >
-      <Text variant={textRole} style={{ color: theme.accent, textDecorationLine: 'underline' }}>
-        {children}
-      </Text>
-    </Pressable>
+    <>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={accessibilityLabel ?? children}
+        {...(hint ? { accessibilityHint: hint } : {})}
+        hitSlop={{ left: 8, right: 8 }}
+        onPress={handlePress}
+        android_ripple={{ color: theme.border }}
+        // Tint on press. The box itself is at least 44pt tall, so the visible target clears the
+        // floor without leaning on an invisible vertical hitSlop; the text stays centered in it.
+        style={({ pressed }) => [
+          styles.pressable,
+          pressed ? { backgroundColor: theme.border } : null,
+        ]}
+        {...rest}
+      >
+        <Text variant={textRole} style={{ color: theme.accent, textDecorationLine: 'underline' }}>
+          {children}
+        </Text>
+      </Pressable>
+      {failed ? (
+        <Text variant="caption" colorRole="inkMuted" accessibilityLiveRegion="polite">
+          {LINK_OPEN_FAILED}
+        </Text>
+      ) : null}
+    </>
   );
 }
 

@@ -28,12 +28,20 @@ import { RecordLink } from './record-link';
 import { legText, shortPlace } from './journey';
 import { loadRecordsIndex, recordsQueryCacheKey } from '../records/load-records-index';
 import { FRONT_ROUTES } from './front-routes';
-import { RETELLING_SENTENCES, RETELLING_TAGLINE, archiveSentence } from './retelling-copy';
+import {
+  FRONT_CONTENTS,
+  FRONT_START,
+  RETELLING_CLOSING,
+  RETELLING_SENTENCES,
+  RETELLING_TAGLINE,
+  archiveSentence,
+} from './retelling-copy';
 import { RetellingFilm, type RetellingStop } from './retelling-film';
 import { RETELLING_PICKS, pickedRecord } from './retelling-picks';
 import { RETELLING_SCENES, isRecordScene, type RetellingSceneId } from './retelling-scenes';
 import { TownField } from './town-field';
 import './front.css';
+import './live-lockup.css';
 
 void React;
 
@@ -53,16 +61,21 @@ function SceneWord({ prefix, heading }: { readonly prefix: string; readonly head
   );
 }
 
-/** The official artwork. The wordmark is never retyped beside a symbol. */
+/**
+ * The official artwork, cropped to its ink by the kit (brand/scripts/build-kit.mjs), so nothing
+ * here has to know where the letters end. 1274 by 354 is that crop's own shape.
+ */
 function Lockup() {
-  // eslint-disable-next-line @next/next/no-img-element -- brand artwork
-  return <img src={BRAND_ASSETS.lockup.dark} alt="BlackStory" width={800} height={450} />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- brand artwork
+    <img src={BRAND_ASSETS.vector.lockupTight.dark} alt="BlackStory" width={1274} height={354} />
+  );
 }
 
 export async function Retelling({
   returning = false,
 }: {
-  /** On the front page a reader who has seen the opening lands on the last scene. */
+  /** On the front page a reader who has seen the opening is not shown the year count again. */
   readonly returning?: boolean;
 }) {
   const [{ pins, features, densityLevels }, { data: entities }, { model }] = await Promise.all([
@@ -203,38 +216,67 @@ export async function Retelling({
             <div className="ds-scene__pin">
               <div className="ds-scene__words">
                 {scene.id === 'history' ? (
-                  // The page's title is the brand, on the first screen, in the slot where the
-                  // changing word will stand. "History" stays the section's heading for a
-                  // screen reader and the rail.
+                  // The first screen is the brand's own panel: the mark as the page's title, the
+                  // brand line, what the archive is and the two ways on. "History" stays this
+                  // section's heading for a screen reader and the rail; the persistent word
+                  // shows it as the scroll leaves this screen.
                   <h1 className="ds-scene__heading ds-scene__heading--mark">
                     <Lockup />
                   </h1>
                 ) : null}
-                {scene.kind === 'country' ? (
-                  <h2 className="ds-scene__heading ds-scene__heading--mark" id={`${scene.id}-h`}>
-                    <Lockup />
-                  </h2>
-                ) : (
-                  <h2 className="ds-scene__heading" id={`${scene.id}-h`}>
+                <h2 className="ds-scene__heading" id={`${scene.id}-h`}>
+                  {scene.kind === 'country' ? (
+                    // The name, read once. What is seen is "Black History", set in the
+                    // wordmark's own face (the site's display face) at its own spacing, closing into
+                    // "BlackStory" as the scene lands: the "Hi" and the space shut and the "s"
+                    // takes its capital. The typed word is then the wordmark itself, and the
+                    // symbol comes in beside it where the lockup has it (front.css).
+                    <>
+                      <span className="ds-visually-hidden">{scene.heading}</span>
+                      <span className="ds-scene__closing" aria-hidden="true">
+                        <span className="ds-scene__closing-word">
+                          Black
+                          <span data-part="hi">
+                            <span> Hi</span>
+                          </span>
+                          <span data-part="s">
+                            <span>s</span>
+                          </span>
+                          <span data-part="cap">
+                            <span>S</span>
+                          </span>
+                          tory
+                        </span>
+                        {/* eslint-disable-next-line @next/next/no-img-element -- brand artwork */}
+                        <img
+                          className="ds-scene__closing-mark"
+                          src={BRAND_ASSETS.vector.symbol.dark}
+                          alt=""
+                        />
+                      </span>
+                    </>
+                  ) : (
                     <SceneWord prefix={scene.prefix} heading={scene.heading} />
-                  </h2>
-                )}
-                {scene.kind === 'country' ? (
+                  )}
+                </h2>
+                {scene.id === 'history' ? (
                   <>
                     <p className="ds-scene__tagline">{RETELLING_TAGLINE}</p>
                     <p className="ds-scene__sentence">{archiveSentence(total)}</p>
                     <p className="ds-scene__ways">
+                      <a href={`#${RETELLING_SCENES[i + 1]!.id}`}>{FRONT_START}</a>
+                      <a href="#contents">{FRONT_CONTENTS}</a>
+                    </p>
+                  </>
+                ) : scene.kind === 'country' ? (
+                  <>
+                    <p className="ds-scene__tagline">{RETELLING_CLOSING}</p>
+                    <p className="ds-scene__ways">
                       <Link href={FRONT_ROUTES.method}>How coverage works</Link>
-                      <a href="#history" data-watch="" hidden>
-                        Watch the opening
-                      </a>
                     </p>
                   </>
                 ) : (
-                  <p className="ds-scene__sentence">
-                    {/* The span is the line's own ink ground where it crosses the lights. */}
-                    <span>{RETELLING_SENTENCES[scene.id]}</span>
-                  </p>
+                  <p className="ds-scene__sentence">{RETELLING_SENTENCES[scene.id]}</p>
                 )}
               </div>
               {scene.id === 'history' && firstDecade !== null && lastDecade !== null ? (

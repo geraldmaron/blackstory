@@ -80,8 +80,8 @@ describe('a pick against the live record', () => {
 });
 
 describe('the scene sentences', () => {
-  it('gives every scene but the last one sentence', () => {
-    for (const scene of RETELLING_SCENES.slice(0, -1)) {
+  it('gives every scene between the brand panel and the name one sentence', () => {
+    for (const scene of RETELLING_SCENES.slice(1, -1)) {
       const sentence = RETELLING_SENTENCES[scene.id];
       assert.ok(sentence, scene.id);
       assert.equal(sentence.match(/[.!?]/g)?.length, 1, `${scene.id}: one sentence`);

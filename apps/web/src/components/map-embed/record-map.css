@@ -40,7 +40,9 @@
   opacity: 1;
 }
 
-.ds-record-map__canvas:focus-visible {
+/* MapLibre's own <canvas> is the focusable element, and the frame clips an outset ring. */
+.ds-record-map__canvas:focus-visible,
+.ds-record-map__canvas canvas:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-focus-ring);
   outline-offset: calc(-1 * var(--ds-focus-width));
 }
@@ -183,6 +185,15 @@
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+/* The zoom pair (the map's own buttons, map-controls.css), top right: the place token holds the
+   bottom left and the credit the bottom right. */
+.ds-record-map__zoom {
+  position: absolute;
+  top: var(--ds-space-3);
+  right: var(--ds-space-3);
+  z-index: 2; /* local: above the canvas within this frame only */
 }
 
 /* Hover answers like the plate's own token: the numeral takes the type color, the name underlines

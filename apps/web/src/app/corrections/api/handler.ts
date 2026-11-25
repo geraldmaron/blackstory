@@ -399,7 +399,10 @@ export async function buildDefaultCorrectionRouteDependencies(): Promise<Correct
 }
 
 export function resolveReceiptCodeFromPath(receiptCode: string): string {
-  return decodeURIComponent(receiptCode).trim();
+  // A hand-typed address arrives in any case, and a pasted code with spaces or a closing period.
+  return decodeURIComponent(receiptCode)
+    .replace(/[\s.]+/g, '')
+    .toUpperCase();
 }
 
 export async function lookupPublicStatusByReceipt(

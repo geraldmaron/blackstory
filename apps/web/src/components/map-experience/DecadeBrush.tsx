@@ -3,14 +3,15 @@
  *
  * Bars are documented decades (`collection-period.ts`), never event years. Neutral at rest; drag
  * across them to brush a range, which draws in ink with copper handles. A click picks one decade,
- * the handles nudge either edge (pointer or arrow keys), and the x clears it. The draft range
+ * the handles nudge either edge (pointer or arrow keys), and the x clears it. The From and To
+ * selects set the same range without a drag (WCAG 2.5.7). The draft range
  * follows the pointer; the filter commits on release, so a drag across the archive does not
  * re-filter thousands of records on every frame.
  */
 'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
-import { cx } from '@repo/ui';
+import { buttonClassName, cx } from '@repo/ui';
 import type { DecadeBar } from '../../lib/map-experience/decade-density';
 import { MapKey } from './MapKey';
 import './decade-brush.css';
@@ -45,6 +46,32 @@ export function decadeRangeLabel(range: DecadeRange): string {
   return range.start === range.end ? `${range.start}s` : `${range.start}s to ${range.end}s`;
 }
 
+/** A range that spans every bar is no range: it would only drop the undated records. */
+export function committedRange(
+  bars: readonly DecadeBar[],
+  next: DecadeRange | null,
+): DecadeRange | null {
+  const whole = next !== null && next.start === bars[0]?.decade && next.end === bars.at(-1)?.decade;
+  return whole ? null : next;
+}
+
+/**
+ * The range a From or To choice makes. With no range the other end rests on the archive's own
+ * end, as the handles do; a choice past the other end brings that end along with it.
+ */
+export function rangeWithEnd(
+  bars: readonly DecadeBar[],
+  range: DecadeRange | null,
+  edge: 'start' | 'end',
+  decade: number,
+): DecadeRange {
+  const start = range?.start ?? bars[0]?.decade ?? decade;
+  const end = range?.end ?? bars.at(-1)?.decade ?? decade;
+  return edge === 'start'
+    ? { start: decade, end: Math.max(decade, end) }
+    : { start: Math.min(decade, start), end: decade };
+}
+
 type Drag =
   | { readonly kind: 'brush'; readonly anchor: number; readonly moved: boolean }
   | { readonly kind: 'edge'; readonly edge: 'start' | 'end' };
@@ -63,13 +90,8 @@ export function DecadeBrush({ bars, range, onChange, className }: DecadeBrushPro
   // With no range the handles rest on the archive's two ends, so the keyboard can start one.
   const startIndex = active ? indexOf(shown!.start) : 0;
   const endIndex = active ? indexOf(shown!.end) : bars.length - 1;
-  /** A range that spans every bar is no range: it would only drop the undated records. */
   const commit = useCallback(
-    (next: DecadeRange | null) => {
-      const whole =
-        next !== null && next.start === bars[0]?.decade && next.end === bars.at(-1)?.decade;
-      onChange(whole ? null : next);
-    },
+    (next: DecadeRange | null) => onChange(committedRange(bars, next)),
     [bars, onChange],
   );
 
@@ -251,6 +273,32 @@ export function DecadeBrush({ bars, range, onChange, className }: DecadeBrushPro
           </div>
         ) : null}
       </div>
+
+      {first && last ? (
+        <div className="ds-xbrush__ends">
+          {(['start', 'end'] as const).map((edge) => (
+            <label key={edge} className="ds-xbrush__end">
+              <span className="ds-xbrush__end-label">{edge === 'start' ? 'From' : 'To'}</span>
+              <select
+                className={buttonClassName('secondary', 'ds-xbrush__select')}
+                value={
+                  (edge === 'start' ? range?.start : range?.end) ??
+                  (edge === 'start' ? first : last).decade
+                }
+                onChange={(event) =>
+                  commit(rangeWithEnd(bars, range, edge, Number(event.currentTarget.value)))
+                }
+              >
+                {bars.map((bar) => (
+                  <option key={bar.decade} value={bar.decade}>
+                    {bar.decade}s
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

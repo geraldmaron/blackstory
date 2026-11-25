@@ -37,11 +37,18 @@ export const BRAND_ASSETS = {
     light: '/brand/symbol-light.png',
     dark: '/brand/symbol-dark.png',
   },
+  /** The same marks as vectors (brand/vector), for anything shown larger than the PNGs. */
+  vector: {
+    lockup: { light: '/brand/lockup-light.svg', dark: '/brand/lockup-dark.svg' },
+    /** The lockup cropped to its ink, with no margin of its own. */
+    lockupTight: { light: '/brand/lockup-tight-light.svg', dark: '/brand/lockup-tight-dark.svg' },
+    symbol: { light: '/brand/symbol-light.svg', dark: '/brand/symbol-dark.svg' },
+  },
   // Opaque 1200×630 composites (no alpha). `v=` busts scraper caches when the
   // asset is regenerated — iMessage / Slack keep stale previews otherwise.
   openGraph: {
-    light: '/brand/open-graph-light-1200x630.png?v=20260721',
-    dark: '/brand/open-graph-dark-1200x630.png?v=20260721',
+    light: '/brand/open-graph-light-1200x630.png?v=20261124',
+    dark: '/brand/open-graph-dark-1200x630.png?v=20261124',
   },
   favicon: {
     light: {

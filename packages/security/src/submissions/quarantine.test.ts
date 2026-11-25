@@ -82,6 +82,36 @@ test('rejects submissions that exceed the independent frequency policy', () => {
   }
 });
 
+test('the messages a reader sees name what to fix and the limit, in plain words', () => {
+  const messages = (input: unknown, options = {}) => {
+    const result = validateAndNormalizeSubmission(input, options);
+    return result.valid ? [] : result.issues.map((entry) => entry.message);
+  };
+  const nowMs = 1_700_000_000_000;
+  const all = [
+    ...messages({ nope: true }),
+    ...messages({ ...VALID_SUBMISSION, statement: 'too short' }),
+    ...messages({ ...VALID_SUBMISSION, statement: 'long enough to count. '.repeat(400) }),
+    ...messages({ ...VALID_SUBMISSION, targetRecordId: 'r'.repeat(129) }),
+    ...messages({ ...VALID_SUBMISSION, submitterContact: 'c'.repeat(321) }),
+    ...messages({ ...VALID_SUBMISSION, statement: `${VALID_SUBMISSION.statement}\u0007` }),
+    ...messages(VALID_SUBMISSION, {
+      nowMs,
+      recentSubmissionTimestamps: Array.from({ length: 8 }, (_, index) => nowMs - index),
+    }),
+  ];
+  assert.deepEqual(all, [
+    'This could not be read as it was sent. Reload the page and send it again.',
+    'Say a little more. What you wrote needs at least 20 characters.',
+    'What you wrote is too long. Keep it to 6,000 characters or fewer.',
+    'Name the record or paste its page address, in 128 characters or fewer.',
+    'Check the email address. It can be up to 320 characters, typed rather than pasted from a document.',
+    'Something you pasted carries hidden characters that cannot be accepted. Retype that part and send it again.',
+    'No more than 8 can be sent in 60 minutes. Wait a while, then send it again.',
+  ]);
+  assert.doesNotMatch(all.join(' '), /schema|policy|Submission|Submitter|identifier/);
+});
+
 test('scores deterministic spam signals without auto-promoting content', () => {
   const assessment = scoreSubmissionSpam({
     kind: 'contribution',

@@ -59,7 +59,7 @@ export const TYPE_SCALE = {
   display: { size: 36, lineHeight: 40, weight: '800', family: 'display' as const },
   /** Web --ds-weight-headline 700. Screen and section titles. */
   headline: { size: 26, lineHeight: 32, weight: '700', family: 'display' as const },
-  /** Web --ds-weight-title 650; the nearest loaded Schibsted cut is 600. Rows and sub-sections. */
+  /** Web --ds-weight-title 650; the nearest loaded Outfit cut is 600. Rows and sub-sections. */
   title: { size: 20, lineHeight: 26, weight: '600', family: 'display' as const },
   body: { size: 16, lineHeight: 24, weight: '400', family: 'uiBody' as const },
   bodyEmphasis: { size: 16, lineHeight: 24, weight: '600', family: 'uiBody' as const },
@@ -74,10 +74,10 @@ export const TYPE_SCALE = {
 
 /**
  * Logo/clear-space constraints, transcribed from
- * brand/guide/pages/03-usage-rules.png ("Usage Rules", BlackStory Brand
+ * brand/source/generated-2026-07-18/guide/pages/03-usage-rules.png ("Usage Rules", BlackStory Brand
  * Guide v1.0) — read visually, not measured from source vector files (the
  * guide is a flattened PNG export, not editable art). Re-verify against the
- * PDF (`brand/guide/pdf/BlackStory-Brand-Guide.pdf`) if these ever need
+ * PDF (`brand/source/generated-2026-07-18/guide/pdf/BlackStory-Brand-Guide.pdf`) if these ever need
  * higher-precision figures than the guide page states.
  */
 export const LOGO_CONSTRAINTS = {

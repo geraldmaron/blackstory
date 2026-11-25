@@ -174,10 +174,10 @@ export function AppBottomSheet({
         onAccessibilityAction={handleAccessibilityAction}
         testID="app-bottom-sheet-handle"
       >
-        <View style={[styles.handlePill, { backgroundColor: theme.border }]} />
+        <View style={[styles.handlePill, { backgroundColor: theme.borderControl }]} />
       </View>
     ),
-    [handleAccessibilityAction, snapCount, targetIndex, theme.border],
+    [handleAccessibilityAction, snapCount, targetIndex, theme.borderControl],
   );
 
   const handleChange = useCallback(

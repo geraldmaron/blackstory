@@ -68,9 +68,14 @@ export {
   type UtilityScreenShellProps,
   type UtilityScreenShellScrollProps,
 } from './UtilityScreenShell';
+export { Chip, type ChipProps } from './Chip';
+export { SearchField, type SearchFieldProps } from './SearchField';
 export { CorrectionTextField, type CorrectionTextFieldProps } from './CorrectionTextField';
 export { NavIcon, navIconForEntityKind, type NavIconProps, type NavIconName } from './NavIcon';
 export { ApiStatusBanner, type ApiStatusBannerProps } from './ApiStatusBanner';
 export { DevMenuHeaderButton } from './DevMenuHeaderButton';
 export { useAccessibilityFocus } from './useAccessibilityFocus';
 export { useAnnounceOnMount } from './useAnnounceOnMount';
+export { useAnnounceOnChange } from './useAnnounceOnChange';
+export { useBackDismiss } from './useBackDismiss';
+export { linesForFontScale, LARGE_TYPE_THRESHOLD } from './large-type';

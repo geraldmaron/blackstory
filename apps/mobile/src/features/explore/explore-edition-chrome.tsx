@@ -5,7 +5,7 @@
 import type { ReactNode, Ref } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Surface, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
+import { Surface, Text, space, useThemeColors, MIN_TOUCH_TARGET, Chip } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
 
 const MIN_TOUCH = MIN_TOUCH_TARGET;
@@ -208,28 +208,14 @@ export function ExploreRestoreChip({
   selected = false,
   testID,
 }: ExploreRestoreChipProps) {
-  const theme = useThemeColors();
-
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ selected }}
+    <Chip
+      label={label}
+      selected={selected}
       onPress={onPress}
       testID={testID}
-      style={({ pressed }) => [
-        styles.restoreChip,
-        {
-          backgroundColor: selected ? theme.surfaceRaised : theme.surface,
-          borderColor: selected ? theme.accent : theme.border,
-          opacity: pressed ? 0.85 : 1,
-        },
-      ]}
-    >
-      <Text variant="meta" style={{ color: selected ? theme.accent : theme.inkMuted }}>
-        {label}
-      </Text>
-    </Pressable>
+      style={styles.restoreChip}
+    />
   );
 }
 
@@ -326,12 +312,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   restoreChip: {
-    minHeight: MIN_TOUCH,
     paddingHorizontal: space['2'],
-    borderRadius: radius.sm,
-    borderWidth: StyleSheet.hairlineWidth,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   instrumentsFrame: {
     maxHeight: '55%',

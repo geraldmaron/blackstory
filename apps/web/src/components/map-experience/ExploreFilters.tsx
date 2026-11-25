@@ -23,6 +23,7 @@ import {
 import { AREA_FILL_REFUSAL_NOTE } from '../../lib/map-experience/lens-composition';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import type { ExploreRowSort } from '../../lib/map-experience/explore-rows';
+import { LayerLegend, type LayerLegendProps } from './LayerLegend';
 import { MapKey } from './MapKey';
 import './explore-refine.css';
 
@@ -76,6 +77,9 @@ export type ExploreFiltersProps = {
   readonly onLayerModeChange: (mode: ExploreLayerMode) => void;
   /** False while a violence-adjacent topic is active (`lensPermitsAreaFill`): no area fill paints. */
   readonly areaFillPermitted: boolean;
+  /** What the active shading layer is drawing, for its key. */
+  readonly densityLevels?: LayerLegendProps['densityLevels'];
+  readonly population?: LayerLegendProps['population'];
   readonly layers: ExploreFilterLayers;
   readonly onLayerToggle: (layer: keyof ExploreFilterLayers) => void;
 
@@ -116,6 +120,8 @@ export function ExploreFilters({
   layerMode,
   onLayerModeChange,
   areaFillPermitted,
+  densityLevels,
+  population,
   layers,
   onLayerToggle,
   className,
@@ -249,6 +255,9 @@ export function ExploreFilters({
           <p className="ds-xrefine__note">
             Census decennial counts of residents, not records. Not comparable with record density.
           </p>
+        ) : null}
+        {areaFillPermitted && layerMode !== 'off' ? (
+          <LayerLegend mode={layerMode} densityLevels={densityLevels} population={population} />
         ) : null}
       </Group>
 

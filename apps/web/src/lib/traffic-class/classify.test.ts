@@ -8,6 +8,7 @@ import { AI_TRAINING_USER_AGENTS } from './agent-lists';
 import {
   buildTrafficEventPayload,
   classifyTraffic,
+  shouldCountAnalyticsEvent,
   shouldSendTrafficEvent,
   TRAFFIC_CLASSES,
   TRAFFIC_EVENT_NAME,
@@ -123,4 +124,27 @@ test('the traffic event is sampled, not sent on every navigation', () => {
   assert.equal(shouldSendTrafficEvent(TRAFFIC_EVENT_SAMPLE_RATE - 1e-9), true);
   assert.equal(shouldSendTrafficEvent(TRAFFIC_EVENT_SAMPLE_RATE), false);
   assert.equal(shouldSendTrafficEvent(0.999), false);
+});
+
+test('analytics keeps human pageviews on blackstory.app and drops aliases and automation', () => {
+  const view = (url: string) => ({ type: 'pageview' as const, url });
+  assert.equal(
+    shouldCountAnalyticsEvent(view('https://blackstory.app/archive'), 'likely_human'),
+    true,
+  );
+  assert.equal(
+    shouldCountAnalyticsEvent(view('https://www.blackstory.app/'), 'likely_human'),
+    true,
+  );
+  assert.equal(
+    shouldCountAnalyticsEvent(view('https://blackstory-admin.vercel.app/'), 'likely_human'),
+    false,
+  );
+  assert.equal(shouldCountAnalyticsEvent(view('http://localhost:3048/'), 'likely_human'), false);
+  assert.equal(shouldCountAnalyticsEvent(view('https://blackstory.app/'), 'automated'), false);
+  assert.equal(shouldCountAnalyticsEvent(view('not a url'), 'likely_human'), false);
+  assert.equal(
+    shouldCountAnalyticsEvent({ type: 'event', url: 'https://blackstory.app/' }, 'automated'),
+    true,
+  );
 });

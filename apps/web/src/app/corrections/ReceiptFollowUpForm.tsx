@@ -17,19 +17,28 @@ import {
   isEmail,
   isHttpsUrl,
 } from '../../components/forms/validators';
-import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+import { postJsonWithRequestIntegrity } from '../../lib/request-integrity/client';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
-import { MIN_STATEMENT_LENGTH } from './correction-form';
+import {
+  MAX_CONTACT_LENGTH,
+  MAX_STATEMENT_LENGTH,
+  MIN_STATEMENT_LENGTH,
+  tooLongMessage,
+} from './correction-intake';
+
+const STATEMENT_LIMIT_HINT = `Up to ${MAX_STATEMENT_LENGTH.toLocaleString('en-US')} characters.`;
 
 void React;
 
 export type FollowUpKind = 'appeal' | 'abuse';
 
+const FOLLOW_UP_FIELDS = new Set(['statement', 'sourceUrl', 'contact', 'privacyConsent']);
+
 const COPY = {
   appeal: {
     endpoint: '/corrections/appeal/api',
     statementLabel: 'Why should the outcome change?',
-    statementHint: 'Say what the review missed. Plain language is fine.',
+    statementHint: `Say what the review missed. Plain language is fine. ${STATEMENT_LIMIT_HINT}`,
     linkRequired: true,
     linkLabel: 'Where can it be checked?',
     send: 'Send the appeal',
@@ -41,7 +50,7 @@ const COPY = {
   abuse: {
     endpoint: '/corrections/abuse/api',
     statementLabel: 'What happened?',
-    statementHint: 'Describe the activity. Leave out anyone’s private details.',
+    statementHint: `Describe the activity. Leave out anyone’s private details. ${STATEMENT_LIMIT_HINT}`,
     linkRequired: false,
     linkLabel: 'A link that shows it',
     send: 'Send the report',
@@ -53,8 +62,11 @@ const COPY = {
 
 export function validateFollowUp(kind: FollowUpKind, data: FormData): FieldErrors {
   const errors: Record<string, string> = {};
-  if (fieldText(data, 'statement').length < MIN_STATEMENT_LENGTH) {
+  const statement = fieldText(data, 'statement');
+  if (statement.length < MIN_STATEMENT_LENGTH) {
     errors.statement = `Say a little more. It needs at least ${MIN_STATEMENT_LENGTH} characters.`;
+  } else if (statement.length > MAX_STATEMENT_LENGTH) {
+    errors.statement = tooLongMessage('what you wrote', MAX_STATEMENT_LENGTH);
   }
   const link = fieldText(data, 'sourceUrl');
   if (link.length === 0 && COPY[kind].linkRequired) {
@@ -63,7 +75,9 @@ export function validateFollowUp(kind: FollowUpKind, data: FormData): FieldError
     errors.sourceUrl = URL_MESSAGE;
   }
   const contact = fieldText(data, 'contact');
-  if (contact.length > 0 && !isEmail(contact)) errors.contact = EMAIL_MESSAGE;
+  if (contact.length > MAX_CONTACT_LENGTH) {
+    errors.contact = tooLongMessage('the email address', MAX_CONTACT_LENGTH);
+  } else if (contact.length > 0 && !isEmail(contact)) errors.contact = EMAIL_MESSAGE;
   if (data.get('privacyConsent') !== 'on') {
     errors.privacyConsent = 'Tick the box to confirm you have read how this is handled.';
   }
@@ -109,18 +123,21 @@ export function ReceiptFollowUpForm({
     };
     setState({ status: 'submitting' });
     try {
-      const response = await fetch(copy.endpoint, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', ...(await getRequestIntegrityHeaders()) },
-        body: JSON.stringify(payload),
-      });
+      const response = await postJsonWithRequestIntegrity(copy.endpoint, payload);
       const body: unknown = await response.json().catch(() => undefined);
       if (response.status === 202) {
         setState({ status: 'success' });
         return;
       }
-      if (kind === 'appeal' && (response.status === 403 || response.status === 404)) {
+      if (response.status === 429) {
+        setState({
+          status: 'failed',
+          title: 'Too many messages from this connection just now.',
+          detail: 'Wait a few minutes, then send it again. Nothing you typed has been lost.',
+        });
+        return;
+      }
+      if (kind === 'appeal' && [403, 404, 409].includes(response.status)) {
         setState({
           status: 'failed',
           title: 'This receipt can’t take an appeal right now.',
@@ -129,18 +146,32 @@ export function ReceiptFollowUpForm({
         return;
       }
       if (response.status === 400 && body && typeof body === 'object' && 'issues' in body) {
+        // The server names the link field `sourceUrls`; an issue on a field this form does not
+        // draw (the receipt code, the whole payload) has to surface as a form-level message.
+        const issues = (
+          (body as { issues?: readonly { field: string; message: string }[] }).issues ?? []
+        ).map((issue) => (issue.field === 'sourceUrls' ? { ...issue, field: 'sourceUrl' } : issue));
+        const elsewhere = issues.filter((issue) => !FOLLOW_UP_FIELDS.has(issue.field));
         fields.showIssues(
           formRef.current,
-          (body as { issues?: readonly { field: string; message: string }[] }).issues ?? [],
+          issues.filter((issue) => FOLLOW_UP_FIELDS.has(issue.field)),
         );
-        setState({ status: 'idle' });
+        setState(
+          elsewhere.length === 0
+            ? { status: 'idle' }
+            : {
+                status: 'failed',
+                title: 'It wasn’t accepted.',
+                detail: elsewhere.map((issue) => issue.message).join(' '),
+              },
+        );
         return;
       }
       throw new Error(`follow-up intake answered ${response.status}`);
     } catch {
       setState({
         status: 'failed',
-        title: 'It wasn’t sent.',
+        title: 'We couldn’t confirm it was sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }

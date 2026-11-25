@@ -197,3 +197,21 @@ test('an eased step never overshoots the target', () => {
     assert.ok(current.zoom >= Math.min(CAMERAS.opening.zoom, to.zoom) - 1e-9);
   }
 });
+
+test('a negative or non-finite share never sends the camera away from its target', () => {
+  // A frame timestamp earlier than the clock read that started the follow gave a negative share,
+  // which pushed a padding of zero below zero; the map rejects a negative inset.
+  const to = CAMERAS.stops[0] as TourCamera;
+  const from: TourCamera = {
+    ...CAMERAS.opening,
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+  };
+  for (const share of [-0.05, -3, Number.NaN, Number.POSITIVE_INFINITY, 4]) {
+    const { camera } = easeTourCamera(from, to, share);
+    for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+      const low = Math.min(from.padding[side], to.padding[side]);
+      const high = Math.max(from.padding[side], to.padding[side]);
+      assert.ok(camera.padding[side] >= low && camera.padding[side] <= high, `${side} at ${share}`);
+    }
+  }
+});

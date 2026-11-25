@@ -5,16 +5,7 @@
  * labels — no nested LiftedSurface / indexed panels.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Keyboard,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { ActivityIndicator, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { router } from 'expo-router';
 
 import { ApiStatusBanner } from '@/ui/ApiStatusBanner';
@@ -24,17 +15,17 @@ import { EmptyState } from '@/ui/EmptyState';
 import { ErrorState } from '@/ui/ErrorState';
 import { LedgerSectionLabel } from '@/ui/LedgerSectionLabel';
 import { ListRow } from '@/ui/ListRow';
-import { NavIcon, navIconForEntityKind, type NavIconName } from '@/ui/NavIcon';
+import { NavIcon, navIconForEntityKind } from '@/ui/NavIcon';
 import { Notice } from '@/ui/Notice';
 import { ScreenCanvas } from '@/ui/ScreenCanvas';
 import { Text } from '@/ui/Text';
 import {
-  MIN_TOUCH_TARGET,
-  radius,
+  linesForFontScale,
   space,
-  typeScale,
+  useAnnounceOnChange,
   useScreenScrollInsets,
-  useThemeColors,
+  Chip,
+  SearchField,
 } from '@/ui';
 import { parseEntityId } from '@/lib/route-params';
 import { markPerf } from '@/lib/perf-marks';
@@ -86,7 +77,6 @@ export function SearchScreen({
   pinnedRecordCount,
   archiveScopeLabel = 'Active release',
 }: SearchScreenProps) {
-  const theme = useThemeColors();
   const insets = useScreenScrollInsets();
   const {
     draft,
@@ -196,6 +186,18 @@ export function SearchScreen({
   const showBrowse = state.kind === 'browse';
   const draftLength = draft.trim().length;
 
+  // Speak the settled outcome only. `results` and `empty` are what the controller lands on after
+  // its debounce; typing and loading pass null, so nothing is spoken per keystroke. The error
+  // states announce themselves through `ErrorState`.
+  const shownCount = cardData.length;
+  useAnnounceOnChange(
+    state.kind === 'results'
+      ? `${shownCount} ${shownCount === 1 ? 'record' : 'records'} shown${state.hasMore ? ', more available' : ''}`
+      : showEmpty
+        ? 'No matching records'
+        : null,
+  );
+
   return (
     <ScreenCanvas edges={['left', 'right']}>
       <ScrollView
@@ -214,56 +216,13 @@ export function SearchScreen({
           Every documented person, place, event and institution. Browse by kind, or search by name.
         </Text>
 
-        <View
-          style={[
-            styles.searchField,
-            { borderColor: theme.border, backgroundColor: theme.surface },
-          ]}
-        >
-          <View style={styles.searchRow}>
-            <Ionicons
-              name="search-outline"
-              size={18}
-              color={theme.inkMuted}
-              accessibilityElementsHidden
-            />
-            <TextInput
-              value={draft}
-              onChangeText={setDraft}
-              returnKeyType="search"
-              onSubmitEditing={() => Keyboard.dismiss()}
-              placeholder="Search names, places, events..."
-              placeholderTextColor={theme.inkMuted}
-              accessibilityLabel="Search"
-              accessibilityRole="search"
-              maxLength={MAX_RAW_INPUT_LENGTH}
-              autoCorrect={false}
-              autoCapitalize="none"
-              spellCheck={false}
-              style={[styles.input, { color: theme.ink, flex: 1 }]}
-            />
-            {/* One clear control on both platforms. iOS used to get the native clearButtonMode
-                glyph instead, a 14pt target with no way to size it. */}
-            {draft.length > 0 ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Clear search"
-                onPress={() => setDraft('')}
-                style={({ pressed }) => [
-                  styles.clearButton,
-                  { backgroundColor: pressed ? theme.surfacePressed : 'transparent' },
-                ]}
-              >
-                <Ionicons
-                  name="close-circle"
-                  size={20}
-                  color={theme.inkMuted}
-                  accessibilityElementsHidden
-                />
-              </Pressable>
-            ) : null}
-          </View>
-        </View>
+        <SearchField
+          value={draft}
+          onChangeText={setDraft}
+          placeholder="Search names, places, events..."
+          accessibilityLabel="Search"
+          maxLength={MAX_RAW_INPUT_LENGTH}
+        />
 
         {!showBrowse ? (
           <View>
@@ -378,7 +337,8 @@ function FilterChipsRow({
   filterKind: string | undefined;
   onChangeFilterKind: (kind: string | undefined) => void;
 }) {
-  const theme = useThemeColors();
+  const { fontScale } = useWindowDimensions();
+  const numberOfLines = linesForFontScale(1, fontScale);
 
   return (
     <ScrollView
@@ -387,66 +347,29 @@ function FilterChipsRow({
       contentContainerStyle={styles.chipRow}
       keyboardShouldPersistTaps="handled"
     >
-      <KindFilterChip
+      <Chip
         label="All"
+        accessibilityLabel={filterKind === undefined ? 'All, selected' : 'All'}
         selected={filterKind === undefined}
         onPress={() => onChangeFilterKind(undefined)}
-        theme={theme}
+        numberOfLines={numberOfLines}
+        style={styles.chip}
       />
       {BROWSE_CATEGORIES.map((category) => (
-        <KindFilterChip
+        <Chip
           key={category.kind}
           label={category.label}
+          accessibilityLabel={
+            filterKind === category.kind ? `${category.label}, selected` : category.label
+          }
           iconName={navIconForEntityKind(category.kind)}
           selected={filterKind === category.kind}
           onPress={() => onChangeFilterKind(category.kind)}
-          theme={theme}
+          numberOfLines={numberOfLines}
+          style={styles.chip}
         />
       ))}
     </ScrollView>
-  );
-}
-
-function KindFilterChip({
-  label,
-  iconName,
-  selected,
-  onPress,
-  theme,
-}: {
-  readonly label: string;
-  readonly iconName?: NavIconName;
-  readonly selected: boolean;
-  readonly onPress: () => void;
-  readonly theme: ReturnType<typeof useThemeColors>;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      accessibilityLabel={selected ? `${label}, selected` : label}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.chip,
-        {
-          borderColor: selected ? theme.accent : theme.border,
-          backgroundColor: selected
-            ? theme.surfaceRaised
-            : pressed
-              ? theme.surfacePressed
-              : theme.surface,
-        },
-      ]}
-    >
-      {iconName ? <NavIcon name={iconName} size={16} selected={selected} /> : null}
-      <Text
-        variant="caption"
-        style={{ color: selected ? theme.accent : theme.ink }}
-        numberOfLines={1}
-      >
-        {label}
-      </Text>
-    </Pressable>
   );
 }
 
@@ -555,6 +478,7 @@ function SearchListFooter({
   loadMoreError: string | undefined;
   onLoadMore: () => void;
 }) {
+  useAnnounceOnChange(loadingMore ? null : loadMoreError);
   if (loadingMore) {
     return (
       <View style={styles.centered}>
@@ -583,34 +507,6 @@ function SearchListFooter({
 }
 
 const styles = StyleSheet.create({
-  searchField: {
-    minHeight: MIN_TOUCH_TARGET,
-    justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.sm,
-    paddingHorizontal: space['2'],
-    paddingVertical: space['1'],
-  },
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space['2'],
-  },
-  input: {
-    fontSize: typeScale.caption.size,
-    lineHeight: typeScale.caption.lineHeight,
-    fontWeight: '500',
-    padding: 0,
-    minHeight: 28,
-  },
-  clearButton: {
-    width: MIN_TOUCH_TARGET,
-    height: MIN_TOUCH_TARGET,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.full,
-    marginRight: -space['2'],
-  },
   chipRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -618,18 +514,8 @@ const styles = StyleSheet.create({
     paddingVertical: space['1'],
   },
   chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: 6,
-    // A visible box at the platform floor (44pt iOS, 48dp Android) in both directions: the chips
-    // were 37pt tall, and the label-only "All" chip was 31pt wide.
-    minHeight: MIN_TOUCH_TARGET,
-    minWidth: MIN_TOUCH_TARGET,
-    justifyContent: 'center',
     paddingHorizontal: space['2'],
-    paddingVertical: space['1'],
-    borderRadius: radius.sm,
-    borderWidth: StyleSheet.hairlineWidth,
   },
   hint: {
     marginBottom: space['1'],

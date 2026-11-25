@@ -45,6 +45,13 @@ export default function Error({
         <Notice tone="error" title={display.title}>
           {display.detail}
         </Notice>
+        {/* A plain anchor on purpose: the router may be what failed. */}
+        <p>
+          If it keeps happening, <a href="/support">tell us on the support page</a>
+          {display.digest
+            ? ' and include the reference above, which lets us find what went wrong.'
+            : '.'}
+        </p>
         <p className="ds-utility-ways">
           <Button onClick={reset}>Try again</Button>
           {/* A plain anchor on purpose: the router may be what failed. */}

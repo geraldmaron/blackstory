@@ -7,7 +7,8 @@
  * The page's masthead is the MemorialWallAtmosphere: a full screen of handwritten names at
  * several depths, one name at a time brought forward, and the inscription at its foot. Scrolling
  * steps closer: the wall dims as the list (MemorialSections, the complete accessible path to every
- * name) rises over it. No title or lede over the names, and no controls on the opening screen.
+ * name) rises over it. No title or lede over the names, and the wall draws no controls; the shell's
+ * "Hold still" switch (WorldControls) is the reader's way to stop it.
  * The wall sits inside `<main>` so the inscription, which is real text, is inside a landmark.
  */
 

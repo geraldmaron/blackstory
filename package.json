@@ -58,7 +58,9 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:^",
     "@repo/typescript-config": "workspace:^",
+    "opentype.js": "^2.0.0",
     "prettier": "^3.9.9",
+    "sharp": ">=0.35.0",
     "tsx": "^4.23.15",
     "typescript": "^5.8.3"
   },

@@ -124,9 +124,19 @@
   text-align: center;
 }
 
+/* The inverse of a secondary column: content inside a primary cell that stands in for a hidden
+   secondary column, so it only shows once that column is gone. */
+.ds-datatable__compact-only {
+  display: none;
+}
+
 @media (max-width: 60rem) {
   .ds-datatable__cell--secondary {
     display: none;
+  }
+
+  .ds-datatable__compact-only {
+    display: block;
   }
 }
 

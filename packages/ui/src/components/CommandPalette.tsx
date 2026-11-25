@@ -178,6 +178,12 @@ export function CommandPalette({
     setActiveIndex(0);
   }, [query]);
 
+  // Arrow keys move the highlight, not focus, so the browser will not scroll the option into view.
+  useEffect(() => {
+    if (!open || !active) return;
+    document.getElementById(`${listboxId}-${active.id}`)?.scrollIntoView({ block: 'nearest' });
+  }, [open, active, listboxId]);
+
   function move(delta: number) {
     if (results.length === 0) return;
     setActiveIndex((current) => {
@@ -263,9 +269,10 @@ export function CommandPalette({
                         'ds-command-palette__option',
                         item.id === active?.id && 'is-active',
                       )}
-                      // Pointer selection commits on mousedown so the input never loses focus first.
-                      onMouseDown={(event) => {
-                        event.preventDefault();
+                      // Mousedown is only blocked so the input keeps focus; the commit waits for
+                      // click, so a press can still be cancelled by dragging off (WCAG 2.5.2).
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
                         onSelect(item);
                         onClose();
                       }}

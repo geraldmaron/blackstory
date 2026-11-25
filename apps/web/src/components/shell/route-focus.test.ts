@@ -32,6 +32,11 @@ test('it yields to an open dialog', () => {
 test('main is given a programmatic-only tab stop', () => {
   assert.match(source, /setAttribute\('tabindex', '-1'\)/);
   assert.match(source, /preventScroll/, 'focusing must not jump the page');
+  assert.match(
+    source,
+    /\.ds-shell-body/,
+    'the target must outlive a loading.tsx skeleton, whose <main> is replaced after the focus',
+  );
 });
 
 test('it is mounted in the persistent layout, not the remounting template', () => {

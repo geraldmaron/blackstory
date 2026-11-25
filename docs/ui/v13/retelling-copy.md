@@ -13,7 +13,7 @@ reads as an epigram. A unit test holds the mechanical ones (`retelling-picks.tes
 
 | Scene | Word          | Wired (first draft)                            | Alternative A                                      | Alternative B                                |
 | ----- | ------------- | ---------------------------------------------- | -------------------------------------------------- | -------------------------------------------- |
-| 1     | History       | History is the story that got told, so keep going and watch the word change. (Changed 2026-11-23 with the first screen's rebuild; was: History is the record of what happened.)        | History is what happened, and what was kept of it. | History is the past, as it was written down. |
+| 1     | History       | None since 2026-11-24. The first screen is the brand panel (see Scene 1 below)                                                                                                         |                                                    |                                              |
 | 2     | _His_ story   | His story is one man’s part of it.             | His story is what one man did, and where.          | His story belongs to one man.                |
 | 3     | _Her_ story   | Her story is one woman’s part of it.           | Her story is what one woman did, and where.        | Her story belongs to one woman.              |
 | 4     | _Your_ story  | Your story is the part nearest you.            | Your story starts where you live.                  | Your story is the part with your town in it. |
@@ -27,22 +27,31 @@ Watch for: "one man's part of it" leans on scene 1's "it" (the record of what ha
 scene 1's sentence changes, read 2 and 3 again. Alternative B for scene 1 ("as it was written
 down") edges toward a claim about who wrote history; it is the least safe of the three.
 
-## Scene 6
+## Scene 1
 
-Not provisional: the brand line, set under the official wordmark artwork.
+The brand panel (2026-11-24): the official wordmark artwork as the page's h1, then the brand line,
+which is not provisional.
 
 > History, pinned to place.
 
 Provisional: the archive's one sentence. It carries the count of published records as a number
-in a sentence, read from the live catalog, and says what a dark place means.
+in a sentence, read from the live catalog.
 
-|       | Sentence                                                                                                                                                                                        |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Wired | BlackStory is an archive of 4,403 sourced records of Black history in the United States, each pinned to the place it happened, and the dark places on this map are the ones not researched yet. |
-| A     | BlackStory is an archive of 4,403 sourced records of Black history in the United States, each pinned to its place. A dark place on this map has not been researched yet.                        |
-| B     | BlackStory pins 4,403 sourced records of Black history to the places they happened, and where this map is dark, the research has not reached yet.                                               |
+> BlackStory is an archive of 4,403 sourced records of Black history in the United States, each
+> pinned to the place it happened.
 
-The task asked for one sentence; alternative A is two and reads more easily aloud.
+## Scene 6
+
+Provisional (2026-11-24, from the owner's direction). Centered on the whole country, the heading
+arrives as "Black History" and closes into "BlackStory", which the symbol then joins to make
+the lockup. A
+screen reader hears "BlackStory" once. Then one line.
+
+> It happened here.
+
+Considered and not used: "It can't be hidden" (a claim about history, which the scene rule keeps
+out) and "The dark places on this map are the ones not researched yet" (the owner found it corny,
+2026-11-24; "How coverage works" still links to the account of coverage).
 
 ## Other words on the page
 
@@ -57,7 +66,8 @@ The task asked for one sentence; alternative A is two and reads more easily alou
 | Scene 4, nothing near     | Nothing within 50 miles of Tuskegee, Alabama is researched yet. The nearest record is (name), 212 mi away. | Plain, and true by arithmetic                                                                          |
 | Scene 4, no script        | This field needs JavaScript to answer.                                                                     |                                                                                                        |
 | Scene 6                   | How coverage works                                                                                         | Link to Method                                                                                         |
-| Scene 6, returning reader | Watch the opening                                                                                          | Link back to scene 1                                                                                   |
+| Scene 1                   | Start the opening                                                                                          | Link to scene 2, for a reader who does not scroll                                                      |
+| Scene 1                   | See what is in the archive                                                                                 | Link past the opening to the contents                                                                  |
 | Contents                  | In the archive                                                                                             | The contents' heading                                                                                  |
 | Contents                  | Archive, Stories, Data, Memorial                                                                           | Each followed by its own line from the destination catalog (`packages/public-contracts`), not new copy |
 | No WebGL                  | The map could not start in this browser. Everything on this page still works.                              | Carried from the current home page                                                                     |

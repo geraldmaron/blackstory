@@ -14,6 +14,11 @@ export function generateCsrfToken(byteLength = 32): string {
   return randomBytes(byteLength).toString('hex');
 }
 
+/** Whether a value has exactly the shape `generateCsrfToken()` mints by default (64 lowercase hex). */
+export function isMintedCsrfToken(value: string): boolean {
+  return /^[0-9a-f]{64}$/.test(value);
+}
+
 /** Build Set-Cookie header value for the CSRF double-submit cookie.  */
 export function buildCsrfSetCookieHeader(token: string): string {
   return serializeSetCookie(CSRF_COOKIE_NAME, token, csrfCookieDefaults());

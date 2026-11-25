@@ -235,6 +235,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <FormButton
           type="button"
           className={query.reviewStatus === 'pending' ? 'is-active' : undefined}
+          aria-pressed={query.reviewStatus === 'pending'}
           onClick={() => patchQuery({ reviewStatus: 'pending' })}
         >
           Pending <strong>{counts.pending}</strong>
@@ -242,6 +243,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <FormButton
           type="button"
           className={query.reviewStatus === 'all' ? 'is-active' : undefined}
+          aria-pressed={query.reviewStatus === 'all'}
           onClick={() => patchQuery({ reviewStatus: 'all' })}
         >
           All <strong>{counts.total}</strong>
@@ -249,6 +251,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <FormButton
           type="button"
           className={query.reviewStatus === 'approved' ? 'is-active' : undefined}
+          aria-pressed={query.reviewStatus === 'approved'}
           onClick={() => patchQuery({ reviewStatus: 'approved' })}
         >
           Approved <strong>{counts.approved}</strong>
@@ -256,6 +259,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <FormButton
           type="button"
           className={query.reviewStatus === 'needs_evidence' ? 'is-active' : undefined}
+          aria-pressed={query.reviewStatus === 'needs_evidence'}
           onClick={() => patchQuery({ reviewStatus: 'needs_evidence' })}
         >
           Needs evidence <strong>{counts.needsEvidence}</strong>
@@ -263,6 +267,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <FormButton
           type="button"
           className={query.reviewStatus === 'rejected' ? 'is-active' : undefined}
+          aria-pressed={query.reviewStatus === 'rejected'}
           onClick={() => patchQuery({ reviewStatus: 'rejected' })}
         >
           Rejected <strong>{counts.rejected}</strong>
@@ -270,6 +275,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
         <FormButton
           type="button"
           className={query.issuesOnly ? 'is-active' : undefined}
+          aria-pressed={query.issuesOnly}
           onClick={() => patchQuery({ issuesOnly: !query.issuesOnly })}
         >
           With issues <strong>{counts.withIssues}</strong>
@@ -452,6 +458,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                       <tr
                         key={row.submissionId}
                         className={isSelected ? 'is-selected' : undefined}
+                        aria-current={isSelected ? 'true' : undefined}
                         onClick={() => setSelectedId(row.submissionId)}
                       >
                         <td onClick={(event) => event.stopPropagation()}>
@@ -483,7 +490,7 @@ export function StoryReviewDesk({ initialRows = [] }: StoryReviewDeskProps) {
                   })}
                 </tbody>
               </table>
-              <p className="story-review__queue-foot ds-mono">
+              <p className="story-review__queue-foot ds-mono" role="status">
                 Showing {visible.length} of {rows.length}
               </p>
             </div>

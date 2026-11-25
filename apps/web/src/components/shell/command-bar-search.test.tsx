@@ -81,17 +81,16 @@ describe('bar search', () => {
     // The endpoint caps concurrent in-flight requests per caller. A lookup the reader has already
     // typed past, still running, is a slot their next keystroke gets denied for.
     assert.match(source, /signal: AbortSignal/);
-    assert.match(source, /\bsignal,/);
+    assert.match(source, /\bsignal \}/);
   });
 
   it('presents the same-origin request-integrity proof required by the search endpoint', () => {
     const source = code('components/shell/CommandBarSearch.tsx');
-    assert.match(source, /getRequestIntegrityHeaders\(\)/);
-    assert.match(source, /credentials:\s*['"]same-origin['"]/);
-    assert.match(
-      source,
-      /headers:\s*\{\s*accept:\s*['"]application\/json['"],\s*\.\.\.integrityHeaders\s*\}/,
-    );
+    assert.match(source, /fetchWithRequestIntegrity\(/);
+    // The helper owns the credentials mode, the header and the one retry on a stale token.
+    const client = code('lib/request-integrity/client.ts');
+    assert.match(client, /credentials:\s*['"]same-origin['"]/);
+    assert.match(client, /\.\.\.\(await getRequestIntegrityHeaders\(\)\)/);
   });
 
   it('owns the palette chord', () => {
@@ -125,6 +124,17 @@ describe('CommandBar destinations', () => {
     // stays quiet; the shell does not.
     assert.doesNotMatch(source, /QUIET_BAR_PATHS|commandBarIsQuiet/);
     assert.doesNotMatch(source, /pathname === ['"]\/memorial['"]/);
+  });
+
+  it('labels the theme button with the theme it switches to, and no pressed state', () => {
+    const source = code('components/shell/CommandBar.tsx');
+    assert.match(source, /aria-label=\{`Switch to \$\{switchTo\} theme`\}/);
+    assert.doesNotMatch(source, /Switch between light and dark/);
+    // Read from <html data-theme> through an external store, so hydration starts from the
+    // server's label and every later change, whoever makes it, relabels the button.
+    assert.match(source, /useSyncExternalStore\(subscribeToTheme, nextTheme, nextThemeOnServer\)/);
+    assert.match(source, /attributeFilter: \['data-theme'\]/);
+    assert.doesNotMatch(source, /aria-pressed/);
   });
 
   it('does not greet with the catalog count', () => {

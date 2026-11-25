@@ -23,7 +23,12 @@ import {
 } from './categories';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
 import { validateCorrectionForm } from './correction-form';
-import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+import {
+  MAX_STATEMENT_LENGTH,
+  MAX_TARGET_ID_LENGTH,
+  MIN_STATEMENT_LENGTH,
+} from './correction-intake';
+import { postJsonWithRequestIntegrity } from '../../lib/request-integrity/client';
 
 void React;
 
@@ -95,13 +100,7 @@ export function CorrectionForm({
 
     setState({ status: 'submitting' });
     try {
-      const integrityHeaders = await getRequestIntegrityHeaders();
-      const response = await fetch('/corrections/api', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', ...integrityHeaders },
-        body: JSON.stringify(payload),
-      });
+      const response = await postJsonWithRequestIntegrity('/corrections/api', payload);
       const body: unknown = await response.json().catch(() => undefined);
 
       if (response.status === 202 && body && typeof body === 'object' && 'receiptCode' in body) {
@@ -144,7 +143,7 @@ export function CorrectionForm({
     } catch {
       setState({
         status: 'failed',
-        title: 'The correction wasn’t sent.',
+        title: 'We couldn’t confirm the correction was sent.',
         detail: 'Nothing you typed has been lost. Check your connection and send it again.',
       });
     }
@@ -216,7 +215,7 @@ export function CorrectionForm({
             </>
           }
           htmlFor={ids.target}
-          hint="Name the place or paste its page address. You don’t need an internal id."
+          hint={`Name the place or paste its page address, in ${MAX_TARGET_ID_LENGTH} characters or fewer. You don’t need an internal id.`}
           {...errorProps('targetRecordId')}
         >
           <input
@@ -228,7 +227,6 @@ export function CorrectionForm({
             name="targetRecordId"
             type="text"
             defaultValue={initialTarget}
-            maxLength={128}
             required
           />
         </Field>
@@ -262,7 +260,7 @@ export function CorrectionForm({
             </>
           }
           htmlFor={ids.statement}
-          hint="For example: The 1891 building was purpose-built, not converted. Plain language is fine."
+          hint={`For example: The 1891 building was purpose-built, not converted. Plain language is fine, up to ${MAX_STATEMENT_LENGTH.toLocaleString('en-US')} characters.`}
           {...errorProps('statement')}
         >
           <textarea
@@ -274,7 +272,7 @@ export function CorrectionForm({
             name="statement"
             rows={5}
             required
-            minLength={20}
+            minLength={MIN_STATEMENT_LENGTH}
           />
         </Field>
 

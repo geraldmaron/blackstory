@@ -92,7 +92,11 @@ test('the decade prints once, in words that say what it is', () => {
 test('a photo shows only when the archive holds one; never a placeholder box', () => {
   assert.doesNotMatch(render(), /ds-inspector__photo/);
   const html = render({ record: { ...RECORD, photoUrl: 'https://cdn.example/gaston.jpg' } });
-  assert.match(html, /<img src="https:\/\/cdn.example\/gaston.jpg" alt=""/);
+  // A record photo with no published alt is still the record's photo, never a silent image.
+  assert.match(
+    html,
+    /<img src="https:\/\/cdn.example\/gaston.jpg" alt="Photograph associated with [^"]+"/,
+  );
   // In color: never the toned plate (design-direction-v12.md).
   assert.doesNotMatch(html, /ds-plate/);
   assert.match(html, /date is not on record/);

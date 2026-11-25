@@ -58,3 +58,22 @@ test('an empty correction is told how to fix each required answer', () => {
   data.set('sourceUrl', 'https://www.loc.gov/item/1');
   assert.deepEqual(validateCorrectionForm(data), {});
 });
+
+test('a pasted address is never cut short; one too long is told the limit and what to paste', () => {
+  const html = renderToStaticMarkup(<CorrectionForm />);
+  assert.doesNotMatch(html, /name="targetRecordId"[^>]*maxlength/i);
+  assert.match(html, /in 128 characters or fewer/);
+  assert.match(html, /up to 4,000 characters/);
+
+  const data = new FormData();
+  data.set('targetRecordId', `https://example.org/entity/${'a'.repeat(120)}`);
+  data.set('category', 'factual_error');
+  data.set('statement', 's'.repeat(4001));
+  data.set('sourceUrl', 'https://www.loc.gov/item/1');
+  data.set('contact', `${'c'.repeat(320)}@example.org`);
+  data.set('privacyConsent', 'on');
+  const errors = validateCorrectionForm(data);
+  assert.match(errors.targetRecordId!, /This is 147 characters and the limit is 128\. Paste only/);
+  assert.equal(errors.statement, 'Keep what it should say to 4,000 characters or fewer.');
+  assert.equal(errors.contact, 'Keep the email address to 320 characters or fewer.');
+});

@@ -19,6 +19,17 @@ test('The route error boundary every public route inherits shows a retry and a w
   assert.match(html, /<a[^>]*href="\/"[^>]*>Back to the front page<\/a>/);
 });
 
+test('The reference comes with what to do with it and where to send it', () => {
+  const withRef = renderRouteBoundary(Object.assign(new Error('anything'), { digest: 'ref987' }));
+  assert.match(
+    withRef,
+    /If it keeps happening, <a href="\/support">tell us on the support page<\/a> and include the reference above/,
+  );
+  const without = renderRouteBoundary(new Error('anything'));
+  assert.match(without, /<a href="\/support">tell us on the support page<\/a>\./);
+  assert.doesNotMatch(without, /reference above/);
+});
+
 test('The route error boundary never prints the raw message or stack in production', () => {
   const prior = process.env.NEXT_PUBLIC_APP_ENV;
   process.env.NEXT_PUBLIC_APP_ENV = 'production';

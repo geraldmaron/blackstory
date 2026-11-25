@@ -252,3 +252,39 @@ test('the first-paint shell drops shop tokens, including leftover facet labels',
   assert.equal(cleaned.viewState.selected, undefined);
   assert.equal(cleaned.totalMatched, 4101);
 });
+
+test('a readable slug with a number in it, and an invention page, stay links on a pin', () => {
+  const named = (displayName: string, href: string, kind = 'place') =>
+    leakyFeature({
+      displayName,
+      href,
+      kind,
+      entityId: `rec-${displayName.length}`,
+      oneLineStory: 'A record with a public page.',
+    });
+  const pins = toDoorLinkPins([
+    named('369th Regiment Armory', '/place/369th-regiment-armory'),
+    named('Dough-Kneading Machine', '/invention/dough-kneading-machine', 'invention'),
+    // An id-shaped slug that is not the record's own name is still kept off the page.
+    named('Some Church', '/place/q64006081'),
+    // A same-name record's id suffix goes through the opaque redirect instead of the page.
+    named('Gerrit Smith Estate', '/place/gerrit-smith-estate--ent_gerrit_smith_estate'),
+    named('Dough-Kneading Machine', '/invention/dough-kneading-machine--inv_x1', 'invention'),
+    named('Bethel Church', '/place/bethel-church--nrhp-12000345'),
+  ]);
+  assert.deepEqual(
+    pins.features.map((pin) => pin.properties.href),
+    [
+      '/place/369th-regiment-armory',
+      '/invention/dough-kneading-machine',
+      '',
+      '/door/pin/pin-3',
+      '/door/pin/pin-4',
+      '/door/pin/pin-5',
+    ],
+  );
+  assert.equal(
+    resolveDoorPinTarget('pin-0', [named('369th Regiment Armory', '/place/369th-regiment-armory')]),
+    '/place/369th-regiment-armory',
+  );
+});

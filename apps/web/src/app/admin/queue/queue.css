@@ -32,8 +32,9 @@
   min-width: 16rem;
 }
 
-/* The j/k highlight: an inset bar plus a tint, so it reads without relying on color alone. */
-.queue__table tbody tr[data-queue-active] {
+/* The j/k row is the one holding focus: an inset bar plus a tint, so it reads without relying on
+   color alone. */
+.queue__table tbody tr:focus-within {
   background: var(--ds-surface);
   box-shadow: inset var(--ds-space-1) 0 0 var(--ds-ink);
 }

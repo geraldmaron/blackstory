@@ -7,9 +7,9 @@
  * the one rhythm, so a reader learns to scan the page once.
  */
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 
-import { MIN_TOUCH_TARGET, Text, space } from '@/ui';
+import { LARGE_TYPE_THRESHOLD, MIN_TOUCH_TARGET, Text, space } from '@/ui';
 
 /** Exported for layout contract tests — inline icon + label + value on one row. */
 export const recordBeatRowStyle = {
@@ -47,6 +47,9 @@ export function RecordBeatRow({
   testID,
   labelTestID,
 }: RecordBeatRowProps) {
+  // At large text sizes the uppercase label outgrows its fixed column and runs into the value,
+  // so the label goes above the value instead. Read live: the OS setting can change mid-session.
+  const stacked = useWindowDimensions().fontScale >= LARGE_TYPE_THRESHOLD;
   // A trailing mark belongs to the value it qualifies. Letting the value keep growing pushes the
   // mark out to the right margin, where it reads as a separate column of its own.
   const valueStyle = trailing ? styles.valueWithTrailing : styles.value;
@@ -56,14 +59,8 @@ export function RecordBeatRow({
     </Text>
   );
 
-  return (
-    <View style={styles.row} testID={testID}>
-      <View style={styles.labelCluster} testID={labelTestID}>
-        {leading}
-        <Text variant="caption" colorRole="inkSubtle" style={styles.labelText}>
-          {label}
-        </Text>
-      </View>
+  const valueAndTrailing = (
+    <>
       {onPress ? (
         <Pressable
           accessibilityRole="button"
@@ -82,6 +79,18 @@ export function RecordBeatRow({
         body
       )}
       {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
+    </>
+  );
+
+  return (
+    <View style={stacked ? styles.stackedRow : styles.row} testID={testID}>
+      <View style={stacked ? styles.stackedLabelCluster : styles.labelCluster} testID={labelTestID}>
+        {leading}
+        <Text variant="caption" colorRole="inkSubtle" style={styles.labelText}>
+          {label}
+        </Text>
+      </View>
+      {stacked ? <View style={styles.row}>{valueAndTrailing}</View> : valueAndTrailing}
     </View>
   );
 }
@@ -98,6 +107,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexShrink: 0,
     width: recordBeatLabelColumnWidth,
+    gap: space['2'],
+  },
+  stackedRow: {
+    gap: space['1'],
+    width: '100%',
+    minWidth: 0,
+  },
+  stackedLabelCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: space['2'],
   },
   labelText: {

@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Pagination } from '@repo/ui';
+import { ConfirmAction, type ConfirmActionRequest } from '../design-system/ConfirmAction';
 import { DeskToolbar } from '../design-system/DeskToolbar';
 import { ActiveFilters, DeskTitleBar, Panel, type ActiveFilter } from '../design-system/ui';
 import { useAdminAuth } from '../auth/AdminAuthProvider';
@@ -36,6 +37,7 @@ import {
   INBOX_CASE_STATES,
   actionHelp,
   legalActionsForState,
+  mergeConfirmation,
   missingDecisionReasonMessage,
   stateLabel,
   type AdminCaseDetail,
@@ -83,6 +85,7 @@ export function CaseQueue({
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState<ConfirmActionRequest | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -210,7 +213,9 @@ export function CaseQueue({
 
   // The page behind the sheet is inert while it is open, so focus can only go back to the opener
   // once the trap has released it. Effect cleanups run before effect bodies in the same commit.
-  useFocusTrap(dialogRef, activeId !== null, { overlayRef });
+  // The merge confirmation is a native modal that makes everything else inert itself; the sheet's
+  // trap stands down while it is open or Tab would be pulled back into the sheet behind it.
+  useFocusTrap(dialogRef, activeId !== null && confirming === null, { overlayRef });
 
   useEffect(() => {
     if (!activeId) {
@@ -223,7 +228,8 @@ export function CaseQueue({
     }
     closeRef.current?.focus();
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
+      // Escape inside the merge confirmation cancels that, not the sheet under it.
+      if (event.key === 'Escape' && !(event.target as Element | null)?.closest?.('dialog')) {
         event.preventDefault();
         closeSheet();
       }
@@ -232,7 +238,12 @@ export function CaseQueue({
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [activeId, closeSheet]);
 
-  async function runTransition(action: AdminCaseTransitionAction, caseIds: readonly string[]) {
+  async function runTransition(
+    action: AdminCaseTransitionAction,
+    caseIds: readonly string[],
+    trigger: HTMLElement,
+    confirmed = false,
+  ) {
     if (caseIds.length === 0) return;
     if (!reason.trim()) {
       setError(missingDecisionReasonMessage(action));
@@ -241,6 +252,16 @@ export function CaseQueue({
     }
     if (action === 'merge' && !mergeTarget.trim()) {
       setError('Enter the research case id to merge into before Merge.');
+      return;
+    }
+    if (action === 'merge' && !confirmed) {
+      setConfirming({
+        ...mergeConfirmation(
+          caseIds.map((id) => rows.find((row) => row.id === id) ?? detail ?? { title: id }),
+        ),
+        trigger,
+        onConfirm: () => void runTransition(action, caseIds, trigger, true),
+      });
       return;
     }
     setBusy(true);
@@ -464,7 +485,9 @@ export function CaseQueue({
                 }
                 title={actionHelp(action)}
                 disabled={busy || selectedIds.size > RESEARCH_CASE_BULK_LIMIT || !reason.trim()}
-                onClick={() => void runTransition(action, [...selectedIds])}
+                onClick={(event) =>
+                  void runTransition(action, [...selectedIds], event.currentTarget)
+                }
               >
                 {actionLabel(action)}
               </FormButton>
@@ -834,7 +857,9 @@ export function CaseQueue({
                       }
                       title={actionHelp(action)}
                       disabled={busy || !reason.trim()}
-                      onClick={() => void runTransition(action, [activeId])}
+                      onClick={(event) =>
+                        void runTransition(action, [activeId], event.currentTarget)
+                      }
                     >
                       {actionLabel(action)}
                     </FormButton>
@@ -853,6 +878,7 @@ export function CaseQueue({
           </div>
         ) : null}
       </div>
+      <ConfirmAction request={confirming} onDismiss={() => setConfirming(null)} />
     </div>
   );
 }

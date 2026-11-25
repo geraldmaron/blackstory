@@ -3,7 +3,7 @@
  * in-map instruments chassis. Facet changes apply immediately (selected = active);
  * there is no draft/Apply gate. Modal mode keeps Clear + Done (Done only dismisses).
  *
- * Pin Pulse instruments: icon kind chips with copper selected state, one job per
+ * Pin Pulse instruments: icon kind chips with the shared ink-and-check selected state, one job per
  * control, active-filter strip with easy clear. Facet order matches web
  * (kind → tone → era → theme → status → confidence → where). Place find is a
  * History handoff until mobile geocoding ships.
@@ -30,13 +30,13 @@ import {
 } from '@/features/map/kind-encoding';
 import {
   Button,
-  NavIcon,
   Text,
   space,
   radius,
   useThemeColors,
   MIN_TOUCH_TARGET,
   type NavIconName,
+  Chip,
 } from '@/ui';
 import { ExploreFacetRow } from './explore-edition-chrome';
 import { activeFilterChips, clearFilterKey } from './active-filter-chips';
@@ -139,59 +139,6 @@ export type ExploreFiltersPanelProps = {
   readonly description?: string;
 };
 
-/**
- * Compact filter chip. `accent` mode = copper border/text when selected (instruments).
- * Default mode = ink fill when selected (modal).
- */
-function FilterChip({
-  label,
-  selected,
-  onPress,
-  accentWhenSelected = false,
-  iconName,
-  accessibilityRole = 'radio',
-  accessibilityHint,
-}: {
-  readonly label: string;
-  readonly selected: boolean;
-  readonly onPress: () => void;
-  readonly accentWhenSelected?: boolean;
-  readonly iconName?: NavIconName;
-  readonly accessibilityRole?: 'radio' | 'button';
-  readonly accessibilityHint?: string;
-}) {
-  const theme = useThemeColors();
-  const useCopper = accentWhenSelected;
-  return (
-    <Pressable
-      accessibilityRole={accessibilityRole}
-      accessibilityLabel={label}
-      accessibilityHint={accessibilityHint}
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      hitSlop={4}
-      style={({ pressed }) => [
-        styles.chip,
-        {
-          backgroundColor: selected ? (useCopper ? theme.surfaceRaised : theme.ink) : theme.surface,
-          borderColor: selected ? (useCopper ? theme.accent : theme.ink) : theme.border,
-          opacity: pressed ? 0.85 : 1,
-        },
-      ]}
-    >
-      {iconName ? <NavIcon name={iconName} size={14} selected={selected && useCopper} /> : null}
-      <Text
-        variant="caption"
-        style={{
-          color: selected ? (useCopper ? theme.accent : theme.inverseInk) : theme.ink,
-        }}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
 function ActiveFiltersStrip({
   filters,
   facetOptions,
@@ -222,13 +169,11 @@ function ActiveFiltersStrip({
       </Text>
       <View style={styles.activeChipRow}>
         {chips.map((chip) => (
-          <FilterChip
+          <Chip
             key={chip.key}
             label={chip.label}
-            iconName={chip.iconName}
             selected
-            accentWhenSelected
-            accessibilityRole="button"
+            style={styles.chip}
             accessibilityHint={`Removes ${chip.label} filter`}
             onPress={() => onFiltersChange(clearFilterKey(filters, chip.key))}
           />
@@ -293,30 +238,30 @@ function FilterGroup({
 function KindChipRow({
   kind,
   onKindChange,
-  accentWhenSelected,
 }: {
   readonly kind: KindFilterValue | undefined;
   readonly onKindChange: (kind: KindFilterValue | undefined) => void;
-  readonly accentWhenSelected?: boolean;
 }) {
   return (
     <View style={styles.chipRow} accessibilityRole="radiogroup" accessibilityLabel="Record kind">
-      <FilterChip
+      <Chip
+        role="radio"
+        style={styles.chip}
         label="All kinds"
         selected={!kind}
-        accentWhenSelected={accentWhenSelected}
         onPress={() => onKindChange(undefined)}
       />
       {KIND_FAMILIES.map((candidate) => {
         const label = KIND_LABELS[candidate];
         const isSelected = candidate === kind;
         return (
-          <FilterChip
+          <Chip
+            role="radio"
+            style={styles.chip}
             key={candidate}
             label={label}
             iconName={KIND_ICONS[candidate]}
             selected={isSelected}
-            accentWhenSelected={accentWhenSelected}
             onPress={() => onKindChange(isSelected ? undefined : candidate)}
           />
         );
@@ -330,13 +275,11 @@ function FacetChipRow({
   value,
   options,
   onChange,
-  accentWhenSelected,
 }: {
   readonly facetKey: keyof ExploreFacetOptions;
   readonly value: string | undefined;
   readonly options: readonly FacetOption[];
   readonly onChange: (next: string | undefined) => void;
-  readonly accentWhenSelected?: boolean;
 }) {
   const selectable = options.filter((option) => option.value !== 'all');
   const anyLabel =
@@ -344,21 +287,23 @@ function FacetChipRow({
 
   return (
     <View style={styles.chipRow} accessibilityRole="radiogroup" accessibilityLabel={facetKey}>
-      <FilterChip
+      <Chip
+        role="radio"
+        style={styles.chip}
         label={anyLabel}
         selected={!value}
-        accentWhenSelected={accentWhenSelected}
         onPress={() => onChange(undefined)}
       />
       {selectable.map((option) => {
         const isSelected = option.value === value;
         const chipLabel = option.label.replace(/\s\(\d+\)$/, '');
         return (
-          <FilterChip
+          <Chip
+            role="radio"
+            style={styles.chip}
             key={option.value}
             label={chipLabel}
             selected={isSelected}
-            accentWhenSelected={accentWhenSelected}
             onPress={() => onChange(isSelected ? undefined : option.value)}
           />
         );
@@ -491,7 +436,6 @@ export function ExploreFiltersPanel({
               <KindChipRow
                 kind={filters.kind}
                 onKindChange={(kind) => onFiltersChange(updateFilter(filters, 'kind', kind))}
-                accentWhenSelected
               />
             ) : key === 'era' ? (
               <FacetChipRow
@@ -503,7 +447,6 @@ export function ExploreFiltersPanel({
                     EXPLORE_ERA_QUICK_OPTIONS.includes(option.value as never),
                 )}
                 onChange={(era) => onFiltersChange(updateFilter(filters, 'era', era))}
-                accentWhenSelected
               />
             ) : (
               <FacetChipRow
@@ -513,7 +456,6 @@ export function ExploreFiltersPanel({
                 onChange={(next) =>
                   onFiltersChange(updateFilter(filters, key, next as FilterState[typeof key]))
                 }
-                accentWhenSelected
               />
             )}
           </ExploreFacetRow>
@@ -699,16 +641,8 @@ const styles = StyleSheet.create({
     paddingBottom: space['3'],
   },
   chip: {
-    minHeight: MIN_TOUCH,
-    minWidth: MIN_TOUCH,
-    paddingHorizontal: space['3'],
     paddingVertical: space['2'],
-    borderRadius: radius.sm,
     borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: space['1'],
   },
   footer: {
     borderTopWidth: StyleSheet.hairlineWidth,

@@ -102,7 +102,7 @@ test('memorial sections render full list anchor and no em dashes in copy', () =>
   assert.doesNotMatch(copy, /Written by hand, one at a time/);
 });
 
-test('the memorial opening has no scroll cue and no hold toggle', () => {
+test('the memorial opening has no scroll cue and no control of its own', () => {
   const page = readFileSync(join(here, 'page.tsx'), 'utf8');
   const wall = readFileSync(
     join(here, '../../components/patterns/memorial-wall/MemorialWallAtmosphere.tsx'),
@@ -111,6 +111,30 @@ test('the memorial opening has no scroll cue and no hold toggle', () => {
   assert.doesNotMatch(page, /ScrollCue|Read every name/);
   assert.doesNotMatch(wall, /<button|Hold the wall still|hold-wall/);
   assert.equal(existsSync(join(here, 'MemorialScrollCue.tsx')), false);
+});
+
+test("the shell's Hold still switch shows on the memorial and pauses the wall where it is", () => {
+  const shell = join(here, '../../components/shell');
+  const css = readFileSync(join(shell, 'world-controls.css'), 'utf8');
+  const controls = readFileSync(join(shell, 'WorldControls.tsx'), 'utf8');
+  const providers = readFileSync(join(here, '../../components/SiteShellProviders.tsx'), 'utf8');
+  const wall = readFileSync(
+    join(here, '../../components/patterns/memorial-wall/MemorialWallAtmosphere.tsx'),
+    'utf8',
+  );
+  // The one switch, shown where the wall is, named for the wall, before the content that moves.
+  assert.match(css, /body:has\(\.ds-memorial-wall\) \.ds-world-controls,[\s\S]*?display: flex/);
+  assert.match(controls, /onMemorial \? 'Memorial wall motion' : 'Map display'/);
+  assert.match(controls, /<button[\s\S]*?aria-pressed=\{still\}/);
+  assert.ok(providers.indexOf('<WorldControls />') < providers.indexOf('ds-shell-body'));
+  // The wall follows the stored choice and the switch itself.
+  assert.match(wall, /holdStill\(\)/);
+  assert.match(wall, /closest\('\.ds-world-controls__button'\)/);
+  // Paused stops the loop; only the composed still (reduced motion) returns names to their places.
+  assert.match(wall, /const running = \(\) =>\s*!held &&\s*!pausedRef\.current &&/);
+  assert.match(wall, /const y = held \? item\.y0 : wrapDrift\(/);
+  assert.match(wall, /held=\{reducedMotion \|\| hold === 'still'\}/);
+  assert.doesNotMatch(wall, /There is no on-page control/);
 });
 
 /*

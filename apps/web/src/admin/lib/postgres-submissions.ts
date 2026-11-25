@@ -467,6 +467,23 @@ const defaultDependencies: SubmissionDecisionDependencies = {
   notify,
 };
 
+/** Who a closed correction is mailed to: it needs both a receipt code and a usable address. */
+function correctionRecipient(
+  payload: unknown,
+): { readonly receiptCode: string; readonly contact: string } | null {
+  const fields = asRecord(payload);
+  const receiptCode = typeof fields?.receiptCode === 'string' ? fields.receiptCode : undefined;
+  const contact = recipientFrom(asRecord(asRecord(fields?.original)?.payload)?.submitterContact);
+  return receiptCode && contact ? { receiptCode, contact } : null;
+}
+
+/** Whether rejecting or resolving this submission emails its submitter. Spam never does. */
+export function submissionOutcomeEmailsSubmitter(
+  submission: Pick<SubmissionDetail, 'payload'>,
+): boolean {
+  return correctionRecipient(submission.payload) !== null;
+}
+
 /**
  * Tells the corrector their receipt closed. Only receipts (corrections) are mailed, and never on
  * 'spam': confirming receipt to a spammer is the one email that only helps them.
@@ -479,10 +496,10 @@ function notifyCorrectionOutcome(
   publicReason?: string,
 ): void {
   const fields = asRecord(payload);
-  const receiptCode = typeof fields?.receiptCode === 'string' ? fields.receiptCode : undefined;
   const outcome = decision === 'resolve' ? 'resolved' : decision === 'reject' ? 'rejected' : null;
-  const contact = recipientFrom(asRecord(asRecord(fields?.original)?.payload)?.submitterContact);
-  if (!receiptCode || !outcome || !contact) return;
+  const recipient = correctionRecipient(payload);
+  if (!outcome || !recipient) return;
+  const { receiptCode, contact } = recipient;
   const appealAvailable = isAppealEligible({
     phase: 'closed',
     closureReason: outcome,

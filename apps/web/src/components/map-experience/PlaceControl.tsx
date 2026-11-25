@@ -15,7 +15,10 @@
  */
 import React, { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Segmented, cx } from '@repo/ui';
-import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+import {
+  clearRequestIntegrityToken,
+  getRequestIntegrityHeaders,
+} from '../../lib/request-integrity/client';
 import { fetchLocateByAddress } from '../../lib/geocode/locate-client';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import {
@@ -129,9 +132,14 @@ export function PlaceControl({
       return;
     }
     setStatus({ kind: 'loading' });
-    const result = await fetchLocateByAddress(text, await getRequestIntegrityHeaders(), {
-      forCamera: true,
-    });
+    const lookUpOnce = async () =>
+      fetchLocateByAddress(text, await getRequestIntegrityHeaders(), { forCamera: true });
+    let result = await lookUpOnce();
+    // This tab's cached token can outlive the shared cookie: ask for the current one, once.
+    if (result.kind === 'request_integrity_denied') {
+      clearRequestIntegrityToken();
+      result = await lookUpOnce();
+    }
     if (result.kind === 'resolved') {
       const target = resolveExploreAddressCamera(result.resolution);
       if (!target) {

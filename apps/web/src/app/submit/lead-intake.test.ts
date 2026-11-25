@@ -3,7 +3,16 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { validateLeadSubmission, type LeadSubmissionInput } from './lead-intake';
+import {
+  DEFAULT_SUBMISSION_VALIDATION_LIMITS,
+  validateAndNormalizeSubmission,
+} from '@repo/security';
+import {
+  MAX_LEAD_STATEMENT_LENGTH,
+  leadStatementLength,
+  validateLeadSubmission,
+  type LeadSubmissionInput,
+} from './lead-intake';
 
 function baseInput(overrides: Partial<LeadSubmissionInput> = {}): LeadSubmissionInput {
   return {
@@ -94,4 +103,50 @@ test('derives a title from the description when present, otherwise from whyItMat
       'This documents a school building nobody else has recorded.',
     );
   }
+});
+
+test('the whole-lead cap is the quarantine’s own, measured the way the quarantine measures it', () => {
+  assert.equal(
+    MAX_LEAD_STATEMENT_LENGTH,
+    DEFAULT_SUBMISSION_VALIDATION_LIMITS.maxStatementCharacters,
+  );
+  // Spacing, line endings and compatibility characters the quarantine normalizes before counting.
+  const messy = baseInput({
+    description: '  ﬁrst\r\nline   with\tgaps and a ① ',
+    whyItMatters: 'It   names the ﬁrst teacher\rat the school.  ',
+    location: ' Tulsa,   Oklahoma ',
+    era: '１９２１',
+    attestation: true,
+  });
+  const intake = validateLeadSubmission(messy);
+  assert.equal(intake.valid, true);
+  if (!intake.valid) return;
+  const quarantine = validateAndNormalizeSubmission(intake.payload);
+  assert.equal(quarantine.valid, true);
+  if (!quarantine.valid) return;
+  assert.equal(leadStatementLength(messy), quarantine.normalized.statement.length);
+  assert.notEqual(leadStatementLength(messy), intake.payload.statement.length);
+});
+
+test('a lead too long as a whole is refused in words that name the visible fields', () => {
+  const fits = baseInput({ description: 'd'.repeat(3000), whyItMatters: 'w'.repeat(2900) });
+  assert.equal(validateLeadSubmission(fits).valid, true);
+  const result = validateLeadSubmission({ ...fits, whyItMatters: 'w'.repeat(3000) });
+  assert.equal(result.valid, false);
+  if (result.valid) return;
+  assert.deepEqual(
+    result.issues.map((issue) => issue.field),
+    ['whyItMatters'],
+  );
+  assert.match(result.issues[0]!.message, /can hold 6,000 characters, and this is \d+ over/);
+  assert.match(result.issues[0]!.message, /Shorten “What you know” or “Why it matters”/);
+});
+
+test('a field over its own limit is named the way the form labels it', () => {
+  const result = validateLeadSubmission(baseInput({ location: 'x'.repeat(201) }));
+  assert.equal(result.valid, false);
+  if (result.valid) return;
+  assert.deepEqual(result.issues, [
+    { field: 'location', message: 'Keep “Where” to 200 characters or fewer.' },
+  ]);
 });

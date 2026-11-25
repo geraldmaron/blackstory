@@ -93,7 +93,7 @@ describe('ExploreFiltersPanel — structure', () => {
 
     const places = getByLabelText('Places');
     expect(places.props.accessibilityRole).toBe('radio');
-    expect(places.props.accessibilityState?.selected).toBe(false);
+    expect(places.props.accessibilityState?.checked).toBe(false);
     const styleProp = places.props.style;
     const resolved = typeof styleProp === 'function' ? styleProp({ pressed: false }) : styleProp;
     const flat = Array.isArray(resolved)

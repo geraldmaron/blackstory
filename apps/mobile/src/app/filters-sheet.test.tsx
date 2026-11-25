@@ -35,7 +35,7 @@ describe('FiltersSheet — kind picker selected state (MOB-017)', () => {
     const { getAllByRole, getByLabelText } = await render(<FiltersSheet />);
     const radios = getAllByRole('radio');
     expect(radios.length).toBeGreaterThan(0);
-    expect(getByLabelText('All kinds').props.accessibilityState?.selected).toBe(true);
+    expect(getByLabelText('All kinds').props.accessibilityState?.checked).toBe(true);
   });
 
   it('marks exactly the pressed kind option as selected (no checkmark glyph in label)', async () => {
@@ -45,9 +45,9 @@ describe('FiltersSheet — kind picker selected state (MOB-017)', () => {
     await fireEvent.press(target);
 
     const after = getAllByRole('radio');
-    const selected = after.filter((r) => r.props.accessibilityState?.selected === true);
+    const selected = after.filter((r) => r.props.accessibilityState?.checked === true);
     expect(selected.length).toBeGreaterThanOrEqual(1);
-    expect(getByLabelText('Places').props.accessibilityState?.selected).toBe(true);
+    expect(getByLabelText('Places').props.accessibilityState?.checked).toBe(true);
     for (const radio of selected) {
       expect(radio.props.accessibilityLabel).not.toContain('✓');
     }
@@ -57,11 +57,11 @@ describe('FiltersSheet — kind picker selected state (MOB-017)', () => {
     const { getByLabelText } = await render(<FiltersSheet />);
 
     await fireEvent.press(getByLabelText('Places'));
-    expect(getByLabelText('Places').props.accessibilityState?.selected).toBe(true);
+    expect(getByLabelText('Places').props.accessibilityState?.checked).toBe(true);
 
     await fireEvent.press(getByLabelText('Places'));
-    expect(getByLabelText('Places').props.accessibilityState?.selected).toBe(false);
-    expect(getByLabelText('All kinds').props.accessibilityState?.selected).toBe(true);
+    expect(getByLabelText('Places').props.accessibilityState?.checked).toBe(false);
+    expect(getByLabelText('All kinds').props.accessibilityState?.checked).toBe(true);
   });
 });
 
@@ -103,9 +103,9 @@ describe('FiltersSheet — live facet apply (no Apply gate)', () => {
 
     await fireEvent.press(getByText('Clear'));
 
-    expect(getByLabelText('Events').props.accessibilityState?.selected).toBe(false);
-    expect(getByLabelText('1960s').props.accessibilityState?.selected).toBe(false);
-    expect(getByLabelText('All kinds').props.accessibilityState?.selected).toBe(true);
+    expect(getByLabelText('Events').props.accessibilityState?.checked).toBe(false);
+    expect(getByLabelText('1960s').props.accessibilityState?.checked).toBe(false);
+    expect(getByLabelText('All kinds').props.accessibilityState?.checked).toBe(true);
     expect(mockNavigate).toHaveBeenCalledWith(
       expect.objectContaining({
         pathname: '/archive',

@@ -83,3 +83,29 @@ export const TRAFFIC_EVENT_SAMPLE_RATE = 0.1;
 export function shouldSendTrafficEvent(random: number = Math.random()): boolean {
   return random < TRAFFIC_EVENT_SAMPLE_RATE;
 }
+
+/**
+ * Hosts whose events reach Vercel Analytics. The project's `*.vercel.app` aliases serve the same
+ * production build outside Cloudflare's bot challenge, so scrapers and our own release checks
+ * land there; they are not readers of blackstory.app.
+ */
+export const COUNTED_HOSTS: readonly string[] = ['blackstory.app', 'www.blackstory.app'];
+
+/**
+ * Whether an analytics event is kept (`beforeSend`). Every event needs a counted host; a pageview
+ * also needs a likely-human browser. The sampled `traffic` event still reports automated classes,
+ * since measuring them is its job.
+ */
+export function shouldCountAnalyticsEvent(
+  event: { readonly type: 'pageview' | 'event'; readonly url: string },
+  trafficClass: TrafficClass,
+): boolean {
+  let host: string;
+  try {
+    host = new URL(event.url).hostname;
+  } catch {
+    return false;
+  }
+  if (!COUNTED_HOSTS.includes(host)) return false;
+  return event.type !== 'pageview' || trafficClass === 'likely_human';
+}

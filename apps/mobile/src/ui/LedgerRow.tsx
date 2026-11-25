@@ -3,10 +3,17 @@
  * PLACE slug, 13 Inter Medium title, serif one-liner. Hairline divider — not a card stack.
  */
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View, type GestureResponderEvent } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  type GestureResponderEvent,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from './Text';
 import { Divider } from './Divider';
+import { linesForFontScale } from './large-type';
 import { MIN_TOUCH_TARGET, space, useThemeColors } from './tokens';
 
 const MIN_ROW_HEIGHT = MIN_TOUCH_TARGET;
@@ -46,6 +53,8 @@ export function LedgerRow({
   secondaryAction,
 }: LedgerRowProps) {
   const theme = useThemeColors();
+  // Clamps grow with the OS text size; see `large-type.ts`.
+  const { fontScale } = useWindowDimensions();
   const label =
     accessibilityLabel ??
     [title, slug, summary].filter((part) => typeof part === 'string' && part.length > 0).join('. ');
@@ -71,11 +80,11 @@ export function LedgerRow({
       {leading ? <View style={styles.leading}>{leading}</View> : null}
       <View style={styles.textColumn}>
         {slug ? (
-          <Text variant="meta" colorRole="inkMuted" numberOfLines={1}>
+          <Text variant="meta" colorRole="inkMuted" numberOfLines={linesForFontScale(1, fontScale)}>
             {slug}
           </Text>
         ) : null}
-        <Text variant="bodyEmphasis" numberOfLines={2}>
+        <Text variant="bodyEmphasis" numberOfLines={linesForFontScale(2, fontScale, 4)}>
           {title}
         </Text>
         {summary ? (
@@ -84,7 +93,11 @@ export function LedgerRow({
           // so the hierarchy read backwards on every screen that uses this row. The editorial
           // serif is the reading register: it belongs to a Story's body, not to a navigation
           // row's gloss.
-          <Text variant="caption" colorRole="inkMuted" numberOfLines={2}>
+          <Text
+            variant="caption"
+            colorRole="inkMuted"
+            numberOfLines={linesForFontScale(2, fontScale, 4)}
+          >
             {summary}
           </Text>
         ) : null}

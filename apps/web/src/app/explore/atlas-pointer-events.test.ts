@@ -34,7 +34,6 @@ describe('Explore pointer-events', () => {
       '.ds-bar',
       '.ds-xcol',
       '.ds-xdock',
-      '.ds-map-controls',
       '.ds-palette',
       '.ds-shortcuts',
       '.ds-saved',
@@ -46,6 +45,16 @@ describe('Explore pointer-events', () => {
       );
     }
     assert.match(atlasCss, /\.ds-atlas\s*>\s*\.ds-bar[\s\S]*?pointer-events:\s*auto/s);
+    // The control stack is wider than its buttons (the move pad), so its root passes clicks to
+    // the map and only the buttons take them.
+    const controlsCss = readFileSync(
+      new URL('../../components/map-experience/map-controls.css', import.meta.url),
+      'utf8',
+    );
+    assert.match(
+      controlsCss,
+      /\.ds-map-controls__btn,\s*\.ds-map-controls__stack\s*\{\s*pointer-events:\s*auto/,
+    );
   });
 
   it('keeps full-bleed chrome and the toast stack transparent to the pointer', () => {

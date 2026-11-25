@@ -51,6 +51,7 @@ import {
   radius,
   space,
   typeScale,
+  useAnnounceOnChange,
   useReduceMotion,
   useThemeColors,
   type NavIconName,
@@ -213,6 +214,18 @@ function TownSlip({
     });
   }
 
+  // iOS ignores the live region below, so the settled answer is also announced.
+  const settled = answer && answer !== 'loading' ? answer : undefined;
+  useAnnounceOnChange(
+    settled?.kind === 'found'
+      ? `${settled.records.length} ${settled.records.length === 1 ? 'record names' : 'records name'} ${asked}`
+      : settled?.kind === 'none'
+        ? `No record names ${asked} yet. That means it isn’t researched yet, not that nothing happened there.`
+        : settled?.kind === 'failed'
+          ? 'The archive didn’t answer. Check the connection and try again.'
+          : null,
+  );
+
   return (
     <View style={[styles.slip, { backgroundColor: theme.canvas }]} testID="opening-town-slip">
       <Text variant="bodyEmphasis" nativeID="opening-town-label">
@@ -346,7 +359,9 @@ export function OpeningScreen({
     const next = Math.min(lastIndex, Math.max(0, index));
     // Reduce motion: the page is simply there, with no slide.
     pager.current?.scrollTo({ x: next * width, animated: !reduceMotion });
-    if (reduceMotion) setPage(next);
+    // Unconditional: a programmatic scroll is not guaranteed a momentum event, and pages other
+    // than `page` are hidden from assistive tech.
+    setPage(next);
   }
   function handleSettle(event: NativeSyntheticEvent<NativeScrollEvent>) {
     setPage(Math.round(event.nativeEvent.contentOffset.x / Math.max(1, width)));
@@ -405,6 +420,7 @@ export function OpeningScreen({
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         onMomentumScrollEnd={handleSettle}
         testID="opening-pager"
       >
@@ -414,6 +430,9 @@ export function OpeningScreen({
             style={[{ width }, index === lastIndex ? { backgroundColor: theme.canvas } : undefined]}
             contentContainerStyle={styles.page}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            // The town field sits low on its page; without this the keyboard covers it on iOS.
+            automaticallyAdjustKeyboardInsets
             // Only the page on screen is read; the others are a swipe away, not in the way.
             accessibilityElementsHidden={index !== page}
             importantForAccessibility={index === page ? 'auto' : 'no-hide-descendants'}

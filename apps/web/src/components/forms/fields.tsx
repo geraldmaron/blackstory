@@ -191,6 +191,8 @@ export function NumberedStep({ index, title, detail, done = false, className }: 
         {done ? '✓' : index}
       </span>
       <span className="ds-doc-ustep__t">
+        {/* The check mark is decorative; the state has to be in the text a screen reader gets. */}
+        <span className="ds-visually-hidden">{done ? 'Done: ' : 'Not yet: '}</span>
         {title}
         {detail ? <small>{detail}</small> : null}
       </span>

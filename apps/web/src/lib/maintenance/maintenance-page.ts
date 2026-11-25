@@ -66,7 +66,7 @@ export function renderMaintenancePage(options: MaintenancePageOptions): string {
   --copper: #8E4F2A;
   --stone: #6D675F;
   --rule: #D7D0C4;
-  --sans: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --sans: "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --serif: Newsreader, ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }

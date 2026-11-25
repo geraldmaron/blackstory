@@ -25,6 +25,8 @@ export function ChartMarks({
   const ref = useRef<HTMLDivElement>(null);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    // Escape puts the tip away without moving focus (WCAG 1.4.13); the next focus brings it back.
+    if (event.key === 'Escape') ref.current?.setAttribute('data-tips-off', '');
     if (!KEYS.has(event.key) || !ref.current) return;
     const marks = Array.from(ref.current.querySelectorAll<HTMLElement>('[data-mark]'));
     const at = marks.indexOf(document.activeElement as HTMLElement);
@@ -44,7 +46,14 @@ export function ChartMarks({
   }
 
   return (
-    <div ref={ref} className={className} role="group" aria-label={label} onKeyDown={onKeyDown}>
+    <div
+      ref={ref}
+      className={className}
+      role="group"
+      aria-label={label}
+      onKeyDown={onKeyDown}
+      onFocus={(event) => event.currentTarget.removeAttribute('data-tips-off')}
+    >
       {children}
     </div>
   );

@@ -3,8 +3,9 @@
  * Loads display + editorial + sans + mono fonts, design-system stylesheet, and app shell.
  * Also wires Add to Home Screen metadata (manifest + Apple web app) without a service worker.
  *
- * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Schibsted
- * Grotesk for headlines/titles/key statements (800 display, 700 headline, 650 title), Geist for UI and body, Newsreader for
+ * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Outfit, the
+ * wordmark's own face, for headlines/titles/key statements (800 display, 700 headline, 650
+ * title), Geist for UI and body, Newsreader for
  * editorial longform, Geist Mono for data/citations. All four are variable faces, so no weight
  * list is passed: next/font serves the axis and the type-scale tokens pick weights off it.
  *
@@ -19,13 +20,7 @@
  */
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import {
-  Schibsted_Grotesk,
-  Geist,
-  Newsreader,
-  Geist_Mono,
-  Google_Sans_Flex,
-} from 'next/font/google';
+import { Outfit, Geist, Newsreader, Geist_Mono, Google_Sans_Flex } from 'next/font/google';
 import { brandOpenGraph, PRODUCT_NAME } from '@repo/config';
 import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
@@ -63,7 +58,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const displayFace = Schibsted_Grotesk({
+const displayFace = Outfit({
   subsets: ['latin'],
   variable: '--ds-font-display',
   display: 'swap',

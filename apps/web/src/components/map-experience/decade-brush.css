@@ -7,7 +7,7 @@
  */
 .ds-xbrush {
   display: grid;
-  grid-template-columns: 11rem minmax(0, 1fr);
+  grid-template-columns: 11rem minmax(0, 1fr) auto;
   align-items: stretch;
   gap: var(--ds-space-4);
   height: 56px;
@@ -37,7 +37,7 @@
 
 @media (min-width: 80rem) {
   .ds-xdock .ds-xbrush {
-    grid-template-columns: 22rem minmax(0, 1fr);
+    grid-template-columns: 22rem minmax(0, 1fr) auto;
   }
 
   .ds-xdock .ds-xbrush__key {
@@ -195,6 +195,13 @@
   opacity: 1;
 }
 
+/* A finger has no hover to find the handles with, so there they always show. */
+@media (hover: none), (pointer: coarse) {
+  .ds-xbrush:not(.ds-xbrush--active) .ds-xbrush__handle {
+    opacity: 1;
+  }
+}
+
 .ds-xbrush--active .ds-xbrush__handle::before,
 .ds-xbrush--active .ds-xbrush__handle::after {
   background: var(--ds-accent-graphic);
@@ -216,4 +223,51 @@
   letter-spacing: var(--ds-tracking-meta);
   line-height: 1;
   text-transform: uppercase;
+}
+
+/* From and To: the same range as two native selects in the kit's secondary button dress (as the
+   quick filters are), for a reader who cannot or would rather not drag. */
+.ds-xbrush__ends {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-xbrush__end {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-caption);
+}
+
+/* 44px targets inside the strip's 40px row: they reach into its padding, as the clear button does. */
+.ds-xbrush__select {
+  margin-block: calc(var(--ds-space-1) * -0.5);
+  padding-inline: var(--ds-space-2);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+/* Between the column and a wide screen the bars need the room: the words go, the names stay. */
+@media (min-width: 64rem) and (max-width: 79.9375rem) {
+  .ds-xdock .ds-xbrush__end-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Inside Filters on a phone the selects take a row of their own under the bars. */
+.ds-xcol--sheet .ds-xbrush__ends {
+  padding-top: var(--ds-space-3);
+}
+
+.ds-xcol--sheet .ds-xbrush__select {
+  margin-block: 0;
 }

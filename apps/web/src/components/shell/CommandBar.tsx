@@ -14,7 +14,7 @@
  */
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor } from '../../lib/nav/surface-classes';
@@ -108,6 +108,17 @@ function ThemeGlyphs() {
   );
 }
 
+/** Follows `<html data-theme>`, whoever sets it (the head script, this button, a caller's own). */
+function subscribeToTheme(onChange: () => void): () => void {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
+  return () => observer.disconnect();
+}
+/** The theme the button will switch to, read the way `toggleDocumentTheme` decides it. */
+const nextTheme = () => (document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+/** The server cannot see a stored choice; it names the switch away from the light default. */
+const nextThemeOnServer = () => 'dark' as const;
+
 export function CommandBar({
   query,
   savedCount = 0,
@@ -117,6 +128,8 @@ export function CommandBar({
   className,
 }: CommandBarProps) {
   const pathname = usePathname() || '/';
+  // Hydrates as the server's label, then re-renders to the real theme without a mismatch.
+  const switchTo = useSyncExternalStore(subscribeToTheme, nextTheme, nextThemeOnServer);
   const [searchOpen, setSearchOpen] = useState(false);
   const openerRef = useRef<HTMLButtonElement>(null);
 
@@ -135,7 +148,7 @@ export function CommandBar({
     // The header's own brand link, tabs and tools sit behind the sheet too; leaving them focusable
     // let Tab walk out of a dialog that declares aria-modal.
     const behind = document.querySelectorAll(
-      '.ds-shell-body, .ds-shell-footer, .ds-tabbar, .ds-bar__brand, .ds-bar__tabs, .ds-bar__tools',
+      '.ds-skip-link, .ds-shell-offline, .ds-world-controls, .ds-shell-body, .ds-shell-footer, .ds-tabbar, .ds-bar__brand, .ds-bar__tabs, .ds-bar__tools',
     );
     behind.forEach((element) => element.setAttribute('inert', ''));
     document.documentElement.dataset.searchSheet = 'open';
@@ -258,7 +271,7 @@ export function CommandBar({
               type="button"
               className="ds-bar__tool"
               onClick={onToggleTheme ?? toggleDocumentTheme}
-              aria-label="Switch between light and dark"
+              aria-label={`Switch to ${switchTo} theme`}
             >
               <ThemeGlyphs />
             </button>

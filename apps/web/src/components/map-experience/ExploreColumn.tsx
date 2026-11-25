@@ -177,6 +177,8 @@ export function ExploreColumn({
       {search ? (
         <div
           className="ds-xcol__search"
+          // The search and quick filters act on the catalog; the heading and the body stay live.
+          inert={busy}
           // On a phone the place field shows at peek. Using it needs room for its suggestions
           // and the keyboard, so focus raises the sheet.
           onFocusCapture={() => {

@@ -4,7 +4,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { SearchHit } from '@/lib/content';
 
 type Props = {
@@ -14,6 +14,7 @@ type Props = {
 export function DocsSearch({ index }: Props) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const hits = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -29,13 +30,28 @@ export function DocsSearch({ index }: Props) {
   }, [index, query]);
 
   return (
-    <div className="search-slot">
+    <div
+      className="search-slot"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setOpen(false);
+        }
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && open) {
+          // Focus first: the input's onFocus reopens, and the close below must win.
+          inputRef.current?.focus();
+          setOpen(false);
+        }
+      }}
+    >
       <div className="search-wrap">
         <label className="visually-hidden" htmlFor="docs-search">
           Search docs
         </label>
         <input
           id="docs-search"
+          ref={inputRef}
           type="search"
           placeholder="Search docs…"
           value={query}
@@ -44,21 +60,31 @@ export function DocsSearch({ index }: Props) {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          onBlur={() => {
-            window.setTimeout(() => setOpen(false), 150);
-          }}
           autoComplete="off"
         />
       </div>
+      <p className="visually-hidden" role="status">
+        {query.trim().length < 2
+          ? ''
+          : `${hits.length} ${hits.length === 1 ? 'result' : 'results'}`}
+      </p>
       {open && hits.length > 0 ? (
-        <div className="search-results" role="listbox" aria-label="Search results">
+        // Safari does not focus a link on click, so keep focus in the input
+        // or the blur above unmounts the link before its click lands.
+        <ul
+          className="search-results"
+          aria-label="Search results"
+          onMouseDown={(event) => event.preventDefault()}
+        >
           {hits.map((hit) => (
-            <Link key={hit.slug} href={hit.url} onClick={() => setOpen(false)}>
-              <strong>{hit.title}</strong>
-              <span>{hit.description || hit.excerpt}</span>
-            </Link>
+            <li key={hit.slug}>
+              <Link href={hit.url} onClick={() => setOpen(false)}>
+                <strong>{hit.title}</strong>
+                <span>{hit.description || hit.excerpt}</span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       ) : null}
     </div>
   );

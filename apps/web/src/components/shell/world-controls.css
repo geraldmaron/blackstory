@@ -1,5 +1,6 @@
 /* The world's two switches: bottom right, clear of the map credit at bottom left. Mono caps, the
-   v11 chrome voice. Hidden where no world is painted, unless documents mode is on. */
+   v11 chrome voice. Hidden where no world is painted, unless documents mode is on. The memorial
+   paints no world but its wall of names moves, so the switch that stops it shows there too. */
 .ds-world-controls {
   position: fixed;
   right: var(--ds-space-3);
@@ -13,6 +14,7 @@
 
 body:has([data-surface='door']) .ds-world-controls,
 html[data-world-on] .ds-world-controls,
+body:has(.ds-memorial-wall) .ds-world-controls,
 .ds-world-controls[data-documents] {
   display: flex;
 }
@@ -83,6 +85,14 @@ body:has(.ds-world-controls--inline) .ds-world-controls:not(.ds-world-controls--
 @media (max-width: 47.9375rem) {
   .ds-world-controls {
     bottom: calc(var(--ds-tabbar-h, 4rem) + env(safe-area-inset-bottom, 0px) + var(--ds-space-2));
+  }
+
+  /* The memorial's inscription runs the full width at the foot of a phone screen, so the switch
+     sits under the header there, over the wall, where it covers no sentence. */
+  body:has(.ds-memorial-wall) .ds-world-controls {
+    /* The phone header is in flow (48px), so the island clearance is zero here. */
+    top: calc(var(--ds-header-h) + env(safe-area-inset-top, 0px) + var(--ds-space-2));
+    bottom: auto;
   }
 }
 

@@ -51,10 +51,12 @@ export function SiteFooter() {
           </div>
 
           <nav aria-label="Footer" className="ds-shell-footer__columns">
-            {columns.map((column) => (
+            {columns.map((column, index) => (
               <div key={column.title} className="ds-shell-footer__column">
-                <p className="ds-shell-footer__column-title">{column.title}</p>
-                <ul className="ds-shell-footer__links">
+                <p className="ds-shell-footer__column-title" id={`footer-column-${index}`}>
+                  {column.title}
+                </p>
+                <ul className="ds-shell-footer__links" aria-labelledby={`footer-column-${index}`}>
                   {column.items.map((item) => (
                     <li key={item.href}>
                       {/* Footer nav mounts on every route; skip the default viewport prefetch

@@ -285,7 +285,13 @@ export function validateAndNormalizeSubmission(
   if (!input) {
     return {
       valid: false,
-      issues: [issue('schema_invalid', '$', 'Submission does not match the approved schema.')],
+      issues: [
+        issue(
+          'schema_invalid',
+          '$',
+          'This could not be read as it was sent. Reload the page and send it again.',
+        ),
+      ],
     };
   }
 
@@ -303,7 +309,13 @@ export function validateAndNormalizeSubmission(
   }
   if (statement.length < 20 || statement.length > limits.maxStatementCharacters) {
     issues.push(
-      issue('statement_invalid', 'statement', 'Statement length is outside the accepted range.'),
+      issue(
+        'statement_invalid',
+        'statement',
+        statement.length < 20
+          ? 'Say a little more. What you wrote needs at least 20 characters.'
+          : `What you wrote is too long. Keep it to ${limits.maxStatementCharacters.toLocaleString('en-US')} characters or fewer.`,
+      ),
     );
   }
   if (
@@ -313,7 +325,11 @@ export function validateAndNormalizeSubmission(
       targetRecordId.length > limits.maxTargetRecordIdCharacters)
   ) {
     issues.push(
-      issue('schema_invalid', 'targetRecordId', 'Target record identifier is outside policy.'),
+      issue(
+        'schema_invalid',
+        'targetRecordId',
+        `Name the record or paste its page address, in ${limits.maxTargetRecordIdCharacters} characters or fewer.`,
+      ),
     );
   }
   if (
@@ -322,7 +338,11 @@ export function validateAndNormalizeSubmission(
       containsProhibitedCharacters(input.submitterContact))
   ) {
     issues.push(
-      issue('characters_invalid', 'submitterContact', 'Submitter contact is outside policy.'),
+      issue(
+        'characters_invalid',
+        'submitterContact',
+        `Check the email address. It can be up to ${limits.maxContactCharacters} characters, typed rather than pasted from a document.`,
+      ),
     );
   }
   if (
@@ -331,7 +351,11 @@ export function validateAndNormalizeSubmission(
     (input.targetRecordId !== undefined && containsProhibitedCharacters(input.targetRecordId))
   ) {
     issues.push(
-      issue('characters_invalid', '$', 'Submission contains prohibited control characters.'),
+      issue(
+        'characters_invalid',
+        '$',
+        'Something you pasted carries hidden characters that cannot be accepted. Retype that part and send it again.',
+      ),
     );
   }
 
@@ -371,8 +395,13 @@ export function validateAndNormalizeSubmission(
     (timestamp) => timestamp <= nowMs && nowMs - timestamp < limits.frequencyWindowMs,
   ).length;
   if (recentCount >= limits.maxSubmissionsPerWindow) {
+    const minutes = Math.round(limits.frequencyWindowMs / 60_000);
     issues.push(
-      issue('frequency_exceeded', '$', 'Submission frequency exceeds the intake policy.'),
+      issue(
+        'frequency_exceeded',
+        '$',
+        `No more than ${limits.maxSubmissionsPerWindow} can be sent in ${minutes === 1 ? 'a minute' : `${minutes} minutes`}. Wait a while, then send it again.`,
+      ),
     );
   }
 

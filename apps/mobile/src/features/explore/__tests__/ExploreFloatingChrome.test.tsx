@@ -1,10 +1,46 @@
 /**
  * Explore floating mast count labels — viewport list size plus loaded release total.
  */
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
+import { AccessibilityInfo } from 'react-native';
 import { ExploreFloatingChrome } from '../ExploreFloatingChrome';
 
 const noop = () => {};
+
+describe('ExploreFloatingChrome — count announcement', () => {
+  it('speaks the count after a filter change settles, and never for a pan', async () => {
+    jest.useFakeTimers();
+    const announce = jest
+      .spyOn(AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
+    const chrome = (inViewCount: number, filters: { kind?: 'place' }) => (
+      <ExploreFloatingChrome
+        inViewCount={inViewCount}
+        releaseCount={1365}
+        scopeLabel="Nearby"
+        filters={filters}
+        onToggleInstruments={noop}
+        onNationalView={noop}
+      />
+    );
+    const { rerender } = await render(chrome(712, {}));
+    // A pan: the count moves, the filters do not.
+    await rerender(chrome(40, {}));
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(announce).not.toHaveBeenCalled();
+
+    await rerender(chrome(2, { kind: 'place' }));
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(announce).toHaveBeenCalledTimes(1);
+    expect(announce).toHaveBeenCalledWith('Nearby, 2 nearby · filtered, 1,365 in release');
+    announce.mockRestore();
+    jest.useRealTimers();
+  });
+});
 
 describe('ExploreFloatingChrome — mast count scope', () => {
   it('labels the pre-viewport count as all pinned', async () => {

@@ -103,7 +103,7 @@
   font-weight: 600;
   font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4.5rem);
   line-height: 1.02;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.018em;
   color: var(--ds-ink);
   text-wrap: balance;
 }
@@ -266,7 +266,7 @@ a.ds-memorial-index__jump-link:hover {
   font-weight: 600;
   font-size: var(--ds-text-display-2);
   line-height: 0.9;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   color: var(--ds-ink);
 }
 

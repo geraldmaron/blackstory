@@ -12,6 +12,10 @@ export type SparklineStripProps = {
   readonly series: DataGroupedBarSeries;
 };
 
+function isMeasured(value: number | undefined): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
 export function SparklineStrip({ series }: SparklineStripProps) {
   const theme = useThemeColors();
   const primaryId = series.series[0]?.id;
@@ -20,21 +24,17 @@ export function SparklineStrip({ series }: SparklineStripProps) {
     return null;
   }
 
-  const allValues = series.points.flatMap((point) => {
-    const a = point.values[primaryId];
-    const b = point.values[comparisonId];
-    return [typeof a === 'number' ? a : 0, typeof b === 'number' ? b : 0];
-  });
-  const maxValue = Math.max(1, ...allValues);
+  const maxValue = Math.max(
+    1,
+    ...series.points.flatMap((point) =>
+      [point.values[primaryId], point.values[comparisonId]].filter(isMeasured),
+    ),
+  );
   const primaryLabel = series.series[0]?.label ?? 'Primary';
   const comparisonLabel = series.series[1]?.label ?? 'Comparison';
 
   return (
-    <View
-      style={styles.block}
-      accessibilityRole="summary"
-      accessibilityLabel={`${series.title} sparkline across ${series.points.length} periods`}
-    >
+    <View style={styles.block}>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.swatch, { backgroundColor: theme.accentGraphic }]} />
@@ -43,7 +43,7 @@ export function SparklineStrip({ series }: SparklineStripProps) {
           </Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.swatch, { backgroundColor: theme.border }]} />
+          <View style={[styles.swatch, { backgroundColor: theme.borderControl }]} />
           <Text variant="caption" colorRole="inkMuted">
             {comparisonLabel}
           </Text>
@@ -51,22 +51,38 @@ export function SparklineStrip({ series }: SparklineStripProps) {
       </View>
       <View style={styles.rail}>
         {series.points.map((point) => {
-          const primary = point.values[primaryId] ?? 0;
-          const comparison = point.values[comparisonId] ?? 0;
-          const primaryH = Math.max(4, (primary / maxValue) * 48);
-          const comparisonH = Math.max(4, (comparison / maxValue) * 48);
+          // A missing value stays missing: no bar, and "not available" in words. Drawing it as a
+          // short bar would present an unmeasured period as a measured zero.
+          const primary = point.values[primaryId];
+          const comparison = point.values[comparisonId];
+          const say = (value: number | undefined) =>
+            isMeasured(value) ? formatDataValue(value, series.unit) : 'not available';
+          const barHeight = (value: number | undefined) =>
+            isMeasured(value) ? Math.max(4, (value / maxValue) * 48) : 0;
           return (
-            <View key={point.period} style={styles.period}>
+            // The bars are hidden from assistive tech, so each period speaks both values.
+            <View
+              key={point.period}
+              style={styles.period}
+              accessible
+              accessibilityLabel={`${point.period}: ${primaryLabel} ${say(primary)}, ${comparisonLabel} ${say(comparison)}`}
+            >
               <View
                 style={styles.bars}
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               >
                 <View
-                  style={[styles.bar, { height: primaryH, backgroundColor: theme.accentGraphic }]}
+                  style={[
+                    styles.bar,
+                    { height: barHeight(primary), backgroundColor: theme.accentGraphic },
+                  ]}
                 />
                 <View
-                  style={[styles.bar, { height: comparisonH, backgroundColor: theme.border }]}
+                  style={[
+                    styles.bar,
+                    { height: barHeight(comparison), backgroundColor: theme.borderControl },
+                  ]}
                 />
               </View>
               <Text variant="meta" colorRole="inkMuted" style={styles.periodLabel}>
@@ -79,7 +95,7 @@ export function SparklineStrip({ series }: SparklineStripProps) {
                 adjustsFontSizeToFit
                 minimumFontScale={0.8}
               >
-                {formatDataValue(primary, series.unit)}
+                {isMeasured(primary) ? formatDataValue(primary, series.unit) : 'n/a'}
               </Text>
             </View>
           );

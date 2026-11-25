@@ -6,13 +6,14 @@ The tone shows in the edge, the tint and the cue; the title and body stay in ink
 
 > **v13 (2026-11-23):** [`DESIGN.md`](./DESIGN.md) is the design system. This file still binds for the marks, the brand swatches, the type families, the dignity rules and the accessibility floor. Its rules on grounds, radius, depth, plates, texture and motion (the sections marked below) are superseded by `DESIGN.md` section 7 and remain only as a description of what is still in code until each phase lands.
 
-> **Binding source (2026-07-18):** root `brand/` — BlackStory full polished kit
-> (book-and-pin symbol + wordmark, light/dark transparent lockups and symbols,
-> app icons, 4-page guide, token files). Served copies use **role-based** paths
-> under `apps/web/public/brand/` (`lockup-*.png`, `symbol-*.png`,
-> `open-graph-*-1200x630.png`, favicons, apple-touch, install icons). Call sites must use
-> those role names (or `@repo/config` `BRAND_ASSETS` helpers), never
-> product-prefixed filenames.
+> **Binding source (2026-11-24):** root `brand/`, a kit built from one definition
+> (`brand/scripts/brand-geometry.mjs`) by one script (`brand/scripts/build-kit.mjs`): vector
+> masters, light and dark lockups and symbols, app icons, social banners, token files and the
+> wordmark's font. [`brand/README.md`](../../brand/README.md) is its guide. Served copies use
+> **role-based** paths under each app's `public/brand/` (`lockup-*`, `symbol-*`,
+> `open-graph-*-1200x630.png`, favicons, apple-touch, install icons) and are written by the
+> script. Call sites use those role names (or `@repo/config` `BRAND_ASSETS`), never
+> product-prefixed filenames. No brand file is edited by hand: change the definition and rebuild.
 
 **Product name:** BlackStory. Core line: *History, pinned to place.* Support:
 *People. Places. Evidence. Context.*
@@ -56,12 +57,17 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
    Archive Paper swatch `#F4EFE5` is the brand color; the web theme canvas is
    one value step lighter so a sunken well and a raised surface both have room
    (see Theme roles).
-3. **Display type.** Headlines use Schibsted Grotesk on its variable weight axis
-   (800 display, 700 headline, 650 title); SemiBold-everywhere is retired because it
-   left size as the only contrast axis. UI Geist; editorial Newsreader; data Geist
-   Mono (see `apps/web/src/app/layout.tsx`).
-4. **Lockup rendering.** Official artwork PNGs at `apps/web/public/brand/` —
-   never type the wordmark next to a bare symbol in React.
+3. **Display type.** Headlines use Outfit, the wordmark's own face, on its variable weight
+   axis (800 display, 700 headline, 650 title), so the logo and the headlines are one typeface
+   (owner, 2026-11-24; it replaced Schibsted Grotesk on the web, in the mobile app and in
+   `apps/site`). UI Geist;
+   editorial Newsreader; data Geist Mono (see `apps/web/src/app/layout.tsx`).
+4. **Lockup rendering.** Use the kit's artwork (`BRAND_ASSETS`). The wordmark is Outfit
+   Regular, kerned, tracked -0.03em. Where the letters must be live text, set them in the
+   display face at that weight and tracking and place the symbol from
+   `brand/tokens/live-lockup.json`, as the front page's last scene does; then the text and the
+   symbol are the lockup. Never type the name in any other face, weight or spacing next to a
+   symbol.
 5. **Copper text.** Use `#8E4F2A` on light / `#D07A32` on dark
    (`--ds-accent`), not raw Copper Pin for body text on light canvas.
    Inline links in operational notices use that theme-aware token, an underline, and a
@@ -75,7 +81,7 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
 
 Anatomy: book cover, page bands, place pin, wordmark. The symbol is a
 standalone book-and-pin mark (not a letterform). Official lockup and symbol
-are artwork, used as provided.
+are artwork, used as provided. Their construction is in `brand/README.md`.
 
 ### Logo family
 
@@ -85,7 +91,7 @@ are artwork, used as provided.
 | Lockup (symbol + wordmark) | Default signature; headers |
 | App icon | App launchers and tiles |
 
-Each ships as a light and dark transparent PNG pair.
+Each ships as a light and dark pair, as SVG (`brand/vector`) and as transparent PNG.
 
 ### Clear space and minimum sizes
 
@@ -100,7 +106,8 @@ Each ships as a light and dark transparent PNG pair.
 
 - Stretch, recolor beyond approved light/dark variants, remove the pin,
   add effects, or crowd clear space.
-- Reconstruct the lockup by typing the wordmark beside a symbol render.
+- Reconstruct the lockup by typing the wordmark beside a symbol render in any face or
+  spacing but the kit's own (rule 4).
 - Put product-prefixed names into npm scopes, CSS prefixes, or env prefixes.
 
 ## Color
@@ -186,7 +193,7 @@ Rules that follow from the numbers:
 
 ## Type
 
-Schibsted Grotesk for headlines, with weight as a real axis; Geist for UI/body;
+Outfit for headlines, with weight as a real axis; Geist for UI/body;
 Newsreader for editorial/longform; Geist Mono for data, citations, dates,
 confidence and technical labels. All open-source; no licensed fonts, and no new
 family: boldness comes from weight and scale inside these four.

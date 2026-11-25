@@ -13,7 +13,9 @@ void React;
 
 export function MapKey({ className }: { readonly className?: string }) {
   return (
-    <p className={cx('ds-mapkey', className)} aria-label="How records are drawn">
+    <p className={cx('ds-mapkey', className)}>
+      {/* A paragraph cannot take aria-label; the name is text only a screen reader gets. */}
+      <span className="ds-visually-hidden">How records are drawn: </span>
       <span className="ds-mapkey__item">
         <span className="ds-mapkey__mark ds-mapkey__mark--site" aria-hidden="true" />
         Exact site

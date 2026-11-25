@@ -65,7 +65,7 @@
   font-size: var(--ds-text-display-2);
   font-weight: 600;
   line-height: 0.95;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
@@ -134,7 +134,7 @@
   font-size: var(--ds-text-display-2);
   font-weight: 600;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
 }
 
 .ds-stories-head__dek {

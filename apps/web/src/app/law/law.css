@@ -296,7 +296,7 @@
   font-weight: 650;
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
 }
 
 .ds-law-row__year[data-unknown='true'] {

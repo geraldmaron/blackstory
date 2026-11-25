@@ -13,10 +13,16 @@ import {
   type CorrectionTargetType,
 } from './categories';
 
-const MIN_STATEMENT_LENGTH = 20;
-const MAX_FIELD_LENGTH = 4_000;
-const MAX_CONTACT_LENGTH = 320;
-const MAX_TARGET_ID_LENGTH = 128;
+/* Exported so the forms state and check the same limits the server enforces. */
+export const MIN_STATEMENT_LENGTH = 20;
+export const MAX_STATEMENT_LENGTH = 4_000;
+export const MAX_CONTACT_LENGTH = 320;
+export const MAX_TARGET_ID_LENGTH = 128;
+
+/** "Keep the email address to 320 characters or fewer." `what` names the field as the reader sees it. */
+export function tooLongMessage(what: string, max: number): string {
+  return `Keep ${what} to ${max.toLocaleString('en-US')} characters or fewer.`;
+}
 
 export type CorrectionSubmissionInput = {
   readonly targetType: CorrectionTargetType;
@@ -64,10 +70,11 @@ function composeStatement(input: CorrectionSubmissionInput): string {
 function fieldTooLong(
   value: string | undefined,
   field: string,
+  what: string,
   max: number,
 ): CorrectionFieldIssue | undefined {
   if (value !== undefined && value.length > max) {
-    return { field, message: `${field} must be ${max} characters or fewer.` };
+    return { field, message: tooLongMessage(what, max) };
   }
   return undefined;
 }
@@ -112,12 +119,17 @@ export function validateCorrectionSubmission(
     });
   }
 
-  for (const [value, field, max] of [
-    [input.targetRecordId, 'targetRecordId', MAX_TARGET_ID_LENGTH],
-    [input.statement, 'statement', MAX_FIELD_LENGTH],
-    [input.contact, 'contact', MAX_CONTACT_LENGTH],
+  for (const [value, field, what, max] of [
+    [
+      input.targetRecordId,
+      'targetRecordId',
+      'the record name or page address',
+      MAX_TARGET_ID_LENGTH,
+    ],
+    [input.statement, 'statement', 'what it should say', MAX_STATEMENT_LENGTH],
+    [input.contact, 'contact', 'the email address', MAX_CONTACT_LENGTH],
   ] as const) {
-    const issue = fieldTooLong(value, field, max);
+    const issue = fieldTooLong(value, field, what, max);
     if (issue) issues.push(issue);
   }
 
@@ -173,9 +185,19 @@ export function validateAppealSubmission(input: AppealSubmissionInput): AppealSu
       message: 'You must confirm the privacy notice before submitting an appeal.',
     });
   }
-  const statementIssue = fieldTooLong(input.statement, 'statement', MAX_FIELD_LENGTH);
+  const statementIssue = fieldTooLong(
+    input.statement,
+    'statement',
+    'what you wrote',
+    MAX_STATEMENT_LENGTH,
+  );
   if (statementIssue) issues.push(statementIssue);
-  const contactIssue = fieldTooLong(input.contact, 'contact', MAX_CONTACT_LENGTH);
+  const contactIssue = fieldTooLong(
+    input.contact,
+    'contact',
+    'the email address',
+    MAX_CONTACT_LENGTH,
+  );
   if (contactIssue) issues.push(contactIssue);
 
   if (issues.length > 0) return { valid: false, issues };
@@ -227,9 +249,19 @@ export function validateAbuseReportSubmission(input: AbuseReportInput): AppealSu
       message: 'You must confirm the privacy notice before submitting a report.',
     });
   }
-  const statementIssue = fieldTooLong(input.statement, 'statement', MAX_FIELD_LENGTH);
+  const statementIssue = fieldTooLong(
+    input.statement,
+    'statement',
+    'what you wrote',
+    MAX_STATEMENT_LENGTH,
+  );
   if (statementIssue) issues.push(statementIssue);
-  const contactIssue = fieldTooLong(input.contact, 'contact', MAX_CONTACT_LENGTH);
+  const contactIssue = fieldTooLong(
+    input.contact,
+    'contact',
+    'the email address',
+    MAX_CONTACT_LENGTH,
+  );
   if (contactIssue) issues.push(contactIssue);
 
   if (issues.length > 0) return { valid: false, issues };

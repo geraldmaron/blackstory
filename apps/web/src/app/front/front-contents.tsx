@@ -31,7 +31,12 @@ export async function FrontContents() {
         <h2 className="ds-front-contents__title" id="front-contents-h">
           In the archive
         </h2>
-        <form className="ds-front-contents__search" action={FRONT_ROUTES.search} role="search">
+        <form
+          className="ds-front-contents__search"
+          action={FRONT_ROUTES.search}
+          role="search"
+          aria-label="Archive"
+        >
           <label htmlFor="front-search">Search the archive</label>
           <div>
             <input

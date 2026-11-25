@@ -5,7 +5,7 @@
  * The scenes are complete without this (retelling.tsx) and their layout and word change are CSS
  * (front.css). This adds three things: the camera (the country for a word scene, a landing on a
  * record's place, the tour's own dive and traverse between them, from `camera-path.ts`); the
- * rail's current scene; and, on the front page, landing a returning reader on the last scene.
+ * rail's current scene; and the first screen's count of the years, once per reader.
  *
  * One passive scroll listener, coalesced to a frame. Nothing is timed and nothing captures the
  * wheel. Reduced motion and "Hold still" get no travel: the camera cuts to the scene in the
@@ -221,14 +221,6 @@ export function RetellingFilm({
     document.addEventListener('click', onClick);
     return () => document.removeEventListener('click', onClick);
   }, []);
-
-  // A returning reader lands on the last scene, with a link back to the start.
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root || !returning || !seen() || window.location.hash) return;
-    root.querySelector<HTMLElement>('[data-watch]')?.removeAttribute('hidden');
-    root.querySelector<HTMLElement>('.ds-scene:last-of-type')?.scrollIntoView({ block: 'start' });
-  }, [returning]);
 
   useEffect(() => {
     const root = rootRef.current;

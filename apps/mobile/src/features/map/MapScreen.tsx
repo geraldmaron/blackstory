@@ -28,7 +28,13 @@
  * suite in this repo, so that evidence is a human running the app.
  */
 import { useEffect, useMemo, useRef, useState, type Ref } from 'react';
-import { Pressable, StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  View,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import {
   Camera,
   GeoJSONSource,
@@ -392,11 +398,15 @@ export function MapScreen({
 
   if (loadState.kind === 'loading') {
     return (
-      <View style={styles.errorContainer} testID="map-loading-state">
-        <ErrorState
-          title="Loading the map"
-          description="Fetching the latest release-coupled places. The list will fill in as soon as they arrive."
-        />
+      // Loading is progress, not an alert: same pattern as the record screen's loading state.
+      <View
+        style={[styles.errorContainer, styles.loadingContainer]}
+        accessible
+        accessibilityRole="progressbar"
+        accessibilityLabel="Loading the map"
+        testID="map-loading-state"
+      >
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -682,6 +692,7 @@ function MapZoomButton({
 const styles = StyleSheet.create({
   container: { flex: 1 },
   errorContainer: { flex: 1, justifyContent: 'center' },
+  loadingContainer: { alignItems: 'center' },
   zoomControls: {
     position: 'absolute',
     right: space['4'],

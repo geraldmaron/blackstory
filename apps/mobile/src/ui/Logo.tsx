@@ -2,7 +2,7 @@
  * Official BlackStory brand mark, rendered from the approved raster exports
  * in assets/brand/ (copied verbatim from brand/logos and brand/symbols —
  * never re-vectorized or redrawn). Enforces the guide's usage rules
- * (brand/guide/pages/03-usage-rules.png, transcribed into
+ * (brand/source/generated-2026-07-18/guide/pages/03-usage-rules.png, transcribed into
  * tokens/generated/logo.generated.ts):
  *
  *  - `resizeMode="contain"` at the source aspect ratio always — never
