@@ -136,3 +136,11 @@ test('a fact rejected against one source stops counting once another source is c
     'dropped fact',
   ]);
 });
+
+test('a rejection no longer counts once a claim for that fact is approved against current text', async () => {
+  const rejections = [{ object: 'Fact A', href: 'https://x.gov/a' }];
+  const claims = [{ object: 'Fact A', citationHref: 'https://x.gov/a' }];
+  const { standingRejectedFacts } = await import('./public-text-review.ts');
+  assert.deepEqual(standingRejectedFacts(rejections, claims), ['Fact A']);
+  assert.deepEqual(standingRejectedFacts(rejections, claims, new Set(['Fact A'])), []);
+});

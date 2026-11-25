@@ -6,6 +6,7 @@ import type { QueryablePool } from './model-invocation-log.js';
 import { validatePreservationDecision } from './wayback-anchor.js';
 
 const hash = (text: string): string => createHash('sha256').update(text, 'utf8').digest('hex');
+const PASSAGE_BATCH = 50;
 export const PASSAGE_VERSION = 'unicode-window-1800-overlap-180-v1';
 
 /** Offsets count Unicode code points, matching PostgreSQL and Web Annotation text positions. */
@@ -54,9 +55,17 @@ export async function indexCaptureText(
     throw new Error('Text does not match the captured extraction hash');
   }
   const chunks = segmentEvidenceText(input.text);
-  // One SQL statement prevents a crash from leaving a partly rebuilt document index.
-  const indexed = await db.query(
-    `WITH authorized_origin AS (
+  // Batches keep each statement's parameter small (a 340K-character nomination in one statement
+  // dropped the pooled connection); the caller's transaction keeps the index all-or-nothing.
+  const rows = chunks.map((chunk) => ({
+    ...chunk,
+    id: `passage_${hash(`${input.captureId}|${input.sourceItemId}|${input.parserVersion}|${PASSAGE_VERSION}|${documentHash}|${chunk.ordinal}`)}`,
+    body_hash: chunk.bodyHash,
+  }));
+  let indexedCount = 0;
+  for (let at = 0; at < rows.length; at += PASSAGE_BATCH) {
+    const indexed = await db.query(
+      `WITH authorized_origin AS (
       UPDATE evidence.capture_origins SET storage_object=jsonb_set(storage_object,'{preservationDecision}',$6::jsonb)
       WHERE capture_id=$1 AND source_item_id=$2 AND retention_revoked_at IS NULL
         AND (storage_object->'preservationDecision' IS NULL OR storage_object->'preservationDecision'='null'::jsonb OR
@@ -71,25 +80,21 @@ export async function indexCaptureText(
     WHERE evidence.retrieval_passages.withdrawn_at IS NULL
       AND (EXCLUDED.retention_decision->>'reviewedAt')::timestamptz >= (evidence.retrieval_passages.retention_decision->>'reviewedAt')::timestamptz
     RETURNING id`,
-    [
-      input.captureId,
-      input.sourceItemId,
-      `${input.parserVersion}:${PASSAGE_VERSION}`,
-      documentHash,
-      JSON.stringify(
-        chunks.map((chunk) => ({
-          ...chunk,
-          id: `passage_${hash(`${input.captureId}|${input.sourceItemId}|${input.parserVersion}|${PASSAGE_VERSION}|${documentHash}|${chunk.ordinal}`)}`,
-          body_hash: chunk.bodyHash,
-        })),
-      ),
-      JSON.stringify(decision),
-      decision.expiresAt,
-    ],
-  );
-  if (indexed.rows.length !== chunks.length)
+      [
+        input.captureId,
+        input.sourceItemId,
+        `${input.parserVersion}:${PASSAGE_VERSION}`,
+        documentHash,
+        JSON.stringify(rows.slice(at, at + PASSAGE_BATCH)),
+        JSON.stringify(decision),
+        decision.expiresAt,
+      ],
+    );
+    indexedCount += indexed.rows.length;
+  }
+  if (indexedCount !== chunks.length)
     throw new Error('Capture policy changed or text was withdrawn; indexing refused');
-  return indexed.rows.length;
+  return indexedCount;
 }
 
 export function parseEvidenceQueryVector(value: unknown): { model: string; values: number[] } {

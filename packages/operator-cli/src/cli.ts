@@ -104,7 +104,7 @@ import {
   HARNESS_ADJUDICATION_PROGRAM_ID,
   stageHarnessAdjudicatedRelationships,
 } from './harness-relationship-staging.js';
-import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
+import { createNodeSafeFetchDependencies, nominationParser, runQuickAddFetch } from './fetch.js';
 import {
   createMetadataOnlyStorage,
   type CaptureDeps,
@@ -1243,7 +1243,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
               ? fetchNrhpRegistryRow(url)
               : runQuickAddFetch(
                   url,
-                  fetchDependencies,
+                  isNpgalleryNomination(url)
+                    ? { ...fetchDependencies, parser: nominationParser }
+                    : fetchDependencies,
                   isNpgalleryNomination(url) ? { limits: NOMINATION_PDF_LIMITS } : {},
                 ),
           storage: captureStorageFromEnv(process.env, decisions),

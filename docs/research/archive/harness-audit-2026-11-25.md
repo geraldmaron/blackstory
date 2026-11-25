@@ -202,6 +202,16 @@ What the batch found:
 - The Colored Musicians Club ledger refused a verdict because one quotation did not occur verbatim
   in its capture (curly quotes or the cut above).
 
+### Follow-up the same day
+
+Collier Heights published after three more fixes: NPS nomination PDFs now keep up to 400,000
+characters of text (`nominationParser`), the passage index is written in batches of 50 (one
+340,000-character document in a single statement dropped the pooled database connection), and a
+rejection recorded against a truncated capture stops counting once a claim for that fact is
+approved against the current text. Two records still hold: Jackson Ward and Colored Musicians
+Club fail in the storage upload of the extracted text (`fetch failed`, other side closed; not size
+related, cause not found), and Farish Street's PDF exceeds the 64 MB fetch limit.
+
 ## What is still to build, in order
 
 1. **Burn down NRHP enrichment** with the correction path, in small batches, and re-pin the

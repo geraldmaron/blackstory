@@ -163,17 +163,21 @@ export const PUBLIC_TEXT_OUTPUT_SCHEMA = {
 /**
  * Rejected facts that still stand against a record. A fact rejected against one source stops
  * counting once the record cites a different source for it; that claim stands or falls on its
- * own review. A fact rejected against the source the record still cites keeps counting.
+ * own review. A fact rejected against the source the record still cites keeps counting, unless
+ * a claim for it has since been approved against the source's current text (`approvedObjects`):
+ * a rejection made against a truncated capture says nothing about the full one.
  */
 export function standingRejectedFacts(
   rejections: readonly { readonly object: string; readonly href: string | null }[],
   claims: readonly { readonly object: string; readonly citationHref: string | null | undefined }[],
+  approvedObjects: ReadonlySet<string> = new Set(),
 ): string[] {
   return [
     ...new Set(
       rejections
         .filter(
           (rejection) =>
+            !approvedObjects.has(rejection.object) &&
             !claims.some(
               (claim) => claim.object === rejection.object && claim.citationHref !== rejection.href,
             ),

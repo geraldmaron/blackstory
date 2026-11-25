@@ -74,6 +74,16 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
     clientRequest.end();
   });
 
+/** Parser for NPS nomination PDFs: keeps far more text than the default so a quoted passage is in the capture. */
+export async function nominationParser(
+  content: Uint8Array,
+  contentType: string,
+): Promise<SafeParserResult> {
+  return contentType === 'application/pdf'
+    ? parseResearchPdf(content, { maxChars: 400_000, maxMs: 90_000 })
+    : parseTextOnlyHtml(content, contentType);
+}
+
 /** Text-only parser that strips scripts/styles and checks universal malware signatures without active content blocks. */
 export async function parseTextOnlyHtml(
   content: Uint8Array,
