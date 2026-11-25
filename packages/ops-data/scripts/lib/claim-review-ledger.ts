@@ -324,9 +324,14 @@ JOIN evidence.source_captures c ON c.id = o.capture_id
 JOIN evidence.retrieval_passages p ON p.capture_id = o.capture_id
   AND p.source_item_id = o.source_item_id AND p.withdrawn_at IS NULL AND p.retention_expires_at > now()
 WHERE si.url = ANY($1::text[])
-GROUP BY si.url, o.capture_id, o.source_item_id, c.content_hash_digest, p.document_text_hash, o.observed_at
--- A document stored more than once (an earlier extraction cut at a text cap) resolves to its longest text.
-ORDER BY si.url, o.observed_at DESC, max(p.end_offset) DESC, o.capture_id`;
+GROUP BY si.url, o.capture_id, o.source_item_id, c.content_hash_digest, p.document_text_hash, o.observed_at,
+  o.storage_object
+-- A document stored more than once resolves to the extraction its origin currently records (a
+-- recapture can be shorter than the text it replaces, once entities are decoded), then to its
+-- longest text (an earlier extraction cut at a text cap).
+ORDER BY si.url, o.observed_at DESC,
+  (p.document_text_hash = o.storage_object->>'extractedTextHash') DESC NULLS LAST,
+  max(p.end_offset) DESC, o.capture_id`;
 
 /** Rebuild review claims from the database. Prepare and apply both call this; apply never trusts a packet file. */
 export async function loadReviewClaims(

@@ -145,6 +145,26 @@ record corrected in place, `publication.entities_corrected` written, page checke
 Postgres-backed site. The dataset URL is dated, so the citation link will break when NPS replaces
 the file; the captured row text is kept for a year.
 
+## First NRHP batch, same day
+
+Five live records were enriched from stored government evidence and run through the correction
+path. Three published in place (Nugent House, Jake Gaither Golf Course, Palmer Memorial Institute
+Historic District); 39 claims were approved across the four that reached review. Two were held,
+both for reasons the gate should catch:
+
+- **George Washington Carver Library.** The city's page now gives October 5, 1980 where the stored
+  evidence said October 24. The reviewer rejected the claim. The record needs its evidence swept
+  again before anything about that date is published.
+- **Eastside Historic District.** The state press release groups two bridges under the 1950s; the
+  text reviewer held the record because that chronology looks wrong for one of them and no second
+  source was supplied.
+
+The batch also exposed two defects in the capture text, both fixed: HTML entities were left
+encoded (`A&amp;M`, `&nbsp;`), so a quotation copied from the page did not occur in its capture;
+and review picked a document's longest stored text, which after a recapture is the stale one.
+Entities are now decoded (angle brackets excepted) and review prefers the extraction the capture
+origin currently records.
+
 ## What is still to build, in order
 
 1. **Burn down NRHP enrichment** with the correction path, in small batches, and re-pin the

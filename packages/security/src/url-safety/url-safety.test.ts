@@ -303,3 +303,13 @@ test('sandbox extraction strips every end-tag shape a browser honors', async () 
     assert.equal(result.extractedText.includes('tail'), true);
   }
 });
+
+test('sandbox extraction decodes text entities and leaves angle brackets encoded', async () => {
+  const html =
+    '<p>Florida A&amp;M, east of&nbsp;Greensboro, Hogan&#8217;s &#x201C;Creek&#x201D; &lt;script&gt; &#60;b&#62; &bogus;</p>';
+  const result = await parseContentInSandbox(Buffer.from(html), 'text/html');
+  assert.equal(
+    result.extractedText,
+    'Florida A&M, east of Greensboro, Hogan’s “Creek” &lt;script&gt; &#60;b&#62; &bogus;',
+  );
+});

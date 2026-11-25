@@ -56,6 +56,41 @@ export type SafeFetchFailureReason =
 
 export type MalwareIndicator = 'eicar_test_signature' | 'executable_magic' | 'active_content';
 
+const TEXT_ENTITIES: Readonly<Record<string, string>> = {
+  amp: '&',
+  nbsp: ' ',
+  quot: '"',
+  apos: "'",
+  lsquo: '‘',
+  rsquo: '’',
+  ldquo: '“',
+  rdquo: '”',
+  ndash: '–',
+  mdash: '—',
+  hellip: '…',
+};
+const HTML_ENTITY = /&(#x[0-9a-f]{1,6}|#\d{1,7}|[a-z]{2,8});/giu;
+
+/**
+ * Text entities as the characters a reader sees, so a quotation copied from the page occurs in the
+ * extracted text ("A&amp;M" is "A&M" on the page). Angle brackets stay encoded, in either
+ * spelling: decoding them would put tag-shaped text back into a rendering reported as tag-free.
+ */
+/** Decode the text entities of tag-stripped HTML; angle brackets stay encoded. */
+export function decodeTextEntities(text: string): string {
+  return text.replace(HTML_ENTITY, decodeTextEntity);
+}
+
+function decodeTextEntity(match: string, entity: string): string {
+  const name = entity.toLowerCase();
+  if (!name.startsWith('#')) return TEXT_ENTITIES[name] ?? match;
+  const code = name.startsWith('#x') ? Number.parseInt(name.slice(2), 16) : Number(name.slice(1));
+  if (!Number.isInteger(code) || code < 32 || code > 0x10ffff || code === 60 || code === 62) {
+    return match;
+  }
+  return code === 160 ? ' ' : String.fromCodePoint(code);
+}
+
 export type SafeParserResult = {
   readonly safe: boolean;
   readonly indicators: readonly MalwareIndicator[];
@@ -192,6 +227,7 @@ export async function parseContentInSandbox(
         // rendering of a fetched document (CodeQL js/bad-tag-filter).
         .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\b[^>]*>/giu, ' ')
         .replace(/<[^>]+>/gu, ' ')
+        .replace(HTML_ENTITY, decodeTextEntity)
         .replace(/\s+/gu, ' ')
         .trim()
     : text.replace(/\s+/gu, ' ').trim();

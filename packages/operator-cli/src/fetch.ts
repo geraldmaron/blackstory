@@ -17,6 +17,7 @@ import { request as httpRequest, type IncomingMessage } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import {
   DEFAULT_SAFE_FETCH_LIMITS,
+  decodeTextEntities,
   executeSafeFetch,
   type PinnedTransport,
   type PinnedTransportResponse,
@@ -98,6 +99,7 @@ export async function parseTextOnlyHtml(
         // leaves the element's contents in the extracted text (CodeQL js/bad-tag-filter).
         .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\b[^>]*>/giu, ' ')
         .replace(/<[^>]+>/gu, ' ')
+        .replace(/&[#a-z0-9]{2,8};/giu, decodeTextEntities)
         .replace(/\s+/gu, ' ')
         .trim()
     : text.replace(/\s+/gu, ' ').trim();
