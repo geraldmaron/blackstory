@@ -82,7 +82,7 @@ lint grandfathers 523 violations, and `docs/ui/README.md` still names v10 as bin
 
 Kept because it survived every version or the owner said so: the scroll dive to a pin and the
 traverse between places (owner, 11-22: "loved and stays"); ink, paper and copper; Schibsted
-Grotesk, Geist, Newsreader and Geist Mono; the evidence grade in words; the memorial's
+Grotesk (replaced by Outfit on 11-24, section 7.2), Geist, Newsreader and Geist Mono; the evidence grade in words; the memorial's
 handwritten names; "happened here"; the `/law` time rail and the `/books` state tile map (signed
 off 11-21); color photographs with a visible credit.
 
@@ -162,7 +162,8 @@ photograph, a document or body text.
 
 ### 7.2 Type
 
-The four families and seven roles in `brand.md` stay. Changes:
+The four families and seven roles in `brand.md` stay, with one family changed on 2026-11-24:
+the display face is Outfit, the wordmark's own, in place of Schibsted Grotesk. Changes:
 
 - **The accent rule.** A display or headline line may set one word in Newsreader italic, in
   copper on ink or ink on paper. It marks the word the sentence turns on ("*here.*", "*Her*
@@ -171,14 +172,18 @@ The four families and seven roles in `brand.md` stay. Changes:
 - The alias tokens (`--ds-text-display-title`, `-display-hero`, `-display-1`,
   `-display-numeral`) are removed with their last users.
 - Compact scale: display tops out at 88px, headline at 44px. The page earns size from the
-  exhibit, which is large, and keeps type tight around it. One exception (owner, 2026-11-23): the
-  front page's last scene sets the official wordmark from the window, about half its width
-  (`--ds-text-hero`), once on the site. The first screen carries the same wordmark smaller, about a
-  third of the window and at most 30rem, as the page's h1, on the changing word's left edge and
-  centered in the space over the year (owner, 2026-11-23: top-aligned it read too high on large
-  windows); its sentence is display-3 italic and its counting year
-  headline size, so the lit map carries the screen. "History" is that scene's heading for a screen
-  reader and the rail.
+  exhibit, which is large, and keeps type tight around it. The front page shows the official wordmark once, on
+  its first screen (owner, 2026-11-24: the mark at both ends was redundant, the first screen felt
+  empty, and the first screen must carry the brand). It is the page's h1, about a third of the
+  window and at most 30rem, with the brand line, one sentence on what the archive is and two
+  links under it, and the counting year at headline size at the foot. "History" is that scene's
+  heading for a screen reader and the rail, and the persistent word shows it as the scroll leaves
+  the first screen. The last scene is centered: it arrives reading "Black History", set in
+  the display face at the wordmark's weight and tracking, which closes into "BlackStory" once
+  the scene lands. The typed word is then the wordmark itself, and the symbol comes in beside it
+  where the lockup has it, placed from `brand/tokens/live-lockup.json`; "It happened here."
+  follows under it (owner's direction, 2026-11-24). Held still, under reduced motion or without
+  script the lockup is there from the start.
 
 ### 7.3 The exhibit frame
 
@@ -437,12 +442,12 @@ chapter rail naming all six and "Skip to the archive" on screen throughout.
 
 | Scene | Word | Shows | Ground action |
 | ----- | ---- | ----- | ------------- |
-| 1 | History (read, not shown) | The wordmark as the page's h1, one sentence, the year counting as the lights come on. No document by default (see the verdict) | Map lit |
+| 1 | History (shown as the scroll leaves) | The brand panel: the wordmark as the page's h1, "History, pinned to place.", one sentence on what the archive is, "Start the opening" and "See what is in the archive", the year counting as the lights come on. No document by default (see the verdict) | Map lit |
 | 2 | *His* story | One sourced record of a man | Camera lands on his place |
 | 3 | *Her* story | One sourced record of a woman | Traverse, land |
 | 4 | *Your* story | A field: "Type a town." It answers with the nearest records and the distance, or says plainly that nothing near there is researched yet | Traverse to the town |
 | 5 | *Their* story | A place many people made: a church, a school, a district | Traverse, land |
-| 6 | BlackStory | The wordmark, "History, pinned to place.", every light on, then the contents: Archive, Stories, Data, Memorial with one true line each, and search | Rise to the country; ground turns to paper below |
+| 6 | BlackStory | Centered on the whole country: "Black History" closing into "BlackStory" in the wordmark's own face, the symbol joining it to make the lockup, "It happened here.", "How coverage works", every light on, then the contents: Archive, Stories, Data, Memorial with one true line each, and search | Rise to the country; ground turns to paper below |
 
 The word changes with the *turn* verb: the italic prefix swaps while "story" holds still, and
 the final step closes the gap and hands off to the official wordmark artwork. The existing
@@ -468,8 +473,10 @@ and direction; no scene implies its record is connected to the last (v12's open 
 Scene 1 does not open on the apportionment clause by default: a document that counts people as
 fractions is a dehumanizing first image for a twelve-year-old. Scene 1 is the word and one
 sentence on the dark map; the choice of any document there is the owner's and gets a content
-review. (c): a returning visitor (a first-party flag in
-local storage, no tracking) lands on scene 6 with "Watch the opening" as a link; total scroll
+review. (c): every visitor lands on the first screen, which links past the opening to the contents
+(2026-11-24; a returning visitor used to land on scene 6, which no longer says what the site
+is). A returning visitor (a first-party flag in local storage, no tracking) is not shown the
+year count again; total scroll
 is capped at eight screens; the read test in section 12 times it. (d): the field takes typed
 text only and calls the existing place search; "Use my location" is a separate explicit button
 that reuses the existing client-only locate flow. Neither the typed town nor a device position

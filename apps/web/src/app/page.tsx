@@ -1,7 +1,7 @@
 /**
  * `/` is the front page (docs/ui/DESIGN.md section 9.7): the retelling, History to BlackStory, on
  * ink, then the contents on paper. The owner made it the entrance on 2026-11-23; the v12 home
- * film it replaced is deleted. A returning reader lands on the last scene.
+ * film it replaced is deleted. A returning reader is not shown the year count again.
  */
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
