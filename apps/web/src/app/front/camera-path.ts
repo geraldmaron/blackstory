@@ -221,15 +221,19 @@ export function measureTourLayout(root: ParentNode = document): TourLayout | nul
 const approach = (a: number, b: number, k: number) => a + (b - a) * k;
 
 /**
- * One eased step of the camera toward where the scroll wants it. `k` is the share of the gap
- * closed this step. `arrived` is set once every part is within what a reader can see, and then
+ * One eased step of the camera toward where the scroll wants it. `share` is the share of the gap
+ * closed this step, held to 0..1. `arrived` is set once every part is within what a reader can see, and then
  * the camera is the target itself, so the last frame is the scroll's own camera.
  */
 export function easeTourCamera(
   current: TourCamera,
   target: TourCamera,
-  k: number,
+  share: number,
 ): { readonly camera: TourCamera; readonly arrived: boolean } {
+  // A step closes part of the gap and never passes the target or backs away from it. A frame's
+  // timestamp can be earlier than the clock read that started the follow, which made the share
+  // negative, sent the padding below zero, and the map rejects a negative inset.
+  const k = Number.isFinite(share) ? Math.min(1, Math.max(0, share)) : 1;
   const camera: TourCamera = {
     center: [
       approach(current.center[0], target.center[0], k),
