@@ -15,7 +15,7 @@ import {
   useState,
   type FormEvent,
 } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
 import {
   ADMIN_NETWORK_FAILURE_MESSAGE,
@@ -34,7 +34,6 @@ function loginErrorMessage(err: unknown): string {
 }
 
 export default function LoginClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { ready, user, signIn, signOut, getIdToken } = useAdminAuth();
   const [email, setEmail] = useState('');
@@ -59,10 +58,15 @@ export default function LoginClient() {
   /**
    * A Supabase session alone is not admin access — the gates require a staff role in
    * app_metadata.app_role. Confirm it here, otherwise redirecting would bounce straight
-   * back off the middleware and loop. router.refresh() drops the cached RSC payload so
-   * the destination re-renders on the server with the new session cookie.
+   * back off the middleware and loop. The destination is a full page load, so it renders on the
+   * server with the new session cookie: a soft router.refresh() plus router.replace() raced each
+   * other (each aborted the other) and left the page stuck on "Checking your staff access".
    */
+  const entering = useRef(false);
   const enterConsole = useCallback(async () => {
+    // Session events re-run the effect below; one check and one navigation is enough.
+    if (entering.current) return;
+    entering.current = true;
     let response: Response | null;
     try {
       const token = await getIdToken();
@@ -74,6 +78,7 @@ export default function LoginClient() {
       await signOut().catch(() => undefined);
       setError(loginErrorMessage(err));
       setBusy(false);
+      entering.current = false;
       return;
     }
     if (!response?.ok) {
@@ -81,11 +86,11 @@ export default function LoginClient() {
       // Only a 403 means the role is missing; an expired token or a server fault is not that.
       setError(response?.status === 403 ? NOT_PROVISIONED : NOT_CONFIRMED);
       setBusy(false);
+      entering.current = false;
       return;
     }
-    router.refresh();
-    router.replace(nextPath);
-  }, [getIdToken, signOut, router, nextPath]);
+    window.location.assign(nextPath);
+  }, [getIdToken, signOut, nextPath]);
 
   useEffect(() => {
     if (ready && user) {
