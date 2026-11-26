@@ -177,6 +177,46 @@ metered API. Codex work runs through `codex exec` on the ChatGPT login with stdi
 5. Scale only cohorts that pass, at no more than 4 concurrent research subagents. Subscription rate
    limits and the orchestrator's review of each batch are the real ceiling.
 
+**Stop rule confirmed by the owner, 2026-11-25:** fewer than 1 in 4 kept rows live stops the cohort.
+
+### Sample, fixed 2026-11-25 before any stage ran
+
+Drawn from `pending` rows, ordered by `md5(id || 'burndown-pilot-2026-11-25')`. Cohort 1 takes the first
+row per kind, then the second per kind, and so on, excluding persons and rows with evidence.
+
+1. **other, mention-mined (15):** `gap_aclu`, `gap_first_and_fourteenth_amendments`,
+   `gap_mississippi_house_of_representatives`, `gap_emory_university`, `gap_chicago_landmark`,
+   `gap_double_v_campaign`, `gap_summit_agreement_on_open_housing_reached_august_26_1966`, `gap_kongo`,
+   `gap_davis_v_county_school_board`, `gap_new_york_national_guard_s_369th_infantry_regiment`,
+   `gap_massachusetts_attorney_general`, `gap_second_party_system`,
+   `gap_louisiana_s_legislative_act_87_of_1880`, `gap_flying_africans`, `gap_harvard`.
+   **other, stubs (15):** `disc_odd_fellows_cemetery_q7077343`, `disc_exodusters_q5420574`,
+   `disc_samuel_anderson_q123592059`, `disc_black_panther_militia_q106726791`,
+   `disc_john_warren_davis_q90649402`, `sundown_humboldt_county_california`,
+   `disc_william_brinkley_q107265790`, `disc_new_york_african_society_for_mutual_relief_q104844761`,
+   `disc_harlem_renaissance_q829895`, `disc_william_tebeau_q22806753`, `disc_gordon_q16200625`,
+   `disc_black_ankle_q4920275`, `disc_the_black_wall_street_times_q122945494`,
+   `disc_black_abstractionism_q130251315`, `disc_segregation_academy_q7446325`.
+2. **dc-sites (17):** `dc-black-history-sites-` + `c14`, `i10`, `i106`, `i49`, `i58`, `i81`, `i87`, `i88`,
+   `i93`, `l2`, `l4`, `p32`, `p85`, `p90`, `s11`, `s22`, `s24`.
+3. **divine-nine (13):** `divine-nine-person-iota-` + `albert-hicks`, `barron-willis`, `charles-briscoe`,
+   `charles-brown`, `charles-gregory`, `elias-dorsey-jr`, `frank-coakley`, `john-slade`,
+   `lewis-hudnell`, `lonnie-spruill-jr`, `michael-williams`, `webster-lewis`; and
+   `divine-nine-person-zpb-fannie-pettie-watts` (already holds the owner's 2026-07-28 person review and
+   one captured source; counted here, not in cohort 4).
+4. **evidence-ready (16):** `us-ed-hbcu-140146`, `gap_meharry`, `gap_supreme_court`,
+   `gap_tulsa_race_massacre`, and the persons `disc_a_j_smitherman_q112749131`,
+   `disc_alfred_niger_q111214355`, `disc_arthur_l_hardge_q124343795`,
+   `disc_barbara_gomes_beach_q132201345`, `disc_black_hawk_q714534`,
+   `disc_elise_johnson_mcdougald_q19974907`, `disc_eliza_ann_gardner_q22018527`,
+   `disc_james_l_farmer_jr_q3806642`, `disc_john_robinson_q16073477`,
+   `disc_oscar_james_cooper_q110409084`, `disc_richard_h_harris_q108215593`,
+   `disc_ruth_denny_q111317467`.
+
+Person rule for the pilot: the owner's 2026-11-10 decision lets a session record approvals, so a person
+whose death is sourced gets `payload.personReview` from the session with that source as its basis. A
+person with no sourced death date is held as living-unknown, not published.
+
 ## Owner decisions this cannot make
 
 - Whether to widen Green Book beyond the six states. The other-state rows could go through the existing
