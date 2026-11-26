@@ -65,8 +65,23 @@ async function main(): Promise<void> {
   const rawConnection = requireEnv('DATABASE_URL', 'APP_DATABASE_URL');
   const { connectionString, ssl } = normalizePgConnectionString(rawConnection);
   const client = new pg.Client({ connectionString, ...(ssl ? { ssl } : {}) });
+  // Two runs at once let the older one upload its bytes last and move published_at back.
+  // The lock lives in an open transaction on its own connection, so it holds through a
+  // transaction-mode pooler and ends with the run, however the run ends.
+  const lockClient = new pg.Client({ connectionString, ...(ssl ? { ssl } : {}) });
   await client.connect();
+  await lockClient.connect();
   try {
+    await lockClient.query('BEGIN');
+    const lock = await lockClient.query<{ readonly locked: boolean }>(
+      "SELECT pg_try_advisory_xact_lock(hashtextextended('release-catalog-publish', 0)) AS locked",
+    );
+    if (!lock.rows[0]?.locked) {
+      throw new Error(
+        'Another catalog publish is running. Rerun after it finishes, so writes it missed are published.',
+      );
+    }
+
     // Capture the watermark BEFORE any expensive read. A write landing after this point stays
     // flagged dirty (see the race-safety note at the top of the file) and is caught next run.
     const watermark = await client.query<WatermarkRow>(
@@ -195,6 +210,8 @@ async function main(): Promise<void> {
     // dirty_at we captured at the START of this run, not "now" — a write that landed mid-run
     // (after we snapshotted the watermark) must stay dirty so the next run picks it up, rather
     // than being masked because "now" had already moved past it.
+    // Throws if the lock connection dropped mid-run, rather than advancing an unguarded watermark.
+    await lockClient.query('SELECT 1');
     await client.query(
       `UPDATE published.release_catalog_publish_watermark
        SET published_at = COALESCE($1::timestamptz, now())
@@ -205,6 +222,8 @@ async function main(): Promise<void> {
     console.log(`consumer env: APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL=${publicBase}`);
   } finally {
     await client.end();
+    // Ending the connection ends its transaction, which releases the lock.
+    await lockClient.end();
   }
 }
 

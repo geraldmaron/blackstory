@@ -457,28 +457,28 @@ export const DEFAULT_BILLING_ALERTS: readonly BillingAlertPolicy[] = [
     thresholdPercent: 50,
     automatedResponse: 'alert_only',
     notifyChannels: ['email'],
-    runbookRef: 'infra/gcp/cost-controls/hard-stop-runbook.md',
+    runbookRef: 'docs/security/cost-resource-controls.md#manual-hard-stop',
   },
   {
     alertId: 'budget-80-soft-shutdown',
     thresholdPercent: 80,
     automatedResponse: 'throttle_optional',
     notifyChannels: ['email', 'slack'],
-    runbookRef: 'infra/gcp/cost-controls/hard-stop-runbook.md',
+    runbookRef: 'docs/security/cost-resource-controls.md#manual-hard-stop',
   },
   {
     alertId: 'budget-95-pause-research',
     thresholdPercent: 95,
     automatedResponse: 'pause_research',
     notifyChannels: ['email', 'slack', 'pagerduty'],
-    runbookRef: 'infra/gcp/cost-controls/hard-stop-runbook.md',
+    runbookRef: 'docs/security/cost-resource-controls.md#manual-hard-stop',
   },
   {
     alertId: 'budget-100-hard-stop-optional',
     thresholdPercent: 100,
     automatedResponse: 'pause_research',
     notifyChannels: ['email', 'slack', 'pagerduty'],
-    runbookRef: 'infra/gcp/cost-controls/hard-stop-runbook.md',
+    runbookRef: 'docs/security/cost-resource-controls.md#manual-hard-stop',
   },
 ];
 

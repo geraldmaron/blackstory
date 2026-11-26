@@ -54,7 +54,7 @@ validated on decode.
 ## Caching
 
 `buildSearchCacheKey` hashes a canonical payload with lowercase normalized text. Use for CDN /
-edge cache keys (see [`infra/gcp/armor/cdn-design.md`](../../infra/gcp/armor/cdn-design.md)).
+edge cache keys.
 
 ## Timeouts
 

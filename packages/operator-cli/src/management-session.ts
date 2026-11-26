@@ -230,5 +230,10 @@ export async function sessionManagementResearch(
   }
   const proposal = await readManagedProposal(store.pool, runId, workerId);
   await store.saveProposal(workId, input.lease, proposal);
-  return { work: await store.get(actor, workId), reviewUrl: `/admin/work/${workId}` };
+  // proposalSaved marks the one call that moved the work to review, so the caller can alert once.
+  return {
+    work: await store.get(actor, workId),
+    reviewUrl: `/admin/work/${workId}`,
+    proposalSaved: true,
+  };
 }

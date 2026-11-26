@@ -14,7 +14,10 @@ import {
   submissionDecisionOptions,
   submissionHasReceipt,
   submissionOutcomeEmailsSubmitter,
+  submissionWorkRequest,
+  type SubmissionDecision,
 } from '../../../../admin/lib/postgres-submissions';
+import { HandToAgentButton } from './HandToAgentButton';
 import { SubmissionDecisionForm } from './SubmissionDecisionForm';
 
 function formatWhen(iso: string): string {
@@ -35,10 +38,13 @@ function titleCase(value: string): string {
 
 export default async function SubmissionDetailPage({
   params,
+  searchParams,
 }: {
   readonly params: Promise<{ readonly id: string }>;
+  /** `do` comes from the quick links in the owner alert email: it only preselects, never acts. */
+  readonly searchParams: Promise<{ readonly do?: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, { do: quick }] = await Promise.all([params, searchParams]);
   const [submission, identity] = await Promise.all([
     getIntakeItemDetail(id),
     readVerifiedAdminIdentity(),
@@ -114,7 +120,17 @@ export default async function SubmissionDetailPage({
               emailsSubmitter={submissionOutcomeEmailsSubmitter(submission)}
               decisions={decisions}
               needsPublicReason={decisions.includes('reject') && submissionHasReceipt(submission)}
+              {...(decisions.includes(quick as SubmissionDecision)
+                ? { initialDecision: quick as SubmissionDecision }
+                : {})}
             />
+            {submission.status === 'quarantined' ? (
+              <HandToAgentButton
+                intakeItemId={submission.id}
+                request={submissionWorkRequest(submission)}
+                focusOnLoad={quick === 'agent'}
+              />
+            ) : null}
           </section>
         ) : (
           <p className="story-review__notice" role="status">

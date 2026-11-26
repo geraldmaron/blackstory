@@ -1,9 +1,7 @@
 # Service surface separation
 
-**Status:** Runtime capability and authorization contracts are implemented in-repo. The optional
-GCP ingress and job manifests are not evidence of live deployment. The current product uses Vercel,
-Cloudflare, Supabase Auth, Supabase Postgres, and Supabase Storage (see
-[`infra/gcp/README.md`](../../infra/gcp/README.md)).
+**Status:** Runtime capability and authorization contracts are implemented in-repo. The product runs on Vercel,
+Cloudflare, Supabase Auth, Supabase Postgres, and Supabase Storage.
 
 **Authority:** [Architecture](../architecture.md) and the typed capability matrix below.
 **Data store:** Supabase Postgres; see [architecture](../architecture.md).
@@ -64,7 +62,6 @@ that write to quarantine only; publication runs from `/admin` and the operator s
 Source of truth for logical capability checks:
 
 - **Runtime TypeScript:** `packages/config/src/surfaces.ts`
-- **Infra JSON:** `infra/gcp/surfaces/surface-matrix.json` (optional deployment stub; not live state)
 
 The active contract uses `staff-session` / `staff-authenticated` for administration and
 `service-identity` / `service-authenticated` for internal operations. Neither value asserts
@@ -98,4 +95,3 @@ accepts a forbidden auth mode.
 ## Related docs
 
 - [Environment isolation](./environment-isolation.md)
-- [GCP isolation matrices](../../infra/gcp/README.md)

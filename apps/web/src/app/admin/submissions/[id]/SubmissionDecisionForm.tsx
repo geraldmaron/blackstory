@@ -40,6 +40,7 @@ export function SubmissionDecisionForm({
   emailsSubmitter = false,
   decisions,
   needsPublicReason = false,
+  initialDecision,
 }: {
   readonly intakeItemId: string;
   /** The submission's own title: the confirmation names what is being closed. */
@@ -49,18 +50,36 @@ export function SubmissionDecisionForm({
   readonly decisions: readonly SubmissionDecision[];
   /** A correction with a receipt: declining it needs a reason its submitter will read. */
   readonly needsPublicReason?: boolean;
+  /** Preselected from an email quick link: focus lands where that decision needs input next. */
+  readonly initialDecision?: SubmissionDecision;
 }) {
   const [state, formAction, pending] = useActionState<SubmissionDecisionState, FormData>(
     decideSubmission,
     SUBMISSION_DECISION_INITIAL,
   );
-  const [reason, setReason] = useState('');
+  // Spam needs no research to justify, so its quick link arrives with the reason filled in.
+  const [reason, setReason] = useState(
+    initialDecision === 'spam' ? 'Spam: nothing here to check against the record.' : '',
+  );
   const [publicReason, setPublicReason] = useState('');
   // Which verb was pressed, so only that button reads "Working…" while the action runs.
   const [pressed, setPressed] = useState<SubmissionDecision | null>(null);
   const [confirming, setConfirming] = useState<ConfirmActionRequest | null>(null);
   const hintId = useId();
   const doneRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Arriving from an email quick link: put focus on the next thing that decision needs.
+  useEffect(() => {
+    if (!initialDecision) return;
+    const form = formRef.current;
+    const target =
+      initialDecision === 'spam'
+        ? form?.querySelector<HTMLButtonElement>('button[value="spam"]')
+        : form?.querySelector<HTMLTextAreaElement>('textarea[name="reason"]');
+    target?.scrollIntoView({ block: 'center' });
+    target?.focus();
+  }, [initialDecision]);
   const canSubmit = reason.trim().length > 0 && !pending;
   const blocked = (decision: SubmissionDecision) =>
     !canSubmit || (decision === 'reject' && needsPublicReason && !publicReason.trim());
@@ -118,7 +137,7 @@ export function SubmissionDecisionForm({
   }
 
   return (
-    <form action={formAction} className="entity-edit__form">
+    <form action={formAction} className="entity-edit__form" ref={formRef}>
       <input type="hidden" name="intakeItemId" value={intakeItemId} />
       {state.status === 'error' ? (
         <p className="ds-notice ds-notice--error" role="alert">

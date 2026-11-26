@@ -25,7 +25,7 @@ export type ServerAdminIdentity = {
  * Read-only Supabase client bound to the request cookies. Server components cannot
  * write cookies, so token refresh is left to middleware; setAll is a no-op here.
  */
-async function createAdminServerClient() {
+export async function createAdminServerClient() {
   const { url, anonKey } = readSupabaseServerConfig();
   const cookieStore = await cookies();
   return createServerClient(url, anonKey, {

@@ -5,10 +5,9 @@
  * whether it is wired to real, already-shipped code ('real') or is a documented stub a future
  * fills in ('stub'). See./jobs/ for the three real job bodies this wires directly.
  *
- * Cadence/budget/timeout numbers here are deliberately consistent with the numbers already
- * shipped in infra/gcp/cost-controls/cost-controls-matrix.json where a job's
- * work maps onto an existing cost-controlled category (e.g. research campaign candidate/day
- * caps); they are new, first-declared values for jobs that don't have a analog yet.
+ * Cadence/budget/timeout numbers match the research campaign budgets in
+ * packages/security/src/resource-controls.ts where a job's work maps onto one; the rest are
+ * first-declared values.
  */
 import { EVENT_DRIVEN_CADENCE_SENTINEL } from './cron.js';
 import { scheduledJobKillSwitchId } from './kill-switch.js';

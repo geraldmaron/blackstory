@@ -4,6 +4,7 @@
  *   appeal sent (with an email)       -> appeal.received to the submitter
  *   staff resolve / reject a receipt  -> correction.closed to the submitter (never on spam)
  *   correction, appeal, abuse report, lead -> owner.new_submission to the owner mailbox
+ *   an agent saves a proposal for review  -> owner.work_ready to the owner mailbox
  *
  * To add a notification: add a template to `TEMPLATES`, then call `notify()` where the event
  * happens. Every template renders through the same branded layout, as HTML and plain text. Sending goes through Resend's HTTP API with plain `fetch`, and is
@@ -41,6 +42,8 @@ function excerpt(value: string, max = 400): string {
  */
 type Email = {
   readonly subject: string;
+  /** The mono-caps line above the heading, like an exhibit label: what this is, then its state. */
+  readonly label: string;
   /** The inbox preview line. */
   readonly preheader: string;
   readonly heading: string;
@@ -51,6 +54,9 @@ type Email = {
    * owner), or the decline reason staff wrote (to the submitter). */
   readonly quote?: string;
   readonly action?: { readonly label: string; readonly href: string };
+  /** Smaller links under the main action. Each opens a signed-in admin page; none acts on its
+   * own, since mail scanners fetch every link in a message. */
+  readonly quickLinks?: readonly { readonly label: string; readonly href: string }[];
   readonly signed: boolean;
   readonly footer: string;
 };
@@ -65,6 +71,7 @@ type Template<Data> = (data: Data) => Email;
 const TEMPLATES = {
   'correction.received': (d: { receiptCode: string }) => ({
     subject: `Correction received, ${d.receiptCode}`,
+    label: 'Correction · received',
     preheader: 'Keep this email. Your receipt code is how you check the outcome.',
     heading: 'Your correction arrived',
     paragraphs: [
@@ -87,6 +94,7 @@ const TEMPLATES = {
     d.outcome === 'resolved'
       ? {
           subject: `Correction closed, ${d.receiptCode}`,
+          label: 'Correction · closed',
           preheader: 'I’ve finished reviewing your correction.',
           heading: 'Your correction is closed',
           paragraphs: [
@@ -101,6 +109,7 @@ const TEMPLATES = {
         }
       : {
           subject: `Correction declined, ${d.receiptCode}`,
+          label: 'Correction · declined',
           preheader: 'The record stays as it is.',
           heading: 'The record stays as it is',
           paragraphs: [
@@ -122,6 +131,7 @@ const TEMPLATES = {
         },
   'appeal.received': (d: { receiptCode: string }) => ({
     subject: `Appeal received, ${d.receiptCode}`,
+    label: 'Appeal · received',
     preheader: 'Your correction is back in review.',
     heading: 'Your appeal arrived',
     paragraphs: [
@@ -139,13 +149,40 @@ const TEMPLATES = {
     headline: string;
     statement?: string;
     id: string;
-  }) => ({
-    subject: `New ${d.kind} · ${d.headline}`.slice(0, 140),
-    preheader: d.statement ? excerpt(d.statement, 120) : d.headline,
-    heading: `New ${d.kind}`,
-    paragraphs: [d.headline],
-    ...(d.statement ? { quote: excerpt(d.statement) } : {}),
-    action: { label: 'Open it in the admin', href: `${siteOrigin()}/admin/submissions/${d.id}` },
+  }) => {
+    const page = `${siteOrigin()}/admin/submissions/${encodeURIComponent(d.id)}`;
+    return {
+      subject: `New ${d.kind} · ${d.headline}`.slice(0, 140),
+      label: `Intake · ${d.kind}`,
+      preheader: d.statement ? excerpt(d.statement, 120) : d.headline,
+      heading: `New ${d.kind}`,
+      paragraphs: [d.headline],
+      ...(d.statement ? { quote: excerpt(d.statement) } : {}),
+      action: { label: 'Open it in the admin', href: page },
+      quickLinks: [
+        { label: 'Hand to an agent', href: `${page}?do=agent` },
+        { label: 'Reject', href: `${page}?do=reject` },
+        { label: 'Mark spam', href: `${page}?do=spam` },
+      ],
+      signed: false,
+      footer: OWNER_FOOTER,
+    };
+  },
+  /** To the owner: an agent finished and its proposal waits on an approval only the owner gives. */
+  'owner.work_ready': (d: { workId: string; request: string; summary?: string }) => ({
+    subject: `Ready for your review · ${excerpt(d.request, 100)}`.slice(0, 140),
+    label: 'Agent work · ready for review',
+    preheader: 'An agent saved a proposal. Nothing is published until you approve it.',
+    heading: 'Ready for your review',
+    paragraphs: [
+      excerpt(d.request, 300),
+      'An agent saved a proposal for this request. Nothing is published until you approve that exact revision.',
+    ],
+    ...(d.summary ? { quote: excerpt(d.summary) } : {}),
+    action: {
+      label: 'Review the proposal',
+      href: `${siteOrigin()}/admin/work/${encodeURIComponent(d.workId)}`,
+    },
     signed: false,
     footer: OWNER_FOOTER,
   }),
@@ -183,18 +220,22 @@ function escapeHtml(value: string): string {
 
 function renderText(e: Email): string {
   const [first = '', ...rest] = e.paragraphs;
-  const parts = [e.heading, '', first, ''];
+  const parts = [e.label.toUpperCase(), e.heading, '', first, ''];
   if (e.quote) parts.push(...e.quote.split('\n').map((line) => `> ${line}`), '');
   parts.push(...rest.flatMap((p) => [p, '']));
   if (e.code) parts.push(`Receipt code  ${e.code}`, '');
   if (e.action) parts.push(e.action.label, e.action.href, '');
+  for (const link of e.quickLinks ?? []) parts.push(`${link.label}: ${link.href}`);
+  if (e.quickLinks?.length) parts.push('');
   if (e.signed) parts.push(...SIGNATURE, '');
   parts.push('---', e.footer);
   return parts.join('\n');
 }
 
-// Brand tokens from docs/ui/brand.md. Email clients ignore web fonts, so each stack ends in a
-// system face; the copper button carries ink text (4.9:1), never white.
+// Brand swatches from docs/ui/brand.md, laid out by the v13 system (docs/ui/DESIGN.md 7.1-7.4):
+// a square paper sheet opened by a 2px ink rule, no shadow, 8px only on the control, square
+// fields, and copper kept for the one thing to press and links. Email clients ignore web fonts,
+// so each stack ends in a system face; the copper button carries ink text (4.9:1), never white.
 const C = {
   paper: '#F4EFE5',
   surface: '#FBF8F2',
@@ -212,13 +253,21 @@ function renderHtml(e: Email): string {
   const p = (text: string) =>
     `<p style="margin:0 0 16px;font:400 16px/1.55 ${SANS};color:${C.ink};">${escapeHtml(text)}</p>`;
   const code = e.code
-    ? `<p style="margin:4px 0 20px;"><span style="display:inline-block;padding:10px 14px;border:1px solid ${C.rule};border-radius:6px;background:${C.paper};font:600 17px/1 ${MONO};letter-spacing:0.02em;color:${C.ink};">${escapeHtml(e.code)}</span></p>`
+    ? `<p style="margin:4px 0 20px;"><span style="display:inline-block;padding:10px 14px;border:1px solid ${C.rule};background:${C.paper};font:600 17px/1 ${MONO};letter-spacing:0.02em;color:${C.ink};">${escapeHtml(e.code)}</span></p>`
     : '';
   const quote = e.quote
-    ? `<blockquote style="margin:0 0 20px;padding:4px 0 4px 14px;border-left:3px solid ${C.copper};font:400 15px/1.55 ${SANS};color:${C.stone};">${escapeHtml(e.quote)}</blockquote>`
+    ? `<blockquote style="margin:0 0 20px;padding:4px 0 4px 14px;border-left:2px solid ${C.stone};font:400 15px/1.55 ${SANS};color:${C.stone};">${escapeHtml(e.quote)}</blockquote>`
     : '';
   const action = e.action
-    ? `<p style="margin:8px 0 24px;"><a href="${escapeHtml(e.action.href)}" style="display:inline-block;padding:12px 20px;border-radius:6px;background:${C.copper};font:600 15px/1 ${SANS};color:${C.ink};text-decoration:none;">${escapeHtml(e.action.label)}</a></p>`
+    ? `<p style="margin:8px 0 24px;"><a href="${escapeHtml(e.action.href)}" style="display:inline-block;padding:12px 20px;border-radius:8px;background:${C.copper};font:600 15px/1 ${SANS};color:${C.ink};text-decoration:none;">${escapeHtml(e.action.label)}</a></p>`
+    : '';
+  const quickLinks = e.quickLinks?.length
+    ? `<p style="margin:-8px 0 24px;font:400 14px/1.6 ${SANS};color:${C.stone};">${e.quickLinks
+        .map(
+          (link) =>
+            `<a href="${escapeHtml(link.href)}" style="color:${C.copperText};text-decoration:underline;">${escapeHtml(link.label)}</a>`,
+        )
+        .join(' &nbsp;·&nbsp; ')}</p>`
     : '';
   const signature = e.signed
     ? `<p style="margin:8px 0 0;font:400 15px/1.5 ${SANS};color:${C.ink};">${SIGNATURE.map(escapeHtml).join('<br>')}</p>`
@@ -229,11 +278,12 @@ function renderHtml(e: Email): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.paper};"><tr><td align="center" style="padding:32px 16px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
 <tr><td style="padding:0 4px 20px;"><a href="${escapeHtml(siteOrigin())}"><img src="${escapeHtml(siteOrigin())}/brand/email-lockup.png" width="160" height="49" alt="BlackStory" style="display:block;border:0;"></a></td></tr>
-<tr><td style="padding:32px;background:${C.surface};border:1px solid ${C.rule};border-top:3px solid ${C.copper};border-radius:8px;">
+<tr><td style="padding:32px;background:${C.surface};border:1px solid ${C.rule};border-top:2px solid ${C.ink};">
+<p style="margin:0 0 12px;font:500 13px/1.4 ${MONO};letter-spacing:0.04em;text-transform:uppercase;color:${C.stone};">${escapeHtml(e.label)}</p>
 <h1 style="margin:0 0 16px;font:700 24px/1.25 ${HEAD};letter-spacing:-0.01em;color:${C.ink};">${escapeHtml(e.heading)}</h1>
 ${e.paragraphs.slice(0, 1).map(p).join('')}${quote}
 ${e.paragraphs.slice(1).map(p).join('\n')}
-${code}${action}${signature}
+${code}${action}${quickLinks}${signature}
 </td></tr>
 <tr><td style="padding:20px 4px 0;font:400 13px/1.5 ${SANS};color:${C.stone};">${escapeHtml(e.footer)}</td></tr>
 </table></td></tr></table></body></html>`;

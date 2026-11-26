@@ -1,7 +1,7 @@
 # Cost and resource exhaustion controls
 
-**Status:** Policy matrices and evaluators are in-repo. Vercel/Cloudflare/Supabase provider limits and billing controls require provider verification; optional GCP budgets, queues, and jobs are not provisioned by this repository.
-**Depends on:** the shared Vercel `apps/web` deployment, [optional ingress / Cloud Armor design](./ingress-armor.md), and [rate limits](./rate-limits.md)
+**Status:** Policy matrices and evaluators are in-repo. Vercel/Cloudflare/Supabase provider limits and billing controls require provider verification; no GCP budgets, queues, or jobs exist.
+**Depends on:** the shared Vercel `apps/web` deployment, [ingress boundary](./ingress-armor.md), and [rate limits](./rate-limits.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-13](./threat-model.md#t-13-database-exhaustion-and-connection-starvation), [T-14](./threat-model.md#t-14-cloud-bill-exhaustion)
 
 ## Objective
@@ -477,11 +477,10 @@ was found by hand after the bill.
 |------|------|
 | [`packages/security/src/resource-controls.ts`](../../packages/security/src/resource-controls.ts) | Policy matrices, evaluators, abusive-traffic simulation |
 | [`packages/security/src/resource-controls.test.ts`](../../packages/security/src/resource-controls.test.ts) | Unit tests |
-| [`infra/gcp/cost-controls/`](../../infra/gcp/cost-controls/) | Optional declarative GCP stubs + conditional hard-stop runbook |
 
 ## Related controls
 
-- **Shared `/admin` runtime:** staff authorization is in the Vercel-hosted `apps/web` deployment; any provider scaling or spend cap must be checked in Vercel, not inferred from the optional GCP policy matrix.
+- **Shared `/admin` runtime:** staff authorization is in the Vercel-hosted `apps/web` deployment; any provider scaling or spend cap must be checked in Vercel.
 - **Endpoint quotas:** [Rate limits](./rate-limits.md) describes the policy math and remaining deployment checks.
 
 ## Retry policy
@@ -507,13 +506,12 @@ delay = min(initialBackoffMs × multiplier^(attempt-1), maxBackoffMs)
 
 ## Manual hard-stop
 
-Conditional GCP procedure, only if those resources are actually provisioned: [`infra/gcp/cost-controls/hard-stop-runbook.md`](../../infra/gcp/cost-controls/hard-stop-runbook.md). Current Vercel/Cloudflare/Supabase incidents require provider-specific controls.
+Stop spend with the provider's own controls: Vercel spend management, Supabase compute and usage limits, and the Cloudflare rules in this document.
 
 ## Validation
 
 ```bash
 pnpm --filter @repo/security test
-node --test infra/gcp/cost-controls/cost-controls.test.mjs
 ```
 
 ## Acceptance mapping

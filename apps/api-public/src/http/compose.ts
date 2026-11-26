@@ -32,7 +32,9 @@ export function createProductionHandlerDeps(options: ComposeHandlerDepsOptions =
     ? createPublicDataAccessFromReaders(createPostgresDataAccessReaders())
     : createInMemoryPublicDataAccess({ entities: [] });
 
-  const rateLimitDisabled = environment['RATE_LIMIT_DISABLED'] === '1';
+  // Local dev only: a production deployment keeps its limits even if the flag is copied in.
+  const rateLimitDisabled =
+    environment['RATE_LIMIT_DISABLED'] === '1' && environment['VERCEL_ENV'] !== 'production';
   const sharedRateLimitStore = createInMemoryRateLimitStore();
   const clientAttestationGuard = createPublicApiClientAttestationGuard({ environment });
 

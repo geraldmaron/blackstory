@@ -157,3 +157,24 @@ test('a decline with a reason quotes it right under the line that introduces it'
   });
   assert.match(text, /Here’s why\.\n\n> The ledger says 1926\.\n\nIf you think/u);
 });
+
+test('the owner alert offers quick links that open the admin, never act from the email', () => {
+  const { text, html } = renderNotification({
+    event: 'owner.new_submission',
+    to: 'owner',
+    data: { kind: 'correction', headline: 'h', id: 'item 1' },
+    idempotencyKey: 'o',
+  });
+  for (const action of ['agent', 'reject', 'spam']) {
+    assert.match(text, new RegExp(`/admin/submissions/item%201\\?do=${action}`));
+    assert.match(html, new RegExp(`/admin/submissions/item%201\\?do=${action}`));
+  }
+  const ready = renderNotification({
+    event: 'owner.work_ready',
+    to: 'owner',
+    data: { workId: 'w1', request: 'Review correction <x>' },
+    idempotencyKey: 'r',
+  });
+  assert.match(ready.text, /\/admin\/work\/w1/);
+  assert.doesNotMatch(ready.html, /<x>/);
+});

@@ -5,7 +5,6 @@ Producers (Client-header guards, rate limiters, audit writers, query guardrails)
 implementations and emit signals through `@repo/observability` adapters.
 
 **Depends on:** [ audit/outbox](../../packages/domain/src/audit/index.ts),
-[ Cloud Armor](../../infra/gcp/armor/metrics-alerts-checklist.md),
 [ rate limits](./rate-limits.md)
 
 ## Package surface
@@ -98,8 +97,7 @@ if (event) {
 ## Anomaly rules and alerts
 
 Nineteen declarative rules (`SEC-ARMOR-01` … `SEC-COST-01`) live in
-`packages/observability/src/security-anomaly.ts`. Each rule maps to an alert policy stub in
-[`../../infra/gcp/observability/security-alerts/`](../../infra/gcp/observability/security-alerts/).
+`packages/observability/src/security-anomaly.ts`. No provider alert policies are deployed for them.
 
 Every alert payload includes:
 
@@ -132,22 +130,6 @@ Tests prove:
 2. Synthetic bursts trigger expected rules (e.g. 120 Armor throttles → `SEC-ARMOR-01`)
 3. Redaction removes tokens and protected addresses from emitted events
 4. Alert payloads carry required correlation metadata
-
-Infra stubs validate separately:
-
-```bash
-node infra/gcp/observability/security-alerts/security-alerts.test.mjs
-```
-
-## GCP stubs (design-only)
-
-| Artifact | Purpose |
-|----------|---------|
-| [`security-alert-policies.json`](../../infra/gcp/observability/security-alerts/security-alert-policies.json) | Alert policy catalog |
-| [`security-dashboard.json`](../../infra/gcp/observability/security-alerts/security-dashboard.json) | Dashboard panel definitions |
-| [`README.md`](../../infra/gcp/observability/security-alerts/README.md) | Apply checklist (no live apply in ) |
-
-Cross-reference  Armor metrics: [`../../infra/gcp/armor/metrics-alerts-checklist.md`](../../infra/gcp/armor/metrics-alerts-checklist.md).
 
 ## Acceptance mapping
 

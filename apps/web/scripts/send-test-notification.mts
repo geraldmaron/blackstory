@@ -35,6 +35,10 @@ const emails: Omit<Notification, 'to' | 'idempotencyKey'>[] = all
           id: 'notify-test',
         },
       },
+      {
+        event: 'owner.work_ready',
+        data: { workId: 'notify-test', request: 'Review correction BB-COR-0000TEST0000TEST' },
+      },
     ]
   : [
       {
