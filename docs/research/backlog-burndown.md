@@ -488,3 +488,20 @@ Hicks is held because only an uncaptured page gives his death date.
   documented mainly by their own fraternity. Two may be living (Spruill, Williams). The independent
   pages for the others sit on refused hosts, or their captures failed identity. Nothing more should
   go here until there is a source beyond the fraternity's own roster.
+
+## Gap fixes after the pilot (2026-11-26)
+
+Each fix was measured against real data before it shipped. Two proposed rules were dropped
+because the measurement showed they would hold correct records.
+
+| Gap | What changed | Status |
+|---|---|---|
+| 1. Namesakes pass the identity gate | Nothing yet. The pilot quarantined namesake captures by hand with no reason recorded, and a context-word check failed to separate them: 33 of 34 hand-quarantined pages matched the record's own context. No change ships until the actual namesake ids are known and a rule is tested on them. | Open, waiting on labeled examples |
+| 2. Fresh verdicts lost on a failed step | `session-claim-review-codex.ts` appends each batch as it lands; `research-batch.ts` caches whatever landed even when the review step fails. | Fixed |
+| 3. Earlier "request changes" beats a later approval | Not changed: it is deliberate (`assessPublicTextReview`). Letting a later approval win would let anyone rerun Sol until it agrees. Change the text instead. | By design |
+| 4. Unearned point precision staged | `stage-landscape-evidence.ts` runs the release builder's own `evaluateEarnedPrecision` and refuses a point it would reject (a law pinned to a city). | Fixed, tested on live rows |
+| 5. Persons filed under other kinds | New `check-wikidata-person-kinds.ts` asks Wikidata (P31 = Q5). It found 71: 69 pending rows set to `person` (including living people such as Raphael Warnock, who would have skipped the privacy gate), and 2 live records reported, not changed: Gabriel (d. 1800) and Crispus Attucks (d. 1770). Run it before each wave. | Fixed for pending; 2 live need a kind correction |
+| 6. Lowercase names | 29 pending rows capitalized, originals kept in `provenance.originalDisplayName`. Most are generic concepts that triage should drop. `research-batch.ts` holds any lowercase name anyway. 3 live records still start lowercase. | Fixed for pending |
+| 7. Month without a year | Drafting prompt rule, plus a warning before review. | Fixed |
+| 8. Sentences with no claim | Drafting prompt now asks for one quote per sentence and no padding about what the evidence lacks; the check before review warns on such sentences. A word-overlap hold was tested and dropped: it flagged 9 of 22 records that had passed review. | Mitigated at drafting |
+| 9. Self-published sites | Owner decision. | Open |
