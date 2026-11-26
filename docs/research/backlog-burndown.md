@@ -362,3 +362,129 @@ after another, correction loops after Sol's text review, and waves of 10.
 
 What these do not change: rows held for thin evidence, living status or no citable source. That
 share is set by the backlog, not the pipeline.
+
+## Pilot results (2026-11-25)
+
+**22 records went live from 76 sampled rows.** Three cohorts pass the stop rule (at least 1 in 4 kept
+rows live) and Divine Nine fails it. "Kept" means a row survived identity dedupe and triage. A row
+that research later found was not a subject counts as kept and not live. Every row carries its
+decision and reason in `payload.burndown` (pilot `2026-11-25`).
+
+| | other (30) | dc-sites (17) | divine-nine (13) | evidence-ready (16) |
+|---|---|---|---|---|
+| Merged as an existing live record | 2 | 5 | 0 | 2 |
+| Dropped at triage (both vendors agreed) | 10 | 0 | 0 | 2 |
+| Kept | 18 | 12 | 13 | 12 |
+| Sweep found a non-Wikipedia source | 2 of 18 | 10 of 12 | 1 of 13 | 4 of 12 |
+| Held or dropped at research | 6 of 18 | 2 of 12 | 7 of 13 | 2 of 12 |
+| Held for no citable source after assessment | 0 | 3 (+1 thin at drafting) | 0 | 2 |
+| Held after review (corrections did not converge or ran short) | 2 | 1 | 4 (template-only) | 1 |
+| **Live** | **9 (50%)** | **5 (42%)** | **1 (8%)** | **7 (58%)** |
+| Stop rule | pass | pass | **stop** | pass |
+
+Within "other", the mention-mined half put 4 of 6 kept rows live and the stub half 5 of 12. Mention
+mining had the higher drop rate (9 of 15 dropped at triage) and the higher yield on what survived.
+
+Live: John Robinson, The Black Wall Street Times, Elise Johnson McDougald, Segregation academies,
+William Tebeau, Fannie Pettie Watts, the 1966 Chicago Summit Agreement, St. Teresa of Avila, Wormley's
+Hotel, A. J. Smitherman, Black Panther Militia, New York African Society for Mutual Relief, Ruth
+Denny, Interdenominational Theological Center, Masjid Muhammad, St. Augustine (DC), James Farmer,
+Davis v. County School Board, Flying Africans, 369th Infantry Regiment, Jones-Haywood School of
+Ballet, Meharry Medical College.
+
+### Measures
+
+- **Triage:** 13 of 70 rows dropped on two-vendor agreement. The Sonnet audit (all 13, fewer than the
+  planned 20) upheld 12 and overturned Black Abstractionism. Research later found that it isn't a
+  discrete subject, so the cheap vote was right. The audit ran only two searches; treat it as thin.
+- **Identity:** 9 merges. 6 matched by name. 3 DC sites matched a live record by identical
+  coordinates under a different name, which name matching missed.
+- **Sweep:** 51 of 55 kept rows captured something, but only 17 had a source other than Wikipedia.
+  10 of 32 captures on the Divine Nine and DC rows were namesake pages that passed the identity gate:
+  a saint, a pirate, an Air Force general, an actor, a Philadelphia church, an unrelated Confederate
+  monuments article. All were quarantined.
+- **Research:** 8 Sonnet clusters of 6 to 8 rows. 46 of 56 rows came back sourced.
+- **Source assessment:** 29 hosts went through the isolated two-vendor assessment, and 11 registered.
+  7 more registered on a Wikidata basis. Claude refused 17 of 29 and Sol 12 of 29; a host needs both.
+  Several Claude quotes came from WebFetch summaries rather than raw page text, which weakens that
+  side.
+- **Drafting:** 32 Haiku drafts. 10 of the first 24 failed the validator on one rule (expanded
+  negatives such as "did not"). That was fixed mechanically in prose fields only and then stated in
+  the drafting brief. One validator false positive came from a book title (The New Negro).
+- **Sol claim review:** about 562 claim reviews, 11 rejected (98% approval). 246 verdicts were reused
+  from the cache.
+- **Text review:** 73 reviews. Three correction passes, delete-or-narrow only, took 19 held records to
+  14 live and 5 held.
+- **Cost:** 28 subagent runs, 3.48M tokens in all (Haiku 1.21M, Sonnet 2.27M), about 158k per live
+  record. About 337 Codex calls (234 claim-review batches, 73 text reviews, 29 host assessments, 1
+  triage), about 15 per live record. Wall clock about 165 minutes, roughly an hour of it waiting on
+  old-code Sol runs. Seattle Medium alone cost about 340k agent tokens.
+
+### Old code against new code (same records, same work dir)
+
+| Stage | Old: batch B, 8 records, 103 new claims | Old: batch A re-run, 16 records, 146 new | New, run 3: 19 records, 119 new, 112 reused | New, run 5: 12 records, 59 new, 96 reused |
+|---|---|---|---|---|
+| Capture | 0:46 | 1:28 | 2:22 | 1:19 |
+| Claim review | 8:37 (5.0 s/claim) | 10:24 (4.3 s/claim) | 2:33 (1.3 s/claim) | 1:14 (1.3 s/claim) |
+| Claim ledger write | 2:13 | 3:12 | 4:56 (1.28 s/claim, 231) | 1:06 (0.43 s/claim, 155; per-record transactions) |
+| Text review | 2:23 (7 records) | 5:29 (15) | 1:48 (18) | 1:07 (12) |
+| Publish and republish | 0:38 | stopped | 1:10 | 0:55 |
+| Total | 14:37 | stopped before publish | 12:48 | 5:41 |
+
+Times come from work-dir file mtimes, because piped stdout is block-buffered and log timestamps are
+not reliable. Sol host assessment went from about 6 minutes per host to 5 hosts in 66 seconds.
+
+### Pipeline gaps the pilot found
+
+Fixed in this branch:
+
+- Rows with no `canonical_url` (every mention-mined `gap_` row) ignored `summaryClaims`, so their
+  summaries reached text review with no claim to cite (`lib/incremental-publish.ts`, test added).
+
+Fixed by the session that started the pilot (staging `b030625d0`, `af969f65e`):
+
+- Parallel Codex calls, larger waves, the month-without-year drafting rule, the lowercase
+  display-name hold, and per-record ledger transactions.
+
+Still open:
+
+1. **The sweep's identity gate passes namesakes on common names.** About a third of the captures on
+   person and church rows named someone or something else.
+2. **The verdict cache is written after the ledger step.** A DNS failure between claim review and
+   the ledger threw away 35 fresh verdicts, and the retry paid Sol again.
+3. **An earlier "request changes" on identical text overrides a later approval.** The text has to
+   change before it can pass, even when the new review approves it.
+4. **Location staging accepts point precisions for cases, laws and movements.** The publisher then
+   refuses them (earned precision). `stage-landscape-evidence.ts` should refuse up front or coarsen
+   to county.
+5. **Kind is wrong on Wikidata-derived rows.** 5 persons were filed as `other` or `institution`,
+   which bypasses the person gate. Fix kind at sweep or triage.
+6. **Title-case display names from Wikidata labels.** The live "segregation academy" record was
+   renamed "Segregation academies", with the old name kept as an alias. 30 other pending non-Green
+   Book rows start lowercase.
+7. **Review passed an undated "launched in June".** The Black Wall Street Times was corrected by
+   removing the clause, since no citable page states the year. The dated-source rule now needs a
+   month-without-year check, and the drafting prompt has one.
+8. **Drafts carry sentences with no claim behind them.** This was the most common text-review
+   finding. The drafter should emit one claim per sentence, or the validator should refuse a sentence
+   with no claim.
+9. **Self-published sites hold DC churches.** Churches and schools are often documented only on their
+   own sites. The "facts about itself only" tier is the decision that would unblock them.
+
+Owner decisions recorded during the pilot: the stop rule; contemporary institutions stay live; and
+persons get a session `personReview` only when a captured page states the death (13 recorded). Albert
+Hicks is held because only an uncaptured page gives his death date.
+
+### Recommendation per lane
+
+- **other, mention-mined: scale.** Triage removes most rows for nearly nothing, and what survives
+  publishes at the best rate. Fix gaps 4 and 8 first.
+- **other, stubs: scale.** 5 of 12 kept rows went live. The holds are mostly persons with no
+  sourced death and thin single-source subjects. Fix gaps 1 and 5 first.
+- **evidence-ready: scale,** though only one cohort of 16 exists. The 17 rows are done.
+- **dc-sites: scale with the location dedupe.** Match live records by coordinates as well as name
+  (5 of 17 were already live). The rest hinge on gap 9.
+- **divine-nine: stop.** 1 of 13 live, and the stop rule fires. The 12 Iota Phi Theta founders are
+  documented mainly by their own fraternity. Two may be living (Spruill, Williams). The independent
+  pages for the others sit on refused hosts, or their captures failed identity. Nothing more should
+  go here until there is a source beyond the fraternity's own roster.
