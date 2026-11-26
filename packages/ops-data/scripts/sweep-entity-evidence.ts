@@ -39,6 +39,7 @@ import {
   type HopSubject,
 } from './lib/evidence-collectors/reference-hops.ts';
 import { hostLineageKey, isTier1Host, isWikipediaHost } from './lib/tier1-sources.ts';
+import { wikipediaPageAnchored } from './lib/wikipedia-anchor.ts';
 import { safeFetchPage } from './lib/safe-fetch.ts';
 import { collectNcesNavigatorEvidence } from './lib/evidence-collectors/nces-navigator.ts';
 
@@ -780,7 +781,33 @@ function finalizeEvidenceRow(row: CandidateRow, item: EvidenceRow): EvidenceRow 
             strippedControlChars: item.contentText.length - stripped.length,
           },
         };
-  return applyAddressRestriction(row, sanitized);
+  return applyWikipediaAnchor(row, applyAddressRestriction(row, sanitized));
+}
+
+/** A Wikipedia page found by name alone is a namesake risk; see lib/wikipedia-anchor.ts. */
+function applyWikipediaAnchor(row: CandidateRow, item: EvidenceRow): EvidenceRow {
+  if (item.status !== 'captured' || !isWikipediaHost(item.sourceUrl)) return item;
+  const identity = (item.provenance.identity ?? {}) as {
+    placeKnown?: boolean;
+    placeCorroborated?: boolean;
+  };
+  const anchored = wikipediaPageAnchored({
+    sourceUrl: item.sourceUrl,
+    canonicalUrl: row.payload.canonicalUrl,
+    displayName: row.display_name,
+    placeKnown: identity.placeKnown,
+    placeCorroborated: identity.placeCorroborated,
+  });
+  if (anchored) return item;
+  return {
+    ...item,
+    status: 'quarantined',
+    provenance: {
+      ...item.provenance,
+      quarantineReason:
+        "Wikipedia page found by name, not the record's linked article or a page matching its place",
+    },
+  };
 }
 
 function applyAddressRestriction(row: CandidateRow, item: EvidenceRow): EvidenceRow {
