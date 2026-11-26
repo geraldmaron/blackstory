@@ -190,7 +190,8 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT = [
     'Who runs, owns or leads something, and what a person is doing, are facts about the ' +
     'moment the source was written. State them in past tense tied to that moment ("A 2009 ' +
     'profile said his son ran the paper"), never with "now", "currently" or "today", ' +
-    'unless the evidence itself is current and says so.',
+    'unless the evidence itself is current and says so. Never name a month without its ' +
+    'year ("launched in June"); if the evidence gives no year, leave the month out.',
 
   'PRIVACY. A hard safety rule.\n' +
     'Never state a street address, house number, coordinate pair, or other parcel-precise ' +

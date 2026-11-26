@@ -15,7 +15,10 @@
  *   DATABASE_URL="$ADMIN_DATABASE_URL" node --conditions development --import tsx \
  *     packages/ops-data/scripts/research-batch.ts --ids=id1,id2 --work-dir=<dir outside the repo> \
  *     --drafter-actor=<who wrote the text> --drafter-family=anthropic \
- *     [--preservation-decisions=<file>] [--max=10] [--apply] [--correct]
+ *     [--preservation-decisions=<file>] [--max=50] [--apply] [--correct]
+ *
+ * Before anything else, records whose text fails `preReviewTextCheck` (lowercase display name, a
+ * month with no year, an em dash) are held with the reason, so they never cost a Sol cycle.
  *
  * --correct changes records that are already live, in place, after the same review.
  * Captures use the standing rule below plus any decisions passed in; a source with neither stays
@@ -30,6 +33,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { preReviewTextCheck } from './lib/pre-review-text-check.ts';
 import { lookupSourceRegisterByUrl } from './lib/source-register.ts';
 import { isReputableSecondaryHost, isTier1Host, isWikipediaHost } from './lib/tier1-sources.ts';
 
@@ -219,7 +223,7 @@ const log: Record<string, unknown> = {};
 
 async function main(): Promise<void> {
   const apply = process.argv.includes('--apply');
-  const ids = [
+  const requested = [
     ...new Set(
       flag('ids')
         .split(',')
@@ -227,25 +231,60 @@ async function main(): Promise<void> {
         .filter(Boolean),
     ),
   ];
-  const max = Number(flag('max', '10'));
+  const max = Number(flag('max', '50'));
   const workDir = resolve(flag('work-dir'));
   const drafter = [
     `--drafter-actor=${flag('drafter-actor')}`,
     `--drafter-family=${flag('drafter-family')}`,
   ];
   const decisions = flag('preservation-decisions', '');
-  if (ids.length === 0 || ids.length > max)
-    throw new Error(`${ids.length} ids; this run allows 1 to ${max}`);
+  if (requested.length === 0 || requested.length > max)
+    throw new Error(`${requested.length} ids; this run allows 1 to ${max}`);
   if (workDir.startsWith(REPO_ROOT)) throw new Error('--work-dir must be outside the repository');
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required (the admin login)');
   const correct = process.argv.includes('--correct');
-  Object.assign(log, { startedAt: new Date().toISOString(), apply, correct, attempted: ids });
+  Object.assign(log, {
+    startedAt: new Date().toISOString(),
+    apply,
+    correct,
+    attempted: requested,
+  });
   const switches = await query<{ enabled: boolean }>(
     'SELECT enabled FROM ops.kill_switches WHERE id = $1',
     [KILL_SWITCH_ID],
   );
   if (switches[0]?.enabled === true)
     throw new Error(`kill switch ${KILL_SWITCH_ID} is engaged; nothing run`);
+
+  // Hold records whose text would bounce at Sol's text review anyway, before any capture or call.
+  const textRows = await query<{
+    id: string;
+    display_name: string;
+    summary: string;
+    historical_context: string | null;
+  }>(
+    `SELECT id, display_name, coalesce(summary, '') AS summary,
+            payload->>'historicalContext' AS historical_context
+       FROM research.landscape_candidates WHERE id = ANY($1::text[])`,
+    [requested],
+  );
+  const heldAtPreReview: Record<string, readonly string[]> = {};
+  for (const row of textRows) {
+    const { problems, warnings } = preReviewTextCheck({
+      displayName: row.display_name,
+      summary: row.summary,
+      historicalContext: row.historical_context,
+    });
+    for (const warning of warnings) console.log(`Warning ${row.id}: ${warning}`);
+    if (problems.length > 0) {
+      heldAtPreReview[row.id] = problems;
+      console.log(`Held ${row.id} before review: ${problems.join('; ')}`);
+    }
+  }
+  log.heldAtPreReview = heldAtPreReview;
+  const ids = requested.filter((id) => heldAtPreReview[id] === undefined);
+  if (ids.length === 0)
+    throw new Error('every record failed the pre-review text check; nothing run');
   mkdirSync(join(workDir, 'codex'), { recursive: true });
   const S = 'packages/ops-data/scripts';
   const packets = join(workDir, 'packets.jsonl');
