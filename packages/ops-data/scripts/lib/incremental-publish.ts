@@ -717,10 +717,11 @@ export function buildReleaseSourceFromLandscape(
       ? 'National Register of Historic Places listed properties'
       : hostname;
   // Separate the NRHP listing fact from its significance claim. A candidate without a registry
-  // URL gets no record_index claim and must rely on its actual cited evidence.
+  // URL gets no record_index claim and must rely on its actual cited evidence, which includes the
+  // single-fact summaryClaims enrichment staged (without them its summary has no claim to cite).
   const claims: ReleaseSourceClaim[] =
     canonicalUrl.length === 0
-      ? []
+      ? (summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? [])
       : row.lane === 'nrhp-black-heritage'
         ? [
             {

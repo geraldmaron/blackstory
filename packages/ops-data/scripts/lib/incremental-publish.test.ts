@@ -1850,6 +1850,38 @@ test('a curated row with no canonical_url publishes its evidence claim instead o
   );
 });
 
+test('a curated row with no canonical_url keeps its summaryClaims as evidence claims', () => {
+  const result = gateWithReviewedClaims({
+    row: curatedRow({
+      canonical_url: null,
+      payload: {
+        ...curatedEvidencePayload,
+        summaryClaims: [
+          { object: 'First fact.', citationHref: 'https://example.org/a' },
+          { object: 'Second fact.', citationHref: 'https://example.org/b' },
+        ],
+      },
+    }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.deepEqual(
+    result.entry.claims?.map((c) => [c.object, c.claimRole]),
+    [
+      ['First fact.', 'evidence'],
+      ['Second fact.', 'evidence'],
+      [
+        'The African Meeting House is the oldest Black church building still standing in the United States.',
+        'evidence',
+      ],
+    ],
+  );
+});
+
 test('a row with no canonical_url and no evidence citation still reports missing_canonical_url', () => {
   const result = gateWithReviewedClaims({
     row: curatedRow({ canonical_url: null, payload: {} }),
