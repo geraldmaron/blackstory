@@ -9,17 +9,18 @@
  * Usage (from repo root, after sourcing apps/web/.env.local and exporting DATABASE_SSL=1):
  *   node --conditions development --import tsx packages/ops-data/scripts/session-public-text-review.ts \
  *     --step=prepare --ids-file=<ids> --work-dir=<dir outside the repo> [--rejected-file=<json>]
- *   ... --step=review --work-dir=<dir> [--model=gpt-6.1-sol]
+ *   ... --step=review --work-dir=<dir> [--model=gpt-6.1-sol] [--concurrency=4]
  *   ... --step=apply --work-dir=<dir> --drafter-actor=<who actually wrote this text> --drafter-family=<model family>
  *
  * The drafter flags state the real author of the current text. They are required on apply because
  * a landscape row's metadata names whoever first produced the row, not whoever wrote this revision.
  */
-import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { mapPool } from '../../operator-cli/src/map-pool.ts';
+import { runCodexExec } from './lib/codex-exec.ts';
 import { connectWithDeadline, normalizePgConnectionString } from './lib/pg-connection.ts';
 import { buildReleaseSourceFromLandscape } from './lib/incremental-publish.ts';
 import { loadReviewClaims, recordDecision } from './lib/claim-review-ledger.ts';
@@ -151,58 +152,42 @@ async function prepare(): Promise<void> {
   if (blocked.length > 0) console.log(JSON.stringify(blocked, null, 1));
 }
 
-function review(): void {
+async function review(): Promise<void> {
   const model = flag('model', 'gpt-6.1-sol');
+  const concurrency = Number(flag('concurrency', '4'));
   const packets = readJsonl<PublicTextPacket>(packetsPath);
   const schemaPath = join(workDir, 'text-schema.json');
   writeFileSync(schemaPath, JSON.stringify(PUBLIC_TEXT_OUTPUT_SCHEMA));
-  const lines: string[] = [];
-  for (const packet of packets) {
-    const output = join(workDir, `text-${packet.entityId}.json`);
-    if (existsSync(output)) rmSync(output);
-    const result = spawnSync(
-      'codex',
-      [
-        'exec',
-        '-m',
+  // Records are reviewed `concurrency` at a time; lines keep packet order.
+  const lines = await mapPool(
+    packets,
+    async (packet) => {
+      const output = join(workDir, `text-${packet.entityId}.json`);
+      if (existsSync(output)) rmSync(output);
+      const result = await runCodexExec({
         model,
-        '-s',
-        'read-only',
-        '--skip-git-repo-check',
-        '--ephemeral',
-        '-C',
         workDir,
-        '--output-schema',
         schemaPath,
-        '-o',
-        output,
-        '-',
-      ],
-      // Stdin closes after the prompt; an open stdin makes codex wait forever.
-      {
-        cwd: workDir,
-        input: buildPublicTextPrompt(packet),
-        encoding: 'utf8',
-        timeout: 20 * 60_000,
-        maxBuffer: 64 * 1024 * 1024,
-      },
-    );
-    if (result.status !== 0 || !existsSync(output)) {
-      console.error(`${packet.entityId}: codex failed; no verdict`);
-      continue;
-    }
-    const verdict = JSON.parse(readFileSync(output, 'utf8')) as PublicTextVerdict;
-    lines.push(
-      JSON.stringify({
+        outputPath: output,
+        prompt: buildPublicTextPrompt(packet),
+        timeoutMs: 20 * 60_000,
+      });
+      if (result.status !== 0 || !existsSync(output)) {
+        console.error(`${packet.entityId}: codex failed; no verdict`);
+        return undefined;
+      }
+      const verdict = JSON.parse(readFileSync(output, 'utf8')) as PublicTextVerdict;
+      console.log(`${packet.entityId}: ${verdict.decision}`);
+      return JSON.stringify({
         entityId: packet.entityId,
         textHash: packet.textHash,
         reviewerActorId: `codex-review:${model}`,
         verdict,
-      }),
-    );
-    console.log(`${packet.entityId}: ${verdict.decision}`);
-  }
-  writeFileSync(verdictsPath, `${lines.join('\n')}\n`);
+      });
+    },
+    { concurrency },
+  );
+  writeFileSync(verdictsPath, `${lines.filter((line) => line !== undefined).join('\n')}\n`);
 }
 
 type VerdictLine = {
@@ -299,8 +284,7 @@ async function apply(): Promise<void> {
 }
 
 const step = flag('step');
-const done =
-  step === 'prepare' ? prepare() : step === 'apply' ? apply() : Promise.resolve(review());
+const done = step === 'prepare' ? prepare() : step === 'apply' ? apply() : review();
 done.catch((error) => {
   console.error(error);
   process.exitCode = 1;

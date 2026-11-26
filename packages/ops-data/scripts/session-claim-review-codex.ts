@@ -14,13 +14,15 @@
  * Usage (from repo root; no database access needed):
  *   node --conditions development --import tsx packages/ops-data/scripts/session-claim-review-codex.ts \
  *     --packets-file=<dir>/packets.jsonl --out=<dir>/verdicts.jsonl --work-dir=<empty scratch dir>
- * Optional: --model=gpt-6.1-sol (default) --batch-size=3 --max-prompt-chars=300000
+ * Optional: --model=gpt-6.1-sol (default) --batch-size=3 --max-prompt-chars=300000 --concurrency=4
+ * Batches run --concurrency at a time; verdicts are written in packet order either way.
  * Then apply with CLAIM_REVIEW_REVIEWER_ACTOR_ID=codex-review:<model> CLAIM_REVIEW_REVIEWER_MODEL_FAMILY=openai.
  */
-import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mapPool } from '../../operator-cli/src/map-pool.ts';
+import { runCodexExec } from './lib/codex-exec.ts';
 import {
   REVIEWER_OUTPUT_SCHEMA,
   buildReviewerPrompt,
@@ -56,7 +58,7 @@ function batches(packets: readonly ReviewPacket[], size: number, maxChars: numbe
   return out;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const packets = readFileSync(flag('packets-file'), 'utf8')
     .split('\n')
     .filter((line) => line.trim())
@@ -74,61 +76,46 @@ function main(): void {
   const schemaPath = join(workDir, 'verdict-schema.json');
   writeFileSync(schemaPath, JSON.stringify(REVIEWER_OUTPUT_SCHEMA));
 
-  const verdicts: Verdict[] = [];
-  const missing: string[] = [];
-  for (const [index, batch] of batches(packets, size, maxChars).entries()) {
-    const outputPath = join(workDir, `batch-${index + 1}.json`);
-    if (existsSync(outputPath)) rmSync(outputPath);
-    const result = spawnSync(
-      'codex',
-      [
-        'exec',
-        '-m',
+  const concurrency = Number(flag('concurrency', '4'));
+  const planned = batches(packets, size, maxChars);
+  const results = await mapPool(
+    planned,
+    async (batch, index) => {
+      const outputPath = join(workDir, `batch-${index + 1}.json`);
+      if (existsSync(outputPath)) rmSync(outputPath);
+      const result = await runCodexExec({
         model,
-        '-s',
-        'read-only',
-        '--skip-git-repo-check',
-        '--ephemeral',
-        '-C',
         workDir,
-        '--output-schema',
         schemaPath,
-        '-o',
         outputPath,
-        '-',
-      ],
-      // The prompt goes in on stdin and stdin then closes; an open stdin makes codex wait forever.
-      {
-        cwd: workDir,
-        input: buildReviewerPrompt(batch),
-        encoding: 'utf8',
-        timeout: 20 * 60_000,
-        maxBuffer: 64 * 1024 * 1024,
-      },
-    );
-    if (result.status !== 0 || !existsSync(outputPath)) {
-      console.error(
-        `batch ${index + 1}: codex failed (status ${result.status}); ${String(result.stderr).slice(-400)}`,
-      );
-      missing.push(...batch.map((packet) => packet.packetId));
-      continue;
-    }
-    try {
-      const parsed = parseReviewerVerdicts(
-        readFileSync(outputPath, 'utf8'),
-        batch,
-        reviewerActorId,
-      );
-      verdicts.push(...parsed.verdicts);
-      missing.push(...parsed.missing);
-      console.log(
-        `batch ${index + 1}: ${parsed.verdicts.length}/${batch.length} verdicts, ${parsed.ignored} ignored`,
-      );
-    } catch (error) {
-      console.error(`batch ${index + 1}: unparseable reviewer output (${String(error)})`);
-      missing.push(...batch.map((packet) => packet.packetId));
-    }
-  }
+        prompt: buildReviewerPrompt(batch),
+        timeoutMs: 20 * 60_000,
+      });
+      if (result.status !== 0 || !existsSync(outputPath)) {
+        console.error(
+          `batch ${index + 1}: codex failed (status ${result.status}); ${result.stderr.slice(-400)}`,
+        );
+        return { verdicts: [] as Verdict[], missing: batch.map((packet) => packet.packetId) };
+      }
+      try {
+        const parsed = parseReviewerVerdicts(
+          readFileSync(outputPath, 'utf8'),
+          batch,
+          reviewerActorId,
+        );
+        console.log(
+          `batch ${index + 1}: ${parsed.verdicts.length}/${batch.length} verdicts, ${parsed.ignored} ignored`,
+        );
+        return { verdicts: [...parsed.verdicts], missing: [...parsed.missing] };
+      } catch (error) {
+        console.error(`batch ${index + 1}: unparseable reviewer output (${String(error)})`);
+        return { verdicts: [] as Verdict[], missing: batch.map((packet) => packet.packetId) };
+      }
+    },
+    { concurrency },
+  );
+  const verdicts = results.flatMap((result) => result.verdicts);
+  const missing = results.flatMap((result) => result.missing);
   writeFileSync(
     out,
     verdicts.map((verdict) => JSON.stringify(verdict)).join('\n') + (verdicts.length ? '\n' : ''),
@@ -143,4 +130,7 @@ function main(): void {
   );
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});

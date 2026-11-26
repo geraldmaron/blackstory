@@ -7,7 +7,7 @@
  * claim the host would unblock, so neither has a reason to want a pass:
  *
  *   brief --host <host>                    print the brief (hand it to a Claude subagent as-is)
- *   sol --hosts a,b --out <jsonl> --work-dir <dir outside repo>   run Sol through Codex
+ *   sol --hosts=a,b --out=<jsonl> --work-dir=<dir outside repo> [--concurrency=4]   run Sol
  *   combine --claude <jsonl> --sol <jsonl> --out <json>           pair them for apply-assessment
  *
  * Each JSONL line is `{ host, label, assessment }`, where `assessment` matches
@@ -20,10 +20,11 @@
  * host, and takes the lower class (`entryFromAssessments`). Sol sees only the host name and the
  * public web. See docs/research/source-assessment.md.
  */
-import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mapPool } from '../../operator-cli/src/map-pool.ts';
+import { runCodexExec } from './lib/codex-exec.ts';
 import { SOURCE_REGISTER_ORG_TYPES } from './lib/source-register.ts';
 
 const REPO_ROOT = resolve(fileURLToPath(import.meta.url), '../../../..');
@@ -118,13 +119,14 @@ export function combineAssessments(
   return { rows, unpaired };
 }
 
-function runSol(): void {
+async function runSol(): Promise<void> {
   const hosts = flag('hosts')
     .split(',')
     .map((host) => host.trim())
     .filter(Boolean);
   const out = flag('out');
   const model = flag('model', 'gpt-6.1-sol');
+  const concurrency = Number(flag('concurrency', '4'));
   const workDir = resolve(flag('work-dir'));
   if (workDir === REPO_ROOT || workDir.startsWith(`${REPO_ROOT}/`)) {
     throw new Error('--work-dir must be outside the repository');
@@ -132,51 +134,45 @@ function runSol(): void {
   mkdirSync(workDir, { recursive: true });
   const schemaPath = join(workDir, 'assessment-schema.json');
   writeFileSync(schemaPath, JSON.stringify(ASSESSMENT_OUTPUT_SCHEMA));
-  const lines: string[] = [];
-  for (const host of hosts) {
-    const outputPath = join(workDir, `${host}.json`);
-    if (existsSync(outputPath)) rmSync(outputPath);
-    const result = spawnSync(
-      'codex',
-      [
-        'exec',
-        '-m',
+  // Hosts are assessed `concurrency` at a time; output keeps host order.
+  const lines = await mapPool(
+    hosts,
+    async (host) => {
+      const outputPath = join(workDir, `${host}.json`);
+      if (existsSync(outputPath)) rmSync(outputPath);
+      const result = await runCodexExec({
         model,
-        '-c',
-        'web_search=live',
-        '-s',
-        'read-only',
-        '--skip-git-repo-check',
-        '--ephemeral',
-        '-C',
         workDir,
-        '--output-schema',
         schemaPath,
-        '-o',
         outputPath,
-        '-',
-      ],
-      // stdin carries the brief and then closes; an open stdin makes codex wait forever.
-      { cwd: workDir, input: assessmentBrief(host), encoding: 'utf8', timeout: 15 * 60_000 },
-    );
-    if (result.status !== 0 || !existsSync(outputPath)) {
-      console.error(
-        `${host}: codex failed (status ${result.status}); ${String(result.stderr).slice(-300)}`,
-      );
-      continue;
-    }
-    const parsed = JSON.parse(readFileSync(outputPath, 'utf8')) as Record<string, unknown>;
-    const { label, ...rest } = parsed;
-    lines.push(
-      JSON.stringify({
+        prompt: assessmentBrief(host),
+        timeoutMs: 15 * 60_000,
+        config: ['web_search=live'],
+      });
+      if (result.status !== 0 || !existsSync(outputPath)) {
+        console.error(
+          `${host}: codex failed (status ${result.status}); ${result.stderr.slice(-300)}`,
+        );
+        return undefined;
+      }
+      const parsed = JSON.parse(readFileSync(outputPath, 'utf8')) as Record<string, unknown>;
+      const { label, ...rest } = parsed;
+      console.log(`${host}: ${String(parsed.recommendation)} (${String(parsed.orgType)})`);
+      return JSON.stringify({
         host,
         label,
         assessment: { actorId: `codex-review:${model}`, family: 'openai', ...rest },
-      }),
-    );
-    console.log(`${host}: ${String(parsed.recommendation)} (${String(parsed.orgType)})`);
-  }
-  writeFileSync(out, lines.map((line) => `${line}\n`).join(''));
+      });
+    },
+    { concurrency },
+  );
+  writeFileSync(
+    out,
+    lines
+      .filter((line) => line !== undefined)
+      .map((line) => `${line}\n`)
+      .join(''),
+  );
 }
 
 function main(): void {
@@ -185,7 +181,10 @@ function main(): void {
     console.log(assessmentBrief(flag('host')));
     console.log(`\nOutput schema:\n${JSON.stringify(ASSESSMENT_OUTPUT_SCHEMA, null, 2)}`);
   } else if (verb === 'sol') {
-    runSol();
+    runSol().catch((error: unknown) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
   } else if (verb === 'combine') {
     const { rows, unpaired } = combineAssessments(jsonl(flag('claude')), jsonl(flag('sol')));
     writeFileSync(flag('out'), JSON.stringify(rows, null, 2));
