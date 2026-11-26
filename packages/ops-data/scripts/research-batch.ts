@@ -355,16 +355,21 @@ async function main(): Promise<void> {
   if (todo.length > 0) {
     const todoPackets = join(workDir, 'packets.todo.jsonl');
     writeFileSync(todoPackets, todo.map((packet) => `${JSON.stringify(packet)}\n`).join(''));
-    step('claim review (Sol)', `${S}/session-claim-review-codex.ts`, [
-      `--packets-file=${todoPackets}`,
-      `--out=${fresh}`,
-      `--work-dir=${join(workDir, 'codex')}`,
-    ]);
+    try {
+      step('claim review (Sol)', `${S}/session-claim-review-codex.ts`, [
+        `--packets-file=${todoPackets}`,
+        `--out=${fresh}`,
+        `--work-dir=${join(workDir, 'codex')}`,
+      ]);
+    } finally {
+      // Cache whatever Sol returned even if the step failed, so a retry does not pay for it again.
+      const landed = existsSync(fresh) ? jsonl(fresh) : [];
+      if (landed.length > 0) {
+        appendFileSync(cacheFile, landed.map((v) => `${JSON.stringify(v)}\n`).join(''));
+      }
+    }
   }
   const freshVerdicts = existsSync(fresh) ? jsonl(fresh) : [];
-  if (freshVerdicts.length > 0) {
-    appendFileSync(cacheFile, freshVerdicts.map((v) => `${JSON.stringify(v)}\n`).join(''));
-  }
   writeFileSync(
     verdicts,
     [...cached, ...freshVerdicts].map((verdict) => `${JSON.stringify(verdict)}\n`).join(''),

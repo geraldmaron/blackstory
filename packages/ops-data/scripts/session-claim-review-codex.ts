@@ -18,7 +18,14 @@
  * Batches run --concurrency at a time; verdicts are written in packet order either way.
  * Then apply with CLAIM_REVIEW_REVIEWER_ACTOR_ID=codex-review:<model> CLAIM_REVIEW_REVIEWER_MODEL_FAMILY=openai.
  */
-import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
+import {
+  appendFileSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  rmSync,
+} from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { mapPool } from '../../operator-cli/src/map-pool.ts';
@@ -78,6 +85,9 @@ async function main(): Promise<void> {
 
   const concurrency = Number(flag('concurrency', '4'));
   const planned = batches(packets, size, maxChars);
+  // Each batch is appended as it lands, so a crash mid-run keeps the verdicts already paid for;
+  // the file is rewritten in packet order at the end.
+  writeFileSync(out, '');
   const results = await mapPool(
     planned,
     async (batch, index) => {
@@ -103,6 +113,12 @@ async function main(): Promise<void> {
           batch,
           reviewerActorId,
         );
+        if (parsed.verdicts.length > 0) {
+          appendFileSync(
+            out,
+            parsed.verdicts.map((verdict) => `${JSON.stringify(verdict)}\n`).join(''),
+          );
+        }
         console.log(
           `batch ${index + 1}: ${parsed.verdicts.length}/${batch.length} verdicts, ${parsed.ignored} ignored`,
         );
