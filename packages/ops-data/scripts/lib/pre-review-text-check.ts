@@ -32,6 +32,12 @@ const TIME_WORDS = /\b(?:now|currently|today|presently|nowadays)\b/iu;
 const ABOUT_THE_EVIDENCE =
   /\b(?:the|this|that|its|available|supplied|surviving)\s+(?:evidence|sources?|records?|roster|documents?|page|listing|materials?)\b[^.]*?\b(?:does(?:n['\u2019]t| not)\s+(?:say|state|give|name|mention|record|describe|show)|says nothing|gives no|names no|is silent|offers? no|provides? no)\b/iu;
 
+/**
+ * Names whose subject chose lowercase. The check otherwise holds lowercase names, which are raw
+ * Wikidata labels ("segregation academy"); add a name here only when the subject wrote it that way.
+ */
+const LOWERCASE_BY_CHOICE: ReadonlySet<string> = new Set(['bell hooks']);
+
 export type PreReviewText = {
   readonly displayName: string;
   readonly summary: string;
@@ -48,7 +54,10 @@ export function preReviewTextCheck(input: PreReviewText): {
 } {
   const problems: string[] = [];
   const warnings: string[] = [];
-  if (/^[a-z]/u.test(input.displayName.trim())) {
+  if (
+    /^[a-z]/u.test(input.displayName.trim()) &&
+    !LOWERCASE_BY_CHOICE.has(input.displayName.trim())
+  ) {
     problems.push(`display name starts lowercase: "${input.displayName}"`);
   }
   for (const [field, text] of [

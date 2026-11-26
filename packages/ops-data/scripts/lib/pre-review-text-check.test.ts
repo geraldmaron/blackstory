@@ -44,3 +44,10 @@ test('a sentence about what the evidence lacks warns', () => {
   assert.equal(warnings.length, 1);
   assert.match(warnings[0]!, /evidence itself/u);
 });
+
+test('a name its subject chose to write in lowercase is not held', () => {
+  assert.deepEqual(
+    preReviewTextCheck({ displayName: 'bell hooks', summary: 'Text.' }).problems,
+    [],
+  );
+});
