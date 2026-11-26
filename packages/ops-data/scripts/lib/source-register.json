@@ -66,6 +66,27 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "buffalo.edu",
+      "sourceClass": "reputable_secondary",
+      "orgType": "university",
+      "label": "University at Buffalo",
+      "basis": {
+        "wikidata": "Q681025",
+        "officialWebsite": "https://www.buffalo.edu/",
+        "authorityIds": {
+          "lcnaf": "n82162224",
+          "viaf": "264538167",
+          "isni": "0000000419369887",
+          "ror": "01y64my43",
+          "grid": "grid.273335.3"
+        },
+        "instanceOf": ["Q23002039", "Q45400320", "Q498162", "Q62078547"]
+      },
+      "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
+      "reviewedAt": "2026-11-26T02:59:08.080Z",
+      "verifiedAt": "2026-11-26T02:58:12.722Z"
+    },
+    {
       "host": "chipublib.org",
       "sourceClass": "reputable_secondary",
       "orgType": "library",
@@ -104,6 +125,24 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "cogreatwomen.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "hall_of_fame",
+      "label": "Colorado Women's Hall of Fame",
+      "basis": {
+        "wikidata": "Q5148987",
+        "officialWebsite": "http://www.cogreatwomen.org/",
+        "authorityIds": {
+          "lcnaf": "n99043553",
+          "viaf": "139740303"
+        },
+        "instanceOf": ["Q1046088", "Q618779"]
+      },
+      "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
+      "reviewedAt": "2026-11-26T02:59:08.080Z",
+      "verifiedAt": "2026-11-26T02:58:12.722Z"
+    },
+    {
       "host": "computerhistory.org",
       "sourceClass": "reputable_secondary",
       "orgType": "museum",
@@ -123,6 +162,23 @@
       "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
       "reviewedAt": "2026-09-10T04:12:18.573Z",
       "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "csmonitor.com",
+      "sourceClass": "news_reportage",
+      "orgType": "news_publisher",
+      "label": "The Christian Science Monitor",
+      "basis": {
+        "wikidata": "Q284947",
+        "officialWebsite": "https://www.csmonitor.com/",
+        "authorityIds": {
+          "viaf": "205794409"
+        },
+        "instanceOf": ["Q11032"]
+      },
+      "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
+      "reviewedAt": "2026-11-26T02:59:08.080Z",
+      "verifiedAt": "2026-11-26T02:58:12.722Z"
     },
     {
       "host": "dclibrary.org",
@@ -339,6 +395,26 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "nbcnews.com",
+      "sourceClass": "news_reportage",
+      "orgType": "news_publisher",
+      "label": "NBC News",
+      "basis": {
+        "wikidata": "Q2877626",
+        "officialWebsite": "https://www.nbcnews.com/",
+        "authorityIds": {
+          "lcnaf": "n80125210",
+          "viaf": "147748465",
+          "isni": "0000000405978665",
+          "ror": "02pystr51"
+        },
+        "instanceOf": ["Q11396960", "Q1153191", "Q2001305", "Q561068"]
+      },
+      "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
+      "reviewedAt": "2026-11-26T02:59:08.080Z",
+      "verifiedAt": "2026-11-26T02:58:12.722Z"
+    },
+    {
       "host": "newhavenmuseum.org",
       "sourceClass": "reputable_secondary",
       "orgType": "museum",
@@ -378,6 +454,48 @@
       "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
       "reviewedAt": "2026-09-10T04:12:18.573Z",
       "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "okhistory.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "historical_society",
+      "label": "Oklahoma Historical Society",
+      "basis": {
+        "wikidata": "Q7082247",
+        "officialWebsite": "https://www.okhistory.org/",
+        "authorityIds": {
+          "lcnaf": "n79135288",
+          "viaf": "122618348",
+          "isni": "0000000121045230",
+          "ror": "00ca5f112",
+          "grid": "grid.447255.5"
+        },
+        "instanceOf": ["Q5774403", "Q7603363"]
+      },
+      "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
+      "reviewedAt": "2026-11-26T02:59:08.080Z",
+      "verifiedAt": "2026-11-26T02:58:12.722Z"
+    },
+    {
+      "host": "pbs.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "public_broadcaster",
+      "label": "PBS",
+      "basis": {
+        "wikidata": "Q215616",
+        "officialWebsite": "https://www.pbs.org",
+        "authorityIds": {
+          "lcnaf": "n86134532",
+          "viaf": "125714574",
+          "isni": "0000000403681518",
+          "ror": "03y87q061",
+          "grid": "grid.427226.7"
+        },
+        "instanceOf": ["Q1126006", "Q1254874", "Q163740"]
+      },
+      "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
+      "reviewedAt": "2026-11-26T02:59:08.080Z",
+      "verifiedAt": "2026-11-26T02:58:12.722Z"
     },
     {
       "host": "poets.org",
