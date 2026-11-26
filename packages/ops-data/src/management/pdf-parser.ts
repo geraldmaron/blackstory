@@ -1,7 +1,14 @@
 /** Parse bounded PDF bytes without loading scripts or following document links. */
 import { getDocumentProxy } from 'unpdf';
 import type { SafeParserResult } from '@repo/security/url-safety';
-export async function parseResearchPdf(content: Uint8Array): Promise<SafeParserResult> {
+export type PdfParseLimits = { readonly maxChars?: number; readonly maxMs?: number };
+
+export async function parseResearchPdf(
+  content: Uint8Array,
+  limits: PdfParseLimits = {},
+): Promise<SafeParserResult> {
+  const maxChars = limits.maxChars ?? 100000;
+  const maxMs = limits.maxMs ?? 30000;
   if (new TextDecoder().decode(content.subarray(0, 5)) !== '%PDF-')
     return { safe: false, indicators: ['executable_magic'], extractedText: '' };
   const document = await getDocumentProxy(content, {
@@ -12,7 +19,7 @@ export async function parseResearchPdf(content: Uint8Array): Promise<SafeParserR
     const started = Date.now();
     let extractedText = '';
     for (let index = 1; index <= document.numPages; index++) {
-      if (Date.now() - started > 30000) throw new Error('PDF extraction exceeded its time limit');
+      if (Date.now() - started > maxMs) throw new Error('PDF extraction exceeded its time limit');
       const page = await document.getPage(index);
       const text = await page.getTextContent();
       extractedText +=
@@ -20,9 +27,9 @@ export async function parseResearchPdf(content: Uint8Array): Promise<SafeParserR
         text.items.map((item) => ('str' in item ? item.str : '')).join(' ') +
         '\n';
       page.cleanup();
-      if (extractedText.length >= 100000) {
+      if (extractedText.length >= maxChars) {
         extractedText =
-          extractedText.slice(0, 100000) +
+          extractedText.slice(0, maxChars) +
           '\n[Text limit reached; remaining content was not reviewed.]';
         break;
       }

@@ -121,7 +121,7 @@ numerical prior. Neither table certifies a particular document.
 
 ### Views
 
-All four are `security_invoker`, revoked from `anon`, and return nothing to an `authenticated`
+All five are `security_invoker`, revoked from `anon`, and return nothing to an `authenticated`
 caller who is not staff. Service role and the direct Postgres connection the admin app and
 operator scripts use see everything.
 
@@ -134,6 +134,9 @@ operator scripts use see everything.
   work queue.
 - `evidence.source_library_fitness`: evidence-use fitness per publisher, current policy
   version only.
+- `evidence.source_review_outcomes`: per publisher host, how many model claim reviews approved
+  a claim citing it and how many rejected one. A rejection can mean the draft overreached, so
+  read it as a place to look, never as a ranking or an acceptance rule.
 
 Invariant: `sum(source_library.published_claims) + sum(source_library_unmapped_hosts.published_claims)`
 equals the active release's claim count. If it does not, look for a merge cycle.

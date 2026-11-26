@@ -29,6 +29,7 @@ import {
   buildPublicTextPrompt,
   providerOf,
   publicTextHash,
+  standingRejectedFacts,
   validatePublicTextVerdict,
   type PublicTextPacket,
   type PublicTextVerdict,
@@ -76,13 +77,25 @@ async function buildPackets(
   rejectedFile: Record<string, { object: string }[]>,
 ): Promise<{ packets: PublicTextPacket[]; rows: Map<string, unknown>; blocked: unknown[] }> {
   const { prepared, blocked } = await loadReviewClaims(client, ids);
-  const rejectedInLedger = await client.query<{ uri: string; object: string }>(
-    `SELECT a.storage_uri AS uri, f->>'object' AS object
+  const rejectedInLedger = await client.query<{ uri: string; object: string; href: string | null }>(
+    `SELECT a.storage_uri AS uri, f->>'object' AS object, f->>'citationHref' AS href
      FROM research.artifacts a
      JOIN research.review_decisions r ON r.artifact_id = a.id AND r.decision = 'reject'
      CROSS JOIN LATERAL jsonb_array_elements(r.findings) f
      WHERE a.storage_uri = ANY($1::text[]) AND f ? 'object'`,
     [ids.map((id) => `landscape://${id}`)],
+  );
+  const approvedHashes = new Set(
+    (
+      await client.query<{ hash: string }>(
+        `SELECT DISTINCT f->>'packetHash' AS hash
+         FROM research.artifacts a
+         JOIN research.review_decisions r ON r.artifact_id = a.id AND r.decision = 'approve'
+         CROSS JOIN LATERAL jsonb_array_elements(r.findings) f
+         WHERE a.storage_uri = ANY($1::text[]) AND f ? 'packetHash'`,
+        [ids.map((id) => `landscape://${id}`)],
+      )
+    ).rows.map((row) => row.hash),
   );
   const packets: PublicTextPacket[] = [];
   const rows = new Map<string, unknown>();
@@ -94,7 +107,15 @@ async function buildPackets(
     const sources = new Map(claims.map((claim) => [claim.claim.citationHref, claim.capture.text]));
     const rejected = new Set([
       ...(rejectedFile[id] ?? []).map((fact) => fact.object),
-      ...rejectedInLedger.rows.filter((r) => r.uri === `landscape://${id}`).map((r) => r.object),
+      ...standingRejectedFacts(
+        rejectedInLedger.rows.filter((r) => r.uri === `landscape://${id}`),
+        claims.map((claim) => claim.claim),
+        new Set(
+          claims
+            .filter((claim) => approvedHashes.has(claim.packet.packetHash))
+            .map((claim) => claim.claim.object),
+        ),
+      ),
     ]);
     packets.push({
       entityId: id,
@@ -206,7 +227,6 @@ async function apply(): Promise<void> {
   await withDb(async (client) => {
     await client.query(write ? 'BEGIN' : 'BEGIN READ ONLY');
     try {
-      if (write) await client.query('SET LOCAL ROLE service_role');
       const { packets, rows } = await buildPackets(client, ids, {});
       const stored = new Map(readJsonl<PublicTextPacket>(packetsPath).map((p) => [p.entityId, p]));
       const profiles = (

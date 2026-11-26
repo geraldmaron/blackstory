@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # Run one command with DATABASE_URL set to the database owner login, held in memory only.
 #
-# The claim-review ledger write (session-claim-review-apply.ts) runs `SET LOCAL ROLE service_role`,
-# and research.approve_artifact refuses any other caller. Only the owner login may assume that
-# role; blackstory_admin cannot, by design. The owner password is read from 1Password for this one
-# process and is never written to apps/web/.env.local or printed.
+# For DDL and other owner-only work. The claim-review ledger no longer needs it: since migration
+# 20261125053757 the admin login writes the ledger. The owner password is read from 1Password for
+# this one process and is never written to apps/web/.env.local or printed.
 #
 #   scripts/with-owner-db.sh node --conditions development --import tsx <script> [args]
 set -euo pipefail

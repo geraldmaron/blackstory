@@ -119,3 +119,28 @@ test('asking for changes needs a stated finding', () => {
   });
   assert.equal(validatePublicTextVerdict(packet, withFinding).ok, true);
 });
+
+test('a fact rejected against one source stops counting once another source is cited for it', async () => {
+  const { standingRejectedFacts } = await import('./public-text-review.ts');
+  const rejections = [
+    { object: 'listed January 7, 2026', href: 'https://old.example/page' },
+    { object: 'opened October 24, 1980', href: 'https://city.example/about' },
+    { object: 'dropped fact', href: 'https://old.example/page' },
+  ];
+  const claims = [
+    { object: 'listed January 7, 2026', citationHref: 'https://register.example/row' },
+    { object: 'opened October 24, 1980', citationHref: 'https://city.example/about' },
+  ];
+  assert.deepEqual(standingRejectedFacts(rejections, claims), [
+    'opened October 24, 1980',
+    'dropped fact',
+  ]);
+});
+
+test('a rejection no longer counts once a claim for that fact is approved against current text', async () => {
+  const rejections = [{ object: 'Fact A', href: 'https://x.gov/a' }];
+  const claims = [{ object: 'Fact A', citationHref: 'https://x.gov/a' }];
+  const { standingRejectedFacts } = await import('./public-text-review.ts');
+  assert.deepEqual(standingRejectedFacts(rejections, claims), ['Fact A']);
+  assert.deepEqual(standingRejectedFacts(rejections, claims, new Set(['Fact A'])), []);
+});

@@ -51,17 +51,26 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureSto
     async store({ url, sha256, contentType, byteLength, text }) {
       const snapshotSha256 = createHash('sha256').update(text, 'utf8').digest('hex');
       const path = `captures/${config.retentionRevision ? `${config.retentionRevision}/` : ''}${snapshotSha256}.txt`;
-      const response = await transport(`${base}/storage/v1/object/${config.bucket}/${path}`, {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${config.secretKey}`,
-          apikey: config.secretKey,
-          'content-type': 'text/plain; charset=utf-8',
-          'x-upsert': 'false',
-        },
-        body: text,
-        signal: AbortSignal.timeout(30_000),
-      });
+      const send = () =>
+        transport(`${base}/storage/v1/object/${config.bucket}/${path}`, {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${config.secretKey}`,
+            apikey: config.secretKey,
+            'content-type': 'text/plain; charset=utf-8',
+            'x-upsert': 'false',
+          },
+          body: text,
+          signal: AbortSignal.timeout(30_000),
+        });
+      // A large first upload can finish while its response is dropped ("other side closed").
+      // The path is the content hash, so a retry is safe: a stored object answers as a duplicate.
+      let response: Response;
+      try {
+        response = await send();
+      } catch {
+        response = await send();
+      }
       // Duplicate is success: same hash, same object. Storage may send HTTP 409,
       // or HTTP 400 with a JSON body `{ statusCode: "409", code: "KeyAlreadyExists" }`.
       const alreadyExists = response.status === 409 || (await isAlreadyExistsResponse(response));

@@ -104,7 +104,7 @@ import {
   HARNESS_ADJUDICATION_PROGRAM_ID,
   stageHarnessAdjudicatedRelationships,
 } from './harness-relationship-staging.js';
-import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
+import { createNodeSafeFetchDependencies, nominationParser, runQuickAddFetch } from './fetch.js';
 import {
   createMetadataOnlyStorage,
   type CaptureDeps,
@@ -190,6 +190,12 @@ import {
   type EnrichedCandidate,
   type AdjudicatedRelationship,
 } from '@repo/research-harness';
+import {
+  NOMINATION_PDF_LIMITS,
+  fetchNrhpRegistryRow,
+  isNpgalleryNomination,
+  parseNrhpRegistryRowUrl,
+} from './nrhp-registry-row.js';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
 import { describeRoutedSearch } from '@repo/domain';
 import { runSearchQueries, type ResolvedSearchProvider } from './search-routing.js';
@@ -1231,7 +1237,17 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
         const waybackCredentials = wayback ? waybackCredentialsFromEnv(process.env) : undefined;
         const captureDeps: CaptureDeps = {
-          fetchUrl: (url) => runQuickAddFetch(url, fetchDependencies),
+          // A registry row URL names one row of a spreadsheet; safe-fetch has no parser for it.
+          fetchUrl: (url) =>
+            parseNrhpRegistryRowUrl(url)
+              ? fetchNrhpRegistryRow(url)
+              : runQuickAddFetch(
+                  url,
+                  isNpgalleryNomination(url)
+                    ? { ...fetchDependencies, parser: nominationParser }
+                    : fetchDependencies,
+                  isNpgalleryNomination(url) ? { limits: NOMINATION_PDF_LIMITS } : {},
+                ),
           storage: captureStorageFromEnv(process.env, decisions),
           parserVersion: 'capture-backfill-v1',
           newId: (prefix, seed) =>

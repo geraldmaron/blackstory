@@ -17,6 +17,7 @@ import { request as httpRequest, type IncomingMessage } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import {
   DEFAULT_SAFE_FETCH_LIMITS,
+  decodeTextEntities,
   executeSafeFetch,
   type PinnedTransport,
   type PinnedTransportResponse,
@@ -73,6 +74,16 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
     clientRequest.end();
   });
 
+/** Parser for NPS nomination PDFs: keeps far more text than the default so a quoted passage is in the capture. */
+export async function nominationParser(
+  content: Uint8Array,
+  contentType: string,
+): Promise<SafeParserResult> {
+  return contentType === 'application/pdf'
+    ? parseResearchPdf(content, { maxChars: 400_000, maxMs: 90_000 })
+    : parseTextOnlyHtml(content, contentType);
+}
+
 /** Text-only parser that strips scripts/styles and checks universal malware signatures without active content blocks. */
 export async function parseTextOnlyHtml(
   content: Uint8Array,
@@ -98,6 +109,7 @@ export async function parseTextOnlyHtml(
         // leaves the element's contents in the extracted text (CodeQL js/bad-tag-filter).
         .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\b[^>]*>/giu, ' ')
         .replace(/<[^>]+>/gu, ' ')
+        .replace(/&[#a-z0-9]{2,8};/giu, decodeTextEntities)
         .replace(/\s+/gu, ' ')
         .trim()
     : text.replace(/\s+/gu, ' ').trim();

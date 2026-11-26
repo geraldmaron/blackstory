@@ -105,7 +105,7 @@ for explicit file loading and capability requirements. Command verbs live in
 `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
 `claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
 `neo-voice`, `prose-review`, `ringer-review`, `surface-triage`, `intake-review`,
-`experience-review`) have unique content. See `AGENTS.md` for the
+`experience-review`, `brand-content`) have unique content. See `AGENTS.md` for the
 lane index.
 
 ## Web local QA (agents)

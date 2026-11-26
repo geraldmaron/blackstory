@@ -26,6 +26,7 @@ import {
 } from '@repo/domain';
 import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts';
 import { isRestatedListing } from './greenbook-registry.ts';
+import { isWikipediaHost } from './tier1-sources.ts';
 import {
   assessPublicationClaims,
   confidenceLevelForSource,
@@ -708,6 +709,13 @@ export function buildReleaseSourceFromLandscape(
         ? 'address'
         : 'city';
 
+  // The register's own spreadsheet row states the listing facts; the asset page does not.
+  const registrySourceUrl = readTrimmedString(row.payload.registrySourceUrl);
+  const registryUrl = registrySourceUrl.length > 0 ? registrySourceUrl : canonicalUrl;
+  const registryLabel =
+    registrySourceUrl.length > 0
+      ? 'National Register of Historic Places listed properties'
+      : hostname;
   // Separate the NRHP listing fact from its significance claim. A candidate without a registry
   // URL gets no record_index claim and must rely on its actual cited evidence.
   const claims: ReleaseSourceClaim[] =
@@ -725,10 +733,10 @@ export function buildReleaseSourceFromLandscape(
                     ? (row.payload.listedDateSerial as string | null)
                     : undefined,
               }),
-              confidenceLevel: confidenceLevelForSource(canonicalUrl),
-              citationSource: hostname,
-              citationHref: canonicalUrl,
-              citationLabel: hostname,
+              confidenceLevel: confidenceLevelForSource(registryUrl),
+              citationSource: registryLabel,
+              citationHref: registryUrl,
+              citationLabel: registryLabel,
               claimRole: 'record_index',
             },
             {
@@ -739,12 +747,15 @@ export function buildReleaseSourceFromLandscape(
                     ? row.payload.areaOfSignificance
                     : undefined,
               }),
-              confidenceLevel: confidenceLevelForSource(canonicalUrl),
-              citationSource: hostname,
-              citationHref: canonicalUrl,
-              citationLabel: hostname,
+              confidenceLevel: confidenceLevelForSource(registryUrl),
+              citationSource: registryLabel,
+              citationHref: registryUrl,
+              citationLabel: registryLabel,
               claimRole: 'record_index',
             },
+            // The registry states the listing; what happened there is carried by the facts the
+            // enrichment quoted from its evidence.
+            ...(summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? []),
           ]
         : (summaryClaimsFromPayload(row.payload.summaryClaims, canonicalUrl) ?? [
             {
@@ -970,11 +981,14 @@ export function liveSourceClaims(row: LivePublishedRow): readonly ReleaseSourceC
     });
 }
 
-/** Identity of a claim as a reader meets it: what it says, about what. */
+/** Identity of a claim as a reader meets it: what it says, about what. A closing period is not a different claim. */
 function claimIdentity(claim: ReleaseSourceClaim): string {
   // Use ASCII Unit Separator for this in-memory identity key. Literal NUL bytes cause text
   // tooling to classify the module as binary.
-  return `${claim.predicate.trim().toLowerCase()}\u001f${claim.object.trim().toLowerCase()}`;
+  return `${claim.predicate.trim().toLowerCase()}\u001f${claim.object
+    .trim()
+    .replace(/[\s.;:,]+$/u, '')
+    .toLowerCase()}`;
 }
 
 export type ClaimCarryResult = {
@@ -983,6 +997,8 @@ export type ClaimCarryResult = {
   readonly carried: number;
   readonly rebuilt: number;
   readonly liveCount: number;
+  /** Live claims a correction dropped because they cite Wikipedia, kept for the audit event. */
+  readonly dropped: readonly ReleaseSourceClaim[];
 };
 
 /**
@@ -1006,17 +1022,37 @@ export type ClaimCarryResult = {
 export function carryLiveClaims(
   rebuilt: readonly ReleaseSourceClaim[],
   live: LivePublishedRow | undefined,
+  options: { readonly dropWikipedia?: boolean } = {},
 ): ClaimCarryResult {
   const liveClaims = live === undefined ? [] : liveSourceClaims(live);
   if (liveClaims.length === 0) {
-    return { claims: rebuilt, carried: 0, rebuilt: rebuilt.length, liveCount: 0 };
+    return { claims: rebuilt, carried: 0, rebuilt: rebuilt.length, liveCount: 0, dropped: [] };
   }
 
+  // A correction may retire two kinds of live claim, listed in the audit event. (1) Wikipedia-cited
+  // claims, when the rebuild brings a claim from another source: Wikipedia is never captured, so
+  // they can never be reviewed. (2) Claims citing a document the rebuild cites again: the
+  // correction just re-reviewed that document, and its reviewed claims replace the older ones
+  // (an OCR-garbled quote cannot be reviewed against a clean capture). A record never ends up
+  // with fewer reviewed claims than the correction approved.
+  const cites = (claim: ReleaseSourceClaim) => isWikipediaHost(claim.citationHref);
+  const dropWiki = options.dropWikipedia === true && rebuilt.some((claim) => !cites(claim));
+  const rebuiltHrefs = new Set(rebuilt.map((claim) => claim.citationHref).filter(Boolean));
+  const retired = (claim: ReleaseSourceClaim) =>
+    (dropWiki && cites(claim)) ||
+    (options.dropWikipedia === true &&
+      !!claim.citationHref &&
+      rebuiltHrefs.has(claim.citationHref));
   const seen = new Set(rebuilt.map(claimIdentity));
+  const dropped: ReleaseSourceClaim[] = [];
   const carried: ReleaseSourceClaim[] = [];
   for (const claim of liveClaims) {
     const identity = claimIdentity(claim);
     if (seen.has(identity)) continue;
+    if (retired(claim)) {
+      dropped.push(claim);
+      continue;
+    }
     seen.add(identity);
     carried.push(claim);
   }
@@ -1025,7 +1061,8 @@ export function carryLiveClaims(
     claims: [...rebuilt, ...carried],
     carried: carried.length,
     rebuilt: rebuilt.length,
-    liveCount: liveClaims.length,
+    liveCount: liveClaims.length - dropped.length,
+    dropped,
   };
 }
 

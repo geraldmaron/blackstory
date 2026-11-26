@@ -10,7 +10,7 @@
  * the reviewer's identity, which must not be the producer's:
  *   CLAIM_REVIEW_REVIEWER_ACTOR_ID      e.g. codex-review:gpt-6.1-sol (session-claim-review-codex.ts)
  *   CLAIM_REVIEW_REVIEWER_MODEL_FAMILY  e.g. openai
- * All writes run in one transaction as service_role and roll back unless the publisher's own
+ * All writes run in one transaction on a login holding claim_reviewer and roll back unless the publisher's own
  * gate SQL accepts every written claim version.
  *
  * Usage (from repo root):
@@ -58,7 +58,6 @@ async function main(): Promise<void> {
   const client = await connectWithDeadline<pg.PoolClient>(pool);
   try {
     await client.query(WRITE ? 'BEGIN' : 'BEGIN READ ONLY');
-    if (WRITE) await client.query('SET LOCAL ROLE service_role');
     const report = await runClaimReview(client, { entityIds, verdicts, reviewer, write: WRITE });
     await client.query(WRITE ? 'COMMIT' : 'ROLLBACK');
     console.log(

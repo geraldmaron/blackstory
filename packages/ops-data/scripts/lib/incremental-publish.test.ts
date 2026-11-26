@@ -2475,3 +2475,100 @@ test('an uncalibrated numeric interval neither blocks nor authorizes independent
   assert.ok(result.eligible);
   assert.equal(result.reviewBasis, 'independent_review');
 });
+
+test('a correction retires Wikipedia-cited live claims only when the rebuild adds another source', () => {
+  const own = {
+    ...LIVE_CLAIM,
+    id: 'o',
+    object: 'Stated by the city',
+    citationHref: 'https://www.austintexas.gov/x',
+    citationSource: 'austintexas.gov',
+    confidenceLevel: 'high' as const,
+  };
+  const wiki = { ...LIVE_CLAIM, id: 'w', object: 'From the encyclopedia' };
+  const live = liveRow([own, wiki]);
+  const gov = {
+    predicate: 'listing',
+    object: 'Listed in 2005',
+    confidenceLevel: 'high' as const,
+    citationSource: 'nps.gov',
+    citationLabel: 'NPS',
+    citationHref: 'https://www.nps.gov/x',
+  };
+
+  const kept = carryLiveClaims([gov], live);
+  assert.equal(kept.dropped.length, 0);
+  assert.equal(kept.claims.length, 3);
+
+  const dropped = carryLiveClaims([gov], live, { dropWikipedia: true });
+  assert.deepEqual(
+    dropped.dropped.map((c) => c.object),
+    ['From the encyclopedia'],
+  );
+  assert.equal(dropped.claims.length, 2);
+  assert.equal(dropped.liveCount, 1);
+
+  const wikiOnly = { ...gov, citationHref: 'https://en.wikipedia.org/wiki/Y' };
+  assert.equal(carryLiveClaims([wikiOnly], live, { dropWikipedia: true }).dropped.length, 0);
+});
+
+test('a live claim and a rebuilt claim differing only by a closing period are one fact', () => {
+  const live = liveRow([
+    { ...LIVE_CLAIM, object: 'Dedicated in 1925, the square honors a soldier.' },
+  ]);
+  const rebuilt = [
+    {
+      ...LIVE_CLAIM,
+      object: 'Dedicated in 1925, the square honors a soldier',
+      citationSource: 'nps.gov',
+    },
+  ];
+  const carry = carryLiveClaims(rebuilt, live);
+  assert.equal(carry.carried, 0);
+  assert.equal(carry.claims.length, 1);
+});
+
+test('a correction replaces live claims that cite a document it re-cites, and says which', () => {
+  const doc = 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/1_text';
+  const garbled = {
+    ...LIVE_CLAIM,
+    id: 'g',
+    object: 'M i t c h e l l was a leader',
+    citationHref: doc,
+    citationSource: 'npgallery.nps.gov',
+    confidenceLevel: 'high' as const,
+  };
+  const elsewhere = {
+    ...LIVE_CLAIM,
+    id: 'e',
+    object: 'From the state office',
+    citationHref: 'https://shpo.example.gov/x',
+    citationSource: 'shpo.example.gov',
+    confidenceLevel: 'high' as const,
+  };
+  const rebuilt = [
+    {
+      predicate: 'source states',
+      object: 'Mitchell led the Republican organization',
+      confidenceLevel: 'high' as const,
+      citationSource: 'npgallery.nps.gov',
+      citationLabel: 'NPS',
+      citationHref: doc,
+    },
+  ];
+  const live = liveRow([garbled, elsewhere]);
+
+  const kept = carryLiveClaims(rebuilt, live);
+  assert.equal(kept.dropped.length, 0);
+  assert.equal(kept.claims.length, 3);
+
+  const replaced = carryLiveClaims(rebuilt, live, { dropWikipedia: true });
+  assert.deepEqual(
+    replaced.dropped.map((c) => c.object),
+    ['M i t c h e l l was a leader'],
+  );
+  assert.deepEqual(
+    replaced.claims.map((c) => c.object),
+    ['Mitchell led the Republican organization', 'From the state office'],
+  );
+});

@@ -37,17 +37,20 @@ for every operation.
 
 `DATABASE_URL` in `apps/web/.env.local` is the web role (`blackstory_web_runtime`). It reads
 `published.*` and nothing in `research.*` or `evidence.*`, so sourcing the file as-is fails the
-research scripts with `permission denied`. Three logins cover the work:
+research scripts with `permission denied`:
 
 | Work | Login | How |
 |---|---|---|
 | Web dev server, read-only queries on `published.*` | web role | source `.env.local` as-is |
-| `capture-backfill --commit`, `session-claim-review-prepare.ts`, `session-public-text-review.ts --step=prepare`, every dry run, `publish-release-entities-incremental.ts`, `publish-release-catalog-artifacts.ts` | `blackstory_admin` | source `.env.local`, then `export DATABASE_URL="$ADMIN_DATABASE_URL"` for that command |
-| Ledger writes: `session-claim-review-apply.ts` and `session-public-text-review.ts --step=apply` with `DRY_RUN=0` | database owner | `scripts/with-owner-db.sh <command>` |
+| `capture-backfill --commit`, `session-claim-review-prepare.ts`, `session-public-text-review.ts --step=prepare`, every dry run, the ledger writes, `publish-release-entities-incremental.ts`, `publish-release-catalog-artifacts.ts` | `blackstory_admin` | source `.env.local`, then `export DATABASE_URL="$ADMIN_DATABASE_URL"` for that command |
 
-The owner login is needed only because the ledger writers run `SET LOCAL ROLE service_role` and
-`research.approve_artifact` refuses any other caller; `blackstory_admin` may not assume that role.
-`with-owner-db.sh` reads the password for one process and never writes it to the env file.
+After migration `20261125053757_claim_reviewer_capability.sql` the ledger writers
+(`session-claim-review-apply.ts`, `session-public-text-review.ts --step=apply`,
+`review-greenbook-registry-exact.ts` with `DRY_RUN=0`) run on the `blackstory_admin` login too.
+They no longer switch to `service_role`: `research.submit_artifact` and
+`research.approve_artifact` admit a direct login that holds the `claim_reviewer` marker role and
+has not switched role. Two logins cover the work, and none of it needs the owner password.
+`scripts/with-owner-db.sh` remains for DDL and other owner-only tasks.
 
 The person, not an agent, refreshes the file after a rotation:
 

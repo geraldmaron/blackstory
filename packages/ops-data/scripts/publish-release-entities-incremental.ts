@@ -1,7 +1,8 @@
 /**
  * Publishes selected landscape candidates through reviewed-claim, privacy, withdrawal and
  * content gates. --ids, --lane or --from-landscape-pending scope input; --republish permits
- * corrections to existing records. Default dry-run; writes require DRY_RUN=0 and
+ * corrections to existing records; add --correct with --ids to change live records in place on a
+ * signed release (audited as publication.entities_corrected). Default dry-run; writes require DRY_RUN=0 and
  * INCREMENTAL_PUBLISH_APPLY=1. Post-write taxonomy, relationships and divergence checks cover
  * the active release.
  */
@@ -24,7 +25,6 @@ import {
   canonicalUpsertParamsFromLandscape,
   carryLiveClaims,
   catalogDecisionFromRow,
-  claimCountRegressed,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
   liveLocationFromRow,
@@ -368,6 +368,13 @@ type PreparedPublish = {
    * when the landscape row has no location.
    */
   readonly locationInherited?: boolean;
+  /** Wikipedia-cited live claims this correction retired, listed in the audit event. */
+  readonly droppedClaims?: readonly {
+    readonly id?: string;
+    readonly predicate: string;
+    readonly object: string;
+    readonly citationHref?: string;
+  }[];
 };
 
 function reviewedCitationCaptures(
@@ -506,6 +513,8 @@ function preparePublish(input: {
   readonly publicTextReviews: readonly PublicTextReview[];
   readonly canonicalStatus?: ReturnType<typeof parseCanonicalStatusSnapshot>;
   readonly allowRepublish?: boolean;
+  /** A correction may retire Wikipedia-cited live claims when the rebuild adds other sources. */
+  readonly allowCorrect?: boolean;
   /**
    * The active-release row for an already published entity.
    */
@@ -543,7 +552,9 @@ function preparePublish(input: {
     }
     // Combine candidate claims with separately cited published claims, then reassess the
     // combined set. Rebuilding from the landscape row alone would discard accumulated evidence.
-    const carry = carryLiveClaims(gate.entry.claims ?? [], input.livePublished);
+    const carry = carryLiveClaims(gate.entry.claims ?? [], input.livePublished, {
+      dropWikipedia: input.allowCorrect === true,
+    });
     const combined = assessPublicationClaims(
       { ...gate.entry, claims: carry.claims },
       input.reviewedClaims,
@@ -552,7 +563,7 @@ function preparePublish(input: {
       return { id: input.entityId, reason: 'claim_assessment_required', detail: combined.detail };
     }
     const entry: ReleaseSourceEntity = { ...gate.entry, claims: combined.claims };
-    if (claimCountRegressed(carry.claims, input.livePublished)) {
+    if (carry.claims.length < carry.liveCount) {
       return {
         id: input.entityId,
         reason: 'claim_count_regression',
@@ -589,6 +600,7 @@ function preparePublish(input: {
       landscapeRow: input.row,
       lintReport: built.lintReport,
       ...(gate.locationOverride !== undefined ? { locationInherited: true } : {}),
+      ...(carry.dropped.length > 0 ? { droppedClaims: carry.dropped } : {}),
     };
   }
 
@@ -610,6 +622,18 @@ async function main(): Promise<void> {
   const explicitIds = readIdsArg();
   const laneArg = readArg('--lane=');
   const allowRepublish = hasFlag('--republish');
+  // --correct lets named live records change in place on a signed release. They pass the same
+  // claim and text review as a new record, and the change is recorded as an audit event.
+  const allowCorrect = hasFlag('--correct');
+  if (
+    allowCorrect &&
+    (!allowRepublish || explicitIds.length === 0 || fromLandscapePending || laneArg)
+  ) {
+    console.error(
+      '--correct needs --republish and --ids=..., and cannot be combined with a lane or pending sweep',
+    );
+    process.exit(2);
+  }
   if (!fromLandscapePending && explicitIds.length === 0 && !laneArg) {
     console.error('Pass --from-landscape-pending and/or --ids=id1,id2 and/or --lane=<lane>');
     process.exit(2);
@@ -761,6 +785,7 @@ async function main(): Promise<void> {
         reviewedClaims,
         publicTextReviews,
         allowRepublish,
+        allowCorrect,
         ...(livePublished !== undefined ? { livePublished } : {}),
         ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
         ...(visitOverride !== undefined ? { visitOverride } : {}),
@@ -927,16 +952,28 @@ async function main(): Promise<void> {
         .filter((row) => row.landscapeRow?.exact_in_release === false)
         .map((row) => row.entityRow.entity_id),
     );
+    const correctedIds = new Set(
+      allowCorrect
+        ? prepared
+            .map((row) => row.entityRow.entity_id)
+            .filter((entityId) => !appendedIds.has(entityId))
+        : [],
+    );
     assertArchiveHydrationTargetIsUnsigned(
       signedManifest,
-      prepared.filter((row) => !appendedIds.has(row.entityRow.entity_id)).length,
+      prepared.filter(
+        (row) =>
+          !appendedIds.has(row.entityRow.entity_id) && !correctedIds.has(row.entityRow.entity_id),
+      ).length,
     );
     const signedRelease = prepared.length > 0 && releaseIsSigned(signedManifest);
     const assertNoExistingEntityChanged = (
       step: string,
       changed: readonly { entityId: string }[],
     ) => {
-      const existing = changed.filter((row) => !appendedIds.has(row.entityId));
+      const existing = changed.filter(
+        (row) => !appendedIds.has(row.entityId) && !correctedIds.has(row.entityId),
+      );
       if (signedRelease && existing.length > 0) {
         throw new Error(
           `${step} would change ${existing.length} existing entities of a signed release ` +
@@ -1049,6 +1086,37 @@ async function main(): Promise<void> {
            gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
            'append:' || $1::text || ':' || extract(epoch from now())::text, now())`,
         [releaseId, JSON.stringify([...appendedIds].sort())],
+      );
+    }
+    if (signedRelease && correctedIds.size > 0) {
+      await client.query(
+        `INSERT INTO audit.events (id, action, category, actor, subject, reason, request_id,
+           correlation_id, release_id, idempotency_key, occurred_at)
+         VALUES (gen_random_uuid()::text, 'publication.entities_corrected', 'publication',
+           jsonb_build_object('id', 'incremental-publisher', 'type', 'service'),
+           jsonb_build_object('type', 'release', 'id', $1::text, 'path', 'publication.releases/' || $1::text,
+             'entityIds', $2::jsonb, 'droppedClaims', $3::jsonb),
+           'Live entities corrected in place on a signed release after claim and text review',
+           gen_random_uuid()::text, gen_random_uuid()::text, $1::text,
+           'correct:' || $1::text || ':' || extract(epoch from now())::text, now())`,
+        [
+          releaseId,
+          JSON.stringify([...correctedIds].sort()),
+          JSON.stringify(
+            Object.fromEntries(
+              prepared
+                .filter((row) => row.droppedClaims && correctedIds.has(row.id))
+                .map((row) => [
+                  row.id,
+                  row.droppedClaims!.map((c) => ({
+                    predicate: c.predicate,
+                    object: c.object,
+                    citationHref: c.citationHref ?? null,
+                  })),
+                ]),
+            ),
+          ),
+        ],
       );
     }
     // A retraction recorded while this run worked must still withdraw the record, so the
