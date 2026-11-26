@@ -44,6 +44,75 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "amsterdamnews.com",
+      "sourceClass": "news_reportage",
+      "orgType": "news_publisher",
+      "label": "New York Amsterdam News",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "New York Amsterdam News",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "A Harlem newspaper published since 1909 and owned by the Amnews Corporation, with a long list of named editors. It is a working newspaper with real reporting and is held in library databases (ProQuest, NYPL) as a historical newspaper of record.",
+            "evidence": [
+              {
+                "url": "https://amsterdamnews.com/about-us/",
+                "quote": "the late James H. Anderson put out the first issue of the Amsterdam News"
+              },
+              {
+                "url": "https://lincolncenter.org/article/amsterdam-news-born-in-san-juan-hill-raised-in-harlem",
+                "quote": "The _Amsterdam News_ debuted just 44 years after the signing of the 13th Amendment, abolishing slavery."
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "The New York Amsterdam News is published through Amnews Corporation, owned by Elinor Tatum and her family, and was founded in 1909. Independent reporting documents named editorial leadership, a reporting staff, and investigative journalism; CUNY also lists it as a local independent outlet. Its purpose is reporting on Black communities and public affairs, which supports registration as an accountable newspaper. Direct website access failed during this assessment, so its current bylines and corrections practice could not be verified.",
+            "evidence": [
+              {
+                "url": "https://mediabiasfactcheck.com/new-york-amsterdam-news/",
+                "quote": "Eleanor Tatum, daughter of Wilbert A. Tatum, is the owner, publisher, and editor-in-chief of the newspaper through Amnews Corporation."
+              },
+              {
+                "url": "https://forward.com/culture/537584/elinor-tatum-black-jewish-publisher-of-new-york-amsterdam-news/",
+                "quote": "In 1996, her father gained complete ownership of the Amsterdam News, putting the future of the publication into the family’s hands."
+              },
+              {
+                "url": "https://www.pbs.org/blackpress/news_bios/newbios/nwsppr/amsterdam/amstrdm.html",
+                "quote": "Established by James H. Anderson on December 4, 1909 with an initial capital of $10"
+              },
+              {
+                "url": "https://www.editorandpublisher.com/stories/leading-with-grace-and-power,252691",
+                "quote": "Kristin Fayne-Mulroy is AmNews’ managing editor and arts-and-entertainment editor."
+              },
+              {
+                "url": "https://www.editorandpublisher.com/stories/leading-with-grace-and-power,252691",
+                "quote": "Elinor R. Tatum is E&P’s 2024 Publisher of the Year."
+              },
+              {
+                "url": "https://ny1.com/nyc/all-boroughs/news/2024/03/28/new-amsterdam-news-publisher-storied-black-newspaper",
+                "quote": "“Word in Black,” a collaboration with other Black publishers and “Blacklight,” an investigative unit."
+              },
+              {
+                "url": "https://directory-ccm.journalism.cuny.edu/outlet/?id=30",
+                "quote": "Local independent outlet"
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
+    },
+    {
       "host": "baseballhall.org",
       "sourceClass": "reputable_secondary",
       "orgType": "museum",
@@ -220,6 +289,282 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "docsouth.unc.edu",
+      "sourceClass": "reputable_secondary",
+      "orgType": "library",
+      "label": "Documenting the American South",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "Documenting the American South",
+            "recommendation": "register",
+            "orgType": "library",
+            "reason": "Published by the University Library of UNC Chapel Hill since the mid-1990s, guided by an editorial board. It is a digital library of primary texts and is widely listed in other libraries' research guides.",
+            "evidence": [
+              {
+                "url": "https://dhprojects.web.unc.edu/documenting-the-american-south/",
+                "quote": "The University Library of the University of North Carolina at Chapel Hill sponsors Documenting the American South."
+              },
+              {
+                "url": "https://dhprojects.web.unc.edu/documenting-the-american-south/",
+                "quote": "An editorial board guides development of this digital library."
+              },
+              {
+                "url": "https://libguides.utdallas.edu/primary-sources/primary-sources-on-the-web/us-history",
+                "quote": "a digital publishing initiative that provides Internet access to texts, images, and audio files related to southern history"
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "library",
+            "reason": "DocSouth is a digital publishing initiative of the University Library at the University of North Carolina at Chapel Hill, launched in October 1996. Scholarly editorial oversight and independent reviews from historians and librarians establish accountability and research value. Its collections concern Southern history, literature, and culture rather than promoting UNC. Direct site access failed during this assessment, so a current corrections policy was not verified, but the opened institutional and independent sources support registration.",
+            "evidence": [
+              {
+                "url": "https://vault.tei-c.de/Workgroups/MI/miw06.html",
+                "quote": "an electronic publishing initiative of the University of North Carolina at Chapel Hill Library, was launched on UNC's Sunsite in October of 1996."
+              },
+              {
+                "url": "https://historymatters.gmu.edu/d/368.html",
+                "quote": "Scholars guided by an Editorial Board for Documenting the American South have selected the texts from the premier southern collections"
+              },
+              {
+                "url": "https://oasis.library.unlv.edu/lib_articles/42/",
+                "quote": "Documenting the American South is a fascinating digital collection that is geared towards K–12 and college-level students and teachers."
+              },
+              {
+                "url": "https://www.dlib.org/dlib/november99/11featured-collection.html",
+                "quote": "works are organized by five projects: \"North American Slave Narratives;\" \"A Library of Southern Literature to 1920;\""
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
+    },
+    {
+      "host": "encyclopedia.com",
+      "sourceClass": "reputable_secondary",
+      "orgType": "encyclopedia",
+      "label": "Encyclopedia.com",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "Encyclopedia.com",
+            "recommendation": "register",
+            "orgType": "encyclopedia",
+            "reason": "Owned by Gale, part of Cengage Learning, and it republishes entries from established reference publishers such as Oxford University Press and Columbia Encyclopedia. It originates no content of its own, so it is cited as a reprint aggregator of vetted reference works.",
+            "evidence": [
+              {
+                "url": "https://corescholar.libraries.wright.edu/ul_pub/58",
+                "quote": "Gale, part of Cengage Learning, acquired HighBeam Research in December 2008"
+              },
+              {
+                "url": "https://www.encyclopedia.com/about",
+                "quote": "reference entries from credible, published sources like Oxford University Press and Columbia Encyclopedia"
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "encyclopedia",
+            "reason": "Encyclopedia.com identifies HighBeam Research as its publisher; independent coverage documents its acquisition by Gale, part of Cengage, in 2008, and Infonautics records establish its existence since 1998. Its editorial accountability rests chiefly on identifiable reference publishers and their credited editors; a feedback channel exists, although I found no dedicated corrections policy or current site-wide editorial masthead. Independent library assessments support its reference content, and its subject coverage concerns general knowledge rather than promotion of its owner. Register it as an established reference publisher, while checking the underlying work and edition when citing it.",
+            "evidence": [
+              {
+                "url": "https://www.encyclopedia.com/faq",
+                "quote": "Published by HighBeam Research, Inc."
+              },
+              {
+                "url": "https://corescholar.libraries.wright.edu/ul_pub/58/",
+                "quote": "Gale, part of Cengage Learning, acquired HighBeam Research in December 2008"
+              },
+              {
+                "url": "https://corescholar.libraries.wright.edu/ul_pub/58/",
+                "quote": "The information is from vetted reference sources."
+              },
+              {
+                "url": "https://www.sec.gov/Archives/edgar/data/909494/000090949401500016/info2000ka.htm",
+                "quote": "Encyclopedia.com is a basic, easy-to-use research tool for anyone on the Internet. The site was launched in January 1998."
+              },
+              {
+                "url": "https://www.encyclopedia.com/social-sciences/encyclopedias-almanacs-transcripts-and-maps/editorial-and-production-staff",
+                "quote": "Monica M. Hubbard, Project Editor"
+              },
+              {
+                "url": "https://www.encyclopedia.com/emailus",
+                "quote": "Although we're unable to respond to all feedback, we welcome your feedback about our site."
+              },
+              {
+                "url": "https://lib.smumn.edu/research/formats/encyclopedias/",
+                "quote": "In addition, encyclopedia.com derives its information from 49 authoritative reference works"
+              },
+              {
+                "url": "https://www.encyclopedia.com/about",
+                "quote": "Encyclopedia.com provides you reference entries from credible, published sources like Oxford University Press and Columbia Encyclopedia."
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
+    },
+    {
+      "host": "era3.eji.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "research_institute",
+      "label": "Segregation in America (Equal Justice Initiative)",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "Segregation in America (Equal Justice Initiative)",
+            "recommendation": "register",
+            "orgType": "research_institute",
+            "reason": "Published by the Equal Justice Initiative, a Montgomery nonprofit founded in 1989 by Bryan Stevenson that produces documented research reports on racial history. It is the Segregation in America report series, covered independently by the press.",
+            "evidence": [
+              {
+                "url": "https://eji.org/about/",
+                "quote": "provides legal representation to people who have been illegally convicted"
+              },
+              {
+                "url": "https://www.theartnewspaper.com/news/us-memorial-confronts-america-s-racist-history",
+                "quote": "Bryan Stevenson, the founding director of the Equal Justice Initiative (EJI), which spearheaded the project."
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "cultural_institution",
+            "reason": "The publisher is the Equal Justice Initiative (EJI), a private nonprofit founded by Bryan Stevenson in 1989 that operates museums and publishes historical research. Its reports credit named researchers, writers, and editors, although I found no published corrections policy. Independent coverage and university inclusion support its standing as a public-history publisher whose historical publications concern American history rather than chiefly promoting EJI. The requested subdomain could not be loaded; this publisher-level assessment rests on accessible EJI publications and independent sources.",
+            "evidence": [
+              {
+                "url": "https://eji.org/about/",
+                "quote": "Founded in 1989 by Bryan Stevenson"
+              },
+              {
+                "url": "https://eji.org/about/",
+                "quote": "EJI is a private, 501(c)(3) nonprofit organization"
+              },
+              {
+                "url": "https://segregationinamerica.eji.org/report/acknowledgment.html",
+                "quote": "Jennifer Taylor for research, writing, and editing; Aaryn Urell for research, writing, editing, and layout preparation"
+              },
+              {
+                "url": "https://www.newyorker.com/magazine/2024/04/01/bryan-stevenson-reclaims-the-monument-in-the-heart-of-the-deep-south",
+                "quote": "The organization also has a research arm rivalling that of small universities, focussed on documenting the history of racial injustice."
+              },
+              {
+                "url": "https://cpcrs.upenn.edu/resource/eji-reports",
+                "quote": "The reports address issues of slavery, Reconstruction, lynching, segregation, discrimination, and the injustice of the criminal justice system."
+              },
+              {
+                "url": "https://segregationinamerica.eji.org/about",
+                "quote": "Segregation in America tells the lesser-known story of national opposition to civil rights and racial equality."
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
+    },
+    {
+      "host": "georgiaencyclopedia.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "encyclopedia",
+      "label": "New Georgia Encyclopedia",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "New Georgia Encyclopedia",
+            "recommendation": "register",
+            "orgType": "encyclopedia",
+            "reason": "A state encyclopedia produced by Georgia Humanities and the University of Georgia Press with GALILEO and UGA Libraries as partners. It has a named editorial staff and fact-checking by university librarians, and UGA's own news office describes the partnership.",
+            "evidence": [
+              {
+                "url": "https://www.georgiaencyclopedia.org/about/",
+                "quote": "© 2004–2026 Georgia Humanities, University of Georgia Press"
+              },
+              {
+                "url": "https://news.uga.edu/online-encyclopedia-officially-launches-feb-12",
+                "quote": "The editorial offices are in the main library at UGA."
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "encyclopedia",
+            "reason": "Published since 2004, the New Georgia Encyclopedia is a program of Georgia Humanities and university partners; its copyright names Georgia Humanities and the University of Georgia Press. Georgia Humanities is an independent nonprofit founded in 1971. Named editors, expert review, librarian fact-checking, and ongoing updates provide editorial accountability, while independent library recommendations support its standing. Its broad coverage of Georgia history and culture serves a public reference purpose rather than primarily promoting its owners.",
+            "evidence": [
+              {
+                "url": "https://www.georgiahumanities.org/programs/new-georgia-encyclopedia/",
+                "quote": "The NGE is a program of Georgia Humanities, the University of Georgia Libraries, the University of Georgia Press, and the University System of Georgia/GALILEO."
+              },
+              {
+                "url": "https://www.georgiaencyclopedia.org/about/",
+                "quote": "© 2004–2026 Georgia Humanities, University of Georgia Press"
+              },
+              {
+                "url": "https://exploregeorgia.org/atlanta/arts-culture/cultural-trails-tours/georgia-humanities",
+                "quote": "Founded in 1971, Georgia Humanities is an independent, nonprofit affiliate of the National Endowment for the Humanities."
+              },
+              {
+                "url": "https://www.georgiaencyclopedia.org/about/",
+                "quote": "Since 2004 it has provided ready access to authoritative scholarship on a wide variety of topics. All of its entries are written and reviewed by scholars, fact-checked by reference librarians at the University of Georgia, and updated regularly to reflect new information and recent developments."
+              },
+              {
+                "url": "https://www.georgiaencyclopedia.org/about/",
+                "quote": "John C. Inscoe\n\nFounding Editor\n\nEdward Hatfield\n\nManaging Editor\n\nKara Krewer\n\nAssistant Editor"
+              },
+              {
+                "url": "https://www.georgiaencyclopedia.org/about/editorial",
+                "quote": "All articles are reviewed by experts and rigorously copy edited before fact-checking."
+              },
+              {
+                "url": "https://www.georgiaencyclopedia.org/about/editorial",
+                "quote": "Our editors continually update site content and encourage readers to submit feedback."
+              },
+              {
+                "url": "https://www.cvlga.org/resources/new-georgia-encyclopedia",
+                "quote": "Access to authoritative information on people, places, events, history, and other topics about the state of Georgia. The site includes articles and images on every aspect of the state and includes links to related Internet sites."
+              },
+              {
+                "url": "https://www.georgiaarchives.org/assets/documents/ghrac/2005_Awards.pdf",
+                "quote": "The articles on the site are the product of scholars and reference librarians working with Georgia's documentary heritage, and many of the articles are linked to repositories of original records. Library Journal identified the New Georgia Encyclopedia as a \"best reference source on the Web\" for 2004."
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
+    },
+    {
       "host": "heinzhistorycenter.org",
       "sourceClass": "reputable_secondary",
       "orgType": "historical_society",
@@ -311,6 +656,140 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "jbhe.com",
+      "sourceClass": "news_reportage",
+      "orgType": "news_publisher",
+      "label": "The Journal of Blacks in Higher Education",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "The Journal of Blacks in Higher Education",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "Published by BRUCON Publishing Company, founded in 1993 by Theodore Cross and reporting on Black higher education for decades. Articles are issued under an editorial staff (signed 'The Editors') with a managing editor, and Black Enterprise covered its founding independently.",
+            "evidence": [
+              {
+                "url": "https://www.jbhe.com/about/",
+                "quote": "BRUCON Publishing Company © 2026"
+              },
+              {
+                "url": "https://www.blackenterprise.com/researcher-of-blacks-in-higher-education-remembered/",
+                "quote": "These disparities led him to found JBHE in 1993"
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "JBHE is a specialist news publisher founded by Theodore Cross in 1993 and now operated by BruCon Publishing; its ultimate ownership was not conclusively verified. Named managing editor Robert Bruce Slater, published corrections, and independent coverage establish editorial accountability, although no formal corrections policy was found. JSTOR preserves its former print journal, and Bloomberg independently documents its collection of university enrollment data. Its main subject is Black participation in higher education, rather than promotion of its owner, supporting registration as an accountable publisher.",
+            "evidence": [
+              {
+                "url": "https://jbhe.com/hire/",
+                "quote": "Charges will appear on your statement as BRUCON PUBLISHING JBHE"
+              },
+              {
+                "url": "https://www.jbhe.com/features/67_crosslegacy.html",
+                "quote": "In January 1993, Ted began formulating plans for The Journal of Blacks in Higher Education."
+              },
+              {
+                "url": "https://www.jstor.org/journal/jblachigheduc",
+                "quote": "1993-2010 (No. 1 - No. 67)"
+              },
+              {
+                "url": "https://e1.nmcdn.io/pdf.php?domain=www.ivycoach.com&path=%2Fpress%2Fbloomberg%2Fafter-the-harvard-decision-elite-colleges-are-wary-of-race%2F%3Fprintmode%3Dtrue&v=1728841871",
+                "quote": "says Robert Bruce Slater, managing editor of JBHE."
+              },
+              {
+                "url": "https://jbhe.com/2011/09/two-african-american-scholars-to-lead-the-advisory-committee-of-the-new-institute-on-civic-engagement-and-governance/",
+                "quote": "Correction: A previous version stated that Professor Pinderhughes and Dean Schmoke were leaders of the new institute, not the advisory committee."
+              },
+              {
+                "url": "https://jbhe.com/about/",
+                "quote": "Hundreds of America’s colleges and universities regularly provide us with the statistics we need to develop measures of relative success"
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
+    },
+    {
+      "host": "kinginstitute.stanford.edu",
+      "sourceClass": "reputable_secondary",
+      "orgType": "research_institute",
+      "label": "The Martin Luther King, Jr. Research and Education Institute",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "The Martin Luther King, Jr. Research and Education Institute",
+            "recommendation": "register",
+            "orgType": "research_institute",
+            "reason": "The institute at Stanford University is the home of the King Papers Project, a scholarly documentary edition. The National Archives' NHPRC catalogs the project, so the publisher is accountable and independently recognized.",
+            "evidence": [
+              {
+                "url": "https://kinginstitute.stanford.edu/",
+                "quote": "Building upon the achievements of Stanford University's Martin Luther King, Jr. Papers Project,"
+              },
+              {
+                "url": "https://www.archives.gov/nhprc/projects/catalog/martin-luther-king-jr",
+                "quote": "The project was initiated by the King Center in Atlanta."
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "research_institute",
+            "reason": "Stanford University publishes the site through its King Institute, established in 2005, with a predecessor Papers Project dating to 1985. Named editors and a documented process for cross-checking sources provide editorial accountability, although no formal corrections policy was found in the pages reviewed. An independent review in College & Research Libraries News recommends it as an essential academic library resource. Its main content concerns King and civil rights history through documentary editions, archival resources, and an encyclopedia, rather than promotion of Stanford or the institute.",
+            "evidence": [
+              {
+                "url": "https://kinginstitute.stanford.edu/martin-luther-king-jr-research-and-education-institute-stanford-university",
+                "quote": "Established in 2005, the King Institute at Stanford University became the institutional home for the Martin Luther King, Jr., Papers Project as well as a broad range of activities related to King’s life, the African American freedom struggle, and other nonviolent struggles for social justice around the world."
+              },
+              {
+                "url": "https://kinginstitute.stanford.edu/martin-luther-king-jr-research-and-education-institute-stanford-university",
+                "quote": "In 1985, the King Center's founder and president, Coretta Scott King, invited Stanford University historian Clayborne Carson to become the director and senior editor for the King Papers Project."
+              },
+              {
+                "url": "https://kinginstitute.stanford.edu/",
+                "quote": "© Stanford University.   Stanford, California 94305."
+              },
+              {
+                "url": "https://kinginstitute.stanford.edu/our-staff",
+                "quote": "Tenisha Armstrong\n\nAssociate Editor"
+              },
+              {
+                "url": "https://kinginstitute.stanford.edu/king-papers/about-papers-project/research-and-editorial-process",
+                "quote": "For each item, we provide the author, audience, date, title, and other relevant information. This information is cross-checked against additional sources. Often, we are not able to cite with absolute certainty the document date or other details because it is not provided. In this case, we use the [?] to indicate conjecture. This means that the information is our best guess based on the evidence."
+              },
+              {
+                "url": "https://crln.acrl.org/index.php/crlnews/article/download/8712/9211",
+                "quote": "Though the search functionalities are limited, and the pages are sometimes disorganized and in need of updating, free entree to the King Papers and the Online King Records Access make this an essential resource for any academic library."
+              },
+              {
+                "url": "https://kinginstitute.stanford.edu/",
+                "quote": "The Encyclopedia, based on the extensive historical research originally conducted for The Papers, has over 280 articles on civil rights movement figures, events, and organizations."
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
+    },
+    {
       "host": "kshs.org",
       "sourceClass": "reputable_secondary",
       "orgType": "museum",
@@ -393,6 +872,71 @@
       "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
       "reviewedAt": "2026-09-10T04:12:18.573Z",
       "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "mobballet.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "archive",
+      "label": "Memoirs of Blacks in Ballet (MoBBallet)",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "Memoirs of Blacks in Ballet (MoBBallet)",
+            "recommendation": "register",
+            "orgType": "archive",
+            "reason": "A nonprofit digital archive founded by former ballerina Theresa Ruth Howard around 2015, collecting oral histories and archival material on Black ballet dancers. It has been covered by dance press and partnered with Williams College and Princeton on the Constellation Project.",
+            "evidence": [
+              {
+                "url": "https://thinkingdance.net/articles/2017/05/03/mobballet-website-showcases-black-ballet-history/",
+                "quote": "MOBBallet collects oral histories and archival material from black ballet dancers and gives them a digital home."
+              },
+              {
+                "url": "https://mobballet.org/",
+                "quote": "a digital archive dedicated to the presentation, promotion, and preservation"
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "archive",
+            "reason": "MoBBallet is a digital archive founded in 2015 and led by named founder and curator Theresa Ruth Howard; independent reporting describes it as nonprofit, although its precise legal ownership was not established. Its curated historical exhibitions, independently reported research collaboration with Williams College, named contributors, and published writing standards provide accountability; no formal corrections policy was found. Its substantial historical collections concern Black ballet artists broadly, supporting registration despite its promotion of related programs and services.",
+            "evidence": [
+              {
+                "url": "https://mobballet.org/about-us/",
+                "quote": "In 2015, Howard founded MoBBallet (Memoirs of Blacks in Ballet), a digital archive and initiative dedicated to preserving the contributions of Black ballet artists."
+              },
+              {
+                "url": "https://www.backstage.com/magazine/article/ballet-dancers-color-2800/",
+                "quote": "Memoirs of Blacks in Ballet (MoBBallet), founded by ballerina Theresa Ruth Howard, is a nonprofit organization"
+              },
+              {
+                "url": "https://pointemagazine.com/mobballet-constellation-project/",
+                "quote": "Howard had also partnered with Janine Parker, the artist in residence at Williams College, to co-teach a course"
+              },
+              {
+                "url": "https://mobballet.org/2026/10/20/how-can-we-fix-the-broken-artist-critic-relationship/",
+                "quote": "By Lauren Wingenroth"
+              },
+              {
+                "url": "https://mobballet.org/2026/08/31/mobballets-standards-for-responsible-dance-writing/",
+                "quote": "Maintain Descriptive Integrity: Distinguish clearly between objective observation, subjective reaction, and informed evaluation."
+              },
+              {
+                "url": "https://mobballet.org/",
+                "quote": "The Timeline tracks the significant milestones of Black presence in ballet, charting the evolution of dancers, premieres, institutions, and historical shifts over time."
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
     },
     {
       "host": "nbcnews.com",
@@ -496,6 +1040,79 @@
       "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
       "reviewedAt": "2026-11-26T02:59:08.080Z",
       "verifiedAt": "2026-11-26T02:58:12.722Z"
+    },
+    {
+      "host": "perryhistoricalmuseum.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "historical_society",
+      "label": "Perry Area Historical Museum",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "Perry Area Historical Museum",
+            "recommendation": "register",
+            "orgType": "historical_society",
+            "reason": "Published by the Perry Area Historical Society, a 501(c)(3) founded in 1981 that operates a local history museum in Perry, Georgia. An independent state tourism page describes the museum's collection of artifacts and memorabilia. It is a small local institution, but accountable and focused on preserving local history.",
+            "evidence": [
+              {
+                "url": "https://perryhistoricalmuseum.org",
+                "quote": "founded in 1981 by concerned citizens who sought to preserve Perry's past history for future generations."
+              },
+              {
+                "url": "https://www.exploregeorgia.org/perry/arts-culture/museums/perry-area-historical-museum",
+                "quote": "Opened in March 2010, this local history museum offers an engaging experience for history enthusiasts"
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "museum",
+            "reason": "The publisher is the Perry Area Historical Society, Inc., a nonprofit incorporated in 1981 that operates the museum in a city-owned building leased in 2010. Registered officers, including CEO Ellie Loudermilk, provide institutional accountability; some articles have named authors and revision dates, although no named editorial staff or formal corrections policy was found. Independent coverage and a 2023 Governor’s Arts and Humanities award corroborate its historical preservation work. Its website includes fundraising and organizational information alongside substantive local history, making it an established museum source suitable for registration.",
+            "evidence": [
+              {
+                "url": "https://www.perryhistoricalmuseum.org/",
+                "quote": "The Perry Area Historical Society is a 501(c)(3) corporation founded in 1981 by concerned citizens who sought to preserve Perry's past history for future generations."
+              },
+              {
+                "url": "https://www.perryhistoricalmuseum.org/",
+                "quote": "It was leased to the Perry Area Historical Society in 2010 for a local history museum. The museum archives memorabilia and records, provides local tours, and helps to research genealogical data for local families."
+              },
+              {
+                "url": "https://ecorp.sos.ga.gov/BusinessSearch/BusinessInformation?businessId=615302&businessType=Domestic+Nonprofit+Corporation&fromSearch=True",
+                "quote": "Business Name: PERRY AREA HISTORICAL SOCIETY, INC. Control Number: J111731\nBusiness Type: Domestic Nonprofit Corporation Business Status: Active/Compliance"
+              },
+              {
+                "url": "https://ecorp.sos.ga.gov/BusinessSearch/BusinessInformation?businessId=615302&businessType=Domestic+Nonprofit+Corporation&fromSearch=True",
+                "quote": "Ellie Loudermilk CEO 113 Felton Rd., Perry, GA, 31069, USA"
+              },
+              {
+                "url": "https://www.perryhistoricalmuseum.org/article/tivola-whale",
+                "quote": "By Thomas Thurman\n\nRewritten 04/July/2025"
+              },
+              {
+                "url": "https://www.houstoncountylivingmedia.com/theartofhistoricalpreservation",
+                "quote": "Today, the organization operates with a president, vice president, four board members, a secretary, treasurer, and many volunteers."
+              },
+              {
+                "url": "https://dlg.usg.edu/record/dlg_ggpd_i-ga-bg600-b-pp1-bp7-b2023-s3-h2-belec-p-btext",
+                "quote": "The recipients of the 11th Annual Governor's Awards for the Arts and Humanities are listed below, and a video highlighting the recipients is available here.\nGeorgia Museums, Inc., Bartow County Perry Area Historical Society, Houston County Thomasville Entertainment Foundation, Thomas County Heartbound Ministries, Fulton County Annie Greene, Troup County Jeff Green, Sumter County Alan Rothschild, Columbus County Reverend Dr. Dwight D. Andrews, active in organizations in DeKalb County and Fulton"
+              },
+              {
+                "url": "https://dlg.usg.edu/record/dlg_ggpd_i-ga-bg600-b-pp1-bp7-b2023-s3-h2-belec-p-btext",
+                "quote": "Perry Area Historical Society The Perry Area Historical Society has contributed to education and community development by sharing local history through a variety of programs since 1981. Supported primarily by members' dues and volunteer staff, the Society has attracted visitors from 49 states and 14 foreign countries."
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
     },
     {
       "host": "poets.org",
@@ -606,6 +1223,83 @@
       "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
       "reviewedAt": "2026-11-26T02:16:44.685Z",
       "verifiedAt": "2026-11-26T02:16:44.685Z"
+    },
+    {
+      "host": "washingtoninformer.com",
+      "sourceClass": "news_reportage",
+      "orgType": "news_publisher",
+      "label": "The Washington Informer",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "The Washington Informer",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "A weekly Black-owned newspaper in Washington, DC, founded by Dr. Calvin W. Rolark Sr. in 1964 and now published by his daughter Denise Rolark Barnes, with six decades of local reporting. It is covered by independent local television news as a long-running community newspaper.",
+            "evidence": [
+              {
+                "url": "https://www.nbcwashington.com/news/local/washington-informer-celebrates-60-years-serving-black-dc-community/3861000/?amp=1",
+                "quote": "Barnes' father died in 1994, and the paper went through tough times financially."
+              },
+              {
+                "url": "https://www.washingtoninformer.com/about-us/",
+                "quote": "was founded by Dr. Calvin W. Rolark, Sr. in 1989."
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "The Washington Informer Newspaper Company, Inc. publishes this newspaper, owned and led by second-generation publisher Denise Rolark Barnes and founded by Calvin Rolark in October 1964. It has named editors and reporters, bylined reporting, and published corrections demonstrating editorial accountability. Independent Washington Post coverage and MDDC Press Association awards support its standing as an established news organization. Its principal content is community news and public-affairs reporting, rather than promotion of its owner.",
+            "evidence": [
+              {
+                "url": "https://www.washingtoninformer.com/about/",
+                "quote": "About The Washington Informer Newspaper Company, Inc."
+              },
+              {
+                "url": "https://www.washingtoninformer.com/about/",
+                "quote": "Micha Green\n\nManaging Editor"
+              },
+              {
+                "url": "https://www.washingtoninformer.com/author/denise-rolark-barnes/",
+                "quote": "Denise Rolark Barnes is the publisher and second-generation owner of The Washington Informer, succeeding her father"
+              },
+              {
+                "url": "https://www.dclibrary.org/denise-rolark-barnes",
+                "quote": "She is a second-generation publisher, succeeding her father, Dr. Calvin W. Rolark, who published the first issue on October 16, 1964."
+              },
+              {
+                "url": "https://www.washingtonpost.com/dc-md-va/2021/12/28/washington-informer-local-news-growing/",
+                "quote": "The Washington Informer has added subscribers and staff in an era when many local newspapers are struggling"
+              },
+              {
+                "url": "https://www.mddcpress.com/awards",
+                "quote": "Washington Informer (The)\n\n1st Place\n\nDan Olds: “Sports Page Design” in Sports Page Design (D-12) — BEST OF SHOW"
+              },
+              {
+                "url": "https://www.washingtoninformer.com/jc-lofton-tailors-washington/",
+                "quote": "CORRECTION: A previous version of this story misidentified Ramon Jacobson, executive director of LISC DC."
+              },
+              {
+                "url": "https://www.washingtoninformer.com/string-of-d-c-jail-deaths-spark-fury-about-pre-trial-detention/",
+                "quote": "by Sam Plo Kwia Collins Jr. June 5, 2024 June 6, 2024"
+              },
+              {
+                "url": "https://www.washingtoninformer.com/string-of-d-c-jail-deaths-spark-fury-about-pre-trial-detention/",
+                "quote": "The Informer unsuccessfully attempted to gather comment from one of Weatherspoon’s family members."
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T03:20:57.695Z",
+      "verifiedAt": "2026-11-26T03:20:57.695Z"
     },
     {
       "host": "wisconsinhistory.org",
