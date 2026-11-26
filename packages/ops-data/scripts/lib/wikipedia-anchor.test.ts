@@ -77,3 +77,20 @@ test('punctuation, dashes and a leading "The" do not break an exact-title match'
     assert.ok(wikipediaPageAnchored({ sourceUrl: url, displayName }), displayName);
   }
 });
+
+test('a one-word name never anchors by title alone', () => {
+  assert.equal(
+    wikipediaPageAnchored({
+      sourceUrl: 'https://en.wikipedia.org/wiki/Gabriel',
+      displayName: 'Gabriel',
+    }),
+    false,
+  );
+  assert.ok(
+    wikipediaPageAnchored({
+      sourceUrl: "https://en.wikipedia.org/wiki/Gabriel's_Rebellion",
+      canonicalUrl: "https://en.wikipedia.org/wiki/Gabriel's_Rebellion",
+      displayName: 'Gabriel',
+    }),
+  );
+});

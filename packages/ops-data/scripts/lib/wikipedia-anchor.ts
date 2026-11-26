@@ -49,5 +49,6 @@ export function wikipediaPageAnchored(input: {
   if (input.placeKnown === true) return input.placeCorroborated === true;
   // A trailing "(Site)" or similar qualifier on the record's own name is not part of the subject.
   const name = fold((input.displayName ?? '').replace(/\s*\([^)]*\)\s*$/u, ''));
-  return page !== null && name.length > 0 && page === name;
+  // A one-word name is too ambiguous to anchor anything: "Gabriel" is the archangel's article.
+  return page !== null && name.includes(' ') && page === name;
 }
