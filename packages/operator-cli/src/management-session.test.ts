@@ -269,6 +269,7 @@ test(
       const ready = await next();
       assert.ok('work' in ready && ready.work);
       assert.equal(ready.work.state, 'awaiting_review');
+      assert.ok('proposalSaved' in ready && ready.proposalSaved);
       assert.deepEqual(ready.work.proposal!.researchRunIds, runIds);
       assert.equal(await store.claim(work.id, 'publish'), null);
       const approved = await store.decide(actor, work.id, {

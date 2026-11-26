@@ -17,9 +17,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     // An agent session just saved a proposal: the owner is the only one who can approve it.
     // shortcut: hosted-runner proposals (GitHub Actions) are saved outside this route and send no
     // alert; add one in the runner if hosted mode becomes routine.
-    const work = (result as { work?: WorkItem | null }).work;
-    const completed = (body as { action?: unknown } | null)?.action === 'complete';
-    if (completed && work?.state === 'awaiting_review') {
+    // The proposal is saved on the `next` call after the last task completes, not on `complete`.
+    const { work, proposalSaved } = result as {
+      work?: WorkItem | null;
+      proposalSaved?: boolean;
+    };
+    if (proposalSaved && work?.state === 'awaiting_review') {
       notify({
         event: 'owner.work_ready',
         to: 'owner',
