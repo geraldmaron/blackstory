@@ -27,6 +27,10 @@ const MONTH_PATTERN = new RegExp(
 );
 const YEAR_PATTERN = /\b(?:1[5-9]|20)\d{2}\b/u;
 const TIME_WORDS = /\b(?:now|currently|today|presently|nowadays)\b/iu;
+// Sentences about what the evidence lacks. Measured: 7 of 4,427 live records carry one, some as a
+// deliberate statement of a limit, so this warns rather than holds.
+const ABOUT_THE_EVIDENCE =
+  /\b(?:the|this|that|its|available|supplied|surviving)\s+(?:evidence|sources?|records?|roster|documents?|page|listing|materials?)\b[^.]*?\b(?:does(?:n['\u2019]t| not)\s+(?:say|state|give|name|mention|record|describe|show)|says nothing|gives no|names no|is silent|offers? no|provides? no)\b/iu;
 
 export type PreReviewText = {
   readonly displayName: string;
@@ -58,6 +62,9 @@ export function preReviewTextCheck(input: PreReviewText): {
     for (const sentence of sentences(text)) {
       if (!fieldHasYear && MONTH_PATTERN.test(sentence)) {
         warnings.push(`${field} names a month and no year: "${sentence.slice(0, 120)}"`);
+      }
+      if (ABOUT_THE_EVIDENCE.test(sentence)) {
+        warnings.push(`${field} talks about the evidence itself: "${sentence.slice(0, 120)}"`);
       }
       const timeWord = TIME_WORDS.exec(sentence);
       if (timeWord) {

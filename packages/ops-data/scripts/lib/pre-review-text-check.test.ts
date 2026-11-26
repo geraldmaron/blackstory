@@ -34,3 +34,13 @@ test('a month is not flagged when the field names a year, and "may" as a verb is
   });
   assert.deepEqual(warnings, []);
 });
+
+test('a sentence about what the evidence lacks warns', () => {
+  const { problems, warnings } = preReviewTextCheck({
+    displayName: 'Odd Fellows Cemetery',
+    summary: "The cemetery opened in 1870. The evidence doesn't say who is buried there.",
+  });
+  assert.deepEqual(problems, []);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0]!, /evidence itself/u);
+});

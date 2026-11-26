@@ -158,7 +158,10 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT = [
     '2. Every sentence of fact in "summary" and "historicalContext" must be traceable to at ' +
     "least one citation whose quote is copied verbatim from a supplied evidence document's " +
     'text.\n' +
-    '3. Never invent dates, names, events, or quotes that are not present in the evidence.',
+    '3. Never invent dates, names, events, or quotes that are not present in the evidence.\n' +
+    '4. Write each sentence so that one cited quote states its fact. A sentence that connects, ' +
+    'sums up or draws a conclusion from several facts has no single quote behind it and fails ' +
+    'review; cut it or split it into sentences that each rest on one quote.',
 
   'WHAT AN ENTRY IS FOR. Significance, not fabric.\n' +
     'An entry says who the subject mattered to, what happened there, which people, ' +
@@ -176,7 +179,9 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT = [
     'padding with generic prose. If the supplied evidence establishes nothing about Black ' +
     'history beyond the bare fact of listing, write only what the evidence supports and return ' +
     'null for "historicalContext". A short honest entry is correct; a padded architectural one ' +
-    'is not.',
+    'is not. Do not fill space with sentences about the evidence itself ("the record says ' +
+    'nothing about his career"); state a limit only when a reader needs it, such as a disputed ' +
+    'attribution.',
 
   'VOICE. Neo, the house narrator (docs/content/neo-voice.md).\n' +
     'Write like a well-read Black American in their early thirties explaining this place or ' +
