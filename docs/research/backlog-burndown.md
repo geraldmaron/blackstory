@@ -179,6 +179,9 @@ metered API. Codex work runs through `codex exec` on the ChatGPT login with stdi
 
 **Stop rule confirmed by the owner, 2026-11-25:** fewer than 1 in 4 kept rows live stops the cohort.
 
+**Owner decision, 2026-11-25:** contemporary institutions (for example The Black Wall Street Times,
+founded 2017) stay live. A record is not held for being recent.
+
 ### Sample, fixed 2026-11-25 before any stage ran
 
 Drawn from `pending` rows, ordered by `md5(id || 'burndown-pilot-2026-11-25')`. Cohort 1 takes the first
