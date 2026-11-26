@@ -50,14 +50,18 @@ import { fileURLToPath } from 'node:url';
 import { safeFetchIsReachable, safeFetchJson } from './lib/safe-fetch.ts';
 import {
   AUTHORITY_ID_PROPERTIES,
+  entryFromAssessments,
+  isAgentAssessmentBasis,
   loadSourceRegister,
   ORG_TYPE_SOURCE_CLASS,
   sourceRegisterPath,
   WIKIDATA_CLASS_ALLOWLIST,
   type AuthorityIdKey,
+  type SourceAssessment,
   type SourceRegisterEntry,
   type SourceRegisterFile,
   type SourceRegisterOrgType,
+  type WikidataRegisterBasis,
 } from './lib/source-register.ts';
 import { REPUTABLE_SECONDARY_HOST_SUFFIXES } from './lib/tier1-sources.ts';
 
@@ -119,7 +123,11 @@ export type WikidataCandidate = {
   readonly authorityIds: Partial<Record<AuthorityIdKey, string>>;
 };
 
-export type ProposedEntry = Omit<SourceRegisterEntry, 'reviewedBy' | 'reviewedAt' | 'verifiedAt'>;
+/** `propose` only ever builds a Wikidata basis; an agent-assessment entry comes from `apply-assessment`. */
+export type ProposedEntry = Omit<
+  SourceRegisterEntry,
+  'reviewedBy' | 'reviewedAt' | 'verifiedAt' | 'basis'
+> & { readonly basis: WikidataRegisterBasis };
 
 export type Proposal = {
   readonly host: string;
@@ -737,6 +745,55 @@ function runApply(args: Readonly<Record<string, string | boolean>>): number {
   return 0;
 }
 
+/**
+ * Write register entries from isolated source assessments (`docs/research/source-assessment.md`).
+ * Input: `[{ host, label, assessments: [SourceAssessment, SourceAssessment] }]`. A host the
+ * Wikidata path already accepts should go through `propose`/`apply`; this verb is for the
+ * `review` and `reject` hosts. Anything `entryFromAssessments` refuses is reported, not written.
+ */
+function runApplyAssessment(args: Readonly<Record<string, string | boolean>>): number {
+  if (typeof args.file !== 'string') {
+    console.error('apply-assessment needs --file <assessments.json>');
+    return 2;
+  }
+  const rows = JSON.parse(readFileSync(args.file, 'utf8')) as {
+    host: string;
+    label: string;
+    assessments: SourceAssessment[];
+  }[];
+  const now = new Date().toISOString();
+  const entries: SourceRegisterEntry[] = [];
+  for (const row of rows) {
+    const host = row.host
+      .trim()
+      .toLowerCase()
+      .replace(/^www\./u, '');
+    if (isGovernmentTldHost(host)) {
+      console.error(`refused ${host}: government TLD hosts are already government records`);
+      continue;
+    }
+    const result = entryFromAssessments({
+      host,
+      label: row.label,
+      assessments: row.assessments,
+      reviewedAt: now,
+    });
+    if (result.ok) entries.push(result.entry);
+    else console.error(`refused ${host}: ${result.reason}`);
+  }
+  if (args['dry-run'] === true) {
+    for (const entry of entries)
+      console.log(`would register ${entry.host} as ${entry.sourceClass}`);
+    return 0;
+  }
+  const register = loadSourceRegister();
+  const merged = mergeEntries(register.entries, entries);
+  writeRegister({ version: register.version, entries: merged });
+  for (const entry of entries) console.log(`registered ${entry.host} as ${entry.sourceClass}`);
+  console.log(`register now holds ${merged.length}`);
+  return 0;
+}
+
 /** Liveness failures worth one retry: a slow or flaky answer, not a dead or repointed host. */
 const TRANSIENT_LIVENESS_REASONS = new Set(['duration_exceeded', 'transport_failed']);
 
@@ -760,7 +817,13 @@ export async function verifyEntries(
     deps.reachable ??
     ((url: string) => safeFetchIsReachable(url, { userAgent: SOURCE_REGISTER_USER_AGENT }));
 
-  const qids = [...new Set(entries.map((entry) => entry.basis.wikidata))];
+  const qids = [
+    ...new Set(
+      entries.flatMap((entry) =>
+        isAgentAssessmentBasis(entry.basis) ? [] : [entry.basis.wikidata],
+      ),
+    ),
+  ];
   const candidates = new Map<string, WikidataCandidate>();
   const factBatches = chunk(qids, 40);
   for (const [index, batch] of factBatches.entries()) {
@@ -793,10 +856,14 @@ export async function verifyEntries(
   const clean: string[] = [];
   for (const entry of entries) {
     const problems: string[] = [];
-    const candidate = candidates.get(entry.basis.wikidata);
-    if (candidate === undefined) {
+    const basis = entry.basis;
+    // An agent-assessment entry has no Wikidata basis to re-read; liveness below still applies.
+    const candidate = isAgentAssessmentBasis(basis) ? undefined : candidates.get(basis.wikidata);
+    if (isAgentAssessmentBasis(basis)) {
+      // nothing to re-check against Wikidata
+    } else if (candidate === undefined) {
       problems.push(
-        `Wikidata item ${entry.basis.wikidata} returned nothing — deleted, merged or renumbered`,
+        `Wikidata item ${basis.wikidata} returned nothing — deleted, merged or renumbered`,
       );
     } else {
       const stillClaims = candidate.officialWebsites.some((website) =>
@@ -804,20 +871,20 @@ export async function verifyEntries(
       );
       if (!stillClaims) {
         problems.push(
-          `${entry.basis.wikidata} no longer lists ${entry.host} as its official website (now: ${candidate.officialWebsites.join(', ') || 'none'})`,
+          `${basis.wikidata} no longer lists ${entry.host} as its official website (now: ${candidate.officialWebsites.join(', ') || 'none'})`,
         );
       }
       if (authorityIdCount(candidate) === 0) {
-        problems.push(`${entry.basis.wikidata} no longer carries any authority identifier`);
+        problems.push(`${basis.wikidata} no longer carries any authority identifier`);
       }
       const orgType = orgTypeForClasses(candidate.instanceOf, closure);
       if (orgType === undefined) {
         problems.push(
-          `${entry.basis.wikidata} instance-of ${candidate.instanceOf.join(', ') || 'none'} no longer reaches an allowlisted class`,
+          `${basis.wikidata} instance-of ${candidate.instanceOf.join(', ') || 'none'} no longer reaches an allowlisted class`,
         );
       } else if (orgType !== entry.orgType) {
         problems.push(
-          `${entry.basis.wikidata} now resolves to ${orgType}, registered as ${entry.orgType}`,
+          `${basis.wikidata} now resolves to ${orgType}, registered as ${entry.orgType}`,
         );
       }
     }
@@ -891,8 +958,11 @@ async function main(): Promise<void> {
     case 'verify':
       code = await runVerify(args);
       break;
+    case 'apply-assessment':
+      code = runApplyAssessment(args);
+      break;
     default:
-      console.error('usage: source-register.ts <propose|apply|verify> [options]');
+      console.error('usage: source-register.ts <propose|apply|apply-assessment|verify> [options]');
       code = 2;
   }
   process.exitCode = code;

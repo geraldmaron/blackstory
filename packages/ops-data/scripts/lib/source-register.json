@@ -422,6 +422,74 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "seattlemedium.com",
+      "sourceClass": "news_reportage",
+      "orgType": "news_publisher",
+      "label": "The Seattle Medium",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "The Seattle Medium is a weekly Black community newspaper founded in 1970 by Chris H. Bennett and published by Tiloben Publishing Co., Inc., now led by publisher and CEO Chris B. Bennett. An independent Washington state bulletin confirms the 1970 founding and ownership. I could not open a corrections policy or masthead, and BlackPast and Afro pages returned 403, so independent evidence is limited to one page; registering on the strength of a 55-year news operation.",
+            "evidence": [
+              {
+                "url": "https://content.govdelivery.com/accounts/WAOMWBE/bulletins/3d9b246",
+                "quote": "In 1970, Bennett founded The Seattle Medium Newspaper."
+              },
+              {
+                "url": "https://seattlemedium.com/seattle-medium-newspaper-legacy/",
+                "quote": "Publisher and CEO of The Seattle Medium newspaper"
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "The Seattle Medium is published by minority-owned Tiloben Publishing Company, Inc., led by publisher/CEO Chris Bennett, and has operated since January 1970. Named editorial leadership, bylined reporting, and public contact information establish accountability, although I did not verify a formal corrections policy. The Local Media Association independently recognizes its publisher and describes it as Seattle’s leading Black news source. Its principal purpose is reporting community and national news, making it an established newspaper suitable for a history catalog.",
+            "evidence": [
+              {
+                "url": "https://seattlemedium.com/tiloben-publishing-co-inc/",
+                "quote": "Tiloben Publishing Company, Inc. is the largest Minority-owned and operated communications company in the Pacific Northwest."
+              },
+              {
+                "url": "https://www.bbb.org/us/wa/seattle/profile/newspaper/seattle-medium-newspaper-1296-22007343",
+                "quote": "Business Started:\n    1/15/1970"
+              },
+              {
+                "url": "https://muckrack.com/chrisbbennett",
+                "quote": "Publisher/editor of The Seattle Medium Newspaper Group and Host of the Rhythm & News Radio Show"
+              },
+              {
+                "url": "https://seattlemedium.com/when-holiday-favorites-put-your-health-at-risk/",
+                "quote": "By Aaron Allen, The Seattle Medium"
+              },
+              {
+                "url": "https://seattlemedium.com/contact-seattle-medium/",
+                "quote": "Business Phone: 206-323-3070"
+              },
+              {
+                "url": "https://localmedia.org/2022/09/chris-bennett-of-seattle-medium-is-lma-innovator-of-year-for-revenue-strategy/",
+                "quote": "Chris Bennett, publisher and CEO of The Seattle Medium, has been named an Innovator of the Year by Local Media Association"
+              },
+              {
+                "url": "https://seattlemedium.com/",
+                "quote": "Seattle, King County Challenge Federal Housing Rule That Threatens To Separate Families"
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T02:16:44.685Z",
+      "verifiedAt": "2026-11-26T02:16:44.685Z"
+    },
+    {
       "host": "wisconsinhistory.org",
       "sourceClass": "reputable_secondary",
       "orgType": "archive",

@@ -5,7 +5,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  entryFromAssessments,
   hostMatchesRegisterHost,
+  isAgentAssessmentBasis,
   loadSourceRegister,
   lookupSourceRegister,
   lookupSourceRegisterByUrl,
@@ -129,15 +131,107 @@ test('the committed register file parses and holds no government_record entry', 
   const file = loadSourceRegister();
   assert.ok(file.entries.length > 0);
   for (const registered of file.entries) {
-    assert.match(registered.basis.wikidata, /^Q\d+$/u);
-    assert.ok(
-      Object.values(registered.basis.authorityIds).filter(Boolean).length > 0,
-      `${registered.host} has no authority identifier`,
-    );
+    const basis = registered.basis;
+    if (isAgentAssessmentBasis(basis)) {
+      // An assessed entry must still be one entryFromAssessments would build today.
+      const rebuilt = entryFromAssessments({
+        host: registered.host,
+        label: registered.label,
+        assessments: basis.assessments,
+        reviewedAt: registered.reviewedAt,
+      });
+      assert.ok(rebuilt.ok, `${registered.host}: ${rebuilt.ok ? '' : rebuilt.reason}`);
+    } else {
+      assert.match(basis.wikidata, /^Q\d+$/u);
+      assert.ok(
+        Object.values(basis.authorityIds).filter(Boolean).length > 0,
+        `${registered.host} has no authority identifier`,
+      );
+    }
     assert.equal(registered.sourceClass, ORG_TYPE_SOURCE_CLASS[registered.orgType]);
     assert.ok(
       !registered.host.endsWith('.gov') && !registered.host.endsWith('.mil'),
       `${registered.host} is a government TLD host and does not belong in the register`,
     );
   }
+});
+
+const assessment = (overrides: Record<string, unknown> = {}) => ({
+  actorId: 'claude-session:claude-sonnet-5-5',
+  family: 'anthropic',
+  recommendation: 'register' as const,
+  orgType: 'encyclopedia' as const,
+  reason: 'Nonprofit online encyclopedia of Washington State history with an editorial staff.',
+  evidence: [
+    {
+      url: 'https://www.washington.edu/news/x',
+      quote: 'HistoryLink, the free online encyclopedia',
+    },
+  ],
+  ...overrides,
+});
+
+test('an assessed entry needs two vendors, two register votes and independent evidence', () => {
+  const base = {
+    host: 'historylink.org',
+    label: 'HistoryLink',
+    reviewedAt: '2026-11-25T00:00:00Z',
+  };
+  const sol = assessment({ actorId: 'codex-review:gpt-6.1-sol', family: 'openai' });
+  const ok = entryFromAssessments({ ...base, assessments: [assessment(), sol] });
+  assert.ok(ok.ok);
+  assert.equal(ok.ok && ok.entry.sourceClass, 'reputable_secondary');
+  assert.equal(
+    ok.ok && ok.entry.reviewedBy,
+    'agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol',
+  );
+
+  assert.equal(
+    entryFromAssessments({ ...base, assessments: [assessment(), assessment()] }).ok,
+    false,
+  );
+  assert.equal(
+    entryFromAssessments({
+      ...base,
+      assessments: [assessment(), { ...sol, recommendation: 'refuse' }],
+    }).ok,
+    false,
+  );
+  const selfOnly = {
+    ...sol,
+    evidence: [{ url: 'https://www.historylink.org/about', quote: 'About us' }],
+  };
+  assert.equal(entryFromAssessments({ ...base, assessments: [assessment(), selfOnly] }).ok, false);
+  const wikipediaOnly = {
+    ...sol,
+    evidence: [{ url: 'https://en.wikipedia.org/wiki/HistoryLink', quote: 'HistoryLink is' }],
+  };
+  assert.equal(
+    entryFromAssessments({ ...base, assessments: [assessment(), wikipediaOnly] }).ok,
+    false,
+  );
+  const government = { ...sol, orgType: 'government_agency' as const };
+  assert.equal(
+    entryFromAssessments({ ...base, assessments: [assessment(), government] }).ok,
+    false,
+  );
+});
+
+test('an assessed entry takes the lower of the two classes', () => {
+  const result = entryFromAssessments({
+    host: 'seattlemedium.com',
+    label: 'The Seattle Medium',
+    reviewedAt: '2026-11-25T00:00:00Z',
+    assessments: [
+      assessment({ orgType: 'cultural_institution' }),
+      assessment({
+        actorId: 'codex-review:gpt-6.1-sol',
+        family: 'openai',
+        orgType: 'news_publisher',
+      }),
+    ],
+  });
+  assert.ok(result.ok);
+  assert.equal(result.ok && result.entry.sourceClass, 'news_reportage');
+  assert.equal(result.ok && result.entry.orgType, 'news_publisher');
 });

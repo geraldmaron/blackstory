@@ -35,7 +35,9 @@ A host is registered only when all three of these hold at once:
    institute, hall of fame, government agency, public broadcaster, cultural institution,
    cemetery, newspaper.
 
-Anything short of all three is a `review` for a person, never an automatic accept.
+Anything short of all three is a `review`, never an automatic accept. Since 2026-11-25 a `review`
+or `reject` host goes to the isolated source assessment in [source-assessment.md](source-assessment.md)
+(owner decision), which can register it with a two-assessor basis under a stricter rule.
 
 Wikipedia's own "official website" line may corroborate a reviewer's judgment. It is never
 sufficient on its own: it is uncontrolled free text with no authority record behind it.

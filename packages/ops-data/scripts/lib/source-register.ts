@@ -14,6 +14,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isWikipediaHost } from './tier1-sources.ts';
 
 const REGISTER_PATH = join(dirname(fileURLToPath(import.meta.url)), 'source-register.json');
 
@@ -147,7 +148,7 @@ export const AUTHORITY_ID_PROPERTIES = {
 
 export type AuthorityIdKey = (typeof AUTHORITY_ID_PROPERTIES)[keyof typeof AUTHORITY_ID_PROPERTIES];
 
-export type SourceRegisterBasis = {
+export type WikidataRegisterBasis = {
   /** The Wikidata item the entry rests on. */
   readonly wikidata: string;
   /** The P856 value that matched the host, as stored on the item. */
@@ -158,6 +159,36 @@ export type SourceRegisterBasis = {
   readonly instanceOf: readonly string[];
 };
 
+/** One isolated assessor's verdict on a publisher (see `docs/research/source-assessment.md`). */
+export type SourceAssessment = {
+  /** e.g. `claude-session:claude-sonnet-5-5` or `codex-review:gpt-6.1-sol`. */
+  readonly actorId: string;
+  /** The model vendor; the two assessments behind an entry must differ. */
+  readonly family: string;
+  readonly recommendation: 'register' | 'refuse';
+  /** The class follows from this, via ORG_TYPE_SOURCE_CLASS; an assessor never names a class. */
+  readonly orgType: SourceRegisterOrgType;
+  readonly reason: string;
+  /** Pages the assessor opened, with a verbatim passage from each. */
+  readonly evidence: readonly { readonly url: string; readonly quote: string }[];
+};
+
+/**
+ * For a publisher Wikidata cannot vouch for (no item, or an item with no authority identifier):
+ * two isolated assessments by different vendors that researched the publisher itself, without
+ * seeing the record or claim the host would unblock. Owner decision 2026-11-25.
+ */
+export type AgentAssessmentBasis = {
+  readonly kind: 'agent-assessment';
+  readonly assessments: readonly SourceAssessment[];
+};
+
+export type SourceRegisterBasis = WikidataRegisterBasis | AgentAssessmentBasis;
+
+export function isAgentAssessmentBasis(basis: SourceRegisterBasis): basis is AgentAssessmentBasis {
+  return (basis as AgentAssessmentBasis).kind === 'agent-assessment';
+}
+
 export type SourceRegisterEntry = {
   /** A registrable-domain suffix, matched as host-or-subdomain. Never a substring. */
   readonly host: string;
@@ -165,10 +196,13 @@ export type SourceRegisterEntry = {
   readonly orgType: SourceRegisterOrgType;
   readonly label: string;
   readonly basis: SourceRegisterBasis;
-  /** The person who accepted the entry. Not a bot name — someone answers for this. */
+  /**
+   * Who accepted the entry: a person, or for an agent-assessment basis the two assessors
+   * (agent validation is the gate, owner decision 2026-11-08).
+   */
   readonly reviewedBy: string;
   readonly reviewedAt: string;
-  /** Last time `verify` re-checked the basis against Wikidata and the live host. */
+  /** Last time `verify` re-checked the basis (Wikidata and the live host, or liveness only). */
   readonly verifiedAt: string;
   readonly notes?: string;
 };
@@ -244,4 +278,83 @@ export function lookupSourceRegisterByUrl(
   } catch {
     return undefined;
   }
+}
+
+const CLASS_RANK: Readonly<Record<SourceRegisterClass, number>> = {
+  news_reportage: 0,
+  reputable_secondary: 1,
+  government_record: 2,
+};
+
+/**
+ * Build a register entry from two isolated source assessments, or say why not. Both assessors
+ * must come from different model vendors, both must recommend registering, and each must cite at
+ * least one https page that is not on the host itself and not Wikipedia (a publisher describing
+ * itself is not an assessment of it, and Wikipedia is a bridge source). The class follows from each assessor's organization type, and the entry
+ * takes the LOWER of the two. Government authority is never granted this way: a government
+ * agency belongs on a government TLD or behind a Wikidata authority record.
+ */
+export function entryFromAssessments(input: {
+  readonly host: string;
+  readonly label: string;
+  readonly assessments: readonly SourceAssessment[];
+  readonly reviewedAt: string;
+}):
+  | { readonly ok: true; readonly entry: SourceRegisterEntry }
+  | { readonly ok: false; readonly reason: string } {
+  const { host, assessments } = input;
+  if (assessments.length !== 2) return { ok: false, reason: 'needs exactly two assessments' };
+  const [first, second] = assessments as [SourceAssessment, SourceAssessment];
+  if (first.family.trim().toLowerCase() === second.family.trim().toLowerCase()) {
+    return { ok: false, reason: 'the two assessments must come from different model vendors' };
+  }
+  for (const assessment of assessments) {
+    if (assessment.recommendation !== 'register') {
+      return { ok: false, reason: `${assessment.actorId} recommends ${assessment.recommendation}` };
+    }
+    if (!(assessment.orgType in ORG_TYPE_SOURCE_CLASS)) {
+      return { ok: false, reason: `${assessment.actorId} gave an unknown orgType` };
+    }
+    if (ORG_TYPE_SOURCE_CLASS[assessment.orgType] === 'government_record') {
+      return { ok: false, reason: 'government authority is never granted by assessment' };
+    }
+    const independent = assessment.evidence.filter((item) => {
+      if (item.quote.trim().length === 0) return false;
+      try {
+        const url = new URL(item.url);
+        // Wikipedia is a bridge source everywhere in this pipeline; it is not an assessment either.
+        return (
+          url.protocol === 'https:' &&
+          !hostMatchesRegisterHost(url.hostname, host) &&
+          !isWikipediaHost(url.href)
+        );
+      } catch {
+        return false;
+      }
+    });
+    if (independent.length === 0) {
+      return {
+        ok: false,
+        reason: `${assessment.actorId} cites no page about ${host} from another host`,
+      };
+    }
+  }
+  const lower =
+    CLASS_RANK[ORG_TYPE_SOURCE_CLASS[first.orgType]] <=
+    CLASS_RANK[ORG_TYPE_SOURCE_CLASS[second.orgType]]
+      ? first
+      : second;
+  return {
+    ok: true,
+    entry: {
+      host,
+      sourceClass: ORG_TYPE_SOURCE_CLASS[lower.orgType],
+      orgType: lower.orgType,
+      label: input.label,
+      basis: { kind: 'agent-assessment', assessments },
+      reviewedBy: `agent assessment: ${first.actorId} + ${second.actorId}`,
+      reviewedAt: input.reviewedAt,
+      verifiedAt: input.reviewedAt,
+    },
+  };
 }
