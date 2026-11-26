@@ -44,6 +44,71 @@
       "verifiedAt": "2026-09-10T04:11:11.854Z"
     },
     {
+      "host": "ajc.com",
+      "sourceClass": "news_reportage",
+      "orgType": "news_publisher",
+      "label": "The Atlanta Journal-Constitution",
+      "basis": {
+        "kind": "agent-assessment",
+        "assessments": [
+          {
+            "actorId": "claude-session:claude-sonnet-5-5",
+            "family": "anthropic",
+            "label": "The Atlanta Journal-Constitution",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "The AJC is a metropolitan daily owned by Cox Enterprises, descended from papers dating to the 1860s-1880s, with a newsroom and repeated Pulitzer recognition. The New Georgia Encyclopedia documents its Cox ownership and Pulitzer history. Quotes from the Georgia Encyclopedia came via a WebFetch summary, so wording is lightly verified.",
+            "evidence": [
+              {
+                "url": "https://www.ajc.com/about-us/",
+                "quote": "The AJC is home to the South's essential stories."
+              },
+              {
+                "url": "https://www.georgiaencyclopedia.org/articles/arts-culture/atlanta-journal-constitution/",
+                "quote": "The Journal and Constitution have won numerous Pulitzer Prizes"
+              }
+            ]
+          },
+          {
+            "actorId": "codex-review:gpt-6.1-sol",
+            "family": "openai",
+            "recommendation": "register",
+            "orgType": "news_publisher",
+            "reason": "The Atlanta Journal-Constitution publishes ajc.com and is owned by family-owned Cox Enterprises; its predecessor newspapers began in 1868 and 1883 and fully merged in 2001. It has editors, reporters, bylines, a published ethics code, and a corrections process. Independent encyclopedia, Associated Press, and university-library coverage establish it as a longstanding reporting organization whose main purpose is covering news, rather than promoting its owner.",
+            "evidence": [
+              {
+                "url": "https://www.ajc.com/frequently-asked-questions/who-we-are/RONOAT4VLVBZJI3FOFZWDSJO74/",
+                "quote": "The newspaper is owned by Cox Enterprises, a family-owned company that has been in Atlanta since 1939."
+              },
+              {
+                "url": "https://www.georgiaencyclopedia.org/articles/arts-culture/atlanta-journal-constitution/",
+                "quote": "the Atlanta Constitution, first published on June 16, 1868, and the Atlanta Journal, which debuted on February 24, 1883."
+              },
+              {
+                "url": "https://www.ajc.com/about-us/newsroom-ethics-code/JA6O7M7N5RACXLLUN22HD2FFMQ/",
+                "quote": "We admit our errors and correct them."
+              },
+              {
+                "url": "https://help.ajc.com/hc/en-us/articles/1500005814321-Requests-for-Updating-or-Correcting-Stories-or-Links",
+                "quote": "please contact the appropriate editor from the Newsroom Contact Page or the reporter whose byline and email address are attached to the story."
+              },
+              {
+                "url": "https://research.library.gsu.edu/news/georgia",
+                "quote": "Atlanta news, including sports, political, entertainment, weather, and more."
+              },
+              {
+                "url": "https://apnews.com/article/atlanta-georgia-newspaper-digital-media-5e9e270e8fdf8d4a7213ec666f401e22",
+                "quote": "The Journal-Constitution has hired reporters in the Georgia cities of Athens, Macon and Savannah"
+              }
+            ]
+          }
+        ]
+      },
+      "reviewedBy": "agent assessment: claude-session:claude-sonnet-5-5 + codex-review:gpt-6.1-sol",
+      "reviewedAt": "2026-11-26T04:40:45.530Z",
+      "verifiedAt": "2026-11-26T04:40:45.530Z"
+    },
+    {
       "host": "amsterdamnews.com",
       "sourceClass": "news_reportage",
       "orgType": "news_publisher",
