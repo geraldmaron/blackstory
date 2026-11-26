@@ -544,7 +544,7 @@ export type ProposeDependencies = {
   readonly log?: (message: string) => void;
 };
 
-function sparqlUrl(query: string): string {
+export function sparqlUrl(query: string): string {
   return `${WIKIDATA_SPARQL}?format=json&query=${encodeURIComponent(query)}`;
 }
 
