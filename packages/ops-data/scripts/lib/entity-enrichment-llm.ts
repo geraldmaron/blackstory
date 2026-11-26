@@ -186,6 +186,12 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT = [
     'as the hub/heart/headquarters of"), never use "Negro" or "colored" as your own word outside ' +
     'a proper name or quotation, no em dashes, use contractions, and no slang, dialect or "we".',
 
+  'DATED SOURCES. A source speaks for its own date.\n' +
+    'Who runs, owns or leads something, and what a person is doing, are facts about the ' +
+    'moment the source was written. State them in past tense tied to that moment ("A 2009 ' +
+    'profile said his son ran the paper"), never with "now", "currently" or "today", ' +
+    'unless the evidence itself is current and says so.',
+
   'PRIVACY. A hard safety rule.\n' +
     'Never state a street address, house number, coordinate pair, or other parcel-precise ' +
     'location in any output field. This binds for people (living or possibly living) and for ' +
@@ -233,7 +239,9 @@ export function buildEnrichmentUserPrompt(
           '"ENTERTAINMENT/RECREATION" are NPS form vocabulary, not English. Say what the ' +
           'classification means in plain words ("recognized for its Black heritage") or leave it out',
         'topicIds must only use ids from allowedTopicIds; omit if none clearly apply',
-        'eraBuckets must be decade labels ("1950s") grounded in a year present in the evidence',
+        'eraBuckets must be decade labels ("1950s") grounded in a year present in the evidence, ' +
+          "and only years of the subject's own history (founded, built, operating, events at or by " +
+          "the subject), not years of a related person's separate activities",
         ...(addressGuardApplies(subject)
           ? [
               'PRIVACY (hard rule for this subject): never state a street address, house number, ' +

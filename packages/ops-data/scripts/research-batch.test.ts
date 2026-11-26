@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { eligibleIds, firstJson, passingEntities, standingDecisions } from './research-batch.ts';
+import {
+  eligibleIds,
+  firstJson,
+  passingEntities,
+  splitByCachedVerdict,
+  standingDecisions,
+} from './research-batch.ts';
 
 test('firstJson reads the report and ignores the prose a step prints after it', () => {
   const out =
@@ -62,4 +68,36 @@ test('only the asked-for ids the publisher lists as eligible are published', () 
     'Eligible: 1\nSkipped: 1\n\nEligible IDs:\n  rec-a (basis=independent_review)\n  rec-x (basis=independent_review)\n\nSkip counts:\n  claim_assessment_required: 1\n';
   assert.deepEqual(eligibleIds(out, ['rec-a', 'rec-b']), ['rec-a']);
   assert.deepEqual(eligibleIds('Eligible: 0', ['rec-a']), []);
+});
+
+test('a cached verdict is reused only for the same packetHash from the same reviewer', () => {
+  const packets = [
+    { packetId: 'a', packetHash: 'h1' },
+    { packetId: 'b', packetHash: 'h2' },
+    { packetId: 'c', packetHash: 'h3' },
+  ];
+  const cache = [
+    {
+      packetId: 'a',
+      packetHash: 'h1',
+      reviewerActorId: 'codex-review:gpt-6.1-sol',
+      decision: 'approve',
+    },
+    {
+      packetId: 'b',
+      packetHash: 'h2-old',
+      reviewerActorId: 'codex-review:gpt-6.1-sol',
+      decision: 'approve',
+    },
+    { packetId: 'c', packetHash: 'h3', reviewerActorId: 'codex-review:other', decision: 'approve' },
+  ];
+  const { cached, todo } = splitByCachedVerdict(packets, cache, 'codex-review:gpt-6.1-sol');
+  assert.deepEqual(
+    cached.map((v) => v.packetId),
+    ['a'],
+  );
+  assert.deepEqual(
+    todo.map((p) => p.packetId),
+    ['b', 'c'],
+  );
 });

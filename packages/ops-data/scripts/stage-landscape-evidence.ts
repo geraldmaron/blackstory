@@ -14,6 +14,11 @@
  * file, which is the point: a corrected sentence and the source it rests on reach the publisher
  * together.
  *
+ * A record may also carry `location: { lat, lng, precision, city?, state?, sourceUrl, quote? }`
+ * for a candidate that has no point yet (new records cannot publish without one). It sets
+ * `lat`/`lng`, `provenance.sourceCity`/`sourceState` and `payload.geocode`, and is refused when
+ * the row already has a point: moving a pin is a correction, not staging.
+ *
  * The script touches `summary`, `payload.historicalContext` and `payload.evidenceCitations`,
  * stamps the provenance with who appended what and when, and leaves `status` alone: the
  * incremental publisher re-derives the record on the next `--lane <lane> --republish`, and that
@@ -29,7 +34,12 @@
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
-import { applyProseCorrections, mergeEvidenceCitations } from './lib/landscape-evidence-merge.ts';
+import {
+  applyProseCorrections,
+  mergeEvidenceCitations,
+  parseStagedLocation,
+  type StagedLocation,
+} from './lib/landscape-evidence-merge.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -51,6 +61,7 @@ type InputRecord = {
   readonly id: string;
   readonly newEvidence?: readonly unknown[];
   readonly proseCorrections?: readonly ProseCorrection[];
+  readonly location?: unknown;
 };
 
 type CandidateRow = {
@@ -60,6 +71,7 @@ type CandidateRow = {
   readonly summary: string | null;
   readonly historical_context: string | null;
   readonly citations: unknown;
+  readonly lat: number | null;
 };
 
 async function main(): Promise<void> {
@@ -82,10 +94,11 @@ async function main(): Promise<void> {
     console.log(DRY_RUN || !APPLY ? 'dry-run' : 'apply');
     let totalAdded = 0;
     let totalProse = 0;
+    let totalLocated = 0;
     for (const record of records) {
       const row = await client.query<CandidateRow>(
         `SELECT id, lane, status, summary, payload->>'historicalContext' AS historical_context,
-                payload->'evidenceCitations' AS citations
+                payload->'evidenceCitations' AS citations, lat
            FROM research.landscape_candidates
           WHERE id = $1 AND ($2::text IS NULL OR lane = $2)`,
         [record.id, lane ?? null],
@@ -120,7 +133,47 @@ async function main(): Promise<void> {
       const proseApplied = summaryFix.applied + contextFix.applied;
       if (proseApplied > 0) console.log(`      prose: ${proseApplied} correction(s)`);
 
-      if ((merged.added.length === 0 && proseApplied === 0) || DRY_RUN || !APPLY) continue;
+      let location: StagedLocation | undefined;
+      if (record.location !== undefined) {
+        const parsed = parseStagedLocation(record.location);
+        if (!parsed.ok) console.log(`      refused location (${parsed.reason})`);
+        else if (found.lat !== null)
+          console.log('      refused location (row already has a point)');
+        else {
+          location = parsed.location;
+          console.log(`      location: ${location.precision} ${location.lat},${location.lng}`);
+        }
+      }
+
+      if (DRY_RUN || !APPLY) continue;
+      if (location !== undefined) {
+        await client.query(
+          `UPDATE research.landscape_candidates
+              SET lat = $2, lng = $3,
+                  provenance = provenance || jsonb_strip_nulls(jsonb_build_object(
+                    'sourceCity', $4::text, 'sourceState', $5::text,
+                    'locationStagedAt', now(), 'locationStagedBy', $6::text)),
+                  payload = payload || jsonb_build_object('geocode', $7::jsonb),
+                  updated_at = now()
+            WHERE id = $1 AND lat IS NULL`,
+          [
+            found.id,
+            location.lat,
+            location.lng,
+            location.city ?? null,
+            location.state ?? null,
+            APPENDED_BY,
+            JSON.stringify({
+              precision: location.precision,
+              matchMethod: location.matchMethod ?? 'researched',
+              source: location.sourceUrl,
+              ...(location.quote === undefined ? {} : { quote: location.quote }),
+            }),
+          ],
+        );
+        totalLocated += 1;
+      }
+      if (merged.added.length === 0 && proseApplied === 0) continue;
       await client.query(
         `UPDATE research.landscape_candidates
             SET payload = jsonb_set(
@@ -153,7 +206,9 @@ async function main(): Promise<void> {
       totalAdded += merged.added.length;
       totalProse += proseApplied;
     }
-    console.log(`appended ${totalAdded} citation(s), corrected ${totalProse} passage(s)`);
+    console.log(
+      `appended ${totalAdded} citation(s), corrected ${totalProse} passage(s), located ${totalLocated} row(s)`,
+    );
   } finally {
     await client.end();
   }

@@ -13,6 +13,8 @@
  * merge never removes or reorders what is already there, so a reviewer's diff is additions only.
  */
 
+import { PUBLIC_PRECISION_TIERS, isPublicPrecisionTier } from '@repo/domain';
+
 export type EvidenceCitation = {
   readonly sourceUrl: string;
   readonly title: string;
@@ -129,4 +131,66 @@ export function applyProseCorrections(
     applied += 1;
   }
   return { text: out, applied, refused };
+}
+
+export type StagedLocation = {
+  readonly lat: number;
+  readonly lng: number;
+  readonly precision: string;
+  readonly city?: string;
+  readonly state?: string;
+  readonly sourceUrl: string;
+  readonly quote?: string;
+  readonly matchMethod?: string;
+};
+
+/**
+ * Validate a sourced location before it is staged onto a candidate that has none. New records
+ * cannot publish without coordinates, and nothing else stages them for researched rows. The
+ * precision must already be a controlled public tier (no silent normalization: a researcher who
+ * wrote "street" should be told, not quietly given "address"), and the source must be an https
+ * page so the point can be traced.
+ */
+export function parseStagedLocation(
+  raw: unknown,
+):
+  | { readonly ok: true; readonly location: StagedLocation }
+  | { readonly ok: false; readonly reason: string } {
+  if (typeof raw !== 'object' || raw === null)
+    return { ok: false, reason: 'location is not an object' };
+  const value = raw as Record<string, unknown>;
+  const { lat, lng, precision, sourceUrl } = value;
+  if (typeof lat !== 'number' || !Number.isFinite(lat) || lat < -90 || lat > 90) {
+    return { ok: false, reason: 'lat must be a number between -90 and 90' };
+  }
+  if (typeof lng !== 'number' || !Number.isFinite(lng) || lng < -180 || lng > 180) {
+    return { ok: false, reason: 'lng must be a number between -180 and 180' };
+  }
+  if (typeof precision !== 'string' || !isPublicPrecisionTier(precision)) {
+    return { ok: false, reason: `precision must be one of ${PUBLIC_PRECISION_TIERS.join(', ')}` };
+  }
+  if (typeof sourceUrl !== 'string' || !/^https:\/\/[^\s/]+\.[^\s]+$/u.test(sourceUrl)) {
+    return { ok: false, reason: 'sourceUrl must be an https URL' };
+  }
+  const text = (key: string): string | undefined =>
+    typeof value[key] === 'string' && (value[key] as string).trim().length > 0
+      ? (value[key] as string).trim()
+      : undefined;
+  const city = text('city');
+  const state = text('state');
+  const quote = text('quote');
+  const matchMethod = text('matchMethod');
+  return {
+    ok: true,
+    location: {
+      lat,
+      lng,
+      precision,
+      sourceUrl,
+      ...(city === undefined ? {} : { city }),
+      ...(state === undefined ? {} : { state }),
+      ...(quote === undefined ? {} : { quote }),
+      ...(matchMethod === undefined ? {} : { matchMethod }),
+    },
+  };
 }

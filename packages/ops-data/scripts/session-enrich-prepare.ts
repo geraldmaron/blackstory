@@ -14,13 +14,16 @@
  *     packages/ops-data/scripts/session-enrich-prepare.ts --entity-ids=id1,id2,...
  *
  * Prints one JSON object per line to stdout:
- *   { entityId, displayName, evidenceDigest, systemPrompt, userPrompt }
+ *   { entityId, displayName, evidenceDigest, systemPrompt, userPrompt, responseSchema }
+ * responseSchema is the JSON Schema the provider path sends as its response format; a session
+ * drafter gets no such enforcement, so it must be handed the schema with the prompt.
  * Pair with session-enrich-apply.ts, which takes back { entityId, rawContent } answers.
  */
 import pg from 'pg';
 import { TOPIC_REGISTRY } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
+  ENTITY_ENRICHMENT_RESPONSE_SCHEMA,
   ENTITY_ENRICHMENT_SYSTEM_PROMPT,
   buildEnrichmentUserPrompt,
 } from './lib/entity-enrichment-llm.ts';
@@ -59,6 +62,7 @@ async function main(): Promise<void> {
         evidenceDigest: subject.evidenceDigest,
         systemPrompt: ENTITY_ENRICHMENT_SYSTEM_PROMPT,
         userPrompt: buildEnrichmentUserPrompt(subject, ALLOWED_TOPIC_IDS),
+        responseSchema: ENTITY_ENRICHMENT_RESPONSE_SCHEMA.schema,
       })}\n`,
     );
   }

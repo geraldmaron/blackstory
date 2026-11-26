@@ -5,7 +5,10 @@
  * step is incomplete. Exit codes of those steps are not trusted: the reviewer exits 0 with
  * verdicts missing and the ledger apply exits 0 with refusals, so each result is read and counted.
  *
- * Dry run by default: packets, Sol's claim review and the ledger dry run, nothing written.
+ * Dry run by default: packets, Sol's claim review and the ledger dry run, nothing written. Capture
+ * writes, so a dry run never captures: a new record whose sources are not yet captured has no
+ * reviewable claims until a run with --apply. Keep the same --work-dir across a correction loop:
+ * verdict-cache.jsonl there lets claims whose packetHash did not change skip Sol.
  * DATA LEAVES THIS MACHINE in both modes (claim and source text go to OpenAI through Codex).
  *
  *   cd apps/web && set -a && . ./.env.local && set +a && cd - && export DATABASE_SSL=1
@@ -117,6 +120,33 @@ export function passingEntities(
   for (const rejection of report.rejected ?? []) hold(rejection.entityId, 'a claim was rejected');
   const all = [...new Set([...packets.map((packet) => packet.entityId), ...blockedEntityIds])];
   return { passing: all.filter((id) => held[id] === undefined), held };
+}
+
+/**
+ * Split packets into those a cached verdict already covers and those Sol still has to read. A
+ * verdict binds to `packetHash`, which covers the claim, its capture and the text, so an unchanged
+ * hash from the same reviewer is the same review; the ledger apply re-checks every quote either
+ * way. A correction loop that only rewords the summary then re-reviews nothing at claim level.
+ */
+export function splitByCachedVerdict<P extends { packetHash: string }>(
+  packets: readonly P[],
+  cache: readonly Record<string, unknown>[],
+  reviewerActorId: string,
+): { cached: Record<string, unknown>[]; todo: P[] } {
+  const byHash = new Map<string, Record<string, unknown>>();
+  for (const verdict of cache) {
+    if (verdict.reviewerActorId === reviewerActorId && typeof verdict.packetHash === 'string') {
+      byHash.set(verdict.packetHash, verdict);
+    }
+  }
+  const cached: Record<string, unknown>[] = [];
+  const todo: P[] = [];
+  for (const packet of packets) {
+    const hit = byHash.get(packet.packetHash);
+    if (hit === undefined) todo.push(packet);
+    else cached.push(hit);
+  }
+  return { cached, todo };
 }
 
 function flag(name: string, fallback?: string): string {
@@ -254,7 +284,7 @@ async function main(): Promise<void> {
   ]);
   const blocked = JSON.parse(readFileSync(join(workDir, 'packets.blocked.json'), 'utf8')) as {
     missingEntityIds: string[];
-    blocked: { entityId: string }[];
+    blocked: { entityId: string; reason?: string }[];
   };
   const blockedEntityIds = [
     ...new Set([...blocked.missingEntityIds, ...blocked.blocked.map((claim) => claim.entityId)]),
@@ -263,13 +293,45 @@ async function main(): Promise<void> {
     packetId: String(packet.packetId),
     entityId: String(packet.entityId),
   }));
+  const uncaptured = blocked.blocked.filter((c) => c.reason === 'no_retained_capture_text').length;
+  if (!apply && uncaptured > 0) {
+    // Capture writes, so a dry run never captures: a new record's claims cannot be reviewed yet.
+    console.log(
+      `\n${uncaptured} claim(s) cite sources not captured yet. Capture runs only with --apply; ` +
+        'a first run on a new record has to use it. It still holds each record on any blocked, ' +
+        'rejected or unreviewed claim and publishes nothing that fails review.',
+    );
+  }
   if (packetList.length === 0) throw new Error('no claims to review; see packets.blocked.json');
 
-  step('claim review (Sol)', `${S}/session-claim-review-codex.ts`, [
-    `--packets-file=${packets}`,
-    `--out=${verdicts}`,
-    `--work-dir=${join(workDir, 'codex')}`,
-  ]);
+  // Reuse the work dir across a correction loop and unchanged claims skip Sol.
+  const cacheFile = join(workDir, 'verdict-cache.jsonl');
+  const { cached, todo } = splitByCachedVerdict(
+    jsonl(packets) as (Record<string, unknown> & { packetHash: string })[],
+    existsSync(cacheFile) ? jsonl(cacheFile) : [],
+    REVIEWER.actorId,
+  );
+  const fresh = join(workDir, 'verdicts.fresh.jsonl');
+  writeFileSync(fresh, '');
+  if (todo.length > 0) {
+    const todoPackets = join(workDir, 'packets.todo.jsonl');
+    writeFileSync(todoPackets, todo.map((packet) => `${JSON.stringify(packet)}\n`).join(''));
+    step('claim review (Sol)', `${S}/session-claim-review-codex.ts`, [
+      `--packets-file=${todoPackets}`,
+      `--out=${fresh}`,
+      `--work-dir=${join(workDir, 'codex')}`,
+    ]);
+  }
+  const freshVerdicts = existsSync(fresh) ? jsonl(fresh) : [];
+  if (freshVerdicts.length > 0) {
+    appendFileSync(cacheFile, freshVerdicts.map((v) => `${JSON.stringify(v)}\n`).join(''));
+  }
+  writeFileSync(
+    verdicts,
+    [...cached, ...freshVerdicts].map((verdict) => `${JSON.stringify(verdict)}\n`).join(''),
+  );
+  console.log(`claim verdicts: ${cached.length} reused, ${freshVerdicts.length} new`);
+  log.claimVerdictsReused = cached.length;
   const verdictPacketIds = existsSync(verdicts)
     ? jsonl(verdicts).map((verdict) => String(verdict.packetId))
     : [];

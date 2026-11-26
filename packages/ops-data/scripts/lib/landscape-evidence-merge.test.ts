@@ -4,6 +4,7 @@ import {
   applyProseCorrections,
   evidenceDocumentKey,
   mergeEvidenceCitations,
+  parseStagedLocation,
 } from './landscape-evidence-merge.ts';
 
 const existing = [
@@ -80,4 +81,33 @@ test('a prose correction applies once and is refused when its anchor is missing 
     refused.refused.map((r) => r.split(':')[0]),
     ['ambiguous', 'not found'],
   );
+});
+
+test('a sourced city location parses and keeps its source', () => {
+  const result = parseStagedLocation({
+    lat: 47.6062,
+    lng: -122.3321,
+    precision: 'city',
+    city: 'Seattle',
+    state: 'WA',
+    sourceUrl: 'https://blackpast.org/african-american-history/bennett-chris-h-1943/',
+  });
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.ok && result.location, {
+    lat: 47.6062,
+    lng: -122.3321,
+    precision: 'city',
+    sourceUrl: 'https://blackpast.org/african-american-history/bennett-chris-h-1943/',
+    city: 'Seattle',
+    state: 'WA',
+  });
+});
+
+test('a location is refused for an uncontrolled precision, a bad point or no https source', () => {
+  const base = { lat: 47.6, lng: -122.3, precision: 'city', sourceUrl: 'https://example.org/x' };
+  assert.equal(parseStagedLocation({ ...base, precision: 'street' }).ok, false);
+  assert.equal(parseStagedLocation({ ...base, lat: 91 }).ok, false);
+  assert.equal(parseStagedLocation({ ...base, lng: '-122.3' }).ok, false);
+  assert.equal(parseStagedLocation({ ...base, sourceUrl: 'http://example.org/x' }).ok, false);
+  assert.equal(parseStagedLocation(null).ok, false);
 });
