@@ -298,3 +298,24 @@ My own challenges, and what survived:
   subscription work only.
 
 Verdict: accepted with controls for the one-row path (proven 2026-11-25); needs validation at batch scale until the pilot runs, after the fixes listed under the proof.
+
+## Throughput changes after the pilot's first pass (2026-11-25)
+
+The pilot took about two hours to put 7 records live. Most of the wait was Codex running one call
+after another, correction loops after Sol's text review, and waves of 10.
+
+- **Codex runs in parallel.** Claim review, text review and source assessment now run
+  `--concurrency` calls at once (default 4) through `lib/codex-exec.ts` and the existing
+  `operator-cli/src/map-pool.ts`. Output keeps input order.
+- **Check before review.** `research-batch.ts` runs `lib/pre-review-text-check.ts` before capture.
+  Measured against all live records, only a lowercase display name was reliable enough to hold a
+  record (3 of 4,412 live records hit it, all genuine). A month with no year, an em dash and
+  present-tense time words flagged hundreds of correct live records, so those only print warnings.
+  The month rule also went into the drafting prompt, which is where it actually prevents a bounce.
+- **Bigger waves.** `research-batch.ts --max` defaults to 50, so one run, one Sol pass and one
+  catalog republish cover a wave.
+- **Keep stages moving.** Start drafting a batch as soon as its sweep is done and send each drafted
+  batch to `research-batch.ts` as it lands, instead of waiting for every batch at each stage.
+
+What these do not change: rows held for thin evidence, living status or no citable source. That
+share is set by the backlog, not the pipeline.
