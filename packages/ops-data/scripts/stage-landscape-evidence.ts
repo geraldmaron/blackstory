@@ -17,7 +17,9 @@
  * A record may also carry `location: { lat, lng, precision, city?, state?, sourceUrl, quote? }`
  * for a candidate that has no point yet (new records cannot publish without one). It sets
  * `lat`/`lng`, `provenance.sourceCity`/`sourceState` and `payload.geocode`, and is refused when
- * the row already has a point: moving a pin is a correction, not staging.
+ * the row already has a point (moving a pin is a correction, not staging) or when the release
+ * builder's earned-precision rule would refuse it (a case, law or movement pinned to a city with no
+ * place claim).
  *
  * The script touches `summary`, `payload.historicalContext` and `payload.evidenceCitations`,
  * stamps the provenance with who appended what and when, and leaves `status` alone: the
@@ -34,6 +36,7 @@
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
+import { evaluateEarnedPrecision } from '@repo/domain';
 import {
   applyProseCorrections,
   mergeEvidenceCitations,
@@ -72,7 +75,18 @@ type CandidateRow = {
   readonly historical_context: string | null;
   readonly citations: unknown;
   readonly lat: number | null;
+  readonly kind: string;
+  readonly claim_predicates: string[] | null;
 };
+
+function locationEarned(row: CandidateRow, location: StagedLocation) {
+  return evaluateEarnedPrecision({
+    kind: row.kind,
+    precision: location.precision,
+    matchMethod: location.matchMethod ?? 'manual_research',
+    claims: (row.claim_predicates ?? []).filter(Boolean).map((predicate) => ({ predicate })),
+  });
+}
 
 async function main(): Promise<void> {
   const file = readArg('--file=');
@@ -98,7 +112,10 @@ async function main(): Promise<void> {
     for (const record of records) {
       const row = await client.query<CandidateRow>(
         `SELECT id, lane, status, summary, payload->>'historicalContext' AS historical_context,
-                payload->'evidenceCitations' AS citations, lat
+                payload->'evidenceCitations' AS citations, lat, kind,
+                (SELECT array_agg(c->>'predicate') FROM jsonb_array_elements(
+                   CASE WHEN jsonb_typeof(payload->'summaryClaims') = 'array'
+                        THEN payload->'summaryClaims' ELSE '[]'::jsonb END) c) AS claim_predicates
            FROM research.landscape_candidates
           WHERE id = $1 AND ($2::text IS NULL OR lane = $2)`,
         [record.id, lane ?? null],
@@ -139,7 +156,11 @@ async function main(): Promise<void> {
         if (!parsed.ok) console.log(`      refused location (${parsed.reason})`);
         else if (found.lat !== null)
           console.log('      refused location (row already has a point)');
-        else {
+        else if (!locationEarned(found, parsed.location).ok) {
+          // The release builder's own rule, so a point it would refuse is never staged.
+          const earned = locationEarned(found, parsed.location);
+          console.log(`      refused location (${earned.ok ? '' : earned.message})`);
+        } else {
           location = parsed.location;
           console.log(`      location: ${location.precision} ${location.lat},${location.lng}`);
         }
@@ -165,7 +186,7 @@ async function main(): Promise<void> {
             APPENDED_BY,
             JSON.stringify({
               precision: location.precision,
-              matchMethod: location.matchMethod ?? 'researched',
+              matchMethod: location.matchMethod ?? 'manual_research',
               source: location.sourceUrl,
               ...(location.quote === undefined ? {} : { quote: location.quote }),
             }),
