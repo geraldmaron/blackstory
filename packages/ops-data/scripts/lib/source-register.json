@@ -939,6 +939,27 @@
       "verifiedAt": "2026-11-26T03:20:57.695Z"
     },
     {
+      "host": "morgan.edu",
+      "sourceClass": "reputable_secondary",
+      "orgType": "university",
+      "label": "Morgan State University",
+      "basis": {
+        "wikidata": "Q1054905",
+        "officialWebsite": "https://www.morgan.edu/",
+        "authorityIds": {
+          "lcnaf": "n85066664",
+          "viaf": "144024490",
+          "isni": "0000000122244258",
+          "ror": "017d8gk22",
+          "grid": "grid.260238.d"
+        },
+        "instanceOf": ["Q1620945", "Q23002039", "Q3918"]
+      },
+      "reviewedBy": "Burn-down pilot session (Claude, 2026-11-25), Wikidata basis",
+      "reviewedAt": "2026-11-26T04:39:15.409Z",
+      "verifiedAt": "2026-11-26T04:39:00.767Z"
+    },
+    {
       "host": "nbcnews.com",
       "sourceClass": "news_reportage",
       "orgType": "news_publisher",
